@@ -21,4 +21,4 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 - [x] PROMPT-017 — اعلام توافق شخصی جدا از مسیر رسمی <!-- work-commit:bd3099cc21e6ab33a41bf76948ff439a17bcb284 -->
 - [x] PROMPT-018 — تکمیل پنل‌ها، تنظیمات و مسیرهای ادامه <!-- work-commit:b81dd806d19802985f3bedc0219ea448373e1be7 -->
 - [x] PROMPT-019 — بررسی یکپارچه فلو، امنیت و کیفیت بصری <!-- work-commit:4f31d8a4aa208d1013764c70ea6227bbfd33243c -->
-- [ ] PROMPT-020 — اجرای نهایی، مستندات و آمادگی تحویل
+- [x] PROMPT-020 — اجرای نهایی، مستندات و آمادگی تحویل <!-- work-commit:d6df60c17416f00c297fb09c5c316eed10d2b9d0 -->
