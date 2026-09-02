@@ -1,0 +1,123 @@
+{
+  "promptId": "PROMPT-002",
+  "status": "COMPLETE",
+  "summary": "زیرساخت اجراشدنی همزیست ساخته شد: Next.js 15 + TypeScript strict روی PostgreSQL 16 با migration واقعی، قراردادهای Typed شناسه/خطا/صفحه‌بندی/پول/تقویم/Resume، تنظیمات نسخه‌دار دیتابیسی با مجوز به تفکیک گروه و Audit before/after، اعلان با تحویل idempotent، فایل خصوصی با دانلود مجوزدار، و آداپتورهای بیرونی با وضعیت صادقانه که در production اجرا نمی‌شوند. seed فقط پیکربندی مصوب را وارد می‌کند (مهلت مراجعه ۲۱ روز، عضویت ۳۰۰٬۰۰۰ تومان، ۱۴ روز/شش ماه تقویمی به‌عنوان سیاست مستند) و ۱۱ کلید بدون داده واقعی را NOT_CONFIGURED نگه می‌دارد.",
+  "changedFiles": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "next.config.ts",
+    "postcss.config.mjs",
+    "drizzle.config.ts",
+    "docker-compose.yml",
+    ".env.example",
+    ".gitignore",
+    "app/layout.tsx",
+    "app/page.tsx",
+    "app/globals.css",
+    "app/api/health/route.ts",
+    "app/api/files/[id]/route.ts",
+    "src/config/env.ts",
+    "src/domain/ids.ts",
+    "src/domain/errors.ts",
+    "src/domain/money.ts",
+    "src/domain/calendar.ts",
+    "src/domain/pagination.ts",
+    "src/domain/resume-context.ts",
+    "src/authz/actor.ts",
+    "src/authz/policy.ts",
+    "src/authz/session.ts",
+    "src/db/client.ts",
+    "src/db/migrate.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/core.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0000_foundation.sql",
+    "src/db/seed/index.ts",
+    "src/db/seed/dev-fixtures.ts",
+    "src/db/seed/run.ts",
+    "src/settings/keys.ts",
+    "src/settings/service.ts",
+    "src/audit/service.ts",
+    "src/notifications/service.ts",
+    "src/files/signature.ts",
+    "src/files/storage.ts",
+    "src/adapters/registry.ts",
+    "src/health/service.ts",
+    "tests/helpers/db.ts",
+    "tests/domain/money.test.ts",
+    "tests/domain/calendar.test.ts",
+    "tests/domain/contracts.test.ts",
+    "tests/config/env.test.ts",
+    "tests/db/migrations.test.ts",
+    "tests/db/settings.test.ts",
+    "tests/db/files.test.ts",
+    "tests/db/notifications.test.ts",
+    "tests/db/health.test.ts",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-002.json"
+  ],
+  "decisions": [
+    "DEC-0010",
+    "DEC-0011",
+    "DEC-0012",
+    "DEC-0013",
+    "DEC-0014",
+    "DEC-0015",
+    "DEC-0016",
+    "DEC-0017",
+    "DEC-0018"
+  ],
+  "checks": [
+    {
+      "id": "foundation-integration",
+      "command": "docker compose up -d  &&  node src/db/migrate.ts  &&  node src/db/seed/run.ts  &&  node src/db/migrate.ts  &&  node src/db/seed/run.ts  &&  npm run build  &&  npx next start -p 3111  &&  curl -s -w '%{http_code}' http://127.0.0.1:3111/api/health  &&  curl -s -w '%{http_code}' http://127.0.0.1:3111/api/files/11111111-1111-1111-1111-111111111111  &&  node --test \"tests/**/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "PostgreSQL 16.15 در کانتینر hamzist-db (healthy). migration اول: «Migrations applied» و ۹ جدول در psql \\dt. seed اول: «settings inserted: 22, preserved: 0, breeds inserted: 10, approved issuers: 0». اجرای دوباره هر دو: migration بدون replay و seed «settings inserted: 0, preserved: 22, breeds inserted: 0». psql تأیید کرد referral.validity_days=21، fee.membership_toman=\"300000\"، cooldown.female_months=6 و fee.pedigree_toman خالی (NULL، نه 0). build: «Compiled successfully in 9.0s» با ۴ مسیر. سرور واقعی: GET /api/health → HTTP 200 با status=degraded، database.reachable=true، migrationsApplied=1، settings.total=22 و ۱۱ کلید notConfigured، و هر پنج آداپتور با وضعیت واقعی. GET /api/files/<uuid> بدون Session → HTTP 401 {\"error\":{\"code\":\"UNAUTHENTICATED\"}}. صفحه ریشه با <html lang=\"fa\" dir=\"rtl\"> رندر شد و کلیدهای «تعیین‌نشده» را نشان داد. تست‌ها: ۶۲ pass، ۰ fail، ۰ skipped."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess روی app/، src/ و tests/."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test \"tests/**/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 62 · pass 62 · fail 0 · skipped 0 · duration_ms 5603.7. پوشش: تبدیل تومان/ریال و ردِ گرد کردن، «تعرفه واردنشده هرگز صفر نیست»، شش ماه تقویمی با clamp پایان ماه و کبیسه و تفاوت آن با ۱۸۰ روز، نبود سابقه CONFIRMED بدون تاریخ ساختگی، migration روی دیتابیس ایزوله و اجرای دوباره بدون replay با حفظ داده، مجوز تنظیمات به تفکیک گروه، عدم امکان نوشتن BREEDING_POLICY توسط هیچ Context، نسخه‌بندی و Audit before/after، ردِ نسخه کهنه، حفظ مقدار تغییرکرده هنگام seed مجدد، Role Switcher بدون Shell عملیاتی، امضای بایت فایل و سقف ۱۰ مگابایت، ردِ دسترسی غیرمجاز (شامل سوپرادمین) به فایل هویتی، امنیت مسیر ذخیره، idempotency تحویل اعلان زیر فراخوانی هم‌زمان، و Redaction کلیدهای حساس."
+    },
+    {
+      "id": "package-tests",
+      "command": "node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "tests 23 · pass 23 · fail 0. اجرا پس از تغییرات این مرحله تکرار شد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. هش Requirements.md دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "هیچ ارائه‌دهنده واقعی پیکربندی نشده است: sms-otp، payment-gateway، map-provider و document-render همگی NOT_CONFIGURED گزارش می‌شوند. private-storage فقط LOCAL_TEST است و برای تولید به فضای ذخیره‌سازی خصوصی مدیریت‌شده نیاز دارد.",
+    "۱۱ کلید تنظیمات داده واقعی ندارند و NOT_CONFIGURED مانده‌اند: پنج تعرفه (برگه ثبتی، شجره‌نامه، مجوز جفت‌گیری، ثبت کنل، Puppy Card) و شش قلم مرکز ژنتیک (نام، تماس، نشانی، شماره حساب، شماره کارت، هزینه آزمایش). هیچ عدد یا شماره حساب نمونه‌ای درج نشده است.",
+    "فهرست صادرکنندگان موردتأیید انجمن عمداً خالی است (D14)؛ جدول و مسیر بررسی ساخته شده ولی هیچ نام صادرکننده‌ای اختراع نشده.",
+    "مقادیر OTP (TTL ۱۲۰ ثانیه، ارسال مجدد ۶۰ ثانیه، سقف تلاش ۵، قفل ۱۵ دقیقه) پیش‌فرض فنی با برچسب TECHNICAL_DEFAULT هستند، نه سیاست تأییدشده مالک محصول (DEC-0006/DEC-0016).",
+    "احراز هویت هنوز وجود ندارد: currentActor() مقدار null برمی‌گرداند و مسیر فایل خصوصی برای هر درخواست ۴۰۱ می‌دهد. هویت، OTP، KYC و پروفایل در PROMPT-004 ساخته می‌شوند و جدول account فعلاً حداقلی است (DEC-0018).",
+    "هیچ تطبیق بصری با پروتوتایپ انجام نشده است؛ پوسته فعلی فقط RTL حداقلی است و فونت IRANSansX هنوز تأمین نشده (DEC-0007). لایه کامل توکن و کامپوننت در PROMPT-003 ساخته می‌شود.",
+    "اجرای تست‌های دیتابیس به بالا بودن سرویس docker وابسته است؛ در نبود آن تست‌ها با خطای صریح شکست می‌خورند و هرگز به‌عنوان PASS گزارش نمی‌شوند (DEC-0017).",
+    "بررسی مرورگر و RTL واقعی (Gate rtl-browser-review) در این مرحله اجرا نشده و متعلق به PROMPT-003 است."
+  ],
+  "readiness": {
+    "code": "FOUNDATION_ONLY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

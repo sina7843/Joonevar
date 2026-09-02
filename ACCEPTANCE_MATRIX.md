@@ -31,9 +31,9 @@
 | A-025 | خطا، Retry و اعلان‌ها به همان Draft/Request برمی‌گردند. | PROMPT-004, PROMPT-005, PROMPT-007, PROMPT-018, PROMPT-019 | NOT_STARTED |
 | A-026 | موارد باز به‌جای نتیجه ساختگی، با وضعیت مشخص باقی می‌مانند. | PROMPT-001, PROMPT-019, PROMPT-020, PROMPT-019 | DISCOVERY — [integration-readiness.md](docs/discovery/integration-readiness.md) §۳ (موارد نامعلوم «تعیین‌نشده» می‌مانند) |
 | A-027 | بررسی شجره‌نامه خارجی با انجمن و فهرست صادرکنندگان موردتأیید آن انجام می‌شود؛ SLA ثابت وعده داده نمی‌شود. | PROMPT-006, PROMPT-018, PROMPT-019 | NOT_STARTED |
-| A-028 | مهلت اولیه Referral برابر ۲۱ روز و مقدار آن از دیتابیس و قابل تنظیم از پنل مدیریت است. | PROMPT-002, PROMPT-007, PROMPT-018, PROMPT-019 | NOT_STARTED |
+| A-028 | مهلت اولیه Referral برابر ۲۱ روز و مقدار آن از دیتابیس و قابل تنظیم از پنل مدیریت است. | PROMPT-002, PROMPT-007, PROMPT-018, PROMPT-019 | PARTIAL(PROMPT-002) — مقدار ۲۱ روز در `product_setting` و از پنل قابل تغییر؛ صدور و اعتبارسنجی کد در PROMPT-007 |
 | A-029 | کد منقضی امکان درخواست مجدد با ارزیابی صلاحیت و حفظ سابقه دارد. | PROMPT-007, PROMPT-019 | NOT_STARTED |
-| A-030 | تعرفه‌ها و پارامترهای مدیریتی هاردکد نیستند و تغییر آن‌ها تاریخچه دارد. | PROMPT-002, PROMPT-005, PROMPT-018, PROMPT-019 | NOT_STARTED |
+| A-030 | تعرفه‌ها و پارامترهای مدیریتی هاردکد نیستند و تغییر آن‌ها تاریخچه دارد. | PROMPT-002, PROMPT-005, PROMPT-018, PROMPT-019 | PARTIAL(PROMPT-002) — تعرفه‌ها در DB با نسخه و Audit؛ مقدار نامعلوم NOT_CONFIGURED می‌ماند |
 | A-031 | ارسال پستی فقط درخواست را ثبت می‌کند و ثبت درخواست به معنی ارسال واقعی معرفی نمی‌شود. | PROMPT-011, PROMPT-019 | NOT_STARTED |
 | A-032 | اصلاح تعداد توله برای کاربر مجاز ممکن است؛ مرگ بعدی، نسخه تولد و پروفایل تاریخی را حذف نمی‌کند. | PROMPT-015, PROMPT-016, PROMPT-019 | NOT_STARTED |
 | A-033 | اعتراض Parentage داخل همزیست به همان مرکز ارجاع و با حفظ نتیجه قبلی پیگیری می‌شود. | PROMPT-011, PROMPT-018, PROMPT-019 | NOT_STARTED |

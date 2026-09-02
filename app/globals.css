@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+/*
+ * Foundation tokens only.
+ *
+ * The published Design System file contains just the brand layer, so only the
+ * values it actually defines are treated as confirmed here (DEC-0008). The full
+ * semantic token set and the component layer are built in PROMPT-003.
+ *
+ * Typography uses a system Persian stack as a clearly-marked temporary fallback
+ * until IRANSansX is supplied with a licence (DEC-0007).
+ */
+@theme {
+  --color-brand: #e46a1d;
+  --color-cream: #fff1d6;
+  --color-ink: #171a17;
+  --color-olive-900: #3a3b36;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  --font-fa: 'Vazirmatn', 'IRANSansX', 'Segoe UI', Tahoma, system-ui, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  font-family: var(--font-fa);
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+
+/* Identifiers and numbers stay readable inside Persian RTL text (§24.3). */
+.ltr-isolate {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
