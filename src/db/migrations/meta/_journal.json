@@ -71,6 +71,13 @@
       "when": 1788347905816,
       "tag": "0009_kennels",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788349801558,
+      "tag": "0010_mating",
+      "breakpoints": true
     }
   ]
 }

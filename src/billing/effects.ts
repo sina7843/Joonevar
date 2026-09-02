@@ -14,6 +14,7 @@ import {
   markBatchPaid as markPedigreeBatchPaid,
 } from '../documents/pedigree.ts';
 import { markKennelPaid } from '../kennels/service.ts';
+import { markPermitPaid } from '../mating/permits.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -38,10 +39,14 @@ export const paidEffects: PaidEffects = {
       case 'KENNEL_REGISTRATION':
         await markKennelPaid(tx, batch);
         return;
-      // Permits and puppy cards attach their own effects in
-      // PROMPT-013 to PROMPT-016. Until then a verified payment for them
-      // records the money and issues nothing, which is the truthful outcome
-      // rather than a fabricated document.
+      // Paying does not issue a permit either: it only opens the final submit,
+      // and the association's operational review still decides (§16 steps 7–9).
+      case 'MATING_PERMIT':
+        await markPermitPaid(tx, batch);
+        return;
+      // Puppy cards attach their own effect in a later prompt. Until then a
+      // verified payment for them records the money and issues nothing, which
+      // is the truthful outcome rather than a fabricated document.
       default:
         return;
     }

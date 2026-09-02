@@ -7,10 +7,11 @@
  * guessed. That is truthful: with no animals registered there really is no
  * animal with a registration sheet.
  */
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, or, sql } from 'drizzle-orm';
 import type { DbClient } from '../../db/client.ts';
 import { accountRoles } from '../../db/schema/core.ts';
 import { memberships } from '../../db/schema/billing.ts';
+import { matingPermits } from '../../db/schema/mating.ts';
 import { findCase } from '../../identity/kyc.ts';
 import { countRegisteredAnimals } from '../../animals/service.ts';
 import { countSheetsOfOwner } from '../../documents/registration-sheet.ts';
@@ -26,6 +27,23 @@ import {
   type VetWorkEligibility,
 } from './rules.ts';
 
+/** Issued official permits this account is a party to — §19.4. */
+async function countIssuedPermits(database: DbClient, accountId: string): Promise<number> {
+  const rows = await database
+    .select({ id: matingPermits.id })
+    .from(matingPermits)
+    .where(
+      and(
+        eq(matingPermits.status, 'ISSUED'),
+        or(
+          eq(matingPermits.initiatorAccountId, accountId),
+          eq(matingPermits.counterpartyAccountId, accountId),
+        ),
+      ),
+    );
+  return rows.length;
+}
+
 export async function loadFacts(database: DbClient, accountId: string): Promise<EligibilityFacts> {
   const kyc = await findCase(database, accountId);
   const [membership] = await database
@@ -39,11 +57,11 @@ export async function loadFacts(database: DbClient, accountId: string): Promise<
     // Membership lives on the account, so it is the same in every context (§7).
     membershipActive: membership?.status === 'ACTIVE',
     registeredAnimals: await countRegisteredAnimals(database, accountId),
-    // Sheets, pedigrees, permits and allocations arrive in PROMPT-009 and later;
-    // until then the honest count is zero.
+    // Puppy allocation arrives in a later prompt; until then the honest count
+    // is zero rather than a guess.
     animalsWithRegistrationSheet: await countSheetsOfOwner(database, accountId),
     animalsWithPedigree: await countPedigreesOfOwner(database, accountId),
-    issuedMatingPermits: 0,
+    issuedMatingPermits: await countIssuedPermits(database, accountId),
     puppiesWithFinalAllocation: 0,
   };
 }

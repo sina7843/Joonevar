@@ -1,0 +1,106 @@
+{
+  "promptId": "PROMPT-013",
+  "status": "COMPLETE",
+  "summary": "مسیر رسمی مجوز جفت‌گیری §۱۶ با موجودیت، شناسه (MP-…)، وضعیت و Route کاملاً جدا از «اعلام توافق شخصی» ساخته شد و هیچ مسیری از پرداخت یا Submit این پرونده به Declaration بدون پرداخت وجود ندارد. پیش‌نیاز همان چیزی است که سند می‌گوید: عضویت فعال و حیوان شجره‌دار خودِ کاربر؛ طرف مقابل از کد شجره‌نامه Resolve می‌شود و حساب او همیشه از مالک واقعی همان حیوان خوانده می‌شود، نه از داده‌ای که فرم می‌فرستد. دعوت با اعلان و Resume به همان پرونده می‌رود و تأیید یا رد فقط از حساب طرف مقابل پذیرفته می‌شود؛ آغازکننده نمی‌تواند به‌جای او تأیید کند و شخص سومی حتی پرونده را نمی‌بیند. توافق تقسیم ثابت، درصدی یا ترکیبی پیش از تولد ثبت می‌شود و فقط ساختارش اعتبارسنجی می‌شود؛ هیچ تعداد توله‌ای فرض نمی‌شود و هر صفحه‌ای که قاعده را نشان می‌دهد صریحاً می‌گوید این توافق مالکیت هیچ توله مشخصی را نهایی نمی‌کند. پس از مرور طرفین، حیوان‌ها و توافق، هزینه مجوز از تعرفه دیتابیسی و پیش از Submit نهایی پرداخت می‌شود؛ پرداخت تأییدشده فقط مرحله ارسال را باز می‌کند و هیچ شماره مجوزی نمی‌سازد. صدور فقط در بررسی عملیاتی انجمن و دقیقاً یک بار انجام می‌شود، پرونده رسمی را در سوابق هر دو حیوان ثبت می‌کند و شرط Puppy Card را برای هر دو طرف باز می‌کند. بارداری، زایمان، تأیید دامپزشک و امضا هیچ‌کدام شرط صدور نیستند و هیچ Gate امضای دیجیتالی در مسیر وجود ندارد. اتصال Cooldown به تنظیمات انجام شد، اما بدون تاریخ جفت‌گیری تأییدشده دوطرفه هیچ تاریخ مبنایی ساخته نمی‌شود و هیچ هشداری تولید نمی‌گردد.",
+  "changedFiles": [
+    "src/db/schema/mating.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0010_mating.sql",
+    "src/db/migrations/meta/0010_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/domain/allocation.ts",
+    "src/mating/permits.ts",
+    "src/billing/effects.ts",
+    "src/domain/eligibility/service.ts",
+    "app/mating/page.tsx",
+    "app/mating/actions.ts",
+    "app/mating/forms.tsx",
+    "app/mating/permits/page.tsx",
+    "app/mating/permits/new/page.tsx",
+    "app/mating/permits/[id]/page.tsx",
+    "app/mating/permits/[id]/return/page.tsx",
+    "app/assoc/permits/page.tsx",
+    "app/assoc/permits/[id]/page.tsx",
+    "app/assoc/permits/actions.ts",
+    "app/assoc/permits/review-form.tsx",
+    "tests/db/permit.test.ts",
+    "tests/browser/permit.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-013/permit-resolve.png",
+    "docs/reports/screenshots/prompt-013/permit-awaiting.png",
+    "docs/reports/screenshots/prompt-013/permit-confirmed.png",
+    "docs/reports/screenshots/prompt-013/permit-stranger.png",
+    "docs/reports/screenshots/prompt-013/permit-fee-not-configured.png",
+    "docs/reports/screenshots/prompt-013/permit-review.png",
+    "docs/reports/screenshots/prompt-013/permit-paid.png",
+    "docs/reports/screenshots/prompt-013/permit-assoc-review.png",
+    "docs/reports/screenshots/prompt-013/permit-issued-assoc.png",
+    "docs/reports/screenshots/prompt-013/permit-issued-owner.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-013.json"
+  ],
+  "decisions": ["DEC-0085", "DEC-0086", "DEC-0087", "DEC-0088", "DEC-0089"],
+  "checks": [
+    {
+      "id": "permit-workflow",
+      "command": "node --test \"tests/db/permit.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 7 · pass 7 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد و با دو مالک متفاوت که هرکدام حیوان شجره‌دار واقعی دارند (مسیر کامل ثبت حیوان → میکروچیپ → نمونه → برگه ثبتی → فیش و مرکز ژنتیک → Parentage Result → پرداخت صدور → شجره‌نامه). پوشش واقعی: بدون عضویت و شجره‌نامه، خدمت قفل است؛ کد نامعتبر هیچ‌چیز Resolve نمی‌کند؛ دو حیوان هم‌جنس رد می‌شوند؛ حساب طرف مقابل برابر مالک واقعی حیوان Resolve‌شده ثبت می‌شود و اعلان دعوت دقیقاً به همان حساب و با Resume به همان پرونده می‌رسد؛ پرونده باز دوم برای همان جفت رد می‌شود؛ آغازکننده و شخص سوم نمی‌توانند تأیید کنند و شخص سوم اصلاً پرونده را نمی‌بیند؛ ثبت توافق پیش از تأیید طرف مقابل رد می‌شود و پرداخت پیش از ثبت توافق هم رد می‌شود؛ سهم هر طرف به مالک واقعی همان حیوان گره می‌خورد؛ ارسال پیش از پرداخت رد می‌شود؛ پرداخت تأییدشده فقط وضعیت «آماده ارسال» می‌سازد و permitNo و issuedAt خالی می‌مانند؛ قلم پرداخت با targetType=MATING_CASE و کلید fee.mating_permit_toman و همان مبلغ تعرفه ثبت می‌شود؛ بررسی توسط مالک رد می‌شود؛ صدور یک بار شماره MP-XXXXXXXX می‌سازد و تصمیم دوباره رد می‌شود؛ رویداد صدور در سوابق هر دو حیوان و اعلان برای هر دو طرف ثبت می‌شود و شرط «مجوز» در Puppy Card برای هر دو باز می‌شود؛ چرخه «نیازمند اصلاح» پرداخت تأییدشده را نگه می‌دارد و ارسال دوباره پرداخت جدید نمی‌خواهد؛ رد دعوت بدون دلیل رد می‌شود و پس از رد، پرداخت باز نمی‌شود؛ اعتبارسنجی قاعده تقسیم (درصد ناسازگار، عدد غیرصحیح، حالت ترکیبی ناقص) بررسی می‌شود؛ Cooldown بدون تاریخ تأییدشده هیچ هشداری نمی‌سازد."
+    },
+    {
+      "id": "permit-browser",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node --test --test-concurrency=1 \"tests/browser/permit.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 2 · pass 2 · fail 0 روی Chromium واقعی، با دو مالک جداگانه که هرکدام از صفر تا شجره‌نامه صادرشده از همان صفحه‌های واقعی عبور می‌کنند. پوشش واقعی: داشبورد هر دو ورودی `/mating/permits/new` و `/declaration/new` را جدا نشان می‌دهد؛ کد اشتباه پیام «پیدا نشد» می‌گیرد و هیچ دکمه دعوتی ظاهر نمی‌شود؛ کد درست حیوان و نام کوتاه‌شده مالک را نشان می‌دهد و تنها بعد از آن دعوت ممکن است؛ آغازکننده فرم تأیید را نمی‌بیند؛ طرف مقابل اعلان دعوت را در `/notifications` می‌بیند، وارد همان پرونده می‌شود و تأیید می‌کند و وضعیت به «در انتظار پرداخت» می‌رسد؛ کاربر سوم روی همان نشانی «پیدا نشد» می‌گیرد؛ تا وارد نشدن تعرفه، پیام «تعرفه مجوز جفت‌گیری هنوز ثبت نشده است» نمایش داده می‌شود و دکمه پرداخت وجود ندارد؛ درصدهای ۶۰/۶۰ با پیام «مجموع درصد سهم دو طرف باید ۱۰۰ باشد» رد می‌شود؛ توافق ترکیبی ثبت و در مرور دیده می‌شود و جمله «مالکیت هیچ توله مشخصی را نهایی نمی‌کند» و جمله صریح نبودن هشدار Cooldown روی صفحه است؛ پیش از پرداخت دکمه ارسال وجود ندارد؛ مبلغ ۳۰۰٬۰۰۰ تومان نمایش داده می‌شود، پرداخت از درگاه توسعه با تأیید سرور انجام می‌شود و پس از بازگشت وضعیت «آماده ارسال» است و هیچ شماره مجوزی نمایش داده نمی‌شود؛ پس از ارسال، همان پرونده در صف انجمن است و صفحه تصمیم می‌گوید پرداخت روی سرور تأیید شده و تأیید طرف مقابل ثبت شده است و هیچ فیلد بارداری/زایمان/امضا در آن وجود ندارد (تعداد گزینه‌های تصمیم دقیقاً ۳ است)؛ پس از صدور، هر دو طرف در همان پرونده وضعیت «مجوز صادر شد»، شماره MP-… و متن پرونده رسمی جفت‌گیری را می‌بینند. ۱۰ اسکرین‌شات در docs/reports/screenshots/prompt-013/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 263 · pass 263 · fail 0 · skipped 0 (۷ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 64 · pass 64 · fail 0 در اجرای کامل. در اجرای اول همان روز، یک مورد قدیمی `pedigree.test.ts` به‌دلیل باقی‌ماندن ردیف‌های اجراهای قبلی روی همان دیتابیس توسعه شکست خورد؛ همین ریسک در تست جدید با آدرس‌دهی مستقیم به شناسه فیش و شناسه پرونده مجوز (به‌جای «اولین ردیف صف») برطرف شد و اجرای کامل بعدی ۶۴/۶۴ سبز بود."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0010_mating` اعمال شد (جدول‌های mating_permit و permit_allocation_share با ایندکس یکتای شماره مجوز و ایندکس یکتای طرفِ توافق در هر پرونده) و اجرای دوباره replay نکرد. هر تست دیتابیس هم روی یک دیتابیس تازه همه migrationها را از صفر اجرا می‌کند."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تعرفه واقعی مجوز جفت‌گیری اعلام نشده است؛ در تست‌ها مقدار SYNTHETIC وارد می‌شود و تا ورود مقدار واقعی از پنل مدیریت، مسیر پرداخت بسته می‌ماند و هیچ مبلغی فرض نمی‌شود.",
+    "درگاه پرداخت واقعی همچنان پیکربندی نشده است؛ تأیید پرداخت با درگاه توسعه محلی و تأیید سمت سرور اجرا شد.",
+    "محاسبه و نمایش هشدار Cooldown در این مرحله فقط به‌صورت اتصال آماده وجود دارد؛ تاریخ مبنا از تاریخ‌های جفت‌گیری تأییدشده دوطرفه می‌آید که در PROMPT-014 ساخته می‌شود، و تا آن زمان هیچ هشداری تولید نمی‌شود (DEC-0089).",
+    "ادامه چرخه — تاریخ‌های جفت‌گیری، بارداری، زایمان، توله‌ها و تخصیص نهایی — به PROMPT-014 تا PROMPT-016 تعلق دارد؛ این مرحله فقط پرونده رسمی و قاعده پیش از تولد را می‌سازد.",
+    "نام مالک طرف مقابل در گام Resolve به شکل کوتاه‌شده نمایش داده می‌شود؛ اگر متن مصوب پروتوتایپ چیز دیگری بخواهد، تغییرش یک ویرایش کوچک است (DEC-0086).",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "OFFICIAL_MATING_PERMIT_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

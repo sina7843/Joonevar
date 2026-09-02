@@ -31,8 +31,8 @@
 | `/documents/[id]/postal-request` | CODE | — | s14 | D17 | A-031 |
 | `/breeder/activate` | PROTO | `240:6033` BRD-001..008 | s15 | — | — — پیاده‌شده در PROMPT-012؛ نقش با تأیید کنل فعال می‌شود |
 | `/kennels` و `/kennels/[id]` | PROTO | BRD-003B/C/D, BRD-008 | s15 | D16 | A-014 — پیاده‌شده در PROMPT-012؛ ورود از Context عمومی (DEC-0080) |
-| `/mating/permits/new` | PROTO | `242:6517` MAT-002..006, MAT-005B | s16, s22 | D12 | A-015 |
-| `/mating/permits/[id]` | PROTO | MAT-007..010, MAT-010B | s16 | D12, D13 | A-015, A-023 |
+| `/mating/permits/new` | PROTO | `242:6517` MAT-002..006, MAT-005B | s16, s22 | D12 | A-015 — پیاده‌شده در PROMPT-013؛ Resolve پیش از دعوت و نام مالک به‌صورت کوتاه‌شده (DEC-0086) |
+| `/mating/permits`، `/mating/permits/[id]` و `/mating/permits/[id]/return` | PROTO | MAT-007..010, MAT-010B | s16 | D12, D13 | A-015, A-023 — پیاده‌شده در PROMPT-013؛ ترتیب تأیید ← توافق ← پرداخت ← ارسال روی همان صفحه اجرا می‌شود |
 | `/mating/permits/[id]/dates` | PROTO | MAT-010B + §۱۷ | s17 | — | A-016, A-017 |
 | `/mating/permits/[id]/pregnancy` | PROTO | MAT-011, MAT-011B | s18 | D08, D12 | A-018, A-019, A-020 |
 | `/mating/permits/[id]/birth` | PROTO | `245:7069` MAT-012..016 | s19 | D18 | A-021, A-032 |
@@ -61,7 +61,7 @@
 | `/assoc` | صف‌های انجمن | s21 | D11 | A-003 |
 | `/assoc/members` | عضویت و شماره عضویت — **بدون Gate فعال‌سازی** | s07, s21 | D04 | A-002 |
 | `/assoc/kennels` و `/assoc/kennels/[id]` | بررسی کنل | s15 | — | A-014 — پیاده‌شده در PROMPT-012 |
-| `/assoc/permits` | بررسی و صدور مجوز | s16 | — | A-015 |
+| `/assoc/permits` و `/assoc/permits/[id]` | بررسی و صدور مجوز | s16 | — | A-015 — پیاده‌شده در PROMPT-013؛ صدور شماره مجوز فقط یک بار و فقط از همین صف |
 | `/assoc/foreign-pedigree` | بررسی مدرک خارجی | s09 | D14 | A-027 |
 | `/assoc/issuers` | فهرست صادرکنندگان موردتأیید (در شروع خالی) | s21 | D14, D16 | A-027 |
 | `/genetics` | داشبورد مرکز | s21 | D07 | — |
