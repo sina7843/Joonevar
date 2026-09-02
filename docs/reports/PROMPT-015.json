@@ -1,0 +1,100 @@
+{
+  "promptId": "PROMPT-015",
+  "status": "COMPLETE",
+  "summary": "اعلام رسمی بارداری و نتیجه زایمان فقط از پرونده‌ای با مجوز صادرشده شروع می‌شود و اعلام کاربر UNVERIFIED است: چرخه بدون هیچ دامپزشکی ادامه می‌یابد و این رکوردها مجوز را صادر، مسدود، معلق، باطل یا تغییر نمی‌دهند. تأیید دامپزشک اختیاری است و از همان مسیر §۱۱ می‌آید: Finder در Context Pregnancy، مرکز کامل با پروانه معتبر و درخواست تخصیص‌یافته؛ صف عمومی برای برداشتن پرونده وجود ندارد و ثبت نتیجه فقط از پنل همان دامپزشک و پس از پذیرش کد ممکن است، و انقضای کد مراجعه فقط همان کد را باطل می‌کند نه پرونده یا مجوز را. نتیجه دامپزشک رکورد مستقلی با نام، کد نظام، زمان و Location معاینه است؛ فیلد محل جفت‌گیری اضافه نشد و هیچ‌کدام از دو رکورد دیگری را بازنویسی یا حذف نمی‌کند و هر دو سمت اصلاح نسخه‌دار با حفظ سابقه دارند. اختلاف مقادیر فقط وضعیت نمایشی و اعلان خنثی است: هر دو مقدار با برچسب «مغایرت با اعلام مالک» دیده می‌شوند، اعلان با Resume همان پرونده را باز می‌کند و رویداد Audit شناسه و نسخه هر دو رکورد را دارد؛ برابری مقادیر اعلان مغایرت نمی‌سازد. در زایمان، تعداد زنده و مرده دو عدد صحیح مستقل و نامنفی‌اند: دقیقاً به تعداد زنده پرونده موقت با کد PUP-… ساخته می‌شود، برای مرده‌ی زمان تولد هیچ پرونده، کد موقت یا کارتی ساخته نمی‌شود و هر دو صفر یک Litter بدون پرونده می‌سازد؛ نام توله تا مرحله میکروچیپ اختیاری است. اصلاح تعداد با Actor، زمان، علت و نسخه ثبت می‌شود، وجود پرونده توله آن را قفل نمی‌کند و بررسی انجمن دوباره لازم ندارد: افزایش فقط پرونده‌های کم‌شده را می‌سازد و کاهش بدون مشخص‌کردن پرونده‌های مشمول رد می‌شود و آن پرونده‌ها حذف نمی‌شوند بلکه با علت ثبت‌شده باقی می‌مانند. مرگ پس از تولد از مرده‌بودن در زمان تولد جداست: پرونده، سابقه و گزارش اولیه حفظ می‌شود، فقط «زنده در حال حاضر» تغییر می‌کند و رویداد، توله مربوط و هر دو عدد را ثبت می‌کند.",
+  "changedFiles": [
+    "src/db/schema/breeding.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0012_breeding.sql",
+    "src/db/migrations/meta/0012_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/mating/pregnancy.ts",
+    "src/mating/birth.ts",
+    "app/mating/breeding-actions.ts",
+    "app/mating/breeding-forms.tsx",
+    "app/mating/permits/[id]/pregnancy/page.tsx",
+    "app/mating/permits/[id]/birth/page.tsx",
+    "app/mating/permits/[id]/page.tsx",
+    "app/vet/actions.ts",
+    "app/vet/requests/[id]/page.tsx",
+    "app/vet/requests/[id]/procedure.tsx",
+    "tests/helpers/mating.ts",
+    "tests/db/birth.test.ts",
+    "tests/browser/pregnancy.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-015/pregnancy-empty.png",
+    "docs/reports/screenshots/prompt-015/pregnancy-versions.png",
+    "docs/reports/screenshots/prompt-015/pregnancy-check-requested.png",
+    "docs/reports/screenshots/prompt-015/vet-pregnancy-result.png",
+    "docs/reports/screenshots/prompt-015/pregnancy-mismatch.png",
+    "docs/reports/screenshots/prompt-015/birth-recorded.png",
+    "docs/reports/screenshots/prompt-015/birth-corrected.png",
+    "docs/reports/screenshots/prompt-015/puppy-death.png",
+    "docs/reports/screenshots/prompt-015/birth-withdrawn.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-015.json"
+  ],
+  "decisions": ["DEC-0095", "DEC-0096", "DEC-0097", "DEC-0098", "DEC-0099"],
+  "checks": [
+    {
+      "id": "birth-history-integrity",
+      "command": "node --test \"tests/db/birth.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 7 · pass 7 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد، با دو مالک واقعی و مسیر کامل تا مجوز صادرشده. پوشش واقعی: پیش از صدور مجوز، اعلام بارداری رد می‌شود و همان پرونده پس از صدور باز می‌شود؛ اعلام اول نسخه ۱ است، اصلاح بدون علت رد می‌شود و نسخه ۱ با مقدار خودش باقی می‌ماند؛ تعداد تخمینی منفی رد می‌شود؛ شخص ثالث پرونده را نمی‌بیند؛ در طول همه این کارها وضعیت، نسخه و شماره مجوز تغییر نمی‌کند؛ ثبت نتیجه از حساب مالک رد می‌شود و فقط دامپزشک تخصیص‌یافته با پروانه معتبر ثبت می‌کند و نتیجه، کد نظام و Location معاینه را دارد؛ اختلاف مقادیر مغایرت می‌سازد، Audit شناسه هر دو رکورد را دارد و اعلان خنثی با Resume به همان پرونده می‌رسد، و اصلاح نتیجه دامپزشک مغایرت را برمی‌دارد؛ تعداد منفی، کسری و NaN رد می‌شوند و تاریخ آینده رد می‌شود؛ «۳ زنده و ۲ مرده» دقیقاً سه پرونده با کد PUP- و بدون نام می‌سازد؛ هر دو صفر و نیز «۰ زنده و ۳ مرده» Litter بدون پرونده می‌سازند؛ اصلاح بدون علت و با نسخه کهنه رد می‌شود، افزایش فقط یک پرونده تازه می‌سازد و پرونده‌های قبلی دست‌نخورده می‌مانند، کاهش بدون تعیین پرونده رد می‌شود و پرونده انتخاب‌شده با وضعیت WITHDRAWN و علت باقی می‌ماند و هر سه نسخه با اعداد خودشان خوانده می‌شوند؛ مرگ پس از تولد بدون علت و با تاریخ پیش از تولد رد می‌شود، پس از ثبت، گزارش اولیه ۳ می‌ماند و زنده فعلی ۲ می‌شود، Audit شناسه توله و هر دو عدد را دارد، ویرایش کهنه همان توله رد می‌شود، و اصلاح بعدی همچنان درباره گزارش اولیه است؛ ثبت نتیجه دامپزشک هیچ پرونده‌ای نمی‌سازد یا حذف نمی‌کند و هیچ نسخه تولدی اضافه نمی‌کند."
+    },
+    {
+      "id": "pregnancy-browser",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node --test --test-concurrency=1 \"tests/browser/pregnancy.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 3 · pass 3 · fail 0 روی Chromium واقعی با سه نشست جداگانه (دو مالک و دامپزشک) و مسیر کامل از ثبت حیوان تا مجوز صادرشده. پوشش واقعی: صفحه بارداری جمله «نبود تأیید دامپزشک نقص پرونده نیست» و جمله بی‌اثر بودن روی مجوز را نشان می‌دهد؛ اعلام ثبت می‌شود و وضعیت «UNVERIFIED — اعلام مالک» است؛ اصلاح نسخه ۲ می‌سازد و هر دو مقدار ۴ و ۵ در تاریخچه دیده می‌شوند؛ پس از آن وضعیت مجوز همچنان «مجوز صادر شد» است؛ مالک از Finder در Context Pregnancy درخواست می‌سازد، آن را به پرونده وصل می‌کند و صفحه می‌گوید انتظار نتیجه مهلت مسدودکننده نمی‌سازد؛ دامپزشک پس از پذیرش کد، نتیجه را از پنل خود ثبت می‌کند و پیام «اعلام مالک تغییر نمی‌کند» را می‌بیند؛ در صفحه مالک برچسب «مغایرت با اعلام مالک» با هر دو عدد ۵ و ۲، جمله «اختلاف حقوقی نیست»، و هویت دامپزشک شامل کد نظام و نام مرکز معاینه دیده می‌شود و اعلام مالک بازنویسی نشده است؛ در زایمان، تاریخ آینده و عدد منفی روی صفحه رد می‌شوند، «۲ زنده و ۱ مرده» دقیقاً دو ردیف توله می‌سازد، افزایش به ۳ فقط یک ردیف اضافه می‌کند و «گزارش اولیه ۲» تغییر نمی‌کند، ثبت مرگ یک توله وضعیت آن را «فوت‌شده پس از تولد» می‌کند در حالی که تعداد پرونده‌ها ۳ و زنده فعلی ۲ است و جمله تفاوت تعداد تاریخی و فعلی روی صفحه است، و کاهش به ۲ فهرست انتخاب پرونده را باز می‌کند و پرونده انتخاب‌شده «حذف‌شده با اصلاح گزارش اولیه» می‌شود بدون آنکه از فهرست حذف شود. ۹ اسکرین‌شات در docs/reports/screenshots/prompt-015/."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 285 · pass 285 · fail 0 · skipped 0 (۷ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 68 · pass 68 · fail 0 در اجرای کامل، شامل همه Gateهای مرحله‌های قبل."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0012_breeding` اعمال شد (شش جدول با enum وضعیت توله و نوع رویداد تولد، ایندکس یکتای نسخه در هر پرونده و ایندکس یکتای کد موقت توله) و اجرای دوباره replay نکرد. هر تست دیتابیس هم روی دیتابیس تازه همه migrationها را از صفر اجرا می‌کند."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تخصیص مالکیت توله‌ها (§۱۹.۳) و صدور Puppy Card (§۱۹.۴) در این مرحله ساخته نشد و به PROMPT-016 تعلق دارد؛ آنچه اینجا ساخته شد پرونده موقت توله و تاریخچه تعداد است.",
+    "ورودی تاریخ‌ها میلادی YYYY-MM-DD است و نمایش شمسی؛ انتخابگر تاریخ شمسی اختصاصی ساخته نشد.",
+    "نتیجه دامپزشک فقط شامل بارداری و تعداد تخمینی است؛ سند فیلد بالینی دیگری نام نبرده و هیچ فیلدی اختراع نشد.",
+    "درگاه پرداخت واقعی همچنان پیکربندی نشده است؛ مسیر مجوز در تست‌ها با درگاه توسعه و تأیید سمت سرور طی می‌شود.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "PREGNANCY_AND_BIRTH_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

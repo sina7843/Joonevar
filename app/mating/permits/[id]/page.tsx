@@ -256,6 +256,24 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
                 ثبت و تأیید تاریخ‌های جفت‌گیری
               </Link>
             </p>
+            <p className="mt-md text-body-sm">
+              <Link
+                href={'/mating/permits/' + permit.id + '/pregnancy'}
+                className="text-text-brand underline underline-offset-4"
+                data-testid="open-pregnancy"
+              >
+                اعلام بارداری و تأیید اختیاری دامپزشک
+              </Link>
+            </p>
+            <p className="mt-md text-body-sm">
+              <Link
+                href={'/mating/permits/' + permit.id + '/birth'}
+                className="text-text-brand underline underline-offset-4"
+                data-testid="open-birth-from-permit"
+              >
+                ثبت نتیجه زایمان و توله‌ها
+              </Link>
+            </p>
             <p className="mt-md text-body-sm" data-testid="mating-case-context">
               این مجوز، پرونده رسمی جفت‌گیری بین دو حیوان بالا را ایجاد کرده است و در سوابق هر دو حیوان ثبت
               شده است. ادامه مسیر (تاریخ جفت‌گیری، بارداری، زایمان و تخصیص) در همین پرونده رسمی دنبال می‌شود.

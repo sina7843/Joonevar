@@ -16,6 +16,7 @@ import {
   recordShipment,
   resample,
 } from '../../src/clinical/samples.ts';
+import { recordVetPregnancyResult } from '../../src/mating/pregnancy.ts';
 import type { ChipReadMethod, UnusableStatus } from '../../src/domain/microchip.ts';
 import { AppError } from '../../src/domain/errors.ts';
 import type { VisitServiceTypeName } from '../../src/domain/referral.ts';
@@ -238,6 +239,37 @@ export async function recordShipmentAction(_previous: VetFormState, form: FormDa
     await recordShipment(db(), actor, text(form, 'sampleId'), text(form, 'reference'));
     revalidatePath('/vet/samples');
     return { ok: true, tone: 'success', message: 'ارسال نمونه روی همان کد رهگیری ثبت شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/**
+ * The veterinarian's independent pregnancy result — §18.2, §18.3.
+ *
+ * It is recorded from this panel only, for a request assigned to this
+ * veterinarian, and it never rewrites the owner's declaration.
+ */
+export async function recordPregnancyResultAction(
+  _previous: VetFormState,
+  form: FormData,
+): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    const raw = text(form, 'expectedCount').trim();
+    const row = await recordVetPregnancyResult(db(), actor, requestId, {
+      pregnant: text(form, 'pregnant') === 'YES',
+      expectedCount: raw === '' ? null : Number(raw),
+      noteFa: text(form, 'note'),
+      reasonFa: text(form, 'reason'),
+    });
+    revalidatePath('/vet/requests/' + requestId);
+    return {
+      ok: true,
+      tone: 'success',
+      message: 'نتیجه مستقل شما (نسخه ' + row.version + ') ثبت شد؛ اعلام مالک تغییر نمی‌کند.',
+    };
   } catch (error) {
     return failure(error);
   }

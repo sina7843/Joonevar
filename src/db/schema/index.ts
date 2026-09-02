@@ -10,3 +10,4 @@ export * from './genetics.ts';
 export * from './pedigree.ts';
 export * from './kennels.ts';
 export * from './mating.ts';
+export * from './breeding.ts';

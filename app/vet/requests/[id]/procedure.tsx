@@ -13,6 +13,7 @@ import {
   readChipAction,
   recordSamplingAction,
   rereadChipAction,
+  recordPregnancyResultAction,
   resampleAction,
   type VetFormState,
 } from '../../actions.ts';
@@ -279,5 +280,52 @@ export function UnusableSampleForm({
         {pending ? 'در حال ثبت…' : 'ثبت غیرقابل‌استفاده بودن نمونه'}
       </Button>
     </form>
+  );
+}
+
+/**
+ * The veterinarian's pregnancy result — §18.2, §18.3.
+ *
+ * It is an independent record: it carries this vet's name, council code, time
+ * and examination location, and it never rewrites what the owner declared.
+ */
+export function PregnancyPanel({
+  requestId,
+  isCorrection,
+}: {
+  requestId: string;
+  isCorrection: boolean;
+}) {
+  const [state, submit, pending] = useActionState(recordPregnancyResultAction, EMPTY);
+  return (
+    <Card>
+      <h2 className="text-label-lg">{isCorrection ? 'اصلاح نتیجه بررسی بارداری' : 'ثبت نتیجه بررسی بارداری'}</h2>
+      <p className="mt-md text-caption text-text-secondary">
+        این نتیجه رکورد مستقل شماست و اعلام مالک را بازنویسی نمی‌کند؛ در صورت اختلاف، هر دو مقدار با برچسب
+        خنثی نمایش داده می‌شود.
+      </p>
+      <form action={submit} className="mt-lg space-y-lg" data-testid="vet-pregnancy-form">
+        <input type="hidden" name="requestId" value={requestId} />
+        <Result state={state} />
+        <SelectField
+          label="نتیجه معاینه"
+          name="pregnant"
+          required
+          data-testid="vet-pregnancy-result"
+          options={[
+            { value: 'YES', label: 'بارداری تأیید شد' },
+            { value: 'NO', label: 'بارداری تأیید نشد' },
+          ]}
+        />
+        <TextField label="تعداد تخمینی (اختیاری)" name="expectedCount" ltr data-testid="vet-expected" />
+        <TextField label="توضیح (اختیاری)" name="note" data-testid="vet-note" />
+        {isCorrection ? (
+          <TextField label="علت اصلاح" name="reason" required data-testid="vet-pregnancy-reason" />
+        ) : null}
+        <Button type="submit" block disabled={pending} data-testid="submit-vet-pregnancy">
+          {pending ? 'در حال ثبت…' : isCorrection ? 'ثبت نسخه اصلاحی' : 'ثبت نتیجه معاینه'}
+        </Button>
+      </form>
+    </Card>
   );
 }

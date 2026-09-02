@@ -22,8 +22,9 @@ import {
   SERVICE_TYPE_FA,
 } from '../../../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
+import { checkOfRequest, resultsOfCheck } from '../../../../src/mating/pregnancy.ts';
 import { CorrectServiceForm } from './correct-form.tsx';
-import { ChipPanel, SamplePanel, UnusableSampleForm } from './procedure.tsx';
+import { ChipPanel, PregnancyPanel, SamplePanel, UnusableSampleForm } from './procedure.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +76,9 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
   const latest = sampleRows[0] ?? null;
   const events = latest ? await eventsOfSample(db(), latest.id) : [];
   const liveSample = latest !== null && !isUnusable(latest.status);
+  const pregnancyCheck =
+    request.context === 'PREGNANCY' ? await checkOfRequest(db(), request.id) : null;
+  const pregnancyResults = pregnancyCheck ? await resultsOfCheck(db(), pregnancyCheck.id) : [];
   const readerReady =
     adapterReports(env()).find((a) => a.name === 'chip-reader')?.status !== 'NOT_CONFIGURED';
 
@@ -156,7 +160,20 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
           </Alert>
         ) : null}
 
-        {open ? (
+        {/* §18.2: the pregnancy result belongs to the assigned vet alone. */}
+        {request.context === 'PREGNANCY' ? (
+          pregnancyCheck ? (
+            <PregnancyPanel requestId={request.id} isCorrection={pregnancyResults.length > 0} />
+          ) : (
+            <Alert tone="info" title="این مراجعه به پرونده بارداری وصل نشده است">
+              <span data-testid="pregnancy-not-linked">
+                تا زمانی که مالک این مراجعه را به پرونده مجوز وصل نکند، نتیجه‌ای در آن پرونده ثبت نمی‌شود.
+              </span>
+            </Alert>
+          )
+        ) : null}
+
+        {open && request.context !== 'PREGNANCY' ? (
           <ChipPanel
             requestId={request.id}
             serviceType={request.serviceType}

@@ -171,6 +171,7 @@ export async function withMatingCtx(
       licenceStatus: 'VALID',
       canImplantMicrochip: true,
       canDrawBloodSample: true,
+      canPregnancyCheck: true,
     });
 
     for (const [key, value] of [
