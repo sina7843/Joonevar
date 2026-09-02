@@ -9,7 +9,7 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 - [x] PROMPT-005 — پرداخت، عضویت مادام‌العمر و دسترسی خدمات <!-- work-commit:57b2b65897ca2f936bebc29df92e4232460ce8d2 -->
 - [x] PROMPT-006 — ثبت حیوان، نسب و بررسی شجره‌نامه خارجی <!-- work-commit:bbc41712ab4bdf68a53f83e91541b32c4c225781 -->
 - [x] PROMPT-007 — یافتن دامپزشک و کد مراجعه مستقل <!-- work-commit:3ebe5bc158143946b9cecbb75e8f9dabb28eff5e -->
-- [ ] PROMPT-008 — میکروچیپ، نمونه‌گیری و نگهداری نمونه
+- [x] PROMPT-008 — میکروچیپ، نمونه‌گیری و نگهداری نمونه <!-- work-commit:5c5cde46dd544ad758c4ecca482f3a332ae3ee55 -->
 - [ ] PROMPT-009 — صدور مستقل برگه ثبتی و پرداخت گروهی
 - [ ] PROMPT-010 — فیش ژنتیک، ارسال نمونه و ثبت نتیجه
 - [ ] PROMPT-011 — شجره‌نامه، اعتراض ژنتیک و درخواست پستی
