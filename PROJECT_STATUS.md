@@ -19,6 +19,6 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 - [x] PROMPT-015 — بارداری، زایمان، تأیید اختیاری و اصلاح تعداد <!-- work-commit:bfe4f6386b655fae9bed11d8637075bd65da290d -->
 - [x] PROMPT-016 — تخصیص دوطرفه و صدور کارت توله <!-- work-commit:47b6e8d731369c271b2941f063a55a97658f7a10 -->
 - [x] PROMPT-017 — اعلام توافق شخصی جدا از مسیر رسمی <!-- work-commit:bd3099cc21e6ab33a41bf76948ff439a17bcb284 -->
-- [ ] PROMPT-018 — تکمیل پنل‌ها، تنظیمات و مسیرهای ادامه
+- [x] PROMPT-018 — تکمیل پنل‌ها، تنظیمات و مسیرهای ادامه <!-- work-commit:b81dd806d19802985f3bedc0219ea448373e1be7 -->
 - [ ] PROMPT-019 — بررسی یکپارچه فلو، امنیت و کیفیت بصری
 - [ ] PROMPT-020 — اجرای نهایی، مستندات و آمادگی تحویل
