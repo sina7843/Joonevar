@@ -11,6 +11,7 @@ import {
   startProcessing,
 } from '../../src/genetics/service.ts';
 import { markSampleUnusable } from '../../src/clinical/samples.ts';
+import { answerAppeal, takeAppeal } from '../../src/genetics/appeals.ts';
 import { AppError } from '../../src/domain/errors.ts';
 import type { UnusableStatus } from '../../src/domain/microchip.ts';
 
@@ -135,6 +136,48 @@ export async function refreshResultAction(
     await refreshWaitingResult(db(), actor, text(form, 'resultId'));
     revalidatePath('/genetics/results');
     return { ok: true, message: 'نتیجه نهایی شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/** The centre takes an appeal into review, so the owner sees it moved (§14.5). */
+export async function takeAppealAction(
+  _previous: CentreFormState,
+  form: FormData,
+): Promise<CentreFormState> {
+  const appealId = text(form, 'appealId');
+  try {
+    const actor = await requireActor('/genetics/appeals/' + appealId);
+    await takeAppeal(db(), actor, appealId);
+    revalidatePath('/genetics/appeals');
+    return { ok: true, message: 'اعتراض در دست بررسی قرار گرفت.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/**
+ * The centre answers, and may record a corrected result as a new version.
+ * The disputed result and any issued document are left exactly as they are.
+ */
+export async function answerAppealAction(
+  _previous: CentreFormState,
+  form: FormData,
+): Promise<CentreFormState> {
+  const appealId = text(form, 'appealId');
+  try {
+    const actor = await requireActor('/genetics/appeals/' + appealId);
+    await answerAppeal(db(), actor, {
+      appealId,
+      responseFa: text(form, 'response'),
+      expectedVersion: Number(text(form, 'version')),
+      ...(form.get('correct') === 'on'
+        ? { correctResult: { technicalNoteFa: text(form, 'correctionNote') || null } }
+        : {}),
+    });
+    revalidatePath('/genetics/appeals');
+    return { ok: true, message: 'پاسخ ثبت شد.' };
   } catch (error) {
     return failure(error);
   }

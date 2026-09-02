@@ -11,6 +11,8 @@ import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { referenceBreeds } from '../../../src/db/schema/core.ts';
 import { SAMPLE_TAKEN_NOTE_FA, sheetForOwner } from '../../../src/documents/registration-sheet.ts';
+import { postalRequestsForDocument, savedAddress } from '../../../src/documents/postal.ts';
+import { PostalRequestForm } from '../../pedigree/forms.tsx';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 
@@ -37,6 +39,10 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
   }
 
   const [animal] = await db().select().from(animals).where(eq(animals.id, sheet.animalId));
+  const [address, postal] = await Promise.all([
+    savedAddress(db(), guard.actor.accountId),
+    postalRequestsForDocument(db(), guard.actor, 'REGISTRATION_SHEET', sheet.id),
+  ]);
   const [breed] = animal?.breedId
     ? await db().select().from(referenceBreeds).where(eq(referenceBreeds.id, animal.breedId))
     : [];
@@ -77,6 +83,34 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
         <Alert tone="info" title="این برگه نتیجه ژنتیک یا شجره‌نامه نیست">
           <span data-testid="document-parentage-note">{SAMPLE_TAKEN_NOTE_FA}</span>
         </Alert>
+
+        {postal.length > 0 ? (
+          <Card>
+            <h3 className="text-label-lg">درخواست‌های ارسال ثبت‌شده</h3>
+            <ul className="mt-md space-y-sm text-body-sm" data-testid="sheet-postal-list">
+              {postal.map((row) => (
+                <li key={row.id}>
+                  <Link
+                    href={'/documents/postal/' + row.id}
+                    className="text-text-brand underline underline-offset-4"
+                  >
+                    درخواست {formatCivilDateFa(row.createdAt.toISOString().slice(0, 10))} — {row.recipientNameFa}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null}
+
+        <PostalRequestForm
+          documentType="REGISTRATION_SHEET"
+          documentId={sheet.id}
+          prefill={
+            address
+              ? { provinceFa: address.province, cityFa: address.city, addressFa: address.address }
+              : null
+          }
+        />
 
         <Card>
           <p className="text-caption text-text-secondary">

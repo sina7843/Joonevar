@@ -14,6 +14,7 @@ import { memberships } from '../../db/schema/billing.ts';
 import { findCase } from '../../identity/kyc.ts';
 import { countRegisteredAnimals } from '../../animals/service.ts';
 import { countSheetsOfOwner } from '../../documents/registration-sheet.ts';
+import { countPedigreesOfOwner } from '../../documents/pedigree.ts';
 import { locked } from '../errors.ts';
 import {
   evaluate,
@@ -41,7 +42,7 @@ export async function loadFacts(database: DbClient, accountId: string): Promise<
     // Sheets, pedigrees, permits and allocations arrive in PROMPT-009 and later;
     // until then the honest count is zero.
     animalsWithRegistrationSheet: await countSheetsOfOwner(database, accountId),
-    animalsWithPedigree: 0,
+    animalsWithPedigree: await countPedigreesOfOwner(database, accountId),
     issuedMatingPermits: 0,
     puppiesWithFinalAllocation: 0,
   };

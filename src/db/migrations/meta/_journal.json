@@ -57,6 +57,13 @@
       "when": 1788343432376,
       "tag": "0007_genetics",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788345607342,
+      "tag": "0008_pedigree",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,10 @@ import type { DbClient } from '../db/client.ts';
 import type { BatchRecord, PaidEffects } from './payments.ts';
 import { activateMembershipFromPayment } from './membership.ts';
 import { issueForBatch, markBatchPaid } from '../documents/registration-sheet.ts';
+import {
+  issueForBatch as issuePedigrees,
+  markBatchPaid as markPedigreeBatchPaid,
+} from '../documents/pedigree.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -22,8 +26,14 @@ export const paidEffects: PaidEffects = {
         await markBatchPaid(tx, batch.id);
         await issueForBatch(tx, batch);
         return;
-      // Pedigrees, permits, kennels and puppy cards attach their own effects in
-      // PROMPT-010 to PROMPT-016. Until then a verified payment for them
+      // The pedigree needs both halves of the join: this verified payment and a
+      // final Parentage Result. Whichever arrives second finishes it (§14.2).
+      case 'PEDIGREE':
+        await markPedigreeBatchPaid(tx, batch.id);
+        await issuePedigrees(tx, batch);
+        return;
+      // Permits, kennels and puppy cards attach their own effects in
+      // PROMPT-012 to PROMPT-016. Until then a verified payment for them
       // records the money and issues nothing, which is the truthful outcome
       // rather than a fabricated document.
       default:

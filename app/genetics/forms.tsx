@@ -5,6 +5,8 @@ import { Button } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { SelectField, TextField } from '../../src/ui/field.tsx';
 import {
+  answerAppealAction,
+  takeAppealAction,
   receiveSampleAction,
   recordResultAction,
   refreshResultAction,
@@ -157,6 +159,55 @@ export function RefreshResultForm({ resultId }: { resultId: string }) {
       <Result state={state} />
       <Button tone="secondary" type="submit" block disabled={pending} data-testid="refresh-result">
         {pending ? 'در حال بررسی…' : 'بررسی دوباره نتایج والدین'}
+      </Button>
+    </form>
+  );
+}
+
+export function TakeAppealForm({ appealId }: { appealId: string }) {
+  const [state, submit, pending] = useActionState(takeAppealAction, EMPTY);
+  return (
+    <form action={submit} className="mt-lg space-y-lg" data-testid="take-appeal-form">
+      <input type="hidden" name="appealId" value={appealId} />
+      <Result state={state} />
+      <Button tone="secondary" type="submit" block disabled={pending} data-testid="take-appeal">
+        {pending ? 'در حال ثبت…' : 'شروع بررسی اعتراض'}
+      </Button>
+    </form>
+  );
+}
+
+/**
+ * The centre's answer to an appeal — §14.5.
+ *
+ * Ticking the correction records a new result version. The disputed version and
+ * any document already issued from it are untouched.
+ */
+export function AnswerAppealForm({ appealId, version }: { appealId: string; version: number }) {
+  const [state, submit, pending] = useActionState(answerAppealAction, EMPTY);
+  const [correct, setCorrect] = useState(false);
+  return (
+    <form action={submit} className="mt-lg space-y-lg" data-testid="answer-appeal-form">
+      <input type="hidden" name="appealId" value={appealId} />
+      <input type="hidden" name="version" value={version} />
+      <Result state={state} />
+      <TextField label="پاسخ مرکز" name="response" required data-testid="appeal-response-text" />
+      <label className="flex items-center gap-sm text-body-sm">
+        <input
+          type="checkbox"
+          name="correct"
+          checked={correct}
+          onChange={() => setCorrect((value) => !value)}
+          className="size-[var(--size-selection-md)]"
+          data-testid="appeal-correct-toggle"
+        />
+        نتیجه اصلاحی به‌صورت نسخه جدید ثبت شود
+      </label>
+      {correct ? (
+        <TextField label="یادداشت فنی نتیجه اصلاحی" name="correctionNote" data-testid="appeal-correction-note" />
+      ) : null}
+      <Button type="submit" block disabled={pending} data-testid="submit-appeal-answer">
+        {pending ? 'در حال ثبت…' : 'ثبت پاسخ'}
       </Button>
     </form>
   );

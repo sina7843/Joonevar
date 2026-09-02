@@ -10,6 +10,9 @@ import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { ownerResult, parentResultCheck, RESULT_STATUS_FA } from '../../../src/genetics/service.ts';
+import { appealsOfAnimal, APPEAL_STATUS_FA } from '../../../src/genetics/appeals.ts';
+import { pedigreeOfAnimal } from '../../../src/documents/pedigree.ts';
+import { AppealForm } from '../forms.tsx';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 
@@ -36,6 +39,10 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
 
   const [animal] = await db().select().from(animals).where(eq(animals.id, animalId));
   const parents = await parentResultCheck(db(), animalId);
+  const [appeals, pedigree] = await Promise.all([
+    appealsOfAnimal(db(), animalId),
+    pedigreeOfAnimal(db(), animalId),
+  ]);
 
   return (
     <PublicShell actor={guard.actor} title="نتیجه Parentage" pathname={'/pedigree/' + animalId}>
@@ -89,6 +96,60 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
               نتیجه آماده است و همین‌جا دیده می‌شود؛ فقط صدور شجره‌نامه در انتظار پرداخت صدور می‌ماند.
             </span>
           </Alert>
+        ) : null}
+
+        {pedigree ? (
+          <Card>
+            <h3 className="text-label-lg">شجره‌نامه صادرشده</h3>
+            <p className="mt-md text-body-sm">
+              <Link
+                href={'/documents/pedigree/' + pedigree.id}
+                className="text-text-brand underline underline-offset-4"
+                data-testid="animal-pedigree-link"
+              >
+                مشاهده شجره‌نامه {pedigree.pedigreeCode}
+              </Link>
+            </p>
+          </Card>
+        ) : result?.status === 'FINAL' ? (
+          <Card>
+            <h3 className="text-label-lg">صدور شجره‌نامه</h3>
+            <p className="mt-md text-caption text-text-secondary">
+              نتیجه نهایی است؛ برای صدور سند، پرداخت صدور در هم‌زیست لازم است.
+            </p>
+            <p className="mt-md text-body-sm">
+              <Link
+                href="/pedigree/issue"
+                className="text-text-brand underline underline-offset-4"
+                data-testid="go-to-issuance"
+              >
+                درخواست صدور شجره‌نامه
+              </Link>
+            </p>
+          </Card>
+        ) : null}
+
+        {appeals.length > 0 ? (
+          <Card>
+            <h3 className="text-label-lg">اعتراض‌های ثبت‌شده</h3>
+            <ul className="mt-md space-y-sm text-body-sm" data-testid="animal-appeals">
+              {appeals.map((appeal) => (
+                <li key={appeal.id} className="flex items-center justify-between gap-md">
+                  <Link
+                    href={'/pedigree/appeals/' + appeal.id}
+                    className="text-text-brand underline underline-offset-4"
+                  >
+                    اعتراض {formatCivilDateFa(appeal.createdAt.toISOString().slice(0, 10))}
+                  </Link>
+                  <span className="text-text-secondary">{APPEAL_STATUS_FA[appeal.status]}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null}
+
+        {result && appeals.every((a) => a.status === 'ANSWERED') ? (
+          <AppealForm animalId={animalId} resultId={result.id} />
         ) : null}
 
         <Card>

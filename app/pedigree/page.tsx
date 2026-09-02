@@ -15,6 +15,7 @@ import {
   selectableForPedigree,
 } from '../../src/genetics/service.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
+import { ButtonLink } from '../../src/ui/button.tsx';
 import { SelectPedigreeAnimals } from './forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -49,6 +50,10 @@ export default async function PedigreePage() {
   return (
     <PublicShell actor={actor} title="شجره‌نامه" pathname="/pedigree">
       <div className="space-y-lg">
+        <ButtonLink href="/pedigree/issue" block data-testid="open-issuance">
+          صدور شجره‌نامه برای نتایج نهایی
+        </ButtonLink>
+
         <Card>
           <h2 className="text-label-lg">مرکز ژنتیک مقصد</h2>
           <p className="mt-md text-caption text-text-secondary">

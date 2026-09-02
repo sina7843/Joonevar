@@ -26,8 +26,8 @@
 | `/requests/[id]` (کد + مهلت) | PROTO | MIC-005 QR/Expired, MIC-006, MIC-008 | s11 | D15 | A-005, A-028, A-029 — پیاده‌شده در PROMPT-007؛ تصویر QR هنوز تولید نمی‌شود (DEC-0048) |
 | `/registration`, `/registration/new`, `/registration/[id]` و `/documents/[id]` | PROTO | MIC-007, PET-010 | s13, s22 | D16 | A-013 — پیاده‌شده در PROMPT-009؛ نسخه چاپی رسمی NOT_CONFIGURED است |
 | `/pedigree` و `/pedigree/receipts/[id]` | PROTO | `229:4552` DNA-001, DNA-005, DNA-006 + Receipt | s14, s22 | D07 | A-009, A-010 — پیاده‌شده در PROMPT-010 |
-| `/pedigree/[animalId]` (نتیجه و صدور) | PROTO | DNA-010/011, PET-011/012/013 | s14 | — | A-011, A-012 — نمایش نتیجه در PROMPT-010؛ صدور سند در PROMPT-011 |
-| `/pedigree/[animalId]/appeal` | CODE | ورودی از همان نتیجه | s14 | D19 | A-033 |
+| `/pedigree/[animalId]`، `/pedigree/issue`، `/pedigree/batch/[id]` و `/documents/pedigree/[id]` | PROTO | DNA-010/011, PET-011/012/013 | s14 | — | A-011, A-012 — پیاده‌شده در PROMPT-010 و PROMPT-011 |
+| `/pedigree/appeals/[id]` و `/genetics/appeals` | CODE | ورودی از همان نتیجه | s14 | D19 | A-033 — پیاده‌شده در PROMPT-011 |
 | `/documents/[id]/postal-request` | CODE | — | s14 | D17 | A-031 |
 | `/breeder/activate` | PROTO | `240:6033` BRD-001..008 | s15 | — | — |
 | `/kennels`, `/kennels/new`, `/kennels/[id]` | PROTO | BRD-003B/C/D, BRD-008 | s15 | D16 | A-014 |

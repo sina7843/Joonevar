@@ -1,0 +1,113 @@
+{
+  "promptId": "PROMPT-011",
+  "status": "COMPLETE",
+  "summary": "صدور شجره‌نامه یک اتصال دو شرطی است: نتیجه Parentage نهایی و پرداخت صدور تأییدشده در هم‌زیست. تأیید فیش مرکز ژنتیک جای این پرداخت را نمی‌گیرد و صفحه‌ها همین را صریح می‌گویند؛ نتیجه بدون پرداخت صدور هم دیده می‌شود و فقط سند در انتظار می‌ماند. صدور برای هر حیوان مستقل است: قلم پرداخت‌شده‌ای که نتیجه‌اش هنوز نهایی نیست BLOCKED با دلیل می‌شود و بقیه صادر می‌شوند، و همان قلم بعداً بدون هیچ پول جدیدی صادر می‌شود. اثر صدور داخل تراکنش تأیید پرداخت اجرا می‌شود و ایندکس یکتای حیوان، تکرار Callback و تلاش دوباره را به یک سند می‌رساند. سند، نسخه نتیجه مبنای صدور و والدین همان لحظه را ثبت می‌کند و فقط برای مالک قابل مشاهده است. اعتراض از همان نتیجه و همان حیوان ثبت می‌شود، به همان مرکز می‌رود و مرکز پاسخ می‌دهد؛ نتیجه اصلاحی نسخه جدید است و نتیجه مورد اعتراض با پیوندش حفظ می‌شود. اگر سند قبلاً صادر شده باشد، سند دست‌نخورده می‌ماند و فقط یادداشت نسخه و منشأ کنارش ثبت می‌شود؛ هیچ ابطال یا بازنویسی رخ نمی‌دهد. ثبت درخواست ارسال پستی پس از صدور سند انجام می‌شود، به همان سند گره می‌خورد، نشانی را می‌تواند از داده ذخیره‌شده پیش‌پر کند و هیچ اتصال پستی، تعرفه، برچسب، کد رهگیری یا وضعیت تحویلی نمی‌سازد.",
+  "changedFiles": [
+    "src/db/schema/pedigree.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0008_pedigree.sql",
+    "src/db/migrations/meta/0008_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/documents/pedigree.ts",
+    "src/documents/postal.ts",
+    "src/genetics/appeals.ts",
+    "src/billing/effects.ts",
+    "src/domain/eligibility/service.ts",
+    "app/pedigree/page.tsx",
+    "app/pedigree/actions.ts",
+    "app/pedigree/forms.tsx",
+    "app/pedigree/issue/page.tsx",
+    "app/pedigree/batch/[id]/page.tsx",
+    "app/pedigree/batch/[id]/return/page.tsx",
+    "app/pedigree/[animalId]/page.tsx",
+    "app/pedigree/appeals/[id]/page.tsx",
+    "app/genetics/actions.ts",
+    "app/genetics/forms.tsx",
+    "app/genetics/appeals/page.tsx",
+    "app/genetics/appeals/[id]/page.tsx",
+    "app/documents/[id]/page.tsx",
+    "app/documents/pedigree/[id]/page.tsx",
+    "app/documents/postal/[id]/page.tsx",
+    "tests/db/pedigree.test.ts",
+    "tests/browser/pedigree.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-011/result-without-issuance.png",
+    "docs/reports/screenshots/prompt-011/issuance-not-configured.png",
+    "docs/reports/screenshots/prompt-011/issuance-review.png",
+    "docs/reports/screenshots/prompt-011/issuance-issued.png",
+    "docs/reports/screenshots/prompt-011/pedigree-document.png",
+    "docs/reports/screenshots/prompt-011/postal-request.png",
+    "docs/reports/screenshots/prompt-011/appeal-submitted.png",
+    "docs/reports/screenshots/prompt-011/centre-appeal-answer.png",
+    "docs/reports/screenshots/prompt-011/appeal-answered.png",
+    "docs/reports/screenshots/prompt-011/pedigree-correction-notice.png",
+    "docs/reports/screenshots/prompt-011/pedigree-not-yours.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-011.json"
+  ],
+  "decisions": ["DEC-0074", "DEC-0075", "DEC-0076", "DEC-0077", "DEC-0078", "DEC-0079"],
+  "checks": [
+    {
+      "id": "pedigree-appeal-integration",
+      "command": "node --test \"tests/db/pedigree.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 11 · pass 11 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد. پوشش واقعی: هر دو ترتیب پرداخت و نتیجه (نتیجه→پرداخت و پرداخت→نتیجه) دقیقاً یک سند می‌سازند؛ ورود به Checkout پیش از نهایی‌شدن نتیجه رد می‌شود؛ قلم پرداخت‌شده‌ای که نتیجه‌اش نهایی نیست BLOCKED می‌شود در حالی که حیوان دیگر همان Batch صادر می‌شود و بعداً همان قلم بدون پول جدید صادر می‌شود؛ سه بار تأیید همان پرداخت به‌علاوه تلاش دوباره صدور، یک سند و یک رویداد Audit می‌سازد و کد شجره‌نامه روی حیوان همان کد سند است؛ نتیجه نهایی بدون هیچ پرداخت صدوری برای مالک قابل خواندن است و فقط سند صادر نشده؛ اعتراض دوم روی همان نتیجه رد می‌شود، مالک نمی‌تواند به اعتراض خودش پاسخ دهد و پس از پاسخ مرکز، هر دو نسخه نتیجه با پیوند `supersedesResultId` وجود دارند و نسخه مورد اعتراض دست‌نخورده است؛ سند صادرشده پس از اصلاح همان شناسه، کد، منبع صدور، نسخه مبنا و تاریخ را دارد و فقط یادداشت و اعلان و یک رویداد Audit اضافه می‌شود؛ سند فقط برای مالک خواندنی است (برای غریبه و برای مرکز «پیدا نشد») و صدور آن سرویس مجوز جفت‌گیری را باز می‌کند؛ درخواست ارسال پستی فقط روی سند خود کاربر ثبت می‌شود، نشانی خالی رد می‌شود و رکورد هیچ فیلد شرکت پستی، تعرفه، برچسب، کد رهگیری یا وضعیت تحویل ندارد؛ تعرفه صدور ثبت‌نشده هیچ مسیر پرداختی باز نمی‌کند."
+    },
+    {
+      "id": "pedigree-browser",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  node --test --test-concurrency=1 \"tests/browser/pedigree.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 4 · pass 4 · fail 0 روی Chromium واقعی، با اجرای کامل زنجیره از ثبت حیوان تا سند و اعتراض. پوشش واقعی: با نتیجه نهایی و بدون پرداخت صدور، صفحه نتیجه را نشان می‌دهد و می‌گوید فقط صدور سند در انتظار پرداخت است؛ با تعرفه ثبت‌نشده، مسیر پرداخت بسته و دکمه غیرفعال است و پس از ثبت مقدار SYNTHETIC از پنل مدیریت، مبلغ ۴۰۰٬۰۰۰ تومان و جمله «تأیید فیش مرکز، این پرداخت نیست» نمایش داده می‌شود؛ پرداخت صدور با درگاه توسعه (۴۰۰۰۰۰۰ ریال = ×۱۰) انجام می‌شود، قلم «صادر شد» می‌شود و سند با کد PD- و نسخه نتیجه مبنا باز می‌شود؛ ثبت درخواست ارسال پستی روی همان سند، صفحه تأیید با جمله «ثبت درخواست به معنی ارسال واقعی سند نیست» و بدون هیچ کد رهگیری یا وضعیت تحویل می‌دهد؛ اعتراض از همان صفحه نتیجه ثبت می‌شود، در صف مرکز دیده می‌شود، مرکز صفحه‌ای می‌بیند که می‌گوید نتیجه اصلاحی سند را بازنویسی یا باطل نمی‌کند، بررسی را شروع و با نتیجه اصلاحی پاسخ می‌دهد؛ مالک پاسخ و «نتیجه اصلاحی نسخه 2» و جمله «ثبت اعتراض اجازه ویرایش آن را به کاربر نمی‌دهد» را می‌بیند و سند صادرشده دقیقاً همان کد و همان نسخه مبنا را دارد با یادداشت «بدون تغییر باقی می‌ماند»؛ سند و محیط مرکز برای کاربر دیگر بسته است. ۱۱ اسکرین‌شات در docs/reports/screenshots/prompt-011/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 245 · pass 245 · fail 0 · skipped 0 (۱۱ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 58 · pass 58 · fail 0، در دو اجرای پیاپی. در اجرای اول یکی از موارد این مرحله به مهلت پیش‌فرض ۳۰ ثانیه Playwright در زنجیره طولانی برخورد و دوباره اجرا شد؛ دو اجرای کامل بعدی هر دو ۵۸/۵۸ سبز بودند."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0008_pedigree` اعمال شد (جدول‌های pedigree_issuance_item، pedigree و postal_request با ایندکس یکتای حیوان و کد شجره‌نامه) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تعرفه واقعی صدور شجره‌نامه اعلام نشده است؛ در تست‌ها مقدار SYNTHETIC وارد می‌شود و تا ورود مقدار واقعی از پنل مدیریت مسیر پرداخت بسته است.",
+    "آداپتور `document-render` پیکربندی نشده است؛ شجره‌نامه به‌صورت رکورد داده‌ای با صفحه امن مالک ارائه می‌شود و نسخه چاپی رسمی تولید نمی‌شود (DEC-0075).",
+    "سیاست صدور سند جدید پس از نتیجه اصلاحی تعیین نشده است. رفتار فعلی محافظه‌کارانه است: سند قبلی دست‌نخورده می‌ماند و فقط یادداشت نسخه و منشأ کنارش ثبت می‌شود؛ هیچ ابطال، بازنویسی یا صدور خودکار جدید انجام نمی‌شود (DEC-0076).",
+    "برای اعتراض هیچ هزینه، مهلت یا نمونه‌گیری مجدد خودکاری ساخته نشد چون سند هیچ‌کدام را تعریف نکرده است؛ نمونه‌گیری مجدد فقط از مسیر موجود PROMPT-008 انجام می‌شود (DEC-0077).",
+    "ارسال پستی فقط ثبت درخواست است: هیچ اتصال شرکت پستی، تعرفه حمل، برچسب، کد رهگیری یا وضعیت تحویلی وجود ندارد و صفحه تأیید همین را می‌گوید (D17، DEC-0078).",
+    "درگاه پرداخت واقعی همچنان پیکربندی نشده است و تأیید پرداخت با درگاه توسعه محلی اجرا شد.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "PEDIGREE_AND_APPEAL_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}
