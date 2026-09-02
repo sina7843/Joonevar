@@ -4,7 +4,7 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 
 - [x] PROMPT-001 — بررسی کد و رفرنس‌ها و انتخاب معماری <!-- work-commit:f15cf47e6137f212e5384487bb49c1d8fdceac77 -->
 - [x] PROMPT-002 — زیرساخت، داده، تنظیمات و تاریخچه <!-- work-commit:b33b01859b5d5e4c25ba141ab1a36fe59874ce42 -->
-- [ ] PROMPT-003 — دیزاین سیستم، پوسته‌ها و تجربه فارسی
+- [x] PROMPT-003 — دیزاین سیستم، پوسته‌ها و تجربه فارسی <!-- work-commit:d941c57c5a5ded41c7e81f89a6a28bb0269cc68e -->
 - [ ] PROMPT-004 — ورود، OTP، احراز هویت و حساب
 - [ ] PROMPT-005 — پرداخت، عضویت مادام‌العمر و دسترسی خدمات
 - [ ] PROMPT-006 — ثبت حیوان، نسب و بررسی شجره‌نامه خارجی
