@@ -193,5 +193,6 @@ export const GENETICS_NAV: readonly NavItem[] = [
 export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin', label: 'مرور' },
   { href: '/admin/settings', label: 'تنظیمات' },
+  { href: '/admin/vets', label: 'دامپزشکان معتمد' },
   { href: '/admin/audit', label: 'تاریخچه' },
 ];

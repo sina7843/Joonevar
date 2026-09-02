@@ -55,9 +55,10 @@ export function ButtonLink({
   href,
   children,
   className = '',
-}: CommonProps & { href: string }) {
+  ...rest
+}: CommonProps & { href: string } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'className' | 'children'>) {
   return (
-    <Link href={href} className={[BASE, TONE[tone], block ? 'w-full' : '', className].join(' ')}>
+    <Link href={href} className={[BASE, TONE[tone], block ? 'w-full' : '', className].join(' ')} {...rest}>
       {children}
     </Link>
   );

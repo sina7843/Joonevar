@@ -20,10 +20,10 @@
 | `/animals/new` (۶ مرحله) | PROTO | `156:397` PET-003..PET-008, `414:*` نژاد | s09 | — | A-001, A-012 |
 | `/animals/[id]` + Timeline | PROTO | `180:397` PET-009-O/-P, `428:12222` | s10 | — | A-025 |
 | `/animals/[id]/foreign-pedigree` | PROTO | PET-004 + صف انجمن | s09 | D14 | A-027 |
-| `/vets/finder?ctx=microchip\|dna\|pregnancy` | PROTO | `349:8324` VFD-001..005 ×۳ | s11 | D02, D03 | A-004 |
-| `/vets/location/[id]` | PROTO | VFD-003, `446:12562` LOC-001, `464:12706` MAP-001 | s11 | D02 | A-004 |
-| `/requests/new` | PROTO | `166:397` MIC-001 (۷ ترکیب), MIC-003 | s11, s13 | D03, D09 | A-005 |
-| `/requests/[id]` (کد + QR + مهلت) | PROTO | MIC-005 QR/Expired, MIC-006, MIC-008 | s11 | D15 | A-005, A-028, A-029 |
+| `/vets?context=MICROCHIP\|DNA\|PREGNANCY` | PROTO | `349:8324` VFD-001..005 ×۳ | s11 | D02, D03 | A-004 — پیاده‌شده در PROMPT-007 |
+| `/vets/location/[id]` | PROTO | VFD-003, `446:12562` LOC-001, `464:12706` MAP-001 | s11 | D02 | A-004 — پیاده‌شده در PROMPT-007؛ نقشه NOT_CONFIGURED است و متن آن صریح است |
+| `/requests/new` + `/requests/new/review` | PROTO | `166:397` MIC-001 (۷ ترکیب), MIC-003 | s11, s13 | D03, D09 | A-005 — پیاده‌شده در PROMPT-007؛ انتخاب تا تأیید در URL می‌ماند (DEC-0045) |
+| `/requests/[id]` (کد + مهلت) | PROTO | MIC-005 QR/Expired, MIC-006, MIC-008 | s11 | D15 | A-005, A-028, A-029 — پیاده‌شده در PROMPT-007؛ تصویر QR هنوز تولید نمی‌شود (DEC-0048) |
 | `/registration/batch` | PROTO | MIC-007, PET-010 | s13, s22 | D16 | A-013 |
 | `/pedigree/request` | PROTO | `229:4552` DNA-001, DNA-005, DNA-006 + Receipt | s14, s22 | D07 | A-009, A-010 |
 | `/pedigree/[animalId]` (نتیجه و صدور) | PROTO | DNA-010/011, PET-011/012/013 | s14 | — | A-011, A-012 |
@@ -45,9 +45,9 @@
 
 | مسیر | منبع | node | بخش | D | معیار |
 |---|---|---|---|---|---|
-| `/vet` (صف تخصیص‌یافته) | PROTO | `173:397` VET-001 | s21 | D05 | A-024 |
-| `/vet/checkin` (اسکن + ورود دستی) | PROTO | VET-002 Scan/Invalid | s11 | D03 | A-005, A-006 |
-| `/vet/cases/[requestId]` | PROTO | VET-004/005/006 | s11 | D09 | A-006 |
+| `/vet` (صف تخصیص‌یافته) | PROTO | `173:397` VET-001 | s21 | D05 | A-024 — پیاده‌شده در PROMPT-007 |
+| `/vet/check-in` (اسکن + ورود دستی، یک کد) | PROTO | VET-002 Scan/Invalid | s11 | D03 | A-005, A-006 — پیاده‌شده در PROMPT-007 |
+| `/vet/requests/[id]` (پرونده مراجعه و تغییر نوع خدمت) | PROTO | VET-004/005/006 | s11 | D09 | A-006 — پیاده‌شده در PROMPT-007 |
 | `/vet/cases/[id]/microchip` | PROTO | VET-007 (Scan/Checking/Unique/Status/Install), VET-008 Duplicate block | s12 | — | A-007, A-008 |
 | `/vet/cases/[id]/sample` | PROTO | `233:5666` VET-012/013/014 | s12 | — | A-007 |
 | `/vet/cases/[id]/review` (امضای فیزیکی = اطلاع‌رسانی) | PROTO | VET-009, VET-009B | s12 | D13 | A-023 |
@@ -71,6 +71,7 @@
 | `/genetics/appeals` | اعتراض‌ها و نسخه اصلاحی | s14 | D19 | A-033 |
 | `/admin` | محیط سوپرادمین | s21 | D11 | A-003 |
 | `/admin/settings/deadlines` | مهلت مراجعه (مقدار اولیه ۲۱ روز) | s21 | D15 | A-028 |
+| `/admin/vets` | داده دامپزشکان از قبل تأییدشده و مراکز آن‌ها؛ فرم درخواست معتمدشدن نیست (DEC-0042) | s11, s21 | D01, D02 | A-004 |
 | `/admin/settings/fees` | تعرفه‌ها؛ «تعیین‌نشده» می‌ماند اگر داده نیست | s21, s22 | D16 | A-030 |
 | `/admin/settings/genetics-centre` | مشخصات و حساب همان مرکز ثابت | s21 | D07, D16 | — |
 | `/admin/settings/reference-data` | نژادها و فهرست‌های مرجع | s21 | D16 | — |

@@ -1,0 +1,124 @@
+{
+  "promptId": "PROMPT-007",
+  "status": "COMPLETE",
+  "summary": "Finder سه Context میکروچیپ/DNA/بارداری با جست‌وجوی نام دامپزشک، نام مرکز و محله و فیلترهای شهر و فاصله ساخته شد؛ هیچ نوبت، ساعت، تقویم ظرفیت یا مرتب‌سازی «زودترین نوبت» وجود ندارد. فقط دامپزشک واجد شرایط پذیرش کار جدید و مرکز فعالِ دارای پروانه معتبر با تمام امکانات اجباری در نتایج می‌آید و شرط آن داخل خود کوئری است. کد نظام دامپزشکی و پروانه Location دو تأیید مستقل‌اند و داده دامپزشکان از قبل تأییدشده از محیط سوپرادمین وارد می‌شود، نه با فرم درخواست معتمدشدن. انتخاب چند حیوان با نوع خدمت مستقل هر حیوان، برای هر حیوان یک درخواست و یک کد مراجعه جداگانه می‌سازد؛ گروه فقط نمایش است و هیچ وضعیتی ندارد. مهلت مراجعه از تنظیم دیتابیسی (مقدار اولیه ۲۱ روز) خوانده و همراه نسخه تنظیم روی خود کد ثبت می‌شود، همان مهلتی که نمایش داده و در سرور اجرا می‌شود. پذیرش در محل یک‌بارمصرف و اتمی است: دو اسکن هم‌زمان فقط یک پذیرش می‌سازد و کد نامعتبر، منقضی، لغوشده، جایگزین‌شده، استفاده‌شده یا متعلق به دامپزشک/مرکز دیگر بدون افشای پرونده کس دیگری رد می‌شود. تغییر نوع خدمت در محل فقط همان حیوان را جایگزین می‌کند و درخواست و کد جدید دوباره به پذیرش برمی‌گردد.",
+  "changedFiles": [
+    "src/db/schema/vets.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0004_vets.sql",
+    "src/db/migrations/meta/0004_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/domain/referral.ts",
+    "src/vets/registry.ts",
+    "src/vets/visits.ts",
+    "src/ui/button.tsx",
+    "src/ui/shell.tsx",
+    "app/vets/page.tsx",
+    "app/vets/filters.tsx",
+    "app/vets/location/[id]/page.tsx",
+    "app/requests/page.tsx",
+    "app/requests/actions.ts",
+    "app/requests/selection.ts",
+    "app/requests/new/page.tsx",
+    "app/requests/new/select-form.tsx",
+    "app/requests/new/review/page.tsx",
+    "app/requests/new/review/confirm-form.tsx",
+    "app/requests/[id]/page.tsx",
+    "app/requests/[id]/renew-form.tsx",
+    "app/vet/page.tsx",
+    "app/vet/actions.ts",
+    "app/vet/check-in/page.tsx",
+    "app/vet/check-in/check-in-form.tsx",
+    "app/vet/requests/[id]/page.tsx",
+    "app/vet/requests/[id]/correct-form.tsx",
+    "app/admin/vets/page.tsx",
+    "app/admin/vets/actions.ts",
+    "app/admin/vets/forms.tsx",
+    "tests/domain/referral.test.ts",
+    "tests/db/referrals.test.ts",
+    "tests/browser/finder.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-007/finder-empty.png",
+    "docs/reports/screenshots/prompt-007/finder-partial-capability.png",
+    "docs/reports/screenshots/prompt-007/finder-results.png",
+    "docs/reports/screenshots/prompt-007/finder-no-results.png",
+    "docs/reports/screenshots/prompt-007/location-detail.png",
+    "docs/reports/screenshots/prompt-007/admin-vet-registry.png",
+    "docs/reports/screenshots/prompt-007/requests-list.png",
+    "docs/reports/screenshots/prompt-007/referral-code.png",
+    "docs/reports/screenshots/prompt-007/referral-expired.png",
+    "docs/reports/screenshots/prompt-007/referral-renewed.png",
+    "docs/reports/screenshots/prompt-007/vet-queue.png",
+    "docs/reports/screenshots/prompt-007/check-in-invalid.png",
+    "docs/reports/screenshots/prompt-007/check-in-accepted.png",
+    "docs/reports/screenshots/prompt-007/check-in-consumed.png",
+    "docs/reports/screenshots/prompt-007/service-corrected.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-007.json"
+  ],
+  "decisions": ["DEC-0042", "DEC-0043", "DEC-0044", "DEC-0045", "DEC-0046", "DEC-0047", "DEC-0048", "DEC-0049"],
+  "checks": [
+    {
+      "id": "referral-concurrency",
+      "command": "node --test \"tests/domain/referral.test.ts\" \"tests/db/referrals.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 25 · pass 25 · fail 0 (۱۱ تست قاعده خالص و ۱۴ تست روی Postgres واقعی با دیتابیس ایزوله؛ تست رقابت سه بار پیاپی اجرا و سبز شد). پوشش واقعی: سه پذیرش هم‌زمان روی یک کد که دقیقاً یک CHECKED_IN، یک ردیف Audit و یک CONSUMED می‌سازد و بازنده‌ها پذیرش دوم نمی‌گیرند؛ دامپزشک دیگر با کد معتبر پاسخ WRONG_VET می‌گیرد و پیام هیچ نام حیوانی ندارد؛ مرکز اشتباه WRONG_LOCATION؛ کد ناشناخته، منقضی، لغوشده، جایگزین‌شده و استفاده‌شده هرکدام پاسخ جدا دارند؛ تغییر تنظیم مهلت از ۲۱ به ۷ روز کد صادرشده قبلی را با همان تاریخ و نسخه دست‌نخورده می‌گذارد و صدور بعدی را با نسخه جدید می‌سازد؛ تمدید پس از انقضا کد قبلی را EXPIRED نگه می‌دارد، کد جدید صادر می‌کند و صلاحیت مرکز را دوباره می‌سنجد (مرکزی که پروانه‌اش باطل شده تمدید نمی‌گیرد)؛ دامپزشک تعلیق‌شده نه در Finder می‌آید و نه درخواست جدید می‌گیرد ولی کار فعال قبلی را پذیرش می‌کند؛ اصلاح نوع خدمت فقط همان حیوان را SUPERSEDED می‌کند، Audit قبلی را نگه می‌دارد، کد قبلی را از کار می‌اندازد و حیوان دیگر گروه را دست‌نخورده می‌گذارد؛ اصلاح بدون دلیل و اصلاح توسط غیر دامپزشک رد می‌شود؛ درخواست متعلق به مالک دیگر همان پاسخ «پیدا نشد» می‌گیرد."
+    },
+    {
+      "id": "finder-browser",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  node --test --test-concurrency=1 \"tests/browser/finder.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0 روی Chromium واقعی. پوشش واقعی: Finder پیش از ورود داده واقعی نتیجه‌ای ندارد و همین را می‌گوید؛ سوپرادمین دامپزشک از قبل تأییدشده و مرکزش را ثبت می‌کند و صفحه صریحاً می‌گوید فرم درخواست معتمدشدن نیست؛ مرکزی که فقط کاشت دارد و نمونه‌گیری خون ندارد وارد Finder نمی‌شود و تنها با تکمیل امکانات اجباری وارد می‌شود؛ نتیجه Finder نام مرکز، نام دامپزشک، کد نظام دامپزشکی، نشانی، CTA تماس و دقیقاً متن «برای اطلاع دقیق از قیمت‌ها با دامپزشک یا مرکز تماس بگیرید.» را دارد و هیچ عبارت نوبت/تقویم/ساعت در صفحه نیست؛ جست‌وجوی محله نتیجه می‌دهد و عبارت بی‌نتیجه، حالت خالی با راه اصلاح فیلتر می‌دهد؛ صفحه اطلاعات مرکز، امکانات و نبود سرویس نقشه را صادقانه نشان می‌دهد؛ دو حیوان با دو نوع خدمت متفاوت در یک گروه، دو کد و دو مهلت مستقل می‌گیرند؛ میز پذیرش کد تایپ‌شده را یک بار می‌پذیرد، دفعه دوم «قبلاً استفاده شده» و کد جعلی «معتبر نیست» می‌گیرد و پیش از پذیرش هیچ نام حیوان یا کاربری نمایش داده نمی‌شود؛ اصلاح نوع خدمت درخواست را جایگزین می‌کند، کد جدید می‌دهد، پرونده حیوان دوم گروه دست‌نخورده می‌ماند و مالک اعلان می‌گیرد؛ کد منقضی‌شده با درخواست کد جدید جایگزین می‌شود و سابقه کد قبلی در دیتابیس باقی می‌ماند. ۱۵ اسکرین‌شات در docs/reports/screenshots/prompt-007/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 194 · pass 194 · fail 0 · skipped 0 (۲۵ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 41 · pass 41 · fail 0 (۶ مورد Finder و مراجعه، ۶ مورد حیوان و نسب، ۷ مورد پرداخت/عضویت، ۱۱ مورد هویت، ۱۱ مورد پوسته و RTL)."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0004_vets` اعمال شد (جدول‌های vet_profile، vet_location، vet_visit_batch، vet_visit_request و referral_code) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 هر دو نسخه Requirements.md و reference-inputs برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "هیچ داده واقعی دامپزشک معتمد، کد نظام دامپزشکی یا پروانه مرکز وارد نشده است و اختراع هم نشد. تا ورود داده واقعی از محیط سوپرادمین، Finder خالی است و همین را صریح می‌گوید. داده‌های تست با پیشوند SYNTHETIC و روی محدوده ۰۹۹۹ ساخته می‌شوند.",
+    "تصویر QR تولید نمی‌شود؛ کد به‌صورت مقدار خوانا نمایش داده می‌شود و ورود دستی و اسکن هر دو همان مقدار را وارد می‌کنند (DEC-0048). افزودن کتابخانه تولید QR یک تصمیم مستقل است و انجام نشد.",
+    "سرویس نقشه پیکربندی نشده است؛ فاصله فقط وقتی محاسبه می‌شود که مختصات مرکز به‌صورت دستی ثبت شده باشد و هیچ موقعیت حدسی ساخته نمی‌شود. گرفتن موقعیت کاربر از مرورگر در این مرحله پیاده نشد و فیلتر فاصله بدون مبدأ اثری ندارد.",
+    "مسیر پس از پذیرش — خواندن سریال، کاشت یا تأیید میکروچیپ، نمونه‌گیری اجباری، Sample Tracking Code و Custody — به PROMPT-008 تعلق دارد. صفحه دامپزشک همین حالا می‌گوید نمونه‌گیری اجباری است ولی هنوز آن را ثبت نمی‌کند.",
+    "Context بارداری و DNA ساخته و تست شده‌اند ولی ورودی‌های مجاز آن‌ها (نمونه‌گیری مجدد و اعلام بارداری) در PROMPT‌های بعدی به آن‌ها وصل می‌شوند؛ فعلاً از همان مسیر عمومی درخواست قابل انتخاب‌اند و صفحه توضیح می‌دهد که مسیر معمول شجره‌نامه دامپزشک را دوباره نمی‌خواهد.",
+    "لغو درخواست مراجعه توسط کاربر پیاده نشد چون سند شرط و اثر آن را تعیین نکرده است؛ وضعیت CANCELLED در مدل و در اعتبارسنجی کد وجود دارد ولی هیچ مسیر خودسرانه‌ای برای رسیدن به آن ساخته نشد.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "FINDER_AND_REFERRAL_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}
