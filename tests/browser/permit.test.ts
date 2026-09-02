@@ -20,6 +20,8 @@ import { createDatabase } from '../../src/db/client.ts';
 const BASE_URL = process.env.BROWSER_TEST_URL ?? 'http://127.0.0.1:3111';
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgres://hamzist:hamzist_local_dev@127.0.0.1:5433/hamzist';
 const SHOTS = path.join('docs', 'reports', 'screenshots', 'prompt-013');
+/** The date screens belong to PROMPT-014, so their evidence is stored there. */
+const DATE_SHOTS = path.join('docs', 'reports', 'screenshots', 'prompt-014');
 const MOBILE = { width: 360, height: 800 };
 const DESKTOP = { width: 1440, height: 900 };
 
@@ -330,6 +332,7 @@ let pair!: Pair;
 
 before(async () => {
   await fs.mkdir(SHOTS, { recursive: true });
+  await fs.mkdir(DATE_SHOTS, { recursive: true });
   await withDb(async (db) => {
     await db.execute(sql`delete from otp_challenge where mobile like '0999%'`);
     await db.execute(sql`delete from dev_outbound_sms where to_mobile like '0999%'`);
@@ -573,4 +576,84 @@ test('the rule, the payment, the submission and the issuance happen in the order
     await expectText(page, 'پرونده رسمی جفت‌گیری');
   }
   await owner.screenshot({ path: path.join(SHOTS, 'permit-issued-owner.png'), fullPage: true });
+});
+
+/**
+ * Official dates on the issued permit — §17.1, §17.2.
+ *
+ * The screens are exercised by both participants in their own sessions: a
+ * declaration, a correction that retires the pending approval, a conflict that
+ * keeps both values, the confirmation that sets the official basis, and the
+ * advisory warning that appears afterwards without ever removing the continue.
+ */
+test('both sides declare, correct, disagree and confirm a date on the real screens', async () => {
+  const owner = pair.first.page;
+  const other = pair.second.page;
+
+  await owner.goto(BASE_URL + '/mating/permits', { waitUntil: 'load' });
+  await owner.getByTestId('open-permit').first().click();
+  await owner.waitForURL((url) => /^\/mating\/permits\/[0-9a-f-]{36}$/.test(url.pathname));
+  const permitId = new URL(owner.url()).pathname.split('/')[3]!;
+
+  // The dates page is reachable from the issued case.
+  await owner.getByTestId('open-dates').click();
+  await owner.waitForURL((url) => url.pathname.endsWith('/dates'));
+  await expectText(owner, 'هنوز تاریخ تأییدشده‌ای نیست');
+  await expectText(owner, 'تا ثبت چنین تاریخی، هیچ تاریخ فرضی ساخته نمی‌شود');
+  await owner.screenshot({ path: path.join(DATE_SHOTS, 'dates-empty.png'), fullPage: true });
+
+  const day = (offset: number) => {
+    const d = new Date(Date.now() + offset * 86_400_000);
+    return d.toISOString().slice(0, 10);
+  };
+
+  // A future date is refused on the screen, with its reason.
+  await owner.getByTestId('mated-on').fill(day(1));
+  await owner.getByTestId('submit-date').click();
+  await expectText(owner, 'نمی‌تواند در آینده باشد');
+
+  await owner.getByTestId('mated-on').fill(day(-6));
+  await owner.getByTestId('submit-date').click();
+  await owner.getByTestId('date-version-1').waitFor();
+  assert.equal(await owner.getByTestId('date-status-1').innerText(), 'در انتظار تأیید طرف مقابل');
+
+  // A correction appends version 2 and retires the pending approval.
+  await owner.getByTestId('mated-on-correction').fill(day(-5));
+  await owner.getByTestId('submit-date-correction').click();
+  await owner.getByTestId('date-version-2').waitFor();
+  assert.equal(await owner.getByTestId('date-status-1').innerText(), 'جایگزین‌شده با نسخه جدید');
+  await owner.screenshot({ path: path.join(DATE_SHOTS, 'dates-correction.png'), fullPage: true });
+
+  // The other side answers with a different date: both values stay visible.
+  await other.goto(BASE_URL + '/mating/permits/' + permitId + '/dates', { waitUntil: 'load' });
+  await expectText(other, 'پاسخ شما به نسخه 2');
+  await other.getByTestId('toggle-different-date').click();
+  await other.getByTestId('different-mated-on').fill(day(-4));
+  await other.getByTestId('submit-different-date').click();
+  await other.getByTestId('date-version-3').waitFor();
+  assert.equal(await other.getByTestId('date-status-2').innerText(), 'مغایرت تاریخ (DATE_CONFLICT)');
+  const historyText = await other.getByTestId('date-history').innerText();
+  assert.ok(historyText.includes(day(-5)) && historyText.includes(day(-4)), 'both values stay readable');
+  await other.screenshot({ path: path.join(DATE_SHOTS, 'dates-conflict.png'), fullPage: true });
+
+  // The first side confirms the counter-proposal; that version becomes the basis.
+  await owner.goto(BASE_URL + '/mating/permits/' + permitId + '/dates', { waitUntil: 'load' });
+  await expectText(owner, 'پاسخ شما به نسخه 3');
+  await owner.getByTestId('confirm-date').click();
+  await owner.getByTestId('basis-marker').waitFor();
+  assert.equal(await owner.getByTestId('date-status-3').innerText(), 'تأییدشده دوطرفه');
+
+  // §17.2: the warning now appears, says so plainly, and blocks nothing.
+  await expectText(owner, 'این هشدار مانع ادامه مسیر نیست');
+  assert.equal(await owner.getByTestId('cooldown-warning').count(), 1);
+  assert.equal(await owner.getByTestId('submit-date').count(), 1, 'the continue action stays available');
+  await owner.screenshot({ path: path.join(DATE_SHOTS, 'dates-confirmed-warning.png'), fullPage: true });
+
+  // The same warning at the permit entry, and the animal file carries the date.
+  await owner.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
+  assert.equal(await owner.getByTestId('cooldown-warning').count(), 1);
+  await owner.goto(BASE_URL + '/animals/' + pair.first.animalId, { waitUntil: 'load' });
+  await expectText(owner, 'تاریخ‌های جفت‌گیری');
+  assert.ok((await owner.getByTestId('animal-mating-dates').innerText()).includes(day(-4)));
+  await owner.screenshot({ path: path.join(DATE_SHOTS, 'animal-mating-dates.png'), fullPage: true });
 });

@@ -103,3 +103,56 @@ export const permitAllocationShares = pgTable(
   },
   (t) => [uniqueIndex('permit_allocation_side_key').on(t.permitId, t.side)],
 );
+
+/**
+ * The state of one declared mating date — §17.1.
+ *
+ * A correction never overwrites: the earlier row stays in history as
+ * SUPERSEDED, and a counterparty who answers with a different date leaves both
+ * values visible as a CONFLICTED pair.
+ */
+export const matingDateStatus = pgEnum('mating_date_status', [
+  'PROPOSED',
+  'CONFIRMED',
+  'SUPERSEDED',
+  'CONFLICTED',
+]);
+
+/**
+ * One declared mating date, one version — §17.1, §17.2.
+ *
+ * Either participant may declare a date, as often as they like, so this is an
+ * append-only history rather than a single mutable field. The most recent
+ * mutually CONFIRMED row is what drives both animals' timeline and cooldown; a
+ * personal, unconfirmed record can never take its place (§17.3).
+ */
+export const matingDateDeclarations = pgTable(
+  'mating_date_declaration',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    permitId: uuid('permit_id')
+      .notNull()
+      .references(() => matingPermits.id, { onDelete: 'cascade' }),
+    /** Sequential per permit, so a stale approval can never confirm a new one. */
+    version: integer('version').notNull(),
+    matedOn: text('mated_on').notNull(),
+    status: matingDateStatus('status').notNull().default('PROPOSED'),
+    declaredByAccountId: uuid('declared_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    declaredAt: timestamp('declared_at', { withTimezone: true }).notNull().default(now),
+    confirmedByAccountId: uuid('confirmed_by_account_id').references(() => accounts.id, {
+      onDelete: 'restrict',
+    }),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
+    /** The version this one corrects or contradicts; both stay readable. */
+    replacesVersion: integer('replaces_version'),
+    conflictsWithId: uuid('conflicts_with_id'),
+    noteFa: text('note_fa'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('mating_date_version_key').on(t.permitId, t.version),
+    index('mating_date_permit_idx').on(t.permitId, t.status),
+  ],
+);

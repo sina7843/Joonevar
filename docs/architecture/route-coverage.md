@@ -33,7 +33,7 @@
 | `/kennels` و `/kennels/[id]` | PROTO | BRD-003B/C/D, BRD-008 | s15 | D16 | A-014 — پیاده‌شده در PROMPT-012؛ ورود از Context عمومی (DEC-0080) |
 | `/mating/permits/new` | PROTO | `242:6517` MAT-002..006, MAT-005B | s16, s22 | D12 | A-015 — پیاده‌شده در PROMPT-013؛ Resolve پیش از دعوت و نام مالک به‌صورت کوتاه‌شده (DEC-0086) |
 | `/mating/permits`، `/mating/permits/[id]` و `/mating/permits/[id]/return` | PROTO | MAT-007..010, MAT-010B | s16 | D12, D13 | A-015, A-023 — پیاده‌شده در PROMPT-013؛ ترتیب تأیید ← توافق ← پرداخت ← ارسال روی همان صفحه اجرا می‌شود |
-| `/mating/permits/[id]/dates` | PROTO | MAT-010B + §۱۷ | s17 | — | A-016, A-017 |
+| `/mating/permits/[id]/dates` | PROTO | MAT-010B + §۱۷ | s17 | — | A-016, A-017 — پیاده‌شده در PROMPT-014؛ نسخه‌ها، مغایرت و تأیید نسخه‌محور روی همین صفحه است |
 | `/mating/permits/[id]/pregnancy` | PROTO | MAT-011, MAT-011B | s18 | D08, D12 | A-018, A-019, A-020 |
 | `/mating/permits/[id]/birth` | PROTO | `245:7069` MAT-012..016 | s19 | D18 | A-021, A-032 |
 | `/litters/[id]/allocation` | PROTO | MAT-018/019 | s19 | — | A-022 |

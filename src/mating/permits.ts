@@ -21,8 +21,11 @@ import { assertEligible, eligibilityFor } from '../domain/eligibility/service.ts
 import { conflict, forbidden, notFound, validation, versionStale } from '../domain/errors.ts';
 import { humanCode } from '../domain/ids.ts';
 import { normalizePedigreeCode } from '../domain/lineage.ts';
-import { cooldownWindow, todayCivil } from '../domain/calendar.ts';
-import { readInt } from '../settings/service.ts';
+import {
+  cooldownAdvisoryForAnimals,
+  recordCooldownContinuation,
+  type CooldownAdvisory,
+} from './cooldown.ts';
 import {
   assertAllocationRule,
   type AllocationRuleType,
@@ -157,6 +160,10 @@ export async function startPermit(
     );
   if (live.length > 0) throw conflict('برای این دو حیوان یک پرونده مجوز باز وجود دارد.');
 
+  // §17.2: the same warning at every permit entry. It is advisory, so it is
+  // recorded and the case opens anyway.
+  const advisory = await cooldownAdvisoryForAnimals(database, [sire, dam]);
+
   return database.transaction(async (tx) => {
     const [permit] = await tx
       .insert(matingPermits)
@@ -176,6 +183,11 @@ export async function startPermit(
       targetType: 'MATING_CASE',
       targetId: permit.id,
       after: { sireAnimalId: sire, damAnimalId: dam, counterpartyAccountId: other.ownerAccountId },
+    });
+    await recordCooldownContinuation(tx, actor, advisory, {
+      type: 'MATING_CASE',
+      id: permit.id,
+      step: 'PERMIT_START',
     });
     // The invitation is a notification into this case, addressed to the person
     // the pedigree code actually resolved to (§16 step 4, §23.4).
@@ -350,42 +362,20 @@ export async function saveAllocationRule(
   });
 }
 
-// ── Cooldown seam ─────────────────────────────────────────────────────────
-
-export interface CooldownAdvisory {
-  readonly hasWarning: boolean;
-  readonly messageFa: string | null;
-}
+// ── Cooldown ──────────────────────────────────────────────────────────────
 
 /**
- * The cooldown seam — §17.2, D06.
+ * The cooldown advisory for the two animals of one permit — §17.2.
  *
- * The window is computed only from mutually confirmed mating dates, and those
- * are recorded in the next prompt. Until one exists there is no base date, so
- * there is no warning; and a warning, when it comes, is advisory only and never
- * disables continuing.
+ * The computation itself lives in `cooldown.ts` and is the same at every permit
+ * entry: it reads only mutually confirmed dates, never invents a base date and
+ * never withdraws the continue action.
  */
 export async function cooldownAdvisory(
   database: DbClient,
   permit: PermitRecord,
-  lastConfirmedDates: { sire: string | null; dam: string | null } = { sire: null, dam: null },
 ): Promise<CooldownAdvisory> {
-  const [maleDays, femaleMonths] = await Promise.all([
-    readInt(database, 'cooldown.male_days'),
-    readInt(database, 'cooldown.female_months'),
-  ]);
-  const today = todayCivil();
-  const policy = { maleDays, femaleMonths };
-
-  const sire = cooldownWindow('MALE', lastConfirmedDates.sire, today, policy);
-  const dam = cooldownWindow('FEMALE', lastConfirmedDates.dam, today, policy);
-  const parts: string[] = [];
-  if (sire?.inWindow) parts.push('حیوان نر تا ' + sire.endsOn + ' در بازه Cooldown است.');
-  if (dam?.inWindow) parts.push('حیوان ماده تا ' + dam.endsOn + ' در بازه Cooldown است.');
-
-  return parts.length === 0
-    ? { hasWarning: false, messageFa: null }
-    : { hasWarning: true, messageFa: parts.join(' ') + ' این هشدار مانع ادامه مسیر نیست.' };
+  return cooldownAdvisoryForAnimals(database, [permit.sireAnimalId, permit.damAnimalId]);
 }
 
 // ── Payment and submission ────────────────────────────────────────────────

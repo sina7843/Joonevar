@@ -1,0 +1,102 @@
+{
+  "promptId": "PROMPT-014",
+  "status": "COMPLETE",
+  "summary": "اعلام تاریخ رسمی جفت‌گیری فقط روی پرونده‌ای باز می‌شود که مجوزش صادر شده است؛ پیش از آن همان صفحه دلیلش را می‌گوید. هر دو طرف می‌توانند یک یا چند تاریخ اعلام کنند، حتی چند بار در یک هفته، و هر اعلام نسخه، اعلام‌کننده و زمان ثبت خودش را دارد. هیچ رکوردی overwrite نمی‌شود: اصلاح نسخه تازه می‌سازد و نسخه قبلی با همان مقدار و یادداشتش به‌عنوان جایگزین‌شده در تاریخچه می‌ماند، و تأییدی که برای نسخه قبلی باز مانده بود نسخه جدید را تأیید نمی‌کند چون تأیید به شناسه و شماره همان نسخه و به وضعیت «در انتظار تأیید» در همان UPDATE گره خورده است. پاسخ با تاریخ متفاوت DATE_CONFLICT می‌سازد و هر دو مقدار در فهرست و در Audit دیده می‌شوند. همه تاریخ‌های تأییدشده در تاریخچه می‌مانند و مبنای رسمی، جدیدترین تاریخ تأییدشده دوطرفه در همه پرونده‌های همان حیوان است؛ اعلام تأییدنشده حتی با تاریخ جدیدتر مبنا نمی‌شود و هیچ رکورد شخصی‌ای وارد این محاسبه نیست. بازه نر ۱۴ روز و بازه ماده ۶ ماه تقویمی با Clamp به آخرین روز معتبر ماه است؛ تاریخ‌ها Civil Date بدون ساعت و بدون منطقه‌اند، «امروز» یک بار بر پایه UTC ساخته می‌شود و روز پایان بازه دیگر داخل بازه نیست. داخل بازه، هشدار با جنسیت، تاریخ مبنا و پایان بازه نمایش داده می‌شود، امکان ادامه هرگز حذف یا قفل نمی‌شود و «ادامه آگاهانه» در لحظه اقدام در Audit ثبت می‌گردد؛ بدون سابقه تأییدشده هیچ تاریخ فرضی ساخته نمی‌شود و هیچ هشدار محاسبه‌شده‌ای وجود ندارد. پروفایل حیوان هم دو بخش واقعی «مجوزها» و «تاریخ‌های جفت‌گیری» گرفت.",
+  "changedFiles": [
+    "src/db/schema/mating.ts",
+    "src/db/migrations/0011_mating-dates.sql",
+    "src/db/migrations/meta/0011_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/mating/dates.ts",
+    "src/mating/cooldown.ts",
+    "src/mating/permits.ts",
+    "app/mating/dates-actions.ts",
+    "app/mating/dates-forms.tsx",
+    "app/mating/permits/[id]/dates/page.tsx",
+    "app/mating/permits/[id]/page.tsx",
+    "app/animals/[id]/page.tsx",
+    "tests/helpers/mating.ts",
+    "tests/db/dates.test.ts",
+    "tests/db/permit.test.ts",
+    "tests/domain/cooldown.test.ts",
+    "tests/browser/permit.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-014/dates-empty.png",
+    "docs/reports/screenshots/prompt-014/dates-correction.png",
+    "docs/reports/screenshots/prompt-014/dates-conflict.png",
+    "docs/reports/screenshots/prompt-014/dates-confirmed-warning.png",
+    "docs/reports/screenshots/prompt-014/animal-mating-dates.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-014.json"
+  ],
+  "decisions": ["DEC-0090", "DEC-0091", "DEC-0092", "DEC-0093", "DEC-0094"],
+  "checks": [
+    {
+      "id": "dates-version-concurrency",
+      "command": "node --test \"tests/db/dates.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد و با دو مالک واقعی که هرکدام حیوان شجره‌دار دارند و پرونده مجوزشان تا صدور رفته است. پوشش واقعی: پیش از صدور مجوز، اعلام تاریخ با پیام «فقط روی پرونده‌ای با مجوز صادرشده» رد می‌شود و همان پرونده پس از صدور باز می‌شود؛ هر دو طرف اعلام می‌کنند و دو تاریخ در یک هفته ثبت و تأیید می‌شوند و هیچ‌کدام دیگری را حذف نمی‌کند؛ تاریخ آینده و شخص سوم رد می‌شوند؛ اصلاح نسخه ۲ می‌سازد و نسخه ۱ با همان مقدار و یادداشت به SUPERSEDED می‌رود؛ تأیید کهنه در هر دو شکل (شناسه نسخه قدیمی و شماره نسخه قدیمی روی رکورد جدید) رد می‌شود و پس از آن هنوز هیچ مبنای تأییدشده‌ای وجود ندارد؛ اعلام‌کننده نمی‌تواند نسخه خودش را تأیید کند و تأیید دوباره همان نسخه رد می‌شود؛ پاسخ با همان تاریخ رد می‌شود و پاسخ با تاریخ متفاوت نسخه قبلی را CONFLICTED می‌کند و نسخه جدید با ارجاع به آن ساخته می‌شود، در حالی که مقدار قبلی دست‌نخورده می‌ماند و Audit هر دو مقدار را در before/after دارد؛ تا حل مغایرت هیچ مبنایی وجود ندارد و اعلان مغایرت با Resume به همان صفحه تاریخ‌ها می‌رسد؛ با سه اعلام (دو تأییدشده و یک تأییدنشدهٔ جدیدتر) مبنای هر دو حیوان همان تأییدشده جدیدتر است و هر دو پرونده حیوان دو رویداد ANIMAL_MATING_DATE_CONFIRMED می‌گیرند."
+    },
+    {
+      "id": "cooldown-boundaries",
+      "command": "node --test \"tests/domain/cooldown.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 9 · pass 9 · fail 0. پوشش واقعی مرزها: بازه نر دقیقاً ۱۴ روز است و روز چهاردهم دیگر داخل بازه نیست (روز ۱۳ داخل، روز ۱۴ و ۱۵ خارج، خود روز مبنا داخل)؛ شمارش روز از مرز ماه و سال و از ۲۹ فوریه سال کبیسه عبور می‌کند؛ بازه ماده شش ماه تقویمی است و با هیچ عدد ثابت روز قابل بازتولید نیست؛ ۳۱ اوت + ۶ ماه = ۲۸ فوریه و در سال کبیسه ۲۹ فوریه، ۳۱ مارس + ۶ ماه = ۳۰ سپتامبر و ۳۱ مه + ۶ ماه = ۳۰ نوامبر؛ مبنای ۲۹ فوریه هم در ۶ ماه و هم در ۱۲ ماه درست Clamp می‌شود؛ روز پایان بازه ماده هم خارج از بازه است؛ نبود سابقه تأییدشده هیچ بازه‌ای نمی‌سازد؛ «امروز» از UTC ساخته می‌شود و ساعت‌های ۰۰:۰۰ و ۲۳:۵۹ همان روز تقویمی را می‌دهند، پس اختلاف منطقه زمانی هیچ حیوانی را یک روز جابه‌جا نمی‌کند؛ و شیء بازه هیچ فیلدی جز baseDate/endsOn/inWindow ندارد، یعنی هیچ صفحه‌ای نمی‌تواند آن را «مسدود» بخواند."
+    },
+    {
+      "id": "permit-workflow-regression",
+      "command": "node --test \"tests/db/permit.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 7 · pass 7 · fail 0 پس از انتقال fixture مشترک به tests/helpers/mating.ts؛ Gate مرحله قبل دست‌نخورده سبز ماند."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 278 · pass 278 · fail 0 · skipped 0 (۱۵ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 65 · pass 65 · fail 0. مورد جدید این مرحله کل مسیر تاریخ‌ها را در Chromium و از دو نشست جداگانه اجرا می‌کند: صفحه خالی با متن صریح «هیچ تاریخ فرضی ساخته نمی‌شود»، رد تاریخ آینده روی صفحه، اعلام نسخه ۱، اصلاح به نسخه ۲ و تغییر وضعیت نسخه ۱ به «جایگزین‌شده با نسخه جدید»، پاسخ طرف مقابل با تاریخ متفاوت و دیده‌شدن هم‌زمان هر دو تاریخ با وضعیت «مغایرت تاریخ (DATE_CONFLICT)»، تأیید نسخه ۳ و نمایش نشانگر «مبنای فعلی Cooldown و Timeline هر دو حیوان»، ظاهرشدن هشدار با جمله «این هشدار مانع ادامه مسیر نیست» در حالی که فرم اعلام تاریخ همچنان روی صفحه است، نمایش همان هشدار در ورودی پرونده مجوز، و دیده‌شدن تاریخ تأییدشده در بخش «تاریخ‌های جفت‌گیری» پروفایل حیوان. ۵ اسکرین‌شات در docs/reports/screenshots/prompt-014/."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0011_mating-dates` اعمال شد (جدول mating_date_declaration با enum وضعیت و ایندکس یکتای permit_id+version) و اجرای دوباره replay نکرد. هر تست دیتابیس هم روی یک دیتابیس تازه همه migrationها را از صفر اجرا می‌کند."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "مقادیر ۱۴ روز و ۶ ماه از تنظیمات دیتابیسی (`cooldown.male_days` و `cooldown.female_months`) خوانده می‌شوند؛ اگر انجمن بعداً سیاست دیگری اعلام کند، تغییر مقدار کافی است و منطق تقویمی همان می‌ماند.",
+    "تاریخ‌ها در ورودی به شکل میلادی YYYY-MM-DD گرفته می‌شوند و در نمایش به تقویم فارسی تبدیل می‌شوند؛ انتخابگر تاریخ شمسی اختصاصی ساخته نشد و در صورت نیاز، افزودن آن تغییری در محاسبه ایجاد نمی‌کند.",
+    "رکورد شخصی تاریخ (§۱۷.۳) در این مرحله ساخته نشد و به PROMPT-017 تعلق دارد؛ آنچه اینجا تضمین شده این است که هیچ منبع تأییدنشده‌ای وارد محاسبه مبنای رسمی نمی‌شود.",
+    "ادامه چرخه (بارداری، زایمان، توله و تخصیص) به PROMPT-015 و PROMPT-016 تعلق دارد.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "درگاه پرداخت واقعی همچنان پیکربندی نشده است؛ مسیر مجوز در تست‌ها با درگاه توسعه و تأیید سمت سرور طی می‌شود.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "OFFICIAL_MATING_DATES_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

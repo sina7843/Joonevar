@@ -13,6 +13,8 @@ import { referenceBreeds } from '../../../src/db/schema/core.ts';
 import { familyOf, requireOwnedAnimal } from '../../../src/animals/service.ts';
 import { findForeignCase, FOREIGN_STATUS_FA } from '../../../src/animals/foreign-pedigree.ts';
 import { auditTrail } from '../../../src/audit/service.ts';
+import { permitsOfAnimal, PERMIT_STATUS_FA } from '../../../src/mating/permits.ts';
+import { confirmedDatesOfAnimal } from '../../../src/mating/dates.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { animalChipView } from '../../../src/clinical/microchip.ts';
 import { SAMPLE_TAKEN_NOTE_FA, sheetOfAnimal } from '../../../src/documents/registration-sheet.ts';
@@ -38,13 +40,14 @@ const AUDIT_TITLE_FA: Record<string, string> = {
   ANIMAL_UPDATED: 'اطلاعات پرونده به‌روزرسانی شد',
   ANIMAL_PHOTO_ATTACHED: 'تصویر حیوان بارگذاری شد',
   ANIMAL_GENERATION_FROM_FOREIGN_PEDIGREE: 'نسل از شجره‌نامه خارجی ثبت شد',
+  ANIMAL_MATING_PERMIT_ISSUED: 'مجوز رسمی جفت‌گیری صادر شد',
+  ANIMAL_MATING_PERMIT_REVIEWED: 'پرونده مجوز جفت‌گیری بررسی شد',
+  ANIMAL_MATING_DATE_CONFIRMED: 'تاریخ جفت‌گیری دوطرفه تأیید شد',
 };
 
 /** Sections that belong to features built in later prompts. */
 const PENDING_SECTIONS: ReadonlyArray<{ id: string; title: string; note: string }> = [
   { id: 'pedigree', title: 'شجره‌نامه', note: 'کد شجره‌نامه و وضعیت صدور.' },
-  { id: 'permits', title: 'مجوزها', note: 'مجوز جفت‌گیری و پرونده‌های مرتبط.' },
-  { id: 'mating-dates', title: 'تاریخ‌های جفت‌گیری', note: 'اعلام‌ها، تأییدها و نسخه‌ها.' },
   { id: 'litter', title: 'بارداری، زایمان و Litter', note: 'اعلام کاربر و نتیجه مستقل دامپزشک.' },
 ];
 
@@ -72,6 +75,8 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   const { chip, conflicts } = await animalChipView(db(), animal.id);
   const sheet = await sheetOfAnimal(db(), animal.id);
   const parentage = await resultOfAnimal(db(), animal.id);
+  const permits = await permitsOfAnimal(db(), animal.id);
+  const matingDates = await confirmedDatesOfAnimal(db(), animal.id);
   const sampleRows = await db()
     .select()
     .from(samples)
@@ -323,6 +328,55 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
               }}
             />
           </div>
+        </Card>
+
+        {/* §10 and §16: the official cases this animal is part of. */}
+        <Card>
+          <h3 className="text-label-lg">مجوزها</h3>
+          {permits.length === 0 ? (
+            <p className="mt-md text-body-sm text-text-disabled">پرونده مجوزی برای این حیوان ثبت نشده است.</p>
+          ) : (
+            <ul className="mt-lg space-y-md" data-testid="animal-permits">
+              {permits.map((permit) => (
+                <li key={permit.id} className="flex items-start justify-between gap-md">
+                  <div className="min-w-0">
+                    <p className="text-label-md">{permit.permitNo ?? 'پرونده مجوز'}</p>
+                    <p className="mt-2xs text-caption text-text-secondary">
+                      {PERMIT_STATUS_FA[permit.status]}
+                    </p>
+                  </div>
+                  <Link
+                    href={'/mating/permits/' + permit.id}
+                    className="text-label-md text-text-brand underline underline-offset-4"
+                  >
+                    مشاهده پرونده
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        {/* §17.1: only mutually confirmed dates appear as the official history. */}
+        <Card>
+          <h3 className="text-label-lg">تاریخ‌های جفت‌گیری</h3>
+          <p className="mt-2xs text-caption text-text-secondary">
+            فقط تاریخ‌های تأییدشده دوطرفه؛ جدیدترین آن‌ها مبنای فاصله زمانی است.
+          </p>
+          {matingDates.length === 0 ? (
+            <p className="mt-md text-body-sm text-text-disabled">تاریخ تأییدشده‌ای ثبت نشده است.</p>
+          ) : (
+            <ul className="mt-lg space-y-sm" data-testid="animal-mating-dates">
+              {matingDates.map((row) => (
+                <li key={row.permitId + '-' + row.version} className="text-body-sm">
+                  <span dir="ltr" className="font-mono">
+                    {row.matedOn}
+                  </span>{' '}
+                  · {formatCivilDateFa(row.matedOn)} · نسخه {row.version} · مجوز {row.permitNo ?? '—'}
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
         <Alert tone="info" title="بخش‌هایی که در مراحل بعدی پر می‌شوند">

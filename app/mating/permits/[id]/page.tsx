@@ -26,6 +26,7 @@ import {
   SIDE_FA,
   type AllocationSide,
 } from '../../../../src/domain/allocation.ts';
+import { NO_BASIS_NOTE_FA } from '../../../../src/mating/cooldown.ts';
 import { AllocationRuleForm, ConfirmPartyForm, PayPermitForm, SubmitPermitForm } from '../../forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -112,8 +113,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
             </Alert>
           ) : (
             <p className="mt-lg text-caption text-text-secondary" data-testid="cooldown-seam">
-              محاسبه فاصله زمانی فقط بر پایه تاریخ‌های جفت‌گیری تأییدشده دوطرفه انجام می‌شود؛ تا ثبت چنین
-              تاریخی، هشداری ساخته نمی‌شود و هیچ تاریخی فرض نمی‌شود.
+              {NO_BASIS_NOTE_FA}
             </p>
           )}
         </Card>
@@ -247,6 +247,15 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
         {permit.status === 'ISSUED' ? (
           <Card>
             <h2 className="text-label-lg">پرونده رسمی جفت‌گیری</h2>
+            <p className="mt-md text-body-sm">
+              <Link
+                href={'/mating/permits/' + permit.id + '/dates'}
+                className="text-text-brand underline underline-offset-4"
+                data-testid="open-dates"
+              >
+                ثبت و تأیید تاریخ‌های جفت‌گیری
+              </Link>
+            </p>
             <p className="mt-md text-body-sm" data-testid="mating-case-context">
               این مجوز، پرونده رسمی جفت‌گیری بین دو حیوان بالا را ایجاد کرده است و در سوابق هر دو حیوان ثبت
               شده است. ادامه مسیر (تاریخ جفت‌گیری، بارداری، زایمان و تخصیص) در همین پرونده رسمی دنبال می‌شود.
