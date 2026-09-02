@@ -1,27 +1,123 @@
 @import 'tailwindcss';
 
 /*
- * Foundation tokens only.
+ * Design tokens — read from the approved prototype file
+ * SPDPe6xmPR4fDGXIT5fvni via get_variable_defs on nodes 109:360 (F03),
+ * 156:397 (F04), 349:8324 (F15) and 178:914 (VET-009).
  *
- * The published Design System file contains just the brand layer, so only the
- * values it actually defines are treated as confirmed here (DEC-0008). The full
- * semantic token set and the component layer are built in PROMPT-003.
- *
- * Typography uses a system Persian stack as a clearly-marked temporary fallback
- * until IRANSansX is supplied with a licence (DEC-0007).
+ * Names below are the published variable names, unchanged, so a value can be
+ * traced back to its source. Nothing here is invented; the two entries that do
+ * not exist upstream are marked CODE-ONLY and listed in the design mapping.
  */
 @theme {
-  --color-brand: #e46a1d;
-  --color-cream: #fff1d6;
-  --color-ink: #171a17;
-  --color-olive-900: #3a3b36;
+  /* ── Brand and surfaces ────────────────────────────────────────────── */
+  --color-bg-canvas: #fffcf8;
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: #faf7f2;
+  --color-bg-brand-subtle: #fff6ed;
+  --color-bg-disabled: #f0eae2;
 
+  --color-text-primary: #171a17;
+  --color-text-secondary: #685f57;
+  --color-text-brand: #a83d0b;
+  --color-text-disabled: #b9aea2;
+
+  --color-border-subtle: #f0eae2;
+  --color-border-brand: #e46a1d;
+  --color-border-disabled: #f0eae2;
+
+  --color-action-primary-default: #c94f12;
+  --color-action-primary-on: #ffffff;
+  --color-action-primary-disabled: #f0eae2;
+  --color-action-secondary-default: #ffffff;
+  --color-action-secondary-on: #171a17;
+  --color-action-secondary-disabled: #faf7f2;
+
+  /* ── Status ────────────────────────────────────────────────────────── */
+  --color-status-neutral-bg: #faf7f2;
+  --color-status-neutral-text: #4f4842;
+  --color-status-neutral-border: #ded5ca;
+  --color-status-info-bg: #eff8ff;
+  --color-status-info-text: #175cd3;
+  --color-status-info-border: #2e90fa;
+  --color-status-success-bg: #ecfdf3;
+  --color-status-success-text: #166b48;
+  --color-status-success-border: #22a06b;
+  --color-status-warning-bg: #fffaeb;
+  --color-status-warning-text: #b54708;
+  --color-status-warning-border: #f79009;
+  --color-status-error-bg: #fef3f2;
+  --color-status-error-text: #b42318;
+  --color-status-error-border: #f04438;
+
+  /* ── Logo (Design System file 2GMJPgnnenGnr1zBN2yH5h) ───────────────── */
+  --color-logo-mark: #e46a1d;
+  --color-logo-cutout: #fff1d6;
+
+  /* ── Spacing ───────────────────────────────────────────────────────── */
+  --spacing-0: 0px;
+  --spacing-2xs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+
+  /* ── Radii ─────────────────────────────────────────────────────────── */
+  --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-pill: 999px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
 
-  --font-fa: 'Vazirmatn', 'IRANSansX', 'Segoe UI', Tahoma, system-ui, sans-serif;
+  /* ── Sizes ─────────────────────────────────────────────────────────── */
+  --size-stroke-default: 1px;
+  --size-icon-xs: 16px;
+  --size-icon-sm: 20px;
+  --size-icon-md: 24px;
+  --size-icon-lg: 32px;
+  --size-control-sm: 36px;
+  --size-control-md: 44px;
+  --size-touch-min: 44px;
+  --size-badge-sm: 24px;
+  --size-selection-md: 22px;
+  --size-header-mobile: 64px;
+  --size-textarea-rows-3: 72px;
+
+  /*
+   * Typography. The published styles name IRANSansX at 12/14/16/20/24/32 with
+   * fixed line heights. The font file itself is not in this package and its
+   * licence is not confirmed here, so the stack falls back to a system Persian
+   * face and any typographic claim stays UNVERIFIED (DEC-0007). Sizes and line
+   * heights are the real published values.
+   */
+  --font-fa: 'IRANSansX', 'Vazirmatn', 'Segoe UI', Tahoma, system-ui, sans-serif;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 20px;
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 18px;
+  --text-label-md: 14px;
+  --text-label-md--line-height: 20px;
+  --text-label-lg: 16px;
+  --text-label-lg--line-height: 24px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 24px;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 28px;
+  --text-h4: 20px;
+  --text-h4--line-height: 32px;
+  --text-h3: 24px;
+  --text-h3--line-height: 36px;
+  --text-h1: 32px;
+  --text-h1--line-height: 48px;
+}
+
+:root {
+  /* CODE-ONLY: no overlay/scrim or focus-ring variable is published upstream. */
+  --hz-scrim: color-mix(in srgb, #171a17 45%, transparent);
+  --hz-focus-ring: #c94f12;
 }
 
 html {
@@ -30,13 +126,48 @@ html {
 
 body {
   font-family: var(--font-fa);
-  background: var(--color-cream);
-  color: var(--color-ink);
+  background: var(--color-bg-canvas);
+  color: var(--color-text-primary);
+  font-size: var(--text-body-sm);
+  line-height: var(--text-body-sm--line-height);
+  /* Long Persian words must wrap rather than push the layout sideways. */
+  overflow-wrap: anywhere;
 }
 
-/* Identifiers and numbers stay readable inside Persian RTL text (§24.3). */
-.ltr-isolate {
+/*
+ * Focus must stay visible for keyboard users. Tailwind's reset removes the
+ * default outline, so it is restored explicitly on every focusable element.
+ */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--hz-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/*
+ * Identifiers and numbers stay left-to-right and readable inside Persian text
+ * (§24.3) without altering the stored value.
+ */
+.hz-ltr {
   direction: ltr;
   unicode-bidi: isolate;
   display: inline-block;
+}
+
+/* Horizontal chip rails scroll instead of widening the page. */
+.hz-rail {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hz-rail::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -68,6 +68,11 @@ export function canEnterContext(activeRoles: readonly AccountRoleName[], context
   return activeRoles.includes(context as AccountRoleName);
 }
 
+/** Denial message for a route the actor's current context may not enter. */
+export function forbiddenContext(context: ActorContextName, pathname: string) {
+  return forbidden('Context ' + context + ' may not access ' + pathname);
+}
+
 export function assertContext(actor: Actor, allowed: readonly ActorContextName[]): Actor {
   if (!allowed.includes(actor.context)) {
     throw forbidden('This action is not available in the ' + actor.context + ' context');

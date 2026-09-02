@@ -1,0 +1,93 @@
+/**
+ * Route access map — §4, D10, D11.
+ *
+ * Hiding a link is not access control. Every guarded route is listed here and
+ * checked on the server before anything is rendered, so editing a URL cannot
+ * reach a context the account does not hold.
+ *
+ * Operational shells are separate routes, never a promotion of a public
+ * account, and they are matched most-specific-first.
+ */
+import { canEnterContext, forbiddenContext, type Actor, type ActorContextName, type MaybeActor } from './actor.ts';
+import { unauthenticated } from '../domain/errors.ts';
+
+export type RouteAccess = 'PUBLIC' | readonly ActorContextName[];
+
+const PUBLIC_APP: readonly ActorContextName[] = ['USER', 'BREEDER', 'TRUSTED_VET'];
+
+/** Longest prefix wins, so `/breeder/activate` is matched before `/breeder`. */
+const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
+  { prefix: '/', access: 'PUBLIC' },
+  { prefix: '/login', access: 'PUBLIC' },
+  { prefix: '/api/health', access: 'PUBLIC' },
+
+  { prefix: '/dashboard', access: PUBLIC_APP },
+  { prefix: '/notifications', access: PUBLIC_APP },
+  { prefix: '/profile', access: PUBLIC_APP },
+  { prefix: '/membership', access: PUBLIC_APP },
+  { prefix: '/animals', access: PUBLIC_APP },
+  { prefix: '/requests', access: PUBLIC_APP },
+  { prefix: '/registration', access: PUBLIC_APP },
+  { prefix: '/pedigree', access: PUBLIC_APP },
+  { prefix: '/vets', access: PUBLIC_APP },
+  { prefix: '/declaration', access: PUBLIC_APP },
+  { prefix: '/documents', access: PUBLIC_APP },
+
+  // Becoming a breeder starts from the ordinary user context.
+  { prefix: '/breeder/activate', access: ['USER', 'BREEDER'] },
+  { prefix: '/breeder', access: ['BREEDER'] },
+  { prefix: '/kennels', access: ['BREEDER'] },
+  { prefix: '/mating', access: ['USER', 'BREEDER'] },
+  { prefix: '/puppy-cards', access: ['USER', 'BREEDER'] },
+  { prefix: '/litters', access: ['USER', 'BREEDER'] },
+
+  // The trusted vet panel is the assigned-work surface, not a public context.
+  { prefix: '/vet', access: ['TRUSTED_VET'] },
+
+  // Operational shells (D11).
+  { prefix: '/assoc', access: ['ASSOCIATION_OPERATOR'] },
+  { prefix: '/genetics', access: ['GENETICS_OPERATOR'] },
+  { prefix: '/admin', access: ['SUPERADMIN'] },
+];
+
+function normalize(pathname: string): string {
+  const trimmed = pathname.split('?')[0]!.split('#')[0]!;
+  if (trimmed.length > 1 && trimmed.endsWith('/')) return trimmed.slice(0, -1);
+  return trimmed === '' ? '/' : trimmed;
+}
+
+function matches(pathname: string, prefix: string): boolean {
+  if (prefix === '/') return pathname === '/';
+  return pathname === prefix || pathname.startsWith(prefix + '/');
+}
+
+export function accessForRoute(pathname: string): RouteAccess {
+  const path = normalize(pathname);
+  let best: { prefix: string; access: RouteAccess } | null = null;
+  for (const rule of RULES) {
+    if (!matches(path, rule.prefix)) continue;
+    if (best === null || rule.prefix.length > best.prefix.length) best = rule;
+  }
+  // An unlisted route is closed by default: a new page cannot become publicly
+  // reachable just because nobody remembered to add a rule.
+  return best?.access ?? [];
+}
+
+export function canAccessRoute(actor: MaybeActor, pathname: string): boolean {
+  const access = accessForRoute(pathname);
+  if (access === 'PUBLIC') return true;
+  if (actor === null) return false;
+  if (!access.includes(actor.context)) return false;
+  return canEnterContext(actor.activeRoles, actor.context);
+}
+
+/** Server-side gate used by every guarded layout and route handler. */
+export function assertRouteAccess(actor: MaybeActor, pathname: string): Actor | null {
+  const access = accessForRoute(pathname);
+  if (access === 'PUBLIC') return actor;
+  if (actor === null) throw unauthenticated();
+  if (!access.includes(actor.context) || !canEnterContext(actor.activeRoles, actor.context)) {
+    throw forbiddenContext(actor.context, pathname);
+  }
+  return actor;
+}
