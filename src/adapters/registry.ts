@@ -9,6 +9,8 @@
 import type { Env } from '../config/env.ts';
 import { env as loadEnv } from '../config/env.ts';
 import { AppError } from '../domain/errors.ts';
+import type { DbClient } from '../db/client.ts';
+import { devOutboundSms } from '../db/schema/identity.ts';
 
 export type AdapterStatus = 'NOT_CONFIGURED' | 'LOCAL_TEST' | 'SANDBOX_VERIFIED' | 'LIVE_VERIFIED';
 
@@ -96,6 +98,42 @@ export function localTestSmsSender(sink: Array<{ to: string; text: string }> = [
       sink.push(input);
     },
   };
+}
+
+/**
+ * Development outbox sender.
+ *
+ * Writes the message to `dev_outbound_sms` so a developer — and the browser
+ * review — can finish a sign-in without a real provider. It refuses to exist in
+ * production, it is never exposed over HTTP, and reading it needs database
+ * access. The real provider will never write to this table.
+ */
+export function devOutboxSmsSender(database: DbClient, env?: Env): SmsSender {
+  assertNotProduction('sms-otp', env ?? loadEnv());
+  return {
+    async send(input) {
+      await database.insert(devOutboundSms).values({ toMobile: input.to, body: input.text });
+    },
+  };
+}
+
+/**
+ * The sender the application uses.
+ *
+ * With no configured provider outside production, messages go to the
+ * development outbox. In production a missing provider is a hard failure rather
+ * than a silent no-op, because a sign-in that never sends a code but reports
+ * success would be worse than an outage.
+ */
+export function smsSender(database: DbClient, env: Env = loadEnv()): SmsSender {
+  if (env.APP_ENV === 'production' || env.INTEGRATION_MODE !== 'local') {
+    throw new AppError(
+      'NOT_CONFIGURED',
+      'No SMS provider is configured; one-time codes cannot be sent',
+      { detail: { adapter: 'sms-otp' } },
+    );
+  }
+  return devOutboxSmsSender(database, env);
 }
 
 export interface PaymentIntent {

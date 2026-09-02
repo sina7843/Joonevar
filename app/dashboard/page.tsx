@@ -5,6 +5,11 @@ import { Card, LockedServiceCard } from '../../src/ui/card.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { StatusBadge } from '../../src/ui/status.tsx';
+import { Alert } from '../../src/ui/alert.tsx';
+import { ServiceCard } from '../../src/ui/card.tsx';
+import { db } from '../../src/db/client.ts';
+import { findCase } from '../../src/identity/kyc.ts';
+import { findProfile } from '../../src/identity/account.ts';
 import { LOCK_KYC_REQUIRED, LOCK_MEMBERSHIP_REQUIRED } from '../../src/domain/eligibility/locks.ts';
 
 export const dynamic = 'force-dynamic';
@@ -25,9 +30,27 @@ export default async function DashboardPage() {
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
 
+  // Real state, not a placeholder: animal registration opens on approved KYC and
+  // does not depend on membership (§5, §9.1).
+  const profile = await findProfile(db(), actor.accountId);
+  const kyc = await findCase(db(), actor.accountId);
+  const kycApproved = kyc?.status === 'APPROVED';
+
   return (
     <PublicShell actor={actor} title="داشبورد" pathname="/dashboard">
       <div className="space-y-xl">
+        {profile === null ? (
+          <Alert
+            tone="warning"
+            title="حساب شما هنوز کامل نیست"
+            action={
+              <ButtonLink href="/account/profile">تکمیل اطلاعات هویتی</ButtonLink>
+            }
+          >
+            نام، نام خانوادگی، کد ملی و تاریخ تولد برای ادامه لازم است.
+          </Alert>
+        ) : null}
+
         <section aria-labelledby="membership-heading">
           <h2 id="membership-heading" className="sr-only">
             عضویت انجمن
@@ -56,7 +79,11 @@ export default async function DashboardPage() {
           </h2>
           <EmptyState
             title="هنوز حیوانی ثبت نکرده‌اید"
-            description="پس از تأیید احراز هویت، می‌توانید حیوان خود را در هم‌زیست ثبت کنید."
+            description={
+              kycApproved
+                ? 'می‌توانید اولین حیوان خود را ثبت کنید.'
+                : 'پس از تأیید احراز هویت، می‌توانید حیوان خود را در هم‌زیست ثبت کنید.'
+            }
           />
         </section>
 
@@ -74,7 +101,15 @@ export default async function DashboardPage() {
           <h2 id="services-heading" className="text-h4">
             سرویس‌ها
           </h2>
-          <LockedServiceCard serviceLabel="ثبت حیوان هم‌زیست" lock={LOCK_KYC_REQUIRED} />
+          {kycApproved ? (
+            <ServiceCard
+              label="ثبت حیوان هم‌زیست"
+              description="احراز هویت شما تأیید شده است؛ برای ثبت حیوان عضویت لازم نیست."
+              href="/animals/new"
+            />
+          ) : (
+            <LockedServiceCard serviceLabel="ثبت حیوان هم‌زیست" lock={LOCK_KYC_REQUIRED} />
+          )}
           <LockedServiceCard serviceLabel="کاشت یا تأیید میکروچیپ" lock={LOCK_MEMBERSHIP_REQUIRED} />
         </section>
       </div>

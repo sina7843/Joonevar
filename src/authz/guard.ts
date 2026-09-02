@@ -8,17 +8,33 @@
  */
 import { db } from '../db/client.ts';
 import { AppError } from '../domain/errors.ts';
-import { currentActor } from './request-actor.ts';
-import { assertRouteAccess } from './routes.ts';
-import type { Actor } from './actor.ts';
+import { currentSession } from './request-actor.ts';
+import { setSessionContext } from '../identity/session.ts';
+import { accessForRoute, assertRouteAccess, selectContext } from './routes.ts';
+import type { Actor, MaybeActor } from './actor.ts';
 
 export type GuardResult =
   | { readonly ok: true; readonly actor: Actor }
   | { readonly ok: false; readonly denied: AppError };
 
 export async function guardRoute(pathname: string): Promise<GuardResult> {
-  const actor = await currentActor(db());
+  const session = await currentSession(db());
+  const actor: MaybeActor = session?.actor ?? null;
+
   try {
+    const access = accessForRoute(pathname);
+    if (access !== 'PUBLIC' && actor !== null && session !== null) {
+      const selected = selectContext(actor, access);
+      if (selected !== null && selected !== actor.context) {
+        // Persisted so the shell navigation and the role switcher agree with
+        // the context this request is actually being served in.
+        await setSessionContext(db(), session.sessionId, selected);
+        const switched: Actor = { ...actor, context: selected };
+        assertRouteAccess(switched, pathname);
+        return { ok: true, actor: switched };
+      }
+    }
+
     const allowed = assertRouteAccess(actor, pathname);
     if (allowed === null) throw new AppError('UNAUTHENTICATED', 'Sign-in required');
     return { ok: true, actor: allowed };

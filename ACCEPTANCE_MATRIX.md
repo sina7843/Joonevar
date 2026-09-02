@@ -4,7 +4,7 @@
 
 | ID | معیار اصلی | مراحل اجرا | شاهد اجرا |
 |---|---|---|---|
-| A-001 | ثبت حیوان پس از KYC بدون عضویت ممکن است؛ نشانی سکونت اجباری نشده است. | PROMPT-004, PROMPT-006, PROMPT-019 | NOT_STARTED |
+| A-001 | ثبت حیوان پس از KYC بدون عضویت ممکن است؛ نشانی سکونت اجباری نشده است. | PROMPT-004, PROMPT-006, PROMPT-019 | PARTIAL(PROMPT-004) — تأیید KYC ورودی ثبت حیوان را باز می‌کند و عضویت لازم نیست؛ سکونت خالی هیچ‌جا را قفل نمی‌کند. شواهد: تست‌های `identity.test.ts` و مرورگر + docs/reports/screenshots/prompt-004/dashboard-kyc-approved.png. فرم ثبت حیوان در PROMPT-006 |
 | A-002 | عضویت F14 پس از پرداخت موفق مادام‌العمر فعال است و سالانه/Review اجباری به آن اضافه نشده است. | PROMPT-005, PROMPT-019 | NOT_STARTED |
 | A-003 | Role Switcher فقط Contextهای فعال را نشان می‌دهد؛ پنل‌های عملیاتی مستقل‌اند. | PROMPT-003, PROMPT-018, PROMPT-019 | SHELL-VERIFIED(PROMPT-003) — سوییچر فقط نقش فعال؛ Shell عملیاتی جدا و از سوییچر عمومی غیرقابل‌دسترس. شواهد: تست مرورگر + docs/reports/screenshots/prompt-003/role-switcher.png و denied-wrong-shell.png |
 | A-004 | Location ناقص در Finder نیست؛ رزرو نوبت و انتخاب ساعت وجود ندارد. | PROMPT-007, PROMPT-019 | NOT_STARTED |
@@ -28,7 +28,7 @@
 | A-022 | Puppy Card بدون Allocation دوطرفه FINAL صادر نمی‌شود؛ برگه ثبتی توله پیش‌نیاز آن نیست. | PROMPT-016, PROMPT-019 | NOT_STARTED |
 | A-023 | امضای فیزیکی Gate دیجیتال نساخته است. | PROMPT-008, PROMPT-013, PROMPT-019 | NOT_STARTED |
 | A-024 | درخواست فعال دامپزشک با محدودیت پذیرش کار جدید قابل ادامه است. | PROMPT-005, PROMPT-007, PROMPT-018, PROMPT-019 | NOT_STARTED |
-| A-025 | خطا، Retry و اعلان‌ها به همان Draft/Request برمی‌گردند. | PROMPT-004, PROMPT-005, PROMPT-007, PROMPT-018, PROMPT-019 | PARTIAL(PROMPT-003) — Resume Context روی اعلان و CTA بازگشت به همان پرونده؛ خطا/Retry هر فلو در همان مرحله بررسی می‌شود |
+| A-025 | خطا، Retry و اعلان‌ها به همان Draft/Request برمی‌گردند. | PROMPT-004, PROMPT-005, PROMPT-007, PROMPT-018, PROMPT-019 | PARTIAL(PROMPT-003) — Resume Context روی اعلان و CTA بازگشت به همان پرونده؛ خطا/Retry هر فلو در همان مرحله بررسی می‌شود · PARTIAL(PROMPT-004) — ورود به درخواست مبدأ برمی‌گردد، کد نادرست/منقضی نشست نمی‌سازد و تغییر شماره ناموفق داده را دست‌نخورده می‌گذارد |
 | A-026 | موارد باز به‌جای نتیجه ساختگی، با وضعیت مشخص باقی می‌مانند. | PROMPT-001, PROMPT-019, PROMPT-020, PROMPT-019 | DISCOVERY — [integration-readiness.md](docs/discovery/integration-readiness.md) §۳ (موارد نامعلوم «تعیین‌نشده» می‌مانند) |
 | A-027 | بررسی شجره‌نامه خارجی با انجمن و فهرست صادرکنندگان موردتأیید آن انجام می‌شود؛ SLA ثابت وعده داده نمی‌شود. | PROMPT-006, PROMPT-018, PROMPT-019 | NOT_STARTED |
 | A-028 | مهلت اولیه Referral برابر ۲۱ روز و مقدار آن از دیتابیس و قابل تنظیم از پنل مدیریت است. | PROMPT-002, PROMPT-007, PROMPT-018, PROMPT-019 | PARTIAL(PROMPT-002) — مقدار ۲۱ روز در `product_setting` و از پنل قابل تغییر؛ صدور و اعتبارسنجی کد در PROMPT-007 |

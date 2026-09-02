@@ -1,19 +1,23 @@
 /**
- * Next.js request binding for actor resolution.
+ * Request binding for actor resolution.
  *
- * Kept separate from `session.ts` so the authorization rules stay importable —
- * and testable — outside the framework. This file is the only place that
- * touches request headers.
+ * Kept separate from the authorization rules so those stay testable outside the
+ * framework. This file is the only place that touches request cookies.
+ *
+ * The development actor override that PROMPT-003 used is gone: sign-in is real
+ * now, so the session cookie is the single way to become an actor. There is no
+ * bypass path in any environment.
  */
 import { cookies } from 'next/headers';
-import type { DbClient } from '../db/client.ts';
-import { env as loadEnv } from '../config/env.ts';
-import { DEV_ACTOR_COOKIE, devOverrideAllowed, resolveDevActor } from './session.ts';
+import type { Database } from '../db/client.ts';
+import { resolveSession, SESSION_COOKIE, type ResolvedSession } from '../identity/session.ts';
 import type { MaybeActor } from './actor.ts';
 
-export async function currentActor(database: DbClient): Promise<MaybeActor> {
-  const env = loadEnv();
-  if (!devOverrideAllowed(env)) return null;
+export async function currentSession(database: Database): Promise<ResolvedSession | null> {
   const store = await cookies();
-  return resolveDevActor(database, store.get(DEV_ACTOR_COOKIE)?.value, env);
+  return resolveSession(database, store.get(SESSION_COOKIE)?.value);
+}
+
+export async function currentActor(database: Database): Promise<MaybeActor> {
+  return (await currentSession(database))?.actor ?? null;
 }

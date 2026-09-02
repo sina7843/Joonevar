@@ -1,0 +1,125 @@
+{
+  "promptId": "PROMPT-004",
+  "status": "COMPLETE",
+  "summary": "ورود واقعی با کد یک‌بارمصرف پیاده شد: نرمال‌سازی و اعتبارسنجی موبایل، صدور/ارسال مجدد/انقضا/سقف تلاش/قفل و سقف ارسال ساعتی همگی از تنظیمات دیتابیس، و نشست سرور با توکن hash‌شده و Context روی ردیف نشست. حساب تازه با PROFILE_INCOMPLETE ساخته می‌شود و حساب بازگشتی به درخواست مبدأ برمی‌گردد. اطلاعات هویتی با کد ملی یکتا و رقم کنترلی، سکونت کاملاً اختیاری، KYC با فایل خصوصی JPG/PNG/PDF تا ۱۰ مگابایت، صف بررسی انجمن با تأیید/اصلاح/رد با دلیل و حفظ فایل معتبر، ویرایش مستقیم نام و تاریخ تولد پس از تأیید با کد ملی فقط‌خواندنی، و تغییر موبایل با کد روی شماره جدید که تا تأیید موفق شماره فعلی را دست‌نخورده می‌گذارد. Actor توسعه‌ای PROMPT-003 حذف شد و هیچ کد دور زدن OTP در هیچ محیطی وجود ندارد.",
+  "changedFiles": [
+    "src/domain/identity.ts",
+    "src/db/schema/identity.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0001_identity.sql",
+    "src/db/seed/dev-fixtures.ts",
+    "src/identity/otp.ts",
+    "src/identity/session.ts",
+    "src/identity/account.ts",
+    "src/identity/kyc.ts",
+    "src/authz/request-actor.ts",
+    "src/authz/guard.ts",
+    "src/authz/routes.ts",
+    "src/adapters/registry.ts",
+    "src/settings/keys.ts",
+    "src/ui/shell.tsx",
+    "app/login/page.tsx",
+    "app/login/actions.ts",
+    "app/login/login-form.tsx",
+    "app/account/actions.ts",
+    "app/account/profile-forms.tsx",
+    "app/account/complete/page.tsx",
+    "app/account/profile/page.tsx",
+    "app/account/profile/mobile/page.tsx",
+    "app/account/kyc/page.tsx",
+    "app/account/kyc/kyc-forms.tsx",
+    "app/assoc/kyc/page.tsx",
+    "app/assoc/kyc/[id]/page.tsx",
+    "app/assoc/kyc/actions.ts",
+    "app/assoc/kyc/review-form.tsx",
+    "app/api/context/route.ts",
+    "app/api/files/[id]/route.ts",
+    "app/dashboard/page.tsx",
+    "app/profile/page.tsx",
+    "app/dev/patterns/page.tsx",
+    "tests/domain/identity.test.ts",
+    "tests/db/identity.test.ts",
+    "tests/ui/routes.test.ts",
+    "tests/browser/identity.test.ts",
+    "tests/browser/rtl.test.ts",
+    "docs/reports/screenshots/prompt-004/account-complete.png",
+    "docs/reports/screenshots/prompt-004/dashboard-new-account.png",
+    "docs/reports/screenshots/prompt-004/otp-invalid.png",
+    "docs/reports/screenshots/prompt-004/kyc-under-review.png",
+    "docs/reports/screenshots/prompt-004/kyc-needs-correction.png",
+    "docs/reports/screenshots/prompt-004/assoc-kyc-queue.png",
+    "docs/reports/screenshots/prompt-004/assoc-kyc-review.png",
+    "docs/reports/screenshots/prompt-004/dashboard-kyc-approved.png",
+    "docs/reports/screenshots/prompt-004/mobile-change-failed.png",
+    "package.json",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-004.json"
+  ],
+  "decisions": ["DEC-0025", "DEC-0026", "DEC-0027", "DEC-0028", "DEC-0029", "DEC-0030"],
+  "checks": [
+    {
+      "id": "identity-integration",
+      "command": "node --test \"tests/domain/identity.test.ts\" \"tests/db/identity.test.ts\" \"tests/ui/routes.test.ts\"  (بخشی از npm test)",
+      "result": "PASS",
+      "evidence": "۲۲ تست دیتابیسی روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد، به‌علاوه ۹ تست دامنه و ۱۲ تست مسیر. پوشش واقعی: کد نادرست (کاهش تلاش باقی‌مانده)، کد منقضی، **replay کد مصرف‌شده** که OTP_EXPIRED می‌گیرد، مرز ارسال مجدد (RESEND_TOO_SOON و سپس کد تازه که کد قبلی را باطل می‌کند)، سقف ارسال ساعتی برای یک شماره بدون اثر روی شماره دیگر، قفل پس از سقف تلاش که حتی کد درست را رد می‌کند، **رقابت هم‌زمان روی شماره جدید** که دقیقاً یک حساب می‌سازد، **رقابت هم‌زمان روی کد ملی یکتا** که فقط یکی موفق می‌شود، ذخیره hash کد و نبود آن و نبود شماره کامل در Audit، سکونت کاملاً خالی و اعتبارسنجی کدپستی واردشده، دسترسی خصوصی مدرک KYC (رد برای غریبه، دامپزشک، مرکز ژنتیک و حتی سوپرادمین؛ مجاز برای مالک و اپراتور انجمن)، چرخه اصلاح با حفظ فایل قبلی، ردِ تصمیم با نسخه کهنه و ردِ بازبین غیرمجاز، ویرایش مستقیم نام/تاریخ تولد پس از تأیید و قفل کد ملی، تغییر شماره ناموفق بدون هیچ تغییری و ابطال نشست‌های دیگر پس از تغییر موفق، و اثرگذاری تغییر تنظیمات روی رفتار OTP."
+    },
+    {
+      "id": "identity-browser",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node src/db/seed/run.ts --dev  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "Chromium واقعی روی اپ build‌شده؛ ۲۲/۲۲ تست مرورگر (۱۱ مورد هویت + ۱۱ مورد پوسته/RTL). مسیر کاربر تازه: ورود با کد واقعی → `/account/complete` → تکمیل هویت → داشبورد با سرویس ثبت حیوان همچنان قفل. مسیر کاربر بازگشتی: ورود با `?next=/requests` → بازگشت به همان درخواست؛ بدون مبدأ → داشبورد؛ مقصد مطلق بیرونی رد می‌شود. کد نادرست: پیام خطا، نمایش تلاش باقی‌مانده و **نبود هیچ نشستی**. ارسال مجدد تا پایان شمارش معکوس غیرفعال است. KYC کامل: بارگذاری فایل با هدر واقعی JPEG → ارسال → صف انجمن → «نیازمند اصلاح» با دلیل → متقاضی همان پرونده و همان فایل را می‌بیند → ارسال دوباره → تأیید → داشبورد سرویس ثبت حیوان را باز می‌کند و عضویت همچنان «فعال نیست» → اعلان تأیید در فهرست اعلان‌ها. فایل خصوصی: اپراتور انجمن ۲۰۰، حساب واردشده دیگر ۴۰۳، ناشناس ۴۰۱. تغییر شماره: کد نادرست شماره را عوض نمی‌کند و کد درست عوض می‌کند. خروج، نشست را روی سرور می‌بندد. کوکی نشست جعلی به هیچ Actor تبدیل نمی‌شود. ۹ اسکرین‌شات در docs/reports/screenshots/prompt-004/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 105 · pass 105 · fail 0 · skipped 0."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Compiled successfully؛ مسیرهای ورود، حساب، KYC و صف انجمن ساخته شدند."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)  +  node src/db/seed/run.ts --dev (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0001_identity` اعمال شد و اجرای دوباره replay نکرد. seed دو کلید تازه درج و ۲۲ کلید قبلی را حفظ کرد؛ fixtureهای ساختگی idempotent هستند."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "هیچ ارائه‌دهنده پیامک واقعی پیکربندی نشده است. آداپتور `sms-otp` همچنان NOT_CONFIGURED گزارش می‌شود و در محیط توسعه پیام به جدول `dev_outbound_sms` می‌رود. در production نبود ارائه‌دهنده خطای صریح NOT_CONFIGURED می‌دهد و هیچ کد دور زدنی وجود ندارد (DEC-0029). ارسال واقعی پیامک هنوز اثبات نشده است.",
+    "مقادیر TTL کد (۱۲۰ ثانیه)، فاصله ارسال مجدد (۶۰ ثانیه)، سقف تلاش (۵)، مدت قفل (۱۵ دقیقه)، سقف ارسال ساعتی (۵) و طول عمر نشست (۳۰ روز) پیش‌فرض فنی با برچسب TECHNICAL_DEFAULT هستند، نه سیاست تأییدشده مالک محصول (DEC-0006، DEC-0016، DEC-0026).",
+    "بررسی احراز هویت به مجوز موجود اپراتور انجمن سپرده شد چون سند بازبین دیگری نام نمی‌برد؛ این انتخاب صریحاً افشا شده و با یک ورودی ماتریس قابل تغییر است (DEC-0027).",
+    "کوکی نشست فقط وقتی `secure` می‌شود که APP_ENV=production باشد؛ استقرار پشت HTTPS و تنظیم SESSION_SECRET بیرون از این مرحله است.",
+    "سرویس استعلام هویت بیرونی در دامنه فاز یک نیست؛ بررسی مدرک انسانی است و هیچ اتصال استعلامی ادعا نمی‌شود.",
+    "فرم ثبت حیوان هنوز وجود ندارد (PROMPT-006)؛ آنچه اینجا اثبات شد این است که تأیید KYC ورودی آن را باز می‌کند و عضویت شرط آن نیست.",
+    "عضویت، پرداخت و Eligibility کامل هنوز ساخته نشده‌اند (PROMPT-005)؛ داشبورد وضعیت عضویت را «فعال نیست» نشان می‌دهد چون هنوز موجودیت عضویتی وجود ندارد.",
+    "ورودی فایل بومی مرورگر متن انگلیسی خودش را نشان می‌دهد («Choose File»)؛ جایگزینی آن با کنترل سفارشی به کار طراحی بعدی موکول شد و در بررسی بصری PROMPT-019 دیده می‌شود.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateهای این مرحله به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "IDENTITY_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

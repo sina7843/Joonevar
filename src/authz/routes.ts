@@ -24,6 +24,7 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/dashboard', access: PUBLIC_APP },
   { prefix: '/notifications', access: PUBLIC_APP },
   { prefix: '/profile', access: PUBLIC_APP },
+  { prefix: '/account', access: PUBLIC_APP },
   { prefix: '/membership', access: PUBLIC_APP },
   { prefix: '/animals', access: PUBLIC_APP },
   { prefix: '/requests', access: PUBLIC_APP },
@@ -90,4 +91,24 @@ export function assertRouteAccess(actor: MaybeActor, pathname: string): Actor | 
     throw forbiddenContext(actor.context, pathname);
   }
   return actor;
+}
+
+/**
+ * Pick the context this route needs.
+ *
+ * An operational shell is a separate environment reached by its own URL, not an
+ * entry in the public role switcher (D11), so an operator who holds the role
+ * enters it by visiting the route — and the same person visiting the public app
+ * is back in their ordinary user context. The current context always wins when
+ * it is already allowed.
+ *
+ * This only ever chooses among permissions the account already holds; it never
+ * grants one, so an account without the role still gets a denial.
+ */
+export function selectContext(actor: Actor, allowed: readonly ActorContextName[]): ActorContextName | null {
+  if (allowed.includes(actor.context) && canEnterContext(actor.activeRoles, actor.context)) return actor.context;
+  for (const context of allowed) {
+    if (canEnterContext(actor.activeRoles, context)) return context;
+  }
+  return null;
 }

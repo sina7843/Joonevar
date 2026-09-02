@@ -16,9 +16,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
-import { eq } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
-import { accounts } from '../../src/db/schema/core.ts';
 
 const BASE_URL = process.env.BROWSER_TEST_URL ?? 'http://127.0.0.1:3111';
 const DATABASE_URL =
@@ -41,45 +40,92 @@ const FIXTURES = {
   superadmin: '09990000006',
 } as const;
 
-let browser: Browser;
-const accountIds = new Map<string, string>();
+let browser!: Browser;
 
-before(async () => {
-  await fs.mkdir(SHOTS, { recursive: true });
+/**
+ * One sign-in per fixture for the whole suite.
+ *
+ * Each sign-in sends a real code, and the hourly send cap is a real rule, so the
+ * session is captured once and replayed as storage state instead of signing in
+ * again for every page and viewport.
+ */
+const storageStates = new Map<string, Awaited<ReturnType<BrowserContext['storageState']>>>();
+
+async function lastCodeFor(mobile: string): Promise<string> {
   const { db, pool } = createDatabase(DATABASE_URL);
   try {
-    for (const [name, mobile] of Object.entries(FIXTURES)) {
-      const [row] = await db.select({ id: accounts.id }).from(accounts).where(eq(accounts.mobile, mobile));
-      assert.ok(row, 'synthetic fixture ' + name + ' is missing; run: node src/db/seed/run.ts --dev');
-      accountIds.set(name, row!.id);
-    }
+    const rows = await db.execute<{ body: string }>(
+      sql`select body from dev_outbound_sms where to_mobile = ${mobile} order by created_at desc limit 1`,
+    );
+    const match = /(\d{6})/.exec(rows.rows[0]?.body ?? '');
+    assert.ok(match, 'no code was sent to ' + mobile);
+    return match![1]!;
   } finally {
     await pool.end();
   }
+}
+
+async function captureSession(fixture: keyof typeof FIXTURES): Promise<void> {
+  const mobile = FIXTURES[fixture];
+  const context = await browser.newContext({ viewport: VIEWPORTS.mobileReference, locale: 'fa-IR' });
+  try {
+    const page = await context.newPage();
+    await page.goto(BASE_URL + '/login', { waitUntil: 'load' });
+    await page.getByTestId('mobile-input').fill(mobile);
+    await page.getByTestId('send-code').click();
+    await page.getByTestId('code-input').waitFor();
+    await page.getByTestId('code-input').fill(await lastCodeFor(mobile));
+    await Promise.all([
+      page.waitForURL((url) => !url.pathname.startsWith('/login')),
+      page.getByTestId('verify-code').click(),
+    ]);
+    storageStates.set(fixture, await context.storageState());
+  } finally {
+    await context.close();
+  }
+}
+
+async function signIn(
+  fixture: keyof typeof FIXTURES,
+  viewport: { width: number; height: number },
+): Promise<BrowserContext> {
+  const state = storageStates.get(fixture);
+  assert.ok(state, 'no captured session for ' + fixture);
+  return browser.newContext({ viewport, locale: 'fa-IR', storageState: state });
+}
+
+async function anonymousContext(viewport: { width: number; height: number }): Promise<BrowserContext> {
+  return browser.newContext({ viewport, locale: 'fa-IR' });
+}
+
+before(async () => {
+  await fs.mkdir(SHOTS, { recursive: true });
+
+  const { db, pool } = createDatabase(DATABASE_URL);
+  try {
+    for (const [name, mobile] of Object.entries(FIXTURES)) {
+      const rows = await db.execute<{ id: string }>(
+        sql`select id from account where mobile = ${mobile} limit 1`,
+      );
+      assert.ok(rows.rows[0], 'synthetic fixture ' + name + ' is missing; run: node src/db/seed/run.ts --dev');
+    }
+    // Only the synthetic 0999 range is cleared, so repeated runs are not stopped
+    // by the hourly send cap. Real numbers keep their history and their cap.
+    await db.execute(sql`delete from otp_challenge where mobile like '0999%'`);
+    await db.execute(sql`delete from dev_outbound_sms where to_mobile like '0999%'`);
+  } finally {
+    await pool.end();
+  }
+
   browser = await chromium.launch();
+  for (const fixture of Object.keys(FIXTURES) as Array<keyof typeof FIXTURES>) {
+    await captureSession(fixture);
+  }
 });
 
 after(async () => {
   await browser?.close();
 });
-
-async function contextFor(
-  fixture: keyof typeof FIXTURES | null,
-  actorContext: string,
-  viewport: { width: number; height: number },
-): Promise<BrowserContext> {
-  const context = await browser.newContext({ viewport, locale: 'fa-IR' });
-  if (fixture !== null) {
-    await context.addCookies([
-      {
-        name: 'hz_dev_actor',
-        value: accountIds.get(fixture)! + ':' + actorContext,
-        url: BASE_URL,
-      },
-    ]);
-  }
-  return context;
-}
 
 /** The single most useful RTL regression check: the page must never scroll sideways. */
 async function assertNoHorizontalOverflow(page: Page, label: string) {
@@ -113,7 +159,7 @@ test('every shell renders RTL without horizontal overflow at all reviewed sizes'
 
   for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {
     for (const target of pages) {
-      const context = await contextFor(target.fixture, target.ctx, viewport);
+      const context = await signIn(target.fixture, viewport);
       const page = await context.newPage();
       try {
         const response = await page.goto(BASE_URL + target.url, { waitUntil: 'load' });
@@ -136,7 +182,7 @@ test('every shell renders RTL without horizontal overflow at all reviewed sizes'
 test('route access is enforced by the server, not by hiding navigation', async () => {
   // Anonymous: no cookie at all.
   {
-    const context = await contextFor(null, '', VIEWPORTS.mobileReference);
+    const context = await anonymousContext(VIEWPORTS.mobileReference);
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
@@ -149,7 +195,7 @@ test('route access is enforced by the server, not by hiding navigation', async (
 
   // An ordinary user typing an operational URL is refused by the server.
   for (const url of ['/admin', '/admin/settings', '/assoc', '/genetics', '/vet']) {
-    const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+    const context = await signIn('owner', VIEWPORTS.mobileReference);
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + url, { waitUntil: 'load' });
@@ -161,7 +207,7 @@ test('route access is enforced by the server, not by hiding navigation', async (
 
   // Holding the superadmin role does not open the association shell.
   {
-    const context = await contextFor('superadmin', 'SUPERADMIN', VIEWPORTS.mobileReference);
+    const context = await signIn('superadmin', VIEWPORTS.mobileReference);
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + '/assoc', { waitUntil: 'load' });
@@ -172,15 +218,15 @@ test('route access is enforced by the server, not by hiding navigation', async (
     }
   }
 
-  // A cookie claiming a context the account does not hold resolves to nobody.
+  // A forged session cookie is not a session: the token is matched by hash.
   {
     const context = await browser.newContext({ viewport: VIEWPORTS.mobileReference });
-    await context.addCookies([
-      { name: 'hz_dev_actor', value: accountIds.get('owner')! + ':SUPERADMIN', url: BASE_URL },
-    ]);
+    await context.addCookies([{ name: 'hz_session', value: 'forged-token-value', url: BASE_URL }]);
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + '/admin', { waitUntil: 'load' });
+      assert.equal(await page.getByTestId('denial-code').textContent(), 'UNAUTHENTICATED');
+      await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
       assert.equal(await page.getByTestId('denial-code').textContent(), 'UNAUTHENTICATED');
     } finally {
       await context.close();
@@ -191,7 +237,7 @@ test('route access is enforced by the server, not by hiding navigation', async (
 test('the role switcher shows only active public contexts and switching is checked on the server', async () => {
   // No extra role: nothing to switch between, so no switcher is rendered.
   {
-    const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+    const context = await signIn('owner', VIEWPORTS.mobileReference);
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
@@ -203,7 +249,7 @@ test('the role switcher shows only active public contexts and switching is check
 
   // Breeder: exactly two chips, and no operational context among them.
   {
-    const context = await contextFor('breeder', 'USER', VIEWPORTS.mobileReference);
+    const context = await signIn('breeder', VIEWPORTS.mobileReference);
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
@@ -223,7 +269,7 @@ test('the role switcher shows only active public contexts and switching is check
 
   // The superadmin fixture has no public extra role, so its switcher is absent.
   {
-    const context = await contextFor('superadmin', 'USER', VIEWPORTS.mobileReference);
+    const context = await signIn('superadmin', VIEWPORTS.mobileReference);
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
@@ -235,7 +281,7 @@ test('the role switcher shows only active public contexts and switching is check
 
   // Posting an operational context directly is refused.
   {
-    const context = await contextFor('superadmin', 'USER', VIEWPORTS.mobileReference);
+    const context = await signIn('superadmin', VIEWPORTS.mobileReference);
     try {
       const response = await context.request.post(BASE_URL + '/api/context', {
         form: { context: 'SUPERADMIN', returnTo: '/dashboard' },
@@ -250,7 +296,7 @@ test('the role switcher shows only active public contexts and switching is check
 });
 
 test('a locked service shows its reason, prerequisite and a working CTA', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+  const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
@@ -266,24 +312,25 @@ test('a locked service shows its reason, prerequisite and a working CTA', async 
 });
 
 test('identifiers stay left-to-right inside Persian text', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+  const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
-    await page.goto(BASE_URL + '/profile', { waitUntil: 'load' });
+    const animalId = '11111111-1111-1111-1111-111111111111';
+    await page.goto(BASE_URL + '/animals/' + animalId, { waitUntil: 'load' });
     const identifier = page.getByTestId('identifier').first();
     const direction = await identifier.evaluate((node) => getComputedStyle(node).direction);
     assert.equal(direction, 'ltr');
     const unicodeBidi = await identifier.evaluate((node) => getComputedStyle(node).unicodeBidi);
     assert.ok(unicodeBidi.includes('isolate'), 'identifier is bidi-isolated, got ' + unicodeBidi);
     // The rendered text is the stored value, unchanged.
-    assert.equal(await identifier.textContent(), accountIds.get('owner'));
+    assert.equal(await identifier.textContent(), animalId);
   } finally {
     await context.close();
   }
 });
 
 test('form errors are announced and wired to their input', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+  const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dev/patterns', { waitUntil: 'load' });
@@ -312,7 +359,7 @@ test('form errors are announced and wired to their input', async () => {
 });
 
 test('overlays trap focus, close on Escape and restore focus to the trigger', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+  const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dev/patterns', { waitUntil: 'load' });
@@ -355,7 +402,7 @@ test('overlays trap focus, close on Escape and restore focus to the trigger', as
 });
 
 test('the RTL action order puts the primary action on the right', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+  const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dev/patterns', { waitUntil: 'load' });
@@ -371,7 +418,7 @@ test('the RTL action order puts the primary action on the right', async () => {
 });
 
 test('the official logo renders at its true aspect ratio and is not cropped', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.desktop);
+  const context = await signIn('owner', VIEWPORTS.desktop);
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
@@ -416,7 +463,7 @@ test('the official logo renders at its true aspect ratio and is not cropped', as
 });
 
 test('long Persian text wraps instead of widening the page', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+  const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dev/patterns', { waitUntil: 'load' });
@@ -431,7 +478,7 @@ test('long Persian text wraps instead of widening the page', async () => {
 });
 
 test('the bottom navigation meets the touch target size and marks the current page', async () => {
-  const context = await contextFor('owner', 'USER', VIEWPORTS.mobileReference);
+  const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });

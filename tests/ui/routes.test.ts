@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { accessForRoute, assertRouteAccess, canAccessRoute } from '../../src/authz/routes.ts';
+import { accessForRoute, assertRouteAccess, canAccessRoute, selectContext } from '../../src/authz/routes.ts';
 import { switchableContexts, type Actor, type AccountRoleName, type ActorContextName } from '../../src/authz/actor.ts';
 import type { AccountId } from '../../src/domain/ids.ts';
 
@@ -114,4 +114,22 @@ test('the denial names the context and the path without leaking anything else', 
       error.message.includes('USER') &&
       error.message.includes('/admin/settings'),
   );
+});
+
+test('the guard picks a context the account already holds and never invents one', () => {
+  // An association operator visiting the public app is served as an ordinary user.
+  assert.equal(
+    selectContext(actor('ASSOCIATION_OPERATOR', ['ASSOCIATION_OPERATOR']), ['USER', 'BREEDER', 'TRUSTED_VET']),
+    'USER',
+  );
+  // The same person visiting their shell URL enters the operational context.
+  assert.equal(
+    selectContext(actor('USER', ['ASSOCIATION_OPERATOR']), ['ASSOCIATION_OPERATOR']),
+    'ASSOCIATION_OPERATOR',
+  );
+  // An account without the role gets nothing to select, so the route is denied.
+  assert.equal(selectContext(actor('USER', []), ['ASSOCIATION_OPERATOR']), null);
+  assert.equal(selectContext(actor('USER', ['BREEDER']), ['SUPERADMIN']), null);
+  // The current context wins when it is already allowed.
+  assert.equal(selectContext(actor('BREEDER', ['BREEDER']), ['USER', 'BREEDER']), 'BREEDER');
 });

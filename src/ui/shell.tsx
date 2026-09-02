@@ -174,6 +174,7 @@ export function OpsShell({
 
 export const ASSOC_NAV: readonly NavItem[] = [
   { href: '/assoc', label: 'صف‌ها' },
+  { href: '/assoc/kyc', label: 'احراز هویت' },
   { href: '/assoc/members', label: 'عضویت' },
   { href: '/assoc/kennels', label: 'کنل' },
   { href: '/assoc/permits', label: 'مجوز جفت‌گیری' },

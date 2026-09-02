@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { env } from '../../../src/config/env.ts';
-import { devOverrideAllowed } from '../../../src/authz/session.ts';
+
 import { PatternGallery } from './gallery.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +17,8 @@ export const dynamic = 'force-dynamic';
  * integrations it does not exist at all.
  */
 export default function DevPatternsPage() {
-  if (!devOverrideAllowed(env())) notFound();
+  // Outside development with local integrations this page does not exist.
+  const current = env();
+  if (current.APP_ENV === 'production' || current.INTEGRATION_MODE !== 'local') notFound();
   return <PatternGallery />;
 }
