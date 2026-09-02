@@ -1,0 +1,84 @@
+{
+  "promptId": "PROMPT-020",
+  "status": "COMPLETE",
+  "summary": "راه‌اندازی تکرارپذیر واقعاً از یک Checkout تمیز اجرا شد: کلون تازه، نصب دقیق از package-lock با npm ci، بررسی نوع، ساخت production، اجرا و Smoke روی /login و /api/health که وضعیت degraded را با نام‌بردن دقیق مقادیر تعیین‌نشده برمی‌گرداند. قرارداد پیکربندی آزمون شد و نبود هر مقدار ضروری جلوی بالا آمدن را می‌گیرد؛ production با آداپتور محلی یا بدون SESSION_SECRET اصلاً بالا نمی‌آید و درخواست پیامک یا درگاه در production بدون Provider واقعی خطای صریح NOT_CONFIGURED می‌دهد، پس هیچ‌جا پرداخت یا پیامک نمایشی جای واقعی را نمی‌گیرد. مهاجرت‌ها روی دیتابیس تمیز و سپس روی همان دیتابیس دوباره اجرا شدند و اجرای دوم چیزی replay نکرد؛ Seed هم Idempotent است. پشتیبان‌گیری و بازگرداندن ساخته شد و دیتابیس و فایل‌های خصوصی را در یک Snapshot با manifest و sha256 برمی‌دارد؛ بازگرداندن پیش از نوشتن digestها را بررسی می‌کند و Snapshot دستکاری‌شده را رد می‌کند. این مسیر روی داده یک‌بارمصرف واقعاً آزمایش شد: schema و فایل‌ها حذف شدند، بازگرداندن انجام شد و پیوند نمونه، برگه ثبتی و فایل خصوصی سالم ماند. سه سند تحویل نوشته شد: Runbook برای راه‌اندازی، پیکربندی، فعال‌سازی Provider با شاهد sandbox و سپس live، مهاجرت و بازگشت امن، پایش و redaction؛ راهنمای فارسی اپراتور برای همه پنل‌ها شامل بررسی عضویت و KYC، صادرکنندگان خارجی، تعرفه‌ها و مهلت ۲۱ روزه کد مراجعه، داده دامپزشکان و مراکز از پیش تأییدشده، مرکز ثابت ژنتیک، فیش و نتیجه و اعتراض، صف‌های کنل و مجوز و فهرست درخواست‌های پستی که فقط ثبت درخواست است؛ و سند آمادگی تحویل با ریسک‌های شناخته‌شده. Gate آمادگی تحویل به‌جای ادعای کیفیت، خودِ شواهد را بازرسی می‌کند: گزارش COMPLETE هر Prompt بدون Blocker، PASS بودن هر Gate لازم با متن شاهد واقعی، نبود هیچ ردیف پذیرش یا بخش نیازمندی بدون نگاشت، ثابت‌ماندن production: NOT_READY و integrations: NOT_CONFIGURED در همه گزارش‌ها، UNVERIFIED ماندن ادعای بصری، و نبود تعرفه Seed‌شده جز مبلغ مبنای مستند §۷. هیچ استقرار زنده، push، پرداخت واقعی یا پیام واقعی انجام نشد.",
+  "changedFiles": [
+    "tools/backup.mjs",
+    "tools/restore.mjs",
+    "tools/backup.d.mts",
+    "tools/restore.d.mts",
+    "docs/ops/runbook.md",
+    "docs/ops/operator-guide.md",
+    "docs/ops/release-readiness.md",
+    "tests/db/startup.test.ts",
+    "tests/db/backup-restore.test.ts",
+    "tests/config/release.test.ts",
+    "package.json",
+    "ACCEPTANCE_MATRIX.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "docs/reports/PROMPT-020.json"
+  ],
+  "decisions": ["DEC-0119", "DEC-0120", "DEC-0121"],
+  "checks": [
+    {
+      "id": "reproducible-startup",
+      "command": "node --test \"tests/db/startup.test.ts\"  +  git clone → npm ci → npx tsc --noEmit → npm run build → npx next start → curl /login و /api/health",
+      "result": "PASS",
+      "evidence": "tests 5 · pass 5 · fail 0 روی Postgres واقعی، به‌علاوه اجرای واقعی از یک Checkout تمیز در یک پوشه جدا: `npm ci` ۶۳ بسته نصب کرد، `npx tsc --noEmit` با exit 0 تمام شد، `npm run build` موفق بود و سرور روی پورت ۳۱۲۲ بالا آمد؛ `/login` کد ۲۰۰ داد و `/api/health` پاسخ degraded با `migrationsApplied: 15`، ۲۴ کلید تنظیمات و نام دقیق چهار مقدار تعیین‌نشده مرکز ژنتیک برگرداند. پوشش تست: قرارداد محیط مقدارهای مستندشده را می‌پذیرد و همه نام‌های .env.example را می‌شناسد و هیچ Secret واقعی در آن فایل نیست؛ نبود DATABASE_URL و مقدار نامعتبر APP_ENV یا INTEGRATION_MODE جلوی بالا آمدن را می‌گیرد؛ production با INTEGRATION_MODE=local رد می‌شود و بدون SESSION_SECRET بالا نمی‌آید و در پیکربندی معتبر production، درخواست آداپتور پیامک و درگاه خطای صریح می‌دهد و هر پنج آداپتور بیرونی NOT_CONFIGURED با provider برابر null گزارش می‌شوند؛ migration روی دیتابیس تمیز اعمال می‌شود و اجرای دوباره تعداد رکوردهای __drizzle_migrations را تغییر نمی‌دهد و Seed دوباره تعداد تنظیمات را تغییر نمی‌دهد؛ و گزارش سلامت وضعیت degraded با فهرست نام‌دار مقادیر تعیین‌نشده می‌دهد به‌جای ادعای آمادگی."
+    },
+    {
+      "id": "backup-restore",
+      "command": "node --test \"tests/db/backup-restore.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 2 · pass 2 · fail 0 روی دیتابیس یک‌بارمصرف و پوشه ذخیره‌سازی یک‌بارمصرف. پوشش واقعی: یک حیوان با مراجعه، نمونه، برگه ثبتی و یک فایل خصوصی ساخته می‌شود؛ Snapshot با dump غیرخالی و دست‌کم یک فایل خصوصی گرفته می‌شود؛ سپس schema های public و drizzle واقعاً drop می‌شوند و پوشه فایل‌ها واقعاً پاک می‌شود و خالی‌بودن دیتابیس با شمارش جدول‌ها تأیید می‌شود؛ بازگرداندن انجام می‌شود و پس از آن شناسه و Pet ID برگه ثبتی، کد رهگیری نمونه و کلید ذخیره‌سازی فایل همان قبلی‌اند و بایت‌های فایل خصوصی دوباره برای مالکش خواندنی است. مورد دوم: dump دستکاری‌شده و سپس فایل خصوصی دستکاری‌شده هر دو با پیام «manifest digest» رد می‌شوند و هیچ‌چیز نیمه‌اعمال نمی‌شود."
+    },
+    {
+      "id": "release-readiness-review",
+      "command": "node --test \"tests/config/release.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0. پوشش واقعی: هر ۱۹ Prompt قبلی گزارش COMPLETE بدون Blocker دارد و هر Gate لازمِ آن Prompt با result برابر PASS، فرمان واقعی و متن شاهد بیش از ۴۰ نویسه در گزارش آمده است؛ هر ۳۳ ردیف ACCEPTANCE_MATRIX نگاشت دارد و به فایل شاهد (tests/ یا docs/ یا src/) اشاره می‌کند و هر ۲۹ بخش REQUIREMENTS_TRACEABILITY نگاشت دارد؛ Runbook فرمان‌های npm ci، db:migrate، build و ابزار پشتیبان‌گیری/بازگرداندن و قاعده شکست صریح production را دارد و راهنمای اپراتور همه مسیرهای عملیاتی و کلید مهلت ۲۱ روزه و مرکز ثابت ژنتیک را پوشش می‌دهد؛ هیچ گزارشی production: NOT_READY و integrations: NOT_CONFIGURED را نقض نکرده و همه limitations واقعی دارند؛ ادعای بصری در همه گزارش‌ها UNVERIFIED مانده و رکورد visual-review.json هم همان را می‌گوید؛ و هیچ تعرفه‌ای مقدار Seed ندارد جز مبلغ مبنای مستند §۷ که با یادداشت «مبلغ مبنای مستند» ثبت شده است."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 331 · pass 331 · fail 0 · skipped 0 (۱۳ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 88 · pass 88 · fail 0. در اجرای اول پس از Build تازه، سه تست بصری شکست خوردند چون سرور هنوز از Build قبلی اجرا می‌شد و فایل CSS با hash جدید ۴۰۰ می‌گرفت؛ پس از راه‌اندازی دوباره سرور از همان Build، هر ۸۸ تست سبز شدند. این نکته عملیاتی در گزارش وضعیت ثبت شد."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess، هم در مخزن کاری و هم در Checkout تمیز."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "هیچ استقرار زنده، push، پرداخت واقعی یا ارسال پیام واقعی انجام نشد؛ همه Commitها محلی‌اند و فعال‌سازی Provider واقعی اجازه و شاهد جداگانه لازم دارد.",
+    "تعرفه‌های واقعی (جز مبلغ مبنای مستند عضویت)، مشخصات و حساب مرکز ژنتیک، فهرست صادرکنندگان و داده دامپزشکان از پیش تأییدشده هنوز وارد نشده‌اند؛ تا آن زمان مسیر پرداخت هر قلم بسته می‌ماند و هیچ عددی حدس زده نمی‌شود.",
+    "تطبیق پیکسلی بصری با پروتوتایپ همچنان UNVERIFIED است؛ تصویر مرجع در دسترس نیست.",
+    "آسیب‌پذیری زنجیره next→postcss باز است و رفع رسمی آن ارتقای major به Next 16 است؛ وابستگی زمان build است و در مسیر درخواست کاربر اجرا نمی‌شود.",
+    "migration معکوس خودکار وجود ندارد؛ مسیر امن بازگشت، بازگرداندن آخرین Snapshot و اجرای نسخه کد متناظر آن است.",
+    "MAP-001، INC-01 و INC-02 با اجرای این بسته بسته نشدند و به‌صورت تاریخی باز می‌مانند.",
+    "پس از هر Build تازه باید سرور دوباره راه‌اندازی شود؛ در غیر این صورت دارایی‌های CSS با hash جدید ۴۰۰ می‌گیرند و بررسی بصری به‌اشتباه شکست می‌خورد."
+  ],
+  "readiness": {
+    "code": "PHASE_1_HANDOFF_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

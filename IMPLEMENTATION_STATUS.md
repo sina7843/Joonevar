@@ -661,3 +661,34 @@ Status: MEMBERSHIP_READY — ورود، حساب، KYC، پرداخت و عضو�
 **مانع واقعی:** هیچ مانعی مرحله را مسدود نکرد، اما دو چیز صریحاً باز اعلام می‌شود: تطبیق پیکسلی بصری (نبود تصویر مرجع) و آسیب‌پذیری `postcss` که رفع آن ارتقای major به Next 16 است.
 
 **دستور ادامه:** `node tools/runner.mjs prepare` سپس اجرای PROMPT-020.
+
+## PROMPT-020 — اجرای نهایی، مستندات و آمادگی تحویل
+
+**مرحله جاری:** تکمیل‌شده.
+
+- راه‌اندازی از یک Checkout تمیز واقعاً اجرا شد: `git clone` → `npm ci` (۶۳ بسته) → `npx tsc --noEmit` → `npm run build` → `npx next start` → `/login` با ۲۰۰ و `/api/health` با وضعیت `degraded` که دقیقاً نام مقادیر تعیین‌نشده را می‌گوید.
+- قرارداد پیکربندی آزمون شد: نبود `DATABASE_URL`، مقدار نامعتبر `APP_ENV` یا `INTEGRATION_MODE`، ترکیب `production` با آداپتور محلی و نبود `SESSION_SECRET` در production همگی جلوی بالا آمدن را می‌گیرند؛ در production درخواست آداپتور پیامک یا درگاه خطای صریح `NOT_CONFIGURED` می‌دهد و هیچ Fallback نمایشی وجود ندارد.
+- Migration روی دیتابیس تمیز و سپس روی همان دیتابیس دوباره اجرا شد؛ اجرای دوم چیزی replay نکرد و Seed هم Idempotent است.
+- پشتیبان‌گیری و بازگرداندن ساخته و واقعاً آزمایش شد: `tools/backup.mjs` و `tools/restore.mjs` دیتابیس و فایل‌های خصوصی را در یک Snapshot با `manifest.json` و sha256 برمی‌دارند؛ بازگرداندن پیش از نوشتن digestها را بررسی می‌کند و Snapshot دستکاری‌شده را رد می‌کند (DEC-0119). Gate روی داده یک‌بارمصرف، schema و فایل‌ها را واقعاً حذف و بازگردانی کرد و پیوند نمونه/برگه ثبتی/فایل خصوصی سالم ماند.
+- سه سند تحویل نوشته شد: [runbook.md](docs/ops/runbook.md) (راه‌اندازی، پیکربندی، فعال‌سازی Provider با شاهد sandbox/live، Migration و بازگشت، پایش و redaction)، [operator-guide.md](docs/ops/operator-guide.md) (راهنمای فارسی همه پنل‌ها شامل تعرفه‌ها، مهلت ۲۱ روزه کد مراجعه، مرکز ثابت ژنتیک، صف‌ها و درخواست‌های پستی فقط‌ثبت) و [release-readiness.md](docs/ops/release-readiness.md).
+- Gate آمادگی تحویل خودِ شواهد را بازرسی می‌کند: گزارش هر Prompt، PASS بودن هر Gate لازم با متن شاهد، نبود ردیف بدون نگاشت، ثابت‌ماندن `production: NOT_READY` و ادعای بصری UNVERIFIED، و نبود تعرفه Seed‌شده جز مبلغ مبنای مستند §۷ (DEC-0120). دو ردیف A-025 و A-030 که فقط رفتار را نام می‌بردند به فایل شاهد وصل شدند (DEC-0121).
+
+**فایل‌ها:** `tools/backup.mjs`، `tools/restore.mjs` (+ اعلان‌های نوع)، `docs/ops/{runbook,operator-guide,release-readiness}.md`، سه فایل تست جدید، و افزودن `db:backup` و `db:restore` به اسکریپت‌ها. migration جدیدی لازم نبود.
+
+**بررسی‌های واقعاً اجراشده:**
+
+| بررسی | دستور | نتیجه |
+|---|---|---|
+| Gate `reproducible-startup` | `node --test tests/db/startup.test.ts` | PASS — ۵ تست |
+| Gate `backup-restore` | `node --test tests/db/backup-restore.test.ts` | PASS — ۲ تست |
+| Gate `release-readiness-review` | `node --test tests/config/release.test.ts` | PASS — ۶ تست |
+| Checkout تمیز | `git clone` + `npm ci` + `tsc` + `build` + `start` + smoke | PASS |
+| تست واحد/سرویس | `npm test` | PASS — ۳۳۱/۳۳۱ |
+| تست مرورگر | `npm run test:browser` | PASS — ۸۸/۸۸ |
+| بسته | `node tools/validate-core.mjs` + تست‌های بسته | PASS |
+
+**تصمیم‌های جدید:** DEC-0119 تا DEC-0121.
+
+**مانع واقعی:** هیچ مانعی مرحله را مسدود نکرد. یک نکته عملیاتی ثبت شد: اگر `next start` از یک Build قبلی در حال اجرا بماند و بعد Build دوباره ساخته شود، دارایی‌های CSS با hash جدید ۴۰۰ می‌گیرند و تست‌های بصری به‌اشتباه شکست می‌خورند؛ راه درست، راه‌اندازی دوباره سرور پس از هر Build است.
+
+**دستور ادامه:** همه بیست Prompt تکمیل شده‌اند. ادامه واقعی محصول به ورود داده و اعتبارنامه‌های واقعی و تصویر مرجع بصری وابسته است، نه به Prompt بعدی.
