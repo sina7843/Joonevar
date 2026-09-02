@@ -1,0 +1,74 @@
+{
+  "promptId": "PROMPT-001",
+  "status": "COMPLETE",
+  "summary": "بازرسی واقعی مخزن (خالی از کد محصول)، خواندن فقط‌خواندنی Flow Map/پروتوتایپ/Design System با ثبت node-idهای دقیق، تأیید هش منبع، انتخاب و ثبت Stack (Next.js 15 + TypeScript + PostgreSQL 16 + Drizzle + node:test) و نوشتن مدل دامنه، ماتریس مجوز شش Context، جدول Eligibility، قرارداد Batch/نسخه و چک‌لیست مسیر برای هر ۲۹ بخش، ۱۹ تصمیم و ۳۳ ردیف پذیرش.",
+  "changedFiles": [
+    "docs/discovery/reference-access.md",
+    "docs/discovery/integration-readiness.md",
+    "docs/architecture/implementation-plan.md",
+    "docs/architecture/data-contracts.md",
+    "docs/architecture/permissions.md",
+    "docs/architecture/route-coverage.md",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-001.json"
+  ],
+  "decisions": [
+    "DEC-0001",
+    "DEC-0002",
+    "DEC-0003",
+    "DEC-0004",
+    "DEC-0005",
+    "DEC-0006",
+    "DEC-0007",
+    "DEC-0008",
+    "DEC-0009"
+  ],
+  "checks": [
+    {
+      "id": "source-and-architecture-review",
+      "command": "node tools/runner.mjs setup  +  sha256sum Requirements.md reference-inputs/Hamzist_Project_Reference_v1.1.md  +  Figma MCP read-only: whoami, get_metadata(SPDPe6xmPR4fDGXIT5fvni), get_metadata(SPDPe6xmPR4fDGXIT5fvni,224:581), get_metadata(2GMJPgnnenGnr1zBN2yH5h), get_metadata(2GMJPgnnenGnr1zBN2yH5h,48:456), get_metadata(2GMJPgnnenGnr1zBN2yH5h,0:1), get_variable_defs(2GMJPgnnenGnr1zBN2yH5h,4:4), get_screenshot(SPDPe6xmPR4fDGXIT5fvni,395:10183), get_figjam(r0HblzL2bxAcswyGpAfbe2,2:3), get_figjam(r0HblzL2bxAcswyGpAfbe2,2:6), get_figjam(r0HblzL2bxAcswyGpAfbe2,90:1568)",
+      "result": "PASS",
+      "evidence": "validate-core: «Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact». هر دو نسخه منبع sha256 = cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d برابر source-manifest.json. دسترسی Figma با حساب handle=Mahdi تأیید شد؛ هر سه fileKey باز شدند. ۱۵ سکشن F01–F15 با همان node-idهای §۲۷.۲ تأیید شد، به‌علاوه Deprecated (353:8782)، ERRATA v2.0 (395:10183) و PILOT (891:13743). تعارض‌های زنده §۳ عیناً در نودهای 8:34، 8:97، 90:1595، 90:1599، 90:1655/1659/1663/1679 و سلول‌های «تمدید» جدول 2:6 مشاهده و به D03/D04 حل شدند. شواهد کامل در docs/discovery/reference-access.md؛ برنامه در docs/architecture/implementation-plan.md، data-contracts.md، permissions.md و route-coverage.md."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. Product implementation NOT asserted. (پس از افزودن شواهد Discovery به REQUIREMENTS_TRACEABILITY.md و ACCEPTANCE_MATRIX.md دوباره اجرا شد)"
+    },
+    {
+      "id": "package-tests",
+      "command": "node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "tests 23 · pass 23 · fail 0 · skipped 0 · duration_ms 6835.9"
+    },
+    {
+      "id": "environment-doctor",
+      "command": "node tools/runner.mjs doctor  +  node -v, npm -v, git --version, docker --version, npm ping",
+      "result": "PASS",
+      "evidence": "Node v24.13.1 · npm 11.8.0 · pnpm 11.5.2 · git 2.41.0.windows.3 · claude 2.1.233 · docker 29.6.2 · psql not available (سرور از docker تأمین می‌شود، DEC-0002) · npm registry PONG"
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تطبیق بصری هیچ صفحه‌ای انجام نشده است؛ فقط ساختار سکشن‌ها و فریم‌های عمق ۲ پروتوتایپ تحلیل شد. محتوای برگ‌ها (Copy، اندازه، توکن هر فیلد) در مراحل پیاده‌سازی همان صفحه خوانده می‌شود.",
+    "فایل Design System در وضعیت فعلی فقط دو صفحه دارد (00 Cover و 02 Brand & Logo) و تنها هفت متغیر لوگو منتشر کرده است؛ هیچ Master کامپوننت یا مقیاس تایپوگرافی/فاصله/Radius در آن نیست. توکن‌ها طبق D06 و DEC-0008 در کد ساخته می‌شوند.",
+    "بخش‌های Flow Map با node-id های 2:2, 2:4, 2:5, 35:459, 38:581, 39:663, 40:807, 42:908, 87:1495, 44:1134, 64:1392, 91:1817, 112:2509, 113:2664, 128:2965 در این نوبت خوانده نشدند؛ هیچ ادعایی درباره محتوای فعلی آن‌ها نمی‌شود.",
+    "MAP-001 در پروتوتایپ هنوز با برچسب [BLOCKED — awaiting map asset] باز است (node 464:12591)؛ بسته اعلام نمی‌شود.",
+    "INC-01 و INC-02 در این بازرسی شاهدی نداشتند و بسته اعلام نمی‌شوند.",
+    "هیچ ارائه‌دهنده SMS، درگاه پرداخت، نقشه، Reader یا سرویس رندر سند پیکربندی نشده است.",
+    "تعرفه برگه ثبتی، شجره‌نامه، مجوز جفت‌گیری، ثبت کنل و Puppy Card و نیز نام/تماس/حساب مرکز ژنتیک ثابت و فهرست صادرکنندگان موردتأیید انجمن، داده واقعی ندارند و «تعیین‌نشده» می‌مانند.",
+    "فونت IRANSansX در بسته موجود نیست و مجوز آن اینجا تأیید نشده؛ تا تأمین قانونی از fallback برچسب‌خورده استفاده می‌شود (DEC-0007).",
+    "مقادیر TTL/سقف تلاش/قفل OTP به‌عنوان پیش‌فرض فنی قابل تغییر ثبت می‌شوند، نه سیاست تأییدشده مالک محصول (DEC-0006).",
+    "هیچ کد محصول، migration یا تست محصولی در این مرحله نوشته نشده است؛ ساخت پایه در PROMPT-002 انجام می‌شود."
+  ],
+  "readiness": {
+    "code": "NOT_STARTED",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

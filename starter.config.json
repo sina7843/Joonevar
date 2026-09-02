@@ -1,0 +1,10 @@
+{
+  "starterVersion": "4.0.0-hamzist",
+  "promptIdPrefix": "PROMPT",
+  "minPrompts": 1,
+  "maxPrompts": 100,
+  "promptDirectory": "prompts",
+  "runnerStateDirectory": ".runner",
+  "completionOwner": "claude",
+  "requireCommittedEvidence": true
+}

@@ -1,0 +1,3 @@
+Hamzist package 1.0 / 20 prompts
+Product reference 1.1
+Runner 4.0 (evidence + agent-owned commits)

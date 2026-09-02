@@ -1,0 +1,20 @@
+{
+  "product": {
+    "uploadedName": "Hamzist_Project_Reference_v1.1(1).md",
+    "sha256": "cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d",
+    "sizeBytes": 111876,
+    "sectionCount": 29,
+    "decisionCount": 19,
+    "acceptanceCount": 33,
+    "referencePaths": [
+      "Requirements.md",
+      "reference-inputs/Hamzist_Project_Reference_v1.1.md"
+    ]
+  },
+  "structuralTemplate": {
+    "uploadedName": "Targol-Sahra-Prompt-Driven-Project-v1.1-10-prompts.zip",
+    "sha256": "9ec4552c9de6ece57503cc49852fd69d3a947074827a7f6e714ea47b966f581c",
+    "role": "structure-only"
+  },
+  "liveFigmaInspectedDuringPackaging": false
+}

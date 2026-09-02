@@ -1,0 +1,3 @@
+# Always preserve these product invariants
+
+D01–D19 in IMPLEMENTATION_DECISIONS.md are final. Source precedence is in CLAUDE.md. No annual membership, scheduler, public vet onboarding, partial location workflow, centre selection, digital signature gate or extra role activation payment. Post-permit verification is optional. Chip is permanent once per lifetime; both service types require blood sampling. Result visibility/processing is independent of issuance payment. Date/allocation corrections need fresh version-specific confirmations. Birth corrections/death preserve historical profiles. Personal declarations never create official lineage/cards. All settings/fees come from scoped audited DB data.

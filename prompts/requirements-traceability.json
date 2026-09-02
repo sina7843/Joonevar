@@ -1,0 +1,457 @@
+{
+  "PROMPT-001": {
+    "requirementAreas": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s23",
+      "s24",
+      "s25",
+      "s27",
+      "s29"
+    ],
+    "decisions": [
+      "D01",
+      "D02",
+      "D03",
+      "D04",
+      "D05",
+      "D06",
+      "D07",
+      "D08",
+      "D09",
+      "D10",
+      "D11",
+      "D12",
+      "D13",
+      "D14",
+      "D15",
+      "D16",
+      "D17",
+      "D18",
+      "D19"
+    ],
+    "requiredChecks": [
+      "source-and-architecture-review"
+    ]
+  },
+  "PROMPT-002": {
+    "requirementAreas": [
+      "s04",
+      "s08",
+      "s21",
+      "s22",
+      "s23",
+      "s26",
+      "s29"
+    ],
+    "decisions": [
+      "D10",
+      "D11",
+      "D15",
+      "D16"
+    ],
+    "requiredChecks": [
+      "foundation-integration"
+    ]
+  },
+  "PROMPT-003": {
+    "requirementAreas": [
+      "s04",
+      "s08",
+      "s24",
+      "s27"
+    ],
+    "decisions": [
+      "D06",
+      "D10",
+      "D11"
+    ],
+    "requiredChecks": [
+      "shell-permissions",
+      "rtl-browser-review"
+    ]
+  },
+  "PROMPT-004": {
+    "requirementAreas": [
+      "s04",
+      "s06",
+      "s08",
+      "s21",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D10",
+      "D11"
+    ],
+    "requiredChecks": [
+      "identity-integration",
+      "identity-browser"
+    ]
+  },
+  "PROMPT-005": {
+    "requirementAreas": [
+      "s05",
+      "s07",
+      "s08",
+      "s21",
+      "s22",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D04",
+      "D05",
+      "D15",
+      "D16"
+    ],
+    "requiredChecks": [
+      "payment-idempotency",
+      "membership-eligibility"
+    ]
+  },
+  "PROMPT-006": {
+    "requirementAreas": [
+      "s05",
+      "s09",
+      "s10",
+      "s21",
+      "s23",
+      "s24",
+      "s26"
+    ],
+    "decisions": [
+      "D14"
+    ],
+    "requiredChecks": [
+      "animal-lineage-integration",
+      "animal-registration-browser"
+    ]
+  },
+  "PROMPT-007": {
+    "requirementAreas": [
+      "s07",
+      "s11",
+      "s21",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D01",
+      "D02",
+      "D03",
+      "D05",
+      "D08",
+      "D09",
+      "D15"
+    ],
+    "requiredChecks": [
+      "referral-concurrency",
+      "finder-browser"
+    ]
+  },
+  "PROMPT-008": {
+    "requirementAreas": [
+      "s11",
+      "s12",
+      "s21",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D02",
+      "D05",
+      "D07",
+      "D09",
+      "D13"
+    ],
+    "requiredChecks": [
+      "chip-sample-integrity",
+      "vet-service-browser"
+    ]
+  },
+  "PROMPT-009": {
+    "requirementAreas": [
+      "s05",
+      "s08",
+      "s10",
+      "s13",
+      "s22",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D13",
+      "D16"
+    ],
+    "requiredChecks": [
+      "registration-batch-integration",
+      "registration-browser"
+    ]
+  },
+  "PROMPT-010": {
+    "requirementAreas": [
+      "s10",
+      "s12",
+      "s14",
+      "s21",
+      "s22",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D07",
+      "D09",
+      "D16"
+    ],
+    "requiredChecks": [
+      "genetics-workflow",
+      "genetics-browser"
+    ]
+  },
+  "PROMPT-011": {
+    "requirementAreas": [
+      "s10",
+      "s14",
+      "s21",
+      "s22",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D07",
+      "D14",
+      "D16",
+      "D17",
+      "D19"
+    ],
+    "requiredChecks": [
+      "pedigree-appeal-integration",
+      "pedigree-browser"
+    ]
+  },
+  "PROMPT-012": {
+    "requirementAreas": [
+      "s04",
+      "s05",
+      "s15",
+      "s21",
+      "s22",
+      "s23",
+      "s24",
+      "s26"
+    ],
+    "decisions": [
+      "D06",
+      "D10",
+      "D11",
+      "D16"
+    ],
+    "requiredChecks": [
+      "kennel-workflow",
+      "kennel-browser"
+    ]
+  },
+  "PROMPT-013": {
+    "requirementAreas": [
+      "s05",
+      "s16",
+      "s21",
+      "s22",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D06",
+      "D12",
+      "D13",
+      "D16"
+    ],
+    "requiredChecks": [
+      "permit-workflow",
+      "permit-browser"
+    ]
+  },
+  "PROMPT-014": {
+    "requirementAreas": [
+      "s10",
+      "s16",
+      "s17",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D12"
+    ],
+    "requiredChecks": [
+      "dates-version-concurrency",
+      "cooldown-boundaries"
+    ]
+  },
+  "PROMPT-015": {
+    "requirementAreas": [
+      "s11",
+      "s18",
+      "s19",
+      "s21",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D08",
+      "D09",
+      "D12",
+      "D18"
+    ],
+    "requiredChecks": [
+      "birth-history-integrity",
+      "pregnancy-browser"
+    ]
+  },
+  "PROMPT-016": {
+    "requirementAreas": [
+      "s05",
+      "s19",
+      "s22",
+      "s23",
+      "s26"
+    ],
+    "decisions": [
+      "D16",
+      "D18"
+    ],
+    "requiredChecks": [
+      "allocation-version-integrity",
+      "puppy-card-browser"
+    ]
+  },
+  "PROMPT-017": {
+    "requirementAreas": [
+      "s05",
+      "s17",
+      "s20",
+      "s23",
+      "s26"
+    ],
+    "decisions": [],
+    "requiredChecks": [
+      "personal-declaration-isolation",
+      "personal-browser"
+    ]
+  },
+  "PROMPT-018": {
+    "requirementAreas": [
+      "s04",
+      "s05",
+      "s08",
+      "s10",
+      "s21",
+      "s22",
+      "s23",
+      "s24",
+      "s26"
+    ],
+    "decisions": [
+      "D05",
+      "D06",
+      "D10",
+      "D11",
+      "D14",
+      "D15",
+      "D16",
+      "D17",
+      "D19"
+    ],
+    "requiredChecks": [
+      "operations-rbac",
+      "operations-browser"
+    ]
+  },
+  "PROMPT-019": {
+    "requirementAreas": [
+      "s01",
+      "s02",
+      "s03",
+      "s04",
+      "s05",
+      "s06",
+      "s07",
+      "s08",
+      "s09",
+      "s10",
+      "s11",
+      "s12",
+      "s13",
+      "s14",
+      "s15",
+      "s16",
+      "s17",
+      "s18",
+      "s19",
+      "s20",
+      "s21",
+      "s22",
+      "s23",
+      "s24",
+      "s25",
+      "s26",
+      "s27",
+      "s28",
+      "s29"
+    ],
+    "decisions": [
+      "D01",
+      "D02",
+      "D03",
+      "D04",
+      "D05",
+      "D06",
+      "D07",
+      "D08",
+      "D09",
+      "D10",
+      "D11",
+      "D12",
+      "D13",
+      "D14",
+      "D15",
+      "D16",
+      "D17",
+      "D18",
+      "D19"
+    ],
+    "requiredChecks": [
+      "domain-regression",
+      "cross-flow-browser",
+      "security-review",
+      "visual-reference-review"
+    ]
+  },
+  "PROMPT-020": {
+    "requirementAreas": [
+      "s02",
+      "s21",
+      "s23",
+      "s28",
+      "s29"
+    ],
+    "decisions": [
+      "D01",
+      "D06",
+      "D14",
+      "D15",
+      "D16",
+      "D17",
+      "D18",
+      "D19"
+    ],
+    "requiredChecks": [
+      "reproducible-startup",
+      "backup-restore",
+      "release-readiness-review"
+    ]
+  }
+}

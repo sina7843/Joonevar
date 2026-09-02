@@ -1,0 +1,268 @@
+{
+  "project": "Hamzist — Phase 1 / MVP",
+  "version": "1.0-20-prompts",
+  "sourceVersion": "1.1",
+  "promptCount": 20,
+  "completionOwner": "claude",
+  "prompts": [
+    {
+      "id": "PROMPT-001",
+      "title": "بررسی کد و رفرنس‌ها و انتخاب معماری",
+      "phase": "Discovery",
+      "file": "001-discovery-architecture.md",
+      "dependsOn": [],
+      "requiredChecks": [
+        "source-and-architecture-review"
+      ]
+    },
+    {
+      "id": "PROMPT-002",
+      "title": "زیرساخت، داده، تنظیمات و تاریخچه",
+      "phase": "Foundation",
+      "file": "002-platform-settings-audit.md",
+      "dependsOn": [
+        "PROMPT-001"
+      ],
+      "requiredChecks": [
+        "foundation-integration"
+      ]
+    },
+    {
+      "id": "PROMPT-003",
+      "title": "دیزاین سیستم، پوسته‌ها و تجربه فارسی",
+      "phase": "Foundation",
+      "file": "003-design-system-shells.md",
+      "dependsOn": [
+        "PROMPT-002"
+      ],
+      "requiredChecks": [
+        "shell-permissions",
+        "rtl-browser-review"
+      ]
+    },
+    {
+      "id": "PROMPT-004",
+      "title": "ورود، OTP، احراز هویت و حساب",
+      "phase": "Implementation",
+      "file": "004-identity-otp-kyc.md",
+      "dependsOn": [
+        "PROMPT-003"
+      ],
+      "requiredChecks": [
+        "identity-integration",
+        "identity-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-005",
+      "title": "پرداخت، عضویت مادام‌العمر و دسترسی خدمات",
+      "phase": "Implementation",
+      "file": "005-payments-membership-eligibility.md",
+      "dependsOn": [
+        "PROMPT-004"
+      ],
+      "requiredChecks": [
+        "payment-idempotency",
+        "membership-eligibility"
+      ]
+    },
+    {
+      "id": "PROMPT-006",
+      "title": "ثبت حیوان، نسب و بررسی شجره‌نامه خارجی",
+      "phase": "Implementation",
+      "file": "006-animals-lineage-foreign-pedigree.md",
+      "dependsOn": [
+        "PROMPT-005"
+      ],
+      "requiredChecks": [
+        "animal-lineage-integration",
+        "animal-registration-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-007",
+      "title": "یافتن دامپزشک و کد مراجعه مستقل",
+      "phase": "Implementation",
+      "file": "007-finder-referrals.md",
+      "dependsOn": [
+        "PROMPT-006"
+      ],
+      "requiredChecks": [
+        "referral-concurrency",
+        "finder-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-008",
+      "title": "میکروچیپ، نمونه‌گیری و نگهداری نمونه",
+      "phase": "Implementation",
+      "file": "008-microchip-sampling-custody.md",
+      "dependsOn": [
+        "PROMPT-007"
+      ],
+      "requiredChecks": [
+        "chip-sample-integrity",
+        "vet-service-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-009",
+      "title": "صدور مستقل برگه ثبتی و پرداخت گروهی",
+      "phase": "Implementation",
+      "file": "009-registration-sheet-batch.md",
+      "dependsOn": [
+        "PROMPT-008"
+      ],
+      "requiredChecks": [
+        "registration-batch-integration",
+        "registration-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-010",
+      "title": "فیش ژنتیک، ارسال نمونه و ثبت نتیجه",
+      "phase": "Implementation",
+      "file": "010-genetics-receipt-shipment-results.md",
+      "dependsOn": [
+        "PROMPT-009"
+      ],
+      "requiredChecks": [
+        "genetics-workflow",
+        "genetics-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-011",
+      "title": "شجره‌نامه، اعتراض ژنتیک و درخواست پستی",
+      "phase": "Implementation",
+      "file": "011-pedigree-appeals-postal.md",
+      "dependsOn": [
+        "PROMPT-010"
+      ],
+      "requiredChecks": [
+        "pedigree-appeal-integration",
+        "pedigree-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-012",
+      "title": "فعال‌سازی پرورش‌دهنده و مدیریت کنل",
+      "phase": "Implementation",
+      "file": "012-breeder-kennel.md",
+      "dependsOn": [
+        "PROMPT-011"
+      ],
+      "requiredChecks": [
+        "kennel-workflow",
+        "kennel-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-013",
+      "title": "مجوز رسمی جفت‌گیری",
+      "phase": "Implementation",
+      "file": "013-official-mating-permit.md",
+      "dependsOn": [
+        "PROMPT-012"
+      ],
+      "requiredChecks": [
+        "permit-workflow",
+        "permit-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-014",
+      "title": "تاریخ‌های دوطرفه و هشدار فاصله جفت‌گیری",
+      "phase": "Implementation",
+      "file": "014-mating-dates-cooldown.md",
+      "dependsOn": [
+        "PROMPT-013"
+      ],
+      "requiredChecks": [
+        "dates-version-concurrency",
+        "cooldown-boundaries"
+      ]
+    },
+    {
+      "id": "PROMPT-015",
+      "title": "بارداری، زایمان، تأیید اختیاری و اصلاح تعداد",
+      "phase": "Implementation",
+      "file": "015-pregnancy-birth-revisions.md",
+      "dependsOn": [
+        "PROMPT-014"
+      ],
+      "requiredChecks": [
+        "birth-history-integrity",
+        "pregnancy-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-016",
+      "title": "تخصیص دوطرفه و صدور کارت توله",
+      "phase": "Implementation",
+      "file": "016-allocation-puppy-cards.md",
+      "dependsOn": [
+        "PROMPT-015"
+      ],
+      "requiredChecks": [
+        "allocation-version-integrity",
+        "puppy-card-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-017",
+      "title": "اعلام توافق شخصی جدا از مسیر رسمی",
+      "phase": "Implementation",
+      "file": "017-personal-agreement-declaration.md",
+      "dependsOn": [
+        "PROMPT-016"
+      ],
+      "requiredChecks": [
+        "personal-declaration-isolation",
+        "personal-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-018",
+      "title": "تکمیل پنل‌ها، تنظیمات و مسیرهای ادامه",
+      "phase": "Implementation",
+      "file": "018-operational-panels-completeness.md",
+      "dependsOn": [
+        "PROMPT-017"
+      ],
+      "requiredChecks": [
+        "operations-rbac",
+        "operations-browser"
+      ]
+    },
+    {
+      "id": "PROMPT-019",
+      "title": "بررسی یکپارچه فلو، امنیت و کیفیت بصری",
+      "phase": "Verification",
+      "file": "019-cross-flow-quality-security.md",
+      "dependsOn": [
+        "PROMPT-018"
+      ],
+      "requiredChecks": [
+        "domain-regression",
+        "cross-flow-browser",
+        "security-review",
+        "visual-reference-review"
+      ]
+    },
+    {
+      "id": "PROMPT-020",
+      "title": "اجرای نهایی، مستندات و آمادگی تحویل",
+      "phase": "Verification",
+      "file": "020-runtime-handoff-release-readiness.md",
+      "dependsOn": [
+        "PROMPT-019"
+      ],
+      "requiredChecks": [
+        "reproducible-startup",
+        "backup-restore",
+        "release-readiness-review"
+      ]
+    }
+  ]
+}
