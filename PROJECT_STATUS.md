@@ -6,7 +6,7 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 - [x] PROMPT-002 — زیرساخت، داده، تنظیمات و تاریخچه <!-- work-commit:b33b01859b5d5e4c25ba141ab1a36fe59874ce42 -->
 - [x] PROMPT-003 — دیزاین سیستم، پوسته‌ها و تجربه فارسی <!-- work-commit:d941c57c5a5ded41c7e81f89a6a28bb0269cc68e -->
 - [x] PROMPT-004 — ورود، OTP، احراز هویت و حساب <!-- work-commit:3f636a107b5154382e006f0ee30ff000ad997fb4 -->
-- [ ] PROMPT-005 — پرداخت، عضویت مادام‌العمر و دسترسی خدمات
+- [x] PROMPT-005 — پرداخت، عضویت مادام‌العمر و دسترسی خدمات <!-- work-commit:57b2b65897ca2f936bebc29df92e4232460ce8d2 -->
 - [ ] PROMPT-006 — ثبت حیوان، نسب و بررسی شجره‌نامه خارجی
 - [ ] PROMPT-007 — یافتن دامپزشک و کد مراجعه مستقل
 - [ ] PROMPT-008 — میکروچیپ، نمونه‌گیری و نگهداری نمونه
