@@ -12,7 +12,7 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 - [x] PROMPT-008 — میکروچیپ، نمونه‌گیری و نگهداری نمونه <!-- work-commit:5c5cde46dd544ad758c4ecca482f3a332ae3ee55 -->
 - [x] PROMPT-009 — صدور مستقل برگه ثبتی و پرداخت گروهی <!-- work-commit:b07f7911a56d2154376cbbc9cc7a3c57cdddd556 -->
 - [x] PROMPT-010 — فیش ژنتیک، ارسال نمونه و ثبت نتیجه <!-- work-commit:a665e7fdfb1b19cf664e299eba39e4ce292dbfde -->
-- [ ] PROMPT-011 — شجره‌نامه، اعتراض ژنتیک و درخواست پستی
+- [x] PROMPT-011 — شجره‌نامه، اعتراض ژنتیک و درخواست پستی <!-- work-commit:280babf93d51f63b100cb888a411cdba3fefd1d9 -->
 - [ ] PROMPT-012 — فعال‌سازی پرورش‌دهنده و مدیریت کنل
 - [ ] PROMPT-013 — مجوز رسمی جفت‌گیری
 - [ ] PROMPT-014 — تاریخ‌های دوطرفه و هشدار فاصله جفت‌گیری
