@@ -3,7 +3,7 @@
 All work starts incomplete. Claude updates completion using the evidence-checking Runner; no user approval checkbox is required. Work hashes are inserted by Runner; a separate progress commit records this file.
 
 - [x] PROMPT-001 — بررسی کد و رفرنس‌ها و انتخاب معماری <!-- work-commit:f15cf47e6137f212e5384487bb49c1d8fdceac77 -->
-- [ ] PROMPT-002 — زیرساخت، داده، تنظیمات و تاریخچه
+- [x] PROMPT-002 — زیرساخت، داده، تنظیمات و تاریخچه <!-- work-commit:b33b01859b5d5e4c25ba141ab1a36fe59874ce42 -->
 - [ ] PROMPT-003 — دیزاین سیستم، پوسته‌ها و تجربه فارسی
 - [ ] PROMPT-004 — ورود، OTP، احراز هویت و حساب
 - [ ] PROMPT-005 — پرداخت، عضویت مادام‌العمر و دسترسی خدمات
