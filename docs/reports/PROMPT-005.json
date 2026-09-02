@@ -1,0 +1,106 @@
+{
+  "promptId": "PROMPT-005",
+  "status": "COMPLETE",
+  "summary": "پرداخت با Intent/Attempt/Item و snapshot مبلغ و نسخه تنظیم پیاده شد؛ تأیید فقط سمت سرور انجام می‌شود و بازگشت مرورگر هیچ پرداختی را تأیید نمی‌کند. Callback تکراری و هم‌زمان دقیقاً یک بار اثر می‌گذارد، مبلغ دستکاری‌شده رد می‌شود و pending/failed/cancelled با حفظ اقلام قابل بازیابی‌اند. عضویت F14 کامل شد: hero، پیش‌نیاز و مزایا، مرور هزینه از داده مدیریت‌شده، پرداخت، تأیید، و عضویت مادام‌العمر بدون انقضا، تمدید یا Review پس از پرداخت؛ شماره PENDING هیچ خدمتی را متوقف نمی‌کند و عضویت در سطح حساب است. قواعد §۵ به‌صورت تابع خالص مشترک نوشته شد و داشبورد، صفحه‌ها و رد کردن سمت سرور همگی از همان یک قاعده می‌خوانند.",
+  "changedFiles": [
+    "src/db/schema/billing.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0002_billing.sql",
+    "src/billing/payments.ts",
+    "src/billing/membership.ts",
+    "src/billing/effects.ts",
+    "src/domain/eligibility/rules.ts",
+    "src/domain/eligibility/service.ts",
+    "src/adapters/registry.ts",
+    "app/membership/page.tsx",
+    "app/membership/actions.ts",
+    "app/membership/membership-forms.tsx",
+    "app/membership/return/page.tsx",
+    "app/dashboard/page.tsx",
+    "app/animals/new/page.tsx",
+    "app/dev/gateway/page.tsx",
+    "app/api/dev/gateway/route.ts",
+    "tests/domain/eligibility.test.ts",
+    "tests/db/payments.test.ts",
+    "tests/db/membership.test.ts",
+    "tests/browser/membership.test.ts",
+    "tests/browser/identity.test.ts",
+    "tests/browser/rtl.test.ts",
+    "docs/reports/screenshots/prompt-005/membership-before-payment.png",
+    "docs/reports/screenshots/prompt-005/membership-locked.png",
+    "docs/reports/screenshots/prompt-005/dev-gateway.png",
+    "docs/reports/screenshots/prompt-005/payment-verified.png",
+    "docs/reports/screenshots/prompt-005/payment-not-verified.png",
+    "docs/reports/screenshots/prompt-005/membership-active.png",
+    "docs/reports/screenshots/prompt-005/dashboard-before-membership.png",
+    "docs/reports/screenshots/prompt-005/dashboard-after-membership.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-005.json"
+  ],
+  "decisions": ["DEC-0031", "DEC-0032", "DEC-0033", "DEC-0034", "DEC-0035", "DEC-0036"],
+  "checks": [
+    {
+      "id": "payment-idempotency",
+      "command": "node --test \"tests/db/payments.test.ts\"  +  npm run test:browser (بخش membership)",
+      "result": "PASS",
+      "evidence": "۱۵ تست روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد. پوشش واقعی: Callback تکراری سه‌باره که فقط یک فعال‌سازی، یک اعلان و یک رکورد PAYMENT_VERIFIED می‌سازد؛ سه Callback **هم‌زمان** با شناسه‌های ارائه‌دهنده متفاوت که دقیقاً یکی اثر می‌گذارد؛ مبلغ دستکاری‌شده (درگاه ۳۰۰٬۰۰۰ ریال به‌جای ۳٬۰۰۰٬۰۰۰) که AMOUNT_MISMATCH ثبت می‌شود و هیچ عضویتی فعال نمی‌شود؛ پرداخت ناموفق و لغوشده که Batch و اقلام و مبلغ منجمد را برای تلاش دوباره نگه می‌دارند؛ Callback دیرهنگام روی Attempt لغوشده که اثری ندارد؛ تغییر تعرفه از ۳۰۰٬۰۰۰ به ۴۵۰٬۰۰۰ که Intent قبلی را دست‌نخورده می‌گذارد و Intent بعدی را با نسخه ۲ می‌سازد؛ شکست اثر داخل تراکنش که همه چیز را برمی‌گرداند و Attempt را PENDING نگه می‌دارد تا تلاش دوباره درست ببندد؛ شناسه ناشناخته که بدون تماس با درگاه UNKNOWN_REFERENCE می‌گیرد؛ و Batch متعلق به پرداخت‌کننده که توسط حساب دیگر قابل شروع نیست. در مرورگر: بازگشت مستقیم به /membership/return با شناسه واقعی و بدون عبور از درگاه، «پرداخت تأیید نشد» می‌گیرد و عضویت فعال نمی‌شود."
+    },
+    {
+      "id": "membership-eligibility",
+      "command": "node --test \"tests/domain/eligibility.test.ts\" \"tests/db/membership.test.ts\"  +  npm run test:browser",
+      "result": "PASS",
+      "evidence": "۱۲ تست دامنه و ۹ تست دیتابیسی. پوشش واقعی: ثبت حیوان با KYC تأییدشده و **بدون** عضویت باز است و سرور هم آن را می‌پذیرد، درحالی‌که خدمات پولی رد می‌شوند؛ پیش از KYC همه قفل‌ها به /account/kyc اشاره می‌کنند و پس از KYC بدون عضویت به /membership؛ زنجیره §۵ گام‌به‌گام باز می‌شود (برگه ثبتی → شجره‌نامه/کنل → مجوز)؛ Puppy Card بدون تخصیص FINAL صادر نمی‌شود و برگه ثبتی توله پیش‌نیازش نیست؛ Cooldown حتی به‌عنوان یک fact وجود ندارد؛ شماره عضویت PENDING هیچ خدمتی را متوقف نمی‌کند و صدور بعدی آن چیزی را عوض نمی‌کند؛ عضویت در سطح حساب است و با تغییر Context از USER به BREEDER همان می‌ماند؛ عضویت غیرفعال کار جدید و حضور در Finder دامپزشک را می‌بندد ولی کار فعال قبلی را باز می‌گذارد و نقش و Location را دست‌نخورده نگه می‌دارد؛ فعال‌سازی دوباره فقط همان محدودیت را برمی‌دارد؛ رد صلاحیت حرفه‌ای حالتی جدا از عضویت غیرفعال است؛ صدور شماره و تغییر وضعیت فقط از محیط عملیاتی و با دلیل ممکن است. در مرورگر: قفل‌های عضویت پس از پرداخت برداشته می‌شوند و پیش‌نیاز بعدی هر سرویس نمایش داده می‌شود."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 141 · pass 141 · fail 0 · skipped 0."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 29 · pass 29 · fail 0 (۷ مورد پرداخت/عضویت، ۱۱ مورد هویت، ۱۱ مورد پوسته و RTL). درگاه توسعه مبلغ ۳۰۰۰۰۰۰ ریال را نشان داد که همان ۳۰۰٬۰۰۰ تومان × ۱۰ است. ۸ اسکرین‌شات در docs/reports/screenshots/prompt-005/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)  +  node src/db/seed/run.ts --dev",
+      "result": "PASS",
+      "evidence": "migration `0002_billing` اعمال شد و اجرای دوباره replay نکرد؛ تنظیمات قبلی حفظ شدند (۲۴ کلید preserved)."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "هیچ درگاه پرداخت واقعی پیکربندی نشده است. آداپتور `payment-gateway` همچنان NOT_CONFIGURED گزارش می‌شود و در محیط توسعه از درگاه محلی دیتابیسی استفاده می‌شود که فقط خارج از production با INTEGRATION_MODE=local وجود دارد؛ در production نبود درگاه خطای صریح NOT_CONFIGURED می‌دهد و هیچ مسیر جایگزینی پرداخت را تأیید نمی‌کند. اتصال sandbox یا live هنوز اثبات نشده است (DEC-0033).",
+    "پنج تعرفه دیگر (برگه ثبتی، شجره‌نامه، مجوز جفت‌گیری، ثبت کنل، Puppy Card) همچنان NOT_CONFIGURED هستند؛ ساخت Batch برای آن‌ها با خطای صریح رد می‌شود و هیچ مبلغی فرض نمی‌شود.",
+    "اثر پرداخت فقط برای عضویت پیاده شده است. پرداخت تأییدشده برای سرویس‌های دیگر پول را ثبت می‌کند و هیچ سندی صادر نمی‌کند؛ اثر هر کدام در PROMPT-009 تا PROMPT-016 اضافه می‌شود.",
+    "شمارش‌های Eligibility مربوط به حیوان، برگه ثبتی، شجره‌نامه، مجوز و تخصیص فعلاً صفر خوانده می‌شوند چون آن جدول‌ها هنوز وجود ندارند؛ resolver از PROMPT-006 با شمارش واقعی پر می‌شود بدون تغییر در قواعد.",
+    "قاعده کار دامپزشک پیاده و تست شده، اما اتصال آن به Finder واقعی و به صف درخواست‌های تخصیص‌یافته در PROMPT-007 انجام می‌شود؛ شرط SQL آماده در `finderEligibleVetCondition` قرار دارد.",
+    "سیاست غیرفعال‌سازی عضویت اختراع نشد: فقط سازوکار عملیاتی با دلیل اجباری ساخته شد و هیچ قاعده خودکاری عضویت را غیرفعال نمی‌کند (DEC-0035).",
+    "سیاست بازپرداخت، تخفیف، مالیات و تسویه در سند تعیین نشده و اینجا هم ساخته نشده است؛ حذف قلم از Batch یا تغییر مبلغ پس از پرداخت هم خودسرانه پیاده نشد (§۱۳).",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "MEMBERSHIP_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

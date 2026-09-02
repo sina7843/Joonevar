@@ -11,6 +11,8 @@ import { env as loadEnv } from '../config/env.ts';
 import { AppError } from '../domain/errors.ts';
 import type { DbClient } from '../db/client.ts';
 import { devOutboundSms } from '../db/schema/identity.ts';
+import { devPaymentOutcomes } from '../db/schema/billing.ts';
+import { eq } from 'drizzle-orm';
 
 export type AdapterStatus = 'NOT_CONFIGURED' | 'LOCAL_TEST' | 'SANDBOX_VERIFIED' | 'LIVE_VERIFIED';
 
@@ -158,8 +160,10 @@ export interface PaymentGateway {
 }
 
 /**
- * Local gateway for development. It only reports a payment as paid when the
- * test explicitly marks it, so no flow can accidentally believe money moved.
+ * Local gateway for development.
+ *
+ * `markPaid` is in-process and exists only for unit tests: nothing in the
+ * application can call it, so no flow can accidentally believe money moved.
  */
 export function localTestPaymentGateway(env?: Env): PaymentGateway & { markPaid(reference: string, amountRial: bigint): void } {
   assertNotProduction('payment-gateway', env ?? loadEnv());
@@ -184,4 +188,67 @@ export function localTestPaymentGateway(env?: Env): PaymentGateway & { markPaid(
       };
     },
   };
+}
+
+export const DEV_GATEWAY_PROVIDER = 'dev-local-gateway';
+
+/**
+ * Development gateway backed by the database.
+ *
+ * The redirect goes to a local page that stands in for the bank; whatever is
+ * decided there is written to `dev_payment_outcome`, and this adapter reads it
+ * during the server-side verify. The browser never marks anything paid — it
+ * only triggers the verification, exactly as a real gateway return does.
+ *
+ * It refuses to exist in production.
+ */
+export function devPaymentGateway(database: DbClient, env?: Env): PaymentGateway {
+  assertNotProduction('payment-gateway', env ?? loadEnv());
+  return {
+    async start(input) {
+      return {
+        reference: input.reference,
+        amountRial: input.amountRial,
+        redirectUrl:
+          '/dev/gateway?reference=' +
+          encodeURIComponent(input.reference) +
+          '&amountRial=' +
+          input.amountRial.toString() +
+          '&callback=' +
+          encodeURIComponent(input.callbackUrl),
+      };
+    },
+    async verify(input) {
+      const [row] = await database
+        .select()
+        .from(devPaymentOutcomes)
+        .where(eq(devPaymentOutcomes.reference, input.reference))
+        .limit(1);
+      return {
+        paid: row?.paid === 'true',
+        amountRial: row ? BigInt(row.amountRial) : 0n,
+        providerRef: input.providerRef || (row ? 'dev-' + input.reference : ''),
+      };
+    },
+  };
+}
+
+/**
+ * The gateway the application uses.
+ *
+ * With no configured provider outside production the development gateway is
+ * used. In production a missing provider is a hard failure: a checkout that
+ * reported success without a real gateway would be worse than an outage.
+ */
+export function paymentGateway(database: DbClient, env: Env = loadEnv()): PaymentGateway {
+  if (env.APP_ENV === 'production' || env.INTEGRATION_MODE !== 'local') {
+    throw new AppError('NOT_CONFIGURED', 'No payment gateway is configured; payments cannot be taken', {
+      detail: { adapter: 'payment-gateway' },
+    });
+  }
+  return devPaymentGateway(database, env);
+}
+
+export function paymentProviderName(env: Env = loadEnv()): string {
+  return env.PAYMENT_PROVIDER ?? DEV_GATEWAY_PROVIDER;
 }

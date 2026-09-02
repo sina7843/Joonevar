@@ -303,9 +303,13 @@ test('a locked service shows its reason, prerequisite and a working CTA', async 
     const body = await page.locator('body').innerText();
     assert.ok(body.includes('برای ثبت حیوان هم‌زیست، احراز هویت لازم است'), 'reason is shown');
     assert.ok(body.includes('باید تکمیل و تأیید شود'), 'next prerequisite is shown');
+    // Every service that depends on identity verification shows the same CTA,
+    // so the count grows with the dashboard; what matters is that each one
+    // actually leads to the verification route.
     const cta = page.getByRole('link', { name: 'تکمیل اطلاعات هویتی' });
-    assert.equal(await cta.count(), 1);
-    assert.equal(await cta.getAttribute('href'), '/account/kyc');
+    const hrefs = await cta.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('href')));
+    assert.ok(hrefs.length >= 1);
+    assert.ok(hrefs.every((href) => href === '/account/kyc'));
   } finally {
     await context.close();
   }

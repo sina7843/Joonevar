@@ -339,7 +339,7 @@ test('KYC runs end to end: upload, submit, association review, approval', async 
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
     const dashboard = await page.locator('body').innerText();
     assert.ok(!dashboard.includes('برای ثبت حیوان هم‌زیست، احراز هویت لازم است'));
-    assert.ok(dashboard.includes('برای ثبت حیوان عضویت لازم نیست'));
+    assert.ok(dashboard.includes('برای این کار عضویت لازم نیست'));
     assert.ok(dashboard.includes('فعال نیست'), 'membership is still inactive and shown separately');
     await page.screenshot({ path: path.join(SHOTS, 'dashboard-kyc-approved.png'), fullPage: true });
 
