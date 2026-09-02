@@ -14,7 +14,7 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 - [x] PROMPT-010 — فیش ژنتیک، ارسال نمونه و ثبت نتیجه <!-- work-commit:a665e7fdfb1b19cf664e299eba39e4ce292dbfde -->
 - [x] PROMPT-011 — شجره‌نامه، اعتراض ژنتیک و درخواست پستی <!-- work-commit:280babf93d51f63b100cb888a411cdba3fefd1d9 -->
 - [x] PROMPT-012 — فعال‌سازی پرورش‌دهنده و مدیریت کنل <!-- work-commit:c350aa91c452818d8f71f9f5c21f9ee77a3c7eff -->
-- [ ] PROMPT-013 — مجوز رسمی جفت‌گیری
+- [x] PROMPT-013 — مجوز رسمی جفت‌گیری <!-- work-commit:137dbeb8fbc47ee8cb8543617eab033666e97188 -->
 - [ ] PROMPT-014 — تاریخ‌های دوطرفه و هشدار فاصله جفت‌گیری
 - [ ] PROMPT-015 — بارداری، زایمان، تأیید اختیاری و اصلاح تعداد
 - [ ] PROMPT-016 — تخصیص دوطرفه و صدور کارت توله
