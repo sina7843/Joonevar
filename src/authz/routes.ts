@@ -37,7 +37,10 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // Becoming a breeder starts from the ordinary user context.
   { prefix: '/breeder/activate', access: ['USER', 'BREEDER'] },
   { prefix: '/breeder', access: ['BREEDER'] },
-  { prefix: '/kennels', access: ['BREEDER'] },
+  // §15.2: registering a kennel starts in the public context, because the
+  // breeder role is what an approved kennel produces — it cannot also be the
+  // condition for reaching the form (§15.1).
+  { prefix: '/kennels', access: ['USER', 'BREEDER'] },
   { prefix: '/mating', access: ['USER', 'BREEDER'] },
   { prefix: '/puppy-cards', access: ['USER', 'BREEDER'] },
   { prefix: '/litters', access: ['USER', 'BREEDER'] },

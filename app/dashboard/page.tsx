@@ -39,19 +39,19 @@ const SERVICE_CARDS: ReadonlyArray<{ service: ServiceName; label: string; descri
     service: 'REGISTRATION_SHEET',
     label: 'دریافت برگه ثبتی',
     description: 'پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری.',
-    href: '/registration/batch',
+    href: '/registration/new',
   },
   {
     service: 'PEDIGREE',
     label: 'دریافت شجره‌نامه',
     description: 'با نمونه موجود همان حیوان و برگه ثبتی صادرشده.',
-    href: '/pedigree/request',
+    href: '/pedigree',
   },
   {
     service: 'KENNEL',
     label: 'شروع ثبت کنل',
     description: 'برای پرورش‌دهنده، با حداقل یک برگه ثبتی.',
-    href: '/kennels/new',
+    href: '/kennels',
   },
   {
     service: 'MATING_PERMIT',

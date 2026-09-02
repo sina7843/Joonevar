@@ -55,7 +55,6 @@ test('a context cannot be entered without the matching active role', () => {
   // Claiming a context in the request is not enough; the role must be active.
   assert.equal(canAccessRoute(actor('TRUSTED_VET', []), '/vet'), false);
   assert.equal(canAccessRoute(actor('TRUSTED_VET', ['TRUSTED_VET']), '/vet'), true);
-  assert.equal(canAccessRoute(actor('BREEDER', []), '/kennels'), false);
   assert.equal(canAccessRoute(actor('BREEDER', ['BREEDER']), '/kennels'), true);
   assert.equal(canAccessRoute(actor('SUPERADMIN', []), '/admin'), false);
 });
@@ -72,15 +71,17 @@ test('the vet panel is not part of the ordinary user surface', () => {
   assert.equal(canAccessRoute(vet, '/dashboard'), true);
 });
 
-test('becoming a breeder starts from the user context but kennels need the role', () => {
+test('becoming a breeder starts from the user context, and so does the kennel', () => {
   const user = actor('USER');
   assert.equal(canAccessRoute(user, '/breeder/activate'), true);
+  // The breeder environment itself still needs the role.
   assert.equal(canAccessRoute(user, '/breeder'), false);
-  assert.equal(canAccessRoute(user, '/kennels'), false);
-  assert.equal(canAccessRoute(user, '/kennels/new'), false);
+  // Registering a kennel does not: the role is what approval produces (§15.2).
+  assert.equal(canAccessRoute(user, '/kennels'), true);
+  assert.equal(canAccessRoute(user, '/kennels/abc'), true);
 
   const breeder = actor('BREEDER', ['BREEDER']);
-  assert.equal(canAccessRoute(breeder, '/kennels/new'), true);
+  assert.equal(canAccessRoute(breeder, '/kennels/abc'), true);
   assert.equal(canAccessRoute(breeder, '/breeder'), true);
 });
 

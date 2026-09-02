@@ -13,6 +13,7 @@ import {
   issueForBatch as issuePedigrees,
   markBatchPaid as markPedigreeBatchPaid,
 } from '../documents/pedigree.ts';
+import { markKennelPaid } from '../kennels/service.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -32,8 +33,13 @@ export const paidEffects: PaidEffects = {
         await markPedigreeBatchPaid(tx, batch.id);
         await issuePedigrees(tx, batch);
         return;
-      // Permits, kennels and puppy cards attach their own effects in
-      // PROMPT-012 to PROMPT-016. Until then a verified payment for them
+      // The kennel is not approved by paying: the verified payment only opens
+      // the submission step, and the association still reviews it (§15.2).
+      case 'KENNEL_REGISTRATION':
+        await markKennelPaid(tx, batch);
+        return;
+      // Permits and puppy cards attach their own effects in
+      // PROMPT-013 to PROMPT-016. Until then a verified payment for them
       // records the money and issues nothing, which is the truthful outcome
       // rather than a fabricated document.
       default:

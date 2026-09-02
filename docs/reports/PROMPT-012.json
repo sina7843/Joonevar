@@ -1,0 +1,113 @@
+{
+  "promptId": "PROMPT-012",
+  "status": "COMPLETE",
+  "summary": "مسیر مصوب F11 با همان سه حالت «در حال بررسی»، «تأییدشده» و «نیازمند اصلاح» ساخته شد و نقش پرورش‌دهنده با تأیید پرونده کنل فعال می‌شود، نه با چیز دیگری؛ هیچ آپلود مدرک پرورش‌دهنده و هیچ پرداخت مستقل «فعال‌سازی نقش» اضافه نشد. ورود با همان عنوان «شروع ثبت کنل» است و پیش‌نیازها فقط عضویت فعال و حداقل یک برگه ثبتی‌اند؛ داشتن نقش هرگز شرط رسیدن به فرم نیست. نشانی و موقعیت کنل برای ارسال اجباری است و نشانی محل سکونت مستقل و اختیاری می‌ماند و خالی‌بودنش مانع ثبت کنل نیست. جست‌وجوی نژاد با نام فارسی و انگلیسی از همان فهرست مرجع انجام می‌شود، موارد انتخاب‌شده با تعدادشان نمایش داده می‌شوند و حداقل یک نژاد لازم است. پرداخت از تعرفه دیتابیسی و همان زیرساخت پرداخت موجود انجام می‌شود و فقط مرحله ارسال را باز می‌کند؛ تأیید نهایی با انجمن است. صف، جزئیات، اصلاح، رد با دلیل و تأیید انجمن با Audit و اعلان ساخته شد. پروفایل کنل نام، وضعیت، موقعیت و نژادها را نشان می‌دهد و افزودن/حذف نژاد از همان فهرست، بدون پرداخت و بررسی دوباره، با ثبت Before/After و Actor و زمان انجام می‌شود؛ حذف آخرین نژاد مجاز نیست. پس از تأیید، Role Switcher عمومی واقعاً Context پرورش‌دهنده را نشان می‌دهد.",
+  "changedFiles": [
+    "src/db/schema/kennels.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0009_kennels.sql",
+    "src/db/migrations/meta/0009_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/kennels/service.ts",
+    "src/billing/effects.ts",
+    "src/authz/routes.ts",
+    "app/kennels/page.tsx",
+    "app/kennels/actions.ts",
+    "app/kennels/forms.tsx",
+    "app/kennels/[id]/page.tsx",
+    "app/kennels/[id]/return/page.tsx",
+    "app/breeder/activate/page.tsx",
+    "app/assoc/kennels/page.tsx",
+    "app/assoc/kennels/[id]/page.tsx",
+    "app/assoc/kennels/actions.ts",
+    "app/assoc/kennels/review-form.tsx",
+    "app/dashboard/page.tsx",
+    "tests/db/kennel.test.ts",
+    "tests/browser/kennel.test.ts",
+    "tests/ui/routes.test.ts",
+    "tests/browser/genetics.test.ts",
+    "tests/browser/pedigree.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-012/kennel-locked.png",
+    "docs/reports/screenshots/prompt-012/breeder-activation.png",
+    "docs/reports/screenshots/prompt-012/kennel-form.png",
+    "docs/reports/screenshots/prompt-012/kennel-missing-location.png",
+    "docs/reports/screenshots/prompt-012/kennel-breeds.png",
+    "docs/reports/screenshots/prompt-012/kennel-paid.png",
+    "docs/reports/screenshots/prompt-012/kennel-submitted.png",
+    "docs/reports/screenshots/prompt-012/assoc-kennel-review.png",
+    "docs/reports/screenshots/prompt-012/kennel-needs-correction.png",
+    "docs/reports/screenshots/prompt-012/kennel-approved.png",
+    "docs/reports/screenshots/prompt-012/breeder-context.png",
+    "docs/reports/screenshots/prompt-012/kennel-last-breed.png",
+    "docs/reports/screenshots/prompt-012/kennel-breed-edit.png",
+    "docs/reports/screenshots/prompt-012/kennel-not-yours.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-012.json"
+  ],
+  "decisions": ["DEC-0080", "DEC-0081", "DEC-0082", "DEC-0083", "DEC-0084"],
+  "checks": [
+    {
+      "id": "kennel-workflow",
+      "command": "node --test \"tests/db/kennel.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 11 · pass 11 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد. پوشش واقعی: بدون برگه ثبتی، ورود با همان دلیل مسدود است و داشتن نقش پرورش‌دهنده شرط شروع نیست (در شروع، هیچ ردیف نقشی وجود ندارد)؛ نشانی محل سکونت خالی است و مانع نیست، ولی نبود نشانی کنل هم پرداخت و هم ارسال را می‌بندد؛ بدون نژاد ارسال ممکن نیست، افزودن تکراری بی‌اثر است، حذف آخرین نژاد رد می‌شود و نژاد خارج از فهرست مرجع پذیرفته نمی‌شود؛ جست‌وجوی نژاد با نام فارسی و انگلیسی کار می‌کند؛ ارسال پیش از پرداخت رد می‌شود، پرداخت تأییدشده فقط وضعیت «آماده ارسال» می‌سازد و پرونده را وارد صف نمی‌کند، دقیقاً یک قلم پرداخت با کلید تعرفه کنل ثبت می‌شود، تأیید انجمن نقش BREEDER را ACTIVE می‌کند و رویداد Audit و اعلان‌ها ثبت می‌شوند؛ بازگشت برای اصلاح بدون دلیل رد می‌شود، داده و نژادها حفظ می‌شوند، پرداخت دوباره لازم نیست و در کل چرخه فقط یک Batch کنل وجود دارد؛ پرداخت ناموفق و لغوشده پرونده و انتخاب‌ها را نگه می‌دارند و تلاش بعدی موفق است؛ ویرایش نژاد پس از تأیید وضعیت را عوض نمی‌کند، پرونده را به صف برنمی‌گرداند، Batch جدید نمی‌سازد و Before/After و Actor و زمان را ثبت می‌کند؛ هیچ ستون مدرک روی کنل نیست و تنها فایل ذخیره‌شده کاربر همان کارت ملی KYC است؛ کنل کاربر دیگر قابل ویرایش نیست و رد با دلیل هیچ نقشی فعال نمی‌کند؛ تعرفه ثبت‌نشده هیچ مسیر پرداختی باز نمی‌کند."
+    },
+    {
+      "id": "kennel-browser",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  node --test --test-concurrency=1 \"tests/browser/kennel.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 4 · pass 4 · fail 0 روی Chromium واقعی. پوشش واقعی: بدون برگه ثبتی، ورود قفل است و دکمه شروع وجود ندارد و صفحه فعال‌سازی می‌گوید مدرک اضافه‌ای جز کارت ملی و پرداخت مستقل فعال‌سازی نقش وجود ندارد؛ دکمه ورود دقیقاً «شروع ثبت کنل» است؛ فرم می‌گوید نشانی محل سکونت جدا و اختیاری است و بدون نشانی کنل، پیام «نشانی و موقعیت کنل برای ارسال لازم است» نمایش داده می‌شود؛ جست‌وجوی نژاد و افزودن آن شمارش «1 نژاد انتخاب شده است» را می‌سازد؛ مبلغ ۱۵۰٬۰۰۰ تومان از تعرفه دیتابیسی نمایش داده می‌شود و درگاه توسعه ۱۵۰۰۰۰۰ ریال می‌گیرد؛ پس از پرداخت، صفحه می‌گوید تأیید نهایی با انجمن است و پرونده هنوز در صف انجمن نیست تا کاربر ارسال کند؛ انجمن یک بار با دلیل به اصلاح برمی‌گرداند، کاربر همان دلیل و جمله «پرداخت انجام‌شده حفظ شده است» را می‌بیند و هیچ دکمه پرداخت دوباره‌ای وجود ندارد، اصلاح و ارسال دوباره انجام می‌شود و انجمن تأیید می‌کند؛ سپس صفحه می‌گوید نقش پرورش‌دهنده فعال است و داشبورد Context «پرورش‌دهنده» را نشان می‌دهد؛ در کنل تأییدشده، حذف آخرین نژاد با پیام صریح رد می‌شود، افزودن نژاد دوم شمارش را ۲ می‌کند، وضعیت «تأییدشده» می‌ماند، دکمه پرداخت وجود ندارد و پرونده به صف انجمن برنمی‌گردد؛ کنل کاربر دیگر «پیدا نشد» می‌گیرد و محیط انجمن برای Context عمومی بسته است. ۱۴ اسکرین‌شات در docs/reports/screenshots/prompt-012/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 256 · pass 256 · fail 0 · skipped 0 (۱۱ مورد جدید این مرحله؛ تست مسیرها طبق DEC-0080 به‌روزرسانی شد)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 62 · pass 62 · fail 0 در دو اجرای پیاپی. در اجرای اول، یک مورد قدیمی مرکز ژنتیک با بزرگ‌شدن صف نمونه‌ها به مهلت ۲۰ ثانیه‌ای انتظار برخورد؛ مهلت آن دو انتظار به ۴۵ ثانیه افزایش یافت و دو اجرای کامل بعدی هر دو ۶۲/۶۲ سبز بودند."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0009_kennels` اعمال شد (جدول‌های kennel و kennel_breed با ایندکس یکتای کنل/نژاد) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تعرفه واقعی ثبت کنل اعلام نشده است؛ در تست‌ها مقدار SYNTHETIC وارد می‌شود و تا ورود مقدار واقعی از پنل مدیریت، مسیر پرداخت بسته است.",
+    "فهرست کامل فیلدهای مصوب پروتوتایپ برای فرم کنل در این اجرا در دسترس نبود؛ فقط فیلدهایی ساخته شد که خود سند نام می‌برد به‌علاوه چند فیلد اختیاری هم‌خانواده، و هیچ فیلد اجباری تازه‌ای اختراع نشد (DEC-0083).",
+    "نقشه پیکربندی نشده است؛ مختصات کنل اختیاری و ورودی دستی است و نبود آن مانع ارسال نیست، چون سند نشانی را شرط می‌داند نه نقشه.",
+    "محیط اختصاصی پرورش‌دهنده (`/breeder`) در این مرحله فقط با نقش باز است و محتوای عملیاتی آن به PROMPT‌های بعدی (جفت‌گیری، توله و Puppy Card) تعلق دارد.",
+    "Onboarding عمومی دامپزشک ساخته نشد و طبق D01 در فاز بعد است؛ این مرحله چیزی به آن اضافه نکرد.",
+    "درگاه پرداخت واقعی همچنان پیکربندی نشده است و تأیید پرداخت با درگاه توسعه محلی اجرا شد.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "KENNEL_AND_BREEDER_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

@@ -8,3 +8,4 @@ export * from './clinical.ts';
 export * from './documents.ts';
 export * from './genetics.ts';
 export * from './pedigree.ts';
+export * from './kennels.ts';

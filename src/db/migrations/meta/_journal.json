@@ -64,6 +64,13 @@
       "when": 1788345607342,
       "tag": "0008_pedigree",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788347905816,
+      "tag": "0009_kennels",
+      "breakpoints": true
     }
   ]
 }

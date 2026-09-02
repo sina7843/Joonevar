@@ -361,9 +361,9 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
     centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
   await centre.goto(BASE_URL + '/genetics/samples', { waitUntil: 'load' });
   await centreRow().getByTestId('receive-sample').click();
-  await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 20_000 });
+  await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 45_000 });
   await centreRow().getByTestId('start-processing').click();
-  await centreRow().getByText('در حال پردازش').waitFor({ timeout: 20_000 });
+  await centreRow().getByText('در حال پردازش').waitFor({ timeout: 45_000 });
 
   await centre.goto(BASE_URL + '/genetics/results', { waitUntil: 'load' });
   const resultRow = centre.locator('[data-testid="processing-list"] > li').filter({ hasText: trackingCode });

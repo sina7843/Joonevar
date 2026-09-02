@@ -29,8 +29,8 @@
 | `/pedigree/[animalId]`، `/pedigree/issue`، `/pedigree/batch/[id]` و `/documents/pedigree/[id]` | PROTO | DNA-010/011, PET-011/012/013 | s14 | — | A-011, A-012 — پیاده‌شده در PROMPT-010 و PROMPT-011 |
 | `/pedigree/appeals/[id]` و `/genetics/appeals` | CODE | ورودی از همان نتیجه | s14 | D19 | A-033 — پیاده‌شده در PROMPT-011 |
 | `/documents/[id]/postal-request` | CODE | — | s14 | D17 | A-031 |
-| `/breeder/activate` | PROTO | `240:6033` BRD-001..008 | s15 | — | — |
-| `/kennels`, `/kennels/new`, `/kennels/[id]` | PROTO | BRD-003B/C/D, BRD-008 | s15 | D16 | A-014 |
+| `/breeder/activate` | PROTO | `240:6033` BRD-001..008 | s15 | — | — — پیاده‌شده در PROMPT-012؛ نقش با تأیید کنل فعال می‌شود |
+| `/kennels` و `/kennels/[id]` | PROTO | BRD-003B/C/D, BRD-008 | s15 | D16 | A-014 — پیاده‌شده در PROMPT-012؛ ورود از Context عمومی (DEC-0080) |
 | `/mating/permits/new` | PROTO | `242:6517` MAT-002..006, MAT-005B | s16, s22 | D12 | A-015 |
 | `/mating/permits/[id]` | PROTO | MAT-007..010, MAT-010B | s16 | D12, D13 | A-015, A-023 |
 | `/mating/permits/[id]/dates` | PROTO | MAT-010B + §۱۷ | s17 | — | A-016, A-017 |
@@ -60,7 +60,7 @@
 |---|---|---|---|---|
 | `/assoc` | صف‌های انجمن | s21 | D11 | A-003 |
 | `/assoc/members` | عضویت و شماره عضویت — **بدون Gate فعال‌سازی** | s07, s21 | D04 | A-002 |
-| `/assoc/kennels` | بررسی کنل | s15 | — | A-014 |
+| `/assoc/kennels` و `/assoc/kennels/[id]` | بررسی کنل | s15 | — | A-014 — پیاده‌شده در PROMPT-012 |
 | `/assoc/permits` | بررسی و صدور مجوز | s16 | — | A-015 |
 | `/assoc/foreign-pedigree` | بررسی مدرک خارجی | s09 | D14 | A-027 |
 | `/assoc/issuers` | فهرست صادرکنندگان موردتأیید (در شروع خالی) | s21 | D14, D16 | A-027 |

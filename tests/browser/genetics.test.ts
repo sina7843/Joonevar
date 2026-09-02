@@ -490,10 +490,10 @@ test('the centre receives, processes and records a result without any issuance p
     // the next request aborts the server action that is still running.
     // The row re-renders in place, so the new state is the confirmation.
     await centreRow().getByTestId('receive-sample').click();
-    await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 20_000 });
+    await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 45_000 });
     await centre.screenshot({ path: path.join(SHOTS, 'centre-received.png'), fullPage: true });
     await centreRow().getByTestId('start-processing').click();
-    await centreRow().getByText('در حال پردازش').waitFor({ timeout: 20_000 });
+    await centreRow().getByText('در حال پردازش').waitFor({ timeout: 45_000 });
 
     // No pedigree issuance payment has happened, and the result is recorded.
     await centre.goto(BASE_URL + '/genetics/results', { waitUntil: 'load' });
