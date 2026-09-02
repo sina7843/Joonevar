@@ -1,37 +1,50 @@
+import Link from 'next/link';
+import { eq } from 'drizzle-orm';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { AccessDenied } from '../../../src/ui/access-denied.tsx';
+import { AccessDenied, RecordNotFound } from '../../../src/ui/access-denied.tsx';
+import { AppError } from '../../../src/domain/errors.ts';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
-import { Identifier } from '../../../src/ui/status.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
+import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { Timeline, type TimelineItem } from '../../../src/ui/timeline.tsx';
+import { db } from '../../../src/db/client.ts';
+import { referenceBreeds } from '../../../src/db/schema/core.ts';
+import { familyOf, requireOwnedAnimal } from '../../../src/animals/service.ts';
+import { findForeignCase, FOREIGN_STATUS_FA } from '../../../src/animals/foreign-pedigree.ts';
+import { auditTrail } from '../../../src/audit/service.ts';
+import { generationLabel } from '../../../src/domain/lineage.ts';
+import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
+import { AnimalEditForm } from './edit-form.tsx';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Animal profile composition points — §10.
+ * Animal profile and timeline — §10.
  *
- * The sections and their order are the ones the product requires. They are
- * rendered as empty composition points rather than filled with a sample animal,
- * because animal records do not exist yet (PROMPT-006) and a plausible-looking
- * profile would be indistinguishable from a real one.
- *
- * Identifiers keep their own namespaces (§23.2): Animal ID is internal, Pet ID
- * exists only once a registration sheet is issued.
+ * Every section the source lists is present. Sections whose feature has not
+ * been built yet say so plainly instead of showing invented content, and each
+ * one keeps its place so the file grows rather than being rearranged later.
  */
-const SECTIONS: ReadonlyArray<{ id: string; title: string; note: string }> = [
-  { id: 'identity', title: 'هویت', note: 'اطلاعات پایه، جنسیت، نژاد و نسل محاسبه‌شده' },
-  { id: 'ownership', title: 'مالکیت', note: 'مالک فعلی و سابقه تخصیص' },
-  { id: 'microchip', title: 'میکروچیپ', note: 'شماره میکروچیپ و اتصال دائمی آن به همین حیوان' },
-  { id: 'sample', title: 'نمونه و Custody', note: 'کد رهگیری نمونه، دامپزشک نگهدارنده و زنجیره رویدادها' },
-  { id: 'registration', title: 'برگه ثبتی', note: 'وضعیت صدور و پرداخت مربوط' },
-  { id: 'parentage', title: 'Parentage Result', note: 'نتیجه مرکز ژنتیک و نسخه‌های آن' },
-  { id: 'pedigree', title: 'شجره‌نامه', note: 'کد شجره‌نامه و وضعیت صدور' },
-  { id: 'family', title: 'خانواده و نسب', note: 'والدین قابل Resolve و ancestry' },
-  { id: 'permits', title: 'مجوزها', note: 'مجوز جفت‌گیری و پرونده‌های مرتبط' },
-  { id: 'mating-dates', title: 'تاریخ‌های جفت‌گیری', note: 'اعلام‌ها، تأییدها و نسخه‌ها' },
-  { id: 'litter', title: 'بارداری، زایمان و Litter', note: 'اعلام کاربر و نتیجه مستقل دامپزشک' },
-  { id: 'documents', title: 'مدارک', note: 'فایل‌های خصوصی با دسترسی کنترل‌شده' },
-  { id: 'timeline', title: 'تاریخچه', note: 'رویدادها با زمان، وضعیت، مسئول اقدام و CTA ادامه' },
+const AUDIT_TITLE_FA: Record<string, string> = {
+  ANIMAL_DRAFT_STARTED: 'پیش‌نویس پرونده ساخته شد',
+  ANIMAL_LINEAGE_RESOLVED: 'بررسی نسب انجام شد',
+  ANIMAL_REGISTERED: 'حیوان در هم‌زیست ثبت شد',
+  ANIMAL_UPDATED: 'اطلاعات پرونده به‌روزرسانی شد',
+  ANIMAL_PHOTO_ATTACHED: 'تصویر حیوان بارگذاری شد',
+  ANIMAL_GENERATION_FROM_FOREIGN_PEDIGREE: 'نسل از شجره‌نامه خارجی ثبت شد',
+};
+
+/** Sections that belong to features built in later prompts. */
+const PENDING_SECTIONS: ReadonlyArray<{ id: string; title: string; note: string }> = [
+  { id: 'microchip', title: 'میکروچیپ', note: 'شماره رسمی پس از اسکن و تأیید دامپزشک معتمد ثبت می‌شود.' },
+  { id: 'sample', title: 'نمونه و Custody', note: 'کد رهگیری نمونه، دامپزشک نگهدارنده و زنجیره رویدادها.' },
+  { id: 'registration', title: 'برگه ثبتی', note: 'وضعیت صدور و پرداخت مربوط.' },
+  { id: 'parentage', title: 'Parentage Result', note: 'نتیجه مرکز ژنتیک و نسخه‌های آن.' },
+  { id: 'pedigree', title: 'شجره‌نامه', note: 'کد شجره‌نامه و وضعیت صدور.' },
+  { id: 'permits', title: 'مجوزها', note: 'مجوز جفت‌گیری و پرونده‌های مرتبط.' },
+  { id: 'mating-dates', title: 'تاریخ‌های جفت‌گیری', note: 'اعلام‌ها، تأییدها و نسخه‌ها.' },
+  { id: 'litter', title: 'بارداری، زایمان و Litter', note: 'اعلام کاربر و نتیجه مستقل دامپزشک.' },
 ];
 
 export default async function AnimalProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -40,39 +53,192 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
 
+  // Resource-level permission: the record must belong to this actor.
+  let animal;
+  try {
+    animal = await requireOwnedAnimal(db(), actor, id);
+  } catch (error) {
+    // Ownership is a record-level rule, not a route rule, so it answers here.
+    if (error instanceof AppError && error.code === 'NOT_FOUND') return <RecordNotFound error={error} />;
+    throw error;
+  }
+  const [breed] = animal.breedId
+    ? await db().select().from(referenceBreeds).where(eq(referenceBreeds.id, animal.breedId))
+    : [];
+  const family = await familyOf(db(), animal);
+  const foreign = await findForeignCase(db(), animal.id);
+  const trail = await auditTrail(db(), { targetType: 'ANIMAL', targetId: animal.id }, { page: 1, pageSize: 20 });
+
+  const items: readonly TimelineItem[] = trail.items.map((row) => ({
+    id: row.id,
+    title: AUDIT_TITLE_FA[row.action] ?? 'رویداد پرونده',
+    whenFa: formatCivilDateFa(row.occurredAt.toISOString().slice(0, 10)),
+    status: { tone: 'neutral' as const, label: 'ثبت‌شده' },
+    owner: 'USER' as const,
+    summary: row.action === 'ANIMAL_LINEAGE_RESOLVED' ? 'نسل از رکورد والدین بازمحاسبه شد.' : 'رویداد پرونده حیوان.',
+    href: '/animals/' + animal.id,
+    ctaLabel: 'مشاهده',
+  }));
+
   return (
     <PublicShell actor={actor} title="پرونده حیوان" pathname={'/animals/' + id}>
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-h4">پرونده حیوان</h2>
+              <h2 className="text-h4">{animal.name ?? 'بدون نام'}</h2>
               <p className="mt-2xs text-caption text-text-secondary">
-                <Identifier label="شناسه پرونده:" value={id} />
+                سگ · {breed?.nameFa ?? '—'} · {animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : '—'}
               </p>
-              <p className="mt-2xs text-caption text-text-secondary">شناسه رسمی (Pet ID): — تا صدور برگه ثبتی</p>
+              <p className="mt-2xs text-caption text-text-secondary">
+                <Identifier label="شناسه پرونده:" value={animal.id} />
+              </p>
+              <p className="mt-2xs text-caption text-text-secondary" data-testid="pet-id">
+                شناسه رسمی (Pet ID):{' '}
+                {animal.petId ? <Identifier value={animal.petId} /> : '— تا صدور برگه ثبتی'}
+              </p>
             </div>
+            <StatusBadge tone={animal.status === 'REGISTERED' ? 'info' : 'neutral'}>
+              {animal.status === 'REGISTERED' ? 'پرونده اولیه' : 'پیش‌نویس'}
+            </StatusBadge>
           </div>
         </Card>
 
-        <Alert tone="info" title="این پرونده هنوز داده‌ای ندارد">
-          ساختار بخش‌های پرونده طبق سند آماده شده است. رکورد حیوان، میکروچیپ، نمونه و اسناد در مراحل بعدی
-          پیاده‌سازی ثبت می‌شوند و همین بخش‌ها با داده واقعی پر می‌شوند.
+        <Card>
+          <h3 className="text-label-lg">هویت</h3>
+          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
+            <dt className="text-text-secondary">تاریخ تولد</dt>
+            <dd>
+              {animal.birthDate ? formatCivilDateFa(animal.birthDate) : '—'}
+              {animal.birthDateApproximate ? ' (تقریبی)' : ''}
+            </dd>
+            <dt className="text-text-secondary">نسل</dt>
+            <dd data-testid="animal-generation">{generationLabel(animal.generation)}</dd>
+            <dt className="text-text-secondary">منبع شناسایی</dt>
+            <dd data-testid="animal-origin">
+              {animal.origin === 'G0'
+                ? 'بدون اسناد هویتی'
+                : animal.origin === 'INTERNAL_G1PLUS'
+                  ? 'نسب ثبت‌شده در هم‌زیست'
+                  : 'شجره‌نامه خارجی'}
+            </dd>
+            <dt className="text-text-secondary">رنگ</dt>
+            <dd>{animal.color ?? '—'}</dd>
+            <dt className="text-text-secondary">نشانه‌های ظاهری</dt>
+            <dd>{animal.markings ?? '—'}</dd>
+            <dt className="text-text-secondary">میکروچیپ اعلامی</dt>
+            <dd data-testid="declared-microchip-value">
+              {animal.declaredMicrochipNumber ? (
+                <Identifier value={animal.declaredMicrochipNumber} />
+              ) : (
+                '—'
+              )}
+            </dd>
+          </dl>
+          <p className="mt-md text-caption text-text-secondary">
+            نسل فقط‌خواندنی است. شماره میکروچیپ اعلامی تا اسکن و تأیید دامپزشک معتمد رسمی نیست.
+          </p>
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">مالکیت</h3>
+          <p className="mt-md text-body-sm">
+            <Identifier label="مالک:" value={animal.ownerAccountId} />
+          </p>
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">خانواده و نسب</h3>
+          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
+            <dt className="text-text-secondary">پدر</dt>
+            <dd data-testid="family-sire">
+              {family.sire ? (
+                <Link href={'/animals/' + family.sire.id} className="text-text-brand underline underline-offset-4">
+                  {family.sire.name ?? 'بدون نام'} · {generationLabel(family.sire.generation)}
+                </Link>
+              ) : (
+                '—'
+              )}
+            </dd>
+            <dt className="text-text-secondary">مادر</dt>
+            <dd data-testid="family-dam">
+              {family.dam ? (
+                <Link href={'/animals/' + family.dam.id} className="text-text-brand underline underline-offset-4">
+                  {family.dam.name ?? 'بدون نام'} · {generationLabel(family.dam.generation)}
+                </Link>
+              ) : (
+                '—'
+              )}
+            </dd>
+            <dt className="text-text-secondary">فرزندان</dt>
+            <dd>{family.offspring.length === 0 ? '—' : family.offspring.length + ' مورد'}</dd>
+          </dl>
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">شجره‌نامه خارجی</h3>
+          {foreign ? (
+            <>
+              <p className="mt-md text-body-sm" data-testid="foreign-status">
+                وضعیت: {FOREIGN_STATUS_FA[foreign.status]}
+                {foreign.reasonFa ? ' — ' + foreign.reasonFa : ''}
+              </p>
+              <p className="mt-sm text-caption text-text-secondary">
+                <Link
+                  href={'/animals/' + animal.id + '/foreign-pedigree'}
+                  className="text-text-brand underline underline-offset-4"
+                >
+                  مشاهده و مدیریت مدرک
+                </Link>
+              </p>
+            </>
+          ) : (
+            <p className="mt-md text-body-sm text-text-secondary">
+              اگر این حیوان شجره‌نامه صادرشده خارج از هم‌زیست دارد، می‌توانید{' '}
+              <Link
+                href={'/animals/' + animal.id + '/foreign-pedigree'}
+                className="text-text-brand underline underline-offset-4"
+              >
+                مدرک را برای بررسی انجمن بارگذاری کنید
+              </Link>
+              .
+            </p>
+          )}
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">ویرایش اطلاعات مجاز</h3>
+          <div className="mt-lg">
+            <AnimalEditForm
+              animalId={animal.id}
+              values={{
+                name: animal.name ?? '',
+                color: animal.color ?? '',
+                markings: animal.markings ?? '',
+                birthDateApproximate: animal.birthDateApproximate,
+              }}
+            />
+          </div>
+        </Card>
+
+        <Alert tone="info" title="بخش‌هایی که در مراحل بعدی پر می‌شوند">
+          ساختار پرونده کامل است؛ داده این بخش‌ها با ساخته‌شدن همان فرایندها ثبت می‌شود.
         </Alert>
 
-        <div className="space-y-md">
-          {SECTIONS.map((section) => (
-            <section key={section.id} aria-labelledby={'sec-' + section.id}>
-              <Card>
-                <h3 id={'sec-' + section.id} className="text-label-lg">
-                  {section.title}
-                </h3>
-                <p className="mt-2xs text-caption text-text-secondary">{section.note}</p>
-                <p className="mt-md text-body-sm text-text-disabled">اطلاعاتی برای نمایش وجود ندارد.</p>
-              </Card>
-            </section>
-          ))}
-        </div>
+        {PENDING_SECTIONS.map((section) => (
+          <Card key={section.id}>
+            <h3 className="text-label-lg">{section.title}</h3>
+            <p className="mt-2xs text-caption text-text-secondary">{section.note}</p>
+            <p className="mt-md text-body-sm text-text-disabled">اطلاعاتی برای نمایش وجود ندارد.</p>
+          </Card>
+        ))}
+
+        <section aria-labelledby="timeline-heading" className="space-y-md">
+          <h3 id="timeline-heading" className="text-h4">
+            تاریخچه
+          </h3>
+          <Timeline items={items} />
+        </section>
       </div>
     </PublicShell>
   );

@@ -49,14 +49,21 @@ export interface ResumeContext {
   readonly selection?: Readonly<Record<string, string | number | boolean | readonly string[]>>;
 }
 
-const ROUTE = /^\/[A-Za-z0-9\-._~/%\[\]]*$/;
+/**
+ * A relative path, optionally with a query string, and never protocol-relative.
+ * A step inside a form is a legitimate part of the return address, so `?step=6`
+ * has to survive; an absolute or `//host` target must not.
+ */
+const ROUTE = /^\/(?!\/)[^\s#]*$/;
 
 export function resumeContext(input: ResumeContext): ResumeContext {
   if (!input.entity?.type || !input.entity?.id) throw validation('Resume context requires an entity reference');
   if (!input.step.trim()) throw validation('Resume context requires a step');
   if (!ROUTE.test(input.originRoute)) throw validation('Resume context requires a relative origin route');
-  // A list route defeats the purpose: §8 requires reopening the same case and step.
-  if (input.originRoute === '/' || input.originRoute === '/dashboard') {
+  // A list route defeats the purpose, checked below on the path alone.
+  // §8 requires reopening the same case and step, so a bare list is refused.
+  const path = input.originRoute.split('?')[0];
+  if (path === '/' || path === '/dashboard') {
     throw validation('Resume context must point at the case, not the dashboard');
   }
   return input;

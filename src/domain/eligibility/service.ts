@@ -12,6 +12,7 @@ import type { DbClient } from '../../db/client.ts';
 import { accountRoles } from '../../db/schema/core.ts';
 import { memberships } from '../../db/schema/billing.ts';
 import { findCase } from '../../identity/kyc.ts';
+import { countRegisteredAnimals } from '../../animals/service.ts';
 import { locked } from '../errors.ts';
 import {
   evaluate,
@@ -35,9 +36,9 @@ export async function loadFacts(database: DbClient, accountId: string): Promise<
     kycApproved: kyc?.status === 'APPROVED',
     // Membership lives on the account, so it is the same in every context (§7).
     membershipActive: membership?.status === 'ACTIVE',
-    // Animals, sheets, pedigrees, permits and allocations arrive in PROMPT-006
-    // and later; until then the honest count is zero.
-    registeredAnimals: 0,
+    registeredAnimals: await countRegisteredAnimals(database, accountId),
+    // Sheets, pedigrees, permits and allocations arrive in PROMPT-009 and later;
+    // until then the honest count is zero.
     animalsWithRegistrationSheet: 0,
     animalsWithPedigree: 0,
     issuedMatingPermits: 0,

@@ -319,7 +319,20 @@ test('identifiers stay left-to-right inside Persian text', async () => {
   const context = await signIn('owner', VIEWPORTS.mobileReference);
   const page = await context.newPage();
   try {
+    // The profile is a real record now, and it is refused to anyone but its
+    // owner, so the fixture owns this synthetic animal.
     const animalId = '11111111-1111-1111-1111-111111111111';
+    const { db, pool } = createDatabase(DATABASE_URL);
+    try {
+      await db.execute(sql`
+        insert into animal (id, owner_account_id, status, name)
+        select ${animalId}::uuid, account.id, 'REGISTERED', 'نمونه نمایش'
+        from account where account.mobile = ${FIXTURES.owner}
+        on conflict (id) do nothing
+      `);
+    } finally {
+      await pool.end();
+    }
     await page.goto(BASE_URL + '/animals/' + animalId, { waitUntil: 'load' });
     const identifier = page.getByTestId('identifier').first();
     const direction = await identifier.evaluate((node) => getComputedStyle(node).direction);

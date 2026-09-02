@@ -1,0 +1,119 @@
+{
+  "promptId": "PROMPT-006",
+  "status": "COMPLETE",
+  "summary": "ثبت حیوان هم‌زیست با فرم شش‌مرحله‌ای PET-004…PET-008 پیاده شد: هر گام یک رکورد پیش‌نویس واقعی ذخیره می‌کند و بازگشت، همه مقادیر واردشده را برمی‌گرداند. سه مسیر شناسایی §۹.۲ ساخته شد: G0 بدون اسناد، G1+ با Resolve کد شجره‌نامه والدین در هم‌زیست، و شجره‌نامه صادرشده خارج از هم‌زیست با بارگذاری جدا‌گانه روی برگه و پشت برگه و بررسی انجمن. نسل هرگز ورودی کاربر نیست و از 1 + min(نسل پدر، نسل مادر) محاسبه می‌شود (G0×G0→G1 و G2×G1→G2)؛ نبود واقعی والد با خطای فنی جست‌وجو اشتباه نمی‌شود و رکورد را بی‌دلیل به G0 تنزل نمی‌دهد. رفت‌وبرگشت «ثبت والد گمشده» با Resume Context انجام می‌شود و رکورد تکراری نمی‌سازد. بررسی مدرک خارجی فقط در اختیار اپراتور انجمن است، تأیید بدون نسل استخراج‌شده و اصلاح/رد بدون دلیل ممکن نیست، و فایل قبلی هنگام NEEDS_CORRECTION حفظ می‌شود. ثبت اولیه حیوان به عضویت یا نشانی سکونت گره نخورده است.",
+  "changedFiles": [
+    "src/db/schema/animals.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0003_animals.sql",
+    "src/db/migrations/meta/0003_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/domain/lineage.ts",
+    "src/domain/resume-context.ts",
+    "src/domain/eligibility/service.ts",
+    "src/animals/service.ts",
+    "src/animals/foreign-pedigree.ts",
+    "src/ui/access-denied.tsx",
+    "app/animals/actions.ts",
+    "app/animals/page.tsx",
+    "app/animals/new/page.tsx",
+    "app/animals/[id]/page.tsx",
+    "app/animals/[id]/edit-form.tsx",
+    "app/animals/[id]/edit/page.tsx",
+    "app/animals/[id]/edit/wizard.tsx",
+    "app/animals/[id]/foreign-pedigree/page.tsx",
+    "app/animals/[id]/foreign-pedigree/forms.tsx",
+    "app/assoc/foreign-pedigree/page.tsx",
+    "app/assoc/foreign-pedigree/[id]/page.tsx",
+    "app/assoc/foreign-pedigree/review-form.tsx",
+    "app/assoc/foreign-pedigree/actions.ts",
+    "app/assoc/issuers/page.tsx",
+    "app/assoc/issuers/actions.ts",
+    "app/assoc/issuers/issuer-forms.tsx",
+    "tests/domain/lineage.test.ts",
+    "tests/db/animals.test.ts",
+    "tests/browser/animals.test.ts",
+    "tests/browser/rtl.test.ts",
+    "docs/reports/screenshots/prompt-006/animal-new-entry.png",
+    "docs/reports/screenshots/prompt-006/animal-new-locked.png",
+    "docs/reports/screenshots/prompt-006/animal-profile-g0.png",
+    "docs/reports/screenshots/prompt-006/animal-profile-g1.png",
+    "docs/reports/screenshots/prompt-006/animal-profile-foreign.png",
+    "docs/reports/screenshots/prompt-006/lineage-computed.png",
+    "docs/reports/screenshots/prompt-006/lineage-parent-missing.png",
+    "docs/reports/screenshots/prompt-006/register-missing-parent.png",
+    "docs/reports/screenshots/prompt-006/foreign-no-issuers.png",
+    "docs/reports/screenshots/prompt-006/foreign-uploads.png",
+    "docs/reports/screenshots/prompt-006/foreign-needs-correction.png",
+    "docs/reports/screenshots/prompt-006/assoc-issuers.png",
+    "docs/reports/screenshots/prompt-006/assoc-foreign-review.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-006.json"
+  ],
+  "decisions": ["DEC-0037", "DEC-0038", "DEC-0039", "DEC-0040", "DEC-0041"],
+  "checks": [
+    {
+      "id": "animal-lineage-integration",
+      "command": "node --test \"tests/domain/lineage.test.ts\" \"tests/db/animals.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 28 · pass 28 · fail 0 (۱۰ تست قاعده خالص نسب و ۱۸ تست روی Postgres واقعی با دیتابیس ایزوله). پوشش واقعی: G0×G0→G1 و G2×G1→G2 دقیقاً مطابق §۹.۳؛ نسل برابر 1 + min(والدین) در هر دو ترتیب؛ نبود واقعی والد که G0 می‌دهد و نام والد گمشده را برمی‌گرداند، در برابر خطای فنی جست‌وجو که نسل فعلی را نگه می‌دارد و حتی وقتی والد دیگر واقعاً غایب است هم رکورد را به G0 تنزل نمی‌دهد؛ ثبت والد گمشده و بازگشت که همان رکورد را به‌روزرسانی می‌کند و پیش‌نویس تکراری نمی‌سازد؛ پیوند به خود و حلقه نسب (فرزند به‌عنوان نیای خودش) رد می‌شود و داده حلقه‌دار موجود هم پیمایش را متوقف نمی‌کند؛ دستکاری نسل از فرم عمومی ویرایش رد می‌شود (generation, origin, petId, pedigreeCode, والدین، میکروچیپ اعلامی، وضعیت و مالک همگی محافظت‌شده‌اند)؛ به‌روزرسانی با نسخه کهنه رد می‌شود؛ روی برگه و پشت برگه مستقل نگهداری می‌شوند و در NEEDS_CORRECTION فایل قبلی حذف نمی‌شود؛ ارسال بدون هر دو تصویر یا بدون صادرکننده معتبر رد می‌شود و نام صادرکننده متن آزاد نیست؛ بررسی مدرک خارجی فقط با Context انجمن ممکن است و مالک نمی‌تواند پرونده خودش را تأیید کند؛ تأیید بدون نسل استخراج‌شده و اصلاح/رد بدون دلیل رد می‌شود؛ پرونده متعلق به دیگری همان پاسخ «پیدا نشد» می‌گیرد."
+    },
+    {
+      "id": "animal-registration-browser",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  node --test --test-concurrency=1 \"tests/browser/animals.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0 روی Chromium واقعی. پوشش واقعی: مالک با KYC تأییدشده و بدون هیچ عضویت و بدون نشانی سکونت، فرم شش‌مرحله‌ای را کامل می‌کند و پرونده G0 ثبت می‌شود (بررسی شد که پس از ثبت هم عضویت فعال نیست)؛ حساب بدون KYC تأییدشده در سرور رد می‌شود و دکمه شروع اصلاً وجود ندارد؛ مسیر G1+ با دو والد ثبت‌شده G1 می‌دهد، هیچ ورودی generation در DOM وجود ندارد و پروفایل پدر و مادر را لینک می‌کند؛ والد گمشده G0 و پیام و CTA می‌دهد، کدهای واردشده پس از reload حفظ می‌شوند، رفتن به ثبت والد پیش‌نویس دیگری باز می‌کند (نه همان فرزند)، پس از ثبت والد نسل به G2 بازمحاسبه می‌شود و در فهرست فقط یک رکورد فرزند وجود دارد؛ مسیر شجره‌نامه خارجی از فهرست خالی صادرکنندگان شروع می‌شود، انجمن صادرکننده را ثبت می‌کند، مالک روی و پشت برگه را جدا بارگذاری و ارسال می‌کند، انجمن با دلیل به اصلاح برمی‌گرداند (فایل قبلی حفظ می‌ماند)، ارسال دوباره و تأیید با نسل ۳ پروفایل را به G3 و «شجره‌نامه خارجی» می‌رساند و اعلان تأیید برای مالک ثبت می‌شود؛ مالک دیگر نه پروفایل و نه فرم ویرایش را باز نمی‌کند. ۱۳ اسکرین‌شات در docs/reports/screenshots/prompt-006/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 169 · pass 169 · fail 0 · skipped 0 (۲۸ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 35 · pass 35 · fail 0 (۶ مورد حیوان و نسب، ۷ مورد پرداخت/عضویت، ۱۱ مورد هویت، ۱۱ مورد پوسته و RTL). تست RTL شناسه‌ها به یک حیوان واقعی متعلق به همان fixture تغییر کرد، چون پروفایل حیوان دیگر صفحه نمونه نیست و برای غیرمالک باز نمی‌شود."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0003_animals` اعمال شد (۲۵ ستون جدول animal، ۵ ایندکس، ۵ کلید خارجی شامل دو ارجاع به خود جدول برای پدر و مادر) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 هر دو نسخه Requirements.md و reference-inputs برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "فهرست صادرکنندگان معتبر شجره‌نامه خارجی خالی است و هیچ داده‌ای برای آن اختراع نشد. تا وقتی انجمن فهرست واقعی را وارد نکند، مالک نمی‌تواند مدرک خارجی ثبت کند و صفحه همین را صریح می‌گوید. صادرکننده‌ای که در تست ساخته می‌شود با پیشوند SYNTHETIC است و داده واقعی نیست.",
+    "صدور کد شجره‌نامه و Pet ID در این مرحله انجام نمی‌شود؛ ستون‌ها و قید یکتایی ساخته شده‌اند ولی مقداردهی به PROMPT مربوط به برگه ثبتی و شجره‌نامه موکول است. در تست‌ها کد شجره‌نامه به‌صورت SYNTHETIC و فقط برای اثبات Resolve نوشته می‌شود.",
+    "شماره میکروچیپ در این مرحله فقط «اعلامی» است. اسکن و تأیید دامپزشک معتمد، ثبت رسمی و قاعده یک‌بار در طول عمر (D08) در PROMPT-007 و بعد از آن اجرا می‌شود و صفحه این تمایز را صریح نمایش می‌دهد.",
+    "OCR یا استخراج خودکار از تصویر شجره‌نامه خارجی وجود ندارد و ادعا هم نشده است؛ نسل توسط اپراتور انجمن از روی مدرک خوانده و ثبت می‌شود و بدون آن تأیید ممکن نیست.",
+    "بخش‌های میکروچیپ، نمونه و Custody، برگه ثبتی، Parentage Result، شجره‌نامه، مجوزها، تاریخ‌های جفت‌گیری و Litter در پروفایل حیوان جای خود را دارند ولی محتوای واقعی ندارند و همین را می‌نویسند؛ محتوای ساختگی نمایش داده نمی‌شود.",
+    "انتقال مالکیت، بایگانی، مرگ و اصلاح تاریخ تولد در این مرحله پیاده نشده‌اند و در PROMPT‌های بعدی طبق §۱۹ و §۲۰ اضافه می‌شوند.",
+    "رنگ و نشانه‌های ظاهری متن آزاد اعلامی هستند چون سند فهرست مرجعی برای آن‌ها منتشر نکرده است (DEC-0041).",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "ANIMAL_REGISTRATION_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

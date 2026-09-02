@@ -26,3 +26,27 @@ export function AccessDenied({ error }: { error: AppError }) {
     </main>
   );
 }
+
+/**
+ * A record that this actor may not see.
+ *
+ * Ownership is checked per record on the server, and the answer is the same
+ * whether the record belongs to somebody else or does not exist at all, so
+ * one owner cannot probe for another owner's identifiers.
+ */
+export function RecordNotFound({ error }: { error: AppError }) {
+  return (
+    <main className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-lg p-xl text-center">
+      <Logo height={32} />
+      <h1 className="text-h3" data-testid="record-not-found">
+        {error.message}
+      </h1>
+      <p className="text-body-sm text-text-secondary">
+        اگر فکر می‌کنید این پرونده باید در دسترس شما باشد، از فهرست حیوان‌های خود وارد شوید.
+      </p>
+      <p className="text-caption text-text-disabled" data-testid="denial-code">
+        {error.code}
+      </p>
+    </main>
+  );
+}
