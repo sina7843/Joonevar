@@ -16,7 +16,7 @@ All work starts incomplete. Claude updates completion using the evidence-checkin
 - [x] PROMPT-012 — فعال‌سازی پرورش‌دهنده و مدیریت کنل <!-- work-commit:c350aa91c452818d8f71f9f5c21f9ee77a3c7eff -->
 - [x] PROMPT-013 — مجوز رسمی جفت‌گیری <!-- work-commit:137dbeb8fbc47ee8cb8543617eab033666e97188 -->
 - [x] PROMPT-014 — تاریخ‌های دوطرفه و هشدار فاصله جفت‌گیری <!-- work-commit:2ad24b65c6fa77c6eda1218c398d7d8e972876c6 -->
-- [ ] PROMPT-015 — بارداری، زایمان، تأیید اختیاری و اصلاح تعداد
+- [x] PROMPT-015 — بارداری، زایمان، تأیید اختیاری و اصلاح تعداد <!-- work-commit:bfe4f6386b655fae9bed11d8637075bd65da290d -->
 - [ ] PROMPT-016 — تخصیص دوطرفه و صدور کارت توله
 - [ ] PROMPT-017 — اعلام توافق شخصی جدا از مسیر رسمی
 - [ ] PROMPT-018 — تکمیل پنل‌ها، تنظیمات و مسیرهای ادامه
