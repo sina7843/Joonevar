@@ -1,0 +1,110 @@
+{
+  "promptId": "PROMPT-010",
+  "status": "COMPLETE",
+  "summary": "مسیر معمول شجره‌نامه از داده موجود شروع می‌شود: برگه ثبتی صادرشده، نمونه قابل استفاده و Custodian مشخص؛ هیچ انتخاب دامپزشک، نمونه‌گیری دوباره یا Selector مرکز وجود ندارد و اطلاعات یک مرکز ثابت فقط نمایش داده می‌شود. تا ثبت داده واقعی نام و مقصد پرداخت مرکز، مسیر فیش باز نمی‌شود و هیچ شماره حساب یا کارتی فرض نمی‌شود. فیش به کد رهگیری دقیق نمونه‌های انتخاب‌شده نگاشت می‌شود، فقط مرکز آن را بررسی می‌کند، و اصلاح روی همان فیش با حفظ فایل و کدها انجام می‌شود. تأیید فیش به کاربر و به همان دامپزشک نگهدارنده هر نمونه اعلان می‌دهد و ارسال را فقط همان نگهدارنده روی همان کد ثبت می‌کند. مرکز دریافت را ثبت می‌کند، قابلیت استفاده نمونه را می‌سنجد، پردازش را شروع می‌کند و Parentage Result را ثبت می‌کند؛ مرکز هرگز نمونه‌گیری نمی‌کند. پردازش و نمایش نتیجه هیچ وابستگی به پرداخت صدور سند در هم‌زیست ندارند. برای G0 نتیجه مستقیم به حیوان نسبت داده می‌شود و برای G1+ تا کامل‌شدن نتیجه هر دو والد، همان رکورد در وضعیت «در انتظار تکمیل نتایج والدین» می‌ماند و بعداً همان رکورد نهایی می‌شود. نمونه نامعتبر به مسیر موجود نمونه‌گیری مجدد برمی‌گردد و اختیارات مرکز به همان چهار کار محدود است.",
+  "changedFiles": [
+    "src/db/schema/genetics.ts",
+    "src/db/schema/clinical.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0007_genetics.sql",
+    "src/db/migrations/meta/0007_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/genetics/service.ts",
+    "src/domain/microchip.ts",
+    "app/pedigree/page.tsx",
+    "app/pedigree/actions.ts",
+    "app/pedigree/forms.tsx",
+    "app/pedigree/receipts/[id]/page.tsx",
+    "app/pedigree/[animalId]/page.tsx",
+    "app/genetics/actions.ts",
+    "app/genetics/forms.tsx",
+    "app/genetics/receipts/page.tsx",
+    "app/genetics/receipts/[id]/page.tsx",
+    "app/genetics/samples/page.tsx",
+    "app/genetics/results/page.tsx",
+    "app/animals/[id]/page.tsx",
+    "tests/db/genetics.test.ts",
+    "tests/browser/genetics.test.ts",
+    "tests/browser/vet-service.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-010/centre-not-configured.png",
+    "docs/reports/screenshots/prompt-010/centre-details.png",
+    "docs/reports/screenshots/prompt-010/receipt-submitted.png",
+    "docs/reports/screenshots/prompt-010/centre-receipt-review.png",
+    "docs/reports/screenshots/prompt-010/receipt-needs-correction.png",
+    "docs/reports/screenshots/prompt-010/receipt-approved.png",
+    "docs/reports/screenshots/prompt-010/custodian-shipment.png",
+    "docs/reports/screenshots/prompt-010/centre-received.png",
+    "docs/reports/screenshots/prompt-010/centre-result.png",
+    "docs/reports/screenshots/prompt-010/owner-result.png",
+    "docs/reports/screenshots/prompt-010/animal-with-result.png",
+    "docs/reports/screenshots/prompt-010/receipt-not-yours.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-010.json"
+  ],
+  "decisions": ["DEC-0066", "DEC-0067", "DEC-0068", "DEC-0069", "DEC-0070", "DEC-0071", "DEC-0072", "DEC-0073"],
+  "checks": [
+    {
+      "id": "genetics-workflow",
+      "command": "node --test \"tests/db/genetics.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 11 · pass 11 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد. پوشش واقعی: حیوان بدون برگه ثبتی وارد این مسیر نمی‌شود و حیوان دارای برگه، همان نمونه و همان Custodian ثبت‌شده را نشان می‌دهد؛ مرکز پیکربندی‌نشده مسیر فیش را باز نمی‌کند و هیچ شماره حسابی فرض نمی‌شود؛ ارسال فیش بدون تصویر رد می‌شود، بازگشت برای اصلاح بدون دلیل رد می‌شود، اصلاح روی همان فیش با همان کدهای نمونه انجام می‌شود و فیش ردشده هیچ دستور ارسالی نمی‌سازد؛ تأیید فیش به کاربر و به همان دامپزشک نگهدارنده اعلان می‌دهد و نمونه را SEND_INSTRUCTED می‌کند؛ دامپزشک دیگر نمی‌تواند ارسال کند و کد رهگیری در ارسال و دریافت عوض نمی‌شود؛ نمونه ارسال‌نشده قابل دریافت نیست؛ ثبت نتیجه بدون هیچ پرداخت صدوری انجام می‌شود و فقط یک رکورد نتیجه با نسخه ۱ می‌سازد؛ زنجیره پدر/مادر/فرزند نشان می‌دهد G1 بدون هر دو والد در انتظار می‌ماند، یک والد کافی نیست و پس از کامل‌شدن، همان رکورد نهایی می‌شود؛ G0 نتیجه مستقیم می‌گیرد؛ نمونه نامعتبر ثبت نتیجه را می‌بندد و نمونه‌گیری مجدد از همان درخواست با حفظ نمونه و دلیل قبلی انجام می‌شود؛ مرکز نمی‌تواند پرونده حیوان را ویرایش کند، عملیات میز دامپزشک را انجام دهد یا نمونه‌ای را که نگه نداشته ارسال کند، و بررسی فیش/دریافت/ثبت نتیجه برای مالک، دامپزشک و سوپرادمین رد می‌شود؛ کل مسیر ردپای Audit روی همان کد نمونه دارد."
+    },
+    {
+      "id": "genetics-browser",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  node --test --test-concurrency=1 \"tests/browser/genetics.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 4 · pass 4 · fail 0 روی Chromium واقعی، با اجرای کامل زنجیره از ثبت حیوان تا نتیجه. پوشش واقعی: با مرکز پیکربندی‌نشده، صفحه می‌گوید اطلاعات پرداخت ثبت نشده و دکمه ثبت فیش غیرفعال است و همان صفحه تصریح می‌کند یک مرکز ثابت وجود دارد و انتخاب مرکز در محصول نیست؛ پس از ثبت نام و حساب مرکز از پنل مدیریت (مقادیر آشکارا SYNTHETIC)، همان مقادیر نمایش داده می‌شوند و حیوان با کد رهگیری نمونه موجود پیشنهاد می‌شود؛ فیش بدون تصویر قابل ارسال نیست، پس از بارگذاری و ارسال در صف مرکز می‌نشیند، مرکز با دلیل به اصلاح برمی‌گرداند، کاربر همان دلیل و جمله «فایل قبلی شما حفظ شده است» را روی همان فیش می‌بیند و پس از بارگذاری دوباره و تأیید مرکز، صفحه می‌گوید تأیید فیش پرداخت صدور در هم‌زیست نیست؛ دامپزشک نگهدارنده «دستور ارسال صادر شد» را می‌بیند و ارسال را روی همان کد ثبت می‌کند؛ مرکز دریافت و شروع پردازش را ثبت می‌کند و صفحه‌اش می‌گوید مرکز نمونه‌گیری نمی‌کند؛ صفحه نتایج می‌گوید هیچ خروجی موازی با نام DNA Profile ساخته نمی‌شود و برای حیوان G0 نتیجه مستقیم ثبت می‌شود؛ بدون هیچ پرداخت صدوری، مالک نتیجه نهایی را در صفحه نتیجه و در پرونده حیوان می‌بیند و صفحه می‌گوید فقط صدور سند در انتظار پرداخت است؛ فیش کاربر دیگر «پیدا نشد» می‌گیرد و محیط مرکز برای Context عمومی بسته است. ۱۲ اسکرین‌شات در docs/reports/screenshots/prompt-010/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 234 · pass 234 · fail 0 · skipped 0 (۱۱ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 54 · pass 54 · fail 0 (۴ مورد مرکز ژنتیک، ۴ مورد برگه ثبتی، ۵ مورد میکروچیپ و نمونه، ۶ مورد Finder و مراجعه، ۶ مورد حیوان و نسب، ۷ مورد پرداخت/عضویت، ۱۱ مورد هویت، ۱۱ مورد پوسته و RTL)."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0007_genetics` اعمال شد (جدول‌های genetics_receipt، genetics_receipt_item و parentage_result، به‌علاوه وضعیت‌های RECEIVED و PROCESSING روی نمونه) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "نام واقعی مرکز ژنتیک، نشانی، تلفن، شماره حساب/کارت و هزینه آزمایش آن هنوز اعلام نشده‌اند و اختراع نشدند. تا ورود داده واقعی از پنل مدیریت، مسیر فیش بسته است؛ مقادیر تست آشکارا SYNTHETIC هستند و شبیه شماره حساب واقعی ساخته نشدند (DEC-0067).",
+    "پرداخت به مرکز خارج از هم‌زیست انجام می‌شود و محصول فقط فیش را نگه می‌دارد؛ هیچ تأیید بانکی یا مطابقت مبلغ در این مسیر ادعا نمی‌شود.",
+    "صدور خود شجره‌نامه و پرداخت صدور آن به PROMPT-011 تعلق دارد؛ اینجا فقط نتیجه ثبت و نمایش داده می‌شود و صفحه می‌گوید سند در انتظار پرداخت صدور می‌ماند.",
+    "اعتراض به نتیجه (§۱۴.۵) و ثبت درخواست ارسال پستی (§۱۴.۶) در این مرحله ساخته نشدند و به PROMPT‌های بعدی تعلق دارند؛ ساختار نسخه‌دار نتیجه برای نتیجه اصلاحی آماده است.",
+    "مراحل تأیید فنی داخل مرکز به‌صورت حداقلی است: وضعیت، نسخه و یادداشت فنی. هیچ فیلد آزمایشگاهی اختراع نشد و هیچ DNA Profile یا کد نتیجه دومی ساخته نشد (DEC-0070).",
+    "هیچ اتصال آزمایشگاهی یا سامانه بیرونی مرکز پیکربندی نشده است؛ همه رویدادها ورودی دستی اپراتور مرکز هستند.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "GENETICS_WORKFLOW_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

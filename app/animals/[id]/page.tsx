@@ -16,6 +16,7 @@ import { auditTrail } from '../../../src/audit/service.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { animalChipView } from '../../../src/clinical/microchip.ts';
 import { SAMPLE_TAKEN_NOTE_FA, sheetOfAnimal } from '../../../src/documents/registration-sheet.ts';
+import { resultOfAnimal, RESULT_STATUS_FA } from '../../../src/genetics/service.ts';
 import { READ_METHOD_FA, SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import { samples } from '../../../src/db/schema/clinical.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
@@ -41,7 +42,6 @@ const AUDIT_TITLE_FA: Record<string, string> = {
 
 /** Sections that belong to features built in later prompts. */
 const PENDING_SECTIONS: ReadonlyArray<{ id: string; title: string; note: string }> = [
-  { id: 'parentage', title: 'Parentage Result', note: 'نتیجه مرکز ژنتیک و نسخه‌های آن.' },
   { id: 'pedigree', title: 'شجره‌نامه', note: 'کد شجره‌نامه و وضعیت صدور.' },
   { id: 'permits', title: 'مجوزها', note: 'مجوز جفت‌گیری و پرونده‌های مرتبط.' },
   { id: 'mating-dates', title: 'تاریخ‌های جفت‌گیری', note: 'اعلام‌ها، تأییدها و نسخه‌ها.' },
@@ -71,6 +71,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   const trail = await auditTrail(db(), { targetType: 'ANIMAL', targetId: animal.id }, { page: 1, pageSize: 20 });
   const { chip, conflicts } = await animalChipView(db(), animal.id);
   const sheet = await sheetOfAnimal(db(), animal.id);
+  const parentage = await resultOfAnimal(db(), animal.id);
   const sampleRows = await db()
     .select()
     .from(samples)
@@ -250,6 +251,31 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                 </li>
               ))}
             </ul>
+          )}
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">Parentage Result</h3>
+          {parentage ? (
+            <>
+              <p className="mt-md text-body-sm" data-testid="animal-result-status">
+                {RESULT_STATUS_FA[parentage.status]} · نسخه {parentage.resultVersion}
+              </p>
+              <p className="mt-sm text-body-sm">
+                <Link
+                  href={'/pedigree/' + animal.id}
+                  className="text-text-brand underline underline-offset-4"
+                  data-testid="animal-result-link"
+                >
+                  مشاهده نتیجه Parentage
+                </Link>
+              </p>
+            </>
+          ) : (
+            <p className="mt-md text-body-sm text-text-secondary">
+              نتیجه‌ای ثبت نشده است. پس از دریافت و پردازش نمونه در مرکز ژنتیک، نتیجه در همین پرونده دیده
+              می‌شود.
+            </p>
           )}
         </Card>
 

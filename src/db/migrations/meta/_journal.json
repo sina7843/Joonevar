@@ -50,6 +50,13 @@
       "when": 1788341861229,
       "tag": "0006_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788343432376,
+      "tag": "0007_genetics",
+      "breakpoints": true
     }
   ]
 }

@@ -480,7 +480,7 @@ test('the sample code appears only after the sampling is recorded, and custody f
 
     const centre = await genetics.newPage();
     await centre.goto(BASE_URL + '/genetics/samples', { waitUntil: 'load' });
-    await centre.getByTestId('genetics-sample-list').waitFor();
+    await centre.getByTestId('centre-sample-list').waitFor();
     await centre.getByTestId('submit-instruct').first().click();
     await expectText(centre, 'دستور ارسال صادر شد');
     await centre.goto(BASE_URL + '/genetics/samples', { waitUntil: 'load' });

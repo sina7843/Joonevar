@@ -21,6 +21,8 @@ export type SampleStatusName =
   | 'IN_CUSTODY'
   | 'SEND_INSTRUCTED'
   | 'SHIPPED'
+  | 'RECEIVED'
+  | 'PROCESSING'
   | 'INVALID'
   | 'INSUFFICIENT'
   | 'DAMAGED'
@@ -30,6 +32,8 @@ export const SAMPLE_STATUS_FA: Record<SampleStatusName, string> = {
   IN_CUSTODY: 'نزد دامپزشک',
   SEND_INSTRUCTED: 'دستور ارسال صادر شد',
   SHIPPED: 'ارسال‌شده',
+  RECEIVED: 'دریافت‌شده در مرکز',
+  PROCESSING: 'در حال پردازش',
   INVALID: 'نامعتبر',
   INSUFFICIENT: 'ناکافی',
   DAMAGED: 'خراب',

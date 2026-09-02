@@ -41,6 +41,8 @@ export const sampleStatus = pgEnum('sample_status', [
   'IN_CUSTODY',
   'SEND_INSTRUCTED',
   'SHIPPED',
+  'RECEIVED',
+  'PROCESSING',
   'INVALID',
   'INSUFFICIENT',
   'DAMAGED',
@@ -52,6 +54,8 @@ export const sampleEventKind = pgEnum('sample_event_kind', [
   'CUSTODY_RECORDED',
   'SEND_INSTRUCTED',
   'SHIPPED',
+  'RECEIVED',
+  'PROCESSING_STARTED',
   'MARKED_UNUSABLE',
   'RESAMPLED',
 ]);
