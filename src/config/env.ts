@@ -28,6 +28,7 @@ const schema = z.object({
   PAYMENT_PROVIDER: z.string().min(1).optional(),
   MAP_PROVIDER: z.string().min(1).optional(),
   DOCUMENT_RENDERER: z.string().min(1).optional(),
+  CHIP_READER_PROVIDER: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof schema>;

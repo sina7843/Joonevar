@@ -9,12 +9,14 @@
 import { createHash, randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 import type { DbClient } from '../db/client.ts';
 import { storedFiles } from '../db/schema/core.ts';
+import { animals } from '../db/schema/animals.ts';
+import { vetVisitRequests } from '../db/schema/vets.ts';
 import { recordAudit } from '../audit/service.ts';
 import type { Actor } from '../authz/actor.ts';
-import { assertCanReadFile, type FilePurposeName } from '../authz/policy.ts';
+import { assertCanReadFile, canReadFile, type FilePurposeName } from '../authz/policy.ts';
 import { notFound, validation } from '../domain/errors.ts';
 import { assertAcceptable, EXTENSION } from './signature.ts';
 
@@ -112,6 +114,33 @@ export async function findFile(tx: DbClient, fileId: string): Promise<StoredFile
 }
 
 /**
+ * The one record-scoped exception to the purpose table.
+ *
+ * The schema is imported, not the visits service, so the file module keeps no
+ * dependency on the clinical flow beyond this single question.
+ */
+async function vetMaySeeAnimalPhoto(
+  tx: DbClient,
+  actor: Actor,
+  record: StoredFileRecord,
+): Promise<boolean> {
+  if (record.purpose !== 'ANIMAL_PHOTO' || actor.context !== 'TRUSTED_VET') return false;
+  const rows = await tx
+    .select({ id: vetVisitRequests.id })
+    .from(vetVisitRequests)
+    .innerJoin(animals, eq(animals.id, vetVisitRequests.animalId))
+    .where(
+      and(
+        eq(animals.photoFileId, record.id),
+        eq(vetVisitRequests.vetAccountId, actor.accountId),
+        inArray(vetVisitRequests.status, ['CHECKED_IN', 'COMPLETED']),
+      ),
+    )
+    .limit(1);
+  return rows.length > 0;
+}
+
+/**
  * Authorized read. The permission check happens before any filesystem access,
  * so an unauthorized request cannot even probe whether the object exists.
  */
@@ -122,7 +151,15 @@ export async function readPrivateFile(
   fileId: string,
 ): Promise<{ record: StoredFileRecord; bytes: Buffer }> {
   const record = await findFile(tx, fileId);
-  assertCanReadFile(actor, { ownerAccountId: record.ownerAccountId, purpose: record.purpose });
+  if (!canReadFile(actor, { ownerAccountId: record.ownerAccountId, purpose: record.purpose })) {
+    // One record-scoped grant: the veterinarian a visit was assigned to may see
+    // that animal's photo while the visit is open at their desk (§12.5, §21.1).
+    // It is a permission over one record, not over the whole purpose, so it is
+    // asked as a question about this file rather than added to the policy table.
+    if (!(await vetMaySeeAnimalPhoto(tx, actor, record))) {
+      assertCanReadFile(actor, { ownerAccountId: record.ownerAccountId, purpose: record.purpose });
+    }
+  }
   const bytes = await fs.readFile(resolveWithinRoot(root, record.storageKey));
   return { record, bytes };
 }

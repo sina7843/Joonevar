@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../src/ui/access-denied.tsx';
 import { AppError } from '../../../src/domain/errors.ts';
@@ -14,6 +14,9 @@ import { familyOf, requireOwnedAnimal } from '../../../src/animals/service.ts';
 import { findForeignCase, FOREIGN_STATUS_FA } from '../../../src/animals/foreign-pedigree.ts';
 import { auditTrail } from '../../../src/audit/service.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
+import { animalChipView } from '../../../src/clinical/microchip.ts';
+import { READ_METHOD_FA, SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
+import { samples } from '../../../src/db/schema/clinical.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { AnimalEditForm } from './edit-form.tsx';
 
@@ -37,8 +40,6 @@ const AUDIT_TITLE_FA: Record<string, string> = {
 
 /** Sections that belong to features built in later prompts. */
 const PENDING_SECTIONS: ReadonlyArray<{ id: string; title: string; note: string }> = [
-  { id: 'microchip', title: 'میکروچیپ', note: 'شماره رسمی پس از اسکن و تأیید دامپزشک معتمد ثبت می‌شود.' },
-  { id: 'sample', title: 'نمونه و Custody', note: 'کد رهگیری نمونه، دامپزشک نگهدارنده و زنجیره رویدادها.' },
   { id: 'registration', title: 'برگه ثبتی', note: 'وضعیت صدور و پرداخت مربوط.' },
   { id: 'parentage', title: 'Parentage Result', note: 'نتیجه مرکز ژنتیک و نسخه‌های آن.' },
   { id: 'pedigree', title: 'شجره‌نامه', note: 'کد شجره‌نامه و وضعیت صدور.' },
@@ -68,6 +69,12 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   const family = await familyOf(db(), animal);
   const foreign = await findForeignCase(db(), animal.id);
   const trail = await auditTrail(db(), { targetType: 'ANIMAL', targetId: animal.id }, { page: 1, pageSize: 20 });
+  const { chip, conflicts } = await animalChipView(db(), animal.id);
+  const sampleRows = await db()
+    .select()
+    .from(samples)
+    .where(eq(samples.animalId, animal.id))
+    .orderBy(sql`collected_at desc`);
 
   const items: readonly TimelineItem[] = trail.items.map((row) => ({
     id: row.id,
@@ -173,6 +180,48 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
             <dt className="text-text-secondary">فرزندان</dt>
             <dd>{family.offspring.length === 0 ? '—' : family.offspring.length + ' مورد'}</dd>
           </dl>
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">میکروچیپ</h3>
+          {chip ? (
+            <>
+              <p className="mt-md text-body-sm" data-testid="official-microchip">
+                <Identifier label="شماره رسمی:" value={chip.number} />
+              </p>
+              <p className="mt-2xs text-caption text-text-secondary">
+                روش خواندن: {READ_METHOD_FA[chip.readMethod]} · هر حیوان در طول عمر فقط یک میکروچیپ دارد؛ تعویض،
+                انتقال یا شماره دوم وجود ندارد.
+              </p>
+            </>
+          ) : (
+            <p className="mt-md text-body-sm text-text-secondary">
+              شماره رسمی پس از اسکن و تأیید دامپزشک معتمد ثبت می‌شود.
+            </p>
+          )}
+          {conflicts.length > 0 ? (
+            <p className="mt-md text-caption text-status-error-text" data-testid="animal-chip-conflict">
+              تعارض ثبت‌شده: {conflicts[0]!.detailFa}
+            </p>
+          ) : null}
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">نمونه و Custody</h3>
+          {sampleRows.length === 0 ? (
+            <p className="mt-md text-body-sm text-text-secondary">
+              کد رهگیری نمونه پس از انجام واقعی نمونه‌گیری صادر می‌شود.
+            </p>
+          ) : (
+            <ul className="mt-md space-y-sm text-body-sm" data-testid="animal-samples">
+              {sampleRows.map((sample) => (
+                <li key={sample.id} className="flex items-center justify-between gap-md">
+                  <Identifier value={sample.trackingCode} />
+                  <span className="text-text-secondary">{SAMPLE_STATUS_FA[sample.status]}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
         <Card>

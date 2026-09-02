@@ -1,0 +1,127 @@
+{
+  "promptId": "PROMPT-008",
+  "status": "COMPLETE",
+  "summary": "پرونده مراجعه در پنل دامپزشک با تصویر حیوان، کاربر مرتبط، نوع خدمت، کد مراجعه و مرکز ساخته شد و این اطلاعات فقط پس از پذیرش کد نمایش داده می‌شود. چهار روش خواندن شماره (ریدر بلوتوث، ریدر موبایل، بارکد بسته، ورود دستی) به یک فیلد Canonical می‌رسند؛ آداپتور `chip-reader` تا پیکربندی NOT_CONFIGURED گزارش می‌شود و ورود دستی همیشه کار می‌کند. مسیر کاشت: خواندن سریال پیش از کاشت، کنترل یکتایی سراسری و نبود چیپ دیگر، ثبت کاشت، خواندن مجدد و تطبیق، سپس اتصال دائمی. مسیر تأیید: همان چیپ/همان حیوان تأیید می‌شود؛ چیپ حیوان دیگر، چیپ دوم در طول عمر و ناهمخوانی سریال تعارض ثبت‌شده و توقف عملیات‌اند و هیچ بازنویسی رخ نمی‌دهد. چیپ فیزیکی بدون رکورد فقط پس از همان دو کنترل متصل می‌شود. قاعده یک میکروچیپ در طول عمر با دو ایندکس یکتا در مرز تراکنش اجرا می‌شود. در هر دو خدمت نمونه خون اجباری است و کد رهگیری نمونه فقط پس از ثبت نمونه‌گیری واقعی صادر می‌شود؛ کد مراجعه و کد نمونه هرگز یکی نمی‌شوند. Custody نزد همان دامپزشک ثبت می‌شود، نمونه انقضای خودکار ندارد، ارسال فقط پس از دستور مرکز ژنتیک و به‌صورت رویدادی روی همان کد ثبت می‌شود، و نمونه‌گیری مجدد در همان درخواست کد جدید می‌سازد بدون حذف نمونه و دلیل قبلی و بدون کاشت دوباره. مرور نهایی خدمت همه فیلدهای §۱۲.۵ را دارد و امضای فیزیکی فقط اطلاع‌رسانی است.",
+  "changedFiles": [
+    "src/db/schema/clinical.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0005_clinical.sql",
+    "src/db/migrations/meta/0005_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/domain/microchip.ts",
+    "src/clinical/microchip.ts",
+    "src/clinical/samples.ts",
+    "src/files/storage.ts",
+    "src/adapters/registry.ts",
+    "src/config/env.ts",
+    "src/vets/visits.ts",
+    ".env.example",
+    "app/vet/actions.ts",
+    "app/vet/page.tsx",
+    "app/vet/requests/[id]/page.tsx",
+    "app/vet/requests/[id]/procedure.tsx",
+    "app/vet/samples/page.tsx",
+    "app/vet/samples/shipment-form.tsx",
+    "app/genetics/samples/page.tsx",
+    "app/genetics/samples/actions.ts",
+    "app/genetics/samples/instruct-form.tsx",
+    "app/animals/[id]/page.tsx",
+    "app/requests/[id]/page.tsx",
+    "tests/domain/microchip.test.ts",
+    "tests/db/microchip.test.ts",
+    "tests/browser/vet-service.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-008/vet-visit-detail.png",
+    "docs/reports/screenshots/prompt-008/vet-not-assigned.png",
+    "docs/reports/screenshots/prompt-008/chip-pre-read.png",
+    "docs/reports/screenshots/prompt-008/chip-serial-mismatch.png",
+    "docs/reports/screenshots/prompt-008/chip-bound.png",
+    "docs/reports/screenshots/prompt-008/animal-official-chip.png",
+    "docs/reports/screenshots/prompt-008/sample-recorded.png",
+    "docs/reports/screenshots/prompt-008/service-summary.png",
+    "docs/reports/screenshots/prompt-008/owner-sample-code.png",
+    "docs/reports/screenshots/prompt-008/custody-list.png",
+    "docs/reports/screenshots/prompt-008/genetics-instruct.png",
+    "docs/reports/screenshots/prompt-008/sample-shipped.png",
+    "docs/reports/screenshots/prompt-008/sample-unusable.png",
+    "docs/reports/screenshots/prompt-008/sample-resampled.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-008.json"
+  ],
+  "decisions": [
+    "DEC-0050",
+    "DEC-0051",
+    "DEC-0052",
+    "DEC-0053",
+    "DEC-0054",
+    "DEC-0055",
+    "DEC-0056",
+    "DEC-0057",
+    "DEC-0058"
+  ],
+  "checks": [
+    {
+      "id": "chip-sample-integrity",
+      "command": "node --test \"tests/domain/microchip.test.ts\" \"tests/db/microchip.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 18 · pass 18 · fail 0 (۶ تست قاعده خالص و ۱۲ تست روی Postgres واقعی با دیتابیس ایزوله). پوشش واقعی: مسیر کاشت که پیش از خواندن مجدد هیچ اتصالی نمی‌سازد و خواندن مجدد پیش از ثبت کاشت رد می‌شود؛ ناهمخوانی سریال که تعارض SERIAL_MISMATCH ثبت می‌کند و جدول microchip خالی می‌ماند؛ تلاش برای چیپ دوم روی حیوانی که چیپ دارد که با ANIMAL_HAS_OTHER_CHIP متوقف می‌شود و اتصال قبلی دست‌نخورده می‌ماند؛ دو مراجعه هم‌زمان روی یک شماره که دقیقاً یک اتصال و یک تعارض DUPLICATE_NUMBER می‌سازند (ایندکس یکتا داور است، نه خواندن قبلی)؛ تأیید همان چیپ همان حیوان بدون ساخت ردیف دوم و سریال متعلق به حیوان دیگر که متوقف می‌شود؛ چیپ فیزیکی بدون رکورد که پس از دو کنترل متصل می‌شود و رویداد کاشت برایش ثبت نمی‌شود؛ نبود هر کد نمونه پیش از تعیین‌تکلیف میکروچیپ و رد درخواست نمونه دوم؛ اجباری بودن نمونه در مسیر تأیید و ماندن Custody نزد همان دامپزشک (دامپزشک دیگر چیزی نگه نمی‌دارد)؛ نمونه‌گیری مجدد که نمونه و دلیل قبلی را نگه می‌دارد، کد جدید می‌سازد و رکورد میکروچیپ و رویداد کاشت را دست نمی‌زند؛ ارسال پیش از دستور مرکز که رد می‌شود، دستور ارسال که فقط از مرکز ژنتیک صادر می‌شود و ارسال که کد رهگیری را عوض نمی‌کند؛ دسترسی: دامپزشک دیگر و مالک به عملیات میز دسترسی ندارند و نمونه دامپزشک دیگر برای او پیدا نمی‌شود؛ شماره با قالب نامعتبر اصلاً به رکورد نمی‌رسد."
+    },
+    {
+      "id": "vet-service-browser",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  node --test --test-concurrency=1 \"tests/browser/vet-service.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 5 · pass 5 · fail 0 روی Chromium واقعی. پوشش واقعی: پیش از پذیرش کد، پرونده هیچ نام حیوان، نام کاربر یا تصویری نشان نمی‌دهد و پس از پذیرش، تصویر حیوان، کاربر، نوع خدمت، کد مراجعه و مرکز نمایش داده می‌شود و درخواست مستقیم فایل تصویر ۲۰۰ برمی‌گرداند؛ دامپزشک تخصیص‌نیافته نه صفحه را می‌بیند و نه فایل تصویر را می‌گیرد (۴۰۳)؛ با ریدر پیکربندی‌نشده، کل مسیر کاشت با ورود دستی انجام می‌شود و صفحه صریحاً می‌گوید اتصال دستگاه پیکربندی نشده است؛ خواندن مجدد ناهمخوان، تعارض نشان می‌دهد و هیچ اتصالی ثبت نمی‌کند و خواندن درست بعدی شماره رسمی را روی پرونده و روی پروفایل حیوان مالک می‌نشاند؛ پیش از ثبت نمونه‌گیری هیچ کد رهگیری وجود ندارد و پس از آن کد در پرونده دامپزشک، در فهرست Custody و در صفحه مالک دیده می‌شود با این جمله که کد نمونه با کد مراجعه یکی نیست؛ مرور نهایی شامل شماره میکروچیپ، کد نظام دامپزشکی و مرکز است و می‌گوید امضای دیجیتال لازم نیست؛ نمونه تا دستور مرکز ژنتیک نزد دامپزشک می‌ماند و فرم ارسال اصلاً وجود ندارد، پس از دستور مرکز ارسال روی همان کد ثبت می‌شود؛ ثبت نمونه خراب و سپس نمونه‌گیری مجدد، دو کد را کنار هم با دلیل نمونه قبلی نگه می‌دارد. ۱۴ اسکرین‌شات در docs/reports/screenshots/prompt-008/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 212 · pass 212 · fail 0 · skipped 0 (۱۸ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 46 · pass 46 · fail 0 (۵ مورد میکروچیپ و نمونه، ۶ مورد Finder و مراجعه، ۶ مورد حیوان و نسب، ۷ مورد پرداخت/عضویت، ۱۱ مورد هویت، ۱۱ مورد پوسته و RTL)."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0005_clinical` اعمال شد (جدول‌های microchip، microchip_conflict، chip_procedure، sample و sample_event با دو ایندکس یکتای حیوان و شماره) و اجرای دوباره replay نکرد؛ /api/health شش migration اعمال‌شده گزارش می‌کند."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 نسخه‌های مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "هیچ ریدر میکروچیپ واقعی متصل نیست. آداپتور `chip-reader` تا پیکربندی `CHIP_READER_PROVIDER` وضعیت NOT_CONFIGURED دارد و صفحه همین را می‌گوید؛ ورود دستی و بارکد بسته کار می‌کنند و کل Gate مرورگر با ورود دستی اجرا شد. آمادگی بلوتوث یا اتصال موبایل ادعا نمی‌شود (DEC-0053).",
+    "خواندن بارکد بسته‌بندی به‌صورت دوربین یا اسکنر پیاده نشده است؛ روش در رکورد ثبت می‌شود ولی مقدار از همان فیلد وارد می‌شود.",
+    "قالب شماره میکروچیپ ۱۵ رقم ISO 11784/11785 فرض شده چون سند قالبی تعیین نکرده است (DEC-0051)؛ اگر قالب دیگری اعلام شود فقط یک تابع تغییر می‌کند.",
+    "رفع تعارض میکروچیپ عمداً ساخته نشد. تعارض ثبت و عملیات متوقف می‌شود و هیچ مسیر بازنویسی، حذف یا انتقال وجود ندارد؛ سیاست رسیدگی انسانی به تعارض در سند تعریف نشده و اختراع نشد.",
+    "تأیید فیش، دریافت نمونه در مرکز، وضعیت‌های پردازش و نتیجه Parentage به PROMPT-010 تعلق دارند؛ اینجا فقط دستور ارسال و ثبت ارسال روی همان کد ساخته شد (DEC-0055).",
+    "پرداخت برگه ثبتی و صدور آن (§۱۳) در این مرحله انجام نمی‌شود؛ تکمیل مراجعه فقط وضعیت درخواست را COMPLETED می‌کند.",
+    "مرور نهایی، فیلدهای موجود همین مرحله را نشان می‌دهد؛ فیلدهایی مثل شماره برگه ثبتی که هنوز ساخته نشده‌اند در آن نیستند و جای خالی ساختگی هم ندارند.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "MICROCHIP_AND_SAMPLE_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

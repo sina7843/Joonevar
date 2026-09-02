@@ -48,10 +48,10 @@
 | `/vet` (صف تخصیص‌یافته) | PROTO | `173:397` VET-001 | s21 | D05 | A-024 — پیاده‌شده در PROMPT-007 |
 | `/vet/check-in` (اسکن + ورود دستی، یک کد) | PROTO | VET-002 Scan/Invalid | s11 | D03 | A-005, A-006 — پیاده‌شده در PROMPT-007 |
 | `/vet/requests/[id]` (پرونده مراجعه و تغییر نوع خدمت) | PROTO | VET-004/005/006 | s11 | D09 | A-006 — پیاده‌شده در PROMPT-007 |
-| `/vet/cases/[id]/microchip` | PROTO | VET-007 (Scan/Checking/Unique/Status/Install), VET-008 Duplicate block | s12 | — | A-007, A-008 |
-| `/vet/cases/[id]/sample` | PROTO | `233:5666` VET-012/013/014 | s12 | — | A-007 |
-| `/vet/cases/[id]/review` (امضای فیزیکی = اطلاع‌رسانی) | PROTO | VET-009, VET-009B | s12 | D13 | A-023 |
-| `/vet/samples` (Custody، دستور ارسال، Shipment، Resampling) | PROTO | VET-010/011/015, DNA-009 | s12, s14 | D07 | A-009, A-010 |
+| `/vet/requests/[id]` — بخش میکروچیپ | PROTO | VET-007 (Scan/Checking/Unique/Status/Install), VET-008 Duplicate block | s12 | — | A-007, A-008 — پیاده‌شده در PROMPT-008 |
+| `/vet/requests/[id]` — بخش نمونه | PROTO | `233:5666` VET-012/013/014 | s12 | — | A-007 — پیاده‌شده در PROMPT-008 |
+| `/vet/requests/[id]` — مرور نهایی (امضای فیزیکی = اطلاع‌رسانی) | PROTO | VET-009, VET-009B | s12 | D13 | A-023 — پیاده‌شده در PROMPT-008 |
+| `/vet/samples` (Custody و Shipment) و `/genetics/samples` (دستور ارسال) | PROTO | VET-010/011/015, DNA-009 | s12, s14 | D07 | A-009, A-010 — Custody، دستور ارسال، Shipment و Resampling در PROMPT-008؛ دریافت و پردازش در PROMPT-010 |
 | `/vet/pregnancy/[requestId]` | CODE | ورودی از Finder Pregnancy | s18 | D08 | A-019, A-020 |
 
 ## ۳. Shellهای عملیاتی مستقل (D06 / D11 — همه CODE)

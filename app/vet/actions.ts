@@ -4,6 +4,19 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { checkIn, correctService } from '../../src/vets/visits.ts';
+import {
+  bindExistingChip,
+  confirmImplant,
+  recordChipRead,
+  recordRereadAndBind,
+} from '../../src/clinical/microchip.ts';
+import {
+  markSampleUnusable,
+  recordSampling,
+  recordShipment,
+  resample,
+} from '../../src/clinical/samples.ts';
+import type { ChipReadMethod, UnusableStatus } from '../../src/domain/microchip.ts';
 import { AppError } from '../../src/domain/errors.ts';
 import type { VisitServiceTypeName } from '../../src/domain/referral.ts';
 
@@ -74,6 +87,157 @@ export async function correctServiceAction(_previous: VetFormState, form: FormDa
       message: 'درخواست قبلی جایگزین شد و کد مراجعه جدید صادر شد؛ برای ادامه باید دوباره پذیرش شود.',
       requestId: result.request.id,
     };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+// ── Microchip and sample (§12) ────────────────────────────────────────────
+
+/**
+ * Every reading method ends here with one canonical number, so a device that
+ * is not configured never blocks the visit: manual entry writes the same field.
+ */
+export async function readChipAction(_previous: VetFormState, form: FormData): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    const outcome = await recordChipRead(db(), actor, requestId, {
+      number: text(form, 'number'),
+      method: text(form, 'method') as ChipReadMethod,
+    });
+    revalidatePath('/vet/requests/' + requestId);
+    if (outcome.state === 'CONFLICT') {
+      return { ok: false, tone: 'error', message: outcome.messageFa + ' عملیات متوقف شد و تعارض ثبت شد.' };
+    }
+    if (outcome.state === 'CONFIRMED') {
+      return { ok: true, tone: 'success', message: 'سریال با رکورد همین حیوان می‌خواند؛ تأیید شد.' };
+    }
+    if (outcome.state === 'BINDABLE') {
+      return {
+        ok: true,
+        tone: 'info',
+        message: 'این چیپ رکورد سیستمی ندارد. پس از کنترل یکتایی می‌توانید آن را به همین حیوان متصل کنید.',
+      };
+    }
+    return { ok: true, tone: 'info', message: 'سریال پیش از کاشت ثبت شد. حالا کاشت را انجام و ثبت کنید.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function confirmImplantAction(_previous: VetFormState, form: FormData): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    await confirmImplant(db(), actor, requestId);
+    revalidatePath('/vet/requests/' + requestId);
+    return { ok: true, tone: 'info', message: 'کاشت ثبت شد. حالا سریال را دوباره بخوانید تا تطبیق داده شود.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function rereadChipAction(_previous: VetFormState, form: FormData): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    const outcome = await recordRereadAndBind(db(), actor, requestId, {
+      number: text(form, 'number'),
+      method: text(form, 'method') as ChipReadMethod,
+    });
+    revalidatePath('/vet/requests/' + requestId);
+    return outcome.state === 'BOUND'
+      ? { ok: true, tone: 'success', message: 'سریال تطبیق داده شد و به‌صورت دائمی به همین حیوان متصل شد.' }
+      : { ok: false, tone: 'error', message: outcome.messageFa + ' هیچ اتصالی ثبت نشد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function bindExistingChipAction(
+  _previous: VetFormState,
+  form: FormData,
+): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    const outcome = await bindExistingChip(db(), actor, requestId);
+    revalidatePath('/vet/requests/' + requestId);
+    return outcome.state === 'BOUND'
+      ? { ok: true, tone: 'success', message: 'چیپ موجود پس از کنترل یکتایی به همین حیوان متصل شد.' }
+      : { ok: false, tone: 'error', message: outcome.messageFa + ' هیچ اتصالی ثبت نشد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function recordSamplingAction(_previous: VetFormState, form: FormData): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    const sample = await recordSampling(db(), actor, requestId, { noteFa: text(form, 'note') || null });
+    revalidatePath('/vet/requests/' + requestId);
+    revalidatePath('/vet/samples');
+    return {
+      ok: true,
+      tone: 'success',
+      message: 'نمونه خون ثبت شد و کد رهگیری ' + sample.trackingCode + ' صادر شد.',
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function markSampleUnusableAction(
+  _previous: VetFormState,
+  form: FormData,
+): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    await markSampleUnusable(
+      db(),
+      actor,
+      text(form, 'sampleId'),
+      text(form, 'status') as UnusableStatus,
+      text(form, 'reason'),
+    );
+    revalidatePath('/vet/requests/' + requestId);
+    revalidatePath('/vet/samples');
+    return {
+      ok: true,
+      tone: 'info',
+      message: 'نمونه غیرقابل‌استفاده ثبت شد. کد و سابقه قبلی حفظ می‌شود؛ کد جدید فقط پس از نمونه‌گیری مجدد صادر می‌شود.',
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function resampleAction(_previous: VetFormState, form: FormData): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    const sample = await resample(db(), actor, requestId, { noteFa: text(form, 'note') || null });
+    revalidatePath('/vet/requests/' + requestId);
+    revalidatePath('/vet/samples');
+    return {
+      ok: true,
+      tone: 'success',
+      message: 'نمونه‌گیری مجدد در همین درخواست ثبت شد؛ کد جدید ' + sample.trackingCode + ' است.',
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function recordShipmentAction(_previous: VetFormState, form: FormData): Promise<VetFormState> {
+  try {
+    const actor = await requireActor('/vet/samples');
+    await recordShipment(db(), actor, text(form, 'sampleId'), text(form, 'reference'));
+    revalidatePath('/vet/samples');
+    return { ok: true, tone: 'success', message: 'ارسال نمونه روی همان کد رهگیری ثبت شد.' };
   } catch (error) {
     return failure(error);
   }

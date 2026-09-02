@@ -295,6 +295,22 @@ export async function vetQueue(database: DbClient, actor: Actor): Promise<readon
   return decorate(database, rows);
 }
 
+/** Recently finished work, so the summary stays reachable after completion. */
+export async function vetCompleted(
+  database: DbClient,
+  actor: Actor,
+  limit = 10,
+): Promise<readonly RequestView[]> {
+  if (actor.context !== 'TRUSTED_VET') throw forbidden('این فهرست فقط برای دامپزشک معتمد است.');
+  const rows = await database
+    .select()
+    .from(vetVisitRequests)
+    .where(and(eq(vetVisitRequests.vetAccountId, actor.accountId), eq(vetVisitRequests.status, 'COMPLETED')))
+    .orderBy(desc(vetVisitRequests.updatedAt))
+    .limit(limit);
+  return decorate(database, rows);
+}
+
 export interface VetRequestDetail extends RequestView {
   readonly ownerNameFa: string | null;
   readonly ownerMobileTail: string | null;

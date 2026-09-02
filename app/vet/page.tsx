@@ -8,7 +8,7 @@ import { Alert } from '../../src/ui/alert.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { StatusBadge } from '../../src/ui/status.tsx';
 import { db } from '../../src/db/client.ts';
-import { vetQueue } from '../../src/vets/visits.ts';
+import { vetCompleted, vetQueue } from '../../src/vets/visits.ts';
 import { vetEligibilityFor } from '../../src/domain/eligibility/service.ts';
 import { REQUEST_STATUS_FA, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
@@ -27,8 +27,9 @@ export default async function VetPage() {
   const guard = await guardRoute('/vet');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
-  const [queue, eligibility] = await Promise.all([
+  const [queue, completed, eligibility] = await Promise.all([
     vetQueue(db(), guard.actor),
+    vetCompleted(db(), guard.actor),
     vetEligibilityFor(db(), guard.actor.accountId),
   ]);
 
@@ -47,6 +48,9 @@ export default async function VetPage() {
 
         <ButtonLink href="/vet/check-in" block data-testid="open-check-in">
           پذیرش با QR یا کد مراجعه
+        </ButtonLink>
+        <ButtonLink tone="secondary" href="/vet/samples" block data-testid="open-custody">
+          نمونه‌های نزد من
         </ButtonLink>
 
         {queue.length === 0 ? (
@@ -86,6 +90,24 @@ export default async function VetPage() {
               </li>
             ))}
           </ul>
+        )}
+
+        {completed.length === 0 ? null : (
+          <Card>
+            <h2 className="text-label-lg">پرونده‌های تکمیل‌شده اخیر</h2>
+            <ul className="mt-md space-y-sm text-body-sm" data-testid="vet-completed">
+              {completed.map((row) => (
+                <li key={row.request.id}>
+                  <Link
+                    href={'/vet/requests/' + row.request.id}
+                    className="text-text-brand underline underline-offset-4"
+                  >
+                    {SERVICE_TYPE_FA[row.request.serviceType]} — مشاهده مرور نهایی
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Card>
         )}
       </div>
     </PublicShell>

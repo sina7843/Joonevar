@@ -8,6 +8,8 @@ import { Alert } from '../../../src/ui/alert.tsx';
 import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { ownerRequest } from '../../../src/vets/visits.ts';
+import { ownerSamples } from '../../../src/clinical/samples.ts';
+import { SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import {
   CONTACT_FOR_PRICE_FA,
   CONTEXT_FA,
@@ -49,6 +51,7 @@ export default async function RequestPage({
   }
 
   const { request, referral, expired } = view;
+  const sampleRows = await ownerSamples(db(), guard.actor, request.id);
   const usable = referral !== null && referral.status === 'ACTIVE' && !expired;
 
   return (
@@ -119,6 +122,23 @@ export default async function RequestPage({
             )}
           </Card>
         )}
+
+        {sampleRows.length > 0 ? (
+          <Card>
+            <h3 className="text-label-lg">نمونه</h3>
+            <ul className="mt-md space-y-sm text-body-sm" data-testid="owner-samples">
+              {sampleRows.map((sample) => (
+                <li key={sample.id} className="flex items-center justify-between gap-md">
+                  <Identifier label="کد رهگیری:" value={sample.trackingCode} />
+                  <span className="text-text-secondary">{SAMPLE_STATUS_FA[sample.status]}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-md text-caption text-text-secondary">
+              کد رهگیری نمونه با کد مراجعه یکی نیست؛ یکی اجازه پذیرش است و دیگری شناسه خود نمونه.
+            </p>
+          </Card>
+        ) : null}
 
         {request.status === 'SUPERSEDED' && request.supersededByRequestId ? (
           <Card>

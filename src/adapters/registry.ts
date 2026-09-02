@@ -16,7 +16,13 @@ import { eq } from 'drizzle-orm';
 
 export type AdapterStatus = 'NOT_CONFIGURED' | 'LOCAL_TEST' | 'SANDBOX_VERIFIED' | 'LIVE_VERIFIED';
 
-export type AdapterName = 'sms-otp' | 'payment-gateway' | 'map-provider' | 'document-render' | 'private-storage';
+export type AdapterName =
+  | 'sms-otp'
+  | 'payment-gateway'
+  | 'map-provider'
+  | 'document-render'
+  | 'chip-reader'
+  | 'private-storage';
 
 export interface AdapterReport {
   readonly name: AdapterName;
@@ -63,6 +69,12 @@ export function adapterReports(env: Env = loadEnv()): readonly AdapterReport[] {
       status: statusOf(env.DOCUMENT_RENDERER, env),
       provider: env.DOCUMENT_RENDERER ?? null,
       note: 'قالب رسمی سند هنوز تحویل نشده است.',
+    },
+    {
+      name: 'chip-reader',
+      status: statusOf(env.CHIP_READER_PROVIDER, env),
+      provider: env.CHIP_READER_PROVIDER ?? null,
+      note: 'اتصال ریدر بلوتوث یا ریدر متصل به موبایل. نمایش این روش‌ها در UI اثبات آماده‌بودن سخت‌افزار نیست؛ ورود دستی و بارکد بسته همیشه در دسترس‌اند.',
     },
     {
       name: 'private-storage',
