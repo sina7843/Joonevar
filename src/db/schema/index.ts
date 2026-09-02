@@ -11,3 +11,4 @@ export * from './pedigree.ts';
 export * from './kennels.ts';
 export * from './mating.ts';
 export * from './breeding.ts';
+export * from './declarations.ts';

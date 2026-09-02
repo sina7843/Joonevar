@@ -115,6 +115,7 @@ test('a verified payment activates a lifetime membership and opens the member se
 
     const before = await eligibilitySummary(testDb.db, member.accountId);
     assert.equal(before.services.PERSONAL_DECLARATION.allowed, false);
+    assert.equal(before.services.PERSONAL_DECLARATION.lock.cta.href, '/membership');
 
     await payForMembership(testDb, member.actor);
 
@@ -124,7 +125,11 @@ test('a verified payment activates a lifetime membership and opens the member se
 
     const after = await eligibilitySummary(testDb.db, member.accountId);
     assert.equal(after.facts.membershipActive, true);
-    assert.equal(after.services.PERSONAL_DECLARATION.allowed, true);
+    // Membership is no longer what stands in the way: each service now names
+    // its own remaining prerequisite (§5, §20).
+    const declaration = after.services.PERSONAL_DECLARATION;
+    assert.ok(!declaration.allowed);
+    assert.equal(declaration.lock.cta.href, '/animals/new');
     // Still gated by their own prerequisites, not by membership any more.
     assert.equal(after.services.REGISTRATION_SHEET.allowed, false);
     assert.match(
@@ -147,7 +152,11 @@ test('a membership number that is still PENDING blocks nothing', async () => {
     // Active services are open even though no number has been issued (§7).
     const summary = await eligibilitySummary(testDb.db, member.accountId);
     assert.equal(summary.facts.membershipActive, true);
-    assert.equal(summary.services.PERSONAL_DECLARATION.allowed, true);
+    assert.equal(
+      summary.services.PERSONAL_DECLARATION.allowed ? '' : summary.services.PERSONAL_DECLARATION.lock.cta.href,
+      '/animals/new',
+      'membership is active, so only the service’s own prerequisite remains',
+    );
 
     // Issuing the number later changes nothing about eligibility.
     const issued = await issueMembershipNumber(
@@ -156,7 +165,8 @@ test('a membership number that is still PENDING blocks nothing', async () => {
       { accountId: member.accountId, membershipNo: 'HZ-M-000123' },
     );
     assert.equal(issued.numberStatus, 'ISSUED');
-    assert.equal((await eligibilitySummary(testDb.db, member.accountId)).services.PERSONAL_DECLARATION.allowed, true);
+    const stillOpen = (await eligibilitySummary(testDb.db, member.accountId)).services.PERSONAL_DECLARATION;
+    assert.equal(stillOpen.allowed ? '' : stillOpen.lock.cta.href, '/animals/new');
   });
 });
 
@@ -276,7 +286,8 @@ test('an inactive membership also closes the member services for that account', 
   await withDb(async (testDb, root) => {
     const member = await approvedMember(testDb, root, '09990200007', '9000004111');
     await payForMembership(testDb, member.actor);
-    assert.equal((await eligibilityFor(testDb.db, member.accountId, 'PERSONAL_DECLARATION')).allowed, true);
+    const open = await eligibilityFor(testDb.db, member.accountId, 'PERSONAL_DECLARATION');
+    assert.equal(open.allowed ? '' : open.lock.cta.href, '/animals/new', 'membership is not the blocker');
 
     await setMembershipActive(testDb.db, actorFor(member.reviewerId, 'ASSOCIATION_OPERATOR'), {
       accountId: member.accountId,
@@ -286,6 +297,7 @@ test('an inactive membership also closes the member services for that account', 
 
     const closed = await eligibilityFor(testDb.db, member.accountId, 'PERSONAL_DECLARATION');
     assert.equal(closed.allowed, false);
+    assert.equal(closed.lock.cta.href, '/membership', 'membership is the blocker again');
     // Registering an animal never depended on membership, so it stays open.
     assert.equal((await eligibilityFor(testDb.db, member.accountId, 'ANIMAL_REGISTRATION')).allowed, true);
   });

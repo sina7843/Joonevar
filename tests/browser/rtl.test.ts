@@ -185,8 +185,11 @@ test('route access is enforced by the server, not by hiding navigation', async (
     const context = await anonymousContext(VIEWPORTS.mobileReference);
     const page = await context.newPage();
     try {
+      // Anonymous access is not a refusal screen: it is a sign-in with the
+      // requested page carried along, so the flow resumes there (§8, DEC-0110).
       await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'UNAUTHENTICATED');
+      await page.waitForURL((url) => url.pathname === '/login');
+      assert.equal(new URL(page.url()).searchParams.get('next'), '/dashboard');
       await page.screenshot({ path: path.join(SHOTS, 'denied-anonymous.png'), fullPage: true });
     } finally {
       await context.close();
@@ -224,10 +227,14 @@ test('route access is enforced by the server, not by hiding navigation', async (
     await context.addCookies([{ name: 'hz_session', value: 'forged-token-value', url: BASE_URL }]);
     const page = await context.newPage();
     try {
+      // A forged cookie is treated exactly like no session at all: sign in,
+      // with the requested page carried along (DEC-0110).
       await page.goto(BASE_URL + '/admin', { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'UNAUTHENTICATED');
+      await page.waitForURL((url) => url.pathname === '/login');
+      assert.equal(new URL(page.url()).searchParams.get('next'), '/admin');
       await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'UNAUTHENTICATED');
+      await page.waitForURL((url) => url.pathname === '/login');
+      assert.equal(new URL(page.url()).searchParams.get('next'), '/dashboard');
     } finally {
       await context.close();
     }

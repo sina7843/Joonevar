@@ -455,8 +455,12 @@ test('signing out ends the session on the server', async () => {
     await page.goto(BASE_URL + '/account/profile', { waitUntil: 'load' });
     await Promise.all([page.waitForURL('**/login'), page.getByTestId('sign-out').click()]);
 
+    // A signed-out visitor is sent back to sign in, carrying the page they
+    // asked for so the flow resumes there afterwards (§8, DEC-0110).
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('denial-code').textContent(), 'UNAUTHENTICATED');
+    await page.waitForURL((url) => url.pathname === '/login');
+    assert.equal(new URL(page.url()).searchParams.get('next'), '/dashboard');
+    assert.equal(await page.getByTestId('mobile-input').count(), 1);
   } finally {
     await context.close();
   }

@@ -6,6 +6,7 @@
  * the layout would still let the page run its queries. Every guarded page calls
  * this before it reads anything.
  */
+import { redirect } from 'next/navigation';
 import { db } from '../db/client.ts';
 import { AppError } from '../domain/errors.ts';
 import { currentSession } from './request-actor.ts';
@@ -39,6 +40,11 @@ export async function guardRoute(pathname: string): Promise<GuardResult> {
     if (allowed === null) throw new AppError('UNAUTHENTICATED', 'Sign-in required');
     return { ok: true, actor: allowed };
   } catch (error) {
+    // A visitor who is simply not signed in is sent to sign in, carrying the
+    // page they asked for, so the flow resumes exactly there afterwards (§8).
+    if (error instanceof AppError && error.code === 'UNAUTHENTICATED') {
+      redirect('/login?next=' + encodeURIComponent(pathname));
+    }
     if (error instanceof AppError) return { ok: false, denied: error };
     throw error;
   }

@@ -79,6 +79,8 @@ export const payingGateway = (amountRial: bigint): PaymentGateway => ({
 export interface Party {
   readonly accountId: string;
   readonly actor: Actor;
+  /** The number this party signed in with, for flows that invite by mobile. */
+  readonly mobile: string;
 }
 
 export interface MatingCtx {
@@ -106,7 +108,7 @@ async function approved(testDb: TestDb, root: string, operator: Actor, mobile: s
   await attachKycDocument(testDb.db, root, actor, { bytes: JPEG });
   const submitted = await submitKyc(testDb.db, actor);
   await reviewKyc(testDb.db, operator, { caseId: submitted.id, decision: 'APPROVED' });
-  return { accountId: account.accountId, actor };
+  return { accountId: account.accountId, actor, mobile };
 }
 
 async function payMembership(testDb: TestDb, actor: Actor) {
@@ -139,13 +141,19 @@ export async function withMatingCtx(
     const association: Party = {
       accountId: operatorAccount.accountId,
       actor: actorFor(operatorAccount.accountId, 'ASSOCIATION_OPERATOR'),
+      mobile: mobile('99'),
     };
     const adminAccount = await signInWithVerifiedMobile(testDb.db, mobile('98'));
-    const admin: Party = { accountId: adminAccount.accountId, actor: actorFor(adminAccount.accountId, 'SUPERADMIN') };
+    const admin: Party = {
+      accountId: adminAccount.accountId,
+      actor: actorFor(adminAccount.accountId, 'SUPERADMIN'),
+      mobile: mobile('98'),
+    };
     const centreAccount = await signInWithVerifiedMobile(testDb.db, mobile('97'));
     const centre: Party = {
       accountId: centreAccount.accountId,
       actor: actorFor(centreAccount.accountId, 'GENETICS_OPERATOR'),
+      mobile: mobile('97'),
     };
 
     const first = await approved(testDb, root, association.actor, mobile('01'), '0499370899');
@@ -195,7 +203,7 @@ export async function withMatingCtx(
       admin,
       association,
       centre,
-      vet: { accountId: vetParty.accountId, actor: actorFor(vetParty.accountId, 'TRUSTED_VET') },
+      vet: { accountId: vetParty.accountId, actor: actorFor(vetParty.accountId, 'TRUSTED_VET'), mobile: mobile('02') },
       locationId: location.id,
       breedId: breed!.id,
     });

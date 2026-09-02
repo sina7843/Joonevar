@@ -144,10 +144,13 @@ export function evaluate(service: ServiceName, facts: EligibilityFacts): Eligibi
       if (facts.puppiesWithFinalAllocation < 1) return lockedBy(LOCK_PUPPY_ALLOCATION);
       return ALLOWED;
 
-    // §20: KYC, active membership and two existing animal records. No payment.
+    // §20: KYC, active membership and two existing animal records. No payment,
+    // and no registration sheet or pedigree among them. The second
+    // animal is the counterparty's and is checked when the invitation is sent.
     case 'PERSONAL_DECLARATION':
       if (!facts.kycApproved) return lockedBy(LOCK_KYC_REQUIRED);
       if (!facts.membershipActive) return lockedBy(LOCK_MEMBERSHIP_REQUIRED);
+      if (facts.registeredAnimals < 1) return lockedBy(LOCK_ANIMAL_NEEDED);
       return ALLOWED;
 
     case 'HAMZIST_CONTRACT':

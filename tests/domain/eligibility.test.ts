@@ -50,9 +50,17 @@ test('after KYC without membership the paid services ask for membership, not for
 test('an active member still needs the concrete prerequisite of each service', () => {
   const all = evaluateAll(MEMBER);
 
-  // §20: the personal declaration needs KYC, membership and existing animals; it
-  // has no payment and no document prerequisite.
-  assert.equal(all.PERSONAL_DECLARATION.allowed, true);
+  // §20: the personal declaration needs KYC, membership and existing animal
+  // records; it has no payment and no document prerequisite.
+  const declaration = all.PERSONAL_DECLARATION;
+  assert.ok(!declaration.allowed, 'a member with no animal record has nothing to declare about');
+  assert.equal(declaration.lock.cta.href, '/animals/new');
+  const withAnimal = evaluate('PERSONAL_DECLARATION', facts({
+    kycApproved: true,
+    membershipActive: true,
+    registeredAnimals: 1,
+  }));
+  assert.equal(withAnimal.allowed, true, 'no sheet and no pedigree are required');
 
   const sheet = all.REGISTRATION_SHEET;
   assert.ok(!sheet.allowed);

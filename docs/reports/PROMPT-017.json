@@ -1,0 +1,102 @@
+{
+  "promptId": "PROMPT-017",
+  "status": "COMPLETE",
+  "summary": "مسیر «اعلام توافق شخصی» ساخته شد و فقط «وجود توافق خارج از هم‌زیست» را ثبت می‌کند: هیچ متن، فایل، تصویر، امضا، شرط حقوقی یا سهمی ذخیره نمی‌شود و جدول اصلاً ستونی برای آن‌ها ندارد. پیش‌نیازها همان‌های سند هستند — KYC تأییدشده، عضویت فعال و رکورد حیوان موجود — و برگه ثبتی یا شجره‌نامه هیچ‌جا شرط نیست؛ این سرویس هیچ پرداختی ندارد و هیچ Batch یا قلمی نمی‌سازد. آغازکننده حیوان خود را انتخاب می‌کند و حیوان طرف مقابل را با شناسه یک رکورد موجود (شماره میکروچیپ، Pet ID یا کد شجره‌نامه) معرفی می‌کند؛ حیوان دستی خارج از دیتابیس پذیرفته نمی‌شود و فهرست حیوان‌های دیگران هم برای کسی مرور نمی‌شود. شماره دعوت باید متعلق به مالک همان حیوان باشد و در صورت ناهمخوانی، نه رکوردی ساخته می‌شود و نه پیامکی ارسال. دعوت از آداپتور پیامک خود محصول عبور می‌کند که بدون Provider پیکربندی‌شده به Outbox توسعه می‌نویسد و در Production اصلاً موجود نیست، پس در حین ساخت هیچ پیامی به فرد واقعی نمی‌رسد. تا پاسخ طرف مقابل وضعیت PENDING_COUNTERPARTY_CONFIRMATION است؛ پاسخ فقط از حساب دعوت‌شده و از نشست خودش پذیرفته می‌شود، رد نیازمند دلیل است و آغازکننده می‌تواند دعوت بی‌پاسخ را لغو کند. برای امضای توافق هیچ کد یک‌بارمصرف تازه‌ای ساخته نشد؛ تنها OTP این مسیر همان کد ورود §۶ است و مبدأ درخواست در همان جریان ورود حفظ می‌شود. یادداشت‌های شخصی تاریخ، بارداری و زایمان روی همان اعلام و همیشه UNVERIFIED ثبت می‌شوند و هیچ کوئری‌ای که مبنای رسمی Cooldown، Timeline، تخصیص یا اسناد را می‌سازد آن‌ها را نمی‌خواند. تأیید این اعلام هیچ مجوز، lineage رسمی، تاریخ تأییدشده رسمی، تخصیص مالکیت توله یا کارت توله‌ای نمی‌سازد و قرارداد رسمی هم‌زیست همچنان «به‌زودی» و غیرفعال است.",
+  "changedFiles": [
+    "src/db/schema/declarations.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0014_declarations.sql",
+    "src/db/migrations/meta/0014_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/mating/declaration.ts",
+    "src/domain/declaration-copy.ts",
+    "src/domain/eligibility/rules.ts",
+    "src/authz/guard.ts",
+    "app/declaration/page.tsx",
+    "app/declaration/new/page.tsx",
+    "app/declaration/[id]/page.tsx",
+    "app/declaration/actions.ts",
+    "app/declaration/forms.tsx",
+    "tests/db/declaration.test.ts",
+    "tests/browser/personal.test.ts",
+    "tests/helpers/mating.ts",
+    "tests/domain/eligibility.test.ts",
+    "tests/db/membership.test.ts",
+    "tests/browser/rtl.test.ts",
+    "tests/browser/identity.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-017/declaration-locked.png",
+    "docs/reports/screenshots/prompt-017/declaration-new.png",
+    "docs/reports/screenshots/prompt-017/declaration-mismatch.png",
+    "docs/reports/screenshots/prompt-017/declaration-pending.png",
+    "docs/reports/screenshots/prompt-017/declaration-after-login.png",
+    "docs/reports/screenshots/prompt-017/declaration-confirmed.png",
+    "docs/reports/screenshots/prompt-017/declaration-note.png",
+    "docs/reports/screenshots/prompt-017/declaration-vs-official.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-017.json"
+  ],
+  "decisions": ["DEC-0105", "DEC-0106", "DEC-0107", "DEC-0108", "DEC-0109", "DEC-0110"],
+  "checks": [
+    {
+      "id": "personal-declaration-isolation",
+      "command": "node --test \"tests/db/declaration.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0 روی Postgres واقعی با دیتابیس ایزوله و فرستنده پیامک SYNTHETIC درون‌فرایندی. پوشش واقعی: عضو فعال بدون رکورد حیوان قفل است و CTA آن `/animals/new` است؛ با یک حیوان ساده (بدون میکروچیپ، بدون برگه ثبتی و بدون شجره‌نامه) خدمت باز می‌شود و اعلام با وضعیت PENDING_COUNTERPARTY_CONFIRMATION ساخته می‌شود؛ حساب و حیوان طرف مقابل از رکورد واقعی خوانده می‌شوند و اعلان با Resume به همان اعلام می‌رسد؛ در کل فیکسچر هیچ Batch پرداختی جز عضویت‌ها ساخته نمی‌شود؛ نام دستی «سگ همسایه» Resolve نمی‌شود، شناسه خالی رد می‌شود، شماره‌ای که مالک آن حیوان نیست دعوت را رد می‌کند و در آن حالت نه پیامکی ارسال می‌شود و نه رکوردی ساخته، و دو حیوان یک مالک هم رد می‌شود؛ آغازکننده و شخص ثالث نمی‌توانند به‌جای دعوت‌شده پاسخ دهند و شخص ثالث اعلام را اصلاً نمی‌بیند؛ رد بدون دلیل رد می‌شود و پس از رد، پاسخ دوباره ممکن نیست؛ نام ستون‌های جدول برای terms/text/file/image/signature/share/amount/price بررسی می‌شود و هیچ‌کدام وجود ندارد؛ پس از تأیید، هیچ مجوز، کارت توله یا Batch تازه‌ای ساخته نمی‌شود، شرط کارت توله همچنان «مجوز» را نام می‌برد و قرارداد هم‌زیست comingSoon می‌ماند؛ یادداشت تاریخ بدون تاریخ و با تاریخ آینده رد می‌شود و پس از ثبت دو یادداشت، `latestConfirmedDateOfAnimal` هر دو حیوان همچنان null است و Audit وضعیت UNVERIFIED را ثبت کرده است؛ لغو فقط از آغازکننده پذیرفته می‌شود، پس از لغو پاسخ و یادداشت بسته می‌شود و اعلام تازه برای همان جفت ممکن است در حالی که دو اعلام باز هم‌زمان رد می‌شود."
+    },
+    {
+      "id": "personal-browser",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node --test --test-concurrency=1 \"tests/browser/personal.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 4 · pass 4 · fail 0 روی Chromium واقعی با سه نشست (آغازکننده، طرف مقابل و یک عضو بدون حیوان). پوشش واقعی: عضو بدون حیوان قفل را با ذکر «حیوان» می‌بیند و در متن آن هیچ اشاره‌ای به برگه ثبتی یا شجره‌نامه نیست و دکمه شروع وجود ندارد؛ صفحه ورودی جمله «فقط وجود توافق خارج از هم‌زیست» و جمله «کارت توله نمی‌سازد و پرداختی ندارد» را نشان می‌دهد؛ نام دستی پیام «حیوانی با این شناسه در هم‌زیست پیدا نشد» می‌گیرد؛ شماره‌ای که مالک آن حیوان نیست پیام «با مالک این حیوان یکی نیست» می‌گیرد و در Outbox توسعه هیچ دعوتی برای آن شماره ثبت نمی‌شود؛ جفت درست، پرونده را با وضعیت «در انتظار تأیید طرف مقابل» می‌سازد، متن دعوت در Outbox شناسه همان پرونده را دارد و آغازکننده فقط چهار رقم آخر شماره را می‌بیند؛ یک نشست تازه با همان شماره از نشانی اعلام به `/login?next=…` هدایت می‌شود، پس از کد ورود دقیقاً به همان اعلام برمی‌گردد، صفحه هیچ ورودی فایل، textarea یا فیلد امضا/شروط/سهم ندارد و فقط دو گزینه «هست/نیست» دارد، و تأیید وضعیت را به «وجود توافق تأیید شد» می‌برد؛ یادداشت شخصی با برچسب UNVERIFIED و جمله «مبنای رسمی Cooldown و Timeline را تغییر نمی‌دهند» ثبت می‌شود، صفحه هیچ گام پرداختی ندارد، صفحه کارت توله همچنان «مجوز» را می‌خواهد و داشبورد هر دو خدمت رسمی و شخصی را با ورودی‌های جدا نشان می‌دهد. ۸ اسکرین‌شات در docs/reports/screenshots/prompt-017/."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 297 · pass 297 · fail 0 · skipped 0 (۶ مورد جدید این مرحله). سه تست عضویت که از این خدمت به‌عنوان نمونه «سرویس عضویتی» استفاده می‌کردند، پس از افزودن شرط رکورد حیوان به §۵ به‌روزرسانی شدند تا همان معنا را با پیش‌نیاز درست بررسی کنند (DEC-0109)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 75 · pass 75 · fail 0 در اجرای کامل. دو تست قدیمی مسیر و خروج که صفحه «ورود لازم است» را انتظار داشتند، به رفتار جدید (هدایت به `/login?next=…`) به‌روزرسانی و اجرا شدند (DEC-0110)."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0014_declarations` اعمال شد (دو جدول با enum وضعیت اعلام و نوع یادداشت) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "هیچ Provider پیامک واقعی پیکربندی نشده است؛ دعوت‌ها به Outbox توسعه می‌روند و در Production این آداپتور با خطای صریح NOT_CONFIGURED کار نمی‌کند. تا انتخاب Provider واقعی، هیچ دعوتی به فرد واقعی ارسال نمی‌شود.",
+    "طرف مقابل باید حسابی داشته باشد که همان شماره را دارد و حیوان به نامش ثبت شده است؛ سناریوی «حیوان طرف مقابل هنوز در هم‌زیست ثبت نشده» طبق §۲۰ خارج از دامنه این سرویس است و حیوان دستی پذیرفته نمی‌شود.",
+    "قرارداد رسمی هم‌زیست همچنان «به‌زودی» و غیرفعال است و در این مرحله هیچ سازنده قرارداد یا ذخیره متنی ساخته نشد.",
+    "یادداشت‌های شخصی عمداً به هیچ گزارش یا Timeline رسمی وصل نشدند؛ نمایش توصیه‌ای آن‌ها فقط در همان پرونده اعلام است.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "PERSONAL_DECLARATION_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}
