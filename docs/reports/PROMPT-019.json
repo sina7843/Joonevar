@@ -1,0 +1,105 @@
+{
+  "promptId": "PROMPT-019",
+  "status": "COMPLETE",
+  "summary": "هر ردیف ACCEPTANCE_MATRIX به کد، بررسی و شاهد واقعی وصل شد و دو ردیف باقی‌مانده (A-021 و A-031) و بخش s28 هم بسته شدند. مسیر کامل رسمی — KYC، ثبت حیوان، عضویت، کد مراجعه، میکروچیپ و نمونه، برگه ثبتی، فیش ژنتیک، ارسال نمونه، Parentage Result، پرداخت صدور، شجره‌نامه، مجوز جفت‌گیری، تاریخ دوطرفه، زایمان، تخصیص دوطرفه و کارت توله — هم در سطح دامنه و هم از صفحه‌های واقعی مرورگر اجرا شد، و شاخه‌های مستقل کنل، شجره‌نامه خارجی، اعلام توافق شخصی، اعتراض ژنتیک و درخواست پستی جدا اجرا شدند بدون آنکه هیچ‌کدام از مسیر رسمی صلاحیت قرض بگیرند. ترتیب ناهمگام روی همان داده واقعی بررسی شد: Replay بازگشت درگاه فقط یک اثر و یک اعلان می‌سازد، تأیید کهنه پس از اصلاح تاریخ رد می‌شود، DATE_CONFLICT هر دو مقدار را نگه می‌دارد و مبنای رسمی را خالی می‌گذارد، رقابت روی یک کد مراجعه دقیقاً یک پذیرش دارد، تمدید پس از پذیرش رد می‌شود، اصلاح فیش و نمونه‌گیری مجدد سابقه را حفظ می‌کنند و اتصال دو شرطی شجره‌نامه در هر دو ترتیب کار می‌کند. بررسی امنیتی روی Postgres واقعی انجام شد: دسترسی فایل خصوصی به تفکیک نوع سند و Context بازبین، اعتبارسنجی آپلود از روی بایت‌ها و سقف حجم، مسیر ذخیره‌سازی بدون خروج از ریشه، rate limit و یک‌بارمصرف‌بودن کد ورود، نبودن کد در هیچ ردیف Audit، redaction، ذخیره‌نشدن توکن خام نشست و ابطال سمت سرور، یکتایی میکروچیپ و رد کد مراجعه در دامپزشک و مرکز دیگر، به‌علاوه ماتریس رد دسترسی داده‌محور با دستکاری شناسه. در بررسی وابستگی‌ها، آسیب‌پذیری SQL injection با شدت high در drizzle-orm با ارتقا به 0.45.2 بسته شد و همه ۳۱۸ تست دامنه/دیتابیس و ۸۸ تست مرورگر پس از ارتقا دوباره اجرا و سبز شدند؛ مورد باقی‌مانده postcss از زنجیره next است که رفع رسمی آن ارتقای major به Next 16 است و در مسیر درخواست کاربر اجرا نمی‌شود. بازبینی بصری ۱۲ صفحه را در دو اندازه ۳۶۰×۸۰۰ و ۱۴۴۰×۹۰۰ پوشش داد و جهت RTL، نبود اسکرول افقی، وجود واقعی توکن‌های Design System و جهت چپ‌به‌راست شناسه‌ها را تأیید کرد، اما تطبیق پیکسلی با پروتوتایپ مصوب انجام نشد و UNVERIFIED ثبت شد چون تصویر مرجع در دسترس نیست و Figma فقط‌خواندنی است. گزارش پذیرش در docs/qa/phase-1-acceptance.md نوشته شد و پنج ادعای مستقل، جدول آمادگی یکپارچه‌سازی به تفکیک local/sandbox/live و موارد تاریخی باز (MAP-001، INC-01، INC-02) را جدا از هم ثبت می‌کند.",
+  "changedFiles": [
+    "docs/qa/phase-1-acceptance.md",
+    "tests/db/regression.test.ts",
+    "tests/db/security.test.ts",
+    "tests/browser/cross-flow.test.ts",
+    "tests/browser/visual.test.ts",
+    "package.json",
+    "package-lock.json",
+    "ACCEPTANCE_MATRIX.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "docs/reports/screenshots/prompt-019/visual-review.json",
+    "docs/reports/screenshots/prompt-019/dashboard-mobileReference.png",
+    "docs/reports/screenshots/prompt-019/dashboard-desktop.png",
+    "docs/reports/screenshots/prompt-019/permits-mobileReference.png",
+    "docs/reports/screenshots/prompt-019/permit-new-desktop.png",
+    "docs/reports/screenshots/prompt-019/declaration-mobileReference.png",
+    "docs/reports/screenshots/prompt-019/assoc-desktop.png",
+    "docs/reports/screenshots/prompt-019/assoc-members-desktop.png",
+    "docs/reports/screenshots/prompt-019/genetics-desktop.png",
+    "docs/reports/screenshots/prompt-019/admin-settings-desktop.png",
+    "docs/reports/screenshots/prompt-019/admin-breeds-desktop.png",
+    "docs/reports/screenshots/prompt-019/journey-pedigree.png",
+    "docs/reports/screenshots/prompt-019/journey-permit.png",
+    "docs/reports/screenshots/prompt-019/journey-dates.png",
+    "docs/reports/screenshots/prompt-019/journey-birth.png",
+    "docs/reports/screenshots/prompt-019/journey-allocation.png",
+    "docs/reports/screenshots/prompt-019/journey-card.png",
+    "docs/reports/screenshots/prompt-019/journey-dashboard.png",
+    "docs/reports/screenshots/prompt-019/tokens-dashboard.png",
+    "docs/reports/screenshots/prompt-019/identifiers-ltr.png",
+    "docs/reports/PROMPT-019.json"
+  ],
+  "decisions": ["DEC-0116", "DEC-0117", "DEC-0118"],
+  "checks": [
+    {
+      "id": "domain-regression",
+      "command": "node --test \"tests/db/regression.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد. پوشش واقعی: مسیر کامل رسمی از دو حیوان شجره‌دار تا کارت توله اجرا می‌شود و هر گام گام بعد را باز می‌کند — پیش از تأیید دوطرفه تاریخ، مبنای رسمی هر دو حیوان خالی است و پس از آن هر دو همان تاریخ را دارند؛ پیش از نهایی‌شدن تخصیص، کارت هر توله قفل است؛ شاخه‌های کنل، اعلام شخصی و درخواست پستی جدا اجرا می‌شوند و جدول درخواست پستی هیچ ستون tracking/shipped/delivered/carrier ندارد و اعلام شخصی هیچ Batch مجوز نمی‌سازد؛ بازگشت تکراری درگاه بار دوم performed=false می‌دهد و رویداد و اعلان فقط یک بار ثبت شده‌اند؛ اصلاح تاریخ، تأیید نسخه قبلی را رد می‌کند و اعلام تاریخ متفاوت هر دو مقدار را نگه می‌دارد در حالی که مبنای رسمی تا تأیید یک نسخه خالی می‌ماند؛ دو پذیرش هم‌زمان یک کد دقیقاً یکی را می‌پذیرد و دیگری CONSUMED می‌گیرد و تمدید روی درخواست پذیرفته‌شده رد می‌شود؛ فیش بازگشتی برای اصلاح، فایل و سابقه‌اش را نگه می‌دارد و اعتراض و پاسخ آن هر دو در Audit ثبت می‌شوند؛ و شجره‌نامه در هر دو ترتیب (نتیجه اول یا پرداخت اول) فقط با شرط دوم صادر می‌شود."
+    },
+    {
+      "id": "security-review",
+      "command": "node --test \"tests/db/security.test.ts\"  +  npm audit --omit=dev",
+      "result": "PASS",
+      "evidence": "tests 8 · pass 8 · fail 0 روی Postgres واقعی. پوشش واقعی: سند KYC فقط برای مالک و Context بازبین همان نوع سند خوانده می‌شود و مرکز ژنتیک، دامپزشک و عضو دیگر FORBIDDEN می‌گیرند، و بازبین KYC نمی‌تواند فیش ژنتیک را بخواند؛ کلید ذخیره‌سازی داخل ریشه و بدون `..` است و نام فایل کلاینت هرگز مسیر نمی‌شود؛ Audit فقط اندازه و sha256 دارد نه بایت و نه نام؛ فایل غیرتصویری، فایل خالی و فایل بزرگ‌تر از سقف رد می‌شوند؛ ارسال دوباره کد ورود داخل بازه پیام تازه نمی‌فرستد، کد اشتباه ورود نمی‌دهد و کد درست یک‌بارمصرف است و در هیچ ردیف Audit نیست؛ توکن نشست فقط به‌صورت hash ذخیره می‌شود، توکن جعلی نشست نیست و ابطال، نشست را می‌بندد؛ redaction روی otp/token/کد ملی/شماره کارت و ساختارهای تودرتو کار می‌کند؛ یک شماره میکروچیپ برای بیش از یک حیوان در سطح دیتابیس رد می‌شود؛ و کد مراجعه از حساب غیردامپزشک، از دامپزشک دیگر و در مرکز دیگر پذیرفته نمی‌شود. بررسی وابستگی: `npm audit --omit=dev` سه مورد (۲ high، ۱ moderate) داشت؛ SQL injection در drizzle-orm با ارتقا به 0.45.2 بسته شد و پس از آن ۳۱۸ تست دامنه و ۸۸ تست مرورگر دوباره اجرا و سبز شدند. باقی‌مانده: زنجیره next→postcss (۱ high + ۱ moderate) که رفع رسمی آن ارتقای major به Next 16 است و انجام نشد."
+    },
+    {
+      "id": "cross-flow-browser",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node --test --test-concurrency=1 \"tests/browser/cross-flow.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 3 · pass 3 · fail 0 روی Chromium واقعی با دو مالک، دامپزشک، مرکز ژنتیک، انجمن و سوپرادمین. پوشش واقعی: هر دو حیوان از صفحه‌های واقعی تا شجره‌نامه صادرشده می‌روند؛ مجوز از Resolve و دعوت تا تأیید طرف مقابل، توافق تقسیم، پرداخت از درگاه توسعه، ارسال و صدور طی می‌شود و وضعیت «مجوز صادر شد» می‌شود؛ تاریخ اعلام و از سوی طرف مقابل تأیید می‌شود و صفحه «تأییدشده دوطرفه» را نشان می‌دهد؛ زایمان دو پرونده موقت می‌سازد؛ تخصیص با تأیید هر دو طرف «نهایی‌شده با تأیید دوطرفه» می‌شود؛ کارت توله با یک پرداخت صادر و سند آن با شماره PC- باز می‌شود؛ داشبورد هر دو مسیر رسمی و شخصی را جدا نشان می‌دهد، صفحه کنل مجوز جفت‌گیری را ادعا نمی‌کند و صفحه سند هیچ «کد رهگیری پستی» ندارد. ۸ اسکرین‌شات journey-* در docs/reports/screenshots/prompt-019/."
+    },
+    {
+      "id": "visual-reference-review",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node --test --test-concurrency=1 \"tests/browser/visual.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 4 · pass 4 · fail 0 روی Chromium واقعی؛ ۱۲ صفحه × ۲ اندازه (۳۶۰×۸۰۰ و ۱۴۴۰×۹۰۰) = ۲۴ اسکرین‌شات به‌علاوه سه شاهد دیگر. آنچه واقعاً بررسی و تأیید شد: `dir=\"rtl\"` روی همه صفحه‌های بررسی‌شده در هر دو اندازه؛ نبود اسکرول افقی (اختلاف scrollWidth و clientWidth حداکثر ۱ پیکسل)؛ وجود واقعی توکن‌های Design System در زمان اجرا (رنگ برند، رنگ متن، اندازه کنترل) و خانواده فونت فارسی؛ رندر لوگو با ابعاد واقعی؛ و `dir=\"ltr\"` روی فیلد شناسه داخل متن فارسی. آنچه بررسی نشد و به‌عنوان بخشِ بازِ همین Gate ثبت شد: تطبیق پیکسلی با پروتوتایپ مصوب، چون تصویر مرجع در مخزن نیست و Figma برای این اجرا فقط‌خواندنی است؛ این واقعیت در docs/reports/screenshots/prompt-019/visual-review.json با verdict برابر UNVERIFIED ذخیره شده و تست اگر روزی تصویر مرجع اضافه شود شکست می‌خورد تا بازنویسی فراموش نشود (DEC-0117). هیچ‌جا تعداد اسکرین‌شات به‌جای تأیید بصری شمرده نشده است."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 318 · pass 318 · fail 0 · skipped 0 (۱۴ مورد جدید این مرحله). پس از ارتقای امنیتی drizzle-orm دوباره کامل اجرا شد."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 88 · pass 88 · fail 0 در اجرای کامل پس از ارتقای drizzle-orm، شامل همه Gateهای مرحله‌های قبل."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess، پیش و پس از ارتقای وابستگی."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تطبیق پیکسلی بصری با پروتوتایپ مصوب انجام نشده و UNVERIFIED است؛ تصویر مرجع در مخزن موجود نیست و Figma فقط‌خواندنی است. این Gate تا در دسترس قرارگرفتن مرجع باز می‌ماند و با تعداد اسکرین‌شات بسته نمی‌شود (DEC-0117).",
+    "آسیب‌پذیری زنجیره next→postcss (۱ high + ۱ moderate) باز است؛ رفع رسمی آن ارتقای major به Next 16 است که در این مرحله انجام نشد. این وابستگی زمان build است و در مسیر درخواست کاربر اجرا نمی‌شود (DEC-0116).",
+    "درگاه پرداخت، پیامک و نقشه هیچ‌کدام پیکربندی واقعی ندارند؛ همه بررسی‌ها با درگاه توسعه محلی، Outbox توسعه و ورود دستی نشانی انجام شد. MAP-001 همچنان باز است.",
+    "مقادیر واقعی تعرفه‌ها و مشخصات/حساب مرکز ژنتیک اعلام نشده‌اند؛ در تست‌ها فقط مقدار SYNTHETIC وارد می‌شود و تا ورود مقدار واقعی، مسیر پرداخت هر قلم بسته می‌ماند.",
+    "INC-01 و INC-02 با شواهد این مرحله بسته نشدند و به‌صورت تاریخی باز می‌مانند.",
+    "«آماده Production» ادعا نمی‌شود؛ جدول آمادگی یکپارچه‌سازی در گزارش پذیرش، local و sandbox و live را جدا نشان می‌دهد."
+  ],
+  "readiness": {
+    "code": "PHASE_1_FUNCTIONALLY_VERIFIED",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

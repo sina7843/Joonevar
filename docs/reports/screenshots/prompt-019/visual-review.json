@@ -1,0 +1,23 @@
+{
+  "verdict": "UNVERIFIED",
+  "reasonFa": "تصویر مرجع تأییدشده پروتوتایپ در این اجرا در دسترس نیست و Figma فقط‌خواندنی است؛ بنابراین تطبیق پیکسلی انجام نشد و «تأییدنشده» ثبت می‌شود.",
+  "covered": [
+    "/dashboard",
+    "/animals",
+    "/mating/permits",
+    "/mating/permits/new",
+    "/declaration",
+    "/puppy-cards/checkout",
+    "/notifications",
+    "/assoc",
+    "/assoc/members",
+    "/genetics",
+    "/admin/settings",
+    "/admin/breeds"
+  ],
+  "viewports": [
+    "mobileReference",
+    "desktop"
+  ],
+  "run": "700325"
+}
