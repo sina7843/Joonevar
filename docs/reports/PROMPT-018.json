@@ -1,0 +1,101 @@
+{
+  "promptId": "PROMPT-018",
+  "status": "COMPLETE",
+  "summary": "پنل‌های عملیاتی با کامپوننت‌های موجود کامل شدند و هیچ صفحه‌ای در Figma تغییر نکرد. صفحه‌های ورودی انجمن و مرکز ژنتیک که تا این مرحله فهرستی از عنوان‌های ثابت با EmptyState همیشگی بودند، حالا تعداد واقعی هر صف را از همان جدولی می‌خوانند که صفحه جزئیات آن را می‌خواند و هر ردیف همان صف را باز می‌کند؛ هیچ متریک تجمیعی تازه‌ای اختراع نشد. دو ورودی مرده ناوبری رفع شد: «دفتر عضویت» انجمن با همان سرویس‌های موجود صدور شماره عضویت و فعال/غیرفعال‌سازی با دلیل ساخته شد و «تاریخچه» سوپرادمین به‌صورت فقط‌خواندنی روی همان رویدادهای Audit با فیلتر نوع پرونده. هیچ API موازی تازه‌ای برای تغییر رکورد اضافه نشد و همه اقدام‌ها همان توابع ویژگی‌های قبلی‌اند. فهرست مرجع نژادها به داده مدیریت‌شده منتقل شد: افزودن از پنل سوپرادمین انجام می‌شود، «حذف» وجود ندارد و نژاد فقط از انتخاب‌های جدید کنار گذاشته می‌شود در حالی که حیوان‌های ثبت‌شده با آن دست‌نخورده می‌مانند، و هر تغییر Actor، زمان و مقدار قبلی دارد. فهرست درخواست‌های پستی انجمن فقط ثبت درخواست را نشان می‌دهد و هیچ چرخه ارسال، کد رهگیری یا وضعیت تحویلی ندارد. رفتار §۷.۱ روی صفحه بررسی شد: با غیرفعال‌شدن عضویت دامپزشک، پنل او پیام محدودیت را نشان می‌دهد، صف و پرونده‌های قبلی باز می‌مانند و مرکز او از Finder حذف می‌شود؛ عضویت پرداخت‌شده هم هرگز به صف تأیید مسدودکننده برنمی‌گردد. ماتریس رد دسترسی به‌صورت داده‌محور آزمون می‌شود: هر خواننده عملیاتی در برابر هر Actor، به‌علاوه دستکاری شناسه که پیام آن با «مال شما نیست» یکسان است تا وجود رکورد فاش نشود. تنظیمات مدیریتی، Snapshot قیمت و تاریخچه آن‌ها هم آزمون شد: تغییر تعرفه، قلم پرداخت‌شده قبلی را بازنویسی نمی‌کند و Batch جدید با مقدار تازه و نسخه تازه قیمت‌گذاری می‌شود.",
+  "changedFiles": [
+    "src/operations/service.ts",
+    "src/ui/shell.tsx",
+    "app/assoc/page.tsx",
+    "app/assoc/members/page.tsx",
+    "app/assoc/members/actions.ts",
+    "app/assoc/members/forms.tsx",
+    "app/assoc/postal/page.tsx",
+    "app/genetics/page.tsx",
+    "app/admin/audit/page.tsx",
+    "app/admin/breeds/page.tsx",
+    "app/admin/breeds/actions.ts",
+    "app/admin/breeds/forms.tsx",
+    "tests/db/operations.test.ts",
+    "tests/browser/operations.test.ts",
+    "tests/helpers/mating.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-018/assoc-panel.png",
+    "docs/reports/screenshots/prompt-018/assoc-queues.png",
+    "docs/reports/screenshots/prompt-018/assoc-members.png",
+    "docs/reports/screenshots/prompt-018/genetics-panel.png",
+    "docs/reports/screenshots/prompt-018/genetics-queues.png",
+    "docs/reports/screenshots/prompt-018/admin-panel.png",
+    "docs/reports/screenshots/prompt-018/admin-breeds.png",
+    "docs/reports/screenshots/prompt-018/admin-audit.png",
+    "docs/reports/screenshots/prompt-018/vet-inactive-membership.png",
+    "docs/reports/screenshots/prompt-018/finder-without-inactive-vet.png",
+    "docs/reports/screenshots/prompt-018/public-denied-operations.png",
+    "docs/reports/screenshots/prompt-018/animal-timeline.png",
+    "docs/reports/screenshots/prompt-018/resume-after-login.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-018.json"
+  ],
+  "decisions": ["DEC-0111", "DEC-0112", "DEC-0113", "DEC-0114", "DEC-0115"],
+  "checks": [
+    {
+      "id": "operations-rbac",
+      "command": "node --test \"tests/db/operations.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 7 · pass 7 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد. پوشش واقعی: هفت خواننده عملیاتی × پنج Actor به‌صورت ماتریس اجرا می‌شوند و هر ترکیب نادرست FORBIDDEN می‌گیرد؛ نشست عمومی حتی به شمارش حساب‌های بدون عضویت هم نمی‌رسد؛ پرونده مراجعه با شناسه ناموجود و از حساب غیردامپزشک رد می‌شود و پیام «پیدا نشد» با «مال شما نیست» یکسان است؛ تصمیم کنل از مرکز ژنتیک FORBIDDEN و از انجمن با شناسه ناموجود «پیدا نشد» می‌گیرد و همین برای مجوز جفت‌گیری تکرار می‌شود؛ صدور شماره عضویت و تغییر وضعیت عضویت از حساب کاربر و دامپزشک رد می‌شود؛ تغییر تنظیم از حساب کاربر FORBIDDEN است و از سوپرادمین با Actor، زمان، مقدار قبلی و دلیل ثبت می‌شود، مقدار نامعتبر VALIDATION و کلید اعلام‌نشده NOT_FOUND می‌گیرد؛ افزایش تعرفه برگه ثبتی، مبلغ و نسخه Snapshot قلم پرداخت‌شده قبلی را تغییر نمی‌دهد و Batch جدید با مقدار و نسخه تازه ساخته و با موفقیت پرداخت می‌شود؛ فهرست نژادها فقط از سوپرادمین مدیریت می‌شود، نژاد تکراری رد می‌شود، کنارگذاشتن نژادِ حیوانِ ثبت‌شده هیچ حیوانی را تغییر نمی‌دهد و رویداد با مقدار قبلی ثبت می‌شود و بازگرداندن هم ثبت می‌شود؛ صف کنل انجمن پس از ارسال یک پرونده واقعی دقیقاً یک واحد بالا می‌رود و همه مسیرهای صف واقعی‌اند؛ خواندن تاریخچه دو بار، همان ردیف‌ها را برمی‌گرداند و چیزی نمی‌نویسد."
+    },
+    {
+      "id": "operations-browser",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node --test --test-concurrency=1 \"tests/browser/operations.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0 روی Chromium واقعی با چهار نشست (انجمن، مرکز ژنتیک، سوپرادمین، دامپزشک) و یک مالک با حیوان و مراجعه واقعی. پوشش واقعی: هر ۱۸ ورودی ناوبری سه پنل با وضعیت ۲۰۰ باز می‌شود، هیچ‌کدام «دسترسی مجاز نیست» یا خطای اجرا نمی‌دهد و ناوبری هر پنل به هیچ مسیری بیرون از فهرست خودش اشاره نمی‌کند (اگر ورودی مرده‌ای بماند همین‌جا شکست می‌خورد)؛ اعداد صف انجمن و مرکز ژنتیک عدد واقعی‌اند، عدد صف KYC هرگز کمتر از ردیف‌های همان صف نیست و صفر فقط وقتی است که صف خالی باشد، و کلیک روی صف همان مسیر را باز می‌کند؛ افزودن نژاد از پنل سوپرادمین ردیف تازه با وضعیت «فعال» می‌سازد، کنارگذاشتن وضعیت را به «کنارگذاشته‌شده» می‌برد و صفحه می‌گوید پرونده‌های ثبت‌شده تغییر نمی‌کنند، و همان رویداد در `/admin/audit?target=PRODUCT_SETTING` دیده می‌شود در حالی که صفحه صریحاً فقط‌خواندنی است؛ انجمن عضویت دامپزشک را با دلیل غیرفعال می‌کند، پنل دامپزشک پیام «پذیرش کار جدید محدود است» را نشان می‌دهد ولی صف و پرونده مراجعه قبلی باز می‌ماند و مرکز او در Finder دیده نمی‌شود، سپس وضعیت بازگردانده می‌شود؛ از نشست عمومی هر هفت مسیر عملیاتی FORBIDDEN می‌گیرد و Role Switcher هیچ‌یک از سه Context عملیاتی را پیشنهاد نمی‌کند؛ و پس از خروج، درخواست همان پرونده به `/login?next=…` می‌رود و ورود دقیقاً به همان پرونده مراجعه بازمی‌گردد. ۱۳ اسکرین‌شات در docs/reports/screenshots/prompt-018/."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 304 · pass 304 · fail 0 · skipped 0 (۷ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 81 · pass 81 · fail 0 در اجرای کامل، شامل همه Gateهای مرحله‌های قبل."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts",
+      "result": "PASS",
+      "evidence": "این مرحله جدول تازه‌ای لازم نداشت؛ اجرای migration بدون تغییر جدید و بدون replay انجام شد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تأیید نهایی معتمدشدن دامپزشک و فرم درخواست آن طبق D01 در فاز بعد است؛ در این مرحله فقط مدیریت پرونده‌های موجود دامپزشکان ساخته شده و هیچ Onboarding عمومی اضافه نشد.",
+    "درخواست پستی در حد ثبت درخواست می‌ماند: چرخه ارسال، کد رهگیری پستی و وضعیت تحویل ساخته نشد (DEC-0114).",
+    "تاریخچه سوپرادمین فقط‌خواندنی و بدون صفحه‌بندی عمیق است (۵۰ رویداد اخیر با فیلتر نوع پرونده)؛ گزارش‌گیری تحلیلی جزو دامنه این سند نیست.",
+    "مقادیر واقعی تعرفه‌ها، مشخصات مرکز ژنتیک و فهرست صادرکنندگان همچنان وارد نشده‌اند؛ صفحه‌ها «تعیین‌نشده» را صادقانه نشان می‌دهند و هیچ مقدار پیش‌فرضی جای آن‌ها نمی‌گذارند.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "OPERATIONAL_PANELS_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

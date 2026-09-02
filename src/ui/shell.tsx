@@ -178,6 +178,7 @@ export const ASSOC_NAV: readonly NavItem[] = [
   { href: '/assoc/members', label: 'عضویت' },
   { href: '/assoc/kennels', label: 'کنل' },
   { href: '/assoc/permits', label: 'مجوز جفت‌گیری' },
+  { href: '/assoc/postal', label: 'درخواست‌های پستی' },
   { href: '/assoc/foreign-pedigree', label: 'شجره‌نامه خارجی' },
   { href: '/assoc/issuers', label: 'صادرکنندگان' },
 ];
@@ -194,5 +195,6 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin', label: 'مرور' },
   { href: '/admin/settings', label: 'تنظیمات' },
   { href: '/admin/vets', label: 'دامپزشکان معتمد' },
+  { href: '/admin/breeds', label: 'نژادها' },
   { href: '/admin/audit', label: 'تاریخچه' },
 ];

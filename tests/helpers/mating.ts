@@ -220,6 +220,68 @@ const nextChip = () => '90000000' + String((chipCounter += 1)).padStart(7, '0');
  * One animal taken all the way to an issued pedigree, which is the actual
  * prerequisite §16 names for both sides of a permit.
  */
+export interface SheetAnimalOptions {
+  /** Stop before the registration sheet, for a case that only needs the visit. */
+  readonly skipSheet?: boolean;
+  readonly owner?: Party;
+}
+
+/**
+ * One animal through the clinical path, with its registration sheet.
+ *
+ * It stops well before the genetics centre, so a suite that only needs a real
+ * animal, a real visit and a real paid item does not pay for the whole pedigree.
+ */
+export async function animalWithSheet(
+  ctx: MatingCtx,
+  name: string,
+  options: SheetAnimalOptions = {},
+): Promise<{ animalId: string; requestId: string; sampleId: string | null }> {
+  const owner = options.owner ?? ctx.first;
+  const draft = await startDraft(ctx.testDb.db, owner.actor, { forceNew: true });
+  await saveDraft(ctx.testDb.db, owner.actor, draft.id, {
+    name,
+    breedId: ctx.breedId,
+    sex: 'MALE',
+    birthDate: '2022-01-01',
+  });
+  const animal = await registerAnimal(ctx.testDb.db, owner.actor, draft.id);
+
+  const created = await createVisitRequests(ctx.testDb.db, owner.actor, {
+    context: 'MICROCHIP',
+    vetAccountId: ctx.vet.accountId,
+    locationId: ctx.locationId,
+    items: [{ animalId: animal.id, serviceType: 'MICROCHIP_IMPLANT' }],
+  });
+  const requestId = created.items[0]!.request.id;
+  await checkIn(ctx.testDb.db, ctx.vet.actor, {
+    code: created.items[0]!.referral.code,
+    locationId: ctx.locationId,
+  });
+  const number = nextChip();
+  await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
+  await confirmImplant(ctx.testDb.db, ctx.vet.actor, requestId);
+  await recordRereadAndBind(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
+  const sample = await recordSampling(ctx.testDb.db, ctx.vet.actor, requestId);
+  if (options.skipSheet) return { animalId: animal.id, requestId, sampleId: sample?.id ?? null };
+
+  const batch = await createSheetRequest(ctx.testDb.db, owner.actor, [animal.id]);
+  const gateway = payingGateway(2_500_000n);
+  const attempt = await startAttempt(
+    ctx.testDb.db,
+    owner.actor,
+    { batchId: batch.batch.id, callbackUrl: '/x' },
+    gateway,
+    'test',
+  );
+  assert.equal(
+    (await verifyAttempt(ctx.testDb.db, { reference: attempt.reference }, gateway, paidEffects)).state,
+    'PAID',
+  );
+  assert.ok(await sheetOfAnimal(ctx.testDb.db, animal.id));
+  return { animalId: animal.id, requestId, sampleId: sample?.id ?? null };
+}
+
 export async function pedigreedAnimal(
   ctx: MatingCtx,
   owner: Party,
