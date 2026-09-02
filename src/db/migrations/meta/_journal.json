@@ -43,6 +43,13 @@
       "when": 1788340118652,
       "tag": "0005_clinical",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788341861229,
+      "tag": "0006_documents",
+      "breakpoints": true
     }
   ]
 }

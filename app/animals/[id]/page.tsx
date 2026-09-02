@@ -15,6 +15,7 @@ import { findForeignCase, FOREIGN_STATUS_FA } from '../../../src/animals/foreign
 import { auditTrail } from '../../../src/audit/service.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { animalChipView } from '../../../src/clinical/microchip.ts';
+import { SAMPLE_TAKEN_NOTE_FA, sheetOfAnimal } from '../../../src/documents/registration-sheet.ts';
 import { READ_METHOD_FA, SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import { samples } from '../../../src/db/schema/clinical.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
@@ -40,7 +41,6 @@ const AUDIT_TITLE_FA: Record<string, string> = {
 
 /** Sections that belong to features built in later prompts. */
 const PENDING_SECTIONS: ReadonlyArray<{ id: string; title: string; note: string }> = [
-  { id: 'registration', title: 'برگه ثبتی', note: 'وضعیت صدور و پرداخت مربوط.' },
   { id: 'parentage', title: 'Parentage Result', note: 'نتیجه مرکز ژنتیک و نسخه‌های آن.' },
   { id: 'pedigree', title: 'شجره‌نامه', note: 'کد شجره‌نامه و وضعیت صدور.' },
   { id: 'permits', title: 'مجوزها', note: 'مجوز جفت‌گیری و پرونده‌های مرتبط.' },
@@ -70,6 +70,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   const foreign = await findForeignCase(db(), animal.id);
   const trail = await auditTrail(db(), { targetType: 'ANIMAL', targetId: animal.id }, { page: 1, pageSize: 20 });
   const { chip, conflicts } = await animalChipView(db(), animal.id);
+  const sheet = await sheetOfAnimal(db(), animal.id);
   const sampleRows = await db()
     .select()
     .from(samples)
@@ -204,6 +205,34 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
               تعارض ثبت‌شده: {conflicts[0]!.detailFa}
             </p>
           ) : null}
+        </Card>
+
+        <Card>
+          <h3 className="text-label-lg">برگه ثبتی</h3>
+          {sheet ? (
+            <>
+              <p className="mt-md text-body-sm">
+                <Link
+                  href={'/documents/' + sheet.id}
+                  className="text-text-brand underline underline-offset-4"
+                  data-testid="animal-sheet-link"
+                >
+                  <Identifier label="شماره برگه:" value={sheet.sheetNo} />
+                </Link>
+              </p>
+              <p className="mt-sm text-caption text-text-secondary" data-testid="animal-parentage-note">
+                {SAMPLE_TAKEN_NOTE_FA} برگه ثبتی به معنی نتیجه ژنتیک یا شجره‌نامه نیست.
+              </p>
+            </>
+          ) : (
+            <p className="mt-md text-body-sm text-text-secondary">
+              پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری، می‌توانید{' '}
+              <Link href="/registration/new" className="text-text-brand underline underline-offset-4">
+                برگه ثبتی این حیوان را درخواست کنید
+              </Link>
+              .
+            </p>
+          )}
         </Card>
 
         <Card>

@@ -6,6 +6,7 @@ import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { listSettingsForActor } from '../../../src/settings/service.ts';
 import { canWriteSettingGroup } from '../../../src/authz/policy.ts';
+import { SettingForm } from './setting-form.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,8 @@ export const dynamic = 'force-dynamic';
  *
  * The list comes from the same permission-scoped service the API uses, so an
  * operator sees exactly the groups they may read. Values are shown read-only
- * here; editing forms arrive with the flows that own them in PROMPT-018.
+ * here, and editable in place by the groups this actor may write. The panel
+ * itself grows with the flows that own each value (§21.4).
  */
 export default async function AdminSettingsPage() {
   const guard = await guardRoute('/admin/settings');
@@ -47,11 +49,17 @@ export default async function AdminSettingsPage() {
               نسخه: {setting.version}
             </p>
             {setting.noteFa ? <p className="mt-sm text-caption text-text-secondary">{setting.noteFa}</p> : null}
-            {!canWriteSettingGroup(actor, setting.group) ? (
+            {canWriteSettingGroup(actor, setting.group) ? (
+              <SettingForm
+                settingKey={setting.key}
+                version={setting.version}
+                value={setting.configured ? String(setting.value) : ''}
+              />
+            ) : (
               <p className="mt-sm text-caption text-text-disabled">
                 این گروه در نقش فعلی شما قابل تغییر نیست.
               </p>
-            ) : null}
+            )}
           </Card>
         ))}
       </div>

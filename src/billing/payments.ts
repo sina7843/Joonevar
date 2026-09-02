@@ -171,7 +171,10 @@ export async function startAttempt(
   if (batch === null) throw notFound('پرونده پرداخت پیدا نشد.');
   if (batch.accountId !== actor.accountId) throw forbidden();
   if (batch.status === 'PAID') throw conflict('این پرداخت قبلاً تأیید شده است.');
-  if (batch.status === 'CANCELLED') throw conflict('این پرداخت لغو شده است.');
+  // A cancelled or failed payment keeps its draft and its frozen amounts and is
+  // retried from the same review (§26). Only a verified payment is terminal;
+  // the earlier attempt stays in the record as its own row.
+
 
   const totalToman = await batchTotalToman(database, batch.id);
   if (totalToman <= 0n) throw notConfigured('مبلغ این پرداخت');

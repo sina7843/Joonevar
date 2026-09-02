@@ -13,6 +13,7 @@ import { accountRoles } from '../../db/schema/core.ts';
 import { memberships } from '../../db/schema/billing.ts';
 import { findCase } from '../../identity/kyc.ts';
 import { countRegisteredAnimals } from '../../animals/service.ts';
+import { countSheetsOfOwner } from '../../documents/registration-sheet.ts';
 import { locked } from '../errors.ts';
 import {
   evaluate,
@@ -39,7 +40,7 @@ export async function loadFacts(database: DbClient, accountId: string): Promise<
     registeredAnimals: await countRegisteredAnimals(database, accountId),
     // Sheets, pedigrees, permits and allocations arrive in PROMPT-009 and later;
     // until then the honest count is zero.
-    animalsWithRegistrationSheet: 0,
+    animalsWithRegistrationSheet: await countSheetsOfOwner(database, accountId),
     animalsWithPedigree: 0,
     issuedMatingPermits: 0,
     puppiesWithFinalAllocation: 0,

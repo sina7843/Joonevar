@@ -5,3 +5,4 @@ export * from './billing.ts';
 export * from './animals.ts';
 export * from './vets.ts';
 export * from './clinical.ts';
+export * from './documents.ts';

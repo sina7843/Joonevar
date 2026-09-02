@@ -1,0 +1,111 @@
+{
+  "promptId": "PROMPT-009",
+  "status": "COMPLETE",
+  "summary": "مسیر برگه ثبتی به انتخاب حیوان، کد مراجعه، خدمت میکروچیپ و نمونه‌گیری موجود وصل شد: پرداخت فقط پس از میکروچیپ و نمونه قابل استفاده باز می‌شود و مبلغ خدمت دامپزشک در این پرداخت نیست. مرور هزینه، مبلغ هر حیوان را از تعرفه فعال دیتابیس می‌خواند و روی همان قلم منجمد می‌کند؛ تعرفه ثبت‌نشده هیچ مسیر پرداختی باز نمی‌کند و مبلغی فرض نمی‌شود. یک پرداخت گروهی انجام می‌شود ولی صدور هر حیوان مستقل است: حیوان واجد شرایطِ پرداخت‌شده برگه می‌گیرد در حالی که حیوان دیگر همان Batch با دلیل مشخص متوقف می‌ماند و پرداخت آن قلم محفوظ است. صدور، شماره برگه و Pet ID یکتا می‌سازد، آن‌ها را روی پرونده حیوان می‌نشاند و سند فقط برای مالک همان حیوان قابل مشاهده است. Callback تکراری و تلاش دوباره صدور، دقیقاً یک سند تولید می‌کنند. پرداخت ناموفق یا لغوشده انتخاب حیوان‌ها و مبالغ منجمد را نگه می‌دارد و تلاش دوباره از همان مرور ادامه می‌یابد. Timeline و سرویس بعدی حیوان به‌روزرسانی می‌شوند و همه‌جا نوشته می‌شود «نمونه خون دریافت شده؛ آزمایش Parentage هنوز انجام نشده است.» و اینکه برگه ثبتی نتیجه ژنتیک یا شجره‌نامه نیست.",
+  "changedFiles": [
+    "src/db/schema/documents.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0006_documents.sql",
+    "src/db/migrations/meta/0006_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/documents/registration-sheet.ts",
+    "src/domain/ids.ts",
+    "src/billing/effects.ts",
+    "src/billing/payments.ts",
+    "src/domain/eligibility/service.ts",
+    "app/registration/page.tsx",
+    "app/registration/actions.ts",
+    "app/registration/new/page.tsx",
+    "app/registration/new/select-form.tsx",
+    "app/registration/[id]/page.tsx",
+    "app/registration/[id]/batch-forms.tsx",
+    "app/registration/[id]/return/page.tsx",
+    "app/documents/[id]/page.tsx",
+    "app/animals/[id]/page.tsx",
+    "app/admin/settings/page.tsx",
+    "app/admin/settings/actions.ts",
+    "app/admin/settings/setting-form.tsx",
+    "tests/db/registration-sheet.test.ts",
+    "tests/browser/registration.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-009/sheet-not-configured.png",
+    "docs/reports/screenshots/prompt-009/sheet-animal-not-ready.png",
+    "docs/reports/screenshots/prompt-009/sheet-review.png",
+    "docs/reports/screenshots/prompt-009/sheet-paid.png",
+    "docs/reports/screenshots/prompt-009/sheet-items.png",
+    "docs/reports/screenshots/prompt-009/sheet-document.png",
+    "docs/reports/screenshots/prompt-009/animal-with-sheet.png",
+    "docs/reports/screenshots/prompt-009/sheet-retry-issued.png",
+    "docs/reports/screenshots/prompt-009/sheet-not-verified.png",
+    "docs/reports/screenshots/prompt-009/sheet-retry-payment.png",
+    "docs/reports/screenshots/prompt-009/sheet-not-yours.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-009.json"
+  ],
+  "decisions": ["DEC-0059", "DEC-0060", "DEC-0061", "DEC-0062", "DEC-0063", "DEC-0064", "DEC-0065"],
+  "checks": [
+    {
+      "id": "registration-batch-integration",
+      "command": "node --test \"tests/db/registration-sheet.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 11 · pass 11 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد. پوشش واقعی: ساخت Batch پیش از نمونه‌گیری رد می‌شود و هیچ ردیف پرداختی ساخته نمی‌شود، و همان حیوان پس از ثبت نمونه واجد شرایط می‌شود؛ تعرفه ثبت‌نشده مسیر پرداخت را باز نمی‌کند و پس از ثبت مقدار، مبلغ و نسخه تنظیم روی قلم منجمد می‌شود؛ دو حیوان در یک Batch دو قلم پول جدا دارند و پس از پرداخت، حیوان واجد شرایط ISSUED و حیوان با نمونه مفقود BLOCKED با دلیل می‌شود و برای هرکدام اعلان جدا ثبت می‌شود؛ قلم متوقف پس از نمونه‌گیری مجدد و بدون هیچ جابه‌جایی پول صادر می‌شود و مبالغ قلم‌ها پیش و پس از آن دقیقاً یکسان می‌مانند؛ سه بار تأیید همان پرداخت به‌علاوه یک تلاش دوباره صدور، یک سند و یک رویداد Audit صدور می‌سازد و Pet ID روی حیوان همان Pet ID سند است؛ پرداخت ناموفق و پرداخت لغوشده انتخاب و مبالغ را نگه می‌دارند و تلاش بعدی سند را صادر می‌کند؛ تغییر تعرفه پس از ساخت Batch مبلغ منجمد را بازنویسی نمی‌کند؛ سند فقط برای مالک قابل خواندن است و برای غریبه و حتی برای دامپزشکی که کار را انجام داده «پیدا نشد» می‌دهد؛ صدور برگه سرویس بعدی (شجره‌نامه) را باز می‌کند و همان حیوان دوباره پیشنهاد نمی‌شود؛ حیوان کاربر دیگر وارد Batch نمی‌شود؛ سند، کد نمونه قابل استفاده را ثبت می‌کند و نمونه نامعتبر قبلی در سابقه می‌ماند."
+    },
+    {
+      "id": "registration-browser",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  node --test --test-concurrency=1 \"tests/browser/registration.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 4 · pass 4 · fail 0 روی Chromium واقعی، با اجرای کامل مسیر از پنل مدیریت تا سند. پوشش واقعی: با تعرفه ثبت‌نشده، صفحه صریحاً می‌گوید مسیر پرداخت باز نیست و دکمه ادامه غیرفعال است؛ حیوان بدون نمونه با دلیل «نمونه خون این حیوان هنوز ثبت نشده است» غیرقابل‌انتخاب می‌ماند؛ تعرفه از فرم پنل مدیریت با مقدار SYNTHETIC و دلیل ثبت می‌شود و سپس مرور هزینه دو خط ۲۵۰٬۰۰۰ تومانی و جمع ۵۰۰٬۰۰۰ تومان نشان می‌دهد و می‌گوید مبلغ خدمت دامپزشک جدا است؛ درگاه توسعه مبلغ ۵۰۰۰۰۰۰ ریال می‌گیرد (تبدیل ×۱۰)؛ پس از تأیید، یک حیوان «صادر شد» و حیوان دیگر «متوقف» با دلیل و جمله «پرداخت این قلم محفوظ است» نمایش داده می‌شود و متن «نمونه خون دریافت شده؛ آزمایش Parentage هنوز انجام نشده است.» روی همان صفحه است؛ سند صادرشده شماره RS- و Pet ID با پیشوند PET- دارد و می‌گوید نتیجه ژنتیک یا شجره‌نامه نیست؛ پروفایل حیوان همان Pet ID و لینک سند را نشان می‌دهد؛ پس از نمونه‌گیری مجدد در میز دامپزشک، تلاش دوباره صدور بدون هیچ پرداخت جدیدی قلم متوقف را صادر می‌کند و جمع مبالغ تغییر نمی‌کند؛ بازگشت از درگاه با شناسه واقعی و بدون پرداخت «پرداخت تأیید نشد» می‌گیرد، قلم در «در انتظار پرداخت» می‌ماند و پرداخت دوم سند را صادر می‌کند؛ سند کاربر دیگر با «برگه ثبتی پیدا نشد» رد می‌شود. ۱۱ اسکرین‌شات در docs/reports/screenshots/prompt-009/ ذخیره و بازبینی شد."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 223 · pass 223 · fail 0 · skipped 0 (۱۱ مورد جدید این مرحله؛ ۲۴ تست پرداخت و عضویت قبلی پس از تغییر قاعده لغو، بدون تغییر سبز ماندند)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111 -H 127.0.0.1  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 50 · pass 50 · fail 0 (۴ مورد برگه ثبتی، ۵ مورد میکروچیپ و نمونه، ۶ مورد Finder و مراجعه، ۶ مورد حیوان و نسب، ۷ مورد پرداخت/عضویت، ۱۱ مورد هویت، ۱۱ مورد پوسته و RTL)."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0006_documents` اعمال شد (جدول‌های registration_sheet_item و registration_sheet با ایندکس یکتای حیوان، شماره برگه و Pet ID) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تعرفه واقعی صدور برگه ثبتی هنوز اعلام نشده است. مقدار در تست‌ها با پیشوند SYNTHETIC و دلیل ثبت می‌شود و در محیط توسعه پس از هر seed دوباره «تعیین‌نشده» است؛ تا ورود مقدار واقعی از پنل مدیریت، مسیر پرداخت باز نمی‌شود و هیچ عددی فرض نمی‌شود.",
+    "هیچ درگاه پرداخت واقعی پیکربندی نشده است؛ تأیید پرداخت با درگاه توسعه محلی اجرا شد و اتصال sandbox یا live همچنان NOT_CONFIGURED است (DEC-0033).",
+    "آداپتور `document-render` پیکربندی نشده است، بنابراین نسخه چاپی رسمی برگه تولید نمی‌شود؛ آنچه صادر می‌شود رکورد داده‌ای با شماره یکتا و صفحه امن مالک است و صفحه همین را می‌گوید (DEC-0060).",
+    "قالب شماره برگه و Pet ID محلی انتخاب شده چون سند قالبی تعیین نکرده و هیچ مرجع شماره‌گذار بیرونی معرفی نشده است؛ هیچ گواهی بیرونی ادعا نمی‌شود.",
+    "سیاست بازپرداخت، حذف قلم پس از پرداخت و پرداخت اضافه اختراع نشد؛ تنها ویرایش مجاز پس از پرداخت، تلاش دوباره صدور بدون جابه‌جایی پول است (DEC-0062).",
+    "فرم ویرایش تنظیمات فقط برای همان گروه‌هایی است که Actor مجاز نوشتن است و در این مرحله حداقلی است؛ گسترش پنل مدیریت به PROMPT-018 تعلق دارد (DEC-0065).",
+    "نتیجه Parentage، شجره‌نامه و مسیر مرکز ژنتیک در PROMPT-010 و PROMPT-011 ساخته می‌شوند؛ همه‌جا صریح گفته می‌شود که برگه ثبتی نتیجه ژنتیک نیست.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "REGISTRATION_SHEET_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

@@ -8,6 +8,7 @@
 import type { DbClient } from '../db/client.ts';
 import type { BatchRecord, PaidEffects } from './payments.ts';
 import { activateMembershipFromPayment } from './membership.ts';
+import { issueForBatch, markBatchPaid } from '../documents/registration-sheet.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -15,10 +16,16 @@ export const paidEffects: PaidEffects = {
       case 'MEMBERSHIP':
         await activateMembershipFromPayment(tx, batch);
         return;
-      // Registration sheets, pedigrees, permits, kennels and puppy cards attach
-      // their own effects in PROMPT-009 to PROMPT-016. Until then a verified
-      // payment for them records the money and issues nothing, which is the
-      // truthful outcome rather than a fabricated document.
+      // Each animal is issued independently and a blocked one is recorded with
+      // its reason rather than failing the whole verified payment (§13).
+      case 'REGISTRATION_SHEET':
+        await markBatchPaid(tx, batch.id);
+        await issueForBatch(tx, batch);
+        return;
+      // Pedigrees, permits, kennels and puppy cards attach their own effects in
+      // PROMPT-010 to PROMPT-016. Until then a verified payment for them
+      // records the money and issues nothing, which is the truthful outcome
+      // rather than a fabricated document.
       default:
         return;
     }

@@ -57,6 +57,23 @@ export function newSampleTrackingCode(): SampleTrackingCode {
 }
 
 /**
+ * The animal's official identifier, issued with its registration sheet (§13).
+ *
+ * The source names the identifier without giving a format, so this is the
+ * minimal readable one: the same alphabet as every other code people read
+ * aloud, behind a prefix that says what it is. No external numbering authority
+ * is implied by it.
+ */
+export function newPetId(): PetId {
+  return ('PET-' + humanCode(8)) as PetId;
+}
+
+/** The document's own number, distinct from the animal's Pet ID (§13). */
+export function newRegistrationSheetNo(): string {
+  return 'RS-' + humanCode(8);
+}
+
+/**
  * Identifiers stay readable inside Persian RTL text (§24.3) by isolating them
  * with Unicode FSI/PDI rather than by changing the string itself.
  */
