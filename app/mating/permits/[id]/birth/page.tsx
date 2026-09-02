@@ -202,6 +202,20 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
           </Card>
         ) : null}
 
+        {view.litter ? (
+          <Card>
+            <p className="text-body-sm">
+              <Link
+                href={'/litters/' + view.litter.id + '/allocation'}
+                className="text-text-brand underline underline-offset-4"
+                data-testid="open-allocation-from-birth"
+              >
+                تخصیص مالکیت توله‌ها و صدور کارت
+              </Link>
+            </p>
+          </Card>
+        ) : null}
+
         {view.history.length > 0 ? (
           <Card>
             <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>

@@ -15,6 +15,7 @@ import {
 } from '../documents/pedigree.ts';
 import { markKennelPaid } from '../kennels/service.ts';
 import { markPermitPaid } from '../mating/permits.ts';
+import { issueCardsForBatch, markCardBatchPaid } from '../mating/allocation.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -44,9 +45,13 @@ export const paidEffects: PaidEffects = {
       case 'MATING_PERMIT':
         await markPermitPaid(tx, batch);
         return;
-      // Puppy cards attach their own effect in a later prompt. Until then a
-      // verified payment for them records the money and issues nothing, which
-      // is the truthful outcome rather than a fabricated document.
+      // Each puppy is judged again at issuance and issued on its own, so a
+      // puppy that is no longer eligible is recorded with its reason instead of
+      // failing the whole verified payment (§19.4).
+      case 'PUPPY_CARD':
+        await markCardBatchPaid(tx, batch.id);
+        await issueCardsForBatch(tx, batch);
+        return;
       default:
         return;
     }

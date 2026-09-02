@@ -4,6 +4,7 @@ import { accounts } from './core.ts';
 import { animals } from './animals.ts';
 import { matingPermits } from './mating.ts';
 import { vetLocations, vetVisitRequests } from './vets.ts';
+import { paymentBatches } from './billing.ts';
 
 const now = sql`now()`;
 
@@ -207,5 +208,129 @@ export const puppies = pgTable(
   (t) => [
     uniqueIndex('puppy_temp_code_key').on(t.tempCode),
     index('puppy_litter_idx').on(t.litterId, t.status),
+  ],
+);
+
+/**
+ * The state of one allocation version — §19.3.
+ *
+ * FINAL is reached only when both actual counterparties have confirmed that
+ * exact version. A change or a rejection produces a new version that has to be
+ * confirmed again by both, and nothing in between is treated as agreement.
+ */
+export const allocationStatus = pgEnum('allocation_status', [
+  'PENDING_BOTH_OWNERS',
+  'FINAL',
+  'SUPERSEDED',
+  'REJECTED',
+]);
+
+/**
+ * One proposed allocation of a litter's puppies — §19.3.
+ *
+ * The pre-birth rule of the permit is proposal context only: it is shown while
+ * proposing and never assigns a puppy by itself. Hamzist does not arbitrate, so
+ * there is no automatic winner: a disagreement is settled outside the system
+ * and comes back as a new proposed version.
+ */
+export const puppyAllocations = pgTable(
+  'puppy_allocation',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    permitId: uuid('permit_id')
+      .notNull()
+      .references(() => matingPermits.id, { onDelete: 'cascade' }),
+    litterId: uuid('litter_id')
+      .notNull()
+      .references(() => litters.id, { onDelete: 'cascade' }),
+    version: integer('version').notNull(),
+    status: allocationStatus('status').notNull().default('PENDING_BOTH_OWNERS'),
+    proposedByAccountId: uuid('proposed_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    proposedAt: timestamp('proposed_at', { withTimezone: true }).notNull().default(now),
+    noteFa: text('note_fa'),
+    replacesVersion: integer('replaces_version'),
+    finalizedAt: timestamp('finalized_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('puppy_allocation_version_key').on(t.permitId, t.version),
+    index('puppy_allocation_litter_idx').on(t.litterId, t.status),
+  ],
+);
+
+/** One puppy's proposed owner inside one allocation version — §19.3. */
+export const allocationItems = pgTable(
+  'allocation_item',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    allocationId: uuid('allocation_id')
+      .notNull()
+      .references(() => puppyAllocations.id, { onDelete: 'cascade' }),
+    puppyId: uuid('puppy_id')
+      .notNull()
+      .references(() => puppies.id, { onDelete: 'cascade' }),
+    proposedOwnerAccountId: uuid('proposed_owner_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('allocation_item_puppy_key').on(t.allocationId, t.puppyId)],
+);
+
+/**
+ * One party's answer to one exact allocation version — §19.3.
+ *
+ * The row is bound to the version it answered, which is what makes an approval
+ * of an earlier version unusable for new data.
+ */
+export const allocationApprovals = pgTable(
+  'allocation_approval',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    allocationId: uuid('allocation_id')
+      .notNull()
+      .references(() => puppyAllocations.id, { onDelete: 'cascade' }),
+    partyAccountId: uuid('party_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    approved: boolean('approved').notNull(),
+    reasonFa: text('reason_fa'),
+    decidedAt: timestamp('decided_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('allocation_approval_party_key').on(t.allocationId, t.partyAccountId)],
+);
+
+/**
+ * A Puppy Card — §19.4, D16.
+ *
+ * It is its own document: not a registration sheet, not a pedigree and not a
+ * genetic result, even where older Persian copy calls it «برگه ثبتی توله». It
+ * can be issued before that puppy has a registration sheet of its own.
+ */
+export const puppyCards = pgTable(
+  'puppy_card',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    puppyId: uuid('puppy_id')
+      .notNull()
+      .references(() => puppies.id, { onDelete: 'restrict' }),
+    permitId: uuid('permit_id')
+      .notNull()
+      .references(() => matingPermits.id, { onDelete: 'restrict' }),
+    cardNo: text('card_no').notNull(),
+    ownerAccountId: uuid('owner_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    /** The allocation version this card was issued against. */
+    allocationVersion: integer('allocation_version').notNull(),
+    batchId: uuid('batch_id').references(() => paymentBatches.id, { onDelete: 'restrict' }),
+    issuedAt: timestamp('issued_at', { withTimezone: true }).notNull().default(now),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('puppy_card_puppy_key').on(t.puppyId),
+    uniqueIndex('puppy_card_no_key').on(t.cardNo),
   ],
 );

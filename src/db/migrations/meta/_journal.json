@@ -92,6 +92,13 @@
       "when": 1788354133990,
       "tag": "0012_breeding",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1788358736402,
+      "tag": "0013_allocation",
+      "breakpoints": true
     }
   ]
 }

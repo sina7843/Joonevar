@@ -1,0 +1,99 @@
+{
+  "promptId": "PROMPT-016",
+  "status": "COMPLETE",
+  "summary": "برای توله‌های واقعیِ ثبت‌شده پس از تولد، مالک پیشنهادی هر توله مشخص می‌شود و توافق پیش از تولد فقط زمینه پیشنهاد است: هیچ‌جا خودش مالکیت توله مشخصی را تعیین نمی‌کند. هر نسخه تخصیص تأییدهای مخصوص خودش را دارد و FINAL فقط وقتی ثبت می‌شود که هر دو طرفِ واقعی همان نسخه را تأیید کرده باشند؛ تأیید یک طرف، تأیید دوباره همان شخص، پاسخ شخص ثالث و پرداخت هیچ‌کدام این Gate را دور نمی‌زنند. تغییر یا رد پیشنهاد، نسخه جدیدی با صفر تأیید می‌سازد و پاسخ همیشه با شماره همان نسخه بسته می‌شود، پس تأیید نسخه قبلی هرگز داده جدید را تأیید نمی‌کند؛ نسخه ردشده در تاریخچه REJECTED می‌ماند و نسخه در انتظار SUPERSEDED می‌شود. تا نهایی‌نشدن، وضعیت «در انتظار تأیید هر دو طرف» است، کارت توله قفل است و هر دو مقدار و کل تاریخچه خواندنی می‌مانند؛ اختلاف بیرون از سامانه حل می‌شود و نسخه اصلاح‌شده دوباره در همان پرونده ثبت می‌شود، بدون هیچ داوری یا برنده خودکار. کارت توله فقط با مجوز صادرشده، زایمان ثبت‌شده، توله زنده واجد شرایط، تخصیص نهایی و قلم پرداخت‌شده صادر می‌شود؛ برگه ثبتی همان توله پیش‌نیاز نیست و کارت در مدل داده و در متن صفحه از برگه ثبتی، شجره‌نامه و نتیجه ژنتیک جدا نگه داشته شده است. انتخاب یک یا چند توله، تعرفه دیتابیسی به‌ازای هر توله، یک Batch، پرداخت پیش از صدور و صدور مستقل هر کارت انجام می‌شود و توله‌ای که در لحظه تأیید پرداخت دیگر واجد شرایط نیست با دلیل ثبت می‌شود بدون آنکه کل Batch شکست بخورد. با ثبت مرگ یک توله، کارت و مالکیت و سوابق صادرشده حفظ می‌شوند و فقط صدور تازه برای همان توله بسته می‌شود. مسیر شخصی هیچ‌گاه صلاحیت مجوز، lineage یا کارت نمی‌سازد و همه بررسی‌ها سمت سرور و روی مرز «قلم صادرشده/نسخه» انجام می‌شود.",
+  "changedFiles": [
+    "src/db/schema/breeding.ts",
+    "src/db/migrations/0013_allocation.sql",
+    "src/db/migrations/meta/0013_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/mating/allocation.ts",
+    "src/billing/effects.ts",
+    "src/domain/eligibility/service.ts",
+    "app/litters/actions.ts",
+    "app/litters/forms.tsx",
+    "app/litters/[id]/allocation/page.tsx",
+    "app/puppy-cards/checkout/page.tsx",
+    "app/puppy-cards/return/page.tsx",
+    "app/documents/puppy-card/[id]/page.tsx",
+    "app/mating/permits/[id]/birth/page.tsx",
+    "tests/db/allocation.test.ts",
+    "tests/browser/puppy-card.test.ts",
+    "docs/architecture/route-coverage.md",
+    "docs/reports/screenshots/prompt-016/allocation-empty.png",
+    "docs/reports/screenshots/prompt-016/allocation-pending.png",
+    "docs/reports/screenshots/prompt-016/allocation-rejected.png",
+    "docs/reports/screenshots/prompt-016/allocation-final.png",
+    "docs/reports/screenshots/prompt-016/card-locked.png",
+    "docs/reports/screenshots/prompt-016/card-fee-not-configured.png",
+    "docs/reports/screenshots/prompt-016/card-paid.png",
+    "docs/reports/screenshots/prompt-016/card-document.png",
+    "docs/reports/screenshots/prompt-016/my-cards.png",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "ACCEPTANCE_MATRIX.md",
+    "docs/reports/PROMPT-016.json"
+  ],
+  "decisions": ["DEC-0100", "DEC-0101", "DEC-0102", "DEC-0103", "DEC-0104"],
+  "checks": [
+    {
+      "id": "allocation-version-integrity",
+      "command": "node --test \"tests/db/allocation.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 6 · pass 6 · fail 0 روی Postgres واقعی با دیتابیس ایزوله به‌ازای هر مورد، با دو مالک واقعی، مجوز صادرشده و سه توله زنده. پوشش واقعی: پیش از پیشنهاد هیچ تخصیصی وجود ندارد و توافق پیش از تولد چیزی را تخصیص نمی‌دهد؛ پیشنهاد ناقص و مالک خارج از دو طرف رد می‌شوند؛ تأیید یک طرف وضعیت را PENDING_BOTH_OWNERS نگه می‌دارد و finalizedAt خالی می‌ماند؛ تأیید دوباره همان شخص و پاسخ شخص ثالث رد می‌شوند؛ تأیید طرف دوم روی همان نسخه FINAL می‌سازد و شرط §۵ را باز می‌کند؛ پیشنهاد جدید نسخه ۲ با صفر تأیید می‌سازد، نسخه ۱ SUPERSEDED می‌شود، تأیید نسخه کهنه رد می‌شود و پاسخ با شماره نسخه قدیمی VERSION_STALE می‌گیرد؛ رد بدون دلیل رد می‌شود، رد وضعیت REJECTED می‌سازد، اعلان آن جمله «داوری نمی‌کند» را دارد و پس از ثبت نسخه اصلاح‌شده، نسخه ردشده همچنان REJECTED در تاریخچه است؛ با یک تأیید، startCardPayment با همان دلیل رد می‌شود و پرداخت اصلاً باز نمی‌شود؛ پس از نهایی‌شدن، یک Batch با یک قلم به‌ازای هر توله و کلید fee.puppy_card_toman ساخته می‌شود و به‌ازای هر توله یک کارت PC- با نسخه تخصیص و مالک درست صادر می‌شود؛ هیچ برگه ثبتی برای آن توله لازم یا ساخته نشد؛ درخواست دوباره برای تولهٔ دارای کارت رد می‌شود؛ هر مالک فقط کارت‌های خودش را می‌بیند؛ پس از ثبت مرگ، کارت صادرشده و مالکیتش دست‌نخورده می‌ماند و صدور تازه برای همان توله با دلیل صریح بسته می‌شود در حالی که تولهٔ دیگر همان پرونده کارت خود را می‌گیرد؛ روی پرونده‌ای بدون مجوز صادرشده، تخصیص، پرداخت و حتی خواندن صلاحیت رد می‌شود."
+    },
+    {
+      "id": "puppy-card-browser",
+      "command": "npm run build  &&  npx next start -p 3111  &&  node --test --test-concurrency=1 \"tests/browser/puppy-card.test.ts\"",
+      "result": "PASS",
+      "evidence": "tests 3 · pass 3 · fail 0 روی Chromium واقعی با دو نشست مالک و مسیر کامل از ثبت حیوان تا مجوز صادرشده و زایمان دو توله. پوشش واقعی: صفحه تخصیص، توافق پیش از تولد را با عنوان «فقط زمینه پیشنهاد» و جمله «مالکیت هیچ توله مشخصی را نهایی نمی‌کند» و جمله «داوری نمی‌کند» نشان می‌دهد؛ پس از پیشنهاد و تأیید یک طرف، وضعیت «در انتظار تأیید هر دو طرف» می‌ماند و در صفحه کارت، دلیل «تا نهایی‌شدن تخصیص با تأیید هر دو طرف، کارت این توله قفل است» دیده می‌شود و هیچ دکمه پرداختی وجود ندارد؛ رد طرف مقابل وضعیت «ردشده؛ نیازمند نسخه جدید» می‌سازد، نسخه اصلاح‌شده نسخه ۲ می‌شود و نسخه ۱ با همان وضعیت در تاریخچه می‌ماند؛ تأیید هر دو طرف روی نسخه ۲ وضعیت «نهایی‌شده با تأیید دوطرفه» می‌سازد؛ تا وارد نشدن تعرفه، پیام «تعرفه کارت توله هنوز ثبت نشده است» است و مسیر پرداخت باز نمی‌شود؛ پس از ورود تعرفه، مبلغ ۱۲۰٬۰۰۰ تومان و جمله تمایز کارت از برگه ثبتی/شجره‌نامه/نتیجه ژنتیک دیده می‌شود و برای تولهٔ طرف مقابل دلیل «مالک نهایی این توله طرف دیگر پرونده است» نمایش داده می‌شود؛ پرداخت از درگاه توسعه با تأیید سرور انجام می‌شود و کارت با شماره PC- و نسخه تخصیص ۲ صادر می‌شود؛ مالک دیگر همان نشانی کارت را «پیدا نشد» می‌گیرد و پس از پرداخت خودش، در فهرست کارت‌هایش دقیقاً یک کارت می‌بیند. ۹ اسکرین‌شات در docs/reports/screenshots/prompt-016/."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 291 · pass 291 · fail 0 · skipped 0 (۶ مورد جدید این مرحله)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run build  &&  npx next start -p 3111  &&  npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 71 · pass 71 · fail 0 در اجرای کامل، شامل همه Gateهای مرحله‌های قبل."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 با strict و noUncheckedIndexedAccess."
+    },
+    {
+      "id": "migration-rerun",
+      "command": "node src/db/migrate.ts (دو بار)",
+      "result": "PASS",
+      "evidence": "migration `0013_allocation` اعمال شد (چهار جدول با enum وضعیت تخصیص، ایندکس یکتای نسخه در هر پرونده، ایندکس یکتای پاسخ هر طرف در هر نسخه و ایندکس یکتای کارت هر توله و شماره کارت) و اجرای دوباره replay نکرد."
+    },
+    {
+      "id": "package-validation",
+      "command": "node tools/validate-core.mjs  +  node --test tools/tests/runner.test.mjs .claude/tests/guardrails.test.mjs",
+      "result": "PASS",
+      "evidence": "Package valid: 20 prompts; 29 sections; 19 decisions; 33 exact acceptance rows; source hashes and links intact. تست‌های بسته ۲۳/۲۳. sha256 مرجع برابر cc441a4932b1a7ee2f29ca1ef3d15697752c73e854b4ce975454bd163dd8282d و دست‌نخورده."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "تعرفه واقعی کارت توله اعلام نشده است؛ در تست‌ها مقدار SYNTHETIC وارد می‌شود و تا ورود مقدار واقعی از پنل مدیریت، مسیر پرداخت بسته می‌ماند و هیچ مبلغی فرض نمی‌شود.",
+    "نسخه چاپی رسمی کارت توله پیکربندی نشده است؛ صفحه سند این را صریح می‌گوید و هیچ فایل PDF یا قالب چاپی ادعا نمی‌شود.",
+    "سیاست صدور کارت برای توله فوت‌شده محافظه‌کارانه انتخاب شد (صدور تازه بسته، اسناد قبلی حفظ) و به‌عنوان تصمیم شکاف ثبت شد؛ تغییر آن در صورت تصویب سیاست دیگر، فقط یک شرط است (DEC-0103).",
+    "مسیر «اعلام توافق شخصی» هنوز ساخته نشده و در PROMPT-017 می‌آید؛ آنچه اینجا بررسی شد این است که مسیر رسمی هیچ صلاحیتی را از بیرونِ مجوز صادرشده نمی‌پذیرد.",
+    "درگاه پرداخت واقعی همچنان پیکربندی نشده است؛ تأیید پرداخت با درگاه توسعه محلی و تأیید سمت سرور اجرا شد.",
+    "هیچ تطبیق پیکسلی با پروتوتایپ ادعا نمی‌شود؛ اسکرین‌شات‌ها تصویر کد هستند و visual همچنان UNVERIFIED است.",
+    "اجرای Gateها به بالا بودن سرویس docker، اجرای build و اجرای seed --dev وابسته است؛ در نبود آن‌ها تست‌ها با خطای صریح شکست می‌خورند و هرگز PASS گزارش نمی‌شوند."
+  ],
+  "readiness": {
+    "code": "ALLOCATION_AND_PUPPY_CARD_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

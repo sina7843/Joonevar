@@ -36,8 +36,8 @@
 | `/mating/permits/[id]/dates` | PROTO | MAT-010B + §۱۷ | s17 | — | A-016, A-017 — پیاده‌شده در PROMPT-014؛ نسخه‌ها، مغایرت و تأیید نسخه‌محور روی همین صفحه است |
 | `/mating/permits/[id]/pregnancy` | PROTO | MAT-011, MAT-011B | s18 | D08, D12 | A-018, A-019, A-020 — پیاده‌شده در PROMPT-015؛ دو رکورد مستقل و مغایرت خنثی روی همین صفحه |
 | `/mating/permits/[id]/birth` | PROTO | `245:7069` MAT-012..016 | s19 | D18 | A-021, A-032 — پیاده‌شده در PROMPT-015؛ نسخه‌های تعداد، پرونده‌های موقت، اصلاح با علت و مرگ پس از تولد |
-| `/litters/[id]/allocation` | PROTO | MAT-018/019 | s19 | — | A-022 |
-| `/puppy-cards/checkout` | PROTO | MAT-017, MAT-017B | s19, s22 | D16 | A-013, A-022 |
+| `/litters/[id]/allocation` | PROTO | MAT-018/019 | s19 | — | A-022 — پیاده‌شده در PROMPT-016؛ نسخه‌ها، تأیید دوطرفه، رد با دلیل و تاریخچه روی همین صفحه |
+| `/puppy-cards/checkout` و `/documents/puppy-card/[id]` | PROTO | MAT-017, MAT-017B | s19, s22 | D16 | A-013, A-022 — پیاده‌شده در PROMPT-016؛ دلیل قفل هر توله، پرداخت گروهی و کارت مستقل با شماره `PC-…` |
 | `/declaration/new`, `/declaration/[id]` | PROTO | `242:6517` مسیر شخصی | s20 | — | A-015 |
 | `/notifications` | CODE | — | s08 | — | A-025 |
 

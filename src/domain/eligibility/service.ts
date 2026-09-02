@@ -12,6 +12,7 @@ import type { DbClient } from '../../db/client.ts';
 import { accountRoles } from '../../db/schema/core.ts';
 import { memberships } from '../../db/schema/billing.ts';
 import { matingPermits } from '../../db/schema/mating.ts';
+import { countFinalAllocatedPuppies } from '../../mating/allocation.ts';
 import { findCase } from '../../identity/kyc.ts';
 import { countRegisteredAnimals } from '../../animals/service.ts';
 import { countSheetsOfOwner } from '../../documents/registration-sheet.ts';
@@ -57,12 +58,11 @@ export async function loadFacts(database: DbClient, accountId: string): Promise<
     // Membership lives on the account, so it is the same in every context (§7).
     membershipActive: membership?.status === 'ACTIVE',
     registeredAnimals: await countRegisteredAnimals(database, accountId),
-    // Puppy allocation arrives in a later prompt; until then the honest count
-    // is zero rather than a guess.
     animalsWithRegistrationSheet: await countSheetsOfOwner(database, accountId),
     animalsWithPedigree: await countPedigreesOfOwner(database, accountId),
     issuedMatingPermits: await countIssuedPermits(database, accountId),
-    puppiesWithFinalAllocation: 0,
+    // §19.3: only a two-party FINAL allocation counts, never a proposal.
+    puppiesWithFinalAllocation: await countFinalAllocatedPuppies(database, accountId),
   };
 }
 
