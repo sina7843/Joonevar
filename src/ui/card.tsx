@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { ButtonLink } from './button.tsx';
 import { ActionOwner, Identifier, StatusBadge, type ActionOwnerKind, type StatusTone } from './status.tsx';
 import type { LockDetail } from '../domain/errors.ts';
+import { Icon } from './icon.tsx';
+import type { IconName } from './icon-paths.ts';
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
@@ -124,7 +126,15 @@ export function RequestCard({
  * renders exactly that. The component takes a `LockDetail`, so a lock cannot be
  * shown as a bare disabled button with nothing to act on.
  */
-export function LockedServiceCard({ serviceLabel, lock }: { serviceLabel: string; lock: LockDetail }) {
+export function LockedServiceCard({
+  serviceLabel,
+  lock,
+  icon,
+}: {
+  serviceLabel: string;
+  lock: LockDetail;
+  icon?: IconName;
+}) {
   return (
     <div className="space-y-md">
       <div className="rounded-lg bg-bg-subtle p-xl text-center">
@@ -136,8 +146,9 @@ export function LockedServiceCard({ serviceLabel, lock }: { serviceLabel: string
       </div>
       <div
         aria-disabled="true"
-        className="rounded-lg bg-bg-disabled p-lg text-center text-label-lg text-text-disabled"
+        className="flex items-center justify-center gap-sm rounded-lg bg-bg-disabled p-lg text-label-lg text-text-disabled"
       >
+        {icon ? <Icon name={icon} size="md" /> : null}
         {serviceLabel}
       </div>
     </div>
@@ -145,10 +156,24 @@ export function LockedServiceCard({ serviceLabel, lock }: { serviceLabel: string
 }
 
 /** An available service entry point. */
-export function ServiceCard({ label, description, href }: { label: string; description: string; href: string }) {
+export function ServiceCard({
+  label,
+  description,
+  href,
+  icon,
+}: {
+  label: string;
+  description: string;
+  href: string;
+  /** The domain glyph of this service (DS 48:472 domain icons). */
+  icon?: IconName;
+}) {
   return (
     <Card>
-      <h3 className="text-label-lg">{label}</h3>
+      <h3 className="flex items-center gap-sm text-label-lg">
+        {icon ? <Icon name={icon} size="md" className="text-text-brand" /> : null}
+        {label}
+      </h3>
       <p className="mt-2xs text-caption text-text-secondary">{description}</p>
       <div className="mt-lg">
         <ButtonLink tone="secondary" href={href} block>

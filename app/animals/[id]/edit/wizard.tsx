@@ -6,6 +6,7 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { ActionRow, Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Field, FileField, SelectField, TextField } from '../../../../src/ui/field.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import {
   registerAnimalAction,
@@ -77,7 +78,7 @@ function Stepper({ current }: { current: number }) {
                     : 'border-border-subtle text-text-secondary',
               ].join(' ')}
             >
-              {done ? '✓' : step}
+              {done ? <Icon name="check" size="xs" label="انجام‌شده" /> : step}
             </span>
           </li>
         );

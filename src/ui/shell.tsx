@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Logo } from './logo.tsx';
+import { Icon } from './icon.tsx';
+import type { IconName } from './icon-paths.ts';
 import { RoleSwitcher, CONTEXT_LABEL_FA } from './role-switcher.tsx';
 import { switchableContexts, type Actor, type ActorContextName } from '../authz/actor.ts';
 import { db } from '../db/client.ts';
@@ -20,21 +22,27 @@ async function AccountMenu({ actor }: { actor: Actor }) {
   const name = profile === null ? 'حساب من' : profile.firstName + ' ' + profile.lastName;
 
   return (
-    <div className="flex items-center gap-sm">
+    <div className="flex shrink-0 items-center gap-2xs">
+      {/* The name is the wide part, so it is the part that gives way first: on a
+          narrow header the person icon still leads to the same place. */}
       <Link
         href="/account/profile"
-        className="max-w-[12ch] truncate text-label-md text-text-primary underline-offset-4 hover:underline"
+        className="flex min-h-[var(--size-touch-min)] items-center gap-2xs rounded-md px-2xs text-label-md text-text-primary hover:text-text-brand"
         data-testid="account-name"
+        title={name}
       >
-        {name}
+        <Icon name="user" size="sm" />
+        <span className="hidden max-w-[14ch] truncate sm:inline">{name}</span>
       </Link>
       <form action={signOutAction}>
         <button
           type="submit"
-          className="min-h-[var(--size-control-sm)] rounded-md px-md text-label-md text-text-secondary hover:text-text-brand"
+          aria-label="خروج از حساب"
+          className="flex min-h-[var(--size-touch-min)] items-center gap-2xs rounded-md px-2xs text-label-md text-text-secondary hover:text-text-brand"
           data-testid="header-sign-out"
         >
-          خروج
+          <Icon name="signOut" size="sm" mirror />
+          <span className="hidden whitespace-nowrap sm:inline">خروج</span>
         </button>
       </form>
     </div>
@@ -44,21 +52,23 @@ async function AccountMenu({ actor }: { actor: Actor }) {
 interface NavItem {
   readonly href: string;
   readonly label: string;
+  /** DS 48:472 — the glyph of `Navigation/Bottom Item Icon`. */
+  readonly icon: IconName;
 }
 
 /** Bottom tabs of the approved dashboard (prototype OWN-001, node 116:481). */
 const PUBLIC_TABS: readonly NavItem[] = [
-  { href: '/dashboard', label: 'خانه' },
-  { href: '/requests', label: 'درخواست‌ها' },
-  { href: '/notifications', label: 'اعلان‌ها' },
-  { href: '/profile', label: 'پروفایل' },
+  { href: '/dashboard', label: 'خانه', icon: 'house' },
+  { href: '/requests', label: 'درخواست‌ها', icon: 'clipboardText' },
+  { href: '/notifications', label: 'اعلان‌ها', icon: 'bell' },
+  { href: '/profile', label: 'پروفایل', icon: 'user' },
 ];
 
 const VET_TABS: readonly NavItem[] = [
-  { href: '/vet', label: 'صف من' },
-  { href: '/vet/check-in', label: 'پذیرش' },
-  { href: '/vet/samples', label: 'نمونه‌ها' },
-  { href: '/profile', label: 'پروفایل' },
+  { href: '/vet', label: 'صف من', icon: 'listChecks' },
+  { href: '/vet/check-in', label: 'پذیرش', icon: 'qrCode' },
+  { href: '/vet/samples', label: 'نمونه‌ها', icon: 'testTube' },
+  { href: '/profile', label: 'پروفایل', icon: 'user' },
 ];
 
 /**
@@ -87,24 +97,22 @@ export async function PublicShell({
   return (
     <div className="min-h-dvh bg-bg-canvas">
       <header className="sticky top-0 z-20 border-b border-border-subtle bg-bg-surface">
-        <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-3xl items-center justify-between gap-md px-lg">
-          <div className="flex items-center gap-md">
-            <Link href="/dashboard" aria-label="همزیست">
+        <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-3xl items-center justify-between gap-sm px-lg">
+          <div className="flex min-w-0 items-center gap-sm">
+            <Link href="/dashboard" aria-label="همزیست" className="shrink-0">
               <Logo height={24} />
             </Link>
-            <h1 className="text-label-lg">{title}</h1>
+            <h1 className="truncate text-label-lg">{title}</h1>
           </div>
-          <div className="flex items-center gap-md">
+          <div className="flex shrink-0 items-center gap-2xs">
             <Link
               href="/notifications"
               aria-label={'اعلان‌ها' + (unreadCount > 0 ? ' — ' + unreadCount + ' مورد خوانده‌نشده' : '')}
-              className="relative text-text-brand"
+              className="relative flex min-h-[var(--size-touch-min)] items-center px-2xs text-text-brand"
             >
-              <span aria-hidden="true" className="text-h4">
-                ⌾
-              </span>
+              <Icon name="bell" size="md" weight={unreadCount > 0 ? 'fill' : 'regular'} />
               {unreadCount > 0 ? (
-                <span className="absolute -top-1 -left-1 size-[8px] rounded-full bg-status-error-border" />
+                <span className="absolute top-md left-0 size-[8px] rounded-full bg-status-error-border" />
               ) : null}
             </Link>
             <AccountMenu actor={actor} />
@@ -122,10 +130,11 @@ export async function PublicShell({
                 href={tab.href}
                 aria-current={active ? 'page' : undefined}
                 className={[
-                  'py-sm text-label-md',
+                  'flex items-center gap-2xs py-sm text-label-md',
                   active ? 'text-text-brand' : 'text-text-secondary hover:text-text-primary',
                 ].join(' ')}
               >
+                <Icon name={tab.icon} size="sm" weight={active ? 'fill' : 'regular'} />
                 {tab.label}
               </Link>
             );
@@ -155,10 +164,12 @@ export async function PublicShell({
                   href={tab.href}
                   aria-current={active ? 'page' : undefined}
                   className={[
-                    'flex min-h-[var(--size-touch-min)] items-center justify-center py-md text-label-sm',
+                    'flex min-h-[var(--size-touch-min)] flex-col items-center justify-center gap-2xs py-sm text-label-sm',
                     active ? 'text-text-brand' : 'text-text-secondary',
                   ].join(' ')}
                 >
+                  {/* DS 48:472: outline at rest, filled when this is where you are. */}
+                  <Icon name={tab.icon} size="md" weight={active ? 'fill' : 'regular'} />
                   {tab.label}
                 </Link>
               </li>
@@ -193,13 +204,13 @@ export async function OpsShell({
   return (
     <div className="min-h-dvh bg-bg-subtle">
       <header className="border-b border-border-subtle bg-bg-surface">
-        <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-6xl items-center justify-between gap-md px-lg">
-          <div className="flex items-center gap-md">
+        <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-6xl items-center justify-between gap-sm px-lg">
+          <div className="flex min-w-0 items-center gap-sm">
             <Logo height={24} />
-            <h1 className="text-label-lg">{title}</h1>
+            <h1 className="truncate text-label-lg">{title}</h1>
           </div>
-          <div className="flex items-center gap-md">
-            <p className="text-caption text-text-secondary">
+          <div className="flex shrink-0 items-center gap-sm">
+            <p className="hidden text-caption text-text-secondary md:block">
               محیط عملیاتی — {CONTEXT_LABEL_FA[actor.context as ActorContextName]}
             </p>
             <AccountMenu actor={actor} />
@@ -218,11 +229,12 @@ export async function OpsShell({
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
                     className={[
-                      'block rounded-md px-lg py-sm text-label-md whitespace-nowrap',
+                      'flex items-center gap-sm rounded-md px-lg py-sm text-label-md whitespace-nowrap',
                       'min-h-[var(--size-control-sm)]',
                       active ? 'bg-bg-brand-subtle text-text-brand' : 'text-text-secondary hover:bg-bg-surface',
                     ].join(' ')}
                   >
+                    <Icon name={item.icon} size="sm" weight={active ? 'fill' : 'regular'} />
                     {item.label}
                   </Link>
                 </li>
@@ -237,28 +249,28 @@ export async function OpsShell({
 }
 
 export const ASSOC_NAV: readonly NavItem[] = [
-  { href: '/assoc', label: 'صف‌ها' },
-  { href: '/assoc/kyc', label: 'احراز هویت' },
-  { href: '/assoc/members', label: 'عضویت' },
-  { href: '/assoc/kennels', label: 'کنل' },
-  { href: '/assoc/permits', label: 'مجوز جفت‌گیری' },
-  { href: '/assoc/postal', label: 'درخواست‌های پستی' },
-  { href: '/assoc/foreign-pedigree', label: 'شجره‌نامه خارجی' },
-  { href: '/assoc/issuers', label: 'صادرکنندگان' },
+  { href: '/assoc', label: 'صف‌ها', icon: 'listChecks' },
+  { href: '/assoc/kyc', label: 'احراز هویت', icon: 'shieldCheck' },
+  { href: '/assoc/members', label: 'عضویت', icon: 'user' },
+  { href: '/assoc/kennels', label: 'کنل', icon: 'house' },
+  { href: '/assoc/permits', label: 'مجوز جفت‌گیری', icon: 'stamp' },
+  { href: '/assoc/postal', label: 'درخواست‌های پستی', icon: 'mapPin' },
+  { href: '/assoc/foreign-pedigree', label: 'شجره‌نامه خارجی', icon: 'certificate' },
+  { href: '/assoc/issuers', label: 'صادرکنندگان', icon: 'clipboardText' },
 ];
 
 export const GENETICS_NAV: readonly NavItem[] = [
-  { href: '/genetics', label: 'داشبورد' },
-  { href: '/genetics/receipts', label: 'فیش‌ها' },
-  { href: '/genetics/samples', label: 'نمونه‌ها' },
-  { href: '/genetics/results', label: 'نتایج' },
-  { href: '/genetics/appeals', label: 'اعتراض‌ها' },
+  { href: '/genetics', label: 'داشبورد', icon: 'house' },
+  { href: '/genetics/receipts', label: 'فیش‌ها', icon: 'clipboardText' },
+  { href: '/genetics/samples', label: 'نمونه‌ها', icon: 'testTube' },
+  { href: '/genetics/results', label: 'نتایج', icon: 'dna' },
+  { href: '/genetics/appeals', label: 'اعتراض‌ها', icon: 'warning' },
 ];
 
 export const ADMIN_NAV: readonly NavItem[] = [
-  { href: '/admin', label: 'مرور' },
-  { href: '/admin/settings', label: 'تنظیمات' },
-  { href: '/admin/vets', label: 'دامپزشکان معتمد' },
-  { href: '/admin/breeds', label: 'نژادها' },
-  { href: '/admin/audit', label: 'تاریخچه' },
+  { href: '/admin', label: 'مرور', icon: 'house' },
+  { href: '/admin/settings', label: 'تنظیمات', icon: 'listChecks' },
+  { href: '/admin/vets', label: 'دامپزشکان معتمد', icon: 'firstAidKit' },
+  { href: '/admin/breeds', label: 'نژادها', icon: 'dog' },
+  { href: '/admin/audit', label: 'تاریخچه', icon: 'clipboardText' },
 ];

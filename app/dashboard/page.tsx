@@ -22,6 +22,7 @@ const REQUESTS_ON_DASHBOARD = 3;
 import { eligibilitySummary, vetEligibilityFor } from '../../src/domain/eligibility/service.ts';
 import type { ServiceName } from '../../src/domain/eligibility/rules.ts';
 import type { LockDetail } from '../../src/domain/errors.ts';
+import type { IconName } from '../../src/ui/icon-paths.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,10 +34,17 @@ export const dynamic = 'force-dynamic';
  * open, and who the next action belongs to. Every lock below comes from the
  * shared server rule, so a card and a refused request can never disagree.
  */
-const SERVICE_CARDS: ReadonlyArray<{ service: ServiceName; label: string; description: string; href: string }> = [
+const SERVICE_CARDS: ReadonlyArray<{
+  service: ServiceName;
+  label: string;
+  description: string;
+  href: string;
+  icon: IconName;
+}> = [
   {
     service: 'ANIMAL_REGISTRATION',
     label: 'ثبت حیوان هم‌زیست',
+    icon: 'dog',
     description: 'پس از تأیید احراز هویت باز می‌شود؛ برای این کار عضویت لازم نیست.',
     href: '/animals/new',
   },
@@ -52,30 +60,35 @@ const SERVICE_CARDS: ReadonlyArray<{ service: ServiceName; label: string; descri
   {
     service: 'REGISTRATION_SHEET',
     label: 'برگه ثبتی',
+    icon: 'stamp',
     description: 'میکروچیپ و نمونه‌گیری نزد دامپزشک معتمد، پرداخت گروهی و صدور برگه هر حیوان — یک مسیر.',
     href: '/registration/new',
   },
   {
     service: 'PEDIGREE',
     label: 'دریافت شجره‌نامه',
+    icon: 'certificate',
     description: 'با نمونه موجود همان حیوان و برگه ثبتی صادرشده.',
     href: '/pedigree',
   },
   {
     service: 'KENNEL',
     label: 'شروع ثبت کنل',
+    icon: 'house',
     description: 'برای پرورش‌دهنده، با حداقل یک برگه ثبتی.',
     href: '/kennels',
   },
   {
     service: 'MATING_PERMIT',
     label: 'مجوز جفت‌گیری',
+    icon: 'shieldCheck',
     description: 'برای دو حیوان شجره‌دار با تأیید طرفین.',
     href: '/mating/permits/new',
   },
   {
     service: 'PERSONAL_DECLARATION',
     label: 'اعلام توافق شخصی جفت‌گیری',
+    icon: 'clipboardText',
     description: 'ثبت وجود توافق، جدا از مسیر رسمی و بدون پرداخت.',
     href: '/declaration/new',
   },
@@ -93,13 +106,17 @@ const SERVICE_CARDS: ReadonlyArray<{ service: ServiceName; label: string; descri
  */
 function groupLocked(
   entries: ReadonlyArray<{ entry: (typeof SERVICE_CARDS)[number]; lock: LockDetail }>,
-): ReadonlyArray<{ lock: LockDetail; labels: readonly string[] }> {
-  const groups = new Map<string, { lock: LockDetail; labels: string[] }>();
+): ReadonlyArray<{ lock: LockDetail; labels: readonly string[]; icons: readonly IconName[] }> {
+  const groups = new Map<string, { lock: LockDetail; labels: string[]; icons: IconName[] }>();
   for (const { entry, lock } of entries) {
     const key = lock.reason + '|' + lock.nextPrerequisite + '|' + lock.cta.href;
     const existing = groups.get(key);
-    if (existing) existing.labels.push(entry.label);
-    else groups.set(key, { lock, labels: [entry.label] });
+    if (existing) {
+      existing.labels.push(entry.label);
+      existing.icons.push(entry.icon);
+    } else {
+      groups.set(key, { lock, labels: [entry.label], icons: [entry.icon] });
+    }
   }
   return [...groups.values()];
 }
@@ -356,6 +373,7 @@ export default async function DashboardPage() {
               label={entry.label}
               description={entry.description}
               href={entry.href}
+              icon={entry.icon}
             />
           ))}
 
@@ -367,7 +385,7 @@ export default async function DashboardPage() {
 
           {groupLocked(locked).map((group) => (
             <div key={group.lock.reason + group.lock.cta.href} className="space-y-md">
-              <LockedServiceCard serviceLabel={group.labels[0]!} lock={group.lock} />
+              <LockedServiceCard serviceLabel={group.labels[0]!} lock={group.lock} icon={group.icons[0]} />
               {group.labels.length > 1 ? (
                 <p className="text-caption text-text-secondary" data-testid="locked-group-more">
                   با همین کار، {group.labels.length - 1} سرویس دیگر هم باز می‌شود:{' '}

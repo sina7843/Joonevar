@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import type { StatusTone } from './status.tsx';
+import { Icon } from './icon.tsx';
+import type { IconName } from './icon-paths.ts';
 
 const TONE: Record<StatusTone, string> = {
   neutral: 'bg-status-neutral-bg border-status-neutral-border text-status-neutral-text',
@@ -16,6 +18,14 @@ const TONE: Record<StatusTone, string> = {
  * corrections). Advisory notices use `role="status"`, so a cooldown warning is
  * not announced with the urgency of a rejection (§24.3).
  */
+const GLYPH: Record<StatusTone, IconName> = {
+  neutral: 'info',
+  info: 'info',
+  success: 'check',
+  warning: 'warning',
+  error: 'warning',
+};
+
 export function Alert({
   tone = 'info',
   title,
@@ -33,7 +43,12 @@ export function Alert({
       role={urgent ? 'alert' : 'status'}
       className={['rounded-lg border p-lg', TONE[tone]].join(' ')}
     >
-      <p className="text-label-lg">{title}</p>
+      {/* The glyph repeats the tone the colour already carries, so it stays out
+          of the accessibility tree; the title is what is announced. */}
+      <p className="flex items-start gap-sm text-label-lg">
+        <Icon name={GLYPH[tone]} size="sm" className="mt-2xs" />
+        <span>{title}</span>
+      </p>
       {children ? <div className="mt-sm text-body-sm text-text-secondary">{children}</div> : null}
       {action ? <div className="mt-md">{action}</div> : null}
     </div>
