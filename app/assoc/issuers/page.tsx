@@ -28,7 +28,7 @@ export default async function IssuersPage() {
     <OpsShell actor={guard.actor} title="صادرکنندگان موردتأیید" pathname="/assoc/issuers" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Alert tone="warning" title="این فهرست داده عملیاتی انجمن است">
-          بررسی شجره‌نامه خارجی بر اساس همین فهرست انجام می‌شود. هیچ نام نمونه‌ای در سامانه درج نشده است و
+          بررسی Export Pedigree بر اساس همین فهرست انجام می‌شود. هیچ نام نمونه‌ای در سامانه درج نشده است و
           زمان ثابتی هم برای پایان بررسی وعده داده نمی‌شود.
         </Alert>
 

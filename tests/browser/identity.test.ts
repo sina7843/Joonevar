@@ -132,6 +132,7 @@ async function completedAccount(): Promise<string> {
     await page.getByTestId('last-name').fill('حساب بازگشتی');
     await page.getByTestId('national-id').fill(syntheticNationalId());
     await page.getByTestId('birth-date').fill('1990-01-01');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
     return mobile;
   } finally {
@@ -153,6 +154,7 @@ test('a new account signs in, completes its profile and reaches the dashboard', 
     await page.getByTestId('last-name').fill('کاربر آزمایشی');
     await page.getByTestId('national-id').fill(syntheticNationalId());
     await page.getByTestId('birth-date').fill('1990-01-01');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
     const body = await page.locator('body').innerText();
@@ -176,6 +178,7 @@ test('an invalid national id is refused before anything is stored', async () => 
     // Ten digits, wrong check digit.
     await page.getByTestId('national-id').fill('9000000008');
     await page.getByTestId('birth-date').fill('1990-01-01');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await page.getByTestId('save-identity').click();
 
     await expectText(page, 'کد ملی واردشده معتبر نیست');
@@ -274,6 +277,7 @@ test('KYC runs end to end: upload, submit, association review, approval', async 
     await page.getByTestId('last-name').fill('متقاضی آزمایشی');
     await page.getByTestId('national-id').fill(syntheticNationalId());
     await page.getByTestId('birth-date').fill('1991-02-03');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
     await page.goto(BASE_URL + '/account/kyc', { waitUntil: 'load' });
@@ -363,6 +367,7 @@ test('a private KYC document is refused to a signed-in stranger', async () => {
     await page.getByTestId('last-name').fill('صاحب سند');
     await page.getByTestId('national-id').fill(syntheticNationalId());
     await page.getByTestId('birth-date').fill('1994-06-06');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
     await page.goto(BASE_URL + '/account/kyc', { waitUntil: 'load' });
@@ -412,6 +417,7 @@ test('a failed mobile change leaves the current number in place', async () => {
     await page.getByTestId('last-name').fill('تغییر شماره');
     await page.getByTestId('national-id').fill(syntheticNationalId());
     await page.getByTestId('birth-date').fill('1989-09-09');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
     await page.goto(BASE_URL + '/account/profile/mobile', { waitUntil: 'load' });

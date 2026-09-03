@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 import { Card } from '../../src/ui/card.tsx';
 import { Button } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
-import { Field, TextField } from '../../src/ui/field.tsx';
+import { FileField, TextField } from '../../src/ui/field.tsx';
 import {
   createIssuanceAction,
   createPostalRequestAction,
@@ -113,19 +113,15 @@ export function ReceiptForms({
         <form action={upload} className="mt-lg space-y-lg" data-testid="receipt-upload-form">
           <input type="hidden" name="receiptId" value={receiptId} />
           <Result state={uploadState} />
-          <Field label="فایل فیش" hint="تصویر یا PDF فیش پرداخت مستقیم به مرکز.">
-            {({ inputId, describedBy }) => (
-              <input
-                id={inputId}
-                aria-describedby={describedBy}
-                type="file"
-                name="receipt"
-                accept="image/jpeg,image/png,application/pdf"
-                className="w-full text-body-sm"
-                data-testid="receipt-file"
-              />
-            )}
-          </Field>
+          <FileField
+            label="فایل فیش"
+            name="receipt"
+            required
+            accept="image/jpeg,image/png,application/pdf"
+            maxBytes={10 * 1024 * 1024}
+            hint="تصویر یا PDF فیش پرداخت مستقیم به مرکز، تا ۱۰ مگابایت."
+            testId="receipt-file"
+          />
           <Button tone="secondary" type="submit" block disabled={uploading} data-testid="upload-receipt">
             {uploading ? 'در حال بارگذاری…' : 'بارگذاری فیش'}
           </Button>

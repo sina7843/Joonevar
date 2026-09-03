@@ -255,7 +255,7 @@ export const ASSOC_NAV: readonly NavItem[] = [
   { href: '/assoc/kennels', label: 'کنل', icon: 'house' },
   { href: '/assoc/permits', label: 'مجوز جفت‌گیری', icon: 'stamp' },
   { href: '/assoc/postal', label: 'درخواست‌های پستی', icon: 'mapPin' },
-  { href: '/assoc/foreign-pedigree', label: 'شجره‌نامه خارجی', icon: 'certificate' },
+  { href: '/assoc/foreign-pedigree', label: 'Export Pedigree', icon: 'certificate' },
   { href: '/assoc/issuers', label: 'صادرکنندگان', icon: 'clipboardText' },
 ];
 

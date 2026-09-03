@@ -170,7 +170,8 @@ export async function selectableAnimals(
     .where(and(eq(animals.ownerAccountId, actor.accountId), eq(animals.status, 'REGISTERED')));
 
   const readiness = await Promise.all(rows.map((row) => readinessOf(database, actor.accountId, row.id)));
-  // An animal already sitting in an unpaid batch is not offered twice.
+  // An animal whose paid sheet is still being produced is not offered twice.
+  // An unpaid checkout leaves no item at all, so it holds nothing back.
   const pending = await database
     .select({ animalId: registrationSheetItems.animalId })
     .from(registrationSheetItems)
@@ -236,33 +237,18 @@ export async function createSheetRequest(
     },
   });
 
-  const lines = await database.select().from(paymentItems).where(eq(paymentItems.batchId, batch.id));
-
-  return database.transaction(async (tx) => {
-    const items: SheetItemRecord[] = [];
-    for (const animalId of unique) {
-      const line = lines.find((l) => l.targetId === animalId)!;
-      const [row] = await tx
-        .insert(registrationSheetItems)
-        .values({
-          batchId: batch.id,
-          paymentItemId: line.id,
-          animalId,
-          ownerAccountId: actor.accountId,
-        })
-        .returning();
-      if (!row) throw conflict('ساخت قلم درخواست انجام نشد.');
-      items.push(row);
-    }
-    await recordAudit(tx, actor, {
-      action: 'REGISTRATION_SHEET_REQUESTED',
-      targetType: 'PAYMENT_BATCH',
-      targetId: batch.id,
-      after: { animals: unique, itemCount: items.length },
-    });
-    // Resume context lives on the batch; the request itself is the batch.
-    return { batch, items };
-  });
+  /*
+   * Nothing about the document is written yet.
+   *
+   * Until the payment is verified on the server there is no registration-sheet
+   * record of any kind: the batch and its priced lines are the whole of it, and
+   * those are the money, not the document. A person who starts a checkout and
+   * walks away — or presses back — leaves behind an unpaid batch and nothing
+   * else, so nothing has to be cleaned up and no half-made document exists to be
+   * found later. The sheet items are created by `markBatchPaid`, inside the
+   * transaction that verifies the payment.
+   */
+  return { batch, items: [] };
 }
 
 /**
@@ -456,7 +442,32 @@ export async function itemsOfBatch(
 }
 
 /** Marks the items of a batch as awaiting issuance once the money is verified. */
+/**
+ * The verified payment is what brings the document records into existence.
+ *
+ * It runs inside the verifying transaction and is written to be repeatable: a
+ * replayed callback finds the items already there and adds nothing, because the
+ * unique index on (batch, target) is what decides, not a flag this code reads.
+ */
 export async function markBatchPaid(tx: DbClient, batchId: string): Promise<void> {
+  const [batch] = await tx.select().from(paymentBatches).where(eq(paymentBatches.id, batchId)).limit(1);
+  if (!batch) throw notFound('درخواست برگه ثبتی پیدا نشد.');
+
+  const lines = await tx.select().from(paymentItems).where(eq(paymentItems.batchId, batchId));
+  for (const line of lines) {
+    if (line.targetType !== 'ANIMAL') continue;
+    await tx
+      .insert(registrationSheetItems)
+      .values({
+        batchId,
+        paymentItemId: line.id,
+        animalId: line.targetId,
+        ownerAccountId: batch.accountId,
+        state: 'AWAITING_ISSUANCE',
+      })
+      .onConflictDoNothing();
+  }
+
   await tx
     .update(registrationSheetItems)
     .set({ state: 'AWAITING_ISSUANCE', updatedAt: new Date() })

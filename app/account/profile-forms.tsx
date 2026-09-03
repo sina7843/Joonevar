@@ -101,7 +101,8 @@ export function IdentityForm({
       <TextField
         label="نام نمایشی"
         name="displayName"
-        hint="اختیاری. اگر خالی بماند، نام نمایشی ثبت نمی‌شود."
+        required
+        hint="نامی که در صورت روشن‌بودن نمایش، دیگران می‌بینند."
         defaultValue={values.displayName ?? ''}
         data-testid="display-name"
       />

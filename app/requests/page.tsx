@@ -6,7 +6,7 @@ import { RequestCard } from '../../src/ui/card.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { db } from '../../src/db/client.ts';
 import { listOwnerRequests } from '../../src/vets/visits.ts';
-import { REQUEST_STATUS_FA, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
+import { REQUEST_STATUS_FA, REQUEST_STATUS_TONE, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -45,14 +45,7 @@ export default async function RequestsPage() {
                   requestCode={row.referral?.code ?? '—'}
                   animalName={row.animalName ?? 'بدون نام'}
                   status={{
-                    tone:
-                      row.request.status === 'ACTIVE'
-                        ? row.expired
-                          ? 'warning'
-                          : 'info'
-                        : row.request.status === 'CHECKED_IN'
-                          ? 'success'
-                          : 'neutral',
+                    tone: row.expired ? 'warning' : REQUEST_STATUS_TONE[row.request.status]!,
                     label: row.expired ? 'مهلت گذشته' : REQUEST_STATUS_FA[row.request.status]!,
                   }}
                   owner={row.request.status === 'ACTIVE' ? 'USER' : 'VET'}

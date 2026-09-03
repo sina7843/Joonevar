@@ -32,7 +32,7 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
   const record = await foreignCaseById(db(), id);
   if (!record) {
     return (
-      <OpsShell actor={guard.actor} title="پرونده شجره‌نامه خارجی" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
+      <OpsShell actor={guard.actor} title="پرونده Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
         <Alert tone="error" title="پرونده پیدا نشد" />
       </OpsShell>
     );
@@ -44,7 +44,7 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
     : [];
 
   return (
-    <OpsShell actor={guard.actor} title="بررسی شجره‌نامه خارجی" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
+    <OpsShell actor={guard.actor} title="بررسی Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Card>
           <h2 className="text-label-lg">اطلاعات پرونده</h2>

@@ -56,11 +56,11 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
     latestAttempt(db(), batch.id),
   ]);
 
-  const animalRows = items.length
-    ? await db()
-        .select({ id: animals.id, name: animals.name })
-        .from(animals)
-        .where(inArray(animals.id, items.map((i) => i.animalId)))
+  // The selection lives on the money lines before the payment and on the sheet
+  // items after it, so the names are looked up from both.
+  const animalIds = [...new Set([...lines.map((l) => l.targetId), ...items.map((i) => i.animalId)])];
+  const animalRows = animalIds.length
+    ? await db().select({ id: animals.id, name: animals.name }).from(animals).where(inArray(animals.id, animalIds))
     : [];
   const sheets = items.length
     ? await db()
@@ -83,15 +83,19 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
             </StatusBadge>
           </div>
 
+          {/*
+            * The breakdown is built from the priced money lines, because before
+            * the payment those are the only record of what was selected
+            * (DEC-0141) — the document records come into being with the payment.
+            */}
           <ul className="mt-lg space-y-sm text-body-sm" data-testid="sheet-breakdown">
-            {items.map((item) => {
-              const line = lines.find((l) => l.targetId === item.animalId);
-              const name = animalRows.find((a) => a.id === item.animalId)?.name ?? 'بدون نام';
+            {lines.map((line) => {
+              const name = animalRows.find((a) => a.id === line.targetId)?.name ?? 'بدون نام';
               return (
-                <li key={item.id} className="flex items-center justify-between gap-md">
+                <li key={line.id} className="flex items-center justify-between gap-md">
                   <span>{name}</span>
                   <span className="text-text-secondary">
-                    {line ? formatTomanFa(tomanFromColumn(line.amountToman)) : '—'}
+                    {formatTomanFa(tomanFromColumn(line.amountToman))}
                   </span>
                 </li>
               );
@@ -123,6 +127,12 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
           <p className="mt-md text-caption text-text-secondary">
             وضعیت هر حیوان مستقل است؛ توقف یکی، صدور بقیه را متوقف نمی‌کند.
           </p>
+          {items.length === 0 ? (
+            <p className="mt-lg text-body-sm text-text-secondary" data-testid="sheet-items-pending">
+              تا تأیید پرداخت روی سرور، هیچ رکورد سندی ساخته نمی‌شود. پس از تأیید، وضعیت هر حیوان همین‌جا
+              می‌آید.
+            </p>
+          ) : null}
           <ul className="mt-lg space-y-lg" data-testid="sheet-items">
             {items.map((item) => {
               const name = animalRows.find((a) => a.id === item.animalId)?.name ?? 'بدون نام';

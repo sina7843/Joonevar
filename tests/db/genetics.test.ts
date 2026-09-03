@@ -86,6 +86,7 @@ async function approved(testDb: TestDb, root: string, operator: Actor, mobile: s
   await saveProfile(testDb.db, actor, {
     firstName: 'نمونه',
     lastName: 'کاربر آزمایشی',
+    displayName: 'نمایشی آزمایشی',
     nationalId,
     birthDate: '1990-01-01',
   });

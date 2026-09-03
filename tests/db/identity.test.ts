@@ -277,7 +277,13 @@ test('the profile enforces national id uniqueness under a race', async () => {
     const a = await signInWithVerifiedMobile(testDb.db, '09123450002');
     const b = await signInWithVerifiedMobile(testDb.db, '09123450003');
 
-    const input = { firstName: 'علی', lastName: 'رضایی', nationalId: VALID_ID_A, birthDate: '1990-05-20' };
+    const input = {
+      firstName: 'علی',
+      lastName: 'رضایی',
+      displayName: 'نمایشی آزمایشی',
+      nationalId: VALID_ID_A,
+      birthDate: '1990-05-20',
+    };
     const outcomes = await Promise.allSettled([
       saveProfile(testDb.db, actorFor(a.accountId), input),
       saveProfile(testDb.db, actorFor(b.accountId), input),
@@ -296,6 +302,7 @@ test('completing the identity group activates the account without approving KYC'
     await saveProfile(testDb.db, actorFor(account.accountId), {
       firstName: 'مریم',
       lastName: 'کاظمی',
+    displayName: 'نمایشی آزمایشی',
       nationalId: VALID_ID_A,
       birthDate: '1992-03-11',
     });
@@ -340,6 +347,7 @@ test('KYC runs submit, correction and approval while keeping the valid file', as
       await saveProfile(testDb.db, applicantActor, {
         firstName: 'سارا',
         lastName: 'نوری',
+    displayName: 'نمایشی آزمایشی',
         nationalId: VALID_ID_B,
         birthDate: '1995-01-01',
       });
@@ -411,7 +419,8 @@ test('a stale review decision is rejected and a non-operator cannot review', asy
       const applicantActor = actorFor(applicant.accountId);
       const operatorActor = actorFor(operator.accountId, 'ASSOCIATION_OPERATOR');
 
-      await saveProfile(testDb.db, applicantActor, { firstName: 'رضا', lastName: 'مرادی', nationalId: VALID_ID_A, birthDate: '1988-02-02' });
+      await saveProfile(testDb.db, applicantActor, { firstName: 'رضا', lastName: 'مرادی',
+    displayName: 'نمایشی آزمایشی', nationalId: VALID_ID_A, birthDate: '1988-02-02' });
       await attachKycDocument(testDb.db, root, applicantActor, { bytes: JPEG });
       const submitted = await submitKyc(testDb.db, applicantActor);
 
@@ -449,7 +458,8 @@ test('the KYC document is private: owner and association reviewer only', async (
       const stranger = await signInWithVerifiedMobile(testDb.db, '09123450011');
       const applicantActor = actorFor(applicant.accountId);
 
-      await saveProfile(testDb.db, applicantActor, { firstName: 'نگار', lastName: 'صادقی', nationalId: VALID_ID_B, birthDate: '1993-07-07' });
+      await saveProfile(testDb.db, applicantActor, { firstName: 'نگار', lastName: 'صادقی',
+    displayName: 'نمایشی آزمایشی', nationalId: VALID_ID_B, birthDate: '1993-07-07' });
       const attached = await attachKycDocument(testDb.db, root, applicantActor, { bytes: JPEG });
       const fileId = attached.documentFileId!;
 
@@ -477,7 +487,8 @@ test('after approval the name and birth date stay editable while the national id
       const applicantActor = actorFor(applicant.accountId);
       const operatorActor = actorFor(operator.accountId, 'ASSOCIATION_OPERATOR');
 
-      await saveProfile(testDb.db, applicantActor, { firstName: 'حسن', lastName: 'الفت', nationalId: VALID_ID_A, birthDate: '1985-04-04' });
+      await saveProfile(testDb.db, applicantActor, { firstName: 'حسن', lastName: 'الفت',
+    displayName: 'نمایشی آزمایشی', nationalId: VALID_ID_A, birthDate: '1985-04-04' });
       await attachKycDocument(testDb.db, root, applicantActor, { bytes: JPEG });
       const submitted = await submitKyc(testDb.db, applicantActor);
       await reviewKyc(testDb.db, operatorActor, { caseId: submitted.id, decision: 'APPROVED' });
@@ -497,7 +508,8 @@ test('after approval the name and birth date stay editable while the national id
       assert.equal((await findCase(testDb.db, applicant.accountId))?.status, 'APPROVED', 'editing does not reopen KYC');
 
       await assert.rejects(
-        () => saveProfile(testDb.db, applicantActor, { firstName: 'حسین', lastName: 'بهرامی', nationalId: VALID_ID_B, birthDate: '1985-05-05' }),
+        () => saveProfile(testDb.db, applicantActor, { firstName: 'حسین', lastName: 'بهرامی',
+    displayName: 'نمایشی آزمایشی', nationalId: VALID_ID_B, birthDate: '1985-05-05' }),
         /کد ملی پس از تأیید احراز هویت قابل تغییر نیست/,
       );
     });

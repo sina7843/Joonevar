@@ -137,6 +137,7 @@ async function approvedOwner(): Promise<{ context: BrowserContext; page: Page; m
   await page.getByTestId('last-name').fill('مالک آزمایشی');
   await page.getByTestId('national-id').fill(syntheticNationalId());
   await page.getByTestId('birth-date').fill('1990-01-01');
+  await page.getByTestId('display-name').fill('نمایشی آزمایشی');
   await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
   await page.goto(BASE_URL + '/account/kyc', { waitUntil: 'load' });
@@ -172,7 +173,8 @@ async function registerAnimalThroughForm(
   const animalId = new URL(page.url()).pathname.split('/')[2]!;
 
   await page.getByTestId('animal-name').fill(input.name);
-  await page.getByTestId('animal-breed').selectOption({ index: 1 });
+  // The breed picker is a search plus a list, not a native select.
+  await page.getByTestId('animal-breed-list').locator('button').first().click();
   await page.getByTestId('step-1-continue').click();
 
   await page.getByTestId('sex-' + (input.sex ?? 'MALE')).waitFor();
@@ -252,6 +254,7 @@ test('an account without approved KYC is refused the registration route', async 
     await page.getByTestId('last-name').fill('بدون احراز');
     await page.getByTestId('national-id').fill(syntheticNationalId());
     await page.getByTestId('birth-date').fill('1991-01-01');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
     await page.goto(BASE_URL + '/animals/new', { waitUntil: 'load' });
@@ -280,7 +283,8 @@ test('G1+ computes the generation from resolved parents and never offers to set 
     const childId = new URL(page.url()).pathname.split('/')[2]!;
 
     await page.getByTestId('animal-name').fill('فرزند نمونه');
-    await page.getByTestId('animal-breed').selectOption({ index: 1 });
+    // The breed picker is a search plus a list, not a native select.
+    await page.getByTestId('animal-breed-list').locator('button').first().click();
     await page.getByTestId('step-1-continue').click();
     await page.getByTestId('sex-MALE').waitFor();
     await page.getByTestId('sex-MALE').check();
@@ -298,7 +302,7 @@ test('G1+ computes the generation from resolved parents and never offers to set 
 
     await page.getByTestId('origin-INTERNAL_G1PLUS').waitFor();
     await page.getByTestId('origin-INTERNAL_G1PLUS').check();
-    await page.getByTestId('save-origin').click();
+    // The origin choice saves itself; there is no separate button.
     await page.getByTestId('sire-pedigree-code').waitFor();
 
     // There is no generation input anywhere on the form (§9.3).
@@ -339,7 +343,8 @@ test('a missing parent gives G0 with a CTA, and the return rematches the same an
     const childId = new URL(page.url()).pathname.split('/')[2]!;
 
     await page.getByTestId('animal-name').fill('فرزند بی‌مادر');
-    await page.getByTestId('animal-breed').selectOption({ index: 1 });
+    // The breed picker is a search plus a list, not a native select.
+    await page.getByTestId('animal-breed-list').locator('button').first().click();
     await page.getByTestId('step-1-continue').click();
     await page.getByTestId('sex-MALE').waitFor();
     await page.getByTestId('sex-MALE').check();
@@ -357,7 +362,7 @@ test('a missing parent gives G0 with a CTA, and the return rematches the same an
 
     await page.getByTestId('origin-INTERNAL_G1PLUS').waitFor();
     await page.getByTestId('origin-INTERNAL_G1PLUS').check();
-    await page.getByTestId('save-origin').click();
+    // The origin choice saves itself; there is no separate button.
     await page.getByTestId('sire-pedigree-code').waitFor();
     await page.getByTestId('sire-pedigree-code').fill(code('P2'));
     await page.getByTestId('dam-pedigree-code').fill(code('NOBODY'));
@@ -383,7 +388,8 @@ test('a missing parent gives G0 with a CTA, and the return rematches the same an
     await page.screenshot({ path: path.join(SHOTS, 'register-missing-parent.png'), fullPage: true });
 
     await page.getByTestId('animal-name').fill('مادر تازه');
-    await page.getByTestId('animal-breed').selectOption({ index: 1 });
+    // The breed picker is a search plus a list, not a native select.
+    await page.getByTestId('animal-breed-list').locator('button').first().click();
     await page.getByTestId('step-1-continue').click();
     await page.getByTestId('sex-FEMALE').waitFor();
     await page.getByTestId('sex-FEMALE').check();
@@ -488,12 +494,12 @@ test('the foreign pedigree route runs through the association and writes a read-
 
     await page.goto(BASE_URL + '/animals/' + animalId, { waitUntil: 'load' });
     assert.equal(await page.getByTestId('animal-generation').textContent(), 'G3');
-    assert.equal(await page.getByTestId('animal-origin').textContent(), 'شجره‌نامه خارجی');
+    assert.equal(await page.getByTestId('animal-origin').textContent(), 'Export Pedigree');
     await page.screenshot({ path: path.join(SHOTS, 'animal-profile-foreign.png'), fullPage: true });
 
     // And the owner was notified, back into the same case.
     await page.goto(BASE_URL + '/notifications', { waitUntil: 'load' });
-    await expectText(page, 'شجره‌نامه خارجی شما تأیید شد');
+    await expectText(page, 'Export Pedigree شما تأیید شد');
   } finally {
     await owner.context.close();
     await ops.context.close();

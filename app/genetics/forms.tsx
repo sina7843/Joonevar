@@ -143,7 +143,7 @@ export function RecordResultForm({ sampleId }: { sampleId: string }) {
     <form action={submit} className="mt-lg space-y-lg" data-testid="record-result-form">
       <input type="hidden" name="sampleId" value={sampleId} />
       <Result state={state} />
-      <TextField label="یادداشت فنی (اختیاری)" name="note" data-testid="result-note" />
+      <TextField label="کد DNA (اختیاری)" name="note" data-testid="result-note" />
       <Button type="submit" block disabled={pending} data-testid="submit-result">
         {pending ? 'در حال ثبت…' : 'ثبت Parentage Result'}
       </Button>
@@ -204,7 +204,7 @@ export function AnswerAppealForm({ appealId, version }: { appealId: string; vers
         نتیجه اصلاحی به‌صورت نسخه جدید ثبت شود
       </label>
       {correct ? (
-        <TextField label="یادداشت فنی نتیجه اصلاحی" name="correctionNote" data-testid="appeal-correction-note" />
+        <TextField label="کد DNA نتیجه اصلاحی" name="correctionNote" data-testid="appeal-correction-note" />
       ) : null}
       <Button type="submit" block disabled={pending} data-testid="submit-appeal-answer">
         {pending ? 'در حال ثبت…' : 'ثبت پاسخ'}

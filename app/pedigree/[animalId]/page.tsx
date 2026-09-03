@@ -75,7 +75,7 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
               <dd>
                 {result.processedAt ? formatCivilDateFa(result.processedAt.toISOString().slice(0, 10)) : '—'}
               </dd>
-              <dt className="text-text-secondary">یادداشت فنی</dt>
+              <dt className="text-text-secondary">کد DNA</dt>
               <dd>{result.technicalNoteFa ?? '—'}</dd>
             </dl>
           )}

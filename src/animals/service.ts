@@ -398,8 +398,9 @@ export async function registerAnimal(
   if (record.breedId === null) throw validation('نژاد را انتخاب کنید.');
   if (record.sex === null) throw validation('جنسیت را انتخاب کنید.');
   if (record.birthDate === null) throw validation('تاریخ تولد را وارد کنید.');
-  if (record.color === null) throw validation('رنگ حیوان را وارد کنید.');
-  if (record.markings === null) throw validation('نشانه‌های ظاهری را وارد کنید؛ اگر نشانه‌ای ندارد، همین را بنویسید.');
+  // Colour and markings are the owner's option here and the veterinarian's
+  // obligation at the visit: what the owner types is a description of an animal
+  // nobody has seen yet, and what the vet records is the certified identity.
 
   return database.transaction(async (tx) => {
     const [updated] = await tx

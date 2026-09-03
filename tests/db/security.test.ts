@@ -275,6 +275,7 @@ test('a KYC document of one person never reaches another operator context', asyn
     await saveProfile(ctx.testDb.db, actor, {
       firstName: 'نمونه',
       lastName: 'کاربر امنیت',
+    displayName: 'نمایشی آزمایشی',
       nationalId: '9000000017',
       birthDate: '1990-01-01',
     });

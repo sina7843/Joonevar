@@ -144,7 +144,14 @@ export async function saveProfile(
   const lastName = assertPersonName(input.lastName, 'نام خانوادگی');
   const nationalId = assertNationalId(input.nationalId);
   const birthDate = assertBirthDate(input.birthDate, todayCivil());
+  /*
+   * The display name is asked for with the rest of the identity: it is the name
+   * other people see when the owner turns visibility on, and a profile that has
+   * one is a profile that can be shown. Whether it is shown stays a separate
+   * choice — the field is required, the visibility is not.
+   */
   const displayName = normalizeOptionalDisplayName(input.displayName);
+  if (displayName === null) throw validation('نام نمایشی را وارد کنید.');
   const displayNameVisible = input.displayNameVisible ?? false;
 
   try {

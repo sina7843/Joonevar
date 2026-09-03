@@ -10,7 +10,7 @@ import { StatusBadge } from '../../src/ui/status.tsx';
 import { db } from '../../src/db/client.ts';
 import { vetCompleted, vetQueue } from '../../src/vets/visits.ts';
 import { vetEligibilityFor } from '../../src/domain/eligibility/service.ts';
-import { REQUEST_STATUS_FA, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
+import { REQUEST_STATUS_FA, REQUEST_STATUS_TONE, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -73,7 +73,7 @@ export default async function VetPage() {
                         </p>
                       ) : null}
                     </div>
-                    <StatusBadge tone={row.request.status === 'CHECKED_IN' ? 'success' : 'info'}>
+                    <StatusBadge tone={REQUEST_STATUS_TONE[row.request.status]!}>
                       {REQUEST_STATUS_FA[row.request.status]}
                     </StatusBadge>
                   </div>

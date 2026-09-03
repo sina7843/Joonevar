@@ -132,6 +132,7 @@ async function completeProfile(page: Page, lastName: string): Promise<void> {
   await page.getByTestId('last-name').fill(lastName);
   await page.getByTestId('national-id').fill(syntheticNationalId());
   await page.getByTestId('birth-date').fill('1990-01-01');
+  await page.getByTestId('display-name').fill('نمایشی آزمایشی');
   await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 }
 
@@ -261,7 +262,8 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
   const animalId = new URL(owner.url()).pathname.split('/')[2]!;
 
   await owner.getByTestId('animal-name').fill(name);
-  await owner.getByTestId('animal-breed').selectOption({ index: 1 });
+  // The breed picker is a search plus a list, not a native select.
+  await owner.getByTestId('animal-breed-list').locator('button').first().click();
   await owner.getByTestId('step-1-continue').click();
   await owner.getByTestId('sex-MALE').waitFor();
   await owner.getByTestId('sex-MALE').check();

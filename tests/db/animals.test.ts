@@ -69,6 +69,7 @@ async function withCtx(fn: (ctx: Ctx) => Promise<void>) {
     await saveProfile(testDb.db, actor, {
       firstName: 'نمونه',
       lastName: 'مالک آزمایشی',
+    displayName: 'نمایشی آزمایشی',
       nationalId: '0499370899',
       birthDate: '1990-01-01',
     });

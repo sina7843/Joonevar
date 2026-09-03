@@ -56,7 +56,7 @@ export default async function ForeignPedigreePage({ params }: { params: Promise<
   const hasBack = Boolean(record?.backFileId);
 
   return (
-    <PublicShell actor={actor} title="شجره‌نامه خارجی" pathname={'/animals/' + id + '/foreign-pedigree'}>
+    <PublicShell actor={actor} title="Export Pedigree" pathname={'/animals/' + id + '/foreign-pedigree'}>
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">

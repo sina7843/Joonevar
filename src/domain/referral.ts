@@ -44,6 +44,30 @@ export const REFERRAL_STATUS_FA: Record<string, string> = {
   SUPERSEDED: 'جایگزین‌شده',
 };
 
+/**
+ * The colour each state deserves — one table, so every screen agrees.
+ *
+ * The tone says what kind of end this is, not merely that it ended. Finished
+ * work is a success; a request that was replaced is still live somewhere else,
+ * so it is informative rather than dead; a cancelled one is simply over, which
+ * is neutral and not an error, because nothing went wrong.
+ */
+export const REQUEST_STATUS_TONE: Record<string, 'neutral' | 'info' | 'success' | 'warning' | 'error'> = {
+  ACTIVE: 'info',
+  CHECKED_IN: 'success',
+  COMPLETED: 'success',
+  SUPERSEDED: 'info',
+  CANCELLED: 'neutral',
+};
+
+export const REFERRAL_STATUS_TONE: Record<string, 'neutral' | 'info' | 'success' | 'warning' | 'error'> = {
+  ACTIVE: 'info',
+  CONSUMED: 'success',
+  EXPIRED: 'warning',
+  CANCELLED: 'neutral',
+  SUPERSEDED: 'info',
+};
+
 export const REQUEST_STATUS_FA: Record<string, string> = {
   ACTIVE: 'در انتظار مراجعه',
   CHECKED_IN: 'پذیرش‌شده',

@@ -77,6 +77,7 @@ async function approvedAccount(testDb: TestDb, mobile: string, nationalId: strin
   await saveProfile(testDb.db, actor, {
     firstName: 'نمونه',
     lastName: 'پرداخت‌کننده',
+    displayName: 'نمایشی آزمایشی',
     nationalId,
     birthDate: '1990-01-01',
   });

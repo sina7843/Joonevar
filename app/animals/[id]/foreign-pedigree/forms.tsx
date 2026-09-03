@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Button } from '../../../../src/ui/button.tsx';
-import { Field, SelectField, TextField } from '../../../../src/ui/field.tsx';
+import { FileField, SelectField, TextField } from '../../../../src/ui/field.tsx';
 import {
   saveForeignDetailsAction,
   submitForeignCaseAction,
@@ -81,33 +81,25 @@ export function ForeignSideForm({
   attached: boolean;
 }) {
   const [state, submit, pending] = useActionState(uploadForeignSideAction, EMPTY);
-  const label = side === 'FRONT' ? 'روی برگه' : 'پشت برگه';
+  const sideFa = side === 'FRONT' ? 'روی برگه' : 'پشت برگه';
   return (
     <form action={submit} className="space-y-lg" data-testid={'foreign-' + side.toLowerCase() + '-form'}>
       <Result state={state} />
       <input type="hidden" name="animalId" value={animalId} />
       <input type="hidden" name="side" value={side} />
-      <Field
-        label={'تصویر ' + label}
+      <FileField
+        label={side === 'FRONT' ? 'روی برگه Export Pedigree' : 'پشت برگه Export Pedigree'}
+        name="document"
         required
+        accept="image/jpeg,image/png,application/pdf"
+        maxBytes={10 * 1024 * 1024}
         hint={
           attached
             ? 'فایل قبلی شما حفظ شده است؛ در صورت نیاز می‌توانید همین طرف را جایگزین کنید.'
             : 'JPG، PNG یا PDF تا ۱۰ مگابایت. این فایل خصوصی است.'
         }
-      >
-        {({ inputId, describedBy }) => (
-          <input
-            id={inputId}
-            name="document"
-            type="file"
-            accept="image/jpeg,image/png,application/pdf"
-            aria-describedby={describedBy}
-            className="w-full rounded-md border border-border-subtle bg-bg-surface p-md text-body-sm"
-            data-testid={'foreign-' + side.toLowerCase() + '-file'}
-          />
-        )}
-      </Field>
+        testId={'foreign-' + side.toLowerCase() + '-file'}
+      />
       <Button
         tone="secondary"
         type="submit"
@@ -115,7 +107,7 @@ export function ForeignSideForm({
         disabled={pending}
         data-testid={'upload-foreign-' + side.toLowerCase()}
       >
-        {pending ? 'در حال بارگذاری…' : attached ? 'جایگزینی تصویر ' + label : 'بارگذاری تصویر ' + label}
+        {pending ? 'در حال بارگذاری…' : attached ? 'جایگزینی تصویر ' + sideFa : 'بارگذاری تصویر ' + sideFa}
       </Button>
     </form>
   );

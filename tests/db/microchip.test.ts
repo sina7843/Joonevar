@@ -93,6 +93,7 @@ async function approved(
   await saveProfile(testDb.db, actor, {
     firstName: 'نمونه',
     lastName: 'کاربر آزمایشی',
+    displayName: 'نمایشی آزمایشی',
     nationalId,
     birthDate: '1990-01-01',
   });

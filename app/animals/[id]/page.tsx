@@ -41,7 +41,7 @@ const AUDIT_TITLE_FA: Record<string, string> = {
   ANIMAL_REGISTERED: 'حیوان در هم‌زیست ثبت شد',
   ANIMAL_UPDATED: 'اطلاعات پرونده به‌روزرسانی شد',
   ANIMAL_PHOTO_ATTACHED: 'تصویر حیوان بارگذاری شد',
-  ANIMAL_GENERATION_FROM_FOREIGN_PEDIGREE: 'نسل از شجره‌نامه خارجی ثبت شد',
+  ANIMAL_GENERATION_FROM_FOREIGN_PEDIGREE: 'نسل از Export Pedigree ثبت شد',
   ANIMAL_MATING_PERMIT_ISSUED: 'مجوز رسمی جفت‌گیری صادر شد',
   ANIMAL_MATING_PERMIT_REVIEWED: 'پرونده مجوز جفت‌گیری بررسی شد',
   ANIMAL_MATING_DATE_CONFIRMED: 'تاریخ جفت‌گیری دوطرفه تأیید شد',
@@ -177,7 +177,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                 ? 'بدون اسناد هویتی'
                 : animal.origin === 'INTERNAL_G1PLUS'
                   ? 'نسب ثبت‌شده در هم‌زیست'
-                  : 'شجره‌نامه خارجی'}
+                  : 'Export Pedigree'}
             </dd>
             <dt className="text-text-secondary">رنگ</dt>
             <dd>{animal.color ?? '—'}</dd>
@@ -349,7 +349,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         <Card>
           <h3 className="flex items-center gap-sm text-label-lg">
             <Icon name="certificate" size="sm" className="text-text-brand" />
-            شجره‌نامه خارجی
+            Export Pedigree
           </h3>
           {foreign ? (
             <>

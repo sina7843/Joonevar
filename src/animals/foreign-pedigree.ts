@@ -193,9 +193,9 @@ export async function submitForeignCase(
 export type ForeignDecision = 'APPROVED' | 'NEEDS_CORRECTION' | 'REJECTED';
 
 const TITLE_FA: Record<ForeignDecision, string> = {
-  APPROVED: 'شجره‌نامه خارجی شما تأیید شد',
-  NEEDS_CORRECTION: 'شجره‌نامه خارجی شما نیازمند اصلاح است',
-  REJECTED: 'شجره‌نامه خارجی شما رد شد',
+  APPROVED: 'Export Pedigree شما تأیید شد',
+  NEEDS_CORRECTION: 'Export Pedigree شما نیازمند اصلاح است',
+  REJECTED: 'Export Pedigree شما رد شد',
 };
 
 const BODY_FA: Record<ForeignDecision, string> = {
@@ -225,7 +225,7 @@ export async function reviewForeignCase(
   now: Date = new Date(),
 ): Promise<ForeignPedigreeCase> {
   if (actor.context !== 'ASSOCIATION_OPERATOR') {
-    throw forbidden('بررسی شجره‌نامه خارجی فقط از محیط عملیاتی انجمن انجام می‌شود.');
+    throw forbidden('بررسی Export Pedigree فقط از محیط عملیاتی انجمن انجام می‌شود.');
   }
   const reason = input.reasonFa?.trim() ?? '';
   if (input.decision !== 'APPROVED' && reason.length < 3) {
@@ -245,7 +245,7 @@ export async function reviewForeignCase(
     .from(foreignPedigreeCases)
     .where(eq(foreignPedigreeCases.id, input.caseId))
     .limit(1);
-  if (!current) throw notFound('پرونده شجره‌نامه خارجی پیدا نشد.');
+  if (!current) throw notFound('پرونده Export Pedigree پیدا نشد.');
   if (current.status !== 'UNDER_REVIEW') throw conflict('این پرونده در انتظار بررسی نیست.');
   if (input.expectedVersion !== undefined && input.expectedVersion !== current.version) {
     throw conflict('پرونده هم‌زمان تغییر کرده است.');

@@ -125,6 +125,7 @@ async function completeProfile(page: Page, lastName: string): Promise<void> {
   await page.getByTestId('last-name').fill(lastName);
   await page.getByTestId('national-id').fill(syntheticNationalId());
   await page.getByTestId('birth-date').fill('1990-01-01');
+  await page.getByTestId('display-name').fill('نمایشی آزمایشی');
   await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 }
 
@@ -251,7 +252,8 @@ async function registerAnimal(page: Page, name: string): Promise<string> {
   const animalId = new URL(page.url()).pathname.split('/')[2]!;
 
   await page.getByTestId('animal-name').fill(name);
-  await page.getByTestId('animal-breed').selectOption({ index: 1 });
+  // The breed picker is a search plus a list, not a native select.
+  await page.getByTestId('animal-breed-list').locator('button').first().click();
   await page.getByTestId('step-1-continue').click();
   await page.getByTestId('sex-MALE').waitFor();
   await page.getByTestId('sex-MALE').check();
@@ -496,7 +498,13 @@ test('a browser that returns without paying issues nothing, and the retry still 
     await owner.page.screenshot({ path: path.join(SHOTS, 'sheet-not-verified.png'), fullPage: true });
 
     await owner.page.goto(BASE_URL + '/registration/' + batchId, { waitUntil: 'load' });
-    assert.equal((await owner.page.getByTestId('item-state-' + animalId).textContent())?.trim(), 'در انتظار پرداخت');
+    /*
+     * DEC-0141: an unverified return leaves no document record at all — not even
+     * one saying it is waiting. What survives is the selection and its frozen
+     * price on the money lines, which is what the retry charges.
+     */
+    assert.equal(await owner.page.getByTestId('item-state-' + animalId).count(), 0);
+    await expectText(owner.page, 'تا تأیید پرداخت روی سرور، هیچ رکورد سندی ساخته نمی‌شود');
     await expectText(owner.page, 'حیوان‌های انتخاب‌شده و مبلغ هر قلم حفظ شده است');
     assert.equal((await owner.page.getByTestId('sheet-total').textContent())?.trim(), SHEET_FEE_FA);
 

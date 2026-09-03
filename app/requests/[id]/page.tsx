@@ -16,6 +16,8 @@ import {
   REFERRAL_STATUS_FA,
   REQUEST_STATUS_FA,
   SERVICE_TYPE_FA,
+  REQUEST_STATUS_TONE,
+  REFERRAL_STATUS_TONE,
 } from '../../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { RenewReferralForm } from './renew-form.tsx';
@@ -70,9 +72,7 @@ export default async function RequestPage({
                 {CONTEXT_FA[request.context]} · {view.animalName ?? 'بدون نام'}
               </p>
             </div>
-            <StatusBadge
-              tone={request.status === 'CHECKED_IN' ? 'success' : request.status === 'ACTIVE' ? 'info' : 'neutral'}
-            >
+            <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!}>
               <span data-testid="request-status">{REQUEST_STATUS_FA[request.status]}</span>
             </StatusBadge>
           </div>
@@ -94,7 +94,15 @@ export default async function RequestPage({
             <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm">
               <dt className="text-text-secondary">وضعیت کد</dt>
               <dd data-testid="referral-status">
-                {expired && referral.status === 'ACTIVE' ? 'منقضی' : REFERRAL_STATUS_FA[referral.status]}
+                <StatusBadge
+                  tone={
+                    expired && referral.status === 'ACTIVE'
+                      ? 'warning'
+                      : REFERRAL_STATUS_TONE[referral.status]!
+                  }
+                >
+                  {expired && referral.status === 'ACTIVE' ? 'منقضی' : REFERRAL_STATUS_FA[referral.status]}
+                </StatusBadge>
               </dd>
               <dt className="text-text-secondary">مهلت مراجعه تا</dt>
               <dd data-testid="referral-expiry">

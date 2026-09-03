@@ -111,7 +111,7 @@ export async function associationQueues(
     },
     {
       key: 'foreign',
-      titleFa: 'شجره‌نامه خارجی',
+      titleFa: 'Export Pedigree',
       noteFa: 'بررسی بر اساس فهرست صادرکنندگان موردتأیید انجمن',
       href: '/assoc/foreign-pedigree',
       waiting: foreign,

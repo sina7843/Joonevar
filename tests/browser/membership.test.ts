@@ -230,6 +230,7 @@ test('an account without approved KYC is refused the membership payment', async 
     await page.getByTestId('last-name').fill('بدون احراز');
     await page.getByTestId('national-id').fill(syntheticNationalId());
     await page.getByTestId('birth-date').fill('1992-02-02');
+    await page.getByTestId('display-name').fill('نمایشی آزمایشی');
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
     await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });

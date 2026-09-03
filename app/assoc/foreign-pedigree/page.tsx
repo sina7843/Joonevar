@@ -26,7 +26,7 @@ export default async function AssocForeignPedigreePage() {
   const issuers = await listIssuers(db(), true);
 
   return (
-    <OpsShell actor={guard.actor} title="شجره‌نامه خارجی" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
+    <OpsShell actor={guard.actor} title="Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         {issuers.length === 0 ? (
           <Alert tone="warning" title="فهرست صادرکنندگان موردتأیید خالی است">

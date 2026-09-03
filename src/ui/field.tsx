@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useState, type ReactNode } from 'react';
+import { Icon } from './icon.tsx';
 
 /**
  * Form field wrapper.
@@ -223,30 +224,70 @@ export function FileField({
   testId?: string;
 }) {
   const [error, setError] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<{ name: string; sizeFa: string } | null>(null);
   const megabytes = Math.floor(maxBytes / (1024 * 1024));
+
+  const sizeFa = (bytes: number): string => {
+    const mb = bytes / (1024 * 1024);
+    return mb >= 1 ? mb.toFixed(1) + ' مگابایت' : Math.max(1, Math.round(bytes / 1024)) + ' کیلوبایت';
+  };
 
   return (
     <Field label={label} hint={hint} required={required} error={error ?? undefined}>
       {({ inputId, describedBy, invalid }) => (
-        <input
-          id={inputId}
-          name={name}
-          type="file"
-          accept={accept}
-          aria-describedby={describedBy}
-          aria-invalid={invalid || undefined}
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file && file.size > maxBytes) {
-              setError('حجم این فایل بیش از حد مجاز است (حداکثر ' + megabytes + ' مگابایت).');
-              event.target.value = '';
-              return;
-            }
-            setError(null);
-          }}
-          className={['w-full rounded-md border bg-bg-surface p-md text-body-sm', controlTone(invalid)].join(' ')}
-          data-testid={testId}
-        />
+        /*
+         * A bare file input is a grey box with a browser-chosen English label,
+         * and nothing about it says it can be clicked. The label is the control:
+         * it fills the width, states what to do, and after a choice it shows the
+         * file's own name and size so the person can see what they picked
+         * without opening the dialog again. The input itself stays a real file
+         * input, focusable and keyboard-operable — it is only visually hidden.
+         */
+        <label
+          htmlFor={inputId}
+          className={[
+            'flex w-full cursor-pointer items-center gap-md rounded-lg border border-dashed p-lg text-body-sm',
+            'transition-colors hover:bg-bg-brand-subtle',
+            'focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-border-brand',
+            invalid ? 'border-status-error-border' : 'border-border-brand',
+          ].join(' ')}
+        >
+          <span
+            aria-hidden="true"
+            className="flex size-[var(--size-control-sm)] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand"
+          >
+            <Icon name={chosen ? 'check' : 'uploadSimple'} size="sm" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-label-md text-text-brand">
+              {chosen ? 'تغییر فایل انتخاب‌شده' : 'انتخاب فایل'}
+            </span>
+            <span className="mt-2xs block truncate text-caption text-text-secondary" data-testid={testId ? testId + '-name' : undefined}>
+              {chosen ? chosen.name + ' · ' + chosen.sizeFa : 'برای انتخاب، همین‌جا را لمس یا کلیک کنید.'}
+            </span>
+          </span>
+          <input
+            id={inputId}
+            name={name}
+            type="file"
+            accept={accept}
+            aria-describedby={describedBy}
+            aria-invalid={invalid || undefined}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file && file.size > maxBytes) {
+                setError('حجم این فایل بیش از حد مجاز است (حداکثر ' + megabytes + ' مگابایت).');
+                event.target.value = '';
+                setChosen(null);
+                return;
+              }
+              setError(null);
+              setChosen(file ? { name: file.name, sizeFa: sizeFa(file.size) } : null);
+            }}
+            className="sr-only"
+            data-testid={testId}
+          />
+        </label>
       )}
     </Field>
   );

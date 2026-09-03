@@ -112,6 +112,7 @@ export async function approvedMember(
   await page.getByTestId('last-name').fill(lastName);
   await page.getByTestId('national-id').fill(syntheticNationalId());
   await page.getByTestId('birth-date').fill('1990-01-01');
+  await page.getByTestId('display-name').fill('نمایشی آزمایشی');
   await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
   await page.goto(BASE_URL + '/account/kyc', { waitUntil: 'load' });

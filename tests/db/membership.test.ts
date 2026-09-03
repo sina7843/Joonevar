@@ -71,6 +71,7 @@ async function approvedMember(
   await saveProfile(testDb.db, actor, {
     firstName: 'نمونه',
     lastName: 'عضو آزمایشی',
+    displayName: 'نمایشی آزمایشی',
     nationalId,
     birthDate: '1990-01-01',
   });

@@ -86,6 +86,7 @@ async function approved(testDb: TestDb, root: string, operator: Actor, mobile: s
   await saveProfile(testDb.db, actor, {
     firstName: 'نمونه',
     lastName: 'کاربر آزمایشی',
+    displayName: 'نمایشی آزمایشی',
     nationalId,
     birthDate: '1990-01-01',
   });
@@ -324,7 +325,10 @@ test('two animals in one batch keep separate money lines and separate outcomes',
     const second = await readyAnimal(ctx, 'سگ دوم');
 
     const created = await createSheetRequest(ctx.testDb.db, ctx.owner.actor, [first.animalId, second.animalId]);
-    assert.equal(created.items.length, 2);
+    // Nothing about the document exists before the payment (DEC-0141): the
+    // selection lives on the priced money lines and nowhere else.
+    assert.equal(created.items.length, 0);
+    assert.equal((await itemsOfBatch(ctx.testDb.db, created.batch.id)).length, 0);
     const lines = await ctx.testDb.db.select().from(paymentItems).where(eq(paymentItems.batchId, created.batch.id));
     assert.equal(lines.length, 2, 'money is attributed per animal, not to the group');
 
@@ -429,10 +433,13 @@ test('a failed payment keeps the selection and the frozen amounts for a retry', 
     assert.equal(failed.outcome.state, 'FAILED');
     assert.equal(await sheetOfAnimal(ctx.testDb.db, ready.animalId), null);
 
+    // A failed payment leaves no document record at all; what survives is the
+    // frozen price, so the retry charges exactly what was quoted.
     let items = await itemsOfBatch(ctx.testDb.db, created.batch.id);
-    assert.equal(items[0]!.state, 'AWAITING_PAYMENT', 'the item is still waiting, not lost');
+    assert.equal(items.length, 0, 'nothing is written before the money is confirmed');
     const lines = await ctx.testDb.db.select().from(paymentItems).where(eq(paymentItems.batchId, created.batch.id));
     assert.equal(lines[0]!.amountToman, SHEET_FEE);
+    assert.equal(lines[0]!.targetId, ready.animalId, 'the selection is on the money line');
 
     // A cancelled attempt behaves the same way.
     const cancelled = await startAttempt(
@@ -444,7 +451,7 @@ test('a failed payment keeps the selection and the frozen amounts for a retry', 
     );
     await cancelAttempt(ctx.testDb.db, { reference: cancelled.reference });
     items = await itemsOfBatch(ctx.testDb.db, created.batch.id);
-    assert.equal(items[0]!.state, 'AWAITING_PAYMENT');
+    assert.equal(items.length, 0, 'a cancelled attempt writes nothing either');
 
     // And the second, real attempt issues the document.
     const { outcome } = await payBatch(ctx, created.batch.id);

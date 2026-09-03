@@ -1,12 +1,13 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { ActionRow, Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Field, FileField, SelectField, TextField } from '../../../../src/ui/field.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
+import { BreedPicker } from '../../../../src/ui/breed-picker.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import {
   registerAnimalAction,
@@ -97,6 +98,7 @@ export function AnimalWizard({
   parentOf: string | null;
 }) {
   const [step, setStep] = useState(Math.min(Math.max(animal.draftStep, 1), 6));
+  const originForm = useRef<HTMLFormElement>(null);
   const [saveState, save, savePending] = useActionState(saveAnimalStepAction, EMPTY);
   const [photoState, uploadPhoto, photoPending] = useActionState(uploadAnimalPhotoAction, EMPTY);
   const [lineageState, resolveLineage, lineagePending] = useActionState(resolveLineageAction, EMPTY);
@@ -170,15 +172,7 @@ export function AnimalWizard({
                 />
               )}
             </Field>
-            <SelectField
-              label="نژاد"
-              name="breedId"
-              required
-              hint="جست‌وجو با نام فارسی یا انگلیسی انجام می‌شود."
-              defaultValue={animal.breedId ?? ''}
-              options={breeds.map((breed) => ({ value: breed.id, label: breed.nameFa + ' · ' + breed.nameEn }))}
-              data-testid="animal-breed"
-            />
+            <BreedPicker breeds={breeds} defaultValue={animal.breedId} required testId="animal-breed" />
             <Button type="submit" block disabled={savePending} data-testid="step-1-continue">
               ادامه
             </Button>
@@ -254,24 +248,17 @@ export function AnimalWizard({
           <form action={save} className="space-y-lg" data-testid="step-3">
             <input type="hidden" name="animalId" value={animal.id} />
             <input type="hidden" name="step" value="4" />
-            <TextField
-              label="رنگ"
-              name="color"
-              required
-              defaultValue={animal.color ?? ''}
-              data-testid="animal-color"
-            />
+            <TextField label="رنگ" name="color" defaultValue={animal.color ?? ''} data-testid="animal-color" />
             <TextField
               label="نشانه‌های ظاهری"
               name="markings"
-              required
-              hint="مواردی را بنویسید که در تشخیص حیوان کمک می‌کنند؛ اگر نشانه‌ای ندارد، همین را بنویسید."
+              hint="مواردی را بنویسید که در تشخیص حیوان کمک می‌کنند."
               defaultValue={animal.markings ?? ''}
               data-testid="animal-markings"
             />
             <Alert tone="info" title="این اطلاعات اعلامی است">
-              رنگ و نشانه‌های ظاهری اجباری است و به‌عنوان اظهار شما ثبت می‌شود؛ در مراجعه، دامپزشک معتمد
-              همین‌ها را تأیید یا اصلاح می‌کند و از آن پس رسمی و غیرقابل‌تغییر می‌شوند.
+              رنگ و نشانه‌های ظاهری اینجا اختیاری است و اظهار شما ثبت می‌شود. در مراجعه، دامپزشک معتمد
+              همین‌ها را با دیدن حیوان تکمیل یا اصلاح می‌کند و از آن پس رسمی و غیرقابل‌تغییر می‌شوند.
             </Alert>
             <ActionRow
               primary={
@@ -384,7 +371,12 @@ export function AnimalWizard({
         <div className="space-y-lg">
           <Card>
             <h2 className="text-label-lg">نوع ثبت حیوان هم‌زیست</h2>
-            <form action={save} className="mt-lg space-y-md" data-testid="origin-form">
+            {/*
+              * Choosing the kind of record is the whole of this step, so the
+              * choice saves itself. A separate "save" button asked the person to
+              * confirm a radio they had already pressed.
+              */}
+            <form ref={originForm} action={save} className="mt-lg space-y-md" data-testid="origin-form">
               <input type="hidden" name="animalId" value={animal.id} />
               <input type="hidden" name="step" value="6" />
               <label className="flex items-start gap-sm text-body-sm">
@@ -393,7 +385,10 @@ export function AnimalWizard({
                   name="origin"
                   value="G0"
                   checked={origin === 'G0'}
-                  onChange={() => setOrigin('G0')}
+                  onChange={() => {
+                    setOrigin('G0');
+                    originForm.current?.requestSubmit();
+                  }}
                   className="mt-1 size-[var(--size-selection-md)]"
                   data-testid="origin-G0"
                 />
@@ -410,7 +405,10 @@ export function AnimalWizard({
                   name="origin"
                   value="INTERNAL_G1PLUS"
                   checked={origin === 'INTERNAL_G1PLUS'}
-                  onChange={() => setOrigin('INTERNAL_G1PLUS')}
+                  onChange={() => {
+                    setOrigin('INTERNAL_G1PLUS');
+                    originForm.current?.requestSubmit();
+                  }}
                   className="mt-1 size-[var(--size-selection-md)]"
                   data-testid="origin-INTERNAL_G1PLUS"
                 />
@@ -427,20 +425,21 @@ export function AnimalWizard({
                   name="origin"
                   value="FOREIGN_PEDIGREE"
                   checked={origin === 'FOREIGN_PEDIGREE'}
-                  onChange={() => setOrigin('FOREIGN_PEDIGREE')}
+                  onChange={() => {
+                    setOrigin('FOREIGN_PEDIGREE');
+                    originForm.current?.requestSubmit();
+                  }}
                   className="mt-1 size-[var(--size-selection-md)]"
                   data-testid="origin-FOREIGN_PEDIGREE"
                 />
                 <span>
-                  <span className="block text-label-md">شجره‌نامه صادرشده خارج از هم‌زیست</span>
+                  <span className="block text-label-md">Export Pedigree — شجره‌نامه صادرشده خارج از هم‌زیست</span>
                   <span className="text-caption text-text-secondary">
-                    روی برگه و پشت برگه بارگذاری و برای بررسی به انجمن ارسال می‌شود.
+                    هر دو روی برگه و پشت برگه لازم است و پس از بارگذاری هر دو، پرونده برای بررسی به انجمن
+                    می‌رود.
                   </span>
                 </span>
               </label>
-              <Button tone="secondary" type="submit" block disabled={savePending} data-testid="save-origin">
-                ذخیره نوع ثبت
-              </Button>
             </form>
           </Card>
 
@@ -496,7 +495,7 @@ export function AnimalWizard({
 
           {origin === 'FOREIGN_PEDIGREE' ? (
             <Card>
-              <h3 className="text-label-lg">شجره‌نامه خارجی</h3>
+              <h3 className="text-label-lg">Export Pedigree</h3>
               <p className="mt-sm text-body-sm text-text-secondary">
                 پس از ثبت حیوان، مدرک را در همان پرونده بارگذاری و برای بررسی انجمن ارسال کنید.
               </p>
