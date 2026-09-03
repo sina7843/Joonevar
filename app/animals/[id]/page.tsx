@@ -7,6 +7,8 @@ import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
+import { findProfile } from '../../../src/identity/account.ts';
 import { Timeline, type TimelineItem } from '../../../src/ui/timeline.tsx';
 import { db } from '../../../src/db/client.ts';
 import { referenceBreeds } from '../../../src/db/schema/core.ts';
@@ -70,6 +72,9 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
     ? await db().select().from(referenceBreeds).where(eq(referenceBreeds.id, animal.breedId))
     : [];
   const family = await familyOf(db(), animal);
+  const ownerProfile = await findProfile(db(), animal.ownerAccountId);
+  const ownerName =
+    ownerProfile === null ? null : ownerProfile.firstName + ' ' + ownerProfile.lastName;
   const foreign = await findForeignCase(db(), animal.id);
   const trail = await auditTrail(db(), { targetType: 'ANIMAL', targetId: animal.id }, { page: 1, pageSize: 20 });
   const { chip, conflicts } = await animalChipView(db(), animal.id);
@@ -96,30 +101,59 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
 
   return (
     <PublicShell actor={actor} title="پرونده حیوان" pathname={'/animals/' + id}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <div className="min-w-0">
-              <h2 className="text-h4">{animal.name ?? 'بدون نام'}</h2>
-              <p className="mt-2xs text-caption text-text-secondary">
-                سگ · {breed?.nameFa ?? '—'} · {animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : '—'}
-              </p>
-              <p className="mt-2xs text-caption text-text-secondary">
-                <Identifier label="شناسه پرونده:" value={animal.id} />
-              </p>
-              <p className="mt-2xs text-caption text-text-secondary" data-testid="pet-id">
-                شناسه رسمی (Pet ID):{' '}
-                {animal.petId ? <Identifier value={animal.petId} /> : '— تا صدور برگه ثبتی'}
-              </p>
-            </div>
+      <div className="hz-stagger space-y-lg">
+        {/*
+          * Prototype PET-009-O: the file opens with who this animal is — a tile,
+          * the name, what it is, its identifiers — and the two states that
+          * matter as chips above it. The identity is the header of the file, not
+          * the first of a stack of equal cards.
+          */}
+        <section aria-labelledby="animal-identity" className="space-y-md">
+          <div className="hz-rail flex gap-sm">
             <StatusBadge tone={animal.status === 'REGISTERED' ? 'info' : 'neutral'}>
               {animal.status === 'REGISTERED' ? 'پرونده اولیه' : 'پیش‌نویس'}
             </StatusBadge>
+            <StatusBadge tone={animal.identityVerifiedAt === null ? 'neutral' : 'success'}>
+              {animal.identityVerifiedAt === null ? 'مشخصات اظهاری' : 'مشخصات رسمی تأییدشده'}
+            </StatusBadge>
+            {chip ? <StatusBadge tone="success">میکروچیپ ثبت‌شده</StatusBadge> : null}
           </div>
-        </Card>
+
+          <Card>
+            <div className="flex items-start gap-md">
+              <span
+                aria-hidden="true"
+                className="flex size-[var(--size-icon-lg)] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand"
+              >
+                <Icon name="dog" size="md" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 id="animal-identity" className="truncate text-h4">
+                  {animal.name ?? 'بدون نام'}
+                </h2>
+                <p className="mt-2xs text-caption text-text-secondary">
+                  سگ · {breed?.nameFa ?? '—'} ·{' '}
+                  {animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : '—'}
+                </p>
+                {/*
+                  * The prototype header carries the identifier a person can use
+                  * — the Pet ID — and never the database key, which §23.2 keeps
+                  * separate from it and which means nothing to the owner.
+                  */}
+                <p className="mt-2xs text-caption text-text-secondary" data-testid="pet-id">
+                  شناسه رسمی (Pet ID):{' '}
+                  {animal.petId ? <Identifier value={animal.petId} /> : '— تا صدور برگه ثبتی'}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </section>
 
         <Card>
-          <h3 className="text-label-lg">هویت</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="shieldCheck" size="sm" className="text-text-brand" />
+            هویت
+          </h3>
           {/* §10: verified data is not rewritten from this form, and the screen
               says which of the two it is looking at. */}
           <p className="mt-2xs text-caption text-text-secondary" data-testid="identity-provenance">
@@ -164,14 +198,21 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">مالکیت</h3>
-          <p className="mt-md text-body-sm">
-            <Identifier label="مالک:" value={animal.ownerAccountId} />
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="user" size="sm" className="text-text-brand" />
+            مالکیت
+          </h3>
+          <p className="mt-md text-body-sm" data-testid="animal-owner">
+            {/* §23.3: a name identifies a person; an account key identifies a row. */}
+            مالک: {ownerName ?? 'شما'}
           </p>
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">خانواده و نسب</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="dna" size="sm" className="text-text-brand" />
+            خانواده و نسب
+          </h3>
           <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
             <dt className="text-text-secondary">پدر</dt>
             <dd data-testid="family-sire">
@@ -199,7 +240,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">میکروچیپ</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="syringe" size="sm" className="text-text-brand" />
+            میکروچیپ
+          </h3>
           {chip ? (
             <>
               <p className="mt-md text-body-sm" data-testid="official-microchip">
@@ -223,7 +267,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">برگه ثبتی</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="stamp" size="sm" className="text-text-brand" />
+            برگه ثبتی
+          </h3>
           {sheet ? (
             <>
               <p className="mt-md text-body-sm">
@@ -251,7 +298,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">نمونه و Custody</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="testTube" size="sm" className="text-text-brand" />
+            نمونه و Custody
+          </h3>
           {sampleRows.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">
               کد رهگیری نمونه پس از انجام واقعی نمونه‌گیری صادر می‌شود.
@@ -269,7 +319,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">Parentage Result</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="dna" size="sm" className="text-text-brand" />
+            Parentage Result
+          </h3>
           {parentage ? (
             <>
               <p className="mt-md text-body-sm" data-testid="animal-result-status">
@@ -294,7 +347,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">شجره‌نامه خارجی</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="certificate" size="sm" className="text-text-brand" />
+            شجره‌نامه خارجی
+          </h3>
           {foreign ? (
             <>
               <p className="mt-md text-body-sm" data-testid="foreign-status">
@@ -325,7 +381,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">ویرایش اطلاعات مجاز</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="clipboardText" size="sm" className="text-text-brand" />
+            ویرایش اطلاعات مجاز
+          </h3>
           <div className="mt-lg">
             <AnimalEditForm
               animalId={animal.id}
@@ -341,7 +400,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
 
         {/* §10 and §16: the official cases this animal is part of. */}
         <Card>
-          <h3 className="text-label-lg">مجوزها</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="stamp" size="sm" className="text-text-brand" />
+            مجوزها
+          </h3>
           {permits.length === 0 ? (
             <p className="mt-md text-body-sm text-text-disabled">پرونده مجوزی برای این حیوان ثبت نشده است.</p>
           ) : (
@@ -368,7 +430,10 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
 
         {/* §17.1: only mutually confirmed dates appear as the official history. */}
         <Card>
-          <h3 className="text-label-lg">تاریخ‌های جفت‌گیری</h3>
+          <h3 className="flex items-center gap-sm text-label-lg">
+            <Icon name="calendarDots" size="sm" className="text-text-brand" />
+            تاریخ‌های جفت‌گیری
+          </h3>
           <p className="mt-2xs text-caption text-text-secondary">
             فقط تاریخ‌های تأییدشده دوطرفه؛ جدیدترین آن‌ها مبنای فاصله زمانی است.
           </p>

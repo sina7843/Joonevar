@@ -358,14 +358,21 @@ test('identifiers stay left-to-right inside Persian text', async () => {
     // The profile is a real record now, and it is refused to anyone but its
     // owner, so the fixture owns this synthetic animal.
     const animalId = '11111111-1111-1111-1111-111111111111';
+    /*
+     * The Pet ID, not the database key: §23.2 keeps the two apart and the file
+     * shows the one a person can use. It is still the case this test is about —
+     * a latin identifier sitting inside Persian text.
+     */
+    const petId = 'HZ-PET-RTL-0001';
     const { db, pool } = createDatabase(DATABASE_URL);
     try {
       await db.execute(sql`
-        insert into animal (id, owner_account_id, status, name)
-        select ${animalId}::uuid, account.id, 'REGISTERED', 'نمونه نمایش'
+        insert into animal (id, owner_account_id, status, name, pet_id)
+        select ${animalId}::uuid, account.id, 'REGISTERED', 'نمونه نمایش', ${petId}
         from account where account.mobile = ${FIXTURES.owner}
         on conflict (id) do nothing
       `);
+      await db.execute(sql`update animal set pet_id = ${petId} where id = ${animalId}::uuid`);
     } finally {
       await pool.end();
     }
@@ -376,7 +383,7 @@ test('identifiers stay left-to-right inside Persian text', async () => {
     const unicodeBidi = await identifier.evaluate((node) => getComputedStyle(node).unicodeBidi);
     assert.ok(unicodeBidi.includes('isolate'), 'identifier is bidi-isolated, got ' + unicodeBidi);
     // The rendered text is the stored value, unchanged.
-    assert.equal(await identifier.textContent(), animalId);
+    assert.equal(await identifier.textContent(), petId);
   } finally {
     await context.close();
   }

@@ -191,7 +191,16 @@ export default async function DashboardPage() {
 
   return (
     <PublicShell actor={actor} title="داشبورد" pathname="/dashboard">
-      <div className="space-y-xl">
+      <div className="hz-stagger space-y-xl">
+        {/*
+          * Prototype OWN-001 opens with the person, not with a service: the
+          * greeting is the first thing under the header, and everything below it
+          * is ordered by what is waiting for them.
+          */}
+        <h2 className="text-h3" data-testid="dashboard-greeting">
+          {profile === null ? 'سلام' : 'سلام، ' + profile.firstName + ' ' + profile.lastName}
+        </h2>
+
         {profile === null ? (
           <Alert
             tone="warning"
@@ -268,10 +277,22 @@ export default async function DashboardPage() {
                       : 'فعال نیست'}
               </StatusBadge>
             </div>
+            {/* Prototype OWN-001: a settled state is a line of text, not a
+                full-width call to action. The button appears when there is
+                actually something to do. */}
             <div className="mt-lg">
-              <ButtonLink href="/membership" block tone={membershipActive ? 'secondary' : 'primary'}>
-                {membershipActive ? 'مشاهده عضویت' : 'فعال‌سازی عضویت'}
-              </ButtonLink>
+              {membershipActive ? (
+                <Link
+                  href="/membership"
+                  className="text-label-md text-text-brand underline underline-offset-4"
+                >
+                  مشاهده عضویت
+                </Link>
+              ) : (
+                <ButtonLink href="/membership" block>
+                  فعال‌سازی عضویت
+                </ButtonLink>
+              )}
             </div>
           </Card>
         </section>
@@ -330,9 +351,16 @@ export default async function DashboardPage() {
         </section>
 
         <section aria-labelledby="requests-heading" className="space-y-md">
-          <h2 id="requests-heading" className="text-h4">
-            درخواست‌های فعال
-          </h2>
+          <div className="flex items-baseline justify-between gap-md">
+            <h2 id="requests-heading" className="text-h4">
+              درخواست‌های فعال
+            </h2>
+            {activeRequests.length > 0 ? (
+              <Link href="/requests" className="text-label-md text-text-brand underline underline-offset-4">
+                همه ({activeRequests.length})
+              </Link>
+            ) : null}
+          </div>
           {activeRequests.length === 0 ? (
             <EmptyState
               title="درخواست فعالی ندارید"

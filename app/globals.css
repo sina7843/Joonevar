@@ -175,6 +175,56 @@ body {
   display: none;
 }
 
+/*
+ * Motion — small, and only where it explains something.
+ *
+ * Two moves, no more: content arrives from slightly below as the page settles,
+ * and a card that can be opened lifts a little under the pointer. The arrival is
+ * staggered by one step per section so the eye is led down the page in reading
+ * order rather than everything appearing at once. The reduced-motion block below
+ * turns all of it off, so this stays a courtesy and never a requirement.
+ */
+@keyframes hz-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hz-enter {
+  animation: hz-rise 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.hz-stagger > * {
+  animation: hz-rise 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.hz-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.hz-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.hz-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.hz-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.hz-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.hz-stagger > *:nth-child(n + 6) { animation-delay: 200ms; }
+
+/* Only what can be opened lifts, so the movement means "this is a door". */
+.hz-lift {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+.hz-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -12px rgb(23 26 23 / 0.35);
+  border-color: var(--color-border-brand);
+}
+.hz-lift:active {
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

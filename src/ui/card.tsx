@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ButtonLink } from './button.tsx';
 import { ActionOwner, Identifier, StatusBadge, type ActionOwnerKind, type StatusTone } from './status.tsx';
@@ -56,26 +57,37 @@ export function AnimalCard({
   status: { tone: StatusTone; label: string };
   href: string;
 }) {
+  /*
+   * Prototype PET card, F03 116:481: an avatar tile, the name, the species and
+   * breed under it, the identifier, and the state as a badge. The whole row is
+   * the link — the prototype has no button inside this card, and a button per
+   * animal turned a list into a column of calls to action.
+   */
   return (
-    <Card>
-      <CardHeader
-        title={name}
-        badge={status}
-        subtitle={
-          <>
-            <span>{speciesBreed}</span>
-            <span className="mx-xs">·</span>
+    <Link
+      href={href}
+      className="hz-lift block rounded-lg border border-border-subtle bg-bg-surface p-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-brand"
+    >
+      <div className="flex items-start gap-md">
+        <span
+          aria-hidden="true"
+          className="flex size-[var(--size-control-md)] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand"
+        >
+          <Icon name="dog" size="md" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-sm">
+            <h3 className="truncate text-label-lg">{name}</h3>
+            <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+          </div>
+          <p className="mt-2xs text-caption text-text-secondary">{speciesBreed}</p>
+          <p className="mt-2xs text-caption text-text-secondary">
             {/* Pet ID exists only once a registration sheet is issued (§23.2). */}
             {petId ? <Identifier label="شناسه:" value={petId} /> : <span>شناسه: —</span>}
-          </>
-        }
-      />
-      <div className="mt-lg">
-        <ButtonLink tone="secondary" href={href} block>
-          مشاهده پرونده
-        </ButtonLink>
+          </p>
+        </div>
       </div>
-    </Card>
+    </Link>
   );
 }
 
