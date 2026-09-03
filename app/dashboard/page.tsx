@@ -30,16 +30,19 @@ const SERVICE_CARDS: ReadonlyArray<{ service: ServiceName; label: string; descri
     description: 'پس از تأیید احراز هویت باز می‌شود؛ برای این کار عضویت لازم نیست.',
     href: '/animals/new',
   },
-  {
-    service: 'VET_VISIT_REQUEST',
-    label: 'کاشت یا تأیید میکروچیپ',
-    description: 'انتخاب دامپزشک معتمد و دریافت کد مراجعه.',
-    href: '/vets/finder',
-  },
+  /*
+   * §13 and Flow Map section 02 are one service, not two. The chain is: choose
+   * animals, choose implant or verification per animal, choose the trusted vet,
+   * get the referral, have the chip and the mandatory sample done at the visit,
+   * pay once, and receive an independent sheet per animal. Offering the visit
+   * as its own dashboard service made step 4 look like a separate errand the
+   * person had to complete before the sheet would unlock — §5 lists no such
+   * service. It stays reachable from inside the flow, per animal.
+   */
   {
     service: 'REGISTRATION_SHEET',
-    label: 'دریافت برگه ثبتی',
-    description: 'پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری.',
+    label: 'برگه ثبتی',
+    description: 'میکروچیپ و نمونه‌گیری نزد دامپزشک معتمد، پرداخت گروهی و صدور برگه هر حیوان — یک مسیر.',
     href: '/registration/new',
   },
   {

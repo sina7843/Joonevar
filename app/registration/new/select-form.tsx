@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { Card } from '../../../src/ui/card.tsx';
-import { Button } from '../../../src/ui/button.tsx';
+import { Button, ButtonLink } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { createSheetRequestAction, type SheetFormState } from '../actions.ts';
 
@@ -11,14 +11,22 @@ const EMPTY: SheetFormState = {};
 /**
  * Choosing animals for one checkout — §13 steps 1 and 6.
  *
- * An animal that is not ready is shown with the reason rather than hidden, so
- * the missing step is visible instead of the animal simply being absent.
+ * An animal that is not ready is shown with the reason rather than hidden, and
+ * with the link that continues this same flow. The microchip and the sample are
+ * steps 2–4 here, not a separate service, so an animal that has not reached them
+ * offers the vet visit rather than a dead end.
  */
 export function SelectSheetAnimals({
   animals,
   feeLabel,
 }: {
-  animals: ReadonlyArray<{ animalId: string; name: string | null; ready: boolean; reasonFa: string | null }>;
+  animals: ReadonlyArray<{
+    animalId: string;
+    name: string | null;
+    ready: boolean;
+    reasonFa: string | null;
+    nextStep: { labelFa: string; href: string } | null;
+  }>;
   feeLabel: string | null;
 }) {
   const [state, submit, pending] = useActionState(createSheetRequestAction, EMPTY);
@@ -60,6 +68,17 @@ export function SelectSheetAnimals({
                   )}
                 </span>
               </label>
+              {animal.ready || animal.nextStep === null ? null : (
+                <div className="mt-md">
+                  <ButtonLink
+                    tone="secondary"
+                    href={animal.nextStep.href}
+                    data-testid={'sheet-next-' + animal.animalId}
+                  >
+                    {animal.nextStep.labelFa}
+                  </ButtonLink>
+                </div>
+              )}
             </li>
           ))}
         </ul>

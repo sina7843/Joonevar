@@ -10,6 +10,7 @@ import { and, desc, eq, inArray } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
 import { microchips, samples } from '../db/schema/clinical.ts';
+import { vetVisitRequests } from '../db/schema/vets.ts';
 import { paymentBatches, paymentItems } from '../db/schema/billing.ts';
 import { registrationSheetItems, registrationSheets } from '../db/schema/documents.ts';
 import { recordAudit } from '../audit/service.ts';
@@ -29,6 +30,20 @@ export const SAMPLE_TAKEN_NOTE_FA = 'نمونه خون دریافت شده؛ آ�
 export type SheetItemRecord = typeof registrationSheetItems.$inferSelect;
 export type SheetRecord = typeof registrationSheets.$inferSelect;
 
+/**
+ * Where an animal stands inside §13, and what the flow does next for it.
+ *
+ * The microchip and the mandatory blood sample are steps 2–4 of this same
+ * service, not a different service the person has to discover first (Flow Map
+ * section 02: انتخاب چند حیوان → نوع درخواست → دامپزشک → کاشت/تأیید → نمونه →
+ * پرداخت → صدور). So an animal that is not ready carries the route that
+ * continues the flow, instead of only a sentence saying what is missing.
+ */
+export interface NextStep {
+  readonly labelFa: string;
+  readonly href: string;
+}
+
 export interface AnimalReadiness {
   readonly animalId: string;
   readonly name: string | null;
@@ -36,13 +51,15 @@ export interface AnimalReadiness {
   readonly microchipNumber: string | null;
   readonly sampleTrackingCode: string | null;
   readonly reasonFa: string | null;
+  readonly nextStep: NextStep | null;
 }
 
 /**
  * What §13 steps 1–5 have to have produced before the money step opens.
  *
  * The order of the reasons matches the order of the steps, so the message names
- * the nearest missing thing rather than the last one checked.
+ * the nearest missing thing rather than the last one checked, and each one that
+ * is a step of this flow carries the route that continues it.
  */
 export async function readinessOf(
   database: DbClient,
@@ -53,9 +70,30 @@ export async function readinessOf(
   if (!animal || animal.ownerAccountId !== ownerAccountId) throw notFound('پرونده حیوان پیدا نشد.');
 
   const base = { animalId, name: animal.name } as const;
+  const blocked = { ...base, ready: false, microchipNumber: null, sampleTrackingCode: null } as const;
   if (animal.status !== 'REGISTERED') {
-    return { ...base, ready: false, microchipNumber: null, sampleTrackingCode: null, reasonFa: 'ثبت اولیه این حیوان کامل نیست.' };
+    return {
+      ...blocked,
+      reasonFa: 'ثبت اولیه این حیوان کامل نیست.',
+      nextStep: { labelFa: 'تکمیل ثبت حیوان', href: '/animals/' + animalId + '/edit' },
+    };
   }
+
+  /** The request that is already carrying this animal through steps 3–5. */
+  const [openVisit] = await database
+    .select({ id: vetVisitRequests.id })
+    .from(vetVisitRequests)
+    .where(
+      and(
+        eq(vetVisitRequests.animalId, animalId),
+        eq(vetVisitRequests.context, 'MICROCHIP'),
+        inArray(vetVisitRequests.status, ['ACTIVE', 'CHECKED_IN']),
+      ),
+    )
+    .limit(1);
+  const visitStep: NextStep = openVisit
+    ? { labelFa: 'پیگیری درخواست مراجعه', href: '/requests/' + openVisit.id }
+    : { labelFa: 'درخواست مراجعه دامپزشک', href: '/requests/new?context=MICROCHIP' };
 
   const [existing] = await database
     .select({ id: registrationSheets.id })
@@ -63,12 +101,24 @@ export async function readinessOf(
     .where(eq(registrationSheets.animalId, animalId))
     .limit(1);
   if (existing) {
-    return { ...base, ready: false, microchipNumber: null, sampleTrackingCode: null, reasonFa: 'برای این حیوان برگه ثبتی صادر شده است.' };
+    return {
+      ...blocked,
+      reasonFa: 'برای این حیوان برگه ثبتی صادر شده است.',
+      nextStep: { labelFa: 'مشاهده پرونده حیوان', href: '/animals/' + animalId },
+    };
   }
 
   const [chip] = await database.select().from(microchips).where(eq(microchips.animalId, animalId)).limit(1);
   if (!chip) {
-    return { ...base, ready: false, microchipNumber: null, sampleTrackingCode: null, reasonFa: 'میکروچیپ این حیوان هنوز ثبت نشده است.' };
+    return {
+      ...blocked,
+      // Not a separate service that has to be completed first: this is step 2
+      // of the very flow the person is already in.
+      reasonFa: openVisit
+        ? 'مرحله میکروچیپ این حیوان در جریان است؛ پس از مراجعه و نمونه‌گیری، پرداخت صدور باز می‌شود.'
+        : 'مرحله بعدی همین مسیر، کاشت یا تأیید میکروچیپ و نمونه‌گیری نزد دامپزشک معتمد است.',
+      nextStep: visitStep,
+    };
   }
 
   const collected = await database
@@ -83,7 +133,11 @@ export async function readinessOf(
       ready: false,
       microchipNumber: chip.number,
       sampleTrackingCode: null,
-      reasonFa: collected.length === 0 ? 'نمونه خون این حیوان هنوز ثبت نشده است.' : 'نمونه این حیوان قابل استفاده نیست؛ نمونه‌گیری مجدد لازم است.',
+      reasonFa:
+        collected.length === 0
+          ? 'نمونه خون این حیوان هنوز ثبت نشده است؛ نمونه‌گیری در همان مراجعه انجام می‌شود.'
+          : 'نمونه این حیوان قابل استفاده نیست؛ نمونه‌گیری مجدد در همان درخواست انجام می‌شود.',
+      nextStep: visitStep,
     };
   }
 
@@ -93,6 +147,7 @@ export async function readinessOf(
     microchipNumber: chip.number,
     sampleTrackingCode: usable.trackingCode,
     reasonFa: null,
+    nextStep: null,
   };
 }
 
