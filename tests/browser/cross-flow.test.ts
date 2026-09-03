@@ -12,7 +12,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomInt } from 'node:crypto';
-import { certifyIdentity } from './support.ts';
+import { certifyIdentity,
+  waitForShippedSample,
+} from './support.ts';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
@@ -305,9 +307,7 @@ async function pedigreedAnimal(
   await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
     waitUntil: 'load',
   });
-  // The centre may load before the custodian's shipment has landed; wait for
-  // the state the button belongs to instead of racing it.
-  await centreRow().getByText('ارسال‌شده').waitFor({ timeout: 45_000 });
+  await waitForShippedSample(centre, trackingCode);
   await centreRow().getByTestId('receive-sample').click();
   await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 45_000 });
   await centreRow().getByTestId('start-processing').click();

@@ -176,3 +176,24 @@ export async function certifyIdentity(page: Page): Promise<void> {
   await page.getByTestId('identity-submit').click();
   await page.getByTestId('identity-locked').waitFor({ timeout: 20_000 });
 }
+
+/**
+ * Waits for the centre to see a sample as shipped, reloading rather than staring.
+ *
+ * The custodian's shipment and the centre's page are two different requests, and
+ * under a loaded run the centre can render a moment before the write lands. A
+ * single waitFor then watches a page that will never change on its own, because
+ * the list is server-rendered. Reloading is what actually asks again.
+ */
+export async function waitForShippedSample(page: Page, trackingCode: string): Promise<void> {
+  const row = () =>
+    page.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    if ((await row().getByText('ارسال‌شده').count()) > 0) return;
+    await page.waitForTimeout(1_000);
+    await page.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
+      waitUntil: 'load',
+    });
+  }
+  throw new Error('the centre never saw ' + trackingCode + ' as shipped');
+}
