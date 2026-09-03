@@ -1,7 +1,8 @@
 import { guardRoute } from '../../src/authz/guard.ts';
 import { AccessDenied } from '../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../src/ui/shell.tsx';
-import { Card, LockedServiceCard, ServiceCard } from '../../src/ui/card.tsx';
+import Link from 'next/link';
+import { AnimalCard, Card, LockedServiceCard, RequestCard, ServiceCard } from '../../src/ui/card.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { Identifier, StatusBadge } from '../../src/ui/status.tsx';
@@ -9,6 +10,15 @@ import { Alert } from '../../src/ui/alert.tsx';
 import { db } from '../../src/db/client.ts';
 import { findProfile } from '../../src/identity/account.ts';
 import { findMembership } from '../../src/billing/membership.ts';
+import { listAnimals } from '../../src/animals/service.ts';
+import { listOwnerRequests } from '../../src/vets/visits.ts';
+import { REQUEST_STATUS_FA, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
+import { formatCivilDateFa } from '../../src/domain/calendar.ts';
+import { generationLabel } from '../../src/domain/lineage.ts';
+
+/** The dashboard is a summary; the full lists live on their own pages. */
+const ANIMALS_ON_DASHBOARD = 3;
+const REQUESTS_ON_DASHBOARD = 3;
 import { eligibilitySummary, vetEligibilityFor } from '../../src/domain/eligibility/service.ts';
 import type { ServiceName } from '../../src/domain/eligibility/rules.ts';
 import type { LockDetail } from '../../src/domain/errors.ts';
@@ -142,6 +152,16 @@ export default async function DashboardPage() {
   const membershipStatus = membership?.status ?? 'NONE';
   const membershipActive = membershipStatus === 'ACTIVE';
 
+  const [myAnimals, requestRows] = await Promise.all([
+    listAnimals(db(), actor),
+    listOwnerRequests(db(), actor),
+  ]);
+  // §8: "active" means the case is still moving — a completed visit belongs to
+  // the animal's file, not to the list of what is waiting for someone.
+  const activeRequests = requestRows.filter(
+    (row) => row.request.status === 'ACTIVE' || row.request.status === 'CHECKED_IN',
+  );
+
   const operational = OPS_ENVIRONMENTS.filter((environment) =>
     actor.activeRoles.includes(environment.role),
   );
@@ -239,28 +259,90 @@ export default async function DashboardPage() {
           </Card>
         </section>
 
+        {/*
+          * §8: the dashboard has to answer what each animal has completed. It
+          * was drawing a fixed empty state and never asking the database, so a
+          * person with animals was told they had none.
+          */}
         <section aria-labelledby="animals-heading" className="space-y-md">
-          <h2 id="animals-heading" className="text-h4">
-            حیوان‌های من
-          </h2>
-          <EmptyState
-            title="هنوز حیوانی ثبت نکرده‌اید"
-            description={
-              services.ANIMAL_REGISTRATION.allowed
-                ? 'می‌توانید اولین حیوان خود را ثبت کنید.'
-                : 'پس از تأیید احراز هویت، می‌توانید حیوان خود را در هم‌زیست ثبت کنید.'
-            }
-          />
+          <div className="flex items-baseline justify-between gap-md">
+            <h2 id="animals-heading" className="text-h4">
+              حیوان‌های من
+            </h2>
+            {myAnimals.length > 0 ? (
+              <Link href="/animals" className="text-label-md text-text-brand underline underline-offset-4">
+                همه ({myAnimals.length})
+              </Link>
+            ) : null}
+          </div>
+
+          {myAnimals.length === 0 ? (
+            <EmptyState
+              title="هنوز حیوانی ثبت نکرده‌اید"
+              description={
+                services.ANIMAL_REGISTRATION.allowed
+                  ? 'می‌توانید اولین حیوان خود را ثبت کنید.'
+                  : 'پس از تأیید احراز هویت، می‌توانید حیوان خود را در هم‌زیست ثبت کنید.'
+              }
+            />
+          ) : (
+            <ul className="space-y-md" data-testid="dashboard-animals">
+              {myAnimals.slice(0, ANIMALS_ON_DASHBOARD).map((animal) => (
+                <li key={animal.id}>
+                  <AnimalCard
+                    name={animal.name ?? 'بدون نام'}
+                    speciesBreed={'سگ · ' + generationLabel(animal.generation)}
+                    petId={animal.petId}
+                    status={
+                      animal.status === 'REGISTERED'
+                        ? animal.identityVerifiedAt === null
+                          ? { tone: 'info', label: 'پرونده اولیه' }
+                          : { tone: 'success', label: 'مشخصات رسمی ثبت‌شده' }
+                        : { tone: 'neutral', label: 'پیش‌نویس' }
+                    }
+                    href={
+                      animal.status === 'REGISTERED'
+                        ? '/animals/' + animal.id
+                        : '/animals/' + animal.id + '/edit'
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section aria-labelledby="requests-heading" className="space-y-md">
           <h2 id="requests-heading" className="text-h4">
             درخواست‌های فعال
           </h2>
-          <EmptyState
-            title="درخواست فعالی ندارید"
-            description="درخواست‌های مراجعه، صدور سند و بررسی پس از ایجاد در این بخش دیده می‌شوند."
-          />
+          {activeRequests.length === 0 ? (
+            <EmptyState
+              title="درخواست فعالی ندارید"
+              description="درخواست‌های مراجعه، صدور سند و بررسی پس از ایجاد در این بخش دیده می‌شوند."
+            />
+          ) : (
+            <ul className="space-y-lg" data-testid="dashboard-requests">
+              {activeRequests.slice(0, REQUESTS_ON_DASHBOARD).map((row) => (
+                <li key={row.request.id}>
+                  <RequestCard
+                    title={SERVICE_TYPE_FA[row.request.serviceType]}
+                    requestCode={row.referral?.code ?? '—'}
+                    animalName={row.animalName ?? 'بدون نام'}
+                    status={{
+                      tone: row.request.status === 'ACTIVE' ? (row.expired ? 'warning' : 'info') : 'success',
+                      label: row.expired ? 'مهلت گذشته' : REQUEST_STATUS_FA[row.request.status]!,
+                    }}
+                    owner={row.request.status === 'ACTIVE' ? 'USER' : 'VET'}
+                    {...(row.referral
+                      ? { deadlineFa: formatCivilDateFa(row.referral.expiresAt.toISOString().slice(0, 10)) }
+                      : {})}
+                    resumeHref={'/requests/' + row.request.id}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section aria-labelledby="services-heading" className="space-y-lg">
