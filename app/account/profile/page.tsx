@@ -11,7 +11,7 @@ import { findProfile, findResidence } from '../../../src/identity/account.ts';
 import { findCase } from '../../../src/identity/kyc.ts';
 import { mapApiKey } from '../../../src/adapters/integration-settings.ts';
 import { IdentityForm, ResidenceForm } from '../profile-forms.tsx';
-import { signOutAction } from '../../login/actions.ts';
+import { signOutAction } from '../../../src/identity/sign-out-action.ts';
 import { Button } from '../../../src/ui/button.tsx';
 
 export const dynamic = 'force-dynamic';

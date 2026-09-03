@@ -10,7 +10,8 @@ import { db } from '../../src/db/client.ts';
 import { findProfile } from '../../src/identity/account.ts';
 import { findMembership } from '../../src/billing/membership.ts';
 import { eligibilitySummary, vetEligibilityFor } from '../../src/domain/eligibility/service.ts';
-import type { Eligibility, ServiceName } from '../../src/domain/eligibility/rules.ts';
+import type { ServiceName } from '../../src/domain/eligibility/rules.ts';
+import type { LockDetail } from '../../src/domain/errors.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,11 +68,27 @@ const SERVICE_CARDS: ReadonlyArray<{ service: ServiceName; label: string; descri
   },
 ];
 
-function renderService(entry: (typeof SERVICE_CARDS)[number], eligibility: Eligibility) {
-  if (eligibility.allowed) {
-    return <ServiceCard key={entry.service} label={entry.label} description={entry.description} href={entry.href} />;
+/**
+ * §8: what is open, and what the one next action is.
+ *
+ * Every service that depends on identity verification repeats the same lock, so
+ * listing all of them turned the dashboard into a wall of the same sentence and
+ * buried the single thing the person can actually do. Locked services are
+ * grouped by the prerequisite they are waiting for: one card carries the reason
+ * and the CTA, and names the services it opens. Nothing is hidden — a service
+ * the person cannot start is still shown, once, with its real reason.
+ */
+function groupLocked(
+  entries: ReadonlyArray<{ entry: (typeof SERVICE_CARDS)[number]; lock: LockDetail }>,
+): ReadonlyArray<{ lock: LockDetail; labels: readonly string[] }> {
+  const groups = new Map<string, { lock: LockDetail; labels: string[] }>();
+  for (const { entry, lock } of entries) {
+    const key = lock.reason + '|' + lock.nextPrerequisite + '|' + lock.cta.href;
+    const existing = groups.get(key);
+    if (existing) existing.labels.push(entry.label);
+    else groups.set(key, { lock, labels: [entry.label] });
   }
-  return <LockedServiceCard key={entry.service} serviceLabel={entry.label} lock={eligibility.lock} />;
+  return [...groups.values()];
 }
 
 export default async function DashboardPage() {
@@ -86,6 +103,12 @@ export default async function DashboardPage() {
 
   const membershipStatus = membership?.status ?? 'NONE';
   const membershipActive = membershipStatus === 'ACTIVE';
+
+  const open = SERVICE_CARDS.filter((entry) => services[entry.service].allowed);
+  const locked = SERVICE_CARDS.flatMap((entry) => {
+    const eligibility = services[entry.service];
+    return eligibility.allowed ? [] : [{ entry, lock: eligibility.lock }];
+  });
 
   return (
     <PublicShell actor={actor} title="داشبورد" pathname="/dashboard">
@@ -178,7 +201,33 @@ export default async function DashboardPage() {
           <h2 id="services-heading" className="text-h4">
             سرویس‌ها
           </h2>
-          {SERVICE_CARDS.map((entry) => renderService(entry, services[entry.service]))}
+
+          {open.map((entry) => (
+            <ServiceCard
+              key={entry.service}
+              label={entry.label}
+              description={entry.description}
+              href={entry.href}
+            />
+          ))}
+
+          {open.length === 0 && locked.length > 0 ? (
+            <p className="text-body-sm text-text-secondary" data-testid="no-open-service">
+              هنوز هیچ سرویسی برای شما باز نیست. با انجام کار زیر، سرویس‌های وابسته به آن باز می‌شوند.
+            </p>
+          ) : null}
+
+          {groupLocked(locked).map((group) => (
+            <div key={group.lock.reason + group.lock.cta.href} className="space-y-md">
+              <LockedServiceCard serviceLabel={group.labels[0]!} lock={group.lock} />
+              {group.labels.length > 1 ? (
+                <p className="text-caption text-text-secondary" data-testid="locked-group-more">
+                  با همین کار، {group.labels.length - 1} سرویس دیگر هم باز می‌شود:{' '}
+                  {group.labels.slice(1).join('، ')}.
+                </p>
+              ) : null}
+            </div>
+          ))}
         </section>
       </div>
     </PublicShell>

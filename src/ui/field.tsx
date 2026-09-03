@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 
 /**
  * Form field wrapper.
@@ -192,5 +192,62 @@ export function LocationField({
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * A file input that refuses an oversized file in the browser.
+ *
+ * Uploads travel through a Server Action, and a request larger than the
+ * configured body limit fails before any of the product's own checks run — the
+ * person sees a blank application error instead of a reason. This says the
+ * reason in the form, in Persian, and clears the selection so the request is
+ * never sent. The server still applies the real limit, the accepted types and
+ * the signature check: this is a courtesy, not the rule.
+ */
+export function FileField({
+  label,
+  name,
+  accept,
+  maxBytes,
+  hint,
+  required,
+  testId,
+}: {
+  label: string;
+  name: string;
+  accept: string;
+  maxBytes: number;
+  hint?: string;
+  required?: boolean;
+  testId?: string;
+}) {
+  const [error, setError] = useState<string | null>(null);
+  const megabytes = Math.floor(maxBytes / (1024 * 1024));
+
+  return (
+    <Field label={label} hint={hint} required={required} error={error ?? undefined}>
+      {({ inputId, describedBy, invalid }) => (
+        <input
+          id={inputId}
+          name={name}
+          type="file"
+          accept={accept}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file && file.size > maxBytes) {
+              setError('حجم این فایل بیش از حد مجاز است (حداکثر ' + megabytes + ' مگابایت).');
+              event.target.value = '';
+              return;
+            }
+            setError(null);
+          }}
+          className={['w-full rounded-md border bg-bg-surface p-md text-body-sm', controlTone(invalid)].join(' ')}
+          data-testid={testId}
+        />
+      )}
+    </Field>
   );
 }

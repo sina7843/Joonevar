@@ -3,6 +3,43 @@ import type { ReactNode } from 'react';
 import { Logo } from './logo.tsx';
 import { RoleSwitcher, CONTEXT_LABEL_FA } from './role-switcher.tsx';
 import { switchableContexts, type Actor, type ActorContextName } from '../authz/actor.ts';
+import { db } from '../db/client.ts';
+import { findProfile } from '../identity/account.ts';
+import { signOutAction } from '../identity/sign-out-action.ts';
+
+/**
+ * Who is signed in, and the way out.
+ *
+ * Signing out was reachable only from the profile screen, and on a wide screen
+ * the bottom tabs are hidden, so there was no way to leave the account at all.
+ * The name is the person's own; before the profile exists it says so instead of
+ * inventing one.
+ */
+async function AccountMenu({ actor }: { actor: Actor }) {
+  const profile = await findProfile(db(), actor.accountId);
+  const name = profile === null ? 'حساب من' : profile.firstName + ' ' + profile.lastName;
+
+  return (
+    <div className="flex items-center gap-sm">
+      <Link
+        href="/account/profile"
+        className="max-w-[12ch] truncate text-label-md text-text-primary underline-offset-4 hover:underline"
+        data-testid="account-name"
+      >
+        {name}
+      </Link>
+      <form action={signOutAction}>
+        <button
+          type="submit"
+          className="min-h-[var(--size-control-sm)] rounded-md px-md text-label-md text-text-secondary hover:text-text-brand"
+          data-testid="header-sign-out"
+        >
+          خروج
+        </button>
+      </form>
+    </div>
+  );
+}
 
 interface NavItem {
   readonly href: string;
@@ -19,7 +56,7 @@ const PUBLIC_TABS: readonly NavItem[] = [
 
 const VET_TABS: readonly NavItem[] = [
   { href: '/vet', label: 'صف من' },
-  { href: '/vet/checkin', label: 'پذیرش' },
+  { href: '/vet/check-in', label: 'پذیرش' },
   { href: '/vet/samples', label: 'نمونه‌ها' },
   { href: '/profile', label: 'پروفایل' },
 ];
@@ -31,7 +68,7 @@ const VET_TABS: readonly NavItem[] = [
  * column capped for readability, and a bottom tab bar on small screens that
  * becomes a side rail from the medium breakpoint up.
  */
-export function PublicShell({
+export async function PublicShell({
   actor,
   title,
   pathname,
@@ -57,19 +94,43 @@ export function PublicShell({
             </Link>
             <h1 className="text-label-lg">{title}</h1>
           </div>
-          <Link
-            href="/notifications"
-            aria-label={'اعلان‌ها' + (unreadCount > 0 ? ' — ' + unreadCount + ' مورد خوانده‌نشده' : '')}
-            className="relative text-text-brand"
-          >
-            <span aria-hidden="true" className="text-h4">
-              ⌾
-            </span>
-            {unreadCount > 0 ? (
-              <span className="absolute -top-1 -left-1 size-[8px] rounded-full bg-status-error-border" />
-            ) : null}
-          </Link>
+          <div className="flex items-center gap-md">
+            <Link
+              href="/notifications"
+              aria-label={'اعلان‌ها' + (unreadCount > 0 ? ' — ' + unreadCount + ' مورد خوانده‌نشده' : '')}
+              className="relative text-text-brand"
+            >
+              <span aria-hidden="true" className="text-h4">
+                ⌾
+              </span>
+              {unreadCount > 0 ? (
+                <span className="absolute -top-1 -left-1 size-[8px] rounded-full bg-status-error-border" />
+              ) : null}
+            </Link>
+            <AccountMenu actor={actor} />
+          </div>
         </div>
+
+        {/* The bottom tabs are hidden on a wide screen, so the same destinations
+            are offered here instead of leaving the desktop with no navigation. */}
+        <nav aria-label="ناوبری اصلی (دسکتاپ)" className="mx-auto hidden max-w-3xl gap-lg px-lg pb-sm md:flex">
+          {tabs.map((tab) => {
+            const active = pathname === tab.href || pathname.startsWith(tab.href + '/');
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                aria-current={active ? 'page' : undefined}
+                className={[
+                  'py-sm text-label-md',
+                  active ? 'text-text-brand' : 'text-text-secondary hover:text-text-primary',
+                ].join(' ')}
+              >
+                {tab.label}
+              </Link>
+            );
+          })}
+        </nav>
       </header>
 
       <div className="mx-auto max-w-3xl px-lg pb-[96px] pt-lg md:pb-xl">
@@ -116,7 +177,7 @@ export function PublicShell({
  * with its own navigation. It is a separate shell rather than an extra tab in
  * the public app, and it is never reachable by switching a public role.
  */
-export function OpsShell({
+export async function OpsShell({
   actor,
   title,
   pathname,
@@ -137,9 +198,12 @@ export function OpsShell({
             <Logo height={24} />
             <h1 className="text-label-lg">{title}</h1>
           </div>
-          <p className="text-caption text-text-secondary">
-            محیط عملیاتی — {CONTEXT_LABEL_FA[actor.context as ActorContextName]}
-          </p>
+          <div className="flex items-center gap-md">
+            <p className="text-caption text-text-secondary">
+              محیط عملیاتی — {CONTEXT_LABEL_FA[actor.context as ActorContextName]}
+            </p>
+            <AccountMenu actor={actor} />
+          </div>
         </div>
       </header>
 

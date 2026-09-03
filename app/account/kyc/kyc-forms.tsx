@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Button } from '../../../src/ui/button.tsx';
-import { Field } from '../../../src/ui/field.tsx';
+import { FileField } from '../../../src/ui/field.tsx';
 import { submitKycAction, uploadKycDocumentAction, type FormState } from '../actions.ts';
 
 const EMPTY: FormState = {};
@@ -25,23 +25,15 @@ export function KycDocumentForm({ hasDocument }: { hasDocument: boolean }) {
   return (
     <form action={submit} className="space-y-lg" data-testid="kyc-upload-form">
       <Result state={state} />
-      <Field
+      <FileField
         label="تصویر کارت ملی"
+        name="document"
         required
+        accept="image/jpeg,image/png,application/pdf"
+        maxBytes={10 * 1024 * 1024}
         hint="JPG، PNG یا PDF تا ۱۰ مگابایت. این فایل خصوصی است و فقط برای بررسی انجمن در دسترس قرار می‌گیرد."
-      >
-        {({ inputId, describedBy }) => (
-          <input
-            id={inputId}
-            name="document"
-            type="file"
-            accept="image/jpeg,image/png,application/pdf"
-            aria-describedby={describedBy}
-            className="w-full rounded-md border border-border-subtle bg-bg-surface p-md text-body-sm"
-            data-testid="kyc-file"
-          />
-        )}
-      </Field>
+        testId="kyc-file"
+      />
       <Button type="submit" tone="secondary" block disabled={pending} data-testid="upload-kyc">
         {pending ? 'در حال بارگذاری…' : hasDocument ? 'جایگزینی تصویر کارت ملی' : 'بارگذاری تصویر کارت ملی'}
       </Button>

@@ -108,14 +108,3 @@ export async function verifyCodeAction(previous: LoginState, form: FormData): Pr
   redirect(profile === null ? '/account/complete' + (next ? '?next=' + encodeURIComponent(next) : '') : (next ?? '/dashboard'));
 }
 
-export async function signOutAction(): Promise<void> {
-  const store = await cookies();
-  const token = store.get(SESSION_COOKIE)?.value;
-  if (token) {
-    const { resolveSession, revokeSession } = await import('../../src/identity/session.ts');
-    const session = await resolveSession(db(), token);
-    if (session) await revokeSession(db(), session.sessionId);
-  }
-  store.delete(SESSION_COOKIE);
-  redirect('/login');
-}

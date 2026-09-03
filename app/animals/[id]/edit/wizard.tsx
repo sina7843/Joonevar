@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { ActionRow, Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
-import { Field, SelectField, TextField } from '../../../../src/ui/field.tsx';
+import { Field, FileField, SelectField, TextField } from '../../../../src/ui/field.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import {
   registerAnimalAction,
@@ -279,19 +279,14 @@ export function AnimalWizard({
           <Result state={photoState} />
           <form action={uploadPhoto} className="space-y-lg" data-testid="step-4">
             <input type="hidden" name="animalId" value={animal.id} />
-            <Field label="تصویر حیوان" hint="JPG یا PNG تا ۵ مگابایت. این تصویر خصوصی است.">
-              {({ inputId, describedBy }) => (
-                <input
-                  id={inputId}
-                  name="photo"
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  aria-describedby={describedBy}
-                  className="w-full rounded-md border border-border-subtle bg-bg-surface p-md text-body-sm"
-                  data-testid="animal-photo"
-                />
-              )}
-            </Field>
+            <FileField
+              label="تصویر حیوان"
+              name="photo"
+              accept="image/jpeg,image/png"
+              maxBytes={5 * 1024 * 1024}
+              hint="JPG یا PNG تا ۵ مگابایت. این تصویر خصوصی است."
+              testId="animal-photo"
+            />
             {animal.hasPhoto ? <StatusBadge tone="success">تصویر ذخیره شده است</StatusBadge> : null}
             <Button tone="secondary" type="submit" block disabled={photoPending} data-testid="upload-photo">
               {photoPending ? 'در حال بارگذاری…' : 'بارگذاری تصویر'}
