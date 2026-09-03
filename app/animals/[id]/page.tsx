@@ -120,6 +120,15 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
 
         <Card>
           <h3 className="text-label-lg">هویت</h3>
+          {/* §10: verified data is not rewritten from this form, and the screen
+              says which of the two it is looking at. */}
+          <p className="mt-2xs text-caption text-text-secondary" data-testid="identity-provenance">
+            {animal.identityVerifiedAt === null
+              ? 'این مشخصات اظهار شماست. در مراجعه به دامپزشک معتمد، مشخصات رسمی ثبت می‌شود و پس از آن تغییر نمی‌کند.'
+              : 'مشخصات رسمی، در ' +
+                formatCivilDateFa(animal.identityVerifiedAt.toISOString().slice(0, 10)) +
+                ' توسط دامپزشک معتمد ثبت شده است و از این فرم تغییر نمی‌کند.'}
+          </p>
           <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
             <dt className="text-text-secondary">تاریخ تولد</dt>
             <dd>

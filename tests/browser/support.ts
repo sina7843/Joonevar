@@ -161,3 +161,18 @@ export async function setPaymentMode(mode: 'MOCK_AUTO' | 'DEV_GATEWAY'): Promise
     await pool.end();
   }
 }
+
+/**
+ * §13: the vet certifies the identity before the chip step opens.
+ *
+ * The form arrives prefilled with what the owner declared, so a fixture that has
+ * nothing to correct submits it as it stands — which is exactly what a vet does
+ * when the declaration matches the animal in front of them. If the identity is
+ * already on record the panel is read-only and there is nothing to do.
+ */
+export async function certifyIdentity(page: Page): Promise<void> {
+  const form = page.getByTestId('identity-form');
+  if ((await form.count()) === 0) return;
+  await page.getByTestId('identity-submit').click();
+  await page.getByTestId('identity-locked').waitFor({ timeout: 20_000 });
+}

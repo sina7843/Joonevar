@@ -463,6 +463,22 @@ export async function editAnimal(
     }
   }
 
+  /*
+   * Once a trusted veterinarian has certified the identity in person, these are
+   * verified data: §10 says verified data is not rewritable from the profile
+   * form and is corrected through the process and the actor responsible for it.
+   * The name goes with them, because it is printed on the issued sheet.
+   */
+  if (record.identityVerifiedAt !== null) {
+    for (const field of ['name', 'color', 'markings', 'birthDateApproximate'] as const) {
+      if (input[field] !== undefined) {
+        throw forbidden(
+          'مشخصات رسمی این حیوان توسط دامپزشک معتمد ثبت شده است و از فرم پروفایل تغییر نمی‌کند.',
+        );
+      }
+    }
+  }
+
   const name = trimmedOrNull(input.name ?? record.name);
   if (name !== null && name.length > 60) throw validation('نام حیوان بیش از حد طولانی است.');
 

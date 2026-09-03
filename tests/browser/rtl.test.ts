@@ -15,6 +15,8 @@ import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { randomInt } from 'node:crypto';
+import { syntheticNationalId } from './support.ts';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
@@ -96,6 +98,27 @@ async function signIn(
 
 async function anonymousContext(viewport: { width: number; height: number }): Promise<BrowserContext> {
   return browser.newContext({ viewport, locale: 'fa-IR' });
+}
+
+/** Signs a never-seen account in and completes only its profile, nothing else. */
+async function freshAccountAtDashboard(context: BrowserContext): Promise<Page> {
+  const mobile = '0999' + String(randomInt(1_000_000, 9_999_999));
+  const page = await context.newPage();
+  await page.goto(BASE_URL + '/login', { waitUntil: 'load' });
+  await page.getByTestId('mobile-input').fill(mobile);
+  await page.getByTestId('send-code').click();
+  await page.getByTestId('code-input').waitFor();
+  await page.getByTestId('code-input').fill(await lastCodeFor(mobile));
+  await Promise.all([
+    page.waitForURL((url) => !url.pathname.startsWith('/login')),
+    page.getByTestId('verify-code').click(),
+  ]);
+  await page.getByTestId('first-name').fill('نمونه');
+  await page.getByTestId('last-name').fill('بدون احراز');
+  await page.getByTestId('national-id').fill(syntheticNationalId());
+  await page.getByTestId('birth-date').fill('1991-01-01');
+  await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
+  return page;
 }
 
 before(async () => {
@@ -303,8 +326,14 @@ test('the role switcher shows only active public contexts and switching is check
 });
 
 test('a locked service shows its reason, prerequisite and a working CTA', async () => {
-  const context = await signIn('owner', VIEWPORTS.mobileReference);
-  const page = await context.newPage();
+  /*
+   * A brand-new account, not the shared fixture: other suites take the fixture
+   * all the way through KYC and membership, and a test whose premise is "this
+   * account has an unmet prerequisite" cannot depend on state someone else
+   * changes. A fresh account has exactly one unmet prerequisite, always.
+   */
+  const context = await browser.newContext({ viewport: VIEWPORTS.mobileReference, locale: 'fa-IR' });
+  const page = await freshAccountAtDashboard(context);
   try {
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
     const body = await page.locator('body').innerText();

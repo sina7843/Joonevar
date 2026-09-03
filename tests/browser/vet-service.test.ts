@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomInt } from 'node:crypto';
+import { certifyIdentity } from './support.ts';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
@@ -381,6 +382,9 @@ test('manual entry carries the whole implant alongside the keyboard-wedge reader
     await checkInAs(page, code);
     await page.goto(BASE_URL + '/vet/requests/' + requestId, { waitUntil: 'load' });
 
+    // §13: the chip panel appears only once the identity has been certified.
+    await certifyIdentity(page);
+
     // The Bluetooth reader types into the field like a keyboard (DEC-0126), so
     // the page says how it works instead of calling it unconfigured — and manual
     // entry is still one of the four methods, not a workaround.
@@ -441,6 +445,7 @@ test('the sample code appears only after the sampling is recorded, and custody f
     assert.equal(await owner.page.getByTestId('owner-samples').count(), 0);
 
     const number = chipNumber(3);
+    await certifyIdentity(page);
     await page.getByTestId('chip-read-number').fill(number);
     await page.getByTestId('chip-read-submit').click();
     await expectText(page, 'سریال پیش از کاشت ثبت شد');
@@ -510,6 +515,7 @@ test('resampling issues a new code on the same request and keeps the old one', a
 
     // A physical chip with no record binds only after the checks (§12.3).
     const number = chipNumber(4);
+    await certifyIdentity(page);
     await page.getByTestId('chip-read-number').fill(number);
     await page.getByTestId('chip-read-submit').click();
     await expectText(page, 'چیپ فیزیکی بدون رکورد سیستمی');

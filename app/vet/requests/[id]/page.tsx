@@ -13,6 +13,8 @@ import { integrationSettings } from '../../../../src/adapters/integration-settin
 import { vetLocations, vetProfiles } from '../../../../src/db/schema/vets.ts';
 import { vetRequestDetail } from '../../../../src/vets/visits.ts';
 import { animalChipView, procedureOf } from '../../../../src/clinical/microchip.ts';
+import { breedOptions } from '../../../../src/animals/service.ts';
+import { IdentityPanel } from './identity.tsx';
 import { eventsOfSample, samplesOfRequest } from '../../../../src/clinical/samples.ts';
 import { isUnusable, READ_METHOD_FA, SAMPLE_STATUS_FA } from '../../../../src/domain/microchip.ts';
 import {
@@ -65,11 +67,13 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
   const visible = open || done;
   const alternatives = SERVICES_BY_CONTEXT[request.context].filter((s) => s !== request.serviceType);
 
-  const [{ animal, chip, conflicts }, procedure, sampleRows] = await Promise.all([
+  const [{ animal, chip, conflicts }, procedure, sampleRows, breeds] = await Promise.all([
     animalChipView(db(), request.animalId),
     procedureOf(db(), request.id),
     samplesOfRequest(db(), request.id),
+    breedOptions(db()),
   ]);
+  const identityVerifiedAt = animal?.identityVerifiedAt ?? null;
   const [vet] = await db().select().from(vetProfiles).where(eq(vetProfiles.accountId, request.vetAccountId));
   const [location] = await db().select().from(vetLocations).where(eq(vetLocations.id, request.locationId));
 
@@ -175,7 +179,25 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
           )
         ) : null}
 
-        {open && request.context !== 'PREGNANCY' ? (
+        {/* §13: identity first, then the chip that makes it permanent. */}
+        {open && request.context === 'MICROCHIP' ? (
+          <IdentityPanel
+            requestId={request.id}
+            breeds={breeds}
+            defaults={{
+              name: animal?.name ?? null,
+              breedId: animal?.breedId ?? null,
+              sex: animal?.sex ?? null,
+              birthDate: animal?.birthDate ?? null,
+              birthDateApproximate: animal?.birthDateApproximate ?? false,
+              color: animal?.color ?? null,
+              markings: animal?.markings ?? null,
+            }}
+            verified={identityVerifiedAt === null ? null : { at: identityVerifiedAt, byName: null }}
+          />
+        ) : null}
+
+        {open && request.context !== 'PREGNANCY' && identityVerifiedAt !== null ? (
           <ChipPanel
             requestId={request.id}
             serviceType={request.serviceType}

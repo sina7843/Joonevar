@@ -21,6 +21,7 @@ import { registerAnimal, saveDraft, startDraft } from '../../src/animals/service
 import { addLocation, upsertVetProfile } from '../../src/vets/registry.ts';
 import { checkIn, createVisitRequests } from '../../src/vets/visits.ts';
 import { confirmImplant, recordChipRead, recordRereadAndBind } from '../../src/clinical/microchip.ts';
+import { recordOfficialIdentity } from '../../src/clinical/identity.ts';
 import { markSampleUnusable, recordSampling } from '../../src/clinical/samples.ts';
 import {
   createSheetRequest,
@@ -185,6 +186,16 @@ async function readyAnimal(ctx: Ctx, name: string, options: { sample?: boolean }
   await checkIn(ctx.testDb.db, ctx.vet.actor, {
     code: created.items[0]!.referral.code,
     locationId: ctx.locationId,
+  });
+  // §13: the identity is certified at the desk before the chip is bound.
+  await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
+    name,
+    breedId: ctx.breedId,
+    sex: 'MALE',
+    birthDate: '2022-01-01',
+    birthDateApproximate: false,
+    color: 'قهوه‌ای',
+    markings: null,
   });
 
   const number = nextChip();

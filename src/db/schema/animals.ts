@@ -66,7 +66,7 @@ export const animals = pgTable(
     birthDate: date('birth_date'),
     birthDateApproximate: boolean('birth_date_approximate').notNull().default(false),
 
-    // ── Step 3: appearance — declared by the owner and not verified ────────
+    // ── Step 3: appearance — declared by the owner until a vet certifies it ─
     color: text('color'),
     markings: text('markings'),
 
@@ -102,6 +102,24 @@ export const animals = pgTable(
      */
     draftStep: integer('draft_step').notNull().default(1),
     draftData: jsonb('draft_data'),
+
+    /**
+     * The official identity, certified in person — §13 («دامپزشک برای تأیید
+     * هویت»), §10 and §12.5.
+     *
+     * Everything the owner enters before the visit is a declaration. At the
+     * visit the trusted veterinarian sees the animal and records what is
+     * actually true, and from that moment the identity fields are the certified
+     * ones: the owner cannot rewrite them from the profile form, because §10
+     * says verified data is corrected through the process that produced it and
+     * by the actor responsible for it. The previous values stay in the audit
+     * trail rather than being lost.
+     */
+    identityVerifiedAt: timestamp('identity_verified_at', { withTimezone: true }),
+    identityVerifiedByAccountId: uuid('identity_verified_by_account_id').references(() => accounts.id, {
+      onDelete: 'set null',
+    }),
+    identityVerifiedRequestId: uuid('identity_verified_request_id'),
 
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),

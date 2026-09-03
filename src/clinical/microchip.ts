@@ -49,6 +49,19 @@ function uniqueViolation(error: unknown): string | null {
  * The work belongs to the veterinarian who was assigned it and only while the
  * visit is actually open at the desk (§11.3, §21.1).
  */
+/** The chip step of §13 does not start before the identity is on record. */
+export async function assertIdentityVerified(database: DbClient, animalId: string): Promise<void> {
+  const [row] = await database
+    .select({ at: animals.identityVerifiedAt })
+    .from(animals)
+    .where(eq(animals.id, animalId))
+    .limit(1);
+  if (!row) throw notFound('پرونده حیوان پیدا نشد.');
+  if (row.at === null) {
+    throw conflict('ابتدا مشخصات رسمی این حیوان را ثبت کنید؛ میکروچیپ پس از آن ثبت می‌شود.');
+  }
+}
+
 export async function requireOpenVisit(
   database: DbClient,
   actor: Actor,
@@ -193,6 +206,11 @@ export async function recordChipRead(
   if (request.serviceType !== 'MICROCHIP_IMPLANT' && request.serviceType !== 'MICROCHIP_VERIFICATION') {
     throw validation('این خدمت میکروچیپ نیست.');
   }
+  // §13: the vet certifies the identity, and the chip is what makes that
+  // identity permanent. Binding a number to an animal nobody has identified
+  // would be a lifetime link to an unverified record, so the order is enforced
+  // here and not only in the screen that draws the two panels.
+  await assertIdentityVerified(database, request.animalId);
   const number = assertMicrochipNumber(input.number);
   const facts = await factsFor(database, request.animalId, number);
 

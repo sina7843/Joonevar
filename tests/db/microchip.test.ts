@@ -14,7 +14,9 @@ import { attachKycDocument, reviewKyc, submitKyc } from '../../src/identity/kyc.
 import { startMembershipPayment } from '../../src/billing/membership.ts';
 import { startAttempt, verifyAttempt } from '../../src/billing/payments.ts';
 import { paidEffects } from '../../src/billing/effects.ts';
-import { registerAnimal, saveDraft, startDraft } from '../../src/animals/service.ts';
+import { editAnimal, registerAnimal, saveDraft, startDraft } from '../../src/animals/service.ts';
+import { animals } from '../../src/db/schema/animals.ts';
+import { auditTrail } from '../../src/audit/service.ts';
 import { addLocation, upsertVetProfile } from '../../src/vets/registry.ts';
 import { checkIn, createVisitRequests } from '../../src/vets/visits.ts';
 import {
@@ -25,6 +27,7 @@ import {
   recordChipRead,
   recordRereadAndBind,
 } from '../../src/clinical/microchip.ts';
+import { recordOfficialIdentity } from '../../src/clinical/identity.ts';
 import {
   custodyList,
   instructSend,
@@ -203,6 +206,16 @@ async function openVisit(
     locationId,
   });
   assert.equal(outcome.ok, true);
+  // §13: the chip step does not open before the identity is certified.
+  await recordOfficialIdentity(ctx.testDb.db, vet.actor, requestId, {
+    name,
+    breedId: ctx.breedId,
+    sex: 'MALE',
+    birthDate: '2022-01-01',
+    birthDateApproximate: false,
+    color: null,
+    markings: null,
+  });
   return { animalId, requestId, vet, locationId };
 }
 
@@ -543,5 +556,85 @@ test('a malformed number never reaches the record', async () => {
       /۱۵ رقم/,
     );
     assert.equal((await ctx.testDb.db.select().from(microchips)).length, 0);
+  });
+});
+
+test('the identity is certified by the vet, once, and the chip waits for it', async () => {
+  await withCtx(async (ctx) => {
+    const animalId = await makeAnimal(ctx, 'سگ هویت');
+    const created = await createVisitRequests(ctx.testDb.db, ctx.owner.actor, {
+      context: 'MICROCHIP',
+      vetAccountId: ctx.vet.accountId,
+      locationId: ctx.locationId,
+      items: [{ animalId, serviceType: 'MICROCHIP_IMPLANT' }],
+    });
+    const requestId = created.items[0]!.request.id;
+    await checkIn(ctx.testDb.db, ctx.vet.actor, {
+      code: created.items[0]!.referral.code,
+      locationId: ctx.locationId,
+    });
+
+    // §13: a number bound to an animal nobody has identified would be a
+    // lifetime link to an unverified record, so the chip step waits.
+    await assert.rejects(
+      () => recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number: '900000000000041', method: 'MANUAL' }),
+      /مشخصات رسمی/,
+    );
+
+    // The owner declared one thing; the vet, looking at the animal, records
+    // another. What is stored is the vet's.
+    await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
+      name: 'نام رسمی',
+      breedId: ctx.breedId,
+      sex: 'FEMALE',
+      birthDate: '2021-03-04',
+      birthDateApproximate: true,
+      color: 'سیاه',
+      markings: 'لکه سفید روی سینه',
+    });
+    const [afterVerify] = await ctx.testDb.db.select().from(animals).where(eq(animals.id, animalId));
+    assert.equal(afterVerify!.sex, 'FEMALE');
+    assert.equal(afterVerify!.color, 'سیاه');
+    assert.equal(afterVerify!.birthDateApproximate, true);
+    assert.ok(afterVerify!.identityVerifiedAt !== null);
+    assert.equal(afterVerify!.identityVerifiedByAccountId, ctx.vet.accountId);
+
+    // What the owner had declared is kept, not destroyed.
+    const trail = await auditTrail(
+      ctx.testDb.db,
+      { targetType: 'ANIMAL', targetId: animalId },
+      { page: 1, pageSize: 50 },
+    );
+    const entry = trail.items.find((row) => row.action === 'ANIMAL_IDENTITY_VERIFIED');
+    assert.ok(entry, 'the certification is on the record');
+    assert.equal((entry!.before as { sex?: string }).sex, 'MALE');
+
+    // Certified once. A second write is refused rather than silently applied.
+    await assert.rejects(
+      () =>
+        recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
+          name: 'نام دیگر',
+          breedId: ctx.breedId,
+          sex: 'MALE',
+          birthDate: '2020-01-01',
+          birthDateApproximate: false,
+          color: null,
+          markings: null,
+        }),
+      /قبلاً ثبت شده/,
+    );
+
+    // And the owner cannot rewrite it from the profile form (§10).
+    await assert.rejects(
+      () => editAnimal(ctx.testDb.db, ctx.owner.actor, animalId, { color: 'قهوه‌ای' }),
+      /دامپزشک معتمد ثبت شده/,
+    );
+
+    // With the identity on record, the chip step proceeds normally.
+    const read = await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, {
+      number: '900000000000041',
+      method: 'MANUAL',
+    });
+    assert.equal(read.state, 'READY_TO_IMPLANT');
   });
 });

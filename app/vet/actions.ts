@@ -16,6 +16,7 @@ import {
   recordShipment,
   resample,
 } from '../../src/clinical/samples.ts';
+import { recordOfficialIdentity } from '../../src/clinical/identity.ts';
 import { recordVetPregnancyResult } from '../../src/mating/pregnancy.ts';
 import type { ChipReadMethod, UnusableStatus } from '../../src/domain/microchip.ts';
 import { AppError } from '../../src/domain/errors.ts';
@@ -99,6 +100,41 @@ export async function correctServiceAction(_previous: VetFormState, form: FormDa
  * Every reading method ends here with one canonical number, so a device that
  * is not configured never blocks the visit: manual entry writes the same field.
  */
+/**
+ * §13: the vet certifies the identity in front of the animal, once.
+ *
+ * The values the owner entered are shown as the starting point, but what is
+ * stored is what the vet confirms here. There is no edit action beside this one:
+ * a correction afterwards goes through the process that produced the data, not
+ * through a second write from the same screen.
+ */
+export async function recordIdentityAction(
+  _previous: VetFormState,
+  form: FormData,
+): Promise<VetFormState> {
+  const requestId = text(form, 'requestId');
+  try {
+    const actor = await requireActor('/vet/requests/' + requestId);
+    await recordOfficialIdentity(db(), actor, requestId, {
+      name: text(form, 'name'),
+      breedId: text(form, 'breedId'),
+      sex: text(form, 'sex') as 'MALE' | 'FEMALE',
+      birthDate: text(form, 'birthDate'),
+      birthDateApproximate: form.get('birthDateApproximate') !== null,
+      color: text(form, 'color'),
+      markings: text(form, 'markings'),
+    });
+    revalidatePath('/vet/requests/' + requestId);
+    return {
+      ok: true,
+      tone: 'success',
+      message: 'مشخصات رسمی ثبت شد. این مشخصات دیگر از فرم پروفایل مالک تغییر نمی‌کنند.',
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
 export async function readChipAction(_previous: VetFormState, form: FormData): Promise<VetFormState> {
   const requestId = text(form, 'requestId');
   try {

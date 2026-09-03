@@ -11,6 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomInt } from 'node:crypto';
+import { certifyIdentity } from './support.ts';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
@@ -302,6 +303,7 @@ async function animalWithSheet(owner: Page, vet: Page, name: string) {
 
   await vet.goto(BASE_URL + '/vet/requests/' + requestId, { waitUntil: 'load' });
   const number = nextChip();
+  await certifyIdentity(vet);
   await vet.getByTestId('chip-read-number').fill(number);
   await vet.getByTestId('chip-read-submit').click();
   await expectText(vet, 'سریال پیش از کاشت ثبت شد');

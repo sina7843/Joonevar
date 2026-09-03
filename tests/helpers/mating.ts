@@ -27,6 +27,7 @@ import { registerAnimal, saveDraft, startDraft } from '../../src/animals/service
 import { addLocation, upsertVetProfile } from '../../src/vets/registry.ts';
 import { checkIn, createVisitRequests } from '../../src/vets/visits.ts';
 import { confirmImplant, recordChipRead, recordRereadAndBind } from '../../src/clinical/microchip.ts';
+import { recordOfficialIdentity } from '../../src/clinical/identity.ts';
 import { recordSampling, recordShipment } from '../../src/clinical/samples.ts';
 import { createSheetRequest, sheetOfAnimal } from '../../src/documents/registration-sheet.ts';
 import {
@@ -258,6 +259,16 @@ export async function animalWithSheet(
     code: created.items[0]!.referral.code,
     locationId: ctx.locationId,
   });
+  // §13: identity is certified at the desk before the chip is bound.
+  await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
+    name: null,
+    breedId: ctx.breedId,
+    sex: 'MALE',
+    birthDate: '2022-01-01',
+    birthDateApproximate: false,
+    color: null,
+    markings: null,
+  });
   const number = nextChip();
   await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
   await confirmImplant(ctx.testDb.db, ctx.vet.actor, requestId);
@@ -307,6 +318,16 @@ export async function pedigreedAnimal(
   await checkIn(ctx.testDb.db, ctx.vet.actor, {
     code: created.items[0]!.referral.code,
     locationId: ctx.locationId,
+  });
+  // §13: identity is certified at the desk before the chip is bound.
+  await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
+    name: null,
+    breedId: ctx.breedId,
+    sex,
+    birthDate: '2022-01-01',
+    birthDateApproximate: false,
+    color: null,
+    markings: null,
   });
   const number = nextChip();
   await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
