@@ -43,6 +43,22 @@ try {
     from vet_visit_request r
     where c.request_id = r.id and r.status = 'CANCELLED' and c.status = 'ACTIVE'`);
 
+  // The kept four must actually be usable, or the Finder shows nothing: §11.1
+  // asks for an active location with a valid licence and the mandatory
+  // facilities. One is left without blood sampling on purpose, so the rule that
+  // an incomplete location is absent stays visible when testing by hand, and one
+  // carries the pregnancy check so that context has somewhere to go too.
+  await pool.query(
+    `update vet_location
+     set is_active = true, licence_status = 'VALID',
+         can_implant_microchip = true,
+         can_draw_blood_sample = (name_fa <> $2),
+         can_pregnancy_check = (name_fa = $3),
+         updated_at = now()
+     where name_fa = any($1::text[])`,
+    [KEEP, 'SYNTHETIC درمانگاه شمال', 'SYNTHETIC بیمارستان دامپزشکی'],
+  );
+
   const locations = await pool.query(
     `update vet_location set licence_status = 'EXPIRED', updated_at = now()
      where licence_status = 'VALID' and name_fa <> all($1::text[])
