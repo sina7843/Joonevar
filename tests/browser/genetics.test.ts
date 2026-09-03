@@ -483,7 +483,9 @@ test('the centre receives, processes and records a result without any issuance p
     const centreRow = () =>
       centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: animal.trackingCode });
 
-    await centre.goto(BASE_URL + '/genetics/samples', { waitUntil: 'load' });
+    await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(animal.trackingCode), {
+      waitUntil: 'load',
+    });
     await centre.getByTestId('centre-sample-list').waitFor();
     await expectText(centre, 'مرکز نمونه‌گیری نمی‌کند');
     // Wait for the action's own confirmation before navigating away, otherwise

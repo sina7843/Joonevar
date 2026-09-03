@@ -230,6 +230,9 @@ test('the money step is closed until the microchip and the sample exist', async 
 
 test('an unconfigured tariff opens no payment path and invents no amount', async () => {
   await withCtx(async (ctx) => {
+    // The catalogue ships a starting figure, so an unset tariff is something the
+    // operator did on purpose. Clearing it here reproduces exactly that state.
+    await setSheetFee(ctx, null);
     const ready = await readyAnimal(ctx, 'سگ بدون تعرفه');
     await assert.rejects(
       () => createSheetRequest(ctx.testDb.db, ctx.owner.actor, [ready.animalId]),

@@ -48,8 +48,10 @@ test('seed installs the approved product configuration and nothing invented', as
   });
 });
 
-test('unknown tariffs and centre details stay NOT_CONFIGURED rather than zero', async () => {
-  await withDb(async (testDb) => {
+test('a cleared tariff becomes NOT_CONFIGURED rather than zero', async () => {
+  await withDb(async (testDb, actorFor) => {
+    // The catalogue now ships starting figures so the product is usable from the
+    // first run; they are operator data, not announced tariffs.
     for (const key of [
       'fee.registration_sheet_toman',
       'fee.pedigree_toman',
@@ -59,13 +61,22 @@ test('unknown tariffs and centre details stay NOT_CONFIGURED rather than zero', 
       'genetics_centre.test_fee_toman',
     ]) {
       const value = await readMoney(testDb.db, key);
-      assert.equal(value.configured, false, key + ' must not be configured');
+      assert.equal(value.configured, true, key + ' must carry its starting figure');
     }
 
-    for (const key of ['genetics_centre.payment_account', 'genetics_centre.payment_card', 'genetics_centre.name']) {
-      const record = await readSetting(testDb.db, key);
-      assert.equal(record.value, null, key + ' must carry no sample value');
-    }
+    // What must never be invented is a financial destination: the centre's card
+    // number stays empty until someone enters the real one.
+    assert.equal((await readSetting(testDb.db, 'genetics_centre.payment_card')).value, null);
+
+    // Clearing a tariff is an operator decision, and it takes the amount back to
+    // NOT_CONFIGURED — never to zero.
+    await updateSetting(testDb.db, actorFor('SUPERADMIN'), {
+      key: 'fee.pedigree_toman',
+      value: null,
+      reason: 'SYNTHETIC — بازگرداندن به تعیین‌نشده',
+    });
+    const cleared = await readMoney(testDb.db, 'fee.pedigree_toman');
+    assert.equal(cleared.configured, false);
 
     // Snapshotting a missing amount fails loudly instead of snapshotting 0.
     await assert.rejects(() => snapshotSetting(testDb.db, 'fee.pedigree_toman'), /not configured/);
@@ -73,6 +84,7 @@ test('unknown tariffs and centre details stay NOT_CONFIGURED rather than zero', 
     const missing = await unconfiguredKeys(testDb.db);
     assert.ok(missing.includes('fee.pedigree_toman'));
     assert.ok(!missing.includes('referral.validity_days'));
+    assert.ok(!missing.includes('fee.puppy_card_toman'), 'a filled tariff is not reported as missing');
   });
 });
 

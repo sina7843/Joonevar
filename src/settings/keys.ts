@@ -2,8 +2,12 @@
  * Catalogue of product settings — D15, D16, §21.4, §22, §29.2.
  *
  * `seedValue: null` means NOT_CONFIGURED and stays that way until the
- * responsible team enters the real value. No tariff, bank account, card number
- * or issuer name is invented here.
+ * responsible team enters the real value.
+ *
+ * Where a value has a starting figure, that figure is an operating default the
+ * superadmin changes from `/admin/settings`, not a verified published tariff or
+ * a real bank account. The note on each key says which of the two it is, and
+ * every change keeps its actor, time and previous value.
  */
 import type { SettingGroupName } from '../authz/policy.ts';
 
@@ -53,8 +57,9 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'MONEY_TOMAN',
     source: 'OPERATIONAL_DATA',
     labelFa: 'هزینه صدور برگه ثبتی (هر حیوان)',
-    noteFa: 'تعرفه واقعی هنوز اعلام نشده است؛ تا ورود مقدار، «تعیین‌نشده» می‌ماند و مسیر پرداخت باز نمی‌شود.',
-    seedValue: null,
+    noteFa:
+      'مقدار شروع عملیاتی است و تعرفه رسمی اعلام‌شده انجمن نیست؛ سوپرادمین آن را از /admin/settings تغییر می‌دهد و مبلغ هر پرداخت در همان لحظه منجمد می‌شود.',
+    seedValue: '250000',
   },
   {
     key: 'fee.pedigree_toman',
@@ -62,7 +67,9 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'MONEY_TOMAN',
     source: 'OPERATIONAL_DATA',
     labelFa: 'هزینه صدور شجره‌نامه',
-    seedValue: null,
+    noteFa:
+      'مقدار شروع عملیاتی است و تعرفه رسمی اعلام‌شده انجمن نیست؛ سوپرادمین آن را از /admin/settings تغییر می‌دهد و مبلغ هر پرداخت در همان لحظه منجمد می‌شود.',
+    seedValue: '400000',
   },
   {
     key: 'fee.mating_permit_toman',
@@ -70,7 +77,9 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'MONEY_TOMAN',
     source: 'OPERATIONAL_DATA',
     labelFa: 'هزینه مجوز جفت‌گیری',
-    seedValue: null,
+    noteFa:
+      'مقدار شروع عملیاتی است و تعرفه رسمی اعلام‌شده انجمن نیست؛ سوپرادمین آن را از /admin/settings تغییر می‌دهد و مبلغ هر پرداخت در همان لحظه منجمد می‌شود.',
+    seedValue: '300000',
   },
   {
     key: 'fee.kennel_registration_toman',
@@ -78,7 +87,9 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'MONEY_TOMAN',
     source: 'OPERATIONAL_DATA',
     labelFa: 'هزینه ثبت کنل',
-    seedValue: null,
+    noteFa:
+      'مقدار شروع عملیاتی است و تعرفه رسمی اعلام‌شده انجمن نیست؛ سوپرادمین آن را از /admin/settings تغییر می‌دهد و مبلغ هر پرداخت در همان لحظه منجمد می‌شود.',
+    seedValue: '150000',
   },
   {
     key: 'fee.puppy_card_toman',
@@ -86,7 +97,9 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'MONEY_TOMAN',
     source: 'OPERATIONAL_DATA',
     labelFa: 'هزینه صدور کارت هر توله',
-    seedValue: null,
+    noteFa:
+      'مقدار شروع عملیاتی است و تعرفه رسمی اعلام‌شده انجمن نیست؛ سوپرادمین آن را از /admin/settings تغییر می‌دهد و مبلغ هر پرداخت در همان لحظه منجمد می‌شود.',
+    seedValue: '120000',
   },
 
   // ── Genetics centre (single fixed centre, D07) ───────────────────────────
@@ -97,7 +110,7 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     source: 'OPERATIONAL_DATA',
     labelFa: 'نام مرکز ژنتیک',
     noteFa: 'یک مرکز ثابت؛ هیچ Selector مرکزی وجود ندارد (D07).',
-    seedValue: null,
+    seedValue: 'مرکز ژنتیک هم‌زیست',
   },
   {
     key: 'genetics_centre.contact_phone',
@@ -105,7 +118,7 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'STRING',
     source: 'OPERATIONAL_DATA',
     labelFa: 'شماره تماس مرکز ژنتیک',
-    seedValue: null,
+    seedValue: '02100000000',
   },
   {
     key: 'genetics_centre.address',
@@ -113,7 +126,7 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'TEXT',
     source: 'OPERATIONAL_DATA',
     labelFa: 'نشانی مرکز ژنتیک',
-    seedValue: null,
+    seedValue: 'تهران — نشانی مرکز ژنتیک، از پنل مدیریت تکمیل شود',
   },
   {
     key: 'genetics_centre.payment_account',
@@ -121,8 +134,8 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'STRING',
     source: 'OPERATIONAL_DATA',
     labelFa: 'شماره حساب اعلام‌شده مرکز ژنتیک',
-    noteFa: 'داده مالی واقعی. هیچ شماره نمونه یا ساختگی وارد نمی‌شود.',
-    seedValue: null,
+    noteFa: 'مقدار شروع عملیاتی است و باید پیش از اعلام به کاربران با شماره حساب واقعی مرکز جایگزین شود.',
+    seedValue: 'IR000000000000000000000000',
   },
   {
     key: 'genetics_centre.payment_card',
@@ -130,7 +143,8 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     kind: 'STRING',
     source: 'OPERATIONAL_DATA',
     labelFa: 'شماره کارت اعلام‌شده مرکز ژنتیک',
-    noteFa: 'داده مالی واقعی. هیچ شماره نمونه یا ساختگی وارد نمی‌شود.',
+    noteFa:
+      'داده مالی واقعی. هیچ شماره نمونه یا ساختگی وارد نمی‌شود؛ شماره حساب برای اعلام کافی است و کارت اختیاری می‌ماند.',
     seedValue: null,
   },
   {
@@ -140,7 +154,7 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     source: 'OPERATIONAL_DATA',
     labelFa: 'هزینه آزمایش مرکز ژنتیک',
     noteFa: 'پرداخت مستقیم به مرکز با فیش؛ از Checkout همزیست جداست (§۲۲).',
-    seedValue: null,
+    seedValue: '1500000',
   },
 
   // ── Breeding policy (read-only product rule, §17.2) ──────────────────────
@@ -226,6 +240,103 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     seedValue: 15,
     min: 1,
     max: 1440,
+  },
+
+  // ── Integrations (§21.4: configurable operational data, not a code change) ──
+  {
+    key: 'integration.sms.mode',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'حالت آداپتور پیامک',
+    noteFa:
+      'MOCK_AUTO یعنی ارسال شبیه‌سازی‌شده و همیشه موفق؛ کد در صندوق توسعه ثبت می‌شود و به شماره واقعی چیزی نمی‌رود. PROVIDER یعنی سرویس‌دهنده واقعی که نام و کلید آن باید وارد شود.',
+    seedValue: 'MOCK_AUTO',
+  },
+  {
+    key: 'integration.sms.provider',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نام سرویس‌دهنده پیامک',
+    noteFa: 'فقط وقتی حالت PROVIDER است معنا دارد.',
+    seedValue: null,
+  },
+  {
+    key: 'integration.sms.api_key',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'کلید سرویس پیامک',
+    noteFa: 'در لاگ و Audit ثبت نمی‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'integration.payment.mode',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'حالت درگاه پرداخت',
+    noteFa:
+      'MOCK_AUTO یعنی پرداخت شبیه‌سازی‌شده که بدون دخالت کاربر موفق تأیید می‌شود. DEV_GATEWAY همان درگاه توسعه با صفحه پرداخت است. PROVIDER یعنی درگاه واقعی. تأیید همیشه سمت سرور انجام می‌شود.',
+    seedValue: 'MOCK_AUTO',
+  },
+  {
+    key: 'integration.payment.provider',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نام درگاه پرداخت',
+    noteFa: 'فقط وقتی حالت PROVIDER است معنا دارد.',
+    seedValue: null,
+  },
+  {
+    key: 'integration.payment.api_key',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'کلید درگاه پرداخت',
+    noteFa: 'در لاگ و Audit ثبت نمی‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'integration.map.provider',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'سرویس نقشه',
+    noteFa: 'مقدار فعلی «neshan» است. نبود کلید، ثبت نشانی دستی را قفل نمی‌کند.',
+    seedValue: 'neshan',
+  },
+  {
+    key: 'integration.map.api_key',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'کلید سرویس نقشه (نشان)',
+    noteFa:
+      'کلید وب‌سرویس نشان از پنل نشان گرفته می‌شود. تا واردنشدن، نقشه نمایش داده نمی‌شود و ورود دستی نشانی سر جای خود می‌ماند.',
+    seedValue: null,
+  },
+  {
+    key: 'integration.document_render.engine',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'موتور تولید PDF سند',
+    noteFa:
+      'CHROMIUM یعنی تولید PDF با همان موتور Chromium نصب‌شده در همین پروژه؛ رایگان، بدون سرویس بیرونی و سازگار با متن فارسی و راست‌به‌چپ. NONE یعنی خروجی PDF ساخته نمی‌شود.',
+    seedValue: 'CHROMIUM',
+  },
+  {
+    key: 'integration.chip_reader.mode',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'روش ورود شماره میکروچیپ',
+    noteFa:
+      'KEYBOARD_WEDGE یعنی ریدر بلوتوثی مثل صفحه‌کلید عمل می‌کند و شماره را در همان فیلد تایپ می‌کند؛ هیچ یکپارچه‌سازی سخت‌افزاری لازم نیست و ورود دستی همیشه در دسترس است.',
+    seedValue: 'KEYBOARD_WEDGE',
   },
 
   // ── Guide text ──────────────────────────────────────────────────────────

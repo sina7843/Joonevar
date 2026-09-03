@@ -18,6 +18,8 @@ try {
   console.log(
     'settings inserted: ' +
       report.settingsInserted.length +
+      ', filled from baseline: ' +
+      report.settingsFilled.length +
       ', preserved: ' +
       report.settingsPreserved.length +
       ', breeds inserted: ' +

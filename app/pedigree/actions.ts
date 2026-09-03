@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { currentPaymentGateway, currentPaymentProvider } from '../../src/adapters/current.ts';
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { env } from '../../src/config/env.ts';
@@ -9,7 +10,6 @@ import { attachReceiptFile, createReceipt, submitReceipt } from '../../src/genet
 import { createIssuanceRequest, retryIssuance } from '../../src/documents/pedigree.ts';
 import { submitAppeal } from '../../src/genetics/appeals.ts';
 import { createPostalRequest } from '../../src/documents/postal.ts';
-import { paymentGateway, paymentProviderName } from '../../src/adapters/registry.ts';
 import { startAttempt } from '../../src/billing/payments.ts';
 import { AppError } from '../../src/domain/errors.ts';
 
@@ -122,8 +122,8 @@ export async function payIssuanceAction(
       db(),
       actor,
       { batchId, callbackUrl: '/pedigree/batch/' + batchId + '/return' },
-      paymentGateway(db(), env()),
-      paymentProviderName(env()),
+      await currentPaymentGateway(),
+      await currentPaymentProvider(),
     );
     destination = started.redirectUrl;
   } catch (error) {

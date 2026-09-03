@@ -5,6 +5,13 @@
  * does not exist yet. A value an operator has already changed — or deliberately
  * cleared back to NOT_CONFIGURED — is never overwritten by a redeploy, which is
  * what D16 requires of managed data.
+ *
+ * One narrow exception: a row that still carries the baseline version 1 and has
+ * never been given a value receives the starting figure when the catalogue
+ * later gains one. That row is untouched by any operator — its version would be
+ * above 1 otherwise — so filling it changes nobody's decision, and it is what
+ * lets an existing database pick up a newly supplied default instead of staying
+ * empty forever.
  */
 import { eq } from 'drizzle-orm';
 import type { DbClient } from '../client.ts';
@@ -13,6 +20,7 @@ import { SETTING_DEFINITIONS } from '../../settings/keys.ts';
 
 export interface SeedReport {
   readonly settingsInserted: readonly string[];
+  readonly settingsFilled: readonly string[];
   readonly settingsPreserved: readonly string[];
   readonly breedsInserted: number;
   readonly issuersInserted: number;
@@ -38,17 +46,26 @@ const BASELINE_BREEDS: ReadonlyArray<{ fa: string; en: string }> = [
 
 export async function seedBaseline(database: DbClient): Promise<SeedReport> {
   const inserted: string[] = [];
+  const filled: string[] = [];
   const preserved: string[] = [];
 
   for (const definition of SETTING_DEFINITIONS) {
     const [existing] = await database
-      .select({ id: productSettings.id })
+      .select({ id: productSettings.id, value: productSettings.value, version: productSettings.version })
       .from(productSettings)
       .where(eq(productSettings.key, definition.key))
       .limit(1);
 
     if (existing) {
-      preserved.push(definition.key);
+      if (existing.value === null && existing.version === 1 && definition.seedValue !== null) {
+        await database
+          .update(productSettings)
+          .set({ value: definition.seedValue as never })
+          .where(eq(productSettings.id, existing.id));
+        filled.push(definition.key);
+      } else {
+        preserved.push(definition.key);
+      }
       continue;
     }
 
@@ -81,5 +98,11 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
   // is invented here. An empty registry does not remove the review path, it
   // only means no foreign pedigree can be approved until the association
   // supplies the real list.
-  return { settingsInserted: inserted, settingsPreserved: preserved, breedsInserted, issuersInserted: 0 };
+  return {
+    settingsInserted: inserted,
+    settingsFilled: filled,
+    settingsPreserved: preserved,
+    breedsInserted,
+    issuersInserted: 0,
+  };
 }

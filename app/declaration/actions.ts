@@ -1,11 +1,11 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { currentSmsSender } from '../../src/adapters/current.ts';
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { env } from '../../src/config/env.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { smsSender } from '../../src/adapters/registry.ts';
 import {
   addPersonalNote,
   cancelDeclaration,
@@ -53,7 +53,7 @@ export async function startDeclarationAction(
         counterpartyIdentifier: text(form, 'identifier'),
         counterpartyMobile: text(form, 'mobile'),
       },
-      smsSender(db(), env()),
+      await currentSmsSender(),
     );
     destination = '/declaration/' + declaration.id;
   } catch (error) {

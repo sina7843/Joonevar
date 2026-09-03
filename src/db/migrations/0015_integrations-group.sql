@@ -1,0 +1,1 @@
+ALTER TYPE "public"."setting_group" ADD VALUE 'INTEGRATIONS';

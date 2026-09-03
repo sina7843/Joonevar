@@ -408,6 +408,26 @@ test('two animals share one payment, and each one is issued or blocked on its ow
     await expectText(owner.page, 'این برگه نتیجه ژنتیک یا شجره‌نامه نیست');
     await owner.page.screenshot({ path: path.join(SHOTS, 'sheet-document.png'), fullPage: true });
 
+    // The PDF is produced by the local engine and is owner-scoped: the same URL
+    // answers "not found" to anyone else and 401 to a visitor with no session
+    // (DEC-0124). A redirect to the sign-in page would be the wrong answer for a
+    // download, so the status code is what is asserted.
+    const pdfUrl = new URL(owner.page.url()).pathname.replace(
+      /^\/documents\/(.+)$/,
+      '/api/documents/registration-sheet/$1/pdf',
+    );
+    const mine = await owner.context.request.get(BASE_URL + pdfUrl);
+    assert.equal(mine.status(), 200);
+    assert.equal(mine.headers()['content-type'], 'application/pdf');
+    assert.equal((await mine.body()).subarray(0, 5).toString(), '%PDF-');
+
+    const anonymous = await browser.newContext();
+    try {
+      assert.equal((await anonymous.request.get(BASE_URL + pdfUrl)).status(), 401);
+    } finally {
+      await anonymous.close();
+    }
+
     // The animal now carries its Pet ID and links to its sheet.
     await owner.page.goto(BASE_URL + '/animals/' + first, { waitUntil: 'load' });
     assert.match((await owner.page.getByTestId('pet-id').textContent()) ?? '', new RegExp(petId));

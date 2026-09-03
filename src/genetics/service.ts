@@ -6,7 +6,7 @@
  * Parentage Result. Everything else — ownership, microchip, permits — is
  * outside its authority and no function here gives it one.
  */
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
 import { sampleEvents as sampleEventsTable, samples } from '../db/schema/clinical.ts';
@@ -715,17 +715,57 @@ export async function refreshWaitingResult(
 }
 
 /** The centre's own work list, by sample state (§21.3). */
+/**
+ * The centre's working list is bounded, newest first.
+ *
+ * Samples in progress accumulate, so an unbounded list would eventually be a
+ * page that cannot be rendered at all. `centreSampleCount` gives the number the
+ * screen needs to say how much is not shown, so a shortened list is never
+ * mistaken for the whole queue.
+ */
+export const CENTRE_SAMPLE_PAGE_SIZE = 100;
+
+export type CentreSampleStatus =
+  | 'IN_CUSTODY'
+  | 'SEND_INSTRUCTED'
+  | 'SHIPPED'
+  | 'RECEIVED'
+  | 'PROCESSING'
+  | 'INVALID';
+
+/**
+ * Searched by tracking code or by the animal's name, because a bounded list
+ * without a way to find one sample would mean a sample the centre cannot act
+ * on — and a busy centre has more than a page of them in flight at once.
+ */
+function centreSampleFilter(statuses: readonly CentreSampleStatus[], search: string) {
+  const term = search.trim();
+  const status = inArray(samples.status, [...statuses]);
+  if (term === '') return status;
+  const like = '%' + term + '%';
+  return and(status, or(sql`${samples.trackingCode} ilike ${like}`, sql`coalesce(${animals.name}, '') ilike ${like}`));
+}
+
+export async function centreSampleCount(
+  database: DbClient,
+  actor: Actor,
+  statuses: readonly CentreSampleStatus[],
+  search = '',
+): Promise<number> {
+  assertCentre(actor);
+  const [row] = await database
+    .select({ value: count() })
+    .from(samples)
+    .innerJoin(animals, eq(animals.id, samples.animalId))
+    .where(centreSampleFilter(statuses, search));
+  return Number(row?.value ?? 0);
+}
+
 export async function centreSamples(
   database: DbClient,
   actor: Actor,
-  statuses: readonly (
-    | 'IN_CUSTODY'
-    | 'SEND_INSTRUCTED'
-    | 'SHIPPED'
-    | 'RECEIVED'
-    | 'PROCESSING'
-    | 'INVALID'
-  )[],
+  statuses: readonly CentreSampleStatus[],
+  options: { readonly search?: string; readonly limit?: number } = {},
 ) {
   assertCentre(actor);
   return database
@@ -737,8 +777,9 @@ export async function centreSamples(
     })
     .from(samples)
     .innerJoin(animals, eq(animals.id, samples.animalId))
-    .where(inArray(samples.status, [...statuses]))
-    .orderBy(desc(samples.collectedAt));
+    .where(centreSampleFilter(statuses, options.search ?? ''))
+    .orderBy(desc(samples.collectedAt))
+    .limit(options.limit ?? CENTRE_SAMPLE_PAGE_SIZE);
 }
 
 /** The owner's view of one animal's result, scoped to their own animal. */

@@ -1,4 +1,5 @@
 import { guardRoute } from '../../../../../src/authz/guard.ts';
+import { currentPaymentGateway } from '../../../../../src/adapters/current.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
 import { Card } from '../../../../../src/ui/card.tsx';
@@ -6,7 +7,6 @@ import { Alert } from '../../../../../src/ui/alert.tsx';
 import { ButtonLink } from '../../../../../src/ui/button.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { env } from '../../../../../src/config/env.ts';
-import { paymentGateway } from '../../../../../src/adapters/registry.ts';
 import { verifyAttempt } from '../../../../../src/billing/payments.ts';
 import { paidEffects } from '../../../../../src/billing/effects.ts';
 
@@ -34,7 +34,7 @@ export default async function PermitReturnPage({
     ? await verifyAttempt(
         db(),
         { reference, providerRef: providerRef ?? null },
-        paymentGateway(db(), env()),
+        await currentPaymentGateway(),
         paidEffects,
       )
     : ({ state: 'UNKNOWN_REFERENCE' } as const);

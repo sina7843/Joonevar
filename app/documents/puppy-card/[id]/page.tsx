@@ -55,7 +55,16 @@ export default async function PuppyCardPage({ params }: { params: Promise<{ id: 
             <span data-testid="card-distinction">{CARD_DISTINCTION_NOTE_FA}</span>
           </Alert>
           <p className="mt-lg text-caption text-text-secondary" data-testid="card-print-note">
-            نسخه چاپی رسمی این کارت هنوز پیکربندی نشده است و تا آن زمان همین نمایش، سند داخل سامانه است.
+            قالب چاپی رسمی این کارت هنوز تحویل نشده است؛ خروجی PDF زیر، چاپ همین داده‌های ثبت‌شده در سامانه است.
+          </p>
+          <p className="mt-md text-body-sm">
+            <a
+              href={'/api/documents/puppy-card/' + id + '/pdf'}
+              className="text-text-brand underline underline-offset-4"
+              data-testid="download-pdf"
+            >
+              دریافت نسخه PDF این سند
+            </a>
           </p>
         </Card>
       </div>

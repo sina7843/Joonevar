@@ -173,10 +173,11 @@ test('every reviewed screen renders RTL at both sizes with no sideways scroll', 
         );
         assert.ok(overflow <= 1, screen.href + ' must not scroll sideways at ' + label + ' (' + overflow + 'px)');
 
-        await page.screenshot({
-          path: path.join(SHOTS, screen.name + '-' + label + '.png'),
-          fullPage: true,
-        });
+        await page
+          .screenshot({ path: path.join(SHOTS, screen.name + '-' + label + '.png'), fullPage: true })
+          .catch((error) => {
+            throw new Error('screenshot failed for ' + screen.href + ' at ' + label + ': ' + String(error));
+          });
       } finally {
         await context.close();
       }

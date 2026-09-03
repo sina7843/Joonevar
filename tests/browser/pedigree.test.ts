@@ -359,7 +359,11 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
 
   const centreRow = () =>
     centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
-  await centre.goto(BASE_URL + '/genetics/samples', { waitUntil: 'load' });
+  // The centre's list is bounded, so a specific sample is reached by its
+  // tracking code rather than by scrolling the queue (DEC-0128).
+  await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
+    waitUntil: 'load',
+  });
   await centreRow().getByTestId('receive-sample').click();
   await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 45_000 });
   await centreRow().getByTestId('start-processing').click();

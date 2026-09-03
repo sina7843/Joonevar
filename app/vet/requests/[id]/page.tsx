@@ -9,7 +9,7 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier, StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { env } from '../../../../src/config/env.ts';
-import { adapterReports } from '../../../../src/adapters/registry.ts';
+import { integrationSettings } from '../../../../src/adapters/integration-settings.ts';
 import { vetLocations, vetProfiles } from '../../../../src/db/schema/vets.ts';
 import { vetRequestDetail } from '../../../../src/vets/visits.ts';
 import { animalChipView, procedureOf } from '../../../../src/clinical/microchip.ts';
@@ -79,8 +79,10 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
   const pregnancyCheck =
     request.context === 'PREGNANCY' ? await checkOfRequest(db(), request.id) : null;
   const pregnancyResults = pregnancyCheck ? await resultsOfCheck(db(), pregnancyCheck.id) : [];
-  const readerReady =
-    adapterReports(env()).find((a) => a.name === 'chip-reader')?.status !== 'NOT_CONFIGURED';
+  // A Bluetooth reader in keyboard-wedge mode types the number into the field
+  // itself, so there is nothing to integrate and the device methods are usable.
+  const readerMode = (await integrationSettings(db())).chipReader.mode;
+  const readerReady = readerMode === 'KEYBOARD_WEDGE';
 
   const chipStep: 'READ' | 'IMPLANT' | 'REREAD' | 'BINDABLE' | 'DONE' = (() => {
     if (request.serviceType === 'MICROCHIP_IMPLANT') {

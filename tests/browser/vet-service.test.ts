@@ -372,7 +372,7 @@ test('another veterinarian can reach neither the visit nor the animal photo', as
   }
 });
 
-test('manual entry carries the whole implant when no reader is configured', async () => {
+test('manual entry carries the whole implant alongside the keyboard-wedge reader', async () => {
   const owner = await ownerWithAnimal('سگ کاشت');
   const vet = await contextFor(vetState);
   try {
@@ -381,9 +381,10 @@ test('manual entry carries the whole implant when no reader is configured', asyn
     await checkInAs(page, code);
     await page.goto(BASE_URL + '/vet/requests/' + requestId, { waitUntil: 'load' });
 
-    // The unconfigured device is stated plainly, and manual entry is offered as
-    // one of the four methods rather than as a workaround.
-    await expectText(page, 'اتصال ریدر بلوتوث و ریدر موبایل هنوز پیکربندی نشده است');
+    // The Bluetooth reader types into the field like a keyboard (DEC-0126), so
+    // the page says how it works instead of calling it unconfigured — and manual
+    // entry is still one of the four methods, not a workaround.
+    await expectText(page, 'ریدر بلوتوث مانند صفحه‌کلید عمل می‌کند');
     const number = chipNumber(1);
     await page.getByTestId('chip-read-method').selectOption('MANUAL');
     await page.getByTestId('chip-read-number').fill(number);

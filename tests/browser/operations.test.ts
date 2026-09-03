@@ -429,7 +429,11 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
   const assoc = await contextFor(operatorState);
   try {
     const page = await assoc.newPage();
-    await page.goto(BASE_URL + '/assoc/members', { waitUntil: 'load' });
+    // The register is a bounded page, so a specific member is reached by search
+    // rather than by scrolling the whole list (DEC-0128).
+    await page.goto(BASE_URL + '/assoc/members?q=' + encodeURIComponent('دامپزشک آزمایشی'), {
+      waitUntil: 'load',
+    });
     await page.getByTestId('member-list').waitFor();
     const vetRow = page.locator('[data-testid="member-list"] > li').filter({ hasText: 'دامپزشک آزمایشی' });
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
@@ -474,7 +478,9 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
   const restore = await contextFor(operatorState);
   try {
     const page = await restore.newPage();
-    await page.goto(BASE_URL + '/assoc/members', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/members?q=' + encodeURIComponent('دامپزشک آزمایشی'), {
+      waitUntil: 'load',
+    });
     const vetRow = page.locator('[data-testid="member-list"] > li').filter({ hasText: 'دامپزشک آزمایشی' });
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
     await vetRow.locator('[data-testid^="membership-reason-"]').fill('بازگردانی وضعیت آزمایشی ' + RUN);

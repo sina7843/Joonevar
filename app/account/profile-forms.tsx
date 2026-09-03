@@ -126,8 +126,11 @@ export function IdentityForm({
 /** Residence is an optional group; an empty one blocks nothing downstream. */
 export function ResidenceForm({
   values,
+  mapAvailable = false,
 }: {
   values: { province?: string | null; city?: string | null; address?: string | null; postalCode?: string | null };
+  /** True when a map key is configured; manual entry works either way. */
+  mapAvailable?: boolean;
 }) {
   const [state, submit, pending] = useActionState(saveResidenceAction, EMPTY);
   const [address, setAddress] = useState(values.address ?? '');
@@ -142,7 +145,7 @@ export function ResidenceForm({
       <TextField label="شهر" name="city" defaultValue={values.city ?? ''} />
       <LocationField
         label="نشانی"
-        mapAvailable={false}
+        mapAvailable={mapAvailable}
         value={address}
         onChange={setAddress}
       />

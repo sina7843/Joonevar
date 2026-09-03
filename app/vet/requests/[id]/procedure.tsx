@@ -128,10 +128,15 @@ export function ChipPanel({
   return (
     <Card>
       <h3 className="text-label-lg">میکروچیپ</h3>
-      {readerReady ? null : (
+      {readerReady ? (
+        <p className="mt-md text-caption text-text-secondary" data-testid="reader-keyboard-wedge">
+          ریدر بلوتوث مانند صفحه‌کلید عمل می‌کند: کافی است روی فیلد شماره بایستید و با دستگاه بخوانید تا شماره
+          همان‌جا تایپ شود. ورود دستی و بارکد بسته هم همیشه در دسترس‌اند و شماره ثبت‌شده تفاوتی ندارد.
+        </p>
+      ) : (
         <p className="mt-md text-caption text-text-secondary" data-testid="reader-not-configured">
-          اتصال ریدر بلوتوث و ریدر موبایل هنوز پیکربندی نشده است. بارکد بسته و ورود دستی همین حالا کار می‌کنند و
-          شماره ثبت‌شده تفاوتی ندارد.
+          اتصال ریدر یکپارچه هنوز پیکربندی نشده است. بارکد بسته و ورود دستی همین حالا کار می‌کنند و شماره
+          ثبت‌شده تفاوتی ندارد.
         </p>
       )}
 

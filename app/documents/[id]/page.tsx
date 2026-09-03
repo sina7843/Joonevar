@@ -114,8 +114,17 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
 
         <Card>
           <p className="text-caption text-text-secondary">
-            نسخه چاپی رسمی هنوز پیکربندی نشده است؛ آنچه اینجا می‌بینید خود رکورد صادرشده است و فقط برای مالک همین
+            قالب چاپی رسمی انجمن هنوز تحویل نشده است؛ خروجی PDF زیر، چاپ همین داده‌های ثبت‌شده است و آنچه اینجا می‌بینید خود رکورد صادرشده است و فقط برای مالک همین
             حیوان قابل مشاهده است.
+          </p>
+          <p className="mt-md text-body-sm">
+            <a
+              href={'/api/documents/registration-sheet/' + id + '/pdf'}
+              className="text-text-brand underline underline-offset-4"
+              data-testid="download-pdf"
+            >
+              دریافت نسخه PDF این سند
+            </a>
           </p>
           <p className="mt-md text-body-sm">
             <Link

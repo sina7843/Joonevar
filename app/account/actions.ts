@@ -1,12 +1,12 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { currentSmsSender } from '../../src/adapters/current.ts';
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { env } from '../../src/config/env.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { currentSession } from '../../src/authz/request-actor.ts';
-import { smsSender } from '../../src/adapters/registry.ts';
 import { requestOtp, OTP_MESSAGE_FA } from '../../src/identity/otp.ts';
 import {
   assertMobileAvailable,
@@ -136,7 +136,7 @@ export async function startMobileChangeAction(_previous: FormState, form: FormDa
     const outcome = await requestOtp(
       db(),
       { rawMobile: mobile, purpose: 'MOBILE_CHANGE', accountId: actor.accountId },
-      smsSender(db(), env()),
+      await currentSmsSender(),
     );
     if (outcome.state === 'TOO_MANY_ATTEMPTS') {
       return { ok: false, message: OTP_MESSAGE_FA.TOO_MANY_ATTEMPTS, tone: 'error' };

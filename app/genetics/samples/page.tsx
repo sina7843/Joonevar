@@ -2,11 +2,18 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
+import { Button } from '../../../src/ui/button.tsx';
+import { TextField } from '../../../src/ui/field.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
-import { centreSamples } from '../../../src/genetics/service.ts';
+import {
+  CENTRE_SAMPLE_PAGE_SIZE,
+  centreSampleCount,
+  centreSamples,
+  type CentreSampleStatus,
+} from '../../../src/genetics/service.ts';
 import { isUnusable, SAMPLE_STATUS_FA, type SampleStatusName } from '../../../src/domain/microchip.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
@@ -22,18 +29,28 @@ export const dynamic = 'force-dynamic';
  * it can be used and starts processing; a sample it cannot use goes back to the
  * existing resampling path at the veterinarian, with its history intact.
  */
-export default async function GeneticsSamplesPage() {
+export default async function GeneticsSamplesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   const guard = await guardRoute('/genetics/samples');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
-  const rows = await centreSamples(db(), guard.actor, [
+  const STATUSES: readonly CentreSampleStatus[] = [
     'IN_CUSTODY',
     'SEND_INSTRUCTED',
     'SHIPPED',
     'RECEIVED',
     'PROCESSING',
     'INVALID',
+  ];
+  const term = (await searchParams).q?.trim() ?? '';
+  const [rows, total] = await Promise.all([
+    centreSamples(db(), guard.actor, STATUSES, { search: term }),
+    centreSampleCount(db(), guard.actor, STATUSES, term),
   ]);
+  const hidden = Math.max(0, total - rows.length);
 
   return (
     <OpsShell actor={guard.actor} title="هم‌زیست — مرکز ژنتیک" pathname="/genetics/samples" nav={GENETICS_NAV}>
@@ -42,6 +59,28 @@ export default async function GeneticsSamplesPage() {
           نمونه تا دستور ارسال نزد دامپزشک می‌ماند و ارسال را همان نگهدارنده ثبت می‌کند. پردازش در این مرکز به
           پرداخت صدور سند در هم‌زیست وابسته نیست.
         </Alert>
+
+        <Card>
+          <form method="get" action="/genetics/samples" className="space-y-lg" data-testid="sample-search">
+            <TextField
+              label="جست‌وجوی نمونه"
+              name="q"
+              defaultValue={term}
+              hint="کد رهگیری نمونه یا نام حیوان."
+              data-testid="sample-search-term"
+            />
+            <Button type="submit" data-testid="sample-search-submit">
+              جست‌وجو
+            </Button>
+          </form>
+        </Card>
+
+        {hidden > 0 ? (
+          <p className="text-caption text-text-secondary" data-testid="samples-truncated">
+            {CENTRE_SAMPLE_PAGE_SIZE} نمونه تازه‌ترین نمایش داده شده است؛ {hidden} نمونه دیگر با این
+            جست‌وجو هم‌خوان است و در این فهرست نیست. برای رسیدن به یک نمونه مشخص، کد رهگیری را جست‌وجو کنید.
+          </p>
+        ) : null}
 
         {rows.length === 0 ? (
           <EmptyState

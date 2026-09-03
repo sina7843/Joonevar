@@ -16,6 +16,7 @@ export const SETTING_GROUPS = [
   'GUIDE_TEXT',
   'OTP_TECHNICAL',
   'BREEDING_POLICY',
+  'INTEGRATIONS',
 ] as const;
 export type SettingGroupName = (typeof SETTING_GROUPS)[number];
 
@@ -32,6 +33,10 @@ interface GroupAccess {
  */
 const ACCESS: Record<SettingGroupName, GroupAccess> = {
   DEADLINES: { read: ['SUPERADMIN', 'ASSOCIATION_OPERATOR'], write: ['SUPERADMIN'] },
+  // Which provider each adapter uses, and its key. Only the superadmin may
+  // change one, because switching a provider changes what really happens to a
+  // payment or a message.
+  INTEGRATIONS: { read: ['SUPERADMIN'], write: ['SUPERADMIN'] },
   FEES: { read: ['SUPERADMIN', 'ASSOCIATION_OPERATOR'], write: ['SUPERADMIN'] },
   GENETICS_CENTRE: { read: ['SUPERADMIN', 'GENETICS_OPERATOR'], write: ['SUPERADMIN'] },
   REFERENCE_DATA: { read: ['SUPERADMIN', 'ASSOCIATION_OPERATOR'], write: ['SUPERADMIN', 'ASSOCIATION_OPERATOR'] },

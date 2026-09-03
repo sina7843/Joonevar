@@ -6,9 +6,15 @@ import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
-import { accountsWithoutMembership, memberRecords } from '../../../src/operations/service.ts';
+import {
+  MEMBER_PAGE_SIZE,
+  accountsWithoutMembership,
+  memberRecordCount,
+  memberRecords,
+} from '../../../src/operations/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { IssueNumberForm, MembershipStateForm } from './forms.tsx';
+import { MemberSearch } from './search.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,14 +37,21 @@ const NUMBER_FA: Record<string, string> = {
  * numbers, and never asks the member to wait for an approval that §7 does not
  * have. Issuing the number later changes nothing about what is already open.
  */
-export default async function AssocMembersPage() {
+export default async function AssocMembersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   const guard = await guardRoute('/assoc/members');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
-  const [rows, withoutMembership] = await Promise.all([
-    memberRecords(db(), guard.actor),
+  const term = (await searchParams).q?.trim() ?? '';
+  const [rows, withoutMembership, total] = await Promise.all([
+    memberRecords(db(), guard.actor, { search: term }),
     accountsWithoutMembership(db(), guard.actor),
+    memberRecordCount(db(), guard.actor, term),
   ]);
+  const hidden = Math.max(0, total - rows.length);
 
   return (
     <OpsShell actor={guard.actor} title="هم‌زیست — انجمن" pathname="/assoc/members" nav={ASSOC_NAV}>
@@ -50,10 +63,23 @@ export default async function AssocMembersPage() {
           </span>
         </Alert>
 
+        <MemberSearch term={term} />
+
+        {hidden > 0 ? (
+          <p className="text-caption text-text-secondary" data-testid="members-truncated">
+            {MEMBER_PAGE_SIZE} رکورد تازه‌ترین نمایش داده شده است؛ {hidden} رکورد دیگر با این جست‌وجو
+            هم‌خوان است و در این فهرست نیست. برای رسیدن به یک عضو مشخص، از جست‌وجو استفاده کنید.
+          </p>
+        ) : null}
+
         {rows.length === 0 ? (
           <EmptyState
-            title="هنوز عضویتی ثبت نشده است"
-            description={withoutMembership + ' حساب بدون رکورد عضویت وجود دارد.'}
+            title={term === '' ? 'هنوز عضویتی ثبت نشده است' : 'با این جست‌وجو عضوی پیدا نشد'}
+            description={
+              term === ''
+                ? withoutMembership + ' حساب بدون رکورد عضویت وجود دارد.'
+                : 'نام، شماره عضویت یا چهار رقم آخر موبایل را دوباره بررسی کنید.'
+            }
           />
         ) : (
           <ul className="space-y-lg" data-testid="member-list">

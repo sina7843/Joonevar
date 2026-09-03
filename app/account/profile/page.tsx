@@ -9,6 +9,7 @@ import { eq } from 'drizzle-orm';
 import { accounts } from '../../../src/db/schema/core.ts';
 import { findProfile, findResidence } from '../../../src/identity/account.ts';
 import { findCase } from '../../../src/identity/kyc.ts';
+import { mapApiKey } from '../../../src/adapters/integration-settings.ts';
 import { IdentityForm, ResidenceForm } from '../profile-forms.tsx';
 import { signOutAction } from '../../login/actions.ts';
 import { Button } from '../../../src/ui/button.tsx';
@@ -28,6 +29,10 @@ export default async function ProfilePage() {
 
   const profile = await findProfile(db(), actor.accountId);
   const residence = await findResidence(db(), actor.accountId);
+  // The map is shown only when a key is really configured; an empty address is
+  // never a blocker either way (§6.2).
+  const { apiKey: mapKey } = await mapApiKey(db());
+  const mapKeyConfigured = mapKey !== null;
   const kyc = await findCase(db(), actor.accountId);
   const [account] = await db().select({ mobile: accounts.mobile }).from(accounts).where(eq(accounts.id, actor.accountId));
 
@@ -77,6 +82,7 @@ export default async function ProfilePage() {
           <h2 className="text-h4">سکونت</h2>
           <Card>
             <ResidenceForm
+              mapAvailable={mapKeyConfigured}
               values={{
                 province: residence?.province ?? '',
                 city: residence?.city ?? '',

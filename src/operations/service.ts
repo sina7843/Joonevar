@@ -216,8 +216,42 @@ export interface MemberRow {
  * This is a register, not an approval queue: a paid F14 membership is already
  * active and never comes back here for permission.
  */
-export async function memberRecords(database: DbClient, actor: Actor): Promise<readonly MemberRow[]> {
+/**
+ * The newest members first, in one bounded page.
+ *
+ * The register only grows, so an unbounded list would eventually be a page the
+ * browser cannot render and a query nobody can read. The count of what is not
+ * shown is returned with it, so the screen states the truth about the rest
+ * rather than implying the register ends here.
+ */
+export const MEMBER_PAGE_SIZE = 100;
+
+/**
+ * The register is searched by name or by the visible tail of the mobile number,
+ * because a bounded page without a way to find one person would mean a member
+ * nobody can manage. The operator never sees the whole number (§23.3), so the
+ * tail is what can be searched.
+ */
+function memberSearchFilter(search: string) {
+  const term = search.trim();
+  if (term === '') return undefined;
+  const like = '%' + term + '%';
+  const digits = term.replace(/[^0-9]/g, '');
+  const clauses = [
+    sql`coalesce(${profiles.firstName}, '') || ' ' || coalesce(${profiles.lastName}, '') ilike ${like}`,
+    sql`coalesce(${memberships.membershipNo}, '') ilike ${like}`,
+  ];
+  if (digits !== '') clauses.push(sql`right(${accounts.mobile}, 4) like ${'%' + digits + '%'}`);
+  return or(...clauses);
+}
+
+export async function memberRecords(
+  database: DbClient,
+  actor: Actor,
+  options: { readonly search?: string; readonly limit?: number } = {},
+): Promise<readonly MemberRow[]> {
   assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
+  const limit = options.limit ?? MEMBER_PAGE_SIZE;
 
   const rows = await database
     .select({
@@ -233,7 +267,9 @@ export async function memberRecords(database: DbClient, actor: Actor): Promise<r
     .from(memberships)
     .innerJoin(accounts, eq(accounts.id, memberships.accountId))
     .leftJoin(profiles, eq(profiles.accountId, memberships.accountId))
-    .orderBy(desc(memberships.activatedAt));
+    .where(memberSearchFilter(options.search ?? ''))
+    .orderBy(desc(memberships.activatedAt))
+    .limit(limit);
 
   return rows.map((row) => ({
     accountId: row.accountId,
@@ -245,6 +281,18 @@ export async function memberRecords(database: DbClient, actor: Actor): Promise<r
     numberStatus: row.numberStatus,
     activatedAt: row.activatedAt,
   }));
+}
+
+/** How many records the same search matches, for the "not all shown" line. */
+export async function memberRecordCount(database: DbClient, actor: Actor, search = ''): Promise<number> {
+  assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
+  const [row] = await database
+    .select({ value: count() })
+    .from(memberships)
+    .innerJoin(accounts, eq(accounts.id, memberships.accountId))
+    .leftJoin(profiles, eq(profiles.accountId, memberships.accountId))
+    .where(memberSearchFilter(search));
+  return Number(row?.value ?? 0);
 }
 
 // ── Postal requests ───────────────────────────────────────────────────────

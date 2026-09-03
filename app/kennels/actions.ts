@@ -1,11 +1,11 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { currentPaymentGateway, currentPaymentProvider } from '../../src/adapters/current.ts';
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { env } from '../../src/config/env.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { paymentGateway, paymentProviderName } from '../../src/adapters/registry.ts';
 import { cancelAttempt, latestAttempt, startAttempt } from '../../src/billing/payments.ts';
 import {
   addBreed,
@@ -126,8 +126,8 @@ export async function payKennelAction(
       db(),
       actor,
       { batchId: batch.id, callbackUrl: '/kennels/' + kennelId + '/return' },
-      paymentGateway(db(), env()),
-      paymentProviderName(env()),
+      await currentPaymentGateway(),
+      await currentPaymentProvider(),
     );
     destination = started.redirectUrl;
   } catch (error) {

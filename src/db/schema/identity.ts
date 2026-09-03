@@ -168,8 +168,9 @@ export const sessions = pgTable(
  *
  * The local-test sender writes here so a developer — and the browser review —
  * can complete a sign-in without a real provider. It is written only outside
- * production with local integrations, it is never exposed over HTTP, and the
- * real provider never touches it.
+ * production with local integrations, the real provider never touches it, and
+ * the only way to read it back is `/dev/sms`, which does not exist outside that
+ * same development configuration.
  */
 export const devOutboundSms = pgTable(
   'dev_outbound_sms',

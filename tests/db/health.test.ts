@@ -26,11 +26,19 @@ test('health reports the real state of the foundation', async () => {
     assert.ok((report.database.migrationsApplied ?? 0) >= 1);
     assert.ok(report.settings.total >= 20);
 
-    // Missing tariffs and adapters make the app degraded, not "ok".
+    // The local mocks are reported as what they are: usable here, never a
+    // verified integration.
+    const sms = report.adapters.find((a) => a.name === 'sms-otp');
+    const gateway = report.adapters.find((a) => a.name === 'payment-gateway');
+    assert.equal(sms?.status, 'LOCAL_TEST');
+    assert.equal(sms?.provider, 'mock-auto');
+    assert.equal(gateway?.status, 'LOCAL_TEST');
+    assert.equal(gateway?.provider, 'mock-auto');
+    assert.equal(report.adapters.find((a) => a.name === 'map-provider')?.provider, 'neshan');
+
+    // A map key nobody has entered still keeps the whole report honest.
+    assert.equal(report.adapters.find((a) => a.name === 'map-provider')?.status, 'NOT_CONFIGURED');
     assert.equal(report.status, 'degraded');
-    assert.ok(report.settings.notConfigured.includes('fee.pedigree_toman'));
-    assert.equal(report.adapters.find((a) => a.name === 'sms-otp')?.status, 'NOT_CONFIGURED');
-    assert.equal(report.adapters.find((a) => a.name === 'payment-gateway')?.status, 'NOT_CONFIGURED');
     assert.ok(Date.parse(report.checkedAt) > 0);
   } finally {
     await testDb.drop();
@@ -44,6 +52,9 @@ test('entering a real tariff removes it from the not-configured list', async () 
     const accountId = await createTestAccount(testDb.db, '09990003001');
     const superadmin: Actor = { accountId: accountId as AccountId, context: 'SUPERADMIN', activeRoles: [] };
 
+    // Start from a tariff the operator has cleared, which is the only way one is
+    // unset now that the catalogue ships starting figures.
+    await updateSetting(testDb.db, superadmin, { key: 'fee.puppy_card_toman', value: null });
     const before = await healthReport(testDb.db, DEV_ENV);
     assert.ok(before.settings.notConfigured.includes('fee.puppy_card_toman'));
 

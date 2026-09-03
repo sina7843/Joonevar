@@ -276,6 +276,12 @@ test('changing the tariff does not change an intent that was already created', a
 
 test('a batch cannot be created for a tariff nobody has entered', async () => {
   await withApproved(async (testDb, member) => {
+    // A tariff an operator cleared back to NOT_CONFIGURED, not a missing seed.
+    await updateSetting(testDb.db, actorFor(member.operatorId, 'SUPERADMIN'), {
+      key: 'fee.pedigree_toman',
+      value: null,
+      reason: 'SYNTHETIC — بازگرداندن به تعیین‌نشده',
+    });
     await assert.rejects(
       () =>
         createBatch(testDb.db, member.actor, {

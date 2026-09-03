@@ -135,9 +135,11 @@ test('no real secret, tariff or account is committed as though it were verified'
   assert.ok(/#\s*SESSION_SECRET=/.test(example), 'the production secret is commented out, never valued');
   assert.ok(!/SESSION_SECRET=[A-Za-z0-9]{8,}/.test(example));
 
-  // A tariff ships unset unless the source itself supplies the baseline. §7
-  // states the membership figure, so that one — and only that one — has a seed
-  // value, and it carries the note saying where the number comes from.
+  // A tariff may ship with a starting figure so the product is usable on day
+  // one, but it must never be dressed up as an announced tariff. §7 states the
+  // membership figure, so that one cites the source; every other fee has to say
+  // in its own note that it is an operating starting value the superadmin
+  // changes, which is what keeps the claim honest.
   const keys = await fs.readFile(path.join('src', 'settings', 'keys.ts'), 'utf8');
   const feeBlocks = keys.split('key:').filter((block) => block.trimStart().startsWith("'fee."));
   assert.ok(feeBlocks.length >= 6);
@@ -149,6 +151,11 @@ test('no real secret, tariff or account is committed as though it were verified'
       assert.ok(block.includes('مبلغ مبنای مستند'), 'and it says it is the documented baseline');
       continue;
     }
-    assert.equal(seed, 'null', key + ' must ship unset, not guessed');
+    if (seed === 'null') continue;
+    assert.match(seed ?? '', /^'\d+'$/, key + ' must be a plain amount, never an expression');
+    assert.ok(
+      block.includes('مقدار شروع عملیاتی است و تعرفه رسمی اعلام‌شده انجمن نیست'),
+      key + ' must say it is a starting figure, not an announced tariff',
+    );
   }
 });

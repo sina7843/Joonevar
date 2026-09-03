@@ -1,10 +1,10 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { currentPaymentGateway, currentPaymentProvider } from '../../src/adapters/current.ts';
 import { db } from '../../src/db/client.ts';
 import { env } from '../../src/config/env.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { paymentGateway, paymentProviderName } from '../../src/adapters/registry.ts';
 import { startMembershipPayment } from '../../src/billing/membership.ts';
 import { cancelAttempt, latestAttempt, startAttempt } from '../../src/billing/payments.ts';
 import { AppError } from '../../src/domain/errors.ts';
@@ -31,8 +31,8 @@ export async function payMembershipAction(_previous: CheckoutState): Promise<Che
       db(),
       guard.actor,
       { batchId: batch.id, callbackUrl: '/membership/return' },
-      paymentGateway(db(), env()),
-      paymentProviderName(env()),
+      await currentPaymentGateway(),
+      await currentPaymentProvider(),
     );
     destination = started.redirectUrl;
   } catch (error) {

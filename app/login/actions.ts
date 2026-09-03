@@ -1,10 +1,10 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { currentSmsSender } from '../../src/adapters/current.ts';
 import { redirect } from 'next/navigation';
 import { db } from '../../src/db/client.ts';
 import { env } from '../../src/config/env.ts';
-import { smsSender } from '../../src/adapters/registry.ts';
 import { requestOtp, verifyOtp, OTP_MESSAGE_FA } from '../../src/identity/otp.ts';
 import { createSession, SESSION_COOKIE } from '../../src/identity/session.ts';
 import { signInWithVerifiedMobile } from '../../src/identity/account.ts';
@@ -34,7 +34,7 @@ export async function requestCodeAction(_previous: LoginState, form: FormData): 
     const outcome = await requestOtp(
       db(),
       { rawMobile, purpose: 'LOGIN' },
-      smsSender(db(), env()),
+      await currentSmsSender(),
     );
 
     if (outcome.state === 'TOO_MANY_ATTEMPTS') {

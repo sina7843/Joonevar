@@ -53,6 +53,7 @@ export const settingGroup = pgEnum('setting_group', [
   'GUIDE_TEXT',
   'OTP_TECHNICAL',
   'BREEDING_POLICY',
+  'INTEGRATIONS',
 ]);
 
 export const settingScopeType = pgEnum('setting_scope_type', ['GLOBAL']);

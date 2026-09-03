@@ -16,7 +16,7 @@
     "db:seed": "node src/db/seed/run.ts",
     "test": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
     "check": "npm run typecheck && npm run test",
-    "test:browser": "node --test --test-concurrency=1 \"tests/browser/*.test.ts\"",
+    "test:browser": "node tools/browser-tests.mjs",
     "db:backup": "node tools/backup.mjs --out backups",
     "db:restore": "node tools/restore.mjs"
   },

@@ -9,6 +9,7 @@
 import { sql } from 'drizzle-orm';
 import type { DbClient } from '../db/client.ts';
 import { adapterReports, type AdapterReport } from '../adapters/registry.ts';
+import { adapterReportsWithSettings } from '../adapters/integration-settings.ts';
 import { unconfiguredKeys } from '../settings/service.ts';
 import { env as loadEnv, type Env } from '../config/env.ts';
 
@@ -43,7 +44,9 @@ export async function healthReport(database: DbClient, env: Env = loadEnv()): Pr
     reachable = false;
   }
 
-  const adapters = adapterReports(env);
+  // The report must describe the running system, so it reads the provider the
+  // superadmin selected, not only the environment file (§21.4).
+  const adapters = reachable ? await adapterReportsWithSettings(database, env) : adapterReports(env);
   const anythingMissing =
     !reachable || notConfigured.length > 0 || adapters.some((a) => a.status === 'NOT_CONFIGURED');
 

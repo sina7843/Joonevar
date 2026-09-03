@@ -11,7 +11,7 @@ import { env as loadEnv } from '../config/env.ts';
 import { AppError } from '../domain/errors.ts';
 import type { DbClient } from '../db/client.ts';
 import { devOutboundSms } from '../db/schema/identity.ts';
-import { devPaymentOutcomes } from '../db/schema/billing.ts';
+import { devPaymentOutcomes, paymentAttempts } from '../db/schema/billing.ts';
 import { eq } from 'drizzle-orm';
 
 export type AdapterStatus = 'NOT_CONFIGURED' | 'LOCAL_TEST' | 'SANDBOX_VERIFIED' | 'LIVE_VERIFIED';
@@ -132,6 +132,23 @@ export function devOutboxSmsSender(database: DbClient, env?: Env): SmsSender {
 }
 
 /**
+ * Mock sender — always succeeds, never reaches a phone.
+ *
+ * It behaves like a provider that accepted every message: the call returns
+ * successfully and the text is kept in the development outbox so a person can
+ * finish a sign-in locally. The code itself is still generated, still expires
+ * and is still single use; only the delivery is simulated.
+ */
+export function mockAutoSmsSender(database: DbClient, env?: Env): SmsSender {
+  assertNotProduction('sms-otp', env ?? loadEnv());
+  return {
+    async send(input) {
+      await database.insert(devOutboundSms).values({ toMobile: input.to, body: input.text });
+    },
+  };
+}
+
+/**
  * The sender the application uses.
  *
  * With no configured provider outside production, messages go to the
@@ -148,6 +165,27 @@ export function smsSender(database: DbClient, env: Env = loadEnv()): SmsSender {
     );
   }
   return devOutboxSmsSender(database, env);
+}
+
+/**
+ * The sender for the mode the superadmin selected.
+ *
+ * `MOCK_AUTO` accepts every message locally. `PROVIDER` needs a real provider,
+ * and until one is configured it fails with a named reason rather than
+ * silently sending nothing.
+ */
+export function smsSenderForMode(
+  database: DbClient,
+  mode: 'MOCK_AUTO' | 'PROVIDER',
+  provider: string | null,
+  env: Env = loadEnv(),
+): SmsSender {
+  if (mode === 'MOCK_AUTO') return mockAutoSmsSender(database, env);
+  throw new AppError(
+    'NOT_CONFIGURED',
+    'No SMS provider is configured; one-time codes cannot be sent' + (provider ? ' (' + provider + ')' : ''),
+    { detail: { adapter: 'sms-otp' } },
+  );
 }
 
 export interface PaymentIntent {
@@ -245,6 +283,53 @@ export function devPaymentGateway(database: DbClient, env?: Env): PaymentGateway
   };
 }
 
+export const MOCK_GATEWAY_PROVIDER = 'mock-auto-gateway';
+
+/**
+ * Mock gateway — the payment is treated as successful, server-side.
+ *
+ * The redirect goes straight back to the callback and the server-side verify
+ * answers "paid" for the amount the batch was priced at. Nothing about the flow
+ * is skipped: the effect still runs inside the verifying transaction, a
+ * replayed callback still performs nothing twice, and the browser still proves
+ * nothing by itself. Only the bank is simulated, and it refuses to exist in
+ * production.
+ */
+export function mockAutoPaymentGateway(database: DbClient, env?: Env): PaymentGateway {
+  assertNotProduction('payment-gateway', env ?? loadEnv());
+  return {
+    async start(input) {
+      return {
+        reference: input.reference,
+        amountRial: input.amountRial,
+        redirectUrl:
+          input.callbackUrl +
+          (input.callbackUrl.includes('?') ? '&' : '?') +
+          'reference=' +
+          encodeURIComponent(input.reference) +
+          '&providerRef=' +
+          encodeURIComponent('mock-' + input.reference),
+      };
+    },
+    async verify(input) {
+      // The amount comes from the attempt the server itself froze, so the
+      // verifying step still compares a real expected figure rather than
+      // trusting anything the browser carried back.
+      const [attempt] = await database
+        .select({ amountRial: paymentAttempts.amountRial })
+        .from(paymentAttempts)
+        .where(eq(paymentAttempts.reference, input.reference))
+        .limit(1);
+      if (!attempt) return { paid: false, amountRial: 0n, providerRef: input.providerRef };
+      return {
+        paid: true,
+        amountRial: BigInt(attempt.amountRial),
+        providerRef: input.providerRef || 'mock-' + input.reference,
+      };
+    },
+  };
+}
+
 /**
  * The gateway the application uses.
  *
@@ -263,4 +348,31 @@ export function paymentGateway(database: DbClient, env: Env = loadEnv()): Paymen
 
 export function paymentProviderName(env: Env = loadEnv()): string {
   return env.PAYMENT_PROVIDER ?? DEV_GATEWAY_PROVIDER;
+}
+
+/**
+ * The gateway for the mode the superadmin selected.
+ *
+ * Whatever the mode, verification stays a server-side call and the effect stays
+ * inside the verifying transaction; the mode only decides who answers it.
+ */
+export function paymentGatewayForMode(
+  database: DbClient,
+  mode: 'MOCK_AUTO' | 'DEV_GATEWAY' | 'PROVIDER',
+  provider: string | null,
+  env: Env = loadEnv(),
+): PaymentGateway {
+  if (mode === 'MOCK_AUTO') return mockAutoPaymentGateway(database, env);
+  if (mode === 'DEV_GATEWAY') return devPaymentGateway(database, env);
+  throw new AppError(
+    'NOT_CONFIGURED',
+    'No payment gateway is configured; payments cannot be taken' + (provider ? ' (' + provider + ')' : ''),
+    { detail: { adapter: 'payment-gateway' } },
+  );
+}
+
+export function providerNameForMode(mode: 'MOCK_AUTO' | 'DEV_GATEWAY' | 'PROVIDER', provider: string | null): string {
+  if (mode === 'MOCK_AUTO') return MOCK_GATEWAY_PROVIDER;
+  if (mode === 'DEV_GATEWAY') return DEV_GATEWAY_PROVIDER;
+  return provider ?? 'unconfigured-provider';
 }
