@@ -12,7 +12,7 @@ import type { AppError } from '../domain/errors.ts';
 export function AccessDenied({ error }: { error: AppError }) {
   const unauthenticated = error.code === 'UNAUTHENTICATED';
   return (
-    <main className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-lg p-xl text-center">
+    <main className="mx-auto flex min-h-dvh max-w-(--size-content-lg) flex-col items-center justify-center gap-lg p-xl text-center">
       <Logo height={32} />
       <h1 className="text-h3">{unauthenticated ? 'ورود لازم است' : 'دسترسی مجاز نیست'}</h1>
       <p className="text-body-sm text-text-secondary">
@@ -36,7 +36,7 @@ export function AccessDenied({ error }: { error: AppError }) {
  */
 export function RecordNotFound({ error }: { error: AppError }) {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center gap-lg p-xl text-center">
+    <main className="mx-auto flex min-h-dvh max-w-(--size-content-lg) flex-col items-center justify-center gap-lg p-xl text-center">
       <Logo height={32} />
       <h1 className="text-h3" data-testid="record-not-found">
         {error.message}

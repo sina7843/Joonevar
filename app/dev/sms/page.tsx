@@ -31,7 +31,7 @@ export default async function DevSmsPage() {
     .limit(30);
 
   return (
-    <main className="mx-auto max-w-lg space-y-lg p-lg">
+    <main className="mx-auto max-w-(--size-content-lg) space-y-lg p-lg">
       <div className="flex flex-col items-center gap-md">
         <Logo height={28} />
         <h1 className="text-h4">صندوق پیامک توسعه</h1>

@@ -29,7 +29,7 @@ export default async function CompleteAccountPage({
   const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : null;
 
   return (
-    <main className="mx-auto max-w-md space-y-xl p-lg">
+    <main className="mx-auto max-w-(--size-content-md) space-y-xl p-lg">
       <div className="flex flex-col items-center gap-md">
         <Logo height={32} />
         <h1 className="text-h3">تکمیل حساب</h1>

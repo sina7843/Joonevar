@@ -72,6 +72,18 @@
   --radius-full: 999px;
 
   /* ── Sizes ─────────────────────────────────────────────────────────── */
+  /*
+   * Content widths — CODE-ONLY.
+   *
+   * Not `max-w-md`: the spacing scale uses the same names as Tailwind's
+   * container scale, and spacing wins, so `max-w-md` resolves to 12px — a page
+   * twelve pixels wide. These names cannot collide, and they are referenced as
+   * `max-w-(--size-content-md)` so a width utility really means a width.
+   */
+  --size-content-sm: 24rem;
+  --size-content-md: 28rem;
+  --size-content-lg: 32rem;
+
   --size-stroke-default: 1px;
   --size-icon-xs: 16px;
   --size-icon-sm: 20px;

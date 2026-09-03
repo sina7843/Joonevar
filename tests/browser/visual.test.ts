@@ -81,6 +81,10 @@ const contextFor = (
 
 /** The screens this review covers, with the session each one belongs to. */
 const SCREENS = [
+  // The sign-in screen is on the list because it is the one screen every person
+  // sees, signed in or not — and the one where a broken content width went
+  // unnoticed longest.
+  { name: 'login', href: '/login', session: 'anonymous' },
   { name: 'dashboard', href: '/dashboard', session: 'owner' },
   { name: 'animals', href: '/animals', session: 'owner' },
   { name: 'permits', href: '/mating/permits', session: 'owner' },
@@ -96,7 +100,9 @@ const SCREENS = [
 ] as const;
 
 const stateFor = (session: string) =>
-  session === 'owner'
+  session === 'anonymous'
+    ? null
+    : session === 'owner'
     ? ownerState
     : session === 'operator'
       ? operatorState
@@ -172,6 +178,19 @@ test('every reviewed screen renders RTL at both sizes with no sideways scroll', 
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
         );
         assert.ok(overflow <= 1, screen.href + ' must not scroll sideways at ' + label + ' (' + overflow + 'px)');
+
+        // A page can avoid sideways scrolling by being a sliver: children just
+        // shrink. A `max-w-md` that resolves to the 12px spacing token did
+        // exactly that and rendered one character per line, so the width of the
+        // content itself is asserted, not only the absence of overflow.
+        const mainWidth = await page.evaluate(() => {
+          const main = document.querySelector('main');
+          return main === null ? 0 : Math.round(main.getBoundingClientRect().width);
+        });
+        assert.ok(
+          mainWidth >= 320,
+          screen.href + ' renders its content ' + mainWidth + 'px wide at ' + label + '; that is not a layout',
+        );
 
         await page
           .screenshot({ path: path.join(SHOTS, screen.name + '-' + label + '.png'), fullPage: true })

@@ -32,7 +32,7 @@ export function LoginForm({ next }: { next: string | null }) {
   const remaining = useCountdown(active.resendAfterSeconds, active.challengeId ?? '');
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-xl p-lg">
+    <main className="mx-auto flex min-h-dvh max-w-(--size-content-md) flex-col justify-center gap-xl p-lg">
       <div className="flex flex-col items-center gap-md">
         <Logo height={36} />
         <h1 className="text-h3">ورود به هم‌زیست</h1>
