@@ -6,7 +6,7 @@
  * for one animal cannot disturb the others. The code is issued before any
  * sampling, and QR and manual entry are two renderings of the same value.
  */
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, exists, gt, inArray, or, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
 import { profiles } from '../db/schema/identity.ts';
@@ -657,7 +657,49 @@ export async function selectableAnimals(
 }
 
 /** The veterinarian's own locations, for the check-in desk selector. */
+/**
+ * The locations this veterinarian can actually receive someone at — §11.1.
+ *
+ * A location whose licence is not valid does not appear in the Finder and
+ * cannot take new work, so offering it in the check-in list is noise at best
+ * and a wrong selection at worst. The one exception is a location that still
+ * holds an open request: work already booked and paid for must stay possible to
+ * honour, and check-in refuses a mismatched location anyway.
+ */
 export async function myLocations(database: DbClient, actor: Actor) {
   if (actor.context !== 'TRUSTED_VET') throw forbidden('این فهرست فقط برای دامپزشک معتمد است.');
-  return database.select().from(vetLocations).where(eq(vetLocations.vetAccountId, actor.accountId));
+  return database
+    .select()
+    .from(vetLocations)
+    .where(
+      and(
+        eq(vetLocations.vetAccountId, actor.accountId),
+        or(
+          eq(vetLocations.licenceStatus, 'VALID'),
+          // A visit that can still be honoured today: someone already at the
+          // desk, or a referral that has not run out. An expired referral is
+          // replaced (§11.3), and its replacement goes to a valid location.
+          exists(
+            database
+              .select({ one: sql`1` })
+              .from(vetVisitRequests)
+              .leftJoin(referralCodes, eq(referralCodes.requestId, vetVisitRequests.id))
+              .where(
+                and(
+                  eq(vetVisitRequests.locationId, vetLocations.id),
+                  or(
+                    eq(vetVisitRequests.status, 'CHECKED_IN'),
+                    and(
+                      eq(vetVisitRequests.status, 'ACTIVE'),
+                      eq(referralCodes.status, 'ACTIVE'),
+                      gt(referralCodes.expiresAt, new Date()),
+                    ),
+                  ),
+                ),
+              ),
+          ),
+        ),
+      ),
+    )
+    .orderBy(vetLocations.nameFa);
 }

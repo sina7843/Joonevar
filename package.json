@@ -18,7 +18,8 @@
     "check": "npm run typecheck && npm run test",
     "test:browser": "node tools/browser-tests.mjs",
     "db:backup": "node tools/backup.mjs --out backups",
-    "db:restore": "node tools/restore.mjs"
+    "db:restore": "node tools/restore.mjs",
+    "dev:tidy": "node tools/dev-tidy.mjs"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
