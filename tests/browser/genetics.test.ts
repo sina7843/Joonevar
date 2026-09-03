@@ -497,6 +497,9 @@ test('the centre receives, processes and records a result without any issuance p
     // Wait for the action's own confirmation before navigating away, otherwise
     // the next request aborts the server action that is still running.
     // The row re-renders in place, so the new state is the confirmation.
+    // The centre may load before the custodian's shipment has landed; wait for
+    // the state the button belongs to instead of racing it.
+    await centreRow().getByText('ارسال‌شده').waitFor({ timeout: 45_000 });
     await centreRow().getByTestId('receive-sample').click();
     await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 45_000 });
     await centre.screenshot({ path: path.join(SHOTS, 'centre-received.png'), fullPage: true });

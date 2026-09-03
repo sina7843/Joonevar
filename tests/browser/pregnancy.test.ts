@@ -302,6 +302,9 @@ async function pedigreedAnimal(
   await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
     waitUntil: 'load',
   });
+  // The centre may load before the custodian's shipment has landed; wait for
+  // the state the button belongs to instead of racing it.
+  await centreRow().getByText('ارسال‌شده').waitFor({ timeout: 45_000 });
   await centreRow().getByTestId('receive-sample').click();
   await centreRow().getByText('دریافت‌شده در مرکز').waitFor({ timeout: 45_000 });
   await centreRow().getByTestId('start-processing').click();
