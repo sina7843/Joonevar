@@ -352,6 +352,8 @@ test('a referral code is single use, and renewal never revives the old one', asy
       breedId: ctx.breedId,
       sex: 'MALE',
       birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
     });
     const animal = await registerAnimal(ctx.testDb.db, ctx.first.actor, draft.id);
     const created = await createVisitRequests(ctx.testDb.db, ctx.first.actor, {

@@ -180,6 +180,8 @@ async function makeAnimal(ctx: Ctx, name: string): Promise<string> {
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   return (await registerAnimal(ctx.testDb.db, ctx.owner.actor, draft.id)).id;
 }
@@ -213,8 +215,8 @@ async function openVisit(
     sex: 'MALE',
     birthDate: '2022-01-01',
     birthDateApproximate: false,
-    color: null,
-    markings: null,
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   return { animalId, requestId, vet, locationId };
 }

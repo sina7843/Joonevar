@@ -386,9 +386,20 @@ export async function registerAnimal(
     throw versionStale(expectedVersion, record.version);
   }
 
+  /*
+   * Every declared field is mandatory except the photo (DEC-0136).
+   *
+   * The purpose of the paid visit is for a trusted veterinarian to certify this
+   * animal's identity, and a certification of blanks certifies nothing: the vet
+   * has to be confirming or correcting a real statement. The photo stays
+   * optional because it is not part of what the vet attests to.
+   */
+  if (record.name === null) throw validation('نام حیوان را وارد کنید.');
   if (record.breedId === null) throw validation('نژاد را انتخاب کنید.');
   if (record.sex === null) throw validation('جنسیت را انتخاب کنید.');
   if (record.birthDate === null) throw validation('تاریخ تولد را وارد کنید.');
+  if (record.color === null) throw validation('رنگ حیوان را وارد کنید.');
+  if (record.markings === null) throw validation('نشانه‌های ظاهری را وارد کنید؛ اگر نشانه‌ای ندارد، همین را بنویسید.');
 
   return database.transaction(async (tx) => {
     const [updated] = await tx

@@ -85,7 +85,13 @@ export function IdentityPanel({
           <Alert tone={state.ok ? 'success' : 'error'} title={state.message} />
         ) : null}
 
-        <TextField label="نام حیوان" name="name" defaultValue={defaults.name ?? ''} data-testid="identity-name" />
+        <TextField
+          label="نام حیوان"
+          name="name"
+          required
+          defaultValue={defaults.name ?? ''}
+          data-testid="identity-name"
+        />
         <SelectField
           label="نژاد"
           name="breedId"
@@ -124,10 +130,17 @@ export function IdentityPanel({
           />
           تاریخ تولد تقریبی است
         </label>
-        <TextField label="رنگ" name="color" defaultValue={defaults.color ?? ''} data-testid="identity-color" />
+        <TextField
+          label="رنگ"
+          name="color"
+          required
+          defaultValue={defaults.color ?? ''}
+          data-testid="identity-color"
+        />
         <TextField
           label="علائم ظاهری"
           name="markings"
+          required
           defaultValue={defaults.markings ?? ''}
           data-testid="identity-markings"
         />

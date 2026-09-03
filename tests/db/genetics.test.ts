@@ -191,6 +191,8 @@ async function animalWithSheet(
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
     ...(options.sire || options.dam
       ? { origin: 'INTERNAL_G1PLUS' as const, sirePedigreeCode: options.sire, damPedigreeCode: options.dam }
       : {}),
@@ -218,13 +220,13 @@ async function animalWithSheet(
   });
   // §13: identity is certified at the desk before the chip is bound.
   await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
-    name: null,
+    name,
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
     birthDateApproximate: false,
-    color: null,
-    markings: null,
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const number = nextChip();
   await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
@@ -270,6 +272,8 @@ test('the pedigree route needs a sheet and reuses the sample already on record',
       breedId: ctx.breedId,
       sex: 'MALE',
       birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
     });
     const bare = await registerAnimal(ctx.testDb.db, ctx.owner.actor, draft.id);
     const readiness = await pedigreeReadiness(ctx.testDb.db, ctx.owner.accountId, bare.id);

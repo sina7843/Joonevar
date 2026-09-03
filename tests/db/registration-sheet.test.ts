@@ -166,6 +166,51 @@ let chipCounter = 0;
 const nextChip = () => '90000000' + String(1_000_000 + (chipCounter += 1));
 
 /** Takes one animal all the way through microchip and sampling. */
+/** Just the owner's own registration: nothing has been certified or chipped. */
+async function plainAnimal(ctx: Ctx, name: string) {
+  const draft = await startDraft(ctx.testDb.db, ctx.owner.actor, { forceNew: true });
+  await saveDraft(ctx.testDb.db, ctx.owner.actor, draft.id, {
+    name,
+    breedId: ctx.breedId,
+    sex: 'MALE',
+    birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
+  });
+  const animal = await registerAnimal(ctx.testDb.db, ctx.owner.actor, draft.id);
+  return { animalId: animal.id };
+}
+
+/** The paid visit: identity certified, chip bound, sample taken. */
+async function runMicrochipVisit(ctx: Ctx, animalId: string, name: string) {
+  const created = await createVisitRequests(ctx.testDb.db, ctx.owner.actor, {
+    context: 'MICROCHIP',
+    vetAccountId: ctx.vet.accountId,
+    locationId: ctx.locationId,
+    items: [{ animalId, serviceType: 'MICROCHIP_IMPLANT' }],
+  });
+  const requestId = created.items[0]!.request.id;
+  await checkIn(ctx.testDb.db, ctx.vet.actor, {
+    code: created.items[0]!.referral.code,
+    locationId: ctx.locationId,
+  });
+  await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
+    name,
+    breedId: ctx.breedId,
+    sex: 'MALE',
+    birthDate: '2022-01-01',
+    birthDateApproximate: false,
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
+  });
+  const number = nextChip();
+  await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
+  await confirmImplant(ctx.testDb.db, ctx.vet.actor, requestId);
+  await recordRereadAndBind(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
+  await recordSampling(ctx.testDb.db, ctx.vet.actor, requestId);
+  return requestId;
+}
+
 async function readyAnimal(ctx: Ctx, name: string, options: { sample?: boolean } = {}) {
   const draft = await startDraft(ctx.testDb.db, ctx.owner.actor, { forceNew: true });
   await saveDraft(ctx.testDb.db, ctx.owner.actor, draft.id, {
@@ -173,6 +218,8 @@ async function readyAnimal(ctx: Ctx, name: string, options: { sample?: boolean }
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const animal = await registerAnimal(ctx.testDb.db, ctx.owner.actor, draft.id);
 
@@ -195,7 +242,7 @@ async function readyAnimal(ctx: Ctx, name: string, options: { sample?: boolean }
     birthDate: '2022-01-01',
     birthDateApproximate: false,
     color: 'قهوه‌ای',
-    markings: null,
+    markings: 'بدون نشانه خاص',
   });
 
   const number = nextChip();
@@ -218,24 +265,36 @@ async function payBatch(ctx: Ctx, batchId: string, gateway = payingGateway(2_500
   return { started, outcome: await verifyAttempt(ctx.testDb.db, { reference: started.reference }, gateway, paidEffects) };
 }
 
-test('the money step is closed until the microchip and the sample exist', async () => {
+test('the fee is paid before the visit, and the document waits for its result', async () => {
   await withCtx(async (ctx) => {
     await setSheetFee(ctx);
-    const bare = await readyAnimal(ctx, 'سگ بدون نمونه', { sample: false });
+    // DEC-0136: the fee buys the visit, so an animal with nothing done yet is
+    // exactly what a person pays for.
+    const fresh = await plainAnimal(ctx, 'سگ تازه ثبت‌شده');
 
-    const readiness = await readinessOf(ctx.testDb.db, ctx.owner.accountId, bare.animalId);
-    assert.equal(readiness.ready, false);
-    assert.match(readiness.reasonFa ?? '', /نمونه خون/);
+    const before = await readinessOf(ctx.testDb.db, ctx.owner.accountId, fresh.animalId);
+    assert.equal(before.payable, true, 'the service can be bought');
+    assert.equal(before.ready, false, 'but the document cannot be issued yet');
+    assert.equal(before.nextStep?.href, '/requests/new?context=MICROCHIP');
 
-    await assert.rejects(
-      () => createSheetRequest(ctx.testDb.db, ctx.owner.actor, [bare.animalId]),
-      /نمونه خون/,
-    );
-    assert.equal((await ctx.testDb.db.select().from(paymentBatches).where(eq(paymentBatches.service, 'REGISTRATION_SHEET'))).length, 0);
+    const created = await createSheetRequest(ctx.testDb.db, ctx.owner.actor, [fresh.animalId]);
+    await payBatch(ctx, created.batch.id, payingGateway(2_500_000n));
 
-    // Once the sample exists the same animal is ready.
-    await recordSampling(ctx.testDb.db, ctx.vet.actor, bare.requestId);
-    assert.equal((await readinessOf(ctx.testDb.db, ctx.owner.accountId, bare.animalId)).ready, true);
+    // Paid, and honest about it: no sheet exists yet, and the item says why.
+    const [afterPayment] = await itemsOfBatch(ctx.testDb.db, created.batch.id);
+    assert.equal(afterPayment!.state, 'BLOCKED');
+    assert.match(afterPayment!.blockedReasonFa ?? '', /میکروچیپ|مشخصات/);
+    assert.equal((await ctx.testDb.db.select().from(registrationSheets)).length, 0);
+
+    // The visit runs, and the sheet issues by itself when it produces its
+    // result — no second payment and no second request from the owner.
+    await runMicrochipVisit(ctx, fresh.animalId, 'سگ تازه ثبت‌شده');
+
+    const [afterVisit] = await itemsOfBatch(ctx.testDb.db, created.batch.id);
+    assert.equal(afterVisit!.state, 'ISSUED');
+    const sheets = await ctx.testDb.db.select().from(registrationSheets);
+    assert.equal(sheets.length, 1);
+    assert.equal(sheets[0]!.animalId, fresh.animalId);
   });
 });
 

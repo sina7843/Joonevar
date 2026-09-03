@@ -61,6 +61,8 @@ async function plainAnimal(ctx: MatingCtx, owner: Party, name: string) {
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   return registerAnimal(ctx.testDb.db, owner.actor, draft.id);
 }

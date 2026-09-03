@@ -47,6 +47,9 @@ export interface NextStep {
 export interface AnimalReadiness {
   readonly animalId: string;
   readonly name: string | null;
+  /** The whole §13 service can be bought for this animal right now. */
+  readonly payable: boolean;
+  /** The document itself can be issued: the paid visit has produced its result. */
   readonly ready: boolean;
   readonly microchipNumber: string | null;
   readonly sampleTrackingCode: string | null;
@@ -74,6 +77,7 @@ export async function readinessOf(
   if (animal.status !== 'REGISTERED') {
     return {
       ...blocked,
+      payable: false,
       reasonFa: 'ثبت اولیه این حیوان کامل نیست.',
       nextStep: { labelFa: 'تکمیل ثبت حیوان', href: '/animals/' + animalId + '/edit' },
     };
@@ -103,6 +107,7 @@ export async function readinessOf(
   if (existing) {
     return {
       ...blocked,
+      payable: false,
       reasonFa: 'برای این حیوان برگه ثبتی صادر شده است.',
       nextStep: { labelFa: 'مشاهده پرونده حیوان', href: '/animals/' + animalId },
     };
@@ -114,9 +119,10 @@ export async function readinessOf(
       ...blocked,
       // Not a separate service that has to be completed first: this is step 2
       // of the very flow the person is already in.
+      payable: true,
       reasonFa: openVisit
-        ? 'مرحله میکروچیپ این حیوان در جریان است؛ پس از مراجعه و نمونه‌گیری، پرداخت صدور باز می‌شود.'
-        : 'مرحله بعدی همین مسیر، کاشت یا تأیید میکروچیپ و نمونه‌گیری نزد دامپزشک معتمد است.',
+        ? 'پرداخت انجام شده و مراجعه در جریان است؛ برگه پس از تأیید مشخصات، میکروچیپ و نمونه‌گیری صادر می‌شود.'
+        : 'شامل تأیید رسمی مشخصات، کاشت یا تأیید میکروچیپ و نمونه‌گیری نزد دامپزشک معتمد.',
       nextStep: visitStep,
     };
   }
@@ -133,6 +139,7 @@ export async function readinessOf(
       ready: false,
       microchipNumber: chip.number,
       sampleTrackingCode: null,
+      payable: true,
       reasonFa:
         collected.length === 0
           ? 'نمونه خون این حیوان هنوز ثبت نشده است؛ نمونه‌گیری در همان مراجعه انجام می‌شود.'
@@ -143,6 +150,7 @@ export async function readinessOf(
 
   return {
     ...base,
+    payable: true,
     ready: true,
     microchipNumber: chip.number,
     sampleTrackingCode: usable.trackingCode,
@@ -197,10 +205,21 @@ export async function createSheetRequest(
   const unique = [...new Set(animalIds)];
   if (unique.length === 0) throw validation('حداقل یک حیوان انتخاب کنید.');
 
+  /*
+   * The fee is taken before the visit is booked (DEC-0136, product owner's
+   * instruction; §13's step order said the opposite and is superseded).
+   *
+   * So the only things checked here are the ones that make the payment itself
+   * meaningful: the animal is really registered to this person, it does not
+   * already have a sheet, and it is not sitting in another open batch. The chip
+   * and the sample are what the paid visit produces, so requiring them here
+   * would be requiring the outcome before the service.
+   */
   for (const animalId of unique) {
     const readiness = await readinessOf(database, actor.accountId, animalId);
-    // §13: the money step never runs ahead of the microchip and the sample.
-    if (!readiness.ready) throw conflict(readiness.reasonFa ?? 'این حیوان هنوز واجد شرایط صدور نیست.');
+    if (readiness.payable !== true) {
+      throw conflict(readiness.reasonFa ?? 'این حیوان قابل انتخاب برای صدور برگه ثبتی نیست.');
+    }
   }
 
   const batch = await createBatch(database, actor, {
@@ -362,6 +381,41 @@ export async function issueForBatch(tx: DbClient, batch: BatchRecord): Promise<v
  * paid snapshot stays exactly as it was and the only permitted edit after
  * payment is trying the issuance again once the missing prerequisite exists.
  */
+/**
+ * The paid sheet is issued the moment the visit produces its result.
+ *
+ * The fee is now taken before the visit (DEC-0136), so by the time the vet
+ * finishes there is already a paid batch waiting on this animal. Issuing it here
+ * is what makes the whole thing one service instead of a payment and a separate
+ * errand the owner has to come back and finish. It is deliberately quiet: an
+ * animal with nothing paid, or already issued, is simply not affected.
+ */
+export async function issuePaidSheetsForAnimal(tx: DbClient, animalId: string): Promise<void> {
+  const pending = await tx
+    .select({ batchId: registrationSheetItems.batchId })
+    .from(registrationSheetItems)
+    .where(
+      and(
+        eq(registrationSheetItems.animalId, animalId),
+        inArray(registrationSheetItems.state, ['AWAITING_ISSUANCE', 'BLOCKED']),
+      ),
+    );
+
+  for (const batchId of new Set(pending.map((row) => row.batchId))) {
+    const [batch] = await tx.select().from(paymentBatches).where(eq(paymentBatches.id, batchId)).limit(1);
+    // Only a batch whose money is actually confirmed on the server.
+    if (!batch || batch.status !== 'PAID') continue;
+    await issueForBatch(tx, {
+      id: batch.id,
+      accountId: batch.accountId,
+      service: 'REGISTRATION_SHEET',
+      status: 'PAID',
+      resumeContext: batch.resumeContext as never,
+      version: batch.version,
+    });
+  }
+}
+
 export async function retryIssuance(
   database: Database,
   actor: Actor,

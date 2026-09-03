@@ -287,6 +287,8 @@ test('G1+ computes the generation from resolved parents and never offers to set 
     await page.getByTestId('animal-birth-date').fill('2023-04-04');
     await page.getByTestId('step-2-continue').click();
     await page.getByTestId('step-3-continue').waitFor();
+    await page.getByTestId('animal-color').fill('قهوه‌ای');
+    await page.getByTestId('animal-markings').fill('بدون نشانه خاص');
     await page.getByTestId('step-3-continue').click();
     await page.getByTestId('step-4-continue').waitFor();
     await page.getByTestId('step-4-continue').click();
@@ -344,6 +346,8 @@ test('a missing parent gives G0 with a CTA, and the return rematches the same an
     await page.getByTestId('animal-birth-date').fill('2023-08-08');
     await page.getByTestId('step-2-continue').click();
     await page.getByTestId('step-3-continue').waitFor();
+    await page.getByTestId('animal-color').fill('قهوه‌ای');
+    await page.getByTestId('animal-markings').fill('بدون نشانه خاص');
     await page.getByTestId('step-3-continue').click();
     await page.getByTestId('step-4-continue').waitFor();
     await page.getByTestId('step-4-continue').click();
@@ -386,6 +390,8 @@ test('a missing parent gives G0 with a CTA, and the return rematches the same an
     await page.getByTestId('animal-birth-date').fill('2020-02-02');
     await page.getByTestId('step-2-continue').click();
     await page.getByTestId('step-3-continue').waitFor();
+    await page.getByTestId('animal-color').fill('قهوه‌ای');
+    await page.getByTestId('animal-markings').fill('بدون نشانه خاص');
     await page.getByTestId('step-3-continue').click();
     await page.getByTestId('step-4-continue').waitFor();
     await page.getByTestId('step-4-continue').click();

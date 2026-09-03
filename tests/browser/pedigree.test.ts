@@ -266,6 +266,8 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
   await owner.getByTestId('animal-birth-date').fill('2022-05-05');
   await owner.getByTestId('step-2-continue').click();
   await owner.getByTestId('step-3-continue').waitFor();
+  await owner.getByTestId('animal-color').fill('قهوه‌ای');
+  await owner.getByTestId('animal-markings').fill('بدون نشانه خاص');
   await owner.getByTestId('step-3-continue').click();
   await owner.getByTestId('step-4-continue').waitFor();
   await owner.getByTestId('step-4-continue').click();
@@ -339,6 +341,7 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
     owner.waitForURL((url) => url.pathname.startsWith('/pedigree/receipts/')),
     owner.getByTestId('create-receipt').click(),
   ]);
+  const receiptId = new URL(owner.url()).pathname.split('/')[3]!;
   await owner
     .getByTestId('receipt-file')
     .setInputFiles({ name: 'receipt.jpg', mimeType: 'image/jpeg', buffer: JPEG });
@@ -347,8 +350,8 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
   await owner.getByTestId('submit-receipt').click();
   await expectText(owner, 'در حال بررسی مرکز');
 
-  await centre.goto(BASE_URL + '/genetics/receipts', { waitUntil: 'load' });
-  await centre.getByTestId('open-receipt').first().click();
+  // By id: the shared queue holds other runs' receipts.
+  await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
   await centre.getByTestId('receipt-decision-APPROVED').check();
   await centre.getByTestId('submit-receipt-review').click();
   await expectText(centre, 'این فیش در انتظار بررسی نیست');

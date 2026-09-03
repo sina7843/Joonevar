@@ -43,9 +43,19 @@ export default async function SheetReturnPage({
     <PublicShell actor={guard.actor} title="نتیجه پرداخت" pathname={'/registration/' + id + '/return'}>
       <div className="space-y-lg">
         {outcome.state === 'PAID' ? (
-          <Alert tone="success" title="پرداخت تأیید شد">
-            تأیید روی سرور انجام شد. وضعیت صدور هر حیوان جداگانه در همان درخواست دیده می‌شود.
-          </Alert>
+          <>
+            <Alert tone="success" title="پرداخت تأیید شد">
+              تأیید روی سرور انجام شد. مرحله بعدی همین سرویس، انتخاب دامپزشک معتمد و نوع خدمت هر حیوان است؛
+              برگه ثبتی پس از تأیید مشخصات، میکروچیپ و نمونه‌گیری خودبه‌خود صادر می‌شود.
+            </Alert>
+            <ButtonLink
+              href="/requests/new?context=MICROCHIP"
+              block
+              data-testid="continue-to-visit"
+            >
+              ادامه: انتخاب دامپزشک و دریافت کد مراجعه
+            </ButtonLink>
+          </>
         ) : null}
         {outcome.state === 'FAILED' ? (
           <Alert tone="error" title="پرداخت تأیید نشد">

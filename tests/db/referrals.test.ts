@@ -171,6 +171,8 @@ async function makeAnimal(ctx: Ctx, name: string): Promise<string> {
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const registered = await registerAnimal(ctx.testDb.db, ctx.owner.actor, draft.id);
   return registered.id;

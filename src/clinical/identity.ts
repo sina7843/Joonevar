@@ -81,8 +81,18 @@ export async function recordOfficialIdentity(
 
   if (input.sex !== 'MALE' && input.sex !== 'FEMALE') throw validation('جنسیت را انتخاب کنید.');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(input.birthDate)) throw validation('تاریخ تولد را کامل وارد کنید.');
+  // Nothing here is optional (DEC-0136): a certification with blanks in it
+  // certifies nothing. The photo is the one exception, and it is not part of
+  // what the veterinarian attests to.
   const name = trimmed(input.name);
-  if (name !== null && name.length > 60) throw validation('نام حیوان بیش از حد طولانی است.');
+  if (name === null) throw validation('نام حیوان را وارد کنید.');
+  if (name.length > 60) throw validation('نام حیوان بیش از حد طولانی است.');
+  const color = trimmed(input.color);
+  if (color === null) throw validation('رنگ حیوان را وارد کنید.');
+  const markings = trimmed(input.markings);
+  if (markings === null) {
+    throw validation('نشانه‌های ظاهری را وارد کنید؛ اگر نشانه‌ای ندارد، همین را بنویسید.');
+  }
 
   await database.transaction(async (tx) => {
     const [updated] = await tx
@@ -93,8 +103,8 @@ export async function recordOfficialIdentity(
         sex: input.sex,
         birthDate: input.birthDate,
         birthDateApproximate: input.birthDateApproximate,
-        color: trimmed(input.color),
-        markings: trimmed(input.markings),
+        color,
+        markings,
         identityVerifiedAt: new Date(),
         identityVerifiedByAccountId: actor.accountId,
         identityVerifiedRequestId: request.id,

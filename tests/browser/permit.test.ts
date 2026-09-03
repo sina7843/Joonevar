@@ -202,6 +202,8 @@ async function pedigreedAnimal(
   await owner.getByTestId('animal-birth-date').fill('2022-05-05');
   await owner.getByTestId('step-2-continue').click();
   await owner.getByTestId('step-3-continue').waitFor();
+  await owner.getByTestId('animal-color').fill('قهوه‌ای');
+  await owner.getByTestId('animal-markings').fill('بدون نشانه خاص');
   await owner.getByTestId('step-3-continue').click();
   await owner.getByTestId('step-4-continue').waitFor();
   await owner.getByTestId('step-4-continue').click();

@@ -209,6 +209,8 @@ async function ownerWithAnimals(names: readonly string[]) {
     await page.getByTestId('animal-birth-date').fill('2022-05-05');
     await page.getByTestId('step-2-continue').click();
     await page.getByTestId('step-3-continue').waitFor();
+    await page.getByTestId('animal-color').fill('قهوه‌ای');
+    await page.getByTestId('animal-markings').fill('بدون نشانه خاص');
     await page.getByTestId('step-3-continue').click();
     await page.getByTestId('step-4-continue').waitFor();
     await page.getByTestId('step-4-continue').click();

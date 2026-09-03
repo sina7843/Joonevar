@@ -151,7 +151,13 @@ export function AnimalWizard({
           <form action={save} className="space-y-lg" data-testid="step-1">
             <input type="hidden" name="animalId" value={animal.id} />
             <input type="hidden" name="step" value="2" />
-            <TextField label="نام حیوان" name="name" defaultValue={animal.name ?? ''} data-testid="animal-name" />
+            <TextField
+              label="نام حیوان"
+              name="name"
+              required
+              defaultValue={animal.name ?? ''}
+              data-testid="animal-name"
+            />
             <Field label="گونه" required hint="در حال حاضر فقط ثبت سگ پشتیبانی می‌شود.">
               {({ inputId, describedBy }) => (
                 <input
@@ -247,16 +253,24 @@ export function AnimalWizard({
           <form action={save} className="space-y-lg" data-testid="step-3">
             <input type="hidden" name="animalId" value={animal.id} />
             <input type="hidden" name="step" value="4" />
-            <TextField label="رنگ" name="color" defaultValue={animal.color ?? ''} data-testid="animal-color" />
+            <TextField
+              label="رنگ"
+              name="color"
+              required
+              defaultValue={animal.color ?? ''}
+              data-testid="animal-color"
+            />
             <TextField
               label="نشانه‌های ظاهری"
               name="markings"
-              hint="مواردی را بنویسید که در تشخیص حیوان کمک می‌کنند."
+              required
+              hint="مواردی را بنویسید که در تشخیص حیوان کمک می‌کنند؛ اگر نشانه‌ای ندارد، همین را بنویسید."
               defaultValue={animal.markings ?? ''}
               data-testid="animal-markings"
             />
             <Alert tone="info" title="این اطلاعات اعلامی است">
-              رنگ و نشانه‌های ظاهری اختیاری است و به‌عنوان اطلاعات اعلام‌شده توسط کاربر و تأییدنشده ثبت می‌شود.
+              رنگ و نشانه‌های ظاهری اجباری است و به‌عنوان اظهار شما ثبت می‌شود؛ در مراجعه، دامپزشک معتمد
+              همین‌ها را تأیید یا اصلاح می‌کند و از آن پس رسمی و غیرقابل‌تغییر می‌شوند.
             </Alert>
             <ActionRow
               primary={

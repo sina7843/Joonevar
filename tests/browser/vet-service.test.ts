@@ -256,6 +256,8 @@ async function ownerWithAnimal(name: string, withPhoto = true) {
   await page.getByTestId('animal-birth-date').fill('2022-05-05');
   await page.getByTestId('step-2-continue').click();
   await page.getByTestId('step-3-continue').waitFor();
+  await page.getByTestId('animal-color').fill('قهوه‌ای');
+  await page.getByTestId('animal-markings').fill('بدون نشانه خاص');
   await page.getByTestId('step-3-continue').click();
   await page.getByTestId('step-4-continue').waitFor();
   if (withPhoto) {
@@ -474,6 +476,9 @@ test('the sample code appears only after the sampling is recorded, and custody f
     // The owner sees the tracking code, stated as a different identifier.
     await owner.page.goto(BASE_URL + '/requests/' + requestId, { waitUntil: 'load' });
     await owner.page.getByTestId('owner-samples').waitFor();
+    const trackingCode = (await owner.page.getByTestId('owner-samples').innerText()).match(
+      /SM-[A-Z0-9]+/,
+    )![0];
     await expectText(owner.page, 'کد رهگیری نمونه با کد مراجعه یکی نیست');
     await owner.page.screenshot({ path: path.join(SHOTS, 'owner-sample-code.png'), fullPage: true });
 
@@ -481,7 +486,12 @@ test('the sample code appears only after the sampling is recorded, and custody f
     await page.goto(BASE_URL + '/vet/samples', { waitUntil: 'load' });
     await page.getByTestId('custody-list').waitFor();
     await expectText(page, 'تا صدور دستور ارسال از مرکز ژنتیک، نمونه نزد شما می‌ماند');
-    assert.equal(await page.getByTestId('shipment-reference').count(), 0);
+    // Scoped to this sample's own row: the custody list holds every sample this
+    // veterinarian still has, including ones other runs already instructed.
+    const custodyRow = page
+      .locator('[data-testid="custody-list"] > li')
+      .filter({ hasText: trackingCode });
+    assert.equal(await custodyRow.getByTestId('shipment-reference').count(), 0);
     await page.screenshot({ path: path.join(SHOTS, 'custody-list.png'), fullPage: true });
 
     const centre = await genetics.newPage();

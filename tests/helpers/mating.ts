@@ -245,6 +245,8 @@ export async function animalWithSheet(
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const animal = await registerAnimal(ctx.testDb.db, owner.actor, draft.id);
 
@@ -261,13 +263,13 @@ export async function animalWithSheet(
   });
   // §13: identity is certified at the desk before the chip is bound.
   await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
-    name: null,
+    name,
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
     birthDateApproximate: false,
-    color: null,
-    markings: null,
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const number = nextChip();
   await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
@@ -305,6 +307,8 @@ export async function pedigreedAnimal(
     breedId: ctx.breedId,
     sex,
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const animal = await registerAnimal(ctx.testDb.db, owner.actor, draft.id);
 
@@ -321,13 +325,13 @@ export async function pedigreedAnimal(
   });
   // §13: identity is certified at the desk before the chip is bound.
   await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
-    name: null,
+    name,
     breedId: ctx.breedId,
     sex,
     birthDate: '2022-01-01',
     birthDateApproximate: false,
-    color: null,
-    markings: null,
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const number = nextChip();
   await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });

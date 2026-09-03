@@ -9,12 +9,12 @@ import { createSheetRequestAction, type SheetFormState } from '../actions.ts';
 const EMPTY: SheetFormState = {};
 
 /**
- * Choosing animals for one checkout — §13 steps 1 and 6.
+ * Choosing animals for one checkout — §13 step 1, DEC-0136.
  *
- * An animal that is not ready is shown with the reason rather than hidden, and
- * with the link that continues this same flow. The microchip and the sample are
- * steps 2–4 here, not a separate service, so an animal that has not reached them
- * offers the vet visit rather than a dead end.
+ * Every animal that can still get a sheet is selectable, because the fee is what
+ * buys the visit rather than what follows it. An animal that cannot be bought
+ * for at all — already issued, or its own registration unfinished — is shown
+ * with the reason and the link that resolves it, not hidden.
  */
 export function SelectSheetAnimals({
   animals,
@@ -24,20 +24,21 @@ export function SelectSheetAnimals({
     animalId: string;
     name: string | null;
     ready: boolean;
+    payable: boolean;
     reasonFa: string | null;
     nextStep: { labelFa: string; href: string } | null;
   }>;
   feeLabel: string | null;
 }) {
   const [state, submit, pending] = useActionState(createSheetRequestAction, EMPTY);
-  const ready = animals.filter((a) => a.ready);
+  const payable = animals.filter((a) => a.payable);
 
   return (
     <Card>
       <h2 className="text-label-lg">انتخاب حیوان‌ها</h2>
       <p className="mt-md text-caption text-text-secondary">
-        هزینه هر حیوان جداگانه محاسبه می‌شود و در یک پرداخت گروهی جمع می‌شود. مبلغ خدمت دامپزشک جدا است و در این
-        پرداخت نیست.
+        هزینه هر حیوان جداگانه محاسبه می‌شود و در یک پرداخت گروهی جمع می‌شود. پس از پرداخت، دامپزشک معتمد و
+        نوع خدمت هر حیوان انتخاب می‌شود. مبلغ خدمت دامپزشک جدا است و در این پرداخت نیست.
       </p>
 
       <form action={submit} className="mt-lg space-y-lg" data-testid="sheet-select-form">
@@ -51,24 +52,23 @@ export function SelectSheetAnimals({
                   type="checkbox"
                   name="animalId"
                   value={animal.animalId}
-                  disabled={!animal.ready}
+                  disabled={!animal.payable}
                   className="mt-1 size-[var(--size-selection-md)]"
                   data-testid={'sheet-pick-' + animal.animalId}
                 />
                 <span>
                   <span className="block">{animal.name ?? 'بدون نام'}</span>
-                  {animal.ready ? (
-                    feeLabel ? (
-                      <span className="text-caption text-text-secondary">هزینه صدور: {feeLabel}</span>
-                    ) : null
-                  ) : (
-                    <span className="text-caption text-text-secondary" data-testid={'sheet-reason-' + animal.animalId}>
+                  {feeLabel && animal.payable ? (
+                    <span className="text-caption text-text-secondary">هزینه: {feeLabel}</span>
+                  ) : null}
+                  {animal.reasonFa ? (
+                    <span className="block text-caption text-text-secondary" data-testid={'sheet-reason-' + animal.animalId}>
                       {animal.reasonFa}
                     </span>
-                  )}
+                  ) : null}
                 </span>
               </label>
-              {animal.ready || animal.nextStep === null ? null : (
+              {animal.payable || animal.nextStep === null ? null : (
                 <div className="mt-md">
                   <ButtonLink
                     tone="secondary"
@@ -83,7 +83,12 @@ export function SelectSheetAnimals({
           ))}
         </ul>
 
-        <Button type="submit" block disabled={pending || ready.length === 0 || feeLabel === null} data-testid="create-sheet-request">
+        <Button
+          type="submit"
+          block
+          disabled={pending || payable.length === 0 || feeLabel === null}
+          data-testid="create-sheet-request"
+        >
           {pending ? 'در حال ساخت درخواست…' : 'ادامه و مرور هزینه'}
         </Button>
       </form>

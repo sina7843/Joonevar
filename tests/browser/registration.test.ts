@@ -258,6 +258,8 @@ async function registerAnimal(page: Page, name: string): Promise<string> {
   await page.getByTestId('animal-birth-date').fill('2022-05-05');
   await page.getByTestId('step-2-continue').click();
   await page.getByTestId('step-3-continue').waitFor();
+  await page.getByTestId('animal-color').fill('قهوه‌ای');
+  await page.getByTestId('animal-markings').fill('بدون نشانه خاص');
   await page.getByTestId('step-3-continue').click();
   await page.getByTestId('step-4-continue').waitFor();
   await page.getByTestId('step-4-continue').click();
@@ -332,6 +334,7 @@ test('an unset tariff opens no payment path, and an animal without a sample says
     await owner.page.goto(BASE_URL + '/registration/new', { waitUntil: 'load' });
     await expectText(owner.page, 'تعرفه صدور برگه ثبتی هنوز ثبت نشده است');
     await expectText(owner.page, 'نمونه خون این حیوان هنوز ثبت نشده است');
+    // The tariff, not the animal, is what closes the checkout here.
     assert.equal(await owner.page.getByTestId('create-sheet-request').isDisabled(), true);
     await owner.page.screenshot({ path: path.join(SHOTS, 'sheet-not-configured.png'), fullPage: true });
 
@@ -339,8 +342,14 @@ test('an unset tariff opens no payment path, and an animal without a sample says
     await setSheetFee(SHEET_FEE);
     await owner.page.reload({ waitUntil: 'load' });
     assert.equal(await owner.page.getByTestId('sheet-fee-not-configured').count(), 0);
-    // The animal is still not ready, because the sample step has not happened.
-    assert.equal(await owner.page.getByTestId('sheet-pick-' + animalId).isDisabled(), true);
+    /*
+     * DEC-0136: the fee buys the visit, so an animal whose sample has not been
+     * taken yet is exactly what a person pays for — it is selectable, and the
+     * row says what the paid visit will still do for it. The document itself is
+     * what waits, not the checkout.
+     */
+    assert.equal(await owner.page.getByTestId('sheet-pick-' + animalId).isDisabled(), false);
+    await expectText(owner.page, 'نمونه خون این حیوان هنوز ثبت نشده است');
     await owner.page.screenshot({ path: path.join(SHOTS, 'sheet-animal-not-ready.png'), fullPage: true });
   } finally {
     await owner.context.close();

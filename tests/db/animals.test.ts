@@ -96,6 +96,8 @@ async function makeAnimal(
     breedId: ctx.breedId,
     sex: input.sex ?? 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const registered = await registerAnimal(ctx.testDb.db, ctx.owner.actor, draft.id);
 
@@ -173,6 +175,8 @@ test('G0 x G0 gives G1 and G2 x G1 gives G2, from real records', async () => {
       breedId: ctx.breedId,
       sex: 'MALE',
       birthDate: '2023-05-05',
+      color: 'قهوه‌ای',
+      markings: 'بدون نشانه خاص',
       origin: 'INTERNAL_G1PLUS',
       sirePedigreeCode: 'HZ-P-0',
       damPedigreeCode: 'HZ-M-0',
@@ -193,6 +197,8 @@ test('G0 x G0 gives G1 and G2 x G1 gives G2, from real records', async () => {
       breedId: ctx.breedId,
       sex: 'FEMALE',
       birthDate: '2023-06-06',
+      color: 'قهوه‌ای',
+      markings: 'بدون نشانه خاص',
       origin: 'INTERNAL_G1PLUS',
       sirePedigreeCode: 'HZ-P-2',
       damPedigreeCode: 'HZ-M-1',
@@ -213,6 +219,8 @@ test('a genuinely absent parent gives G0 with the codes preserved, and a rematch
       breedId: ctx.breedId,
       sex: 'MALE',
       birthDate: '2023-07-07',
+      color: 'قهوه‌ای',
+      markings: 'بدون نشانه خاص',
       origin: 'INTERNAL_G1PLUS',
       sirePedigreeCode: 'HZ-P-A',
       damPedigreeCode: 'HZ-M-MISSING',
@@ -293,6 +301,8 @@ test('a lineage link cannot make an animal its own ancestor', async () => {
       breedId: ctx.breedId,
       sex: 'MALE',
       birthDate: '2023-01-01',
+      color: 'قهوه‌ای',
+      markings: 'بدون نشانه خاص',
       sirePedigreeCode: 'HZ-CYC-P',
       damPedigreeCode: 'HZ-CYC-M',
     });
@@ -329,6 +339,8 @@ test('the same record cannot be both parents', async () => {
       breedId: ctx.breedId,
       sex: 'MALE',
       birthDate: '2023-02-02',
+      color: 'قهوه‌ای',
+      markings: 'بدون نشانه خاص',
       sirePedigreeCode: 'HZ-ONE',
       damPedigreeCode: 'HZ-ONE',
     });
@@ -408,6 +420,8 @@ test('the family section reads from records, in both directions', async () => {
       breedId: ctx.breedId,
       sex: 'MALE',
       birthDate: '2023-03-03',
+      color: 'قهوه‌ای',
+      markings: 'بدون نشانه خاص',
       sirePedigreeCode: 'HZ-F-P',
       damPedigreeCode: 'HZ-F-M',
     });

@@ -18,15 +18,17 @@ import { SelectSheetAnimals } from './select-form.tsx';
 export const dynamic = 'force-dynamic';
 
 /**
- * The registration-sheet service — §13, Flow Map section 02.
+ * The registration-sheet service — §13, Flow Map section 02, DEC-0136.
  *
- * This is the whole of §13, not its last step. The source runs one chain:
- * choose animals → choose implant or verification per animal → choose the
- * trusted vet → referral → the visit, where the chip and the mandatory sample
- * happen → one batch payment → an independent sheet per animal. So the visit is
- * offered from here, per animal, and the money step opens only for the animals
- * that have already been through it — the order the source states, without
- * turning step 4 into a separate service the person has to find on their own.
+ * One service, bought once: the fee is paid here, and what it buys is the visit
+ * where a trusted veterinarian certifies the animal's identity, implants or
+ * verifies the chip and takes the mandatory sample — after which the sheet
+ * issues by itself.
+ *
+ * The order is the product owner's: the fee comes before the visit is booked.
+ * §13's own step list puts the payment after the visit and says it must not run
+ * ahead of it; that sentence is superseded by the instruction, and the reversal
+ * is recorded in DEC-0136 rather than quietly applied.
  */
 export default async function NewSheetRequestPage() {
   const guard = await guardRoute('/registration/new');
@@ -53,9 +55,10 @@ export default async function NewSheetRequestPage() {
       <div className="space-y-lg">
         <Alert tone="info" title="مراحل این مسیر">
           <span data-testid="sheet-flow-steps">
-            انتخاب حیوان‌ها ← انتخاب کاشت یا تأیید میکروچیپ برای هر حیوان ← انتخاب دامپزشک معتمد و دریافت کد
-            مراجعه ← کاشت یا تأیید میکروچیپ و نمونه‌گیری در محل ← یک پرداخت گروهی ← صدور مستقل برگه ثبتی هر
-            حیوان. میکروچیپ و نمونه‌گیری بخشی از همین مسیرند، نه سرویسی جدا؛ پرداخت از آن‌ها جلو نمی‌افتد.
+            انتخاب حیوان‌ها ← یک پرداخت گروهی ← انتخاب کاشت یا تأیید میکروچیپ برای هر حیوان و انتخاب دامپزشک
+            معتمد ← مراجعه: تأیید رسمی مشخصات حیوان، کاشت یا تأیید میکروچیپ و نمونه‌گیری ← صدور مستقل برگه ثبتی
+            هر حیوان. این یک سرویس است، نه چند کار جدا؛ هدف مراجعه، تأیید رسمی مشخصات حیوان توسط دامپزشک معتمد
+            است.
           </span>
         </Alert>
 
@@ -83,6 +86,7 @@ export default async function NewSheetRequestPage() {
               animalId: a.animalId,
               name: a.name,
               ready: a.ready,
+              payable: a.payable,
               reasonFa: a.reasonFa,
               nextStep: a.nextStep,
             }))}

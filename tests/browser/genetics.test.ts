@@ -261,6 +261,8 @@ async function animalWithSheet(owner: Page, vet: Page, name: string) {
   await owner.getByTestId('animal-birth-date').fill('2022-05-05');
   await owner.getByTestId('step-2-continue').click();
   await owner.getByTestId('step-3-continue').waitFor();
+  await owner.getByTestId('animal-color').fill('قهوه‌ای');
+  await owner.getByTestId('animal-markings').fill('بدون نشانه خاص');
   await owner.getByTestId('step-3-continue').click();
   await owner.getByTestId('step-4-continue').waitFor();
   await owner.getByTestId('step-4-continue').click();
@@ -397,8 +399,9 @@ test('a receipt is corrected in place, then approved, and the custodian ships', 
     // The centre sends it back with a reason.
     await centre.goto(BASE_URL + '/genetics/receipts', { waitUntil: 'load' });
     await centre.getByTestId('receipt-queue').waitFor();
-    await centre.getByTestId('open-receipt').first().click();
-    await centre.waitForURL('**/genetics/receipts/**');
+    // Addressed by id, not by "first row": the shared development queue holds
+    // receipts from every other run.
+    await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
     await expectText(centre, animal.trackingCode);
     await centre.getByTestId('receipt-decision-NEEDS_CORRECTION').check();
     await centre.getByTestId('receipt-review-reason').fill('تصویر فیش خوانا نیست.');
@@ -421,8 +424,8 @@ test('a receipt is corrected in place, then approved, and the custodian ships', 
     await owner.page.getByTestId('submit-receipt').click();
     await expectText(owner.page, 'در حال بررسی مرکز');
 
-    await centre.goto(BASE_URL + '/genetics/receipts', { waitUntil: 'load' });
-    await centre.getByTestId('open-receipt').first().click();
+    // By id: the shared queue holds other runs' receipts.
+    await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
     await centre.getByTestId('receipt-decision-APPROVED').check();
     await centre.getByTestId('submit-receipt-review').click();
     await expectText(centre, 'این فیش در انتظار بررسی نیست');
@@ -461,6 +464,7 @@ test('the centre receives, processes and records a result without any issuance p
       owner.page.waitForURL((url) => url.pathname.startsWith('/pedigree/receipts/')),
       owner.page.getByTestId('create-receipt').click(),
     ]);
+    const receiptId = new URL(owner.page.url()).pathname.split('/')[3]!;
     await owner.page
       .getByTestId('receipt-file')
       .setInputFiles({ name: 'receipt.jpg', mimeType: 'image/jpeg', buffer: JPEG });
@@ -469,8 +473,8 @@ test('the centre receives, processes and records a result without any issuance p
     await owner.page.getByTestId('submit-receipt').click();
     await expectText(owner.page, 'در حال بررسی مرکز');
 
-    await centre.goto(BASE_URL + '/genetics/receipts', { waitUntil: 'load' });
-    await centre.getByTestId('open-receipt').first().click();
+    // By id: the shared queue holds other runs' receipts.
+    await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
     await centre.getByTestId('receipt-decision-APPROVED').check();
     await centre.getByTestId('submit-receipt-review').click();
     await expectText(centre, 'این فیش در انتظار بررسی نیست');

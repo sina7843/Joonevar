@@ -10,6 +10,7 @@ import type { Database, DbClient } from '../db/client.ts';
 import { vetVisitRequests } from '../db/schema/vets.ts';
 import { sampleEvents, samples } from '../db/schema/clinical.ts';
 import { recordAudit } from '../audit/service.ts';
+import { issuePaidSheetsForAnimal } from '../documents/registration-sheet.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { newSampleTrackingCode } from '../domain/ids.ts';
@@ -139,6 +140,10 @@ export async function recordSampling(
       .update(vetVisitRequests)
       .set({ status: 'COMPLETED', version: request.version + 1, updatedAt: new Date() })
       .where(and(eq(vetVisitRequests.id, request.id), eq(vetVisitRequests.version, request.version)));
+
+    // The sheet was paid for before this visit (DEC-0136), so the document is
+    // produced here rather than waiting for the owner to come back and ask.
+    await issuePaidSheetsForAnimal(tx, request.animalId);
 
     return sample;
   });

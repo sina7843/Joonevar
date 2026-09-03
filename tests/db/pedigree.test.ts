@@ -185,6 +185,8 @@ async function animalWithSheet(ctx: Ctx, name: string) {
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const animal = await registerAnimal(ctx.testDb.db, ctx.owner.actor, draft.id);
 
@@ -201,13 +203,13 @@ async function animalWithSheet(ctx: Ctx, name: string) {
   });
   // §13: identity is certified at the desk before the chip is bound.
   await recordOfficialIdentity(ctx.testDb.db, ctx.vet.actor, requestId, {
-    name: null,
+    name,
     breedId: ctx.breedId,
     sex: 'MALE',
     birthDate: '2022-01-01',
     birthDateApproximate: false,
-    color: null,
-    markings: null,
+    color: 'قهوه‌ای',
+    markings: 'بدون نشانه خاص',
   });
   const number = nextChip();
   await recordChipRead(ctx.testDb.db, ctx.vet.actor, requestId, { number, method: 'MANUAL' });
