@@ -91,6 +91,41 @@ function groupLocked(
   return [...groups.values()];
 }
 
+/**
+ * D11: the operational environments are separate, and they are not a public
+ * role switch — but an operator still has to be able to reach the one they are
+ * entitled to. Without this, signing in as an operator landed on the citizen
+ * dashboard with a membership card and locked citizen services, and the only
+ * way into their own panel was to type its address. Operational work has never
+ * depended on association membership; the server checks the role, and only the
+ * role, on every one of these routes.
+ */
+const OPS_ENVIRONMENTS: ReadonlyArray<{
+  role: 'ASSOCIATION_OPERATOR' | 'GENETICS_OPERATOR' | 'SUPERADMIN';
+  label: string;
+  description: string;
+  href: string;
+}> = [
+  {
+    role: 'ASSOCIATION_OPERATOR',
+    label: 'محیط عملیاتی انجمن',
+    description: 'صف‌های احراز هویت، عضویت، کنل، مجوز جفت‌گیری و درخواست‌های پستی.',
+    href: '/assoc',
+  },
+  {
+    role: 'GENETICS_OPERATOR',
+    label: 'محیط عملیاتی مرکز ژنتیک',
+    description: 'فیش‌ها، نمونه‌ها، نتایج و اعتراض‌ها.',
+    href: '/genetics',
+  },
+  {
+    role: 'SUPERADMIN',
+    label: 'محیط سوپرادمین',
+    description: 'تنظیمات، دامپزشکان معتمد، نژادها و تاریخچه.',
+    href: '/admin',
+  },
+];
+
 export default async function DashboardPage() {
   const guard = await guardRoute('/dashboard');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
@@ -103,6 +138,10 @@ export default async function DashboardPage() {
 
   const membershipStatus = membership?.status ?? 'NONE';
   const membershipActive = membershipStatus === 'ACTIVE';
+
+  const operational = OPS_ENVIRONMENTS.filter((environment) =>
+    actor.activeRoles.includes(environment.role),
+  );
 
   const open = SERVICE_CARDS.filter((entry) => services[entry.service].allowed);
   const locked = SERVICE_CARDS.flatMap((entry) => {
@@ -121,6 +160,30 @@ export default async function DashboardPage() {
           >
             نام، نام خانوادگی، کد ملی و تاریخ تولد برای ادامه لازم است.
           </Alert>
+        ) : null}
+
+        {operational.length > 0 ? (
+          <section aria-labelledby="ops-heading" className="space-y-md">
+            <h2 id="ops-heading" className="text-h4">
+              محیط‌های عملیاتی شما
+            </h2>
+            <Card>
+              <p className="text-caption text-text-secondary">
+                این محیط‌ها از حساب کاربری شما جدا هستند و برای کار در آن‌ها عضویت انجمن لازم نیست؛ فقط نقش
+                فعال شما بررسی می‌شود.
+              </p>
+              <div className="mt-lg space-y-md">
+                {operational.map((environment) => (
+                  <div key={environment.href} className="space-y-2xs">
+                    <ButtonLink href={environment.href} block data-testid={'ops-entry-' + environment.role}>
+                      {environment.label}
+                    </ButtonLink>
+                    <p className="text-caption text-text-secondary">{environment.description}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </section>
         ) : null}
 
         {vet !== null && vet.reasonFa !== null ? (
