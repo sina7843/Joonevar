@@ -12,6 +12,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { accounts, species, storedFiles } from './core.ts';
 import { cities, provinces } from './geography.ts';
 import { animals } from './animals.ts';
@@ -130,9 +131,12 @@ export const vetLocations = pgTable(
   'vet_location',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    vetAccountId: uuid('vet_account_id')
-      .notNull()
-      .references(() => accounts.id, { onDelete: 'restrict' }),
+    /**
+     * The veterinarian this place belongs to. Null for a centre branch that no
+     * veterinarian owns (PROMPT-008): the Finder and every Phase 1 flow join on
+     * this column, so such a row never reaches them.
+     */
+    vetAccountId: uuid('vet_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
     nameFa: text('name_fa').notNull(),
     kind: vetLocationKind('kind').notNull().default('CLINIC'),
     provinceFa: text('province_fa'),
@@ -158,6 +162,12 @@ export const vetLocations = pgTable(
     /** Announced hours, as information only — never an appointment slot (P2-D08). */
     hoursNoteFa: text('hours_note_fa'),
 
+    // ── Centre branch (Phase 2, PROMPT-008) ────────────────────────────────
+    /** The centre this place is a branch of; a place may belong to one centre. */
+    centreId: uuid('centre_id').references((): AnyPgColumn => centres.id, { onDelete: 'restrict' }),
+    /** Open around the clock, as the centre announces it (§9). */
+    isOpen24h: boolean('is_open_24h').notNull().default(false),
+
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
@@ -165,6 +175,7 @@ export const vetLocations = pgTable(
   (t) => [
     index('vet_location_vet_idx').on(t.vetAccountId, t.isActive),
     index('vet_location_city_idx').on(t.cityId),
+    index('vet_location_centre_idx').on(t.centreId),
   ],
 );
 
@@ -390,4 +401,176 @@ export const vetApplicationDocuments = pgTable(
     uniqueIndex('vet_application_document_file_key').on(t.fileId),
     index('vet_application_document_application_idx').on(t.applicationId),
   ],
+);
+
+// ── Veterinary centres (Phase 2, PROMPT-008) ───────────────────────────────
+//
+// Centres live here rather than in their own module because a branch is a
+// `vet_location` row: the foreign key points from that table to `centre`, and
+// keeping both definitions together avoids a circular import (DEC-0167).
+
+/** Centre kinds of §9. Reference data: rows arrive by migration and the superadmin may add more. */
+export const centreTypes = pgTable(
+  'centre_type',
+  {
+    code: text('code').primaryKey(),
+    nameFa: text('name_fa').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+  },
+  (t) => [uniqueIndex('centre_type_name_fa_key').on(t.nameFa)],
+);
+
+/** Services a centre states it offers. A listing is the centre's statement, not a certification. */
+export const centreServices = pgTable(
+  'centre_service',
+  {
+    code: text('code').primaryKey(),
+    nameFa: text('name_fa').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+  },
+  (t) => [uniqueIndex('centre_service_name_fa_key').on(t.nameFa)],
+);
+
+/** Amenities of a place — parking, hospitalisation, step-free access. Never a medical claim. */
+export const centreFacilities = pgTable(
+  'centre_facility',
+  {
+    code: text('code').primaryKey(),
+    nameFa: text('name_fa').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+  },
+  (t) => [uniqueIndex('centre_facility_name_fa_key').on(t.nameFa)],
+);
+
+export const centres = pgTable(
+  'centre',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /** The managing account, once a claim is approved (P2-D06, P2-D07; PROMPT-009). */
+    ownerAccountId: uuid('owner_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    typeCode: text('type_code')
+      .notNull()
+      .references(() => centreTypes.code, { onDelete: 'restrict' }),
+    displayNameFa: text('display_name_fa').notNull(),
+    aboutFa: text('about_fa'),
+    phone: text('phone'),
+    websiteUrl: text('website_url'),
+
+    /** The centre's own licence, exactly as a reviewer recorded it (§9). */
+    licenceNumber: text('licence_number'),
+    licenceStatus: licenceStatus('licence_status').notNull().default('NONE'),
+    licenceVerifiedAt: timestamp('licence_verified_at', { withTimezone: true }),
+
+    /** Public page, with the same rules as a veterinarian's (DEC-0164). */
+    publicSlug: text('public_slug'),
+    publicStatus: vetPublicStatus('public_status').notNull().default('DRAFT'),
+    publicPublishedAt: timestamp('public_published_at', { withTimezone: true }),
+    hiddenByReview: boolean('hidden_by_review').notNull().default(false),
+
+    /** An unowned, reviewed suggestion: a city and a public contact until it is claimed (§10). */
+    listedCityId: uuid('listed_city_id').references(() => cities.id, { onDelete: 'restrict' }),
+    listedContactFa: text('listed_contact_fa'),
+    sourceFa: text('source_fa'),
+    claimedAt: timestamp('claimed_at', { withTimezone: true }),
+
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('centre_public_slug_key').on(t.publicSlug),
+    index('centre_status_idx').on(t.publicStatus),
+    index('centre_owner_idx').on(t.ownerAccountId),
+  ],
+);
+
+export const centreServiceLinks = pgTable(
+  'centre_service_link',
+  {
+    centreId: uuid('centre_id')
+      .notNull()
+      .references(() => centres.id, { onDelete: 'restrict' }),
+    serviceCode: text('service_code')
+      .notNull()
+      .references(() => centreServices.code, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.centreId, t.serviceCode] })],
+);
+
+export const centreSpeciesLinks = pgTable(
+  'centre_species',
+  {
+    centreId: uuid('centre_id')
+      .notNull()
+      .references(() => centres.id, { onDelete: 'restrict' }),
+    speciesCode: text('species_code')
+      .notNull()
+      .references(() => species.code, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.centreId, t.speciesCode] })],
+);
+
+export const centreFacilityLinks = pgTable(
+  'centre_facility_link',
+  {
+    centreId: uuid('centre_id')
+      .notNull()
+      .references(() => centres.id, { onDelete: 'restrict' }),
+    facilityCode: text('facility_code')
+      .notNull()
+      .references(() => centreFacilities.code, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.centreId, t.facilityCode] })],
+);
+
+/** A veterinarian listed on a centre's page shows there only after accepting (§9, §20). */
+export const centreMemberStatus = pgEnum('centre_member_status', ['INVITED', 'ACCEPTED', 'DECLINED', 'REMOVED']);
+
+export const centreMembers = pgTable(
+  'centre_member',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    centreId: uuid('centre_id')
+      .notNull()
+      .references(() => centres.id, { onDelete: 'restrict' }),
+    vetProfileId: uuid('vet_profile_id')
+      .notNull()
+      .references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    /** What the centre says this person does there; never a certification. */
+    roleFa: text('role_fa'),
+    status: centreMemberStatus('status').notNull().default('INVITED'),
+    invitedByAccountId: uuid('invited_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    invitedAt: timestamp('invited_at', { withTimezone: true }).notNull().default(now),
+    respondedAt: timestamp('responded_at', { withTimezone: true }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('centre_member_unique_key').on(t.centreId, t.vetProfileId),
+    index('centre_member_vet_idx').on(t.vetProfileId, t.status),
+  ],
+);
+
+/**
+ * Announced opening hours of one place, per weekday (Saturday = 0). Information
+ * only: nothing in this product reserves a time (P2-D08).
+ */
+export const locationHours = pgTable(
+  'location_hours',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    locationId: uuid('location_id')
+      .notNull()
+      .references(() => vetLocations.id, { onDelete: 'restrict' }),
+    weekday: integer('weekday').notNull(),
+    opensAt: text('opens_at').notNull(),
+    closesAt: text('closes_at').notNull(),
+  },
+  (t) => [uniqueIndex('location_hours_day_key').on(t.locationId, t.weekday)],
 );

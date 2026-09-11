@@ -50,7 +50,7 @@ export default async function LocationPage({
     : 'MICROCHIP';
   const selection = query.sel ?? '';
 
-  const [vet] = await db().select().from(vetProfiles).where(eq(vetProfiles.accountId, location.vetAccountId));
+  const [vet] = await db().select().from(vetProfiles).where(eq(vetProfiles.accountId, location.vetAccountId ?? ''));
   const eligibility = eligibilityOf(location, context);
   const capabilities = capabilitiesOf(location);
 

@@ -42,7 +42,7 @@ export default async function ReviewVisitPage({
     ? await db().select().from(vetProfiles).where(eq(vetProfiles.accountId, params.vet)).limit(1)
     : [];
 
-  if (items.length === 0 || !location || !vet || location.vetAccountId !== vet.accountId) {
+  if (items.length === 0 || !location || !vet || vet.accountId === null || location.vetAccountId !== vet.accountId) {
     return (
       <PublicShell actor={actor} title="مرور درخواست مراجعه" pathname="/requests/new/review">
         <Alert tone="error" title="انتخاب شما کامل نیست">

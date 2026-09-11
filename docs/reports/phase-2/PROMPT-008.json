@@ -1,0 +1,94 @@
+{
+  "promptId": "PROMPT-008",
+  "status": "COMPLETE",
+  "summary": "Veterinary centre directory. Migration 0022 adds centre with its type, services, amenities, species, members and hours, and — instead of a second location table — makes vet_location.vet_account_id nullable and adds centre_id and is_open_24h, so a branch is the same Phase 1 row (P2-D15, DEC-0167). A branch created for a centre has no veterinarian, no licence and no capability, so the Finder and every Phase 1 flow (which join on that account) never see it; an existing veterinarian's place joins a centre by link, keeping its licence, capabilities and Finder position untouched. The superadmin records centres and their branches at /admin/centres, the review operator publishes, hides and records the licence at /review/centres, and the managing account edits its own centre at /account/centres; the licence is the Verification axis and its owner never records it. Announced weekday hours and a 24-hour flag are information only (P2-D08). A veterinarian invited to the professional team appears on the page only after accepting from their own profile. Publishing needs a description and a public branch with a city — or, for an unowned reviewed record, a city. The public /centers list filters by type, service, species, province, city, round-the-clock and recorded licence, and /centers/[slug] shows branches with hours, team, amenities and VeterinaryCare JSON-LD.",
+  "changedFiles": [
+    "src/db/schema/vets.ts",
+    "src/db/migrations/0022_centres.sql",
+    "src/db/migrations/meta/0022_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/centres/model.ts",
+    "src/centres/service.ts",
+    "src/centres/actions.ts",
+    "src/centres/forms.tsx",
+    "src/centres/editor.tsx",
+    "src/vets/directory-forms.tsx",
+    "src/authz/routes.ts",
+    "src/public/sections.ts",
+    "src/seo/sitemap.ts",
+    "src/seo/structured-data.ts",
+    "src/domain/resume-context.ts",
+    "src/ui/shell.tsx",
+    "app/(public)/centers/(list)/page.tsx",
+    "app/(public)/centers/(list)/loading.tsx",
+    "app/(public)/centers/[slug]/page.tsx",
+    "app/admin/centres/(list)/page.tsx",
+    "app/admin/centres/[id]/page.tsx",
+    "app/review/centres/(list)/page.tsx",
+    "app/review/centres/(list)/loading.tsx",
+    "app/review/centres/[id]/page.tsx",
+    "app/account/centres/page.tsx",
+    "app/account/centres/[id]/page.tsx",
+    "app/account/vet-profile/page.tsx",
+    "app/requests/new/review/page.tsx",
+    "app/vets/location/[id]/page.tsx",
+    "tests/domain/centres.test.ts",
+    "tests/db/centres.test.ts",
+    "tests/browser/centres.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "tests/ui/seo.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-008-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-008/admin-centre-editor.png",
+    "docs/reports/screenshots/phase-2/prompt-008/review-centre-licence.png",
+    "docs/reports/screenshots/phase-2/prompt-008/centres-list-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-008/centre-page-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-008/vet-invitation-accepted.png"
+  ],
+  "decisions": ["DEC-0167", "DEC-0168"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, before and after npm run build (generated .next route types included)."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0; /centers, /centers/[slug], /admin/centres, /admin/centres/[id], /review/centres, /review/centres/[id], /account/centres and /account/centres/[id] built."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/centres.test.ts tests/ui/routes.test.ts tests/ui/seo.test.ts && node --test --test-concurrency=1 tests/db/centres.test.ts && node --test --test-concurrency=1 tests/db/vet-directory.test.ts tests/db/vet-onboarding.test.ts tests/db/migrations.test.ts tests/db/referrals.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction to not re-run unaffected suites that already passed. Unit: tests 35 · pass 35 · fail 0, and tests/domain/centres.test.ts re-run alone 5/5 after the publish rule changed (announced times read Persian, Arabic and dotted digits and refuse 24:00, a half-filled or reversed weekday, completeness over nine items, publish blockers for owned and unowned records, a licence shown only as recorded). Database on a freshly migrated database: tests/db/centres.test.ts 9/9 (the seeded 10 kinds, 14 services and 10 amenities; creation refused for an ordinary user, for an unknown kind and without a reason, and a repeated name refused until confirmed; content refused for the review operator and a stranger, audited field by field, stale version refused, identical values recorded nothing; a branch is a vet_location row with no account, licence NONE and no capability that appears in no Finder context and leaves the Finder result identical, its hours refuse a half-filled or reversed day and store 09:00 from Persian digits, and a closed branch cannot stay public; an unowned record publishes with a city alone but not without one, an owned one needs its description and a public branch, hiding by review blocks the owner's republish and the address never changes; the licence is recorded only by superadmin or review, needs a number and keeps a verification time only while valid; a member is invited, is absent from the page until accepted, is answered only by the veterinarian themselves and is removed with a reason; an existing Phase 1 place links to a centre keeping its owner, licence, capabilities and Finder position, and a second link is refused; the public list filters by type, service, species, province, city, round-the-clock and licence, a draft is never listed and an internal id is not an address). Regression for the code this touched: tests/db/vet-directory.test.ts, tests/db/vet-onboarding.test.ts, tests/db/migrations.test.ts and tests/db/referrals.test.ts passed 32/32 in the same run. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run test:browser -- tests/browser/centres.test.ts && npm run test:browser -- tests/browser/public-shell.test.ts tests/browser/vet-onboarding.test.ts tests/browser/vet-directory.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/centres.test.ts 4/4 on hamzist_browser_f08a981e0086 at 127.0.0.1:6077: the superadmin records a centre, sees the ownership and verification axes, is refused publication while the centre has no place, adds a branch in تهران with Saturday 09:00–17:00 typed in Persian digits, writes the description, emergency service, dog species and parking, publishes and gets a centre-[10 hex] address; the review operator opens the same centre, has no content form at all, records licence SYN-LIC-… as valid; a phone-width visitor filters by kind and recorded licence, sees the card with تهران, opens the page with the verified badge, services, amenities, 09:00 hours, canonical and VeterinaryCare + BreadcrumbList JSON-LD, with no sideways scroll; an invited veterinarian is absent from the public page until they accept from their own profile, after which the team shows their name and role; a hidden centre answers 404 and leaves the list, an ordinary account is FORBIDDEN in both management environments and sees an empty «centres I manage», and an anonymous visitor is sent to sign-in with the exact next path. Regression on the same build: tests/browser/public-shell.test.ts, tests/browser/vet-onboarding.test.ts and tests/browser/vet-directory.test.ts 13/13 on hamzist_browser_77dde65364e3 (the header now links /centers, and the veterinarian's own page gained the centre invitations). Two earlier centre runs failed and were fixed rather than adjusted away: publication of an unowned record with a city is correct, so the rule now also accepts a public branch with a city; and hours typed while adding a branch were dropped, so the branch is created with them. A third failure was a real defect in the shared form helper: FormData(form) omits the pressed button, so an accept/decline pair sent no answer — the helper now passes the submitter and the invitation posts its answer in a field of its own. Screenshots regenerated for earlier prompts by the regression suites were restored; only prompt-008 evidence is new. Suites not re-run are unaffected; last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Centre images (§9) were not built: the public image pipeline today serves content images only (DEC-0160), so adding centre media needs its own purpose and review path.",
+    "Suggestion by an ordinary user and the manager's claim of a centre (§10) arrive with PROMPT-009; until then the superadmin hands over management with a reason and an audit entry.",
+    "A branch shows its recorded coordinates as text: no map provider is configured and the map belongs to PROMPT-015.",
+    "Linking an existing veterinarian's place to a centre is a superadmin action; a veterinarian cannot attach their own place from their profile yet.",
+    "Reporting a centre profile (§13) and merging duplicate centres (§21) belong to PROMPT-016; advertising packages to PROMPT-011 and ranking and search to PROMPT-012.",
+    "Nothing here reserves a time: announced hours and the 24-hour flag are information only (P2-D08).",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the centre pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "CENTRE_DIRECTORY_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

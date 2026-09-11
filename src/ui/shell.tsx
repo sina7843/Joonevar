@@ -271,6 +271,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin', label: 'مرور', icon: 'house' },
   { href: '/admin/settings', label: 'تنظیمات', icon: 'listChecks' },
   { href: '/admin/vets', label: 'دامپزشکان معتمد', icon: 'firstAidKit' },
+  { href: '/admin/centres', label: 'مراکز دامپزشکی', icon: 'mapPin' },
   { href: '/admin/breeds', label: 'نژادها', icon: 'dog' },
   { href: '/admin/roles', label: 'نقش‌های محتوا', icon: 'shieldCheck' },
   { href: '/admin/audit', label: 'تاریخچه', icon: 'clipboardText' },
@@ -286,6 +287,7 @@ export const AUTHOR_NAV: readonly NavItem[] = [
 export const REVIEW_NAV: readonly NavItem[] = [
   { href: '/review/vets', label: 'درخواست‌های دامپزشک', icon: 'listChecks' },
   { href: '/review/vets/unowned', label: 'پروفایل‌های بدون مالک', icon: 'firstAidKit' },
+  { href: '/review/centres', label: 'مراکز دامپزشکی', icon: 'mapPin' },
 ];
 
 /** Content admin environment. */

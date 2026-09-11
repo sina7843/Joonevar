@@ -33,7 +33,9 @@ export type EntityType =
   | 'POSTAL_REQUEST'
   | 'PRODUCT_SETTING'
   | 'CONTENT_ITEM'
-  | 'VET_APPLICATION';
+  | 'VET_APPLICATION'
+  | 'CENTRE'
+  | 'CENTRE_MEMBER';
 
 export interface EntityRef {
   readonly type: EntityType;

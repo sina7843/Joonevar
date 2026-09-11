@@ -38,7 +38,11 @@ export function Result({ state, testId }: { state: { ok?: boolean; message?: str
 export function submitWith(dispatch: (data: FormData) => void) {
   return (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    // The submitter is passed explicitly: FormData(form) alone drops the name
+    // and value of the button that was pressed, so a form with two answers
+    // would send neither.
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    const data = new FormData(event.currentTarget, submitter instanceof HTMLButtonElement ? submitter : null);
     startTransition(() => dispatch(data));
   };
 }

@@ -7,6 +7,8 @@ import { StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { directoryReferenceData, ownVetDirectory } from '../../../src/vets/directory.ts';
 import { myVetApplications } from '../../../src/vets/onboarding.ts';
+import { myCentreInvitations } from '../../../src/centres/service.ts';
+import { CentreInvitationForm } from '../../../src/centres/forms.tsx';
 import {
   APPLICATION_KIND_FA,
   APPLICATION_STATUS_FA,
@@ -45,10 +47,11 @@ export default async function VetProfileAccountPage() {
   const guard = await guardRoute('/account/vet-profile');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
-  const [own, applications, reference] = await Promise.all([
+  const [own, applications, reference, invitations] = await Promise.all([
     ownVetDirectory(db(), actor),
     myVetApplications(db(), actor),
     directoryReferenceData(db()),
+    myCentreInvitations(db(), actor),
   ]);
   const latest = applications[0] ?? null;
   const open = applications.find((application) => isOpenApplication(application.status)) ?? null;
@@ -68,6 +71,28 @@ export default async function VetProfileAccountPage() {
             </p>
           </Card>
         )}
+
+        {invitations.length > 0 ? (
+          <Card>
+            <h2 className="text-label-lg">دعوت‌های مراکز</h2>
+            <p className="mt-xs text-body-sm text-text-secondary">
+              مرکزی شما را به تیم حرفه‌ای خود دعوت کرده است. نام شما فقط پس از پذیرش در صفحه آن مرکز نمایش داده می‌شود.
+            </p>
+            <div className="mt-lg space-y-md" data-testid="centre-invitations">
+              {invitations.map((invitation) => (
+                <CentreInvitationForm
+                  key={invitation.id}
+                  invitation={{
+                    id: invitation.id,
+                    version: invitation.version,
+                    centreNameFa: invitation.centreNameFa,
+                    roleFa: invitation.roleFa,
+                  }}
+                />
+              ))}
+            </div>
+          </Card>
+        ) : null}
 
         {latest && (!own || isOpenApplication(latest.status)) ? (
           <Card>

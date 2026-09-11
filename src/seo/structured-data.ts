@@ -104,6 +104,75 @@ export function vetPersonLd(
   };
 }
 
+/**
+ * VeterinaryCare for a published centre and its public branches (§19). Only
+ * facts the centre actually recorded: no rating, no price and no opening hour
+ * that was not announced.
+ */
+export function veterinaryCareLd(
+  input: {
+    name: string;
+    path: string;
+    description: string | null;
+    telephone: string | null;
+    website: string | null;
+    branches: ReadonlyArray<{
+      name: string;
+      city: string | null;
+      province: string | null;
+      address: string | null;
+      telephone: string | null;
+      latitude: number | null;
+      longitude: number | null;
+      isOpen24h: boolean;
+      hours: ReadonlyArray<{ weekday: number; opensAt: string; closesAt: string }>;
+    }>;
+  },
+  origin: string,
+): JsonLd {
+  // schema.org day names, in the order the product stores them (Saturday = 0).
+  const DAYS = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const branch = (b: (typeof input.branches)[number]): JsonLd => ({
+    '@type': 'VeterinaryCare',
+    name: b.name,
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'IR',
+      ...(b.province ? { addressRegion: b.province } : {}),
+      ...(b.city ? { addressLocality: b.city } : {}),
+      ...(b.address ? { streetAddress: b.address } : {}),
+    },
+    ...(b.telephone ? { telephone: b.telephone } : {}),
+    ...(b.latitude !== null && b.longitude !== null ? { geo: { '@type': 'GeoCoordinates', latitude: b.latitude, longitude: b.longitude } } : {}),
+    ...(b.isOpen24h
+      ? { openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: DAYS, opens: '00:00', closes: '23:59' }] }
+      : b.hours.length > 0
+        ? {
+            openingHoursSpecification: b.hours.map((hour) => ({
+              '@type': 'OpeningHoursSpecification',
+              dayOfWeek: DAYS[hour.weekday],
+              opens: hour.opensAt,
+              closes: hour.closesAt,
+            })),
+          }
+        : {}),
+  });
+
+  const [first, ...rest] = input.branches;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VeterinaryCare',
+    name: input.name,
+    url: absoluteUrl(origin, input.path),
+    inLanguage: 'fa-IR',
+    ...(input.description ? { description: input.description } : {}),
+    ...(input.telephone ? { telephone: input.telephone } : {}),
+    ...(input.website ? { sameAs: [input.website] } : {}),
+    ...(first ? { address: (branch(first) as { address: unknown }).address } : {}),
+    ...(rest.length > 0 ? { department: rest.map(branch) } : {}),
+  };
+}
+
 export interface Crumb {
   readonly name: string;
   readonly path: string;
