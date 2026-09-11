@@ -71,6 +71,7 @@ test('production refuses the development adapters and the missing secret', () =>
     INTEGRATION_MODE: 'live',
     DATABASE_URL: 'postgres://user:pass@db:5432/hamzist',
     SESSION_SECRET: 'x'.repeat(48),
+    SITE_URL: 'https://hamzist.example',
   });
   assert.throws(() => smsSender({} as never, production), /NOT_CONFIGURED|configured/i);
   assert.throws(() => paymentGateway({} as never, production), /NOT_CONFIGURED|configured/i);

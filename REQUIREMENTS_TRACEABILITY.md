@@ -67,5 +67,6 @@
 | نیازمندی | پرامپت | شاهد |
 |---|---|---|
 | P2-R01 — کشف وضعیت فاز یک و تثبیت مرز فاز دو | PROMPT-001 | [phase-2-boundary.md](docs/architecture/phase-2-boundary.md) · [PROMPT-001-REPORT.md](docs/reports/PROMPT-001-REPORT.md) · `tests/ui/routes.test.ts` (دسترسی پیشوندهای فاز یک و فضای نام فاز دو) · `tests/db/migrations.test.ts` (۵۹ جدول فاز یک) · `tools/browser-tests.mjs` (دیتابیس و سرور جدا برای هر اجرای مرورگر) · DEC-0142…DEC-0148 |
+| P2-R02 — زیرساخت عمومی، SEO و پوسته فارسی | PROMPT-002 | [PROMPT-002-REPORT.md](docs/reports/PROMPT-002-REPORT.md) · `src/public/site-shell.tsx` و `app/(public)/` (پوسته، خانه، درباره، خطا، بارگذاری) · `app/not-found.tsx` · `src/seo/*` و `app/robots.ts`، `app/sitemap.xml`، `app/sitemaps/[file]` · `tests/ui/seo.test.ts` · `tests/config/env.test.ts` (`SITE_URL`) · `tests/browser/public-shell.test.ts` · DEC-0149…DEC-0153 |
 | P2-D05، P2-D09 در برابر D01 | PROMPT-001 | DEC-0145 |
 | P2-D15 | PROMPT-001 | DEC-0146 و [phase-2-boundary.md](docs/architecture/phase-2-boundary.md) §۳ |

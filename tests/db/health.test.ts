@@ -106,6 +106,7 @@ test('synthetic fixtures are isolated, labelled and refused in production', asyn
       INTEGRATION_MODE: 'live',
       DATABASE_URL: 'postgres://user:pass@db/hamzist',
       SESSION_SECRET: 'x'.repeat(40),
+      SITE_URL: 'https://hamzist.example',
     });
     await assert.rejects(() => seedDevFixtures(testDb.db, productionEnv), /never be seeded in production/);
   } finally {

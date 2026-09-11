@@ -73,7 +73,9 @@
 | `/services` | معرفی خدمات | 013 |
 | `/about`، `/search` | درباره همزیست، جست‌وجوی سراسری | 002، 012 |
 
-باز برای تصمیم در پرامپت خودش: مسیر پنل نویسنده و ادمین محتوا/اپراتور بررسی (004/005/016) و الگوی صفحات محلی استان/شهر (015). `/` در 002/013 جای صفحه وضعیت را می‌گیرد؛ وضعیت زیرساخت در `/api/health` می‌ماند.
+باز برای تصمیم در پرامپت خودش: مسیر پنل نویسنده و ادمین محتوا/اپراتور بررسی (004/005/016) و الگوی صفحات محلی استان/شهر (015). `/` در 002 جای صفحه وضعیت را گرفت و 013 آن را کامل می‌کند؛ وضعیت زیرساخت در `/api/health` است.
+
+باز شده در 002 (DEC-0149، DEC-0152): `/about`، `/robots.txt`، `/sitemap.xml` و `/sitemaps/*` با دسترسی `PUBLIC`.
 
 ## ۵. نقش‌ها و محورهای وضعیت
 
@@ -96,7 +98,7 @@
 3. **ترتیب جغرافیا.** فیلتر استان/شهر از 006 لازم است ولی پرامپت جغرافیا 015 است؛ حداقل جدول نرمال در اولین مصرف‌کننده با Decision ساخته می‌شود.
 4. **بدون Scheduler.** انقضای بسته و وضعیت Expired Package در زمان خواندن محاسبه می‌شوند.
 5. **نام «انجمن».** Shell `/assoc` فاز یک با دایرکتوری `/associations` فاز دو دو چیز مختلف‌اند؛ متن UI باید این را روشن نگه دارد.
-6. **صفحه `/`.** متن آن («صفحات محصول در مراحل بعدی ساخته می‌شوند») پس از تکمیل فاز یک کهنه است و در 002 جایگزین می‌شود.
+6. **صفحه `/`.** حل‌شده در 002 (DEC-0149): صفحه وضعیت زیرساخت با خانه عمومی جایگزین شد.
 7. **وابستگی باز.** آسیب‌پذیری زنجیره `next → postcss` از فاز یک باز است (رفع رسمی: ارتقای major).
 8. **بسته فاز دو.** Manifest مسیر `prompts/…` دارد ولی فایل‌ها در `prompts-2/` هستند و شناسه‌ها `001` بدون پیشوندند؛ Runner بدون ویرایش بسته این را نرمال می‌کند (DEC-0142).
 
@@ -105,3 +107,15 @@
 - `node tools/runner.mjs --phase 2 prepare` → اجرا → بررسی → Commit شامل `docs/reports/phase-2/PROMPT-NNN.json` → `node tools/runner.mjs --phase 2 complete --commit HEAD` → Commit جدای `PROJECT_STATUS-PHASE-2.md`.
 - Gateهای پیش‌فرض هر پرامپت فاز دو: `typecheck`، `build`، `product-tests`، `browser-tests`.
 - تست‌های قفل مرز: `tests/ui/routes.test.ts` (دسترسی مسیرهای فاز یک و فضای نام فاز دو) و `tests/db/migrations.test.ts` (وجود هر ۵۹ جدول فاز یک).
+
+## ۸. زیرساخت سطح عمومی (PROMPT-002)
+
+| جزء | محل | قاعده برای پرامپت‌های بعدی |
+|---|---|---|
+| پوسته عمومی | `app/(public)/layout.tsx` → `src/public/site-shell.tsx` | هر صفحه عمومی زیر گروه `(public)` ساخته می‌شود؛ `PublicShell` در `src/ui/shell.tsx` پوسته برنامه واردشده است و جداست |
+| بخش‌ها و ناوبری | `src/public/sections.ts` | ترتیب §۴؛ باز کردن بخش = `live: true` + قاعده `PUBLIC` در `src/authz/routes.ts` (تست هم‌گامی در `tests/ui/seo.test.ts`) |
+| Metadata | `src/seo/metadata.ts` → `buildMetadata` | وضعیت رکورد (`PUBLISHED`/`ARCHIVED`/`DUPLICATE` + `primaryPath`) به همین تابع داده می‌شود؛ پیش‌فرض ریشه `noindex` است |
+| داده ساختاریافته | `src/seo/structured-data.ts`، `src/seo/json-ld.tsx`، `src/ui/breadcrumbs.tsx` | نوع‌های Person / VeterinaryCare / Article / FAQ با پرامپت داده‌شان اضافه می‌شوند؛ فقط داده واقعی |
+| sitemap و robots | `src/seo/sitemap.ts` (`SITEMAP_SECTIONS`)، `src/seo/robots.ts`، `app/sitemap.xml`، `app/sitemaps/[file]`، `app/robots.ts` | هر پرامپت محتوایی یک بخش با رکوردهای منتشرشده اضافه می‌کند؛ robots از `applicationPrefixes()` ساخته می‌شود |
+| مبدأ سایت | `SITE_URL` در `src/config/env.ts` | در production اجباری و https (DEC-0150) |
+| حالت‌ها | `app/not-found.tsx`، `app/(public)/error.tsx`، `app/(public)/loading.tsx` | ۴۰۴ فارسی و noindex؛ پیام خطا بدون افشای جزئیات |

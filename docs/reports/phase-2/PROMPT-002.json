@@ -1,0 +1,93 @@
+{
+  "promptId": "PROMPT-002",
+  "status": "COMPLETE",
+  "summary": "Public site foundation: app/(public) route group with SiteShell (skip link, sticky header, desktop nav with aria-current, sign-in / panel link, mobile disclosure menu closing on Escape and navigation, footer), a real home page replacing the infrastructure status page (only Phase 1 services that exist today, no prices, times or statistics), an about page with breadcrumb, a Persian 404 with noindex, public error and loading states. SEO: buildMetadata gives absolute canonical without query/fragment, fa_IR OpenGraph and Twitter, ARCHIVED noindex+follow, DUPLICATE canonical to the primary + noindex, and nothing indexed outside production; the root layout defaults to noindex. JSON-LD Organization, WebSite and BreadcrumbList serialised safely against </script>. Segmented sitemap (/sitemap.xml index + /sitemaps/<section>.xml, no invented lastmod) and robots.txt derived from the route access map with anchored rules so /vet never hides /veterinarians. SITE_URL is required and https in production. Only built sections are linked; planned §4 sections stay closed routes. No schema or migration.",
+  "changedFiles": [
+    "app/(public)/layout.tsx",
+    "app/(public)/page.tsx",
+    "app/(public)/about/page.tsx",
+    "app/(public)/error.tsx",
+    "app/(public)/loading.tsx",
+    "app/not-found.tsx",
+    "app/robots.ts",
+    "app/sitemap.xml/route.ts",
+    "app/sitemaps/[file]/route.ts",
+    "app/layout.tsx",
+    "src/public/site-shell.tsx",
+    "src/public/site-nav.tsx",
+    "src/public/sections.ts",
+    "src/public/request.ts",
+    "src/seo/metadata.ts",
+    "src/seo/structured-data.ts",
+    "src/seo/json-ld.tsx",
+    "src/seo/sitemap.ts",
+    "src/seo/robots.ts",
+    "src/ui/breadcrumbs.tsx",
+    "src/ui/icon-paths.ts",
+    "src/authz/routes.ts",
+    "src/config/env.ts",
+    ".env.example",
+    "docs/ops/runbook.md",
+    "tools/browser-tests.mjs",
+    "tests/ui/seo.test.ts",
+    "tests/ui/routes.test.ts",
+    "tests/config/env.test.ts",
+    "tests/db/startup.test.ts",
+    "tests/db/health.test.ts",
+    "tests/db/integrations.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "tests/browser/visual.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-002-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-002/home-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-002/home-desktop.png",
+    "docs/reports/screenshots/phase-2/prompt-002/about-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-002/about-desktop.png",
+    "docs/reports/screenshots/phase-2/prompt-002/header-desktop.png",
+    "docs/reports/screenshots/phase-2/prompt-002/menu-open-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-002/not-found-mobile.png"
+  ],
+  "decisions": ["DEC-0149", "DEC-0150", "DEC-0151", "DEC-0152", "DEC-0153"],
+  "checks": [
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build: Compiled successfully, static pages 5/5, exit 0; / and /about are dynamic routes, /_not-found static."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 after the build regenerated .next/types (the previous types still referenced the removed app/page.tsx)."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 352 · pass 352 · fail 0 · cancelled 0 · skipped 0 (74 s), run alone. New: tests/ui/seo.test.ts (13: absolute canonical ignoring query/fragment and refusing other hosts; published/archived/duplicate/non-production robots; duplicate without primary refused; JSON-LD cannot contain < > & or line separators and round-trips; breadcrumb positions; organisation carries only held facts; robots closed outside production; in production every application prefix and /api, /dev blocked while no public section incl. /veterinarians is; §4 order with live sections PUBLIC and planned ones closed; sitemap index/urlset, escaping, real lastmod only, unknown and prototype-key sections not found) and tests/config/env.test.ts SITE_URL (origin normalisation, invalid URL refused, production requires https SITE_URL). tests/ui/routes.test.ts pins the newly public paths; all Phase 1 route pins still pass."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 97 · pass 97 · fail 0 (297 s) on disposable database hamzist_browser_8db32d172dce with its own production server 127.0.0.1:12099 and SITE_URL set to it; no test database left afterwards. tests/browser/public-shell.test.ts (7): home and about RTL/lang fa, no sideways scroll, main not collapsed at 360 and 1440; canonical and og:url absolute without the query, og:locale fa_IR, og:image absolute, meta robots noindex,nofollow in development, BreadcrumbList items match canonical, home has Organization + WebSite; header links exactly / and /about with aria-current, sign-in link, no link to any of seven planned sections, breadcrumb first crumb on the right; mobile menu aria-expanded, 44px target, Escape closes and restores focus, closes after navigating; robots.txt Disallow: /, sitemap index and pages urlset on the server origin without /dashboard or /login, unknown section 404; /veterinarians and an unknown path return 404 with the Persian page, rtl and noindex; anonymous /dashboard still redirects to /login?next=/dashboard and a signed-in visitor gets the panel link. visual.test.ts now also covers / and /about. The full Phase 1 regression (90 earlier tests) passes. Screenshots in docs/reports/screenshots/phase-2/prompt-002/."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Visual fidelity of the public shell is UNVERIFIED: no Figma frame for the Phase 2 public surface is in the sources; only existing Design System tokens and components are used.",
+    "The OpenGraph image is the 144x162 official symbol; no 1200x630 share image exists in the Design System and none was invented.",
+    "Public pages render per request (runtime SITE_URL and signed-in header); static caching is left to PROMPT-018.",
+    "Home §5 blocks for search, featured breeds, content, associations and real statistics arrive with PROMPT-003…013; search and verification entry points (§4) are not linked until PROMPT-012 and 014 build them.",
+    "robots.txt uses the `$` end anchor (supported by Google and Bing); a crawler without it still honours the `/x/` folder rules."
+  ],
+  "readiness": {
+    "code": "PUBLIC_FOUNDATION_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

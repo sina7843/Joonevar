@@ -15,10 +15,10 @@ test('unlisted routes are closed by default', () => {
   assert.equal(canAccessRoute(actor('SUPERADMIN', ['SUPERADMIN']), '/some/new/page'), false);
 });
 
-test('only the status page, sign-in and health are open', () => {
-  assert.equal(accessForRoute('/'), 'PUBLIC');
-  assert.equal(accessForRoute('/login'), 'PUBLIC');
-  assert.equal(accessForRoute('/api/health'), 'PUBLIC');
+test('only sign-in, health and the built public site are open', () => {
+  for (const path of ['/', '/about', '/login', '/api/health', '/robots.txt', '/sitemap.xml', '/sitemaps/pages.xml']) {
+    assert.equal(accessForRoute(path), 'PUBLIC', path);
+  }
   assert.equal(canAccessRoute(null, '/'), true);
   assert.equal(canAccessRoute(null, '/dashboard'), false);
 });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ConfigError, loadEnv } from '../../src/config/env.ts';
+import { ConfigError, loadEnv, siteUrl } from '../../src/config/env.ts';
 import { adapterReports, assertNotProduction, localTestPaymentGateway, localTestSmsSender } from '../../src/adapters/registry.ts';
 
 const DEV = {
@@ -47,6 +47,27 @@ test('production requires a session secret and rejects the local database creden
   );
 });
 
+test('the public origin comes from SITE_URL, and production insists on an https one', () => {
+  assert.equal(siteUrl(loadEnv(DEV)), 'http://localhost:3111');
+  assert.equal(siteUrl(loadEnv({ ...DEV, SITE_URL: 'https://hamzist.example/some/path/' })), 'https://hamzist.example');
+  assert.throws(() => loadEnv({ ...DEV, SITE_URL: 'not a url' }), ConfigError);
+
+  const production = {
+    APP_ENV: 'production',
+    INTEGRATION_MODE: 'live',
+    DATABASE_URL: 'postgres://user:pass@db/hamzist',
+    SESSION_SECRET: 'x'.repeat(40),
+  };
+  const refuses = (source: Record<string, string>, problem: string) =>
+    assert.throws(
+      () => loadEnv(source),
+      (error: unknown) => error instanceof ConfigError && error.problems.some((p) => p.includes(problem)),
+    );
+  refuses(production, 'SITE_URL is required');
+  refuses({ ...production, SITE_URL: 'http://hamzist.example' }, 'https');
+  assert.equal(siteUrl(loadEnv({ ...production, SITE_URL: 'https://hamzist.example' })), 'https://hamzist.example');
+});
+
 test('adapter status is derived from configuration and never assumed ready', () => {
   const reports = adapterReports(loadEnv(DEV));
   const sms = reports.find((r) => r.name === 'sms-otp');
@@ -68,6 +89,7 @@ test('local-test adapters cannot be constructed in production', () => {
     INTEGRATION_MODE: 'live',
     DATABASE_URL: 'postgres://user:pass@db/hamzist',
     SESSION_SECRET: 'x'.repeat(40),
+    SITE_URL: 'https://hamzist.example',
   });
 
   assert.throws(() => assertNotProduction('sms-otp', productionEnv), /must never run in production/);

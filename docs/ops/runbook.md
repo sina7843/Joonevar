@@ -44,11 +44,13 @@ curl -s http://127.0.0.1:3000/api/health | head -40
 | `DATABASE_URL` | بله | رشته اتصال PostgreSQL |
 | `PRIVATE_STORAGE_DIR` | بله | مسیر فایل‌های خصوصی، بیرون از مسیر عمومی |
 | `SESSION_SECRET` | فقط در production | حداقل ۳۲ کاراکتر، از Secret Manager |
+| `SITE_URL` | فقط در production | مبدأ عمومی سایت با `https` (بدون مسیر)؛ canonical، sitemap و OpenGraph از آن ساخته می‌شوند. بیرون از production مقدار خالی یعنی `http://localhost:3111` |
 
 قواعدی که در همین اعتبارسنجی اجرا می‌شوند:
 
 - `APP_ENV=production` با `INTEGRATION_MODE=local` **رد می‌شود**؛ production هرگز آداپتور توسعه را اجرا نمی‌کند.
 - در production بدون `SESSION_SECRET` بالا نمی‌آید.
+- در production بدون `SITE_URL` یا با `SITE_URL` غیر `https` بالا نمی‌آید (DEC-0150).
 - درخواست آداپتور پیامک یا درگاه در production بدون Provider واقعی، خطای صریح `NOT_CONFIGURED` می‌دهد — نه پیامک بی‌صدا و نه پرداخت ساختگی.
 
 ## ۴. فعال‌سازی Provider واقعی

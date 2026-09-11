@@ -21,6 +21,13 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/login', access: 'PUBLIC' },
   { prefix: '/api/health', access: 'PUBLIC' },
 
+  // Public site (Phase 2, DEC-0149). A section opens here when its prompt builds
+  // it; until then its reserved prefix stays unlisted and therefore closed.
+  { prefix: '/about', access: 'PUBLIC' },
+  { prefix: '/robots.txt', access: 'PUBLIC' },
+  { prefix: '/sitemap.xml', access: 'PUBLIC' },
+  { prefix: '/sitemaps', access: 'PUBLIC' },
+
   { prefix: '/dashboard', access: PUBLIC_APP },
   { prefix: '/notifications', access: PUBLIC_APP },
   { prefix: '/profile', access: PUBLIC_APP },
@@ -75,6 +82,11 @@ export function accessForRoute(pathname: string): RouteAccess {
   // An unlisted route is closed by default: a new page cannot become publicly
   // reachable just because nobody remembered to add a rule.
   return best?.access ?? [];
+}
+
+/** Prefixes of the signed-in application — what robots.txt keeps out of search (DEC-0152). */
+export function applicationPrefixes(): string[] {
+  return RULES.filter((rule) => rule.access !== 'PUBLIC').map((rule) => rule.prefix);
 }
 
 export function canAccessRoute(actor: MaybeActor, pathname: string): boolean {

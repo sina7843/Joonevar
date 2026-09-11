@@ -30,6 +30,7 @@ const PROD_ENV = loadEnv({
   INTEGRATION_MODE: 'live',
   DATABASE_URL: 'postgres://user:pass@db:5432/hamzist',
   SESSION_SECRET: 'x'.repeat(48),
+  SITE_URL: 'https://hamzist.example',
 });
 
 async function withDb(fn: (db: Awaited<ReturnType<typeof createTestDb>>) => Promise<void>) {

@@ -85,6 +85,9 @@ const SCREENS = [
   // sees, signed in or not — and the one where a broken content width went
   // unnoticed longest.
   { name: 'login', href: '/login', session: 'anonymous' },
+  // The public site (Phase 2 PROMPT-002): the first thing a visitor sees.
+  { name: 'home', href: '/', session: 'anonymous' },
+  { name: 'about', href: '/about', session: 'anonymous' },
   { name: 'dashboard', href: '/dashboard', session: 'owner' },
   { name: 'animals', href: '/animals', session: 'owner' },
   { name: 'permits', href: '/mating/permits', session: 'owner' },

@@ -22,6 +22,8 @@ const schema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   TEST_DATABASE_URL: z.string().min(1).optional(),
   PRIVATE_STORAGE_DIR: z.string().min(1).default('private-storage'),
+  /** Public origin for canonical links, the sitemap and OpenGraph (DEC-0150). Required in production. */
+  SITE_URL: z.string().url().optional(),
   SESSION_SECRET: z.string().min(32).optional(),
   /** Provider identifiers. Absent means NOT_CONFIGURED, which is a truthful state, not an error in development. */
   SMS_PROVIDER: z.string().min(1).optional(),
@@ -64,6 +66,13 @@ export function loadEnv(source: EnvSource = process.env): Env {
     if (env.DATABASE_URL.includes('hamzist_local_dev')) {
       problems.push('DATABASE_URL still points at the local development credentials');
     }
+    // Canonical links, the sitemap and OpenGraph are absolute. Taking the origin
+    // from the request instead would let any Host header rewrite them.
+    if (!env.SITE_URL) {
+      problems.push('SITE_URL is required in production');
+    } else if (new URL(env.SITE_URL).protocol !== 'https:') {
+      problems.push('SITE_URL must use https in production');
+    }
   }
 
   if (problems.length > 0) throw new ConfigError(problems);
@@ -83,3 +92,9 @@ export function resetEnvCache(): void {
 }
 
 export const isProduction = (e: Env = env()): boolean => e.APP_ENV === 'production';
+
+/** Outside production an unset SITE_URL means the documented local server. */
+const LOCAL_SITE_URL = 'http://localhost:3111';
+
+/** Origin of the public site, with no path or trailing slash (DEC-0150). */
+export const siteUrl = (e: Env = env()): string => new URL(e.SITE_URL ?? LOCAL_SITE_URL).origin;

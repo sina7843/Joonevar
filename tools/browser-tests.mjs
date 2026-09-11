@@ -127,6 +127,8 @@ try {
     INTEGRATION_MODE: 'local',
     DATABASE_URL: url,
     PRIVATE_STORAGE_DIR: storage,
+    // Canonical and sitemap URLs must point at the server under test.
+    SITE_URL: baseUrl,
   };
   server = spawn(process.execPath, [path.join(root, 'node_modules', 'next', 'dist', 'bin', 'next'), 'start', '-p', String(port)], {
     cwd: root,
