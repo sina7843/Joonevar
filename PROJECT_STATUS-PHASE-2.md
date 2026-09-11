@@ -11,7 +11,7 @@ Managed by `node tools/runner.mjs --phase 2 …` (DEC-0142). A row is marked onl
 - [x] PROMPT-007 — ثبت‌نام و Claim دامپزشک <!-- work-commit:664d4e74c772e95f22bcea65fc1859436eaa01d0 -->
 - [x] PROMPT-008 — دایرکتوری مراکز دامپزشکی <!-- work-commit:ff6cd263fd5f2e2aa39e910ef164f3d5892cc815 -->
 - [x] PROMPT-009 — پیشنهاد و Claim مرکز <!-- work-commit:6c5f6f374247b7acbe67d36e584ef66852e929ae -->
-- [ ] PROMPT-010 — انجمن‌ها و کلاب‌ها
+- [x] PROMPT-010 — انجمن‌ها و کلاب‌ها <!-- work-commit:b8bd1e873a11dce1bfa38b0410e534f0e022ff5e -->
 - [ ] PROMPT-011 — بسته‌های تبلیغاتی
 - [ ] PROMPT-012 — جست‌وجو، فیلتر و رتبه‌بندی
 - [ ] PROMPT-013 — خانه و معرفی خدمات
