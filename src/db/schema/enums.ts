@@ -59,6 +59,8 @@ export const settingGroup = pgEnum('setting_group', [
   'OTP_TECHNICAL',
   'BREEDING_POLICY',
   'INTEGRATIONS',
+  /** Anti-abuse limits of user reports (Phase 2, DEC-0161). */
+  'MODERATION',
 ]);
 
 export const settingScopeType = pgEnum('setting_scope_type', ['GLOBAL']);
@@ -88,6 +90,30 @@ export const breedProfileStatus = pgEnum('breed_profile_status', ['DRAFT', 'PUBL
 
 /** CMS content types — Requirements-Phase-2 §12. */
 export const contentKind = pgEnum('content_kind', ['ARTICLE', 'NEWS', 'ANNOUNCEMENT', 'CLUB_POST']);
+
+/** What a user report is about. Profiles join when their prompts publish them (006, 008, 010). */
+export const reportTargetKind = pgEnum('report_target_kind', ['CONTENT']);
+
+export const reportReason = pgEnum('report_reason', [
+  'INCORRECT_INFO',
+  'HEALTH_MISINFORMATION',
+  'OFFENSIVE',
+  'SPAM',
+  'COPYRIGHT',
+  'PRIVACY',
+  'OTHER',
+]);
+
+export const reportStatus = pgEnum('report_status', ['OPEN', 'DISMISSED', 'ACTIONED']);
+
+/** The moderation decisions of Requirements-Phase-2 §13. */
+export const moderationDecision = pgEnum('moderation_decision', [
+  'DISMISS',
+  'REQUEST_CORRECTION',
+  'HIDE',
+  'SOFT_DELETE',
+  'RESTRICT_PUBLISHER',
+]);
 
 /** CMS status — §12. DELETED is the soft delete of P2-D13; no row is removed. */
 export const contentStatus = pgEnum('content_status', ['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED', 'DELETED']);

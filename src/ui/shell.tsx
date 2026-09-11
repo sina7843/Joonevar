@@ -286,5 +286,7 @@ export const AUTHOR_NAV: readonly NavItem[] = [
 export const CONTENT_NAV: readonly NavItem[] = [
   { href: '/content', label: 'همه محتوا', icon: 'clipboardText' },
   { href: '/content/new', label: 'محتوای تازه', icon: 'uploadSimple' },
+  { href: '/content/reports', label: 'گزارش‌ها', icon: 'warning' },
+  { href: '/content/restrictions', label: 'محدودیت ناشر', icon: 'shieldCheck' },
   { href: '/content/categories', label: 'دسته‌ها', icon: 'listChecks' },
 ];

@@ -44,7 +44,7 @@
 | گونه | `animal.species` متن با پیش‌فرض `DOG` | CREATE + MIGRATE — **انجام‌شده در 003** | جدول `species` (کلید `code`) و FK از `animal.species`؛ `breed_group` با ده گروه FCI؛ Seed در Migration `0017` (DEC-0154) | 003 |
 | بانک نژاد سگ | `reference_breed` (نام فارسی/انگلیسی، فعال، ترتیب) با FK از `animal.breed_id` و `kennel_breed` | MIGRATE — **انجام‌شده در 003** | همان ردیف: slug، نام‌های دیگر، گروه، ویژگی‌های Enum، محتوا، `profileStatus` مستقل از `isActive`، `version`، تکراری با `merged_into_breed_id`؛ `breed_slug_redirect` و `breed_medical_claim` (DEC-0155، DEC-0156) | 003 |
 | CMS | — | CREATE — **انجام‌شده در 004** | `content_item`، `content_revision`، `content_category`، `content_slug_redirect` (Migration `0018`)؛ نویسنده FK به `account`، نژاد به `reference_breed`، گونه به `species`، تصویر به `stored_file` با هدف `CONTENT_IMAGE` (DEC-0159، DEC-0160) | 004 |
-| گزارش و Moderation | `audit_event` برای ثبت تصمیم | CREATE + REUSE | صف گزارش تازه، تصمیم در همان Audit | 005 |
+| گزارش و Moderation | `audit_event` برای ثبت تصمیم | CREATE + REUSE — **انجام‌شده در 005** | `moderation_report` (هدف تایپ‌شده با FK؛ امروز فقط محتوا) و `publisher_restriction` (Migration `0019`)؛ تصمیم روی خود گزارش و اثرش در Audit همان موجودیت؛ درخواست اصلاح روی `content_item` (DEC-0161، DEC-0162) | 005 |
 | Claim | — | CREATE | انتقال کنترل ویرایش آینده، نه مالکیت تاریخچه | 007، 009 |
 | انجمن و کلاب (دایرکتوری) | — | CREATE | با Shell عملیاتی `ASSOCIATION_OPERATOR` فاز یک یکی نیست (DEC-0145) | 010 |
 | بسته تبلیغاتی | `payment_batch/item/attempt/callback` با Enum `payment_service`؛ `product_setting` | MIGRATE + CREATE | افزودن سرویس پرداخت و گروه تنظیمات؛ انقضای ۳۰/۹۰/۳۶۵ روز در لحظه خواندن از `ends_at` محاسبه می‌شود، بدون Scheduler | 011 |

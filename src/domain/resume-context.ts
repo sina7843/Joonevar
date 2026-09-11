@@ -31,7 +31,8 @@ export type EntityType =
   | 'PAYMENT_BATCH'
   | 'PERSONAL_DECLARATION'
   | 'POSTAL_REQUEST'
-  | 'PRODUCT_SETTING';
+  | 'PRODUCT_SETTING'
+  | 'CONTENT_ITEM';
 
 export interface EntityRef {
   readonly type: EntityType;

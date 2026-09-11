@@ -286,6 +286,17 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
         </section>
       ) : null}
 
+      <p className="border-t border-border-subtle pt-lg text-body-sm text-text-secondary">
+        {'مطلب نادرست یا نامناسبی می‌بینید؟ '}
+        <Link
+          href={'/report/content/' + item.id}
+          className="text-text-brand underline underline-offset-4"
+          data-testid="report-content-link"
+        >
+          گزارش این مطلب
+        </Link>
+      </p>
+
       {breed ? (
         <p className="text-body-sm" data-testid="content-breed">
           {'نژاد مرتبط: '}

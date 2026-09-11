@@ -46,6 +46,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/vets', access: PUBLIC_APP },
   { prefix: '/declaration', access: PUBLIC_APP },
   { prefix: '/documents', access: PUBLIC_APP },
+  // Reporting content needs a signed-in account; any account may report (§13, DEC-0161).
+  { prefix: '/report', access: PUBLIC_APP },
 
   // Becoming a breeder starts from the ordinary user context.
   { prefix: '/breeder/activate', access: ['USER', 'BREEDER'] },

@@ -77,6 +77,12 @@ export const contentItems = pgTable(
     firstPublishedAt: timestamp('first_published_at', { withTimezone: true }),
     /** Why the content admin hid or deleted it; shown to the author, never to the public. */
     moderationNote: text('moderation_note'),
+    /**
+     * A correction the content admin asked for after a report (§13). The content
+     * stays as it is; the author's next save answers it and clears it (DEC-0162).
+     */
+    correctionNote: text('correction_note'),
+    correctionRequestedAt: timestamp('correction_requested_at', { withTimezone: true }),
 
     revisionNumber: integer('revision_number').notNull().default(1),
     version: integer('version').notNull().default(1),

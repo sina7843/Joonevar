@@ -17,6 +17,7 @@ export const SETTING_GROUPS = [
   'OTP_TECHNICAL',
   'BREEDING_POLICY',
   'INTEGRATIONS',
+  'MODERATION',
 ] as const;
 export type SettingGroupName = (typeof SETTING_GROUPS)[number];
 
@@ -46,6 +47,8 @@ const ACCESS: Record<SettingGroupName, GroupAccess> = {
   },
   OTP_TECHNICAL: { read: ['SUPERADMIN'], write: ['SUPERADMIN'] },
   BREEDING_POLICY: { read: ['SUPERADMIN', 'ASSOCIATION_OPERATOR'], write: [] },
+  // The content admin sees the report limit it works under; only the superadmin changes it.
+  MODERATION: { read: ['SUPERADMIN', 'CONTENT_ADMIN'], write: ['SUPERADMIN'] },
 };
 
 export function canReadSettingGroup(actor: Actor, group: SettingGroupName): boolean {

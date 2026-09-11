@@ -197,6 +197,18 @@ test('the author and content admin environments are separate shells entered only
   assert.equal(canAccessRoute(null, '/author'), false);
 });
 
+test('reporting needs a signed-in account, and the report queue belongs to the content admin', () => {
+  assert.deepEqual(accessForRoute('/report/content/abc'), ['USER', 'BREEDER', 'TRUSTED_VET']);
+  assert.equal(canAccessRoute(null, '/report/content/abc'), false);
+  // An operator or author reaches it as an ordinary user.
+  assert.equal(selectContext(actor('AUTHOR', ['AUTHOR']), ['USER', 'BREEDER', 'TRUSTED_VET']), 'USER');
+
+  assert.deepEqual(accessForRoute('/content/reports/abc'), ['CONTENT_ADMIN']);
+  assert.deepEqual(accessForRoute('/content/restrictions'), ['CONTENT_ADMIN']);
+  assert.equal(canAccessRoute(actor('AUTHOR', ['AUTHOR']), '/content/reports'), false);
+  assert.equal(canAccessRoute(actor('USER'), '/content/reports'), false);
+});
+
 test('the role switcher never offers an operational context', () => {
   assert.deepEqual(switchableContexts(['AUTHOR', 'CONTENT_ADMIN']), ['USER']);
   assert.deepEqual(switchableContexts(['SUPERADMIN', 'ASSOCIATION_OPERATOR', 'GENETICS_OPERATOR']), ['USER']);

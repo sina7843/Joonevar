@@ -1,0 +1,87 @@
+{
+  "promptId": "PROMPT-005",
+  "status": "COMPLETE",
+  "summary": "User reports and moderation for CMS content. Any signed-in account reports a visible or archived item from its public page (/report/content/[id]) with one of seven reasons; not its own content, one open report per account per item (partial unique index) and a 24-hour limit read from the new MODERATION setting moderation.report_daily_limit. The content admin works a queue grouped by item (/content/reports) and decides on all open reports of an item at once: dismiss, request a correction, hide, soft-delete or restrict the publisher, always with a reason; each report records decision, reason, actor and time, and the change it causes is audited where it happens. Hide and soft delete run the CMS status rules inside the same transaction. A correction request keeps the content public, notifies the author and is closed by the author's next save. A publisher restriction stops the author publishing or changing public content (drafts stay editable) until its end date, decided at read time, or until lifted with a reason at /content/restrictions. Authors are notified of every decision except dismissal; reporters are never shown to the content admin or the author; a second simultaneous decision gets a conflict.",
+  "changedFiles": [
+    "src/db/schema/enums.ts",
+    "src/db/schema/moderation.ts",
+    "src/db/schema/content.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0019_moderation.sql",
+    "src/db/migrations/meta/0019_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/moderation/model.ts",
+    "src/moderation/service.ts",
+    "src/moderation/restrictions.ts",
+    "src/moderation/actions.ts",
+    "src/moderation/forms.tsx",
+    "src/content/service.ts",
+    "src/content/panel.tsx",
+    "src/content/public-views.tsx",
+    "src/authz/routes.ts",
+    "src/authz/policy.ts",
+    "src/ui/shell.tsx",
+    "src/settings/keys.ts",
+    "src/domain/resume-context.ts",
+    "app/report/content/[id]/page.tsx",
+    "app/content/reports/page.tsx",
+    "app/content/reports/[contentId]/page.tsx",
+    "app/content/restrictions/page.tsx",
+    "tests/domain/moderation.test.ts",
+    "tests/db/moderation.test.ts",
+    "tests/browser/moderation.test.ts",
+    "tests/ui/routes.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-005-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-005/report-submitted-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-005/report-queue.png",
+    "docs/reports/screenshots/phase-2/prompt-005/report-decided.png",
+    "docs/reports/screenshots/phase-2/prompt-005/author-restricted.png",
+    "docs/reports/screenshots/phase-2/prompt-005/restrictions.png"
+  ],
+  "decisions": ["DEC-0161", "DEC-0162"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0; /report/content/[id], /content/reports, /content/reports/[contentId] and /content/restrictions built."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/moderation.test.ts tests/ui/routes.test.ts && node --test --test-concurrency=1 tests/db/moderation.test.ts tests/db/content.test.ts tests/db/settings.test.ts tests/db/migrations.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction to not re-run unaffected suites that already passed. Unit: tests 20 · pass 20 · fail 0 (new tests/domain/moderation.test.ts: reason and details validation, dismissal vs acted status, restriction active window incl. exact end and lifted, end-date validation, what a restriction blocks; tests/ui/routes.test.ts: /report needs a signed-in account and resolves operators to USER, report queue and restrictions only for CONTENT_ADMIN). Database: tests/db/moderation.test.ts 7/7 (draft and scheduled content not reportable, own content refused, OTHER needs details, one open report per account per item, audit metadata without details, daily limit from the product setting returns RATE_LIMITED; queue grouped per item with reasons, FORBIDDEN outside the content admin, reporter never exposed; dismissal closes all open reports with decision, reason, actor and time, leaves content unchanged, does not notify the author, then nothing is left to decide; hide and soft delete change the content status, write the moderation note, make the page 404, notify the author with the editor route; correction request keeps the content public, notifies, and the author's save clears it with CONTENT_CORRECTION_ADDRESSED; restriction with a past end refused, author cannot publish or edit published content but can edit drafts, second restriction refused while active, restriction ends by its date without a job, indefinite restriction lifted only by the content admin with a reason, lifting twice NOT_FOUND; two simultaneous decisions: one fulfilled, the other CONFLICT). tests/db/content.test.ts, tests/db/settings.test.ts and tests/db/migrations.test.ts also pass because the content service, the settings catalogue and the migrations changed. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run test:browser -- tests/browser/moderation.test.ts tests/browser/content.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, each on a disposable database with its own production server, no database left. tests/browser/content.test.ts 3/3 (content service, editor and public page changed) on hamzist_browser_aa419e28a88a. tests/browser/moderation.test.ts 3/3 on the final build, hamzist_browser_236b74a8d23a at 127.0.0.1:14162: an anonymous visitor's report link leads to sign-in with the exact next path; a fresh reader reports a news item and a second report is refused while open; the content admin sees it in the queue without the reporter's number, requests a correction, the author sees the note and saving closes it; a new report hidden by the content admin makes the news page 404; a restriction with a future end blocks the author's publish with the restriction message and shows the restriction in the editor; lifting it at /content/restrictions lets the same draft publish; reader and author are FORBIDDEN on /content/reports and /content/restrictions; an unknown item's report page is 404. The first moderation run was 1/3: after a decision the form and its result unmounted because no report was left open; the form now stays to show the recorded decision. Suites not re-run are unaffected; last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Reporters do not see the outcome of their reports; a 'my reports' page and outcome notification were not built.",
+    "Only content is reportable; vet, centre, association and club profiles join moderation_report with PROMPT-006, 008 and 010.",
+    "The independent review operator role of §3 is not built; content reports are handled by the content admin (DEC-0161).",
+    "A publisher restriction is recorded from an item's report page only; restricting an author without a report belongs to the admin panel (PROMPT-016).",
+    "Physical deletion is not built and waits for a data retention policy.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the report and moderation pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "MODERATION_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

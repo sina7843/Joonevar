@@ -9,6 +9,7 @@ import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { EmptyState } from '../ui/states.tsx';
 import { ButtonLink } from '../ui/button.tsx';
 import { contentForEditing, contentForPanel } from './service.ts';
+import { restrictionMessage } from '../moderation/restrictions.ts';
 import {
   CONTENT_KINDS,
   CONTENT_STATUSES,
@@ -242,6 +243,19 @@ export async function ContentEditorView({ actor, panel, contentId }: { actor: Ac
         {row.moderationNote && (row.status === 'HIDDEN' || row.status === 'DELETED') ? (
           <Alert tone="warning" title={row.status === 'HIDDEN' ? 'ادمین محتوا این محتوا را پنهان کرده است' : 'این محتوا حذف شده است'}>
             <span data-testid="content-moderation-note">{row.moderationNote}</span>
+          </Alert>
+        ) : null}
+
+        {row.correctionNote ? (
+          <Alert tone="info" title="ادمین محتوا اصلاح این نوشته را خواسته است">
+            <span data-testid="content-correction-note">{row.correctionNote}</span>
+            <span className="mt-xs block text-caption">با ذخیره نسخه اصلاح‌شده، درخواست بسته می‌شود.</span>
+          </Alert>
+        ) : null}
+
+        {data.restriction ? (
+          <Alert tone="warning" title={panel === 'author' ? 'انتشار برای حساب شما محدود است' : 'این نویسنده محدودیت انتشار دارد'}>
+            <span data-testid="content-restriction">{restrictionMessage(data.restriction)}</span>
           </Alert>
         ) : null}
 

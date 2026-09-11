@@ -21,6 +21,8 @@ import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
 import { isReviewDate, normalizeForSearch } from '../breeds/model.ts';
 import type { Actor } from '../authz/actor.ts';
 import type { SitemapEntry } from '../seo/sitemap.ts';
+import { activeRestrictionFor, restrictionMessage } from '../moderation/restrictions.ts';
+import { blockedByRestriction } from '../moderation/model.ts';
 import {
   KIND_PATH,
   allowedMoves,
@@ -166,6 +168,19 @@ async function loadForActor(tx: DbClient, actor: Actor, contentId: string) {
   return { row, role, isOwner: row.authorAccountId === actor.accountId };
 }
 
+/** A publisher restriction stops an author publishing or changing public content (DEC-0162). */
+async function assertNotRestricted(
+  tx: DbClient,
+  role: ContentRole,
+  row: ContentRow,
+  action: 'PUBLISH' | 'EDIT',
+  now: Date,
+): Promise<void> {
+  if (role !== 'AUTHOR' || !blockedByRestriction(action, row.status)) return;
+  const restriction = await activeRestrictionFor(tx, row.authorAccountId, now);
+  if (restriction) throw forbidden(restrictionMessage(restriction));
+}
+
 async function applySlugChange(tx: DbClient, before: ContentRow, after: ContentRow): Promise<void> {
   if (before.slug === after.slug) return;
   await tx
@@ -273,6 +288,7 @@ export async function updateContent(database: Database, actor: Actor, input: Con
       );
     }
     if (current.version !== input.expectedVersion) throw conflict(STALE);
+    await assertNotRestricted(tx, role, current, 'EDIT', new Date());
 
     const categoryId = blankToNull(input.categoryId);
     if (categoryId !== null) {
@@ -319,6 +335,7 @@ export async function updateContent(database: Database, actor: Actor, input: Con
     };
     const change = diff(snapshotOf(current), next);
     if (!change.changed) return current;
+    const clearsCorrection = isOwner && current.correctionNote !== null;
     if (current.status === 'PUBLISHED' || current.status === 'ARCHIVED') {
       const blockers = publishBlockers({ ...next, kind: current.kind });
       if (blockers.length > 0) throw validation('این محتوا منتشر شده است. ' + blockers[0]);
@@ -331,6 +348,8 @@ export async function updateContent(database: Database, actor: Actor, input: Con
       .update(contentItems)
       .set({
         ...next,
+        // The author's own save answers a correction request (DEC-0162).
+        ...(clearsCorrection ? { correctionNote: null, correctionRequestedAt: null } : {}),
         revisionNumber: current.revisionNumber + 1,
         version: current.version + 1,
         updatedAt: new Date(),
@@ -340,6 +359,16 @@ export async function updateContent(database: Database, actor: Actor, input: Con
     if (!row) throw conflict(STALE);
     await applySlugChange(tx, current, row);
     await writeRevision(tx, actor, row, null);
+    if (clearsCorrection) {
+      await recordAudit(tx, actor, {
+        action: 'CONTENT_CORRECTION_ADDRESSED',
+        targetType: TARGET,
+        targetId: row.id,
+        targetVersion: row.version,
+        before: { correctionNote: current.correctionNote },
+        after: { correctionNote: null, revision: row.revisionNumber },
+      });
+    }
     await recordAudit(tx, actor, {
       action: 'CONTENT_UPDATED',
       targetType: TARGET,
@@ -367,6 +396,7 @@ export async function attachContentImage(
     const { row: current, role, isOwner } = await loadForActor(tx, actor, input.contentId);
     if (!canEditContent(role, current.status, isOwner)) throw forbidden('این محتوا در این وضعیت ویرایش نمی‌شود.');
     if (current.version !== input.expectedVersion) throw conflict(STALE);
+    await assertNotRestricted(tx, role, current, 'EDIT', new Date());
 
     // Owned by the author, so the author can preview it whoever uploaded it.
     const stored = await putPrivateFile(tx, storageRoot, actor, {
@@ -407,51 +437,60 @@ export async function changeContentStatus(
   input: { contentId: string; expectedVersion: number; to: string; reason?: string | null; publishAt?: Date | null },
   now: Date = new Date(),
 ): Promise<ContentRow> {
+  return database.transaction((tx) => applyContentStatus(tx, actor, input, now));
+}
+
+/** The status change itself, for a caller already inside a transaction — a moderation decision. */
+export async function applyContentStatus(
+  tx: DbClient,
+  actor: Actor,
+  input: { contentId: string; expectedVersion: number; to: string; reason?: string | null; publishAt?: Date | null },
+  now: Date = new Date(),
+): Promise<ContentRow> {
   if (!isContentStatus(input.to)) throw validation('وضعیت انتخاب‌شده معتبر نیست.');
   const to = input.to;
 
-  return database.transaction(async (tx) => {
-    const { row: current, role, isOwner } = await loadForActor(tx, actor, input.contentId);
-    const moves = allowedMoves(role, current.status, isOwner);
-    if (moves.length === 0 && role === 'AUTHOR') {
-      throw forbidden('این محتوا را ادمین محتوا ' + (current.status === 'HIDDEN' ? 'پنهان' : 'حذف') + ' کرده است.');
-    }
-    if (!moves.includes(to)) throw validation('این تغییر وضعیت برای این محتوا ممکن نیست.');
-    if (current.version !== input.expectedVersion) throw conflict(STALE);
-    const reason = reasonRequired(role, current.status, to, isOwner) ? requireReason(input.reason) : blankToNull(input.reason);
+  const { row: current, role, isOwner } = await loadForActor(tx, actor, input.contentId);
+  const moves = allowedMoves(role, current.status, isOwner);
+  if (moves.length === 0 && role === 'AUTHOR') {
+    throw forbidden('این محتوا را ادمین محتوا ' + (current.status === 'HIDDEN' ? 'پنهان' : 'حذف') + ' کرده است.');
+  }
+  if (!moves.includes(to)) throw validation('این تغییر وضعیت برای این محتوا ممکن نیست.');
+  if (current.version !== input.expectedVersion) throw conflict(STALE);
+  if (to === 'PUBLISHED') await assertNotRestricted(tx, role, current, 'PUBLISH', now);
+  const reason = reasonRequired(role, current.status, to, isOwner) ? requireReason(input.reason) : blankToNull(input.reason);
 
-    let publishAt = current.publishAt;
-    let firstPublishedAt = current.firstPublishedAt;
-    if (to === 'PUBLISHED') {
-      const blockers = publishBlockers(current);
-      if (blockers.length > 0) throw validation(blockers[0]!);
-      if (current.imageFileId !== null && blankToNull(current.imageAltFa) === null) {
-        throw validation('تصویر این محتوا متن جایگزین لازم دارد.');
-      }
-      publishAt = effectivePublishAt(input.publishAt ?? null, now);
-      firstPublishedAt = firstPublishedAt ?? publishAt;
-    } else if (to === 'DRAFT') {
-      publishAt = null;
+  let publishAt = current.publishAt;
+  let firstPublishedAt = current.firstPublishedAt;
+  if (to === 'PUBLISHED') {
+    const blockers = publishBlockers(current);
+    if (blockers.length > 0) throw validation(blockers[0]!);
+    if (current.imageFileId !== null && blankToNull(current.imageAltFa) === null) {
+      throw validation('تصویر این محتوا متن جایگزین لازم دارد.');
     }
-    const moderationNote = to === 'HIDDEN' || to === 'DELETED' ? reason : null;
+    publishAt = effectivePublishAt(input.publishAt ?? null, now);
+    firstPublishedAt = firstPublishedAt ?? publishAt;
+  } else if (to === 'DRAFT') {
+    publishAt = null;
+  }
+  const moderationNote = to === 'HIDDEN' || to === 'DELETED' ? reason : null;
 
-    const [row] = await tx
-      .update(contentItems)
-      .set({ status: to, publishAt, firstPublishedAt, moderationNote, version: current.version + 1, updatedAt: new Date() })
-      .where(and(eq(contentItems.id, current.id), eq(contentItems.version, current.version)))
-      .returning();
-    if (!row) throw conflict(STALE);
-    await recordAudit(tx, actor, {
-      action: 'CONTENT_STATUS_CHANGED',
-      targetType: TARGET,
-      targetId: row.id,
-      targetVersion: row.version,
-      before: { status: current.status, publishAt: current.publishAt },
-      after: { status: row.status, publishAt: row.publishAt },
-      reason,
-    });
-    return row;
+  const [row] = await tx
+    .update(contentItems)
+    .set({ status: to, publishAt, firstPublishedAt, moderationNote, version: current.version + 1, updatedAt: new Date() })
+    .where(and(eq(contentItems.id, current.id), eq(contentItems.version, current.version)))
+    .returning();
+  if (!row) throw conflict(STALE);
+  await recordAudit(tx, actor, {
+    action: 'CONTENT_STATUS_CHANGED',
+    targetType: TARGET,
+    targetId: row.id,
+    targetVersion: row.version,
+    before: { status: current.status, publishAt: current.publishAt },
+    after: { status: row.status, publishAt: row.publishAt },
+    reason,
   });
+  return row;
 }
 
 /** Brings an earlier revision back as a new revision; history is never rewritten. */
@@ -464,6 +503,7 @@ export async function restoreRevision(
     const { row: current, role, isOwner } = await loadForActor(tx, actor, input.contentId);
     if (!canEditContent(role, current.status, isOwner)) throw forbidden('این محتوا در این وضعیت ویرایش نمی‌شود.');
     if (current.version !== input.expectedVersion) throw conflict(STALE);
+    await assertNotRestricted(tx, role, current, 'EDIT', new Date());
     const [revision] = await tx
       .select()
       .from(contentRevisions)
@@ -678,6 +718,7 @@ export async function contentForEditing(database: DbClient, actor: Actor, conten
     moves: allowedMoves(role, row.status, isOwner),
     publicState: publicState(row, now),
     byline: bylineFor(authorProfile[0] ?? null),
+    restriction: await activeRestrictionFor(database, row.authorAccountId, now),
     revisions,
     categories,
     breeds,

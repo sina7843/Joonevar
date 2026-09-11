@@ -367,6 +367,18 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     noteFa: 'D17: فاز اول فقط ثبت درخواست است.',
     seedValue: 'در این مرحله فقط درخواست ارسال ثبت می‌شود؛ ثبت درخواست به معنی ارسال واقعی سند نیست.',
   },
+  // ── Moderation (Phase 2) ───────────────────────────────────────────────
+  {
+    key: 'moderation.report_daily_limit',
+    group: 'MODERATION',
+    kind: 'INT',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'سقف گزارش هر حساب در ۲۴ ساعت',
+    noteFa: 'سد فنی در برابر گزارش انبوه (DEC-0161)؛ پیش‌فرض قابل تغییر، نه سیاست تأییدشده مالک محصول.',
+    seedValue: 10,
+    min: 1,
+    max: 100,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(
