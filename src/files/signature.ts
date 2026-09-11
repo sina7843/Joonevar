@@ -31,6 +31,7 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   ANIMAL_PHOTO: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   CONTENT_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   VET_APPLICATION_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
+  CENTRE_CLAIM_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

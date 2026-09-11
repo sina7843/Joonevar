@@ -79,6 +79,8 @@ export const filePurpose = pgEnum('file_purpose', [
   'CONTENT_IMAGE',
   /** Council card, licence or identity proof of a veterinarian application; reviewers only (DEC-0165). */
   'VET_APPLICATION_DOCUMENT',
+  /** Licence, authorisation letter or identity proof of a centre claim (DEC-0169). */
+  'CENTRE_CLAIM_DOCUMENT',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);

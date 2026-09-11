@@ -118,6 +118,13 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
           دامپزشک را با تخصص، گونه و شهر محل کار پیدا کنید. این فهرست معرفی است؛ نوبت‌دهی و درخواست خدمت از اینجا انجام
           نمی‌شود.
         </p>
+        <p className="text-body-sm text-text-secondary">
+          دامپزشکی را اینجا پیدا نکردید؟{' '}
+          <Link href="/account/suggestions" className="text-text-brand underline underline-offset-4" data-testid="suggest-vet-link">
+            او را به همزیست معرفی کنید
+          </Link>
+          .
+        </p>
       </header>
 
       <form

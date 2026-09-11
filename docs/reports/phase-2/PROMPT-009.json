@@ -1,0 +1,91 @@
+{
+  "promptId": "PROMPT-009",
+  "status": "COMPLETE",
+  "summary": "Suggested directory records and centre claims. Migration 0023 adds directory_suggestion (one table for both VET and CENTRE suggestions, reusing the Phase 2 application status enum), centre_claim with its private documents, the CENTRE_CLAIM_DOCUMENT file purpose and a moderation.suggestion_daily_limit setting. Any signed-in account may report that a veterinarian or centre exists, with a name, a city and the source of the information; records with the same name are shown first and, when one of them is published without an owner, the user is sent to claim it instead of suggesting a duplicate. Three open suggestions per account and a daily ceiling read from settings hold back a flood. The review operator — never the suggester, always with a reason — approves, asks for a correction or rejects; approval creates the record unowned and published (a veterinarian without a council code or verification, a centre typed «other» until a reviewer refines it) and notifies the suggester, who gains no ownership by suggesting. A representative claims an unowned centre from its own public page with their name, role and at least one document (licence, authorisation letter or identity), readable only by them and the reviewers; one open claim per centre and per account. Approval writes the owner only while the centre is still unowned, so competing approvals cannot both win, and the centre's earlier audit entries stay untouched — the claim moves future editing, not the history. A rejection may be appealed once; a correction is answered on the same record; withdrawal archives it.",
+  "changedFiles": [
+    "src/db/schema/vets.ts",
+    "src/db/schema/enums.ts",
+    "src/db/migrations/0023_suggestions-claims.sql",
+    "src/db/migrations/meta/0023_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/authz/policy.ts",
+    "src/files/signature.ts",
+    "src/settings/keys.ts",
+    "src/domain/resume-context.ts",
+    "src/ui/shell.tsx",
+    "src/suggestions/model.ts",
+    "src/suggestions/service.ts",
+    "src/suggestions/actions.ts",
+    "src/suggestions/forms.tsx",
+    "src/centres/claims.ts",
+    "app/account/suggestions/page.tsx",
+    "app/account/centres/claim/[slug]/page.tsx",
+    "app/account/centres/claims/page.tsx",
+    "app/review/suggestions/(list)/page.tsx",
+    "app/review/suggestions/(list)/loading.tsx",
+    "app/review/suggestions/[id]/page.tsx",
+    "app/review/centres/claims/(list)/page.tsx",
+    "app/review/centres/claims/(list)/loading.tsx",
+    "app/review/centres/claims/[id]/page.tsx",
+    "app/(public)/centers/[slug]/page.tsx",
+    "app/(public)/centers/(list)/page.tsx",
+    "app/(public)/veterinarians/(list)/page.tsx",
+    "tests/domain/suggestions.test.ts",
+    "tests/db/suggestions.test.ts",
+    "tests/browser/suggestions.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-009-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-009/suggestion-submitted-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-009/review-suggestion.png",
+    "docs/reports/screenshots/phase-2/prompt-009/claim-form-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-009/review-claim.png",
+    "docs/reports/screenshots/phase-2/prompt-009/centre-claimed.png"
+  ],
+  "decisions": ["DEC-0169"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, before and after npm run build (generated .next route types included)."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0; /account/suggestions, /account/centres/claim/[slug], /account/centres/claims, /review/suggestions, /review/suggestions/[id], /review/centres/claims and /review/centres/claims/[id] built."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/suggestions.test.ts tests/domain/centres.test.ts tests/ui/routes.test.ts tests/ui/seo.test.ts && node --test --test-concurrency=1 tests/db/suggestions.test.ts tests/db/centres.test.ts tests/db/settings.test.ts tests/db/migrations.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction to not re-run unaffected suites that already passed. Unit: tests 37 · pass 37 · fail 0 (new tests/domain/suggestions.test.ts: a suggestion needs a name of at least three characters, a city and a source; a claim needs the representative, their role and between one and five documents). Database on a freshly migrated database: tests 29 · pass 29 · fail 0, of which tests/db/suggestions.test.ts 6/6 (suggesting refused from an operational context and without a name, city, source or valid kind; a draft record with the same name must be confirmed past, while a published unowned one sends the user to claim instead, and similarRecords reports it as published and unowned; three open suggestions allowed and the fourth refused, withdrawal frees the open slots but still counts against the daily ceiling of five, after which RATE_LIMITED; only the review operator decides, never their own suggestion, always with a reason, a correction notifies the suggester with the return route and entity DIRECTORY_SUGGESTION, another account cannot resubmit, a decision on the older version is refused, approval publishes an unowned centre with the suggested city and source and a centre-[10 hex] address and cannot be repeated, and the suggester is not its owner; an approved veterinarian suggestion becomes an unowned profile with no council code and no verification; a claim stores its documents as CENTRE_CLAIM_DOCUMENT readable by the claimant, reviewer and superadmin but not by another account or a content admin, with one open claim per centre and per account; an approved claim writes the owner and claimed_at on the same record and address, keeps the centre's CENTRE_CREATED history and adds CENTRE_CLAIMED with the previous value, notifies the claimant, lets the new manager edit the centre, and makes it neither claimable nor decidable again; a rejected claim is appealed once and a second appeal is refused, and withdrawal archives it). tests/db/centres.test.ts, tests/db/settings.test.ts and tests/db/migrations.test.ts cover the centre service, the new setting and the migration. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run test:browser -- tests/browser/suggestions.test.ts && npm run test:browser -- tests/browser/centres.test.ts tests/browser/vet-directory.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/suggestions.test.ts 3/3 on hamzist_browser_9b5df52c42ba at 127.0.0.1:13084: a phone-width user suggests a centre with its city and source and sees «در انتظار بررسی» with no sideways scroll; the review operator asks for a correction, the user answers it on the same record and it returns to review; approval publishes the record and a visitor finds it in /centers with the «بدون مالک» badge, its listed city on the page, and a claim link that sends an anonymous visitor to sign-in with the exact next path; the representative claims it with a licence file and sees «در حال بررسی»; the reviewer reads that document over /api/files (200, image/png) and approves, after which the claimant's own centre page reports «دارای مدیر» and the public page no longer says unowned; the review environment answers FORBIDDEN to an ordinary account and /account/suggestions sends an anonymous visitor to sign-in with the exact next path. Regression on the same build: tests/browser/centres.test.ts and tests/browser/vet-directory.test.ts 7/7 on hamzist_browser_0d95018757d2 (the centre page gained the claim link and both directory lists gained the «suggest a record» link). Two earlier failures in the new suite were test problems, not product defects, and were fixed in the test: the correction page legitimately shows both the new-suggestion form and the correction form, so the field locators are scoped to their form; and a successful correction removes that form, so the test now waits for the status badge that stays. Screenshots regenerated for earlier prompts by the regression suites were restored; only prompt-009 evidence is new. Suites not re-run are unaffected; last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "A veterinarian claim lives in vet_application (PROMPT-007) and a centre claim in centre_claim: the two review queues stay separate, and unifying them is left to the admin panel of PROMPT-016 (DEC-0169).",
+    "Merging duplicate records (§21) is not built: a duplicate is refused or confirmed past at submission and approval, but two records that already exist cannot be merged yet.",
+    "An approved veterinarian suggestion carries no council code and no professional verification; those arrive only when the veterinarian claims the profile through PROMPT-007.",
+    "A suggested centre is typed «سایر مراکز» until a reviewer sets its real kind on the centre itself; the suggestion form does not ask for a type.",
+    "A suggestion has correction and withdrawal but no appeal; only claims may be appealed once.",
+    "The three-open-suggestions rule and the daily ceiling are technical defaults, not an approved product policy; the superadmin changes the ceiling from settings.",
+    "Reporting a suggested record and centre images remain out of scope (PROMPT-016, and the image pipeline of DEC-0160).",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the suggestion and claim pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "SUGGESTION_CLAIM_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

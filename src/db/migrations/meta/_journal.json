@@ -162,6 +162,13 @@
       "when": 1789165450271,
       "tag": "0022_centres",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1789167523855,
+      "tag": "0023_suggestions-claims",
+      "breakpoints": true
     }
   ]
 }

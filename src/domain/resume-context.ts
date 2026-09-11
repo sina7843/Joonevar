@@ -35,7 +35,9 @@ export type EntityType =
   | 'CONTENT_ITEM'
   | 'VET_APPLICATION'
   | 'CENTRE'
-  | 'CENTRE_MEMBER';
+  | 'CENTRE_MEMBER'
+  | 'DIRECTORY_SUGGESTION'
+  | 'CENTRE_CLAIM';
 
 export interface EntityRef {
   readonly type: EntityType;

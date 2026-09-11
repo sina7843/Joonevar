@@ -379,6 +379,17 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     min: 1,
     max: 100,
   },
+  {
+    key: 'moderation.suggestion_daily_limit',
+    group: 'MODERATION',
+    kind: 'INT',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'سقف پیشنهاد ثبت دامپزشک یا مرکز در ۲۴ ساعت',
+    noteFa: 'سد فنی در برابر پیشنهاد انبوه (DEC-0169)؛ پیش‌فرض قابل تغییر، نه سیاست تأییدشده مالک محصول.',
+    seedValue: 5,
+    min: 1,
+    max: 50,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(

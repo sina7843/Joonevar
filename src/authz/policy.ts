@@ -88,7 +88,8 @@ export type FilePurposeName =
   | 'GENETICS_RECEIPT'
   | 'ANIMAL_PHOTO'
   | 'CONTENT_IMAGE'
-  | 'VET_APPLICATION_DOCUMENT';
+  | 'VET_APPLICATION_DOCUMENT'
+  | 'CENTRE_CLAIM_DOCUMENT';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -100,6 +101,8 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   CONTENT_IMAGE: ['CONTENT_ADMIN'],
   // Council card and identity proof of a veterinarian application: its reviewers only (DEC-0165).
   VET_APPLICATION_DOCUMENT: ['REVIEW_OPERATOR', 'SUPERADMIN'],
+  // Proof that a representative may speak for a centre: its reviewers only (DEC-0169).
+  CENTRE_CLAIM_DOCUMENT: ['REVIEW_OPERATOR', 'SUPERADMIN'],
 };
 
 export function canReadFile(

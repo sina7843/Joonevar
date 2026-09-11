@@ -288,6 +288,8 @@ export const REVIEW_NAV: readonly NavItem[] = [
   { href: '/review/vets', label: 'درخواست‌های دامپزشک', icon: 'listChecks' },
   { href: '/review/vets/unowned', label: 'پروفایل‌های بدون مالک', icon: 'firstAidKit' },
   { href: '/review/centres', label: 'مراکز دامپزشکی', icon: 'mapPin' },
+  { href: '/review/centres/claims', label: 'Claim مراکز', icon: 'shieldCheck' },
+  { href: '/review/suggestions', label: 'پیشنهادهای کاربران', icon: 'uploadSimple' },
 ];
 
 /** Content admin environment. */

@@ -111,7 +111,14 @@ export default async function CentrePage({ params }: Params) {
       {page.owned ? null : (
         <div data-testid="centre-unowned">
           <Alert tone="info" title="این مرکز بدون مالک است">
-            اطلاعات این صفحه از منبع عمومی ثبت و بررسی شده است و هنوز هیچ مدیری آن را به عهده نگرفته است.
+            اطلاعات این صفحه از منبع عمومی ثبت و بررسی شده است و هنوز هیچ مدیری آن را به عهده نگرفته است.{' '}
+            <Link
+              href={'/account/centres/claim/' + page.slug}
+              className="text-text-brand underline underline-offset-4"
+              data-testid="centre-claim-link"
+            >
+              این مرکز شماست؟ درخواست مدیریت
+            </Link>
           </Alert>
         </div>
       )}

@@ -116,6 +116,13 @@ export default async function CentersPage({ searchParams }: { searchParams: Prom
         <p className="max-w-2xl text-body-md text-text-secondary">
           مرکز را با نوع، خدمت، گونه و شهر پیدا کنید. این فهرست معرفی است؛ نوبت‌دهی و درخواست خدمت از اینجا انجام نمی‌شود.
         </p>
+        <p className="text-body-sm text-text-secondary">
+          مرکزی را اینجا پیدا نکردید؟{' '}
+          <Link href="/account/suggestions" className="text-text-brand underline underline-offset-4" data-testid="suggest-centre-link">
+            آن را به همزیست معرفی کنید
+          </Link>
+          .
+        </p>
       </header>
 
       <form

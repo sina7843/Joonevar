@@ -84,7 +84,7 @@
 | محور | منبع |
 |---|---|
 | Completeness | محاسبه از فیلدهای پروفایل |
-| Ownership/Claim | `vet_profile.account_id` و `claimed_at`؛ درخواست‌ها در `vet_application` (007، DEC-0165/0166)؛ مرکز 009 |
+| Ownership/Claim | `vet_profile.account_id` و `centre.owner_account_id` با `claimed_at`؛ درخواست‌ها در `vet_application` (007) و `centre_claim` (009)؛ پیشنهاد کاربر در `directory_suggestion` (DEC-0169) |
 | Professional Verification | `vet_profile.council_verified_at`؛ برای مرکز `centre.licence_status`/`licence_verified_at` که فقط بررسی ثبت می‌کند (DEC-0168) |
 | Trusted Hamzist | نقش `TRUSTED_VET` فعال (فاز یک) |
 | Advertising | اشتراک بسته (011) |

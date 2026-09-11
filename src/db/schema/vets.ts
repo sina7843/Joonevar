@@ -574,3 +574,114 @@ export const locationHours = pgTable(
   },
   (t) => [uniqueIndex('location_hours_day_key').on(t.locationId, t.weekday)],
 );
+
+// ── Suggested records and centre claims (Phase 2, PROMPT-009) ──────────────
+
+/** What an ordinary user suggested: a veterinarian or a centre (§10). */
+export const suggestionKind = pgEnum('suggestion_kind', ['VET', 'CENTRE']);
+
+/**
+ * A record an ordinary user says exists. It is never published as written:
+ * a reviewer decides, and approval creates the unowned record (DEC-0169).
+ * The application statuses of PROMPT-007 are reused, so every queue in the
+ * review environment reads with the same words.
+ */
+export const directorySuggestions = pgTable(
+  'directory_suggestion',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    kind: suggestionKind('kind').notNull(),
+    submittedByAccountId: uuid('submitted_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    displayNameFa: text('display_name_fa').notNull(),
+    cityId: uuid('city_id')
+      .notNull()
+      .references(() => cities.id, { onDelete: 'restrict' }),
+    /** Public contact or address the suggester saw. */
+    contactFa: text('contact_fa'),
+    /** Where the information came from. Internal, never shown publicly. */
+    sourceFa: text('source_fa').notNull(),
+    noteFa: text('note_fa'),
+    status: vetApplicationStatus('status').notNull().default('SUBMITTED'),
+    reviewNoteFa: text('review_note_fa'),
+    reviewedByAccountId: uuid('reviewed_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    /** The record approval created, so a suggestion points at its result. */
+    createdVetProfileId: uuid('created_vet_profile_id').references((): AnyPgColumn => vetProfiles.id, { onDelete: 'restrict' }),
+    createdCentreId: uuid('created_centre_id').references((): AnyPgColumn => centres.id, { onDelete: 'restrict' }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    index('directory_suggestion_status_idx').on(t.status, t.createdAt),
+    index('directory_suggestion_account_idx').on(t.submittedByAccountId, t.createdAt),
+  ],
+);
+
+export const centreClaimDocumentKind = pgEnum('centre_claim_document_kind', [
+  'CENTRE_LICENCE',
+  'AUTHORIZATION_LETTER',
+  'IDENTITY',
+  'OTHER',
+]);
+
+/**
+ * A representative asking for the management of an unowned centre. Approval
+ * transfers who may edit from now on; the centre's history stays as recorded
+ * (§10, DEC-0166).
+ */
+export const centreClaims = pgTable(
+  'centre_claim',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    centreId: uuid('centre_id')
+      .notNull()
+      .references((): AnyPgColumn => centres.id, { onDelete: 'restrict' }),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    claimantNameFa: text('claimant_name_fa').notNull(),
+    /** What the claimant says they are at that centre; free text, never a title the product invents. */
+    roleFa: text('role_fa').notNull(),
+    phone: text('phone'),
+    statementFa: text('statement_fa'),
+    status: vetApplicationStatus('status').notNull().default('SUBMITTED'),
+    reviewNoteFa: text('review_note_fa'),
+    reviewedByAccountId: uuid('reviewed_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    appealFa: text('appeal_fa'),
+    appealedAt: timestamp('appealed_at', { withTimezone: true }),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull().default(now),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    index('centre_claim_status_idx').on(t.status, t.submittedAt),
+    // One open claim per centre, and one open claim per account.
+    uniqueIndex('centre_claim_open_centre_key')
+      .on(t.centreId)
+      .where(sql`${t.status} in ('SUBMITTED', 'NEEDS_CORRECTION')`),
+    uniqueIndex('centre_claim_open_account_key')
+      .on(t.accountId)
+      .where(sql`${t.status} in ('SUBMITTED', 'NEEDS_CORRECTION')`),
+  ],
+);
+
+export const centreClaimDocuments = pgTable(
+  'centre_claim_document',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    claimId: uuid('claim_id')
+      .notNull()
+      .references(() => centreClaims.id, { onDelete: 'restrict' }),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => storedFiles.id, { onDelete: 'restrict' }),
+    kind: centreClaimDocumentKind('kind').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('centre_claim_document_file_key').on(t.fileId), index('centre_claim_document_claim_idx').on(t.claimId)],
+);
