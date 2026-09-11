@@ -7,7 +7,7 @@ Managed by `node tools/runner.mjs --phase 2 …` (DEC-0142). A row is marked onl
 - [x] PROMPT-003 — گونه‌ها و بانک نژاد سگ <!-- work-commit:077253cfe7c046c714ae84e141080a78312bebb6 -->
 - [x] PROMPT-004 — CMS و نقش نویسنده <!-- work-commit:7c74577798474502779613e2735bca9dfb4ac40a -->
 - [x] PROMPT-005 — گزارش محتوا و Moderation <!-- work-commit:7890d9eafd4e794fe7efa3bc96de8641aa8e9f25 -->
-- [ ] PROMPT-006 — پروفایل عمومی دامپزشک
+- [x] PROMPT-006 — پروفایل عمومی دامپزشک <!-- work-commit:5c7fcf7060225453dfb9d498d8f9a2d30420ec31 -->
 - [ ] PROMPT-007 — ثبت‌نام و Claim دامپزشک
 - [ ] PROMPT-008 — دایرکتوری مراکز دامپزشکی
 - [ ] PROMPT-009 — پیشنهاد و Claim مرکز
