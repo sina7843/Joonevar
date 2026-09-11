@@ -26,6 +26,7 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/about', access: 'PUBLIC' },
   { prefix: '/veterinarians', access: 'PUBLIC' },
   { prefix: '/centers', access: 'PUBLIC' },
+  { prefix: '/associations', access: 'PUBLIC' },
   { prefix: '/breeds', access: 'PUBLIC' },
   { prefix: '/articles', access: 'PUBLIC' },
   { prefix: '/news', access: 'PUBLIC' },

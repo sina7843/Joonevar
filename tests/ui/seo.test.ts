@@ -142,7 +142,7 @@ test('only built sections are linked; each is public and every planned one stays
   }
   assert.deepEqual(
     liveSections().map((section) => section.href),
-    ['/', '/veterinarians', '/centers', '/breeds', '/articles', '/news', '/about'],
+    ['/', '/veterinarians', '/centers', '/breeds', '/articles', '/news', '/associations', '/about'],
   );
 });
 

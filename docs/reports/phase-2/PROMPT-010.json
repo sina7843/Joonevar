@@ -1,0 +1,97 @@
+{
+  "promptId": "PROMPT-010",
+  "status": "COMPLETE",
+  "summary": "Associations and clubs. Migration 0024 adds community with its species, breeds, managers and events, plus a community_id on content_item so a club post is an ordinary CMS item rather than a second news system. The two kinds share one profile but never share their rules: only an association carries a registration number and licence status, recorded with a reason by the superadmin or the review operator and never by the record's own manager, and only a club may write posts — and only while the superadmin has granted the direct-publishing permission, which is refused for an association, notifies the club's manager and stops all writing again when revoked. A club post keeps the CMS revisions, reports, moderation and audit; its own statuses are DRAFT, PUBLISHED and ARCHIVED, while HIDDEN and DELETED stay the content admin's decision and cannot be undone from the club's screen. Managers are invited by mobile number and are named on the public page only after they accept, and accepting management is not owning the record; ownership is handed over by the superadmin with a reason, exactly as for a centre. Events keep the dates they were given, are 'upcoming' by their last day at read time with no scheduler, and a cancelled event keeps its reason in public. Publication needs an introduction and one way to get in touch; the review operator's hiding sets hidden_by_review, which the manager cannot undo, and the public address (assoc-/club- plus 10 hex) survives being hidden. Membership itself stays outside Hamzist: the page shows only the community's own conditions and link, and says so. Two defects found by the new tests were fixed in the product: a Jamali date typed into the Gregorian event field parsed as a valid Gregorian date (years before 1900 are now refused), and the club post page answered 404 for its Persian slug because it did not decode the percent-encoded parameter the way the CMS pages do (decodeSlug is now exported and reused).",
+  "changedFiles": [
+    "src/db/schema/communities.ts",
+    "src/db/schema/content.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0024_communities.sql",
+    "src/db/migrations/meta/0024_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/authz/routes.ts",
+    "src/content/service.ts",
+    "src/content/public-views.tsx",
+    "src/domain/resume-context.ts",
+    "src/public/sections.ts",
+    "src/seo/sitemap.ts",
+    "src/ui/shell.tsx",
+    "src/communities/model.ts",
+    "src/communities/service.ts",
+    "src/communities/posts.ts",
+    "src/communities/actions.ts",
+    "src/communities/forms.tsx",
+    "src/communities/editor.tsx",
+    "app/admin/communities/(list)/page.tsx",
+    "app/admin/communities/[id]/page.tsx",
+    "app/review/communities/(list)/page.tsx",
+    "app/review/communities/(list)/loading.tsx",
+    "app/review/communities/[id]/page.tsx",
+    "app/account/communities/page.tsx",
+    "app/account/communities/[id]/page.tsx",
+    "app/(public)/associations/(list)/page.tsx",
+    "app/(public)/associations/(list)/loading.tsx",
+    "app/(public)/associations/[slug]/page.tsx",
+    "app/(public)/associations/[slug]/posts/[postSlug]/page.tsx",
+    "tests/domain/communities.test.ts",
+    "tests/db/communities.test.ts",
+    "tests/browser/communities.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "tests/ui/seo.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-010-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-010/admin-community.png",
+    "docs/reports/screenshots/phase-2/prompt-010/manager-invitation.png",
+    "docs/reports/screenshots/phase-2/prompt-010/club-posts.png",
+    "docs/reports/screenshots/phase-2/prompt-010/directory-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-010/community-public.png",
+    "docs/reports/screenshots/phase-2/prompt-010/community-post.png",
+    "docs/reports/screenshots/phase-2/prompt-010/review-hidden.png",
+    "docs/reports/screenshots/phase-2/prompt-010/forbidden.png"
+  ],
+  "decisions": ["DEC-0170"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: compiled successfully, exit 0. Nine new routes: /associations, /associations/[slug], /associations/[slug]/posts/[postSlug], /admin/communities, /admin/communities/[id], /review/communities, /review/communities/[id], /account/communities and /account/communities/[id]."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/communities.test.ts tests/db/communities.test.ts tests/db/content.test.ts tests/db/migrations.test.ts tests/ui/routes.test.ts tests/ui/seo.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. tests 56 · pass 56 · fail 0. tests/domain/communities.test.ts: a scope that names a place or a breed must name one; only a club with the granted permission publishes; an event keeps its dates and its last day decides whether it is upcoming (a Jamali date typed into the Gregorian field is refused); completeness counts seven items while publishing needs only an introduction and a contact; a registration is shown only as recorded. tests/db/communities.test.ts on a freshly migrated database: an ordinary account cannot record a community and an operator cannot record one without a reason, a second record with the same name and kind needs an explicit confirmation; the reviewer does not write the profile, a provincial scope needs a province, a breed scope needs a breed, the province follows the chosen city, and a stale expectedVersion is CONFLICT; a registration is refused without a number, refused entirely for a club, and audited with its before/after and reason; only the superadmin grants or revokes the publishing permission (the reviewer and the owner are both refused), the club's manager is notified, an association is refused and a second handover is CONFLICT; publication is refused without an introduction, the published slug matches assoc-[10 hex], the reviewer's hiding sets hidden_by_review so the owner cannot republish while the reviewer can, and the public address survives; a manager invitation reaches only its own account, acceptance is single-use, the owner sees the record among their own, and removal is single-use; an event refuses an end before its start and a bad date shape, a cancellation without a reason is refused, and the public page keeps the cancellation reason and marks past events not upcoming; a club writes nothing before the permission, another account cannot write for it, publishing needs a summary and body, the public post and page read back, what the content admin hid cannot be edited or republished from the club and disappears from the public address, and revoking the permission stops writing again; the public directory lists only published records with its kind, breed, name and province filters, the sitemap carries the published address, and unknown or badly shaped addresses are simply not found. tests/db/content.test.ts and tests/db/migrations.test.ts cover the changed content schema and the new migration; tests/ui/routes.test.ts and tests/ui/seo.test.ts cover the route map and the now-live /associations section. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/communities.test.ts && node tools/browser-tests.mjs tests/browser/content.test.ts tests/browser/public-shell.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/communities.test.ts 6/6: the superadmin records a club, is refused a breed scope without a breed, completes the profile, invites a manager and sees «در انتظار پذیرش»; the invited account accepts from its own phone-width screen and the record then shows «تأییدشده» without becoming theirs; the club post form does not exist until the superadmin grants the permission, after which a draft is written, published and the community page goes public; a phone-width visitor filters /associations, reads the club page with its membership note and published event, and opens the club post at its Persian address (200); the review operator hides the page and the same address then answers a real 404; an ordinary account is refused both management environments. Regression on the same build: tests/browser/content.test.ts and tests/browser/public-shell.test.ts 10/10 (the CMS is unchanged by the new community_id column, and the public shell now links /associations as a built section). Two failures in the new suite were real product defects and were fixed in the product, not the test: the Gregorian event date accepted a Jamali date, and the club post page did not decode its percent-encoded Persian slug. Note for later prompts: tools/browser-tests.mjs does not build — it runs next start against the existing .next (line 41), so three runs after the second fix still served the stale build and repeated the same 404 until npm run build was run. Screenshots regenerated for prompts 002 and 004 by the regression were restored with git checkout; only prompt-010 evidence is new. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "A representative cannot claim an association or club: ownership is handed over by the superadmin with a mobile number and a reason, as for a centre before PROMPT-009, and the claim flow is left to PROMPT-016 (DEC-0170).",
+    "Merging duplicate records (§21) is not built; only recording a duplicate name requires an explicit confirmation.",
+    "Membership and event registration happen outside Hamzist: the page keeps only the announced conditions and link, and Hamzist neither takes nor confirms a membership.",
+    "The public list and its filters run in memory over published records; the indexed search arrives with PROMPT-012.",
+    "Advertising packages for these records arrive with PROMPT-011; the advertising axis currently states only that no package is active.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the association, club and club-post pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "COMMUNITY_DIRECTORY_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

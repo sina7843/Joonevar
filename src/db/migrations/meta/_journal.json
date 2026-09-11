@@ -169,6 +169,13 @@
       "when": 1789167523855,
       "tag": "0023_suggestions-claims",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1789168932909,
+      "tag": "0024_communities",
+      "breakpoints": true
     }
   ]
 }

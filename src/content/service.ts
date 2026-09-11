@@ -136,7 +136,7 @@ export type ContentSnapshot = Pick<ContentRow, SnapshotField>;
 const snapshotOf = (row: ContentRow): ContentSnapshot =>
   Object.fromEntries(SNAPSHOT_FIELDS.map((field) => [field, row[field]])) as ContentSnapshot;
 
-async function writeRevision(tx: DbClient, actor: Actor, row: ContentRow, note: string | null): Promise<void> {
+export async function writeRevision(tx: DbClient, actor: Actor, row: ContentRow, note: string | null): Promise<void> {
   await tx.insert(contentRevisions).values({
     contentId: row.id,
     number: row.revisionNumber,

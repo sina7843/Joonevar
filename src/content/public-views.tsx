@@ -42,7 +42,8 @@ const pathOf = (kind: PublicKind): string => KIND_PATH[kind]!;
 type Search = Promise<{ category?: string | string[]; page?: string | string[] }>;
 const one = (value: string | string[] | undefined): string => (Array.isArray(value) ? value[0] : value) ?? '';
 
-function decodeSlug(raw: string): string | null {
+/** A Persian slug arrives percent-encoded in the address; every content page decodes it before matching. */
+export function decodeSlug(raw: string): string | null {
   try {
     return decodeURIComponent(raw);
   } catch {

@@ -272,6 +272,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin/settings', label: 'تنظیمات', icon: 'listChecks' },
   { href: '/admin/vets', label: 'دامپزشکان معتمد', icon: 'firstAidKit' },
   { href: '/admin/centres', label: 'مراکز دامپزشکی', icon: 'mapPin' },
+  { href: '/admin/communities', label: 'انجمن و کلاب', icon: 'user' },
   { href: '/admin/breeds', label: 'نژادها', icon: 'dog' },
   { href: '/admin/roles', label: 'نقش‌های محتوا', icon: 'shieldCheck' },
   { href: '/admin/audit', label: 'تاریخچه', icon: 'clipboardText' },
@@ -289,6 +290,7 @@ export const REVIEW_NAV: readonly NavItem[] = [
   { href: '/review/vets/unowned', label: 'پروفایل‌های بدون مالک', icon: 'firstAidKit' },
   { href: '/review/centres', label: 'مراکز دامپزشکی', icon: 'mapPin' },
   { href: '/review/centres/claims', label: 'Claim مراکز', icon: 'shieldCheck' },
+  { href: '/review/communities', label: 'انجمن و کلاب', icon: 'user' },
   { href: '/review/suggestions', label: 'پیشنهادهای کاربران', icon: 'uploadSimple' },
 ];
 

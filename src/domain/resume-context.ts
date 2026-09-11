@@ -37,7 +37,9 @@ export type EntityType =
   | 'CENTRE'
   | 'CENTRE_MEMBER'
   | 'DIRECTORY_SUGGESTION'
-  | 'CENTRE_CLAIM';
+  | 'CENTRE_CLAIM'
+  | 'COMMUNITY'
+  | 'COMMUNITY_MANAGER';
 
 export interface EntityRef {
   readonly type: EntityType;

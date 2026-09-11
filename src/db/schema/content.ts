@@ -22,6 +22,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import { accounts, referenceBreeds, species, storedFiles } from './core.ts';
+import { communities } from './communities.ts';
 import { contentKind, contentStatus } from './enums.ts';
 import type { ContentSource } from '../../content/model.ts';
 
@@ -60,6 +61,8 @@ export const contentItems = pgTable(
     categoryId: uuid('category_id').references(() => contentCategories.id, { onDelete: 'restrict' }),
     speciesCode: text('species_code').references(() => species.code, { onDelete: 'restrict' }),
     breedId: uuid('breed_id').references(() => referenceBreeds.id, { onDelete: 'restrict' }),
+    /** A club post belongs to its club; every other kind leaves this empty (PROMPT-010). */
+    communityId: uuid('community_id').references(() => communities.id, { onDelete: 'restrict' }),
 
     titleFa: text('title_fa').notNull(),
     summaryFa: text('summary_fa').notNull().default(''),
