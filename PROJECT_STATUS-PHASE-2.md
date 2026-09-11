@@ -2,7 +2,7 @@
 
 Managed by `node tools/runner.mjs --phase 2 …` (DEC-0142). A row is marked only by `complete` after the committed report in `docs/reports/phase-2/` passes the Runner's evidence check; the verified work hash is inserted here and recorded in a separate progress commit.
 
-- [ ] PROMPT-001 — کشف وضعیت فاز یک و تثبیت مرز فاز دو
+- [x] PROMPT-001 — کشف وضعیت فاز یک و تثبیت مرز فاز دو <!-- work-commit:51cf713178ffbd003d370867b5fbe66a51cc59bf -->
 - [ ] PROMPT-002 — زیرساخت عمومی، SEO و پوسته فارسی
 - [ ] PROMPT-003 — گونه‌ها و بانک نژاد سگ
 - [ ] PROMPT-004 — CMS و نقش نویسنده
