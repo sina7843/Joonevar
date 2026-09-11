@@ -238,13 +238,9 @@ test('two scanners racing on one code produce exactly one check-in', async () =>
 
     assert.equal(results.filter((r) => r.ok).length, 1);
     for (const loser of results.filter((r) => !r.ok)) {
-      // Depending on where the loser was when the winner committed, it sees the
-      // code as used or the request as no longer waiting. Both are refusals;
-      // what matters is that neither is a second acceptance.
-      assert.ok(
-        loser.ok === false && ['CONSUMED', 'REQUEST_NOT_ACTIVE'].includes(loser.rejection),
-        'unexpected rejection: ' + (loser.ok === false ? loser.rejection : ''),
-      );
+      // Wherever the loser was when the winner committed, it reads the code and
+      // its request together, so it is always told the code was used (DEC-0147).
+      assert.equal(loser.ok === false ? loser.rejection : 'ACCEPTED', 'CONSUMED');
     }
 
     const [request] = await ctx.testDb.db

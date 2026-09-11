@@ -5,8 +5,19 @@ import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import crypto from 'node:crypto';
 const root=path.resolve(process.env.PROMPT_STARTER_ROOT || path.join(path.dirname(fileURLToPath(import.meta.url)),'..'));
-const stateDir=path.join(root,'.runner');
-const statusFile=path.join(root,'PROJECT_STATUS.md');
+const argv=process.argv.slice(2);
+const phaseAt=argv.indexOf('--phase');
+const phaseName=phaseAt<0?'1':argv.splice(phaseAt,2)[1];
+// ponytail: two phases hardcoded; move this table to starter.config.json if a third package arrives.
+const PHASES={
+ '1':{prompts:'prompts',status:'PROJECT_STATUS.md',state:'.runner',reports:'docs/reports',checks:[]},
+ '2':{prompts:'prompts-2',status:'PROJECT_STATUS-PHASE-2.md',state:'.runner/phase-2',reports:'docs/reports/phase-2',checks:['typecheck','build','product-tests','browser-tests']},
+};
+const phase=PHASES[phaseName];
+if(!phase){console.error('ERROR: Unknown phase: '+phaseName);process.exit(1);}
+const stateDir=path.join(root,phase.state);
+const statusFile=path.join(root,phase.status);
+const manifestFile=path.join(root,phase.prompts,'prompt-manifest.json');
 const stateFile=path.join(stateDir,'state.json');
 const lockFile=path.join(stateDir,'plan.lock');
 const outputFile=path.join(stateDir,'current-prompt.txt');
@@ -19,8 +30,13 @@ function git(args){const r=run('git',args);if(r.error||r.status!==0)fail(`git ${
 function head(){const r=run('git',['rev-parse','--verify','HEAD']);return r.status===0?r.stdout.trim():null;}
 function repoRoot(){const r=run('git',['rev-parse','--show-toplevel']);return r.status===0?path.resolve(r.stdout.trim()):null;}
 function assertRepo(){if(repoRoot()!==root)fail('Run this package from the target Git repository root. Existing worktrees are supported. Do not run inside an unrelated parent repository.');}
-function manifest(){const m=JSON.parse(read(path.join(root,'prompts/prompt-manifest.json')));if(!Array.isArray(m.prompts)||!m.prompts.length)fail('Invalid manifest');return m;}
-function fingerprint(){return hash(read(path.join(root,'prompts/prompt-manifest.json')));}
+// The phase 2 package manifest carries bare ids ("001"), a "prompts/" path and no dependency or check lists.
+// It is normalised here rather than edited, so the delivered package stays byte-identical. Phase 1 is unchanged by this.
+function manifest(){const m=JSON.parse(read(manifestFile));if(!Array.isArray(m.prompts)||!m.prompts.length)fail('Invalid manifest');
+ const pid=x=>/^\d+$/.test(x)?'PROMPT-'+x:x;
+ m.prompts=m.prompts.map((p,i,a)=>({...p,id:pid(p.id),file:path.basename(p.file),dependsOn:p.dependsOn??(i?[pid(a[i-1].id)]:[]),requiredChecks:p.requiredChecks??phase.checks}));
+ m.project??='Hamzist phase '+phaseName;return m;}
+function fingerprint(){return hash(read(manifestFile));}
 function locked(){if(!fs.existsSync(lockFile))fail('Run setup first; plan is not locked.');if(JSON.parse(read(lockFile)).manifestHash!==fingerprint())fail('Manifest changed after setup; inspect the intentional plan change before proceeding.');}
 function state(){return fs.existsSync(stateFile)?JSON.parse(read(stateFile)):{};}
 function save(s){write(stateFile,JSON.stringify({...s,updatedAt:new Date().toISOString()},null,2)+'\n');}
@@ -44,10 +60,11 @@ function prepare(raw){
  if(s.currentPrompt&&s.currentPrompt!==p.id)fail(`Finish or checkpoint current ${s.currentPrompt} before preparing a different prompt.`);
  const previous=m.prompts.slice(0,m.prompts.indexOf(p));
  if(previous.some(x=>f.map.get(x.id))){
-  const r=run('git',['diff','HEAD','--','PROJECT_STATUS.md']);if(r.status!==0||r.stdout.trim())fail('Commit pending PROJECT_STATUS.md progress before preparing the next prompt.');
+  const r=run('git',['diff','HEAD','--',phase.status]);if(r.status!==0||r.stdout.trim())fail(`Commit pending ${phase.status} progress before preparing the next prompt.`);
  }
- const text=read(path.join(root,'prompts',p.file));const body=/```text\s*\r?\n([\s\S]*?)\r?\n```/.exec(text);if(!body)fail('Missing prompt text');
- write(outputFile,body[1].trim()+'\n');
+ const text=read(path.join(root,phase.prompts,p.file));const body=/```text\s*\r?\n([\s\S]*?)\r?\n```/.exec(text);
+ // Phase 2 prompts are plain Markdown with no fenced text block: the whole file is the prompt.
+ write(outputFile,(body?body[1]:text).trim()+'\n');
  if(s.currentPrompt!==p.id)save({currentPrompt:p.id,startHead:head(),preparedAt:new Date().toISOString()});
  log({event:'prepared',prompt:p.id});console.log(`Prepared ${p.id}: ${p.title}\n${outputFile}\nClaude executes, verifies, commits, then runs complete. No manual user approval gate.`);
 }
@@ -61,7 +78,7 @@ function complete(args){
  if(sha===s.startHead)fail('No new work commit since prepare.');
  if(s.startHead){const anc=run('git',['merge-base','--is-ancestor',s.startHead,sha]);if(anc.status!==0)fail('Work commit must descend from prepared HEAD.');}
  const msg=git(['show','-s','--format=%B',sha]);if(!msg.includes(pid))fail('Work commit message must include '+pid);
- const reportPath=`docs/reports/${pid}.json`;
+ const reportPath=`${phase.reports}/${pid}.json`;
  let report;try{report=JSON.parse(git(['show',sha+':'+reportPath]));}catch{fail('A valid committed report is required: '+reportPath);}
  if(report.promptId!==pid||report.status!=='COMPLETE')fail('Committed report must identify prompt and status COMPLETE.');
  if(typeof report.summary!=='string'||report.summary.trim().length<12)fail('Concrete completion summary required.');
@@ -78,7 +95,7 @@ function complete(args){
  write(statusFile,f.text.replace(new RegExp(`^- \\[ \\] ${pid} — .+$`,'m'),line));
  save({currentPrompt:null,lastCompleted:pid,lastWorkCommit:sha});log({event:'completed',prompt:pid,commit:sha});
  if(fs.existsSync(outputFile))fs.unlinkSync(outputFile);
- console.log(`Completed ${pid} with work commit ${sha}.\nClaude must now commit only PROJECT_STATUS.md as a progress commit, report both hashes, then continue.`);
+ console.log(`Completed ${pid} with work commit ${sha}.\nClaude must now commit only ${phase.status} as a progress commit, report both hashes, then continue.`);
 }
 function reopen(args){
  locked();assertRepo();const m=manifest(),f=flags(m);const cascade=args.includes('--cascade');const target=id(args.find(a=>a!=='--cascade'),m)||[...m.prompts].reverse().find(p=>f.map.get(p.id))?.id;
@@ -101,8 +118,10 @@ reopen [N] [--cascade] reopen progress without rewriting Git history
 start                 shell wrappers start Claude with START_CLAUDE.md
 start-step [N]        shell wrappers start Claude with one active prompt
 doctor                inspect local tool availability
+--phase 2             any command above against the phase 2 package: prompts-2/, PROJECT_STATUS-PHASE-2.md,
+                      .runner/phase-2/ and reports in docs/reports/phase-2/ (default: phase 1)
 Typical implementation loop: prepare -> implement -> verify -> commit -> complete -> progress commit.
 No unattended model subprocess loop, no automatic push/deploy, no fabricated test results.`);}
-const [command='help',...args]=process.argv.slice(2);
+const [command='help',...args]=argv;
 try{switch(command){case'setup':setup();break;case'prepare':case'next':prepare(args[0]);break;case'complete':case'done':complete(args);break;case'status':status();break;case'reopen':reopen(args);break;case'check':case'validate':{core();const m=manifest(),f=flags(m);let gap=false;for(const p of m.prompts){if(!f.map.get(p.id))gap=true;else {if(gap)fail('Completed prompt after incomplete predecessor');deps(p,f.map);}}console.log('Sequential status valid.');break;}case'doctor':doctor();break;case'help':case'--help':case'-h':help();break;default:fail('Unknown command: '+command);}}
 catch(e){console.error('ERROR: '+e.message);process.exitCode=1;}

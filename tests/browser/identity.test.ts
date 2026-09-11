@@ -223,7 +223,10 @@ test('an absolute origin is refused, so sign-in cannot be an open redirect', asy
     await page.getByTestId('send-code').click();
     await page.getByTestId('code-input').waitFor();
     await submitCode(page, await lastCodeFor(returning));
-    assert.match(page.url(), /127\.0\.0\.1:3111\/dashboard$/);
+    // The redirect stays on this origin and lands on the dashboard; comparing the
+    // parsed URL keeps the assertion independent of the port the suite runs on.
+    assert.equal(new URL(page.url()).origin, new URL(BASE_URL).origin);
+    assert.equal(new URL(page.url()).pathname, '/dashboard');
   } finally {
     await context.close();
   }

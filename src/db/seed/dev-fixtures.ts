@@ -124,6 +124,9 @@ export async function seedDevFixtures(database: DbClient, env: Env = loadEnv()):
         accountId,
         firstName: fixture.firstName,
         lastName: fixture.lastName,
+        // Required with the rest of the identity since DEC-0141; a fixture that
+        // lacked it could not re-save its own profile.
+        displayName: fixture.firstName + ' ' + fixture.lastName,
         nationalId: fixture.nationalId,
         birthDate: fixture.birthDate,
       })

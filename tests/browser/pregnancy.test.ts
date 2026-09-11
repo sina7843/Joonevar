@@ -221,7 +221,13 @@ async function pedigreedAnimal(
   await owner.getByTestId('pick-animal-' + animalId).check();
   await owner.getByTestId('service-' + animalId + '-MICROCHIP_IMPLANT').check();
   await Promise.all([owner.waitForURL('**/vets**'), owner.getByTestId('choose-vet').click()]);
-  await owner.getByTestId('choose-location').first().click();
+  // The Finder also lists clinics other suites and tools/dev-tidy.mjs keep, so
+  // the visit is booked at this suite's own location, not whichever sorts first (DEC-0148).
+  await owner
+    .locator('li')
+    .filter({ has: owner.getByTestId('finder-location-name').filter({ hasText: LOCATION_NAME }) })
+    .getByTestId('choose-location')
+    .click();
   await owner.waitForURL('**/requests/new/review**');
   await Promise.all([
     owner.waitForURL((url) => url.pathname === '/requests'),
@@ -517,7 +523,13 @@ test('the assigned vet records an independent result and a difference stays neut
   await dam.getByTestId('pick-animal-' + fixture.dam.animalId).check();
   await dam.getByTestId('service-' + fixture.dam.animalId + '-PREGNANCY_CHECK').check();
   await Promise.all([dam.waitForURL('**/vets**'), dam.getByTestId('choose-vet').click()]);
-  await dam.getByTestId('choose-location').first().click();
+  // The Finder also lists clinics other suites and tools/dev-tidy.mjs keep, so
+  // the visit is booked at this suite's own location, not whichever sorts first (DEC-0148).
+  await dam
+    .locator('li')
+    .filter({ has: dam.getByTestId('finder-location-name').filter({ hasText: LOCATION_NAME }) })
+    .getByTestId('choose-location')
+    .click();
   await dam.waitForURL('**/requests/new/review**');
   await Promise.all([
     dam.waitForURL((url) => url.pathname === '/requests'),

@@ -290,7 +290,13 @@ async function bookVisit(
   await page.getByTestId('pick-animal-' + animalId).check();
   await page.getByTestId('service-' + animalId + '-' + service).check();
   await Promise.all([page.waitForURL('**/vets**'), page.getByTestId('choose-vet').click()]);
-  await page.getByTestId('choose-location').first().click();
+  // The Finder also lists clinics other suites and tools/dev-tidy.mjs keep, so
+  // the visit is booked at this suite's own location, not whichever sorts first (DEC-0148).
+  await page
+    .locator('li')
+    .filter({ has: page.getByTestId('finder-location-name').filter({ hasText: LOCATION_NAME }) })
+    .getByTestId('choose-location')
+    .click();
   await page.waitForURL('**/requests/new/review**');
   await Promise.all([
     page.waitForURL((url) => url.pathname === '/requests'),

@@ -48,4 +48,28 @@ test('manifest lock mismatch is rejected',()=>{const f=fixture();fs.appendFileSy
 test('runner refuses a nested directory in another repo',()=>{const f=fixture();const nested=path.join(f.root,'nested');fs.mkdirSync(nested);fs.cpSync(path.join(f.root,'prompts'),path.join(nested,'prompts'),{recursive:true});fs.cpSync(path.join(f.root,'.runner'),path.join(nested,'.runner'),{recursive:true});fs.copyFileSync(path.join(f.root,'PROJECT_STATUS.md'),path.join(nested,'PROJECT_STATUS.md'));const r=run({root:nested},'prepare');assert.notEqual(r.status,0);assert.match(r.stderr,/repository root/);});
 
 test('repair interruption between status write and runner-state write',()=>{const f=fixture();ok(run(f,'prepare'));work(f);ok(run(f,'complete','1','--commit','HEAD'));fs.writeFileSync(path.join(f.root,'.runner/state.json'),JSON.stringify({currentPrompt:'PROMPT-001'}));ok(run(f,'complete','1','--commit','HEAD'));assert.equal(JSON.parse(fs.readFileSync(path.join(f.root,'.runner/state.json'))).currentPrompt,null);progress(f);assert.match(ok(run(f,'prepare')).stdout,/PROMPT-002/);});
+test('phase 2 runs its own package with derived order and checks, leaving phase 1 progress untouched',()=>{
+ const f=fixture();fs.mkdirSync(path.join(f.root,'prompts-2'));fs.mkdirSync(path.join(f.root,'.runner/phase-2'),{recursive:true});
+ // Shape of the delivered phase 2 manifest: bare ids, a prompts/ path, no dependsOn, no requiredChecks, no fenced text block.
+ const m=JSON.stringify({version:'1.0',count:2,prompts:[1,2].map(n=>({id:`00${n}`,slug:'s'+n,title:'Phase two '+n,file:`prompts/00${n}-p.md`}))});
+ fs.writeFileSync(path.join(f.root,'prompts-2/prompt-manifest.json'),m);
+ for(const n of [1,2])fs.writeFileSync(path.join(f.root,`prompts-2/00${n}-p.md`),`# PROMPT-00${n}\n\nPhase two body ${n}.\n`);
+ fs.writeFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-2.md'),'- [ ] PROMPT-001 — Phase two 1\n- [ ] PROMPT-002 — Phase two 2\n');
+ fs.writeFileSync(path.join(f.root,'.runner/phase-2/plan.lock'),JSON.stringify({manifestHash:crypto.createHash('sha256').update(m).digest('hex')}));
+ f.g('add','.');f.g('commit','-m','phase 2 fixture');
+ const phase1=fs.readFileSync(path.join(f.root,'PROJECT_STATUS.md'),'utf8');
+ assert.match(run(f,'prepare','2','--phase','2').stderr,/Incomplete dependency: PROMPT-001/);
+ ok(run(f,'--phase','2','prepare'));
+ assert.match(fs.readFileSync(path.join(f.root,'.runner/phase-2/current-prompt.txt'),'utf8'),/Phase two body 1/);
+ const file='docs/reports/phase-2/PROMPT-001.json';fs.mkdirSync(path.join(f.root,'docs/reports/phase-2'),{recursive:true});
+ const data={promptId:'PROMPT-001',status:'COMPLETE',summary:'Concrete phase two fixture behavior',changedFiles:[file],checks:['typecheck','build','product-tests'].map(id=>({id,command:'fixture',result:'PASS',evidence:'observed'})),blockers:[],limitations:[],readiness:{}};
+ const commit=msg=>{fs.writeFileSync(path.join(f.root,file),JSON.stringify(data));f.g('add','--',file);f.g('commit','-m',msg);};
+ commit('feat: PROMPT-001 phase two');
+ assert.match(run(f,'--phase','2','complete','--commit','HEAD').stderr,/required check: browser-tests/);
+ data.checks.push({id:'browser-tests',command:'fixture',result:'PASS',evidence:'observed'});commit('feat: PROMPT-001 phase two browser evidence');
+ ok(run(f,'--phase','2','complete','--commit','HEAD'));
+ assert.match(fs.readFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-2.md'),'utf8'),/^- \[x\] PROMPT-001 — Phase two 1 <!-- work-commit:[0-9a-f]{40} -->$/m);
+ assert.equal(fs.readFileSync(path.join(f.root,'PROJECT_STATUS.md'),'utf8'),phase1);
+ assert.match(run(f,'--phase','3','status').stderr,/Unknown phase: 3/);
+});
 test('supports existing Git worktree metadata file',()=>{const f=fixture();const wt=path.join(os.tmpdir(),'hamzist-worktree-'+crypto.randomUUID());roots.push(wt);f.g('worktree','add','--detach',wt);fs.mkdirSync(path.join(wt,'.runner'),{recursive:true});fs.copyFileSync(path.join(f.root,'.runner/plan.lock'),path.join(wt,'.runner/plan.lock'));assert.ok(fs.statSync(path.join(wt,'.git')).isFile());assert.match(ok(run({root:wt},'prepare')).stdout,/PROMPT-001/);});

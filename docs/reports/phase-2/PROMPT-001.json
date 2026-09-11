@@ -1,0 +1,81 @@
+{
+  "promptId": "PROMPT-001",
+  "status": "COMPLETE",
+  "summary": "Phase 2 boundary fixed against the real Phase 1 code (base 33acb9a): the Runner runs phase 2 with `--phase 2` without editing the delivered package; docs/architecture/phase-2-boundary.md maps every Phase 2 concept to reuse/migrate/create on Phase 1 tables (no parallel vet, location, breed or document records); Phase 1 route access and the 59 Phase 1 tables are pinned by tests; the reserved public namespace can never fall under a Phase 1 rule. No schema, migration, role or page was added (DEC-0143). The Phase 1 regression found and fixed a check-in race read (single joined SELECT) and a browser suite that depended on the shared development database; it now runs on its own database, storage and server per run, which also exposed and fixed a missing fixture displayName, a hard-coded port and a profile helper that filled the edit form.",
+  "changedFiles": [
+    "tools/runner.mjs",
+    "tools/tests/runner.test.mjs",
+    "tools/browser-tests.mjs",
+    "src/vets/visits.ts",
+    "src/db/seed/dev-fixtures.ts",
+    "tests/ui/routes.test.ts",
+    "tests/db/migrations.test.ts",
+    "tests/db/referrals.test.ts",
+    "tests/browser/cross-flow.test.ts",
+    "tests/browser/finder.test.ts",
+    "tests/browser/genetics.test.ts",
+    "tests/browser/identity.test.ts",
+    "tests/browser/kennel.test.ts",
+    "tests/browser/operations.test.ts",
+    "tests/browser/payment-mock.test.ts",
+    "tests/browser/pedigree.test.ts",
+    "tests/browser/permit.test.ts",
+    "tests/browser/pregnancy.test.ts",
+    "tests/browser/puppy-card.test.ts",
+    "tests/browser/registration.test.ts",
+    "tests/browser/vet-service.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "REQUIREMENTS_TRACEABILITY.json",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-001-REPORT.md",
+    "PROJECT_STATUS-PHASE-2.md",
+    "PRODUCT_DECISIONS.md",
+    "Requirements-Phase-2.md",
+    "prompts-2/prompt-manifest.json",
+    "prompts-2/001-discovery-boundaries.md",
+    "Hamzist-Phase-2-Prompt-Package-v1.0/ARCHITECTURE_BASELINE.md"
+  ],
+  "decisions": ["DEC-0142", "DEC-0143", "DEC-0144", "DEC-0145", "DEC-0146", "DEC-0147", "DEC-0148"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the committed tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build: Compiled successfully, type and lint validity passed, static pages 5/5, exit 0."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 338 · pass 338 · fail 0 · cancelled 0 · skipped 0 (73 s) on per-suite disposable PostgreSQL databases, run alone. Includes the pinned Phase 1 route access and reserved Phase 2 namespace (tests/ui/routes.test.ts), all 59 Phase 1 tables after migrating an empty database (tests/db/migrations.test.ts) and the referral race where the loser always sees CONSUMED (tests/db/referrals.test.ts). Runner: node --test tools/tests/runner.test.mjs → tests 17 · pass 17 · fail 0."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 90 · pass 90 · fail 0 (287 s) — full Phase 1 browser regression on the disposable database hamzist_browser_b76f17ad1ee4 (migrated, baseline + synthetic 0999 fixtures) against its own production server on 127.0.0.1:3330; afterwards no hamzist_browser_% or hamzist_test_% database remained. Before the fixes: 69/90 on the shared development database, then 86/90 isolated; the four remaining failures were test/seed defects described in docs/reports/PROMPT-001-REPORT.md §2."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "vet_profile.account_id and vet_location.vet_account_id are NOT NULL, so an unowned suggested record (P2-D06) needs an additive migration in PROMPT-006/007 and 008/009.",
+    "Geography is free text in four Phase 1 tables; the normalised table is created by its first consumer (PROMPT-006).",
+    "Phase 1 has no revoked/superseded document state; verification (PROMPT-014) cannot show that result until real data exists.",
+    "The next → postcss advisory from Phase 1 remains open (official fix is a major upgrade).",
+    "/admin/vets and /vet/samples are not paginated (DEC-0148).",
+    "Regenerated Phase 1 screenshots were not committed, so the historical evidence of those prompts is unchanged."
+  ],
+  "readiness": {
+    "code": "PHASE_2_BOUNDARY_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

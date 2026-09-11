@@ -37,9 +37,17 @@ before(async () => {
 });
 
 after(async () => {
-  await browser?.close();
-  // Hand the suite back exactly the mode it was running in.
-  if (previousMode === 'MOCK_AUTO' || previousMode === 'DEV_GATEWAY') await setPaymentMode(previousMode);
+  /*
+   * The mode is restored first and unconditionally. It used to follow
+   * browser.close(), so a crashed browser threw before the restore ran and every
+   * suite after this one silently paid through MOCK_AUTO instead of the gateway
+   * it was written for (DEC-0148).
+   */
+  try {
+    if (previousMode === 'MOCK_AUTO' || previousMode === 'DEV_GATEWAY') await setPaymentMode(previousMode);
+  } finally {
+    await browser?.close().catch(() => undefined);
+  }
 });
 
 test('the mock gateway returns straight to the callback and the server verifies it', async () => {

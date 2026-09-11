@@ -455,15 +455,18 @@ export async function checkIn(
   });
   if (code === '') return reject('NOT_FOUND');
 
-  const [referral] = await database.select().from(referralCodes).where(eq(referralCodes.code, code)).limit(1);
-  if (!referral) return reject('NOT_FOUND');
-
-  const [request] = await database
-    .select()
-    .from(vetVisitRequests)
-    .where(eq(vetVisitRequests.id, referral.requestId))
+  // One statement, so the code and its request come from the same snapshot. Two
+  // separate reads let a racing loser see the code still ACTIVE but the request
+  // already CHECKED_IN, and give a different refusal than the one the winner
+  // actually caused (DEC-0147).
+  const [row] = await database
+    .select({ referral: referralCodes, request: vetVisitRequests })
+    .from(referralCodes)
+    .innerJoin(vetVisitRequests, eq(vetVisitRequests.id, referralCodes.requestId))
+    .where(eq(referralCodes.code, code))
     .limit(1);
-  if (!request) return reject('NOT_FOUND');
+  if (!row) return reject('NOT_FOUND');
+  const { referral, request } = row;
 
   const rejection = checkInRejection({
     referralStatus: referral.status,

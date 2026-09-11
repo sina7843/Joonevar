@@ -5,7 +5,34 @@ import { createTestDb } from '../helpers/db.ts';
 import { migrateTo } from '../../src/db/migrate.ts';
 import { createDatabase } from '../../src/db/client.ts';
 
-test('migrations create the foundation schema on an empty database', async () => {
+/**
+ * Every table Phase 1 shipped (migrations 0000–0016). Phase 2 extends these —
+ * P2-D15 forbids a parallel vet, location, breed or document record — so a
+ * Phase 2 migration that drops or renames one of them fails here (DEC-0146).
+ */
+const PHASE_1_TABLES = [
+  // 0000 foundation
+  'account', 'account_role', 'product_setting', 'audit_event', 'notification', 'notification_delivery',
+  'stored_file', 'reference_breed', 'pedigree_issuer',
+  // 0001 identity
+  'profile', 'residence', 'kyc_case', 'otp_challenge', 'session', 'dev_outbound_sms',
+  // 0002 billing
+  'payment_batch', 'payment_item', 'payment_attempt', 'payment_callback', 'membership', 'dev_payment_outcome',
+  // 0003 animals, 0004 vets
+  'animal', 'foreign_pedigree_case', 'vet_profile', 'vet_location', 'vet_visit_batch', 'vet_visit_request',
+  'referral_code',
+  // 0005 clinical, 0006 documents, 0007 genetics
+  'microchip', 'microchip_conflict', 'chip_procedure', 'sample', 'sample_event', 'registration_sheet_item',
+  'registration_sheet', 'genetics_receipt', 'genetics_receipt_item', 'parentage_result',
+  // 0008 pedigree, 0009 kennels
+  'pedigree_issuance_item', 'pedigree', 'parentage_appeal', 'postal_request', 'kennel', 'kennel_breed',
+  // 0010–0014 mating, breeding, allocation, declarations
+  'mating_permit', 'permit_allocation_share', 'mating_date_declaration', 'pregnancy_declaration',
+  'pregnancy_check', 'vet_pregnancy_result', 'birth_event', 'litter', 'puppy', 'puppy_allocation',
+  'allocation_item', 'allocation_approval', 'puppy_card', 'personal_declaration', 'personal_note',
+];
+
+test('migrations create every Phase 1 table on an empty database', async () => {
   const testDb = await createTestDb({ migrate: false });
   try {
     await migrateTo(testDb.url);
@@ -15,17 +42,7 @@ test('migrations create the foundation schema on an empty database', async () =>
         sql`select table_name from information_schema.tables where table_schema = 'public' order by table_name`,
       );
       const names = tables.rows.map((r) => r.table_name);
-      for (const expected of [
-        'account',
-        'account_role',
-        'audit_event',
-        'notification',
-        'notification_delivery',
-        'pedigree_issuer',
-        'product_setting',
-        'reference_breed',
-        'stored_file',
-      ]) {
+      for (const expected of PHASE_1_TABLES) {
         assert.ok(names.includes(expected), 'missing table ' + expected);
       }
     } finally {

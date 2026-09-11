@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "count": 20,
+  "prompts": [
+    {
+      "id": "001",
+      "slug": "discovery-boundaries",
+      "title": "کشف وضعیت فاز یک و تثبیت مرز فاز دو",
+      "file": "prompts/001-discovery-boundaries.md"
+    },
+    {
+      "id": "002",
+      "slug": "public-foundation-seo",
+      "title": "زیرساخت عمومی، SEO و پوسته فارسی",
+      "file": "prompts/002-public-foundation-seo.md"
+    },
+    {
+      "id": "003",
+      "slug": "species-dog-breeds",
+      "title": "گونه‌ها و بانک نژاد سگ",
+      "file": "prompts/003-species-dog-breeds.md"
+    },
+    {
+      "id": "004",
+      "slug": "cms-authoring",
+      "title": "CMS و نقش نویسنده",
+      "file": "prompts/004-cms-authoring.md"
+    },
+    {
+      "id": "005",
+      "slug": "content-reporting",
+      "title": "گزارش محتوا و Moderation",
+      "file": "prompts/005-content-reporting.md"
+    },
+    {
+      "id": "006",
+      "slug": "vet-directory-model",
+      "title": "پروفایل عمومی دامپزشک",
+      "file": "prompts/006-vet-directory-model.md"
+    },
+    {
+      "id": "007",
+      "slug": "vet-onboarding-claim",
+      "title": "ثبت‌نام و Claim دامپزشک",
+      "file": "prompts/007-vet-onboarding-claim.md"
+    },
+    {
+      "id": "008",
+      "slug": "center-directory-model",
+      "title": "دایرکتوری مراکز دامپزشکی",
+      "file": "prompts/008-center-directory-model.md"
+    },
+    {
+      "id": "009",
+      "slug": "center-suggestion-claim",
+      "title": "پیشنهاد و Claim مرکز",
+      "file": "prompts/009-center-suggestion-claim.md"
+    },
+    {
+      "id": "010",
+      "slug": "associations-clubs",
+      "title": "انجمن‌ها و کلاب‌ها",
+      "file": "prompts/010-associations-clubs.md"
+    },
+    {
+      "id": "011",
+      "slug": "advertising-packages",
+      "title": "بسته‌های تبلیغاتی",
+      "file": "prompts/011-advertising-packages.md"
+    },
+    {
+      "id": "012",
+      "slug": "ranking-search",
+      "title": "جست‌وجو، فیلتر و رتبه‌بندی",
+      "file": "prompts/012-ranking-search.md"
+    },
+    {
+      "id": "013",
+      "slug": "public-home-services",
+      "title": "خانه و معرفی خدمات",
+      "file": "prompts/013-public-home-services.md"
+    },
+    {
+      "id": "014",
+      "slug": "document-verification",
+      "title": "استعلام اصالت اسناد",
+      "file": "prompts/014-document-verification.md"
+    },
+    {
+      "id": "015",
+      "slug": "maps-geography",
+      "title": "جغرافیا، نقشه و صفحات محلی",
+      "file": "prompts/015-maps-geography.md"
+    },
+    {
+      "id": "016",
+      "slug": "admin-operations",
+      "title": "پنل مدیریت فاز عمومی",
+      "file": "prompts/016-admin-operations.md"
+    },
+    {
+      "id": "017",
+      "slug": "privacy-security-abuse",
+      "title": "حریم خصوصی و مقابله با سوءاستفاده",
+      "file": "prompts/017-privacy-security-abuse.md"
+    },
+    {
+      "id": "018",
+      "slug": "performance-accessibility",
+      "title": "کارایی و دسترس‌پذیری",
+      "file": "prompts/018-performance-accessibility.md"
+    },
+    {
+      "id": "019",
+      "slug": "migration-testing",
+      "title": "مهاجرت داده و تست یکپارچه",
+      "file": "prompts/019-migration-testing.md"
+    },
+    {
+      "id": "020",
+      "slug": "release-handoff",
+      "title": "آمادگی انتشار و تحویل",
+      "file": "prompts/020-release-handoff.md"
+    }
+  ]
+}

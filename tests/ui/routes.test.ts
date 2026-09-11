@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { accessForRoute, assertRouteAccess, canAccessRoute, selectContext } from '../../src/authz/routes.ts';
+import { accessForRoute, assertRouteAccess, canAccessRoute, selectContext, type RouteAccess } from '../../src/authz/routes.ts';
 import { switchableContexts, type Actor, type AccountRoleName, type ActorContextName } from '../../src/authz/actor.ts';
 import type { AccountId } from '../../src/domain/ids.ts';
 
@@ -92,6 +92,70 @@ test('the longest matching prefix wins', () => {
   assert.deepEqual(accessForRoute('/breeders'), []);
   assert.deepEqual(accessForRoute('/vets/finder'), ['USER', 'BREEDER', 'TRUSTED_VET']);
   assert.deepEqual(accessForRoute('/vet'), ['TRUSTED_VET']);
+});
+
+// Phase 2 boundary (DEC-0144). The public portal is built beside Phase 1, not on
+// top of it: every Phase 1 prefix keeps exactly the access it shipped with, so a
+// public page can never be opened by re-using, say, `/vets` or `/documents`.
+const APP = ['USER', 'BREEDER', 'TRUSTED_VET'] as const;
+const PHASE_1_ROUTES: Record<string, RouteAccess> = {
+  '/': 'PUBLIC',
+  '/login': 'PUBLIC',
+  '/api/health': 'PUBLIC',
+  '/dashboard': APP,
+  '/notifications': APP,
+  '/profile': APP,
+  '/account': APP,
+  '/membership': APP,
+  '/animals': APP,
+  '/requests': APP,
+  '/registration': APP,
+  '/pedigree': APP,
+  '/vets': APP,
+  '/declaration': APP,
+  '/documents': APP,
+  '/breeder/activate': ['USER', 'BREEDER'],
+  '/breeder': ['BREEDER'],
+  '/kennels': ['USER', 'BREEDER'],
+  '/mating': ['USER', 'BREEDER'],
+  '/puppy-cards': ['USER', 'BREEDER'],
+  '/litters': ['USER', 'BREEDER'],
+  '/vet': ['TRUSTED_VET'],
+  '/assoc': ['ASSOCIATION_OPERATOR'],
+  '/genetics': ['GENETICS_OPERATOR'],
+  '/admin': ['SUPERADMIN'],
+};
+
+test('Phase 1 route access is pinned, including everything beneath each prefix', () => {
+  for (const [prefix, access] of Object.entries(PHASE_1_ROUTES)) {
+    assert.deepEqual(accessForRoute(prefix), access, prefix);
+    if (prefix !== '/') assert.deepEqual(accessForRoute(prefix + '/some-id'), access, prefix + '/some-id');
+  }
+});
+
+test('the reserved Phase 2 public namespace never inherits a Phase 1 rule', () => {
+  const reserved = [
+    '/veterinarians',
+    '/centers',
+    '/breeds',
+    '/articles',
+    '/news',
+    '/announcements',
+    '/associations',
+    '/clubs',
+    '/verify',
+    '/services',
+    '/about',
+    '/search',
+  ];
+  for (const prefix of reserved) {
+    assert.ok(!Object.keys(PHASE_1_ROUTES).includes(prefix), prefix + ' is a Phase 1 prefix');
+    for (const path of [prefix, prefix + '/some-slug']) {
+      const access = accessForRoute(path);
+      // Closed until its own prompt opens it, or public once it has — never a Phase 1 context list.
+      assert.ok(access === 'PUBLIC' || access.length === 0, path + ' falls under a Phase 1 rule');
+    }
+  }
 });
 
 test('trailing slashes and query strings do not change the decision', () => {

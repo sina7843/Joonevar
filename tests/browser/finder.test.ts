@@ -243,7 +243,13 @@ async function createVisit(
     await page.getByTestId('service-' + pick.animalId + '-' + pick.service).check();
   }
   await Promise.all([page.waitForURL('**/vets**'), page.getByTestId('choose-vet').click()]);
-  await page.getByTestId('choose-location').first().click();
+  // The Finder also lists clinics other suites and tools/dev-tidy.mjs keep, so
+  // the visit is booked at this suite's own location, not whichever sorts first (DEC-0148).
+  await page
+    .locator('li')
+    .filter({ has: page.getByTestId('finder-location-name').filter({ hasText: LOCATION_NAME }) })
+    .getByTestId('choose-location')
+    .click();
   await page.waitForURL('**/requests/new/review**');
   await page.getByTestId('review-items').waitFor();
   // The review page is itself under /requests, so wait for the list route.
@@ -277,8 +283,16 @@ async function attemptCheckIn(page: Page, code: string): Promise<void> {
 
 test('the Finder is empty until the superadmin records a licensed location', async () => {
   const owner = await ownerWithAnimals([]);
+  /*
+   * The emptiness is scoped to this run's own neighbourhood. The development
+   * database keeps usable clinics for manual testing (tools/dev-tidy.mjs), so
+   * "the whole Finder is empty" is a fact about shared data, not about the rule
+   * under test — which is that this location appears only once it is licensed
+   * and complete (DEC-0148).
+   */
+  const ownFinder = BASE_URL + '/vets?context=MICROCHIP&term=' + encodeURIComponent(NEIGHBORHOOD);
   try {
-    await owner.page.goto(BASE_URL + '/vets?context=MICROCHIP', { waitUntil: 'load' });
+    await owner.page.goto(ownFinder, { waitUntil: 'load' });
     await expectText(owner.page, 'مرکزی با این فیلترها پیدا نشد');
     await owner.page.screenshot({ path: path.join(SHOTS, 'finder-empty.png'), fullPage: true });
 
@@ -312,7 +326,7 @@ test('the Finder is empty until the superadmin records a licensed location', asy
       await page.screenshot({ path: path.join(SHOTS, 'admin-vet-registry.png'), fullPage: true });
       await expectText(page, 'امکانات اجباری این خدمت در این مرکز کامل نیست');
 
-      await owner.page.goto(BASE_URL + '/vets?context=MICROCHIP', { waitUntil: 'load' });
+      await owner.page.goto(ownFinder, { waitUntil: 'load' });
       await expectText(owner.page, 'مرکزی با این فیلترها پیدا نشد');
       await owner.page.screenshot({ path: path.join(SHOTS, 'finder-partial-capability.png'), fullPage: true });
 
@@ -336,7 +350,7 @@ test('the Finder is empty until the superadmin records a licensed location', asy
       await admin.close();
     }
 
-    await owner.page.goto(BASE_URL + '/vets?context=MICROCHIP', { waitUntil: 'load' });
+    await owner.page.goto(ownFinder, { waitUntil: 'load' });
     await owner.page.getByTestId('finder-results').waitFor();
     const body = await owner.page.locator('body').innerText();
     assert.ok(body.includes(LOCATION_NAME));
@@ -375,7 +389,11 @@ test('the supported filters narrow the list and a dead end explains how to widen
 
     // The location page keeps the contact route and states the missing map
     // rather than drawing an invented position.
-    await page.goto(BASE_URL + '/vets?context=MICROCHIP', { waitUntil: 'load' });
+    // The first result of an unfiltered list is whichever clinic sorts first in
+    // shared data; this run's location is opened by its own neighbourhood.
+    await page.goto(BASE_URL + '/vets?context=MICROCHIP&term=' + encodeURIComponent(NEIGHBORHOOD), {
+      waitUntil: 'load',
+    });
     await page.getByTestId('open-location').first().click();
     await page.waitForURL('**/vets/location/**');
     await expectText(page, LOCATION_NAME);

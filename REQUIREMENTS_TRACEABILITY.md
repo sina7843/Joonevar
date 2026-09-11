@@ -59,3 +59,13 @@
 | D19 | PROMPT-001, PROMPT-011, PROMPT-018, PROMPT-019, PROMPT-020 | DISCOVERY — [route-coverage.md](docs/architecture/route-coverage.md) §۶ ردیف D19 |
 
 تمام معیارهای پذیرش §28 عیناً در ACCEPTANCE_MATRIX.md نگاشت شده‌اند. CLAUDE این فایل را فقط برای افزودن شواهد واقعی تکمیل کند؛ برنامهٔ پوشش را به ادعای تست‌شده تبدیل نکند.
+
+## فاز دو — شواهد اجرا
+
+نگاشت نیازمندی به پرامپت در `REQUIREMENTS_TRACEABILITY.json` بسته فاز دو است و دست‌نخورده می‌ماند؛ این جدول فقط شاهد واقعی هر ردیف اجراشده را اضافه می‌کند.
+
+| نیازمندی | پرامپت | شاهد |
+|---|---|---|
+| P2-R01 — کشف وضعیت فاز یک و تثبیت مرز فاز دو | PROMPT-001 | [phase-2-boundary.md](docs/architecture/phase-2-boundary.md) · [PROMPT-001-REPORT.md](docs/reports/PROMPT-001-REPORT.md) · `tests/ui/routes.test.ts` (دسترسی پیشوندهای فاز یک و فضای نام فاز دو) · `tests/db/migrations.test.ts` (۵۹ جدول فاز یک) · `tools/browser-tests.mjs` (دیتابیس و سرور جدا برای هر اجرای مرورگر) · DEC-0142…DEC-0148 |
+| P2-D05، P2-D09 در برابر D01 | PROMPT-001 | DEC-0145 |
+| P2-D15 | PROMPT-001 | DEC-0146 و [phase-2-boundary.md](docs/architecture/phase-2-boundary.md) §۳ |
