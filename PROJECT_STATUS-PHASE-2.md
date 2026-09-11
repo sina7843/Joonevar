@@ -4,7 +4,7 @@ Managed by `node tools/runner.mjs --phase 2 …` (DEC-0142). A row is marked onl
 
 - [x] PROMPT-001 — کشف وضعیت فاز یک و تثبیت مرز فاز دو <!-- work-commit:51cf713178ffbd003d370867b5fbe66a51cc59bf -->
 - [x] PROMPT-002 — زیرساخت عمومی، SEO و پوسته فارسی <!-- work-commit:46b78d264a7ab7ba5af06b2b368d3d98355010af -->
-- [ ] PROMPT-003 — گونه‌ها و بانک نژاد سگ
+- [x] PROMPT-003 — گونه‌ها و بانک نژاد سگ <!-- work-commit:077253cfe7c046c714ae84e141080a78312bebb6 -->
 - [ ] PROMPT-004 — CMS و نقش نویسنده
 - [ ] PROMPT-005 — گزارش محتوا و Moderation
 - [ ] PROMPT-006 — پروفایل عمومی دامپزشک
