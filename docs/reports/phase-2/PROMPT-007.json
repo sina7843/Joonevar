@@ -1,7 +1,7 @@
 {
   "promptId": "PROMPT-007",
   "status": "COMPLETE",
-  "summary": "Veterinarian onboarding and claims on the Phase 1 vet_profile row. Migration 0021 adds the REVIEW_OPERATOR role and context, the VET_APPLICATION_DOCUMENT file purpose, vet_application and vet_application_document, makes vet_profile.account_id and council_code nullable for unowned profiles and adds listed city/contact/source, claimed_at and hidden_by_review. A signed-in account applies from /account/vet-profile for a profile of its own, or claims an unowned profile from /account/vet-profile/claim/[slug], with a normalised council code and 1-5 private documents (council card required, JPG/PNG/PDF up to 10MB, signature-checked, readable only by the applicant, the review operator and the superadmin). One open application per account and one open claim per profile are enforced by partial unique indexes; a code another profile holds is refused and, when that profile is unowned, the message sends the applicant to claim it instead. The review operator works /review/vets: approve, request a correction or reject, always with a reason, a version check and an audit entry, never on their own application, with the duplicate candidates and documents on the decision page; the applicant is notified, answers a correction on the same case, appeals a rejection once, or withdraws it to the archive. Approving a PROFILE creates a draft directory profile with council_verified_at and no TRUSTED_VET role (DEC-0145); approving a CLAIM transfers the same row and address only while it is still unowned, keeping its history. The owner then manages that profile: content, consent, its own locations (licence NONE and no capability, so never in the Finder) and publication — but cannot republish a page the review hid. Only a claimed profile may buy an advertising package.",
+  "summary": "Veterinarian onboarding and claims on the Phase 1 vet_profile row. Migration 0021 adds the REVIEW_OPERATOR role and context, the VET_APPLICATION_DOCUMENT file purpose, vet_application and vet_application_document, makes vet_profile.account_id and council_code nullable for unowned profiles and adds listed city/contact/source, claimed_at and hidden_by_review. A signed-in account applies from /account/vet-profile for a profile of its own, or claims an unowned profile from /account/vet-profile/claim/[slug], with a normalised council code and 1-5 private documents (council card required, JPG/PNG/PDF up to 10MB, signature-checked, readable only by the applicant, the review operator and the superadmin). One open application per account and one open claim per profile are enforced by partial unique indexes; a code another profile holds is refused and, when that profile is unowned, the message sends the applicant to claim it instead. The review operator works /review/vets: approve, request a correction or reject, always with a reason, a version check and an audit entry, never on their own application, with the duplicate candidates and documents on the decision page; the applicant is notified, answers a correction on the same case, appeals a rejection once, or withdraws it to the archive. Approving a PROFILE creates a draft directory profile with council_verified_at and no TRUSTED_VET role (DEC-0145); approving a CLAIM transfers the same row and address only while it is still unowned, keeping its history. The owner then manages that profile: content, consent, its own locations (licence NONE and no capability, so never in the Finder) and publication — but cannot republish a page the review hid. Only a claimed profile may buy an advertising package. The superseded admin-only editor forms and actions (app/admin/vets/[accountId]/forms.tsx and actions.ts) were deleted in commit b750e64 and replaced by the shared src/vets/directory-forms.tsx, directory-actions.ts and directory-editor.tsx.",
   "changedFiles": [
     "src/db/schema/enums.ts",
     "src/db/schema/vets.ts",
@@ -35,8 +35,6 @@
     "app/review/vets/[id]/page.tsx",
     "app/review/vets/unowned/page.tsx",
     "app/admin/vets/[accountId]/page.tsx",
-    "app/admin/vets/[accountId]/actions.ts",
-    "app/admin/vets/[accountId]/forms.tsx",
     "app/admin/roles/forms.tsx",
     "app/(public)/veterinarians/(list)/page.tsx",
     "app/(public)/veterinarians/[slug]/page.tsx",
@@ -57,7 +55,10 @@
     "docs/reports/screenshots/phase-2/prompt-007/claim-in-review-mobile.png",
     "docs/reports/screenshots/phase-2/prompt-007/claimed-owner.png"
   ],
-  "decisions": ["DEC-0165", "DEC-0166"],
+  "decisions": [
+    "DEC-0165",
+    "DEC-0166"
+  ],
   "checks": [
     {
       "id": "typecheck",
