@@ -32,6 +32,7 @@ export function ContentRoleForm() {
             options={[
               { value: 'AUTHOR', label: 'نویسنده' },
               { value: 'CONTENT_ADMIN', label: 'ادمین محتوا' },
+              { value: 'REVIEW_OPERATOR', label: 'اپراتور بررسی' },
             ]}
             data-testid="role-name"
           />

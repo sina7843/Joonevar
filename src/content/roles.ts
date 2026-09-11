@@ -14,12 +14,14 @@ import { recordAudit } from '../audit/service.ts';
 import { forbidden, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
 
-export const CONTENT_ROLES = ['AUTHOR', 'CONTENT_ADMIN'] as const;
+// Independent Phase 2 roles granted here; the review operator joined with PROMPT-007 (DEC-0165).
+export const CONTENT_ROLES = ['AUTHOR', 'CONTENT_ADMIN', 'REVIEW_OPERATOR'] as const;
 export type ContentRoleName = (typeof CONTENT_ROLES)[number];
 
 export const CONTENT_ROLE_FA: Record<ContentRoleName, string> = {
   AUTHOR: 'نویسنده',
   CONTENT_ADMIN: 'ادمین محتوا',
+  REVIEW_OPERATOR: 'اپراتور بررسی',
 };
 
 function assertSuperadmin(actor: Actor): void {

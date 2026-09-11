@@ -72,6 +72,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // Phase 2 content environments (P2-D11, DEC-0158).
   { prefix: '/author', access: ['AUTHOR'] },
   { prefix: '/content', access: ['CONTENT_ADMIN'] },
+  // Veterinarian applications, claims and unowned profiles (§8, §10, DEC-0165).
+  { prefix: '/review', access: ['REVIEW_OPERATOR'] },
 ];
 
 function normalize(pathname: string): string {

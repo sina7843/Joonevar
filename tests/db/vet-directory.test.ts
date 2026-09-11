@@ -84,11 +84,11 @@ async function newVet(label: string, options: { role?: 'ACTIVE' | 'SUSPENDED'; k
 }
 
 const profileInput = (
-  accountId: string,
+  profileId: string,
   expectedVersion: number,
   patch: Partial<VetPublicProfileInput> = {},
 ): VetPublicProfileInput => ({
-  accountId,
+  profileId,
   expectedVersion,
   headlineFa: null,
   bioFa: null,
@@ -118,10 +118,10 @@ async function publishedVet(
   const saved = await updateVetPublicProfile(
     testDb.db,
     admin,
-    profileInput(vet.accountId, vet.profile.version, { bioFa: 'معرفی آزمایشی', ...options.profile }),
+    profileInput(vet.profile.id, vet.profile.version, { bioFa: 'معرفی آزمایشی', ...options.profile }),
   );
   const profile = await changeVetPublicStatus(testDb.db, admin, {
-    accountId: vet.accountId,
+    profileId: vet.profile.id,
     expectedVersion: saved.version,
     to: 'PUBLISHED',
     reason: 'SYNTHETIC',
@@ -179,17 +179,17 @@ test('only the superadmin edits the directory', async () => {
   const vet = await newVet('دسترسی');
   const vetActor = actorFor(vet.accountId, 'TRUSTED_VET');
   await assert.rejects(
-    () => updateVetPublicProfile(testDb.db, user, profileInput(vet.accountId, vet.profile.version, { bioFa: 'x' })),
+    () => updateVetPublicProfile(testDb.db, user, profileInput(vet.profile.id, vet.profile.version, { bioFa: 'x' })),
     code('FORBIDDEN'),
   );
   await assert.rejects(
-    () => updateVetPublicProfile(testDb.db, vetActor, profileInput(vet.accountId, vet.profile.version, { bioFa: 'x' })),
+    () => updateVetPublicProfile(testDb.db, actorFor(user.accountId, 'TRUSTED_VET'), profileInput(vet.profile.id, vet.profile.version, { bioFa: 'x' })),
     code('FORBIDDEN'),
   );
   await assert.rejects(
     () =>
       changeVetPublicStatus(testDb.db, user, {
-        accountId: vet.accountId,
+        profileId: vet.profile.id,
         expectedVersion: vet.profile.version,
         to: 'PUBLISHED',
         reason: 'x',
@@ -219,8 +219,9 @@ test('only the superadmin edits the directory', async () => {
 test('a profile change needs a reason, is audited field by field and refuses a stale version', async () => {
   const vet = await newVet('ویرایش');
   const { accountId } = vet;
+  const profileId = vet.profile.id;
   await assert.rejects(
-    () => updateVetPublicProfile(testDb.db, admin, profileInput(accountId, vet.profile.version, { bioFa: 'x', reason: '  ' })),
+    () => updateVetPublicProfile(testDb.db, admin, profileInput(profileId, vet.profile.version, { bioFa: 'x', reason: '  ' })),
     code('VALIDATION'),
   );
   await assert.rejects(
@@ -228,12 +229,12 @@ test('a profile change needs a reason, is audited field by field and refuses a s
       updateVetPublicProfile(
         testDb.db,
         admin,
-        profileInput(accountId, vet.profile.version, { specialtyCodes: ['NOT_A_SPECIALTY'] }),
+        profileInput(profileId, vet.profile.version, { specialtyCodes: ['NOT_A_SPECIALTY'] }),
       ),
     code('VALIDATION'),
   );
   await assert.rejects(
-    () => updateVetPublicProfile(testDb.db, admin, profileInput(accountId, vet.profile.version, { speciesCodes: ['HORSE'] })),
+    () => updateVetPublicProfile(testDb.db, admin, profileInput(profileId, vet.profile.version, { speciesCodes: ['HORSE'] })),
     code('VALIDATION'),
   );
 
@@ -247,7 +248,7 @@ test('a profile change needs a reason, is audited field by field and refuses a s
   const saved = await updateVetPublicProfile(
     testDb.db,
     admin,
-    profileInput(accountId, vet.profile.version, { ...patch, reason: 'اطلاعات اعلام‌شده دامپزشک' }),
+    profileInput(profileId, vet.profile.version, { ...patch, reason: 'اطلاعات اعلام‌شده دامپزشک' }),
   );
   assert.equal(saved.version, vet.profile.version + 1);
 
@@ -266,11 +267,11 @@ test('a profile change needs a reason, is audited field by field and refuses a s
 
   // Someone saved first: the older form is refused, not merged over.
   await assert.rejects(
-    () => updateVetPublicProfile(testDb.db, admin, profileInput(accountId, vet.profile.version, { bioFa: 'دیگر' })),
+    () => updateVetPublicProfile(testDb.db, admin, profileInput(profileId, vet.profile.version, { bioFa: 'دیگر' })),
     code('CONFLICT'),
   );
   // The same values again change nothing and record nothing.
-  const same = await updateVetPublicProfile(testDb.db, admin, profileInput(accountId, saved.version, patch));
+  const same = await updateVetPublicProfile(testDb.db, admin, profileInput(profileId, saved.version, patch));
   assert.equal(same.version, saved.version);
   assert.equal((await events('VET_PUBLIC_PROFILE_UPDATED', saved.id)).length, 1);
 
@@ -278,7 +279,7 @@ test('a profile change needs a reason, is audited field by field and refuses a s
   const registry = await upsertVetProfile(testDb.db, admin, {
     mobile: vet.mobile,
     displayNameFa: saved.displayNameFa,
-    councilCode: saved.councilCode,
+    councilCode: saved.councilCode!,
     phone: saved.phone,
   });
   assert.equal(registry.bioFa, 'معرفی');
@@ -356,7 +357,7 @@ test('a location is placed and shown without touching what the Finder reads', as
 test('publishing needs the essentials, keeps one address, and a hidden page is not found', async () => {
   const vet = await newVet('انتشار');
   const status = (to: string, expectedVersion: number) =>
-    changeVetPublicStatus(testDb.db, admin, { accountId: vet.accountId, expectedVersion, to, reason: 'SYNTHETIC' });
+    changeVetPublicStatus(testDb.db, admin, { profileId: vet.profile.id, expectedVersion, to, reason: 'SYNTHETIC' });
 
   await assert.rejects(
     () => status('PUBLISHED', vet.profile.version),
@@ -365,7 +366,7 @@ test('publishing needs the essentials, keeps one address, and a hidden page is n
   await assert.rejects(() => status('HIDDEN', vet.profile.version), code('VALIDATION'));
   await assert.rejects(() => status('DRAFT', vet.profile.version), code('VALIDATION'));
   await assert.rejects(
-    () => changeVetPublicStatus(testDb.db, admin, { accountId: vet.accountId, expectedVersion: vet.profile.version, to: 'PUBLISHED', reason: '' }),
+    () => changeVetPublicStatus(testDb.db, admin, { profileId: vet.profile.id, expectedVersion: vet.profile.version, to: 'PUBLISHED', reason: '' }),
     code('VALIDATION'),
   );
 
@@ -378,7 +379,7 @@ test('publishing needs the essentials, keeps one address, and a hidden page is n
     hoursNoteFa: null,
     reason: 'SYNTHETIC',
   });
-  const saved = await updateVetPublicProfile(testDb.db, admin, profileInput(vet.accountId, vet.profile.version, { bioFa: 'معرفی' }));
+  const saved = await updateVetPublicProfile(testDb.db, admin, profileInput(vet.profile.id, vet.profile.version, { bioFa: 'معرفی' }));
   const finderBefore = (await searchFinder(testDb.db, { context: 'MICROCHIP' })).map((row) => row.location.id);
   const published = await status('PUBLISHED', saved.version);
   assert.match(published.publicSlug!, /^vet-[0-9a-f]{10}$/);
@@ -430,7 +431,7 @@ test('the public page shows contact only with consent and only active public loc
   const consent = await updateVetPublicProfile(
     testDb.db,
     admin,
-    profileInput(vet.accountId, vet.profile.version, {
+    profileInput(vet.profile.id, vet.profile.version, {
       bioFa: 'معرفی آزمایشی',
       headlineFa: 'جراح',
       specialtyCodes: ['SURGERY'],

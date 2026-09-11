@@ -282,6 +282,12 @@ export const AUTHOR_NAV: readonly NavItem[] = [
   { href: '/author/new', label: 'نوشته تازه', icon: 'uploadSimple' },
 ];
 
+/** Review operator environment (§8, §10, DEC-0165). */
+export const REVIEW_NAV: readonly NavItem[] = [
+  { href: '/review/vets', label: 'درخواست‌های دامپزشک', icon: 'listChecks' },
+  { href: '/review/vets/unowned', label: 'پروفایل‌های بدون مالک', icon: 'firstAidKit' },
+];
+
 /** Content admin environment. */
 export const CONTENT_NAV: readonly NavItem[] = [
   { href: '/content', label: 'همه محتوا', icon: 'clipboardText' },

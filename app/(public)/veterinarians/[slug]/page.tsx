@@ -11,6 +11,8 @@ import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
+import Link from 'next/link';
+import { Alert } from '../../../../src/ui/alert.tsx';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -99,6 +101,18 @@ export default async function VeterinarianPage({ params }: Params) {
         </div>
       </header>
 
+      {page.owned ? null : (
+        <div data-testid="vet-unowned">
+          <Alert tone="info" title="این پروفایل بدون مالک است">
+            اطلاعات این صفحه از منبع عمومی ثبت و بررسی شده است و هنوز هیچ دامپزشکی مدیریت آن را به عهده نگرفته است. کد نظام آن تأیید
+            نشده است.{' '}
+            <Link href={'/account/vet-profile/claim/' + page.slug} className="text-text-brand underline underline-offset-4" data-testid="vet-claim-link">
+              این پروفایل شماست؟ درخواست Claim
+            </Link>
+          </Alert>
+        </div>
+      )}
+
       <dl className="grid gap-sm sm:grid-cols-2" data-testid="vet-facts">
         {page.councilCode ? (
           <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
@@ -152,10 +166,17 @@ export default async function VeterinarianPage({ params }: Params) {
         </section>
       ) : null}
 
+      {page.locations.length === 0 && !page.listed ? null : (
       <section aria-labelledby="vet-locations-title">
         <h2 id="vet-locations-title" className="text-h4">
           محل‌های کار
         </h2>
+        {page.listed ? (
+          <p className="mt-md flex flex-wrap items-center gap-2xs text-body-sm" data-testid="vet-listed-place">
+            <Icon name="mapPin" size="xs" />
+            {page.listed.provinceNameFa + ' · ' + page.listed.cityNameFa + (page.listed.contactFa ? ' · ' + page.listed.contactFa : '')}
+          </p>
+        ) : null}
         <ul className="mt-md space-y-sm" data-testid="vet-locations">
           {page.locations.map((location) => (
             <li key={location.id} className="rounded-lg border border-border-subtle bg-bg-surface p-md" data-testid="vet-location">
@@ -188,6 +209,7 @@ export default async function VeterinarianPage({ params }: Params) {
           تماس بگیرید.
         </p>
       </section>
+      )}
     </article>
   );
 }

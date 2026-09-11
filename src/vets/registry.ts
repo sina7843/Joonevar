@@ -6,7 +6,7 @@
  * superadmin environment. The professional council code and the location
  * licence are two independent approvals: neither one implies the other.
  */
-import { and, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, eq, ilike, isNotNull, or, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { accountRoles, accounts } from '../db/schema/core.ts';
 import { vetLocations, vetProfiles } from '../db/schema/vets.ts';
@@ -268,9 +268,14 @@ export async function updateLocation(
   });
 }
 
-export async function listVetProfiles(database: DbClient): Promise<readonly VetProfileRecord[]> {
-  const rows = await database.select().from(vetProfiles);
-  return rows.sort((a, b) => a.displayNameFa.localeCompare(b.displayNameFa, 'fa'));
+/** Veterinarians with an account. Unowned directory profiles are the review operator's (PROMPT-007). */
+export async function listVetProfiles(
+  database: DbClient,
+): Promise<readonly (VetProfileRecord & { accountId: string; councilCode: string })[]> {
+  const rows = await database.select().from(vetProfiles).where(isNotNull(vetProfiles.accountId));
+  return rows
+    .map((row) => ({ ...row, accountId: row.accountId!, councilCode: row.councilCode ?? '' }))
+    .sort((a, b) => a.displayNameFa.localeCompare(b.displayNameFa, 'fa'));
 }
 
 export async function locationsOfVet(
@@ -343,6 +348,8 @@ export async function searchFinder(
           : context === 'DNA'
             ? eq(vetLocations.canDrawBloodSample, true)
             : eq(vetLocations.canPregnancyCheck, true),
+        // Owned profiles always have a verified code; the join on account already excludes unowned ones.
+        sql`${vetProfiles.councilCode} is not null`,
         sql`${vetLocations.cityFa} is not null`,
         sql`${vetLocations.addressFa} is not null`,
         sql`${vetLocations.phone} is not null`,
@@ -371,9 +378,9 @@ export async function searchFinder(
   const origin = query.origin ?? null;
   const withDistance = rows.map((row) => ({
     location: row.location,
-    vetAccountId: row.vetAccountId,
+    vetAccountId: row.vetAccountId!,
     vetNameFa: row.vetNameFa,
-    councilCode: row.councilCode,
+    councilCode: row.councilCode!,
     vetPhone: row.vetPhone,
     distanceKm:
       origin && row.location.latitude !== null && row.location.longitude !== null

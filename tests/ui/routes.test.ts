@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { accessForRoute, assertRouteAccess, canAccessRoute, selectContext, type RouteAccess } from '../../src/authz/routes.ts';
-import { switchableContexts, type Actor, type AccountRoleName, type ActorContextName } from '../../src/authz/actor.ts';
+import { OPERATIONAL_CONTEXTS, switchableContexts, type Actor, type AccountRoleName, type ActorContextName } from '../../src/authz/actor.ts';
 import type { AccountId } from '../../src/domain/ids.ts';
 
 const actor = (context: ActorContextName, activeRoles: readonly AccountRoleName[] = []): Actor => ({
@@ -242,4 +242,17 @@ test('the guard picks a context the account already holds and never invents one'
   assert.equal(selectContext(actor('USER', ['BREEDER']), ['SUPERADMIN']), null);
   // The current context wins when it is already allowed.
   assert.equal(selectContext(actor('BREEDER', ['BREEDER']), ['USER', 'BREEDER']), 'BREEDER');
+});
+
+test('the review operator has its own environment, and applying or claiming stays in the applicant account', () => {
+  assert.deepEqual(accessForRoute('/review/vets'), ['REVIEW_OPERATOR']);
+  assert.deepEqual(accessForRoute('/review/vets/some-id'), ['REVIEW_OPERATOR']);
+  assert.deepEqual(accessForRoute('/review/vets/unowned'), ['REVIEW_OPERATOR']);
+  assert.equal(canAccessRoute(actor('SUPERADMIN', ['SUPERADMIN']), '/review/vets'), false);
+  assert.equal(canAccessRoute(actor('CONTENT_ADMIN', ['CONTENT_ADMIN']), '/review/vets'), false);
+  assert.equal(canAccessRoute(actor('REVIEW_OPERATOR', ['REVIEW_OPERATOR']), '/review/vets/unowned'), true);
+  assert.ok(OPERATIONAL_CONTEXTS.includes('REVIEW_OPERATOR'));
+  assert.deepEqual(switchableContexts(['REVIEW_OPERATOR']), ['USER']);
+  assert.deepEqual(accessForRoute('/account/vet-profile'), ['USER', 'BREEDER', 'TRUSTED_VET']);
+  assert.deepEqual(accessForRoute('/account/vet-profile/claim/vet-0123456789'), ['USER', 'BREEDER', 'TRUSTED_VET']);
 });

@@ -1,5 +1,5 @@
 /**
- * Public veterinary directory — Requirements-Phase-2 §7, §19, §20, §23 (PROMPT-006).
+ * Public veterinary directory — Requirements-Phase-2 §7, §10, §19, §20, §23 (PROMPT-006, PROMPT-007).
  *
  * The directory is a view of the Phase 1 veterinarian: the same `vet_profile`
  * and `vet_location` rows, no second veterinarian table (P2-D15). What is
@@ -7,10 +7,13 @@
  * never makes a veterinarian eligible for new work, and hiding one never takes
  * them out of it (DEC-0164).
  *
- * The superadmin edits a profile today; the veterinarian's own editing arrives
- * with registration and claim in PROMPT-007.
+ * Who manages a profile (DEC-0166): the superadmin any profile; its owner —
+ * the account it belongs to, in that account's own public context — its content,
+ * locations and publication; the review operator publication only (moderation).
+ * An unowned profile is a reviewed suggestion with a name and a city until a
+ * claim is approved (PROMPT-007).
  */
-import { and, asc, eq, inArray, ne } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull, ne, or } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';
 import type { Database, DbClient } from '../db/client.ts';
 import { accountRoles, accounts, species } from '../db/schema/core.ts';
@@ -34,7 +37,7 @@ import {
   type CompletenessInput,
   type VetPublicStatus,
 } from './directory-model.ts';
-import type { Actor } from '../authz/actor.ts';
+import type { Actor, ActorContextName } from '../authz/actor.ts';
 
 type ProfileRow = typeof vetProfiles.$inferSelect;
 type LocationRow = typeof vetLocations.$inferSelect;
@@ -44,10 +47,29 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SLUG = /^vet-[0-9a-f]{10}$/;
 const STALE = 'این پرونده هم‌زمان تغییر کرده است؛ صفحه را دوباره باز کنید.';
 const LOCATION_KINDS: readonly LocationKind[] = ['CLINIC', 'HOSPITAL', 'CENTRE'];
+const OWNER_CONTEXTS: readonly ActorContextName[] = ['USER', 'BREEDER', 'TRUSTED_VET'];
+
+type Manager = 'ADMIN' | 'REVIEW' | 'OWNER';
+
+/** How the actor may manage a record owned by `ownerAccountId`, or null. */
+function managerOf(actor: Actor, ownerAccountId: string | null): Manager | null {
+  if (actor.context === 'SUPERADMIN') return 'ADMIN';
+  if (actor.context === 'REVIEW_OPERATOR') return 'REVIEW';
+  if (ownerAccountId !== null && ownerAccountId === actor.accountId && OWNER_CONTEXTS.includes(actor.context)) return 'OWNER';
+  return null;
+}
+
+function assertManager(actor: Actor, ownerAccountId: string | null, allowed: readonly Manager[]): Manager {
+  const manager = managerOf(actor, ownerAccountId);
+  if (manager === null || !allowed.includes(manager)) {
+    throw forbidden('این پروفایل را فقط صاحب آن یا سوپرادمین تغییر می‌دهد.');
+  }
+  return manager;
+}
 
 function assertSuperadmin(actor: Actor): void {
   if (actor.context !== 'SUPERADMIN') {
-    throw forbidden('ویرایش پروفایل عمومی دامپزشک فقط از محیط سوپرادمین ممکن است.');
+    throw forbidden('ویرایش پروفایل عمومی دامپزشک از این صفحه فقط در محیط سوپرادمین ممکن است.');
   }
 }
 
@@ -62,15 +84,18 @@ function bounded(value: string | null | undefined, max: number, labelFa: string)
   return out;
 }
 
-/** Every change made to someone else's public page says why (§20, prompt rule on sensitive changes). */
-function requireReason(reason: string | null | undefined): string {
+/**
+ * A change made to someone else's public page says why (§20, prompt rule on
+ * sensitive changes). The owner editing their own page may add a note.
+ */
+function reasonFor(manager: Manager, reason: string | null | undefined): string | null {
   const out = bounded(reason, 500, 'دلیل');
-  if (out === null) throw validation('دلیل این تغییر را بنویسید.');
+  if (out === null && manager !== 'OWNER') throw validation('دلیل این تغییر را بنویسید.');
   return out;
 }
 
 /** A public address that is not the internal id and cannot be guessed from it (§20). */
-const newPublicSlug = (): string => 'vet-' + randomBytes(5).toString('hex');
+export const newPublicSlug = (): string => 'vet-' + randomBytes(5).toString('hex');
 
 // ── Reading a profile with everything the directory shows ──────────────────
 
@@ -86,47 +111,61 @@ export interface ProfileFacts {
   readonly speciesCodes: readonly string[];
   /** Trusted Hamzist: the Phase 1 TRUSTED_VET role is active right now. */
   readonly trusted: boolean;
+  /** The city an unowned profile was listed in, until locations exist. */
+  readonly listed: { readonly provinceCode: string; readonly provinceNameFa: string; readonly cityNameFa: string } | null;
 }
 
 async function loadFacts(database: DbClient, profiles: readonly ProfileRow[]): Promise<ProfileFacts[]> {
   if (profiles.length === 0) return [];
-  const accountIds = profiles.map((p) => p.accountId);
+  const accountIds = profiles.map((p) => p.accountId).filter((id): id is string => id !== null);
   const profileIds = profiles.map((p) => p.id);
   const [locationRows, specialtyRows, speciesRows, roleRows, provinceRows, cityRows] = await Promise.all([
-    database.select().from(vetLocations).where(inArray(vetLocations.vetAccountId, accountIds)),
+    accountIds.length > 0 ? database.select().from(vetLocations).where(inArray(vetLocations.vetAccountId, accountIds)) : [],
     database.select().from(vetProfileSpecialties).where(inArray(vetProfileSpecialties.vetProfileId, profileIds)),
     database.select().from(vetProfileSpecies).where(inArray(vetProfileSpecies.vetProfileId, profileIds)),
-    database
-      .select({ accountId: accountRoles.accountId })
-      .from(accountRoles)
-      .where(
-        and(
-          inArray(accountRoles.accountId, accountIds),
-          eq(accountRoles.role, 'TRUSTED_VET'),
-          eq(accountRoles.status, 'ACTIVE'),
-        ),
-      ),
+    accountIds.length > 0
+      ? database
+          .select({ accountId: accountRoles.accountId })
+          .from(accountRoles)
+          .where(
+            and(
+              inArray(accountRoles.accountId, accountIds),
+              eq(accountRoles.role, 'TRUSTED_VET'),
+              eq(accountRoles.status, 'ACTIVE'),
+            ),
+          )
+      : [],
     database.select().from(provinces),
     database.select().from(cities),
   ]);
   const provinceName = new Map(provinceRows.map((row) => [row.code, row.nameFa]));
-  const cityName = new Map(cityRows.map((row) => [row.id, row.nameFa]));
+  const cityById = new Map(cityRows.map((row) => [row.id, row]));
   const trusted = new Set(roleRows.map((row) => row.accountId));
 
-  return profiles.map((profile) => ({
-    profile,
-    locations: locationRows
-      .filter((row) => row.vetAccountId === profile.accountId)
-      .map((row) => ({
-        ...row,
-        provinceNameFa: row.provinceCode ? (provinceName.get(row.provinceCode) ?? null) : null,
-        cityNameFa: row.cityId ? (cityName.get(row.cityId) ?? null) : null,
-      }))
-      .sort((a, b) => a.nameFa.localeCompare(b.nameFa, 'fa')),
-    specialtyCodes: specialtyRows.filter((row) => row.vetProfileId === profile.id).map((row) => row.specialtyCode).sort(),
-    speciesCodes: speciesRows.filter((row) => row.vetProfileId === profile.id).map((row) => row.speciesCode).sort(),
-    trusted: trusted.has(profile.accountId),
-  }));
+  return profiles.map((profile) => {
+    const listedCity = profile.listedCityId ? cityById.get(profile.listedCityId) : undefined;
+    return {
+      profile,
+      locations: locationRows
+        .filter((row) => row.vetAccountId === profile.accountId)
+        .map((row) => ({
+          ...row,
+          provinceNameFa: row.provinceCode ? (provinceName.get(row.provinceCode) ?? null) : null,
+          cityNameFa: row.cityId ? (cityById.get(row.cityId)?.nameFa ?? null) : null,
+        }))
+        .sort((a, b) => a.nameFa.localeCompare(b.nameFa, 'fa')),
+      specialtyCodes: specialtyRows.filter((row) => row.vetProfileId === profile.id).map((row) => row.specialtyCode).sort(),
+      speciesCodes: speciesRows.filter((row) => row.vetProfileId === profile.id).map((row) => row.speciesCode).sort(),
+      trusted: profile.accountId !== null && trusted.has(profile.accountId),
+      listed: listedCity
+        ? {
+            provinceCode: listedCity.provinceCode,
+            provinceNameFa: provinceName.get(listedCity.provinceCode) ?? '',
+            cityNameFa: listedCity.nameFa,
+          }
+        : null,
+    };
+  });
 }
 
 /** Locations a visitor sees: marked public and still active. An inactive one is history, not an address. */
@@ -145,6 +184,8 @@ export function completenessInputOf(facts: ProfileFacts): CompletenessInput {
     contactShown: publicPhone(profile.showPhone, profile.phone) !== null,
   };
 }
+
+const ownershipOf = (profile: ProfileRow) => ({ owned: profile.accountId !== null, hasListedCity: profile.listedCityId !== null });
 
 // ── Reference data ───────────────────────────────────────────────────────
 
@@ -165,25 +206,44 @@ export async function directoryReferenceData(database: DbClient) {
   };
 }
 
-// ── Superadmin ───────────────────────────────────────────────────────────
+// ── Editors ──────────────────────────────────────────────────────────────
 
-export async function vetDirectoryEditor(database: DbClient, actor: Actor, accountId: string) {
-  assertSuperadmin(actor);
-  if (!UUID.test(accountId)) return null;
-  const [profile] = await database.select().from(vetProfiles).where(eq(vetProfiles.accountId, accountId)).limit(1);
-  if (!profile) return null;
+async function editorData(database: DbClient, profile: ProfileRow) {
   const [facts] = await loadFacts(database, [profile]);
   const input = completenessInputOf(facts!);
   return {
     facts: facts!,
     completeness: completeness(input),
-    blockers: vetPublishBlockers(input),
+    blockers: vetPublishBlockers(input, ownershipOf(profile)),
     reference: await directoryReferenceData(database),
   };
 }
 
+export type DirectoryEditorData = Awaited<ReturnType<typeof editorData>>;
+
+/** The superadmin's editor of an owned veterinarian, reached from the Phase 1 registry. */
+export async function vetDirectoryEditor(database: DbClient, actor: Actor, accountId: string): Promise<DirectoryEditorData | null> {
+  assertSuperadmin(actor);
+  if (!UUID.test(accountId)) return null;
+  const [profile] = await database.select().from(vetProfiles).where(eq(vetProfiles.accountId, accountId)).limit(1);
+  return profile ? editorData(database, profile) : null;
+}
+
+/** The signed-in veterinarian's own profile, or null when the account owns none (P2-D07). */
+export async function ownVetDirectory(database: DbClient, actor: Actor): Promise<DirectoryEditorData | null> {
+  if (!OWNER_CONTEXTS.includes(actor.context)) return null;
+  const [profile] = await database.select().from(vetProfiles).where(eq(vetProfiles.accountId, actor.accountId)).limit(1);
+  return profile ? editorData(database, profile) : null;
+}
+
+async function profileById(tx: DbClient, profileId: string): Promise<ProfileRow> {
+  const [row] = UUID.test(profileId) ? await tx.select().from(vetProfiles).where(eq(vetProfiles.id, profileId)).limit(1) : [];
+  if (!row) throw notFound('پرونده دامپزشک پیدا نشد.');
+  return row;
+}
+
 export interface VetPublicProfileInput {
-  readonly accountId: string;
+  readonly profileId: string;
   readonly expectedVersion: number;
   readonly headlineFa: string | null;
   readonly bioFa: string | null;
@@ -192,7 +252,7 @@ export interface VetPublicProfileInput {
   readonly showCouncilCode: boolean;
   readonly specialtyCodes: readonly string[];
   readonly speciesCodes: readonly string[];
-  readonly reason: string;
+  readonly reason?: string | null;
 }
 
 /** Saves what the public page says. Only changed fields reach the audit history, each with its previous value. */
@@ -201,8 +261,6 @@ export async function updateVetPublicProfile(
   actor: Actor,
   input: VetPublicProfileInput,
 ): Promise<ProfileRow> {
-  assertSuperadmin(actor);
-  const reason = requireReason(input.reason);
   const next = {
     headlineFa: bounded(input.headlineFa, 120, 'عنوان حرفه‌ای'),
     bioFa: bounded(input.bioFa, 4000, 'معرفی'),
@@ -212,11 +270,11 @@ export async function updateVetPublicProfile(
     specialtyCodes: [...new Set(input.specialtyCodes)].sort(),
     speciesCodes: [...new Set(input.speciesCodes)].sort(),
   };
-  if (!UUID.test(input.accountId)) throw notFound('پرونده دامپزشک پیدا نشد.');
 
   return database.transaction(async (tx) => {
-    const [current] = await tx.select().from(vetProfiles).where(eq(vetProfiles.accountId, input.accountId)).limit(1);
-    if (!current) throw notFound('پرونده دامپزشک پیدا نشد.');
+    const current = await profileById(tx, input.profileId);
+    const manager = assertManager(actor, current.accountId, ['ADMIN', 'OWNER']);
+    const reason = reasonFor(manager, input.reason);
     if (current.version !== input.expectedVersion) throw conflict(STALE);
 
     if (next.specialtyCodes.length > 0) {
@@ -297,28 +355,31 @@ export async function updateVetPublicProfile(
 /**
  * DRAFT → PUBLISHED → HIDDEN → PUBLISHED. A published page is hidden, never
  * turned back into a draft, so its address keeps meaning the same veterinarian.
+ * A page hidden by the superadmin or the review operator stays hidden until
+ * one of them publishes it again; its owner cannot undo moderation (DEC-0166).
  */
 export async function changeVetPublicStatus(
   database: Database,
   actor: Actor,
-  input: { accountId: string; expectedVersion: number; to: string; reason: string },
+  input: { profileId: string; expectedVersion: number; to: string; reason?: string | null },
 ): Promise<ProfileRow> {
-  assertSuperadmin(actor);
-  const reason = requireReason(input.reason);
   if (!isVetPublicStatus(input.to) || input.to === 'DRAFT') throw validation('وضعیت انتخاب‌شده معتبر نیست.');
   const to: VetPublicStatus = input.to;
-  if (!UUID.test(input.accountId)) throw notFound('پرونده دامپزشک پیدا نشد.');
 
   return database.transaction(async (tx) => {
-    const [current] = await tx.select().from(vetProfiles).where(eq(vetProfiles.accountId, input.accountId)).limit(1);
-    if (!current) throw notFound('پرونده دامپزشک پیدا نشد.');
+    const current = await profileById(tx, input.profileId);
+    const manager = assertManager(actor, current.accountId, ['ADMIN', 'REVIEW', 'OWNER']);
+    const reason = reasonFor(manager, input.reason);
     if (current.version !== input.expectedVersion) throw conflict(STALE);
     if (current.publicStatus === to) throw validation('پروفایل همین حالا در این وضعیت است.');
     if (to === 'HIDDEN' && current.publicStatus === 'DRAFT') throw validation('پیش‌نویسی که منتشر نشده پنهان‌کردن ندارد.');
+    if (to === 'PUBLISHED' && manager === 'OWNER' && current.hiddenByReview) {
+      throw conflict('این پروفایل را بررسی همزیست پنهان کرده است و فقط همان‌جا دوباره منتشر می‌شود.');
+    }
 
     if (to === 'PUBLISHED') {
       const [facts] = await loadFacts(tx, [current]);
-      const blockers = vetPublishBlockers(completenessInputOf(facts!));
+      const blockers = vetPublishBlockers(completenessInputOf(facts!), ownershipOf(current));
       if (blockers.length > 0) throw validation(blockers.join(' '));
     }
 
@@ -329,6 +390,7 @@ export async function changeVetPublicStatus(
         publicStatus: to,
         publicSlug: current.publicSlug ?? newPublicSlug(),
         publicPublishedAt: current.publicPublishedAt ?? (to === 'PUBLISHED' ? now : null),
+        hiddenByReview: to === 'HIDDEN' && manager !== 'OWNER',
         version: current.version + 1,
         updatedAt: now,
       })
@@ -340,8 +402,8 @@ export async function changeVetPublicStatus(
       targetType: 'VET_PROFILE',
       targetId: row.id,
       targetVersion: row.version,
-      before: { publicStatus: current.publicStatus, publicSlug: current.publicSlug },
-      after: { publicStatus: row.publicStatus, publicSlug: row.publicSlug },
+      before: { publicStatus: current.publicStatus, publicSlug: current.publicSlug, hiddenByReview: current.hiddenByReview },
+      after: { publicStatus: row.publicStatus, publicSlug: row.publicSlug, hiddenByReview: row.hiddenByReview },
       reason,
     });
     return row;
@@ -355,7 +417,25 @@ export interface LocationPublicInput {
   readonly provinceCode: string | null;
   readonly cityId: string | null;
   readonly hoursNoteFa: string | null;
-  readonly reason: string;
+  readonly reason?: string | null;
+}
+
+async function placeOf(tx: DbClient, provinceCodeInput: string | null, cityIdInput: string | null) {
+  let provinceCode = text(provinceCodeInput);
+  const cityId = text(cityIdInput);
+  let city: typeof cities.$inferSelect | undefined;
+  let province: typeof provinces.$inferSelect | undefined;
+  if (cityId !== null) {
+    [city] = UUID.test(cityId) ? await tx.select().from(cities).where(eq(cities.id, cityId)).limit(1) : [];
+    if (!city) throw validation('شهر انتخاب‌شده در فهرست شهرها نیست.');
+    if (provinceCode !== null && provinceCode !== city.provinceCode) throw validation('شهر انتخاب‌شده در این استان نیست.');
+    provinceCode = city.provinceCode;
+  }
+  if (provinceCode !== null) {
+    [province] = await tx.select().from(provinces).where(eq(provinces.code, provinceCode)).limit(1);
+    if (!province) throw validation('استان انتخاب‌شده در فهرست استان‌ها نیست.');
+  }
+  return { provinceCode, cityId, cityNameFa: city?.nameFa ?? null, provinceNameFa: province?.nameFa ?? null };
 }
 
 /**
@@ -368,31 +448,21 @@ export async function updateLocationPublic(
   actor: Actor,
   input: LocationPublicInput,
 ): Promise<LocationRow> {
-  assertSuperadmin(actor);
-  const reason = requireReason(input.reason);
   const hoursNoteFa = bounded(input.hoursNoteFa, 300, 'ساعات اطلاع‌رسانی');
   if (!UUID.test(input.locationId)) throw notFound('محل کار پیدا نشد.');
-  let provinceCode = text(input.provinceCode);
-  const cityId = text(input.cityId);
 
   return database.transaction(async (tx) => {
     const [current] = await tx.select().from(vetLocations).where(eq(vetLocations.id, input.locationId)).limit(1);
     if (!current) throw notFound('محل کار پیدا نشد.');
+    const manager = assertManager(actor, current.vetAccountId, ['ADMIN', 'OWNER']);
+    const reason = reasonFor(manager, input.reason);
     if (current.version !== input.expectedVersion) throw conflict(STALE);
 
-    if (cityId !== null) {
-      const [city] = UUID.test(cityId) ? await tx.select().from(cities).where(eq(cities.id, cityId)).limit(1) : [];
-      if (!city) throw validation('شهر انتخاب‌شده در فهرست شهرها نیست.');
-      if (provinceCode !== null && provinceCode !== city.provinceCode) throw validation('شهر انتخاب‌شده در این استان نیست.');
-      provinceCode = city.provinceCode;
-    } else if (provinceCode !== null) {
-      const [province] = await tx.select().from(provinces).where(eq(provinces.code, provinceCode)).limit(1);
-      if (!province) throw validation('استان انتخاب‌شده در فهرست استان‌ها نیست.');
-    }
+    const place = await placeOf(tx, input.provinceCode, input.cityId);
     if (input.isPublic && !current.isActive) throw validation('این محل کار غیرفعال است و عمومی نمی‌شود.');
-    if (input.isPublic && cityId === null) throw validation('برای عمومی‌کردن محل کار، شهر آن را انتخاب کنید.');
+    if (input.isPublic && place.cityId === null) throw validation('برای عمومی‌کردن محل کار، شهر آن را انتخاب کنید.');
 
-    const next = { isPublic: input.isPublic === true, provinceCode, cityId, hoursNoteFa };
+    const next = { isPublic: input.isPublic === true, provinceCode: place.provinceCode, cityId: place.cityId, hoursNoteFa };
     const before: Record<string, unknown> = {};
     const after: Record<string, unknown> = {};
     for (const key of Object.keys(next) as (keyof typeof next)[]) {
@@ -422,13 +492,76 @@ export async function updateLocationPublic(
   });
 }
 
+export interface OwnLocationInput {
+  readonly nameFa: string;
+  readonly kind: string;
+  readonly cityId: string;
+  readonly neighborhoodFa?: string | null;
+  readonly addressFa?: string | null;
+  readonly phone?: string | null;
+  readonly hoursNoteFa?: string | null;
+  readonly isPublic: boolean;
+}
+
+/**
+ * A place the owner works at, added from their own profile. It carries no
+ * licence and no capability: those are recorded and judged only by the
+ * superadmin, so a location added here can never reach the Finder (DEC-0166).
+ */
+export async function addOwnLocation(database: Database, actor: Actor, input: OwnLocationInput): Promise<LocationRow> {
+  if (!OWNER_CONTEXTS.includes(actor.context)) throw forbidden('محل کار را صاحب پروفایل از حساب خودش ثبت می‌کند.');
+  const nameFa = bounded(input.nameFa, 120, 'نام محل کار');
+  if (nameFa === null) throw validation('نام محل کار را بنویسید.');
+  if (!LOCATION_KINDS.includes(input.kind as LocationKind)) throw validation('نوع محل کار معتبر نیست.');
+  const values = {
+    neighborhoodFa: bounded(input.neighborhoodFa, 120, 'محله'),
+    addressFa: bounded(input.addressFa, 300, 'نشانی'),
+    phone: bounded(input.phone, 20, 'تلفن'),
+    hoursNoteFa: bounded(input.hoursNoteFa, 300, 'ساعات اطلاع‌رسانی'),
+  };
+
+  return database.transaction(async (tx) => {
+    const [profile] = await tx.select({ id: vetProfiles.id }).from(vetProfiles).where(eq(vetProfiles.accountId, actor.accountId)).limit(1);
+    if (!profile) throw forbidden('این حساب پروفایل دامپزشک ندارد.');
+    const place = await placeOf(tx, null, input.cityId);
+    if (place.cityId === null) throw validation('شهر محل کار را انتخاب کنید.');
+
+    const [row] = await tx
+      .insert(vetLocations)
+      .values({
+        vetAccountId: actor.accountId,
+        nameFa,
+        kind: input.kind as LocationKind,
+        // The Phase 1 free-text columns carry the same place, so older screens read it too.
+        provinceFa: place.provinceNameFa,
+        cityFa: place.cityNameFa,
+        provinceCode: place.provinceCode,
+        cityId: place.cityId,
+        ...values,
+        isPublic: input.isPublic === true,
+        licenceStatus: 'NONE',
+      })
+      .returning();
+    await recordAudit(tx, actor, {
+      action: 'VET_LOCATION_CREATED',
+      targetType: 'VET_LOCATION',
+      targetId: row!.id,
+      targetVersion: row!.version,
+      after: { vetAccountId: actor.accountId, nameFa, cityId: place.cityId, licenceStatus: 'NONE', addedByOwner: true },
+    });
+    return row!;
+  });
+}
+
 /** A city outside the seeded capitals, added as data under its province. */
 export async function addCity(
   database: Database,
   actor: Actor,
   input: { provinceCode: string; nameFa: string },
 ): Promise<typeof cities.$inferSelect> {
-  assertSuperadmin(actor);
+  if (actor.context !== 'SUPERADMIN' && actor.context !== 'REVIEW_OPERATOR') {
+    throw forbidden('شهر تازه را سوپرادمین یا اپراتور بررسی اضافه می‌کند.');
+  }
   const nameFa = unifyPersianLetters(bounded(input.nameFa, 80, 'نام شهر') ?? '').replace(/\s+/g, ' ');
   if (nameFa === '') throw validation('نام شهر را بنویسید.');
 
@@ -458,16 +591,25 @@ async function publishedProfiles(database: DbClient, slug?: string): Promise<Pro
   const rows = await database
     .select({ profile: vetProfiles })
     .from(vetProfiles)
-    .innerJoin(accounts, eq(accounts.id, vetProfiles.accountId))
+    .leftJoin(accounts, eq(accounts.id, vetProfiles.accountId))
     .where(
       and(
         eq(vetProfiles.publicStatus, 'PUBLISHED'),
-        // A disabled account's page goes with it; the profile row stays as history.
-        ne(accounts.status, 'DISABLED'),
+        // A disabled account's page goes with it; the profile row stays as history. Unowned profiles have no account.
+        or(isNull(vetProfiles.accountId), ne(accounts.status, 'DISABLED')),
         slug === undefined ? undefined : eq(vetProfiles.publicSlug, slug),
       ),
     );
   return rows.map((row) => row.profile);
+}
+
+/** The places a profile is found by: its public locations, or the city an unowned profile was listed in. */
+function placesOf(entry: ProfileFacts): { provinceCode: string | null; cityId: string | null; kind: LocationKind | null; cityNameFa: string | null }[] {
+  const locations = publicLocationsOf(entry);
+  if (locations.length > 0) return locations.map((l) => ({ provinceCode: l.provinceCode, cityId: l.cityId, kind: l.kind, cityNameFa: l.cityNameFa }));
+  return entry.listed
+    ? [{ provinceCode: entry.listed.provinceCode, cityId: entry.profile.listedCityId, kind: null, cityNameFa: entry.listed.cityNameFa }]
+    : [];
 }
 
 export interface VetDirectoryQuery {
@@ -489,6 +631,7 @@ export interface VetCard {
   readonly headlineFa: string | null;
   readonly specialtiesFa: readonly string[];
   readonly placesFa: readonly string[];
+  readonly owned: boolean;
   readonly verified: boolean;
   readonly trusted: boolean;
 }
@@ -508,7 +651,7 @@ export async function publishedVets(
   // ponytail: filtered in memory over every published profile; PROMPT-012 search moves this into indexed queries.
   const filtered = facts
     .filter((entry) => {
-      const places = publicLocationsOf(entry);
+      const places = placesOf(entry);
       if (query.specialty && !entry.specialtyCodes.includes(query.specialty)) return false;
       if (query.species && !entry.speciesCodes.includes(query.species)) return false;
       if (query.status === 'VERIFIED' && entry.profile.councilVerifiedAt === null) return false;
@@ -516,16 +659,16 @@ export async function publishedVets(
       if (
         (query.province || query.cityId || kind) &&
         !places.some(
-          (location) =>
-            (!query.province || location.provinceCode === query.province) &&
-            (!query.cityId || location.cityId === query.cityId) &&
-            (!kind || location.kind === kind),
+          (place) =>
+            (!query.province || place.provinceCode === query.province) &&
+            (!query.cityId || place.cityId === query.cityId) &&
+            (!kind || place.kind === kind),
         )
       ) {
         return false;
       }
       if (term !== '') {
-        const haystack = [entry.profile.displayNameFa, entry.profile.headlineFa ?? '', ...places.map((l) => l.nameFa)]
+        const haystack = [entry.profile.displayNameFa, entry.profile.headlineFa ?? '', ...publicLocationsOf(entry).map((l) => l.nameFa)]
           .map(normalizeForSearch)
           .join(' ');
         if (!haystack.includes(term)) return false;
@@ -541,7 +684,8 @@ export async function publishedVets(
     nameFa: entry.profile.displayNameFa,
     headlineFa: entry.profile.headlineFa,
     specialtiesFa: entry.specialtyCodes.map((code) => specialtyName.get(code) ?? code),
-    placesFa: [...new Set(publicLocationsOf(entry).map((l) => l.cityNameFa).filter((c): c is string => c !== null))],
+    placesFa: [...new Set(placesOf(entry).map((p) => p.cityNameFa).filter((c): c is string => c !== null))],
+    owned: entry.profile.accountId !== null,
     verified: entry.profile.councilVerifiedAt !== null,
     trusted: entry.trusted,
   }));
@@ -557,6 +701,8 @@ export interface VetPublicPage {
   /** Only with consent (§7 «کد نظام در حد مجاز»). */
   readonly councilCode: string | null;
   readonly phone: string | null;
+  /** False for a reviewed suggestion nobody has claimed yet (§10). */
+  readonly owned: boolean;
   readonly verified: boolean;
   readonly trusted: boolean;
   readonly specialtiesFa: readonly string[];
@@ -572,6 +718,8 @@ export interface VetPublicPage {
     readonly phone: string | null;
     readonly hoursNoteFa: string | null;
   }[];
+  /** An unowned profile's listed city and public contact, shown while it has no locations. */
+  readonly listed: { readonly cityNameFa: string; readonly provinceNameFa: string; readonly contactFa: string | null } | null;
   readonly updatedAt: Date;
 }
 
@@ -584,6 +732,7 @@ export async function vetPageBySlug(database: DbClient, slug: string): Promise<V
     database.select().from(vetSpecialties).orderBy(asc(vetSpecialties.sortOrder)),
     database.select().from(species).orderBy(asc(species.sortOrder)),
   ]);
+  const locations = publicLocationsOf(facts!);
   return {
     slug,
     nameFa: profile.displayNameFa,
@@ -592,11 +741,12 @@ export async function vetPageBySlug(database: DbClient, slug: string): Promise<V
     experienceFa: profile.experienceFa,
     councilCode: profile.showCouncilCode ? profile.councilCode : null,
     phone: publicPhone(profile.showPhone, profile.phone),
+    owned: profile.accountId !== null,
     verified: profile.councilVerifiedAt !== null,
     trusted: facts!.trusted,
     specialtiesFa: specialtyRows.filter((row) => facts!.specialtyCodes.includes(row.code)).map((row) => row.nameFa),
     speciesFa: speciesRows.filter((row) => facts!.speciesCodes.includes(row.code)).map((row) => row.nameFa),
-    locations: publicLocationsOf(facts!).map((location) => ({
+    locations: locations.map((location) => ({
       id: location.id,
       nameFa: location.nameFa,
       kind: location.kind,
@@ -607,6 +757,14 @@ export async function vetPageBySlug(database: DbClient, slug: string): Promise<V
       phone: location.phone,
       hoursNoteFa: location.hoursNoteFa,
     })),
+    listed:
+      locations.length === 0 && facts!.listed
+        ? {
+            cityNameFa: facts!.listed.cityNameFa,
+            provinceNameFa: facts!.listed.provinceNameFa,
+            contactFa: profile.accountId === null ? profile.listedContactFa : null,
+          }
+        : null,
     updatedAt: profile.updatedAt,
   };
 }

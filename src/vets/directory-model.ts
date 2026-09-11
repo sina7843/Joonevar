@@ -74,11 +74,30 @@ export function completeness(input: CompletenessInput): {
  * who the veterinarian is and where to find them. A name alone is a thin page
  * (§19) and a profile without a place helps nobody.
  */
-export function vetPublishBlockers(input: CompletenessInput): string[] {
+export function vetPublishBlockers(
+  input: CompletenessInput,
+  ownership: { owned: boolean; hasListedCity: boolean } = { owned: true, hasListedCity: false },
+): string[] {
+  // An unowned profile is a reviewed suggestion: a name and a city are what it has (§10, DEC-0166).
+  if (!ownership.owned) return ownership.hasListedCity ? [] : ['پیش از انتشار، شهر پروفایل بدون مالک را انتخاب کنید.'];
   const problems: string[] = [];
   if (!hasText(input.bioFa)) problems.push('پیش از انتشار، معرفی دامپزشک را بنویسید.');
   if (input.publicLocationsWithCity === 0) problems.push('پیش از انتشار، دست‌کم یک محل کار را با شهر عمومی کنید.');
   return problems;
+}
+
+/**
+ * Only a claimed profile may buy an advertising package (§14). An unowned
+ * profile has nobody entitled to pay for it, and a package never creates
+ * ownership, verification or trust (P2-D05). PROMPT-011 asks this before any
+ * payment starts (DEC-0166).
+ */
+export function packagePurchaseEligibility(profile: {
+  accountId: string | null;
+}): { allowed: true } | { allowed: false; reasonFa: string } {
+  return profile.accountId === null
+    ? { allowed: false, reasonFa: 'فقط پروفایلی که Claim و تأیید شده است می‌تواند بسته تبلیغاتی بخرد.' }
+    : { allowed: true };
 }
 
 /** The phone a visitor may see: only with consent, and only when there is one (§20). */

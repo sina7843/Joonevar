@@ -236,6 +236,7 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
                       </span>
                     ) : null}
                     <span className="flex flex-wrap gap-xs pt-2xs">
+                      {vet.owned ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
                       {vet.verified ? <StatusBadge tone="info">کد نظام تأییدشده</StatusBadge> : null}
                       {vet.trusted ? <StatusBadge tone="success">معتمد همزیست</StatusBadge> : null}
                     </span>

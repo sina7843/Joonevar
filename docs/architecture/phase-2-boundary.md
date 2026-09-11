@@ -35,7 +35,7 @@
 |---|---|---|---|---|
 | حساب، OTP، نشست | `account`، `otp_challenge`، `session`، `src/identity/*` | REUSE | ورود عمومی همان OTP فاز یک است؛ حساب دوم ساخته نمی‌شود | 002 |
 | نقش‌های تازه | `account_role`، Enum `account_role_name`، `src/authz/actor.ts` | MIGRATE | افزودن مقدار به Enum؛ هر نقش در پرامپت مصرف‌کننده‌اش (DEC-0145) | 004، 005، 007، 008، 010 |
-| پروفایل عمومی دامپزشک | `vet_profile` (نام، کد نظام یکتا، `council_verified_at`، تلفن، بیو) | MIGRATE | `account_id` امروز NOT NULL است و رکورد «بدون مالک» (P2-D06) را نمی‌پذیرد؛ مالکیت و Claim باید بدون ساخت جدول دامپزشک دوم حل شود. **006:** ستون‌های پروفایل عمومی، تخصص و گونه روی همین ردیف (DEC-0164) | 006، 007 |
+| پروفایل عمومی دامپزشک | `vet_profile` (نام، کد نظام یکتا، `council_verified_at`، تلفن، بیو) | MIGRATE | `account_id` امروز NOT NULL است و رکورد «بدون مالک» (P2-D06) را نمی‌پذیرد؛ مالکیت و Claim باید بدون ساخت جدول دامپزشک دوم حل شود. **006:** ستون‌های پروفایل عمومی، تخصص و گونه روی همین ردیف (DEC-0164). **007:** `account_id` و `council_code` nullable برای پروفایل بدون مالک؛ Claim همان ردیف را منتقل می‌کند (DEC-0166) | 006، 007 |
 | محور Professional Verification | `vet_profile.council_verified_at` | REUSE | همان تأیید کد نظام؛ پرداخت آن را نمی‌سازد | 006 |
 | محور Trusted Hamzist | نقش `TRUSTED_VET` فعال | REUSE | فقط از مسیر عملیاتی فاز یک اعطا می‌شود (DEC-0145) | 006 |
 | محل کار / شعبه | `vet_location` (مالک: `vet_account_id` NOT NULL، نوع CLINIC/HOSPITAL/CENTRE، پروانه، امکانات، مختصات) | MIGRATE | Finder و ارجاع‌های فاز یک (`vet_visit_request.location_id`، `pregnancy_check`) به همین ردیف FK دارند؛ ردیف جابه‌جا یا کپی نمی‌شود | 008 |
@@ -84,7 +84,7 @@
 | محور | منبع |
 |---|---|
 | Completeness | محاسبه از فیلدهای پروفایل |
-| Ownership/Claim | موجودیت Claim (007/009) |
+| Ownership/Claim | `vet_profile.account_id` و `claimed_at`؛ درخواست‌ها در `vet_application` (007، DEC-0165/0166)؛ مرکز 009 |
 | Professional Verification | `vet_profile.council_verified_at` و معادل مرکز |
 | Trusted Hamzist | نقش `TRUSTED_VET` فعال (فاز یک) |
 | Advertising | اشتراک بسته (011) |
@@ -94,7 +94,7 @@
 ## ۶. تعارض‌ها و ریسک‌های شناخته‌شده
 
 1. **D01 فاز یک در برابر P2-D09.** حل‌شده در DEC-0145: ثبت‌نام عمومی دامپزشک فقط پروفایل دایرکتوری و Professional Verification می‌سازد و نقش `TRUSTED_VET` نمی‌دهد.
-2. **مالک اجباری در `vet_profile` و `vet_location`.** رکورد پیشنهادی بدون مالک در ساختار فعلی جا نمی‌شود؛ 006/007 و 008/009 باید Migration افزایشی آن را طراحی کنند بدون اینکه Finder فاز یک رکورد بدون مالک ببیند.
+2. **مالک اجباری در `vet_profile` و `vet_location`.** برای دامپزشک در 007 حل شد (DEC-0166): `vet_profile.account_id` nullable است، پروفایل بدون مالک محل کار ندارد و Finder با join روی حساب آن را نمی‌بیند. مرکز در 008/009.
 3. **ترتیب جغرافیا.** فیلتر استان/شهر از 006 لازم است ولی پرامپت جغرافیا 015 است؛ حداقل جدول نرمال در اولین مصرف‌کننده با Decision ساخته می‌شود.
 4. **بدون Scheduler.** انقضای بسته و وضعیت Expired Package در زمان خواندن محاسبه می‌شوند.
 5. **نام «انجمن».** Shell `/assoc` فاز یک با دایرکتوری `/associations` فاز دو دو چیز مختلف‌اند؛ متن UI باید این را روشن نگه دارد.

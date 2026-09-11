@@ -12,7 +12,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { accounts, species } from './core.ts';
+import { accounts, species, storedFiles } from './core.ts';
 import { cities, provinces } from './geography.ts';
 import { animals } from './animals.ts';
 
@@ -72,11 +72,15 @@ export const vetProfiles = pgTable(
   'vet_profile',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    accountId: uuid('account_id')
-      .notNull()
-      .references(() => accounts.id, { onDelete: 'restrict' }),
+    /**
+     * The owning account. Null only for an unowned profile published by a
+     * reviewer until someone claims it (P2-D06, DEC-0166); the Finder joins on
+     * this column, so it never sees an unowned profile.
+     */
+    accountId: uuid('account_id').references(() => accounts.id, { onDelete: 'restrict' }),
     displayNameFa: text('display_name_fa').notNull(),
-    councilCode: text('council_code').notNull(),
+    /** Unknown for an unowned profile until its claim is approved. */
+    councilCode: text('council_code'),
     councilVerifiedAt: timestamp('council_verified_at', { withTimezone: true }),
     phone: text('phone'),
     bioFa: text('bio_fa'),
@@ -92,6 +96,17 @@ export const vetProfiles = pgTable(
     /** Consent flags (§20): the council code and the phone are shown only when set. */
     showCouncilCode: boolean('show_council_code').notNull().default(false),
     showPhone: boolean('show_phone').notNull().default(false),
+
+    // ── Ownership and claim (Phase 2, PROMPT-007) ──────────────────────────
+    /** Where an unowned profile says the veterinarian works, until an owner records locations. */
+    listedCityId: uuid('listed_city_id').references(() => cities.id, { onDelete: 'restrict' }),
+    /** Public contact or address given for an unowned profile. */
+    listedContactFa: text('listed_contact_fa'),
+    /** Where an unowned profile's information came from. Internal, never shown publicly. */
+    sourceFa: text('source_fa'),
+    claimedAt: timestamp('claimed_at', { withTimezone: true }),
+    /** Hidden by a reviewer: the owner cannot publish it again on their own (DEC-0166). */
+    hiddenByReview: boolean('hidden_by_review').notNull().default(false),
 
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
@@ -291,5 +306,88 @@ export const referralCodes = pgTable(
   (t) => [
     uniqueIndex('referral_code_key').on(t.code),
     index('referral_code_request_idx').on(t.requestId, t.status),
+  ],
+);
+
+// ── Veterinarian applications and claims (Phase 2, PROMPT-007) ─────────────
+
+/** PROFILE asks for a new directory profile; CLAIM asks to take over an unowned one (§8, §10). */
+export const vetApplicationKind = pgEnum('vet_application_kind', ['PROFILE', 'CLAIM']);
+export const vetApplicationStatus = pgEnum('vet_application_status', [
+  'SUBMITTED',
+  'NEEDS_CORRECTION',
+  'APPROVED',
+  'REJECTED',
+  'WITHDRAWN',
+]);
+export const vetApplicationDocumentKind = pgEnum('vet_application_document_kind', [
+  'COUNCIL_CARD',
+  'PRACTICE_LICENCE',
+  'IDENTITY',
+  'OTHER',
+]);
+
+/**
+ * A veterinarian's request for a directory profile or a claim, and its review.
+ * Approval creates or transfers the profile and records Professional
+ * Verification; it never grants the Phase 1 TRUSTED_VET role (DEC-0145).
+ */
+export const vetApplications = pgTable(
+  'vet_application',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    kind: vetApplicationKind('kind').notNull(),
+    /** CLAIM: the profile claimed. PROFILE: the profile created when approved. */
+    vetProfileId: uuid('vet_profile_id').references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    displayNameFa: text('display_name_fa').notNull(),
+    councilCode: text('council_code').notNull(),
+    phone: text('phone'),
+    cityId: uuid('city_id').references(() => cities.id, { onDelete: 'restrict' }),
+    statementFa: text('statement_fa'),
+    status: vetApplicationStatus('status').notNull().default('SUBMITTED'),
+    /** The reviewer's reason for the last decision: correction, rejection or approval. */
+    reviewNoteFa: text('review_note_fa'),
+    reviewedByAccountId: uuid('reviewed_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    /** One appeal per application, after a rejection. */
+    appealFa: text('appeal_fa'),
+    appealedAt: timestamp('appealed_at', { withTimezone: true }),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull().default(now),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    index('vet_application_status_idx').on(t.status, t.submittedAt),
+    // One open application per account, and one open claim per profile.
+    uniqueIndex('vet_application_open_account_key')
+      .on(t.accountId)
+      .where(sql`${t.status} in ('SUBMITTED', 'NEEDS_CORRECTION')`),
+    uniqueIndex('vet_application_open_claim_key')
+      .on(t.vetProfileId)
+      .where(sql`${t.kind} = 'CLAIM' and ${t.status} in ('SUBMITTED', 'NEEDS_CORRECTION')`),
+  ],
+);
+
+/** Private files attached to an application; read only by the applicant and reviewers. */
+export const vetApplicationDocuments = pgTable(
+  'vet_application_document',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    applicationId: uuid('application_id')
+      .notNull()
+      .references(() => vetApplications.id, { onDelete: 'restrict' }),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => storedFiles.id, { onDelete: 'restrict' }),
+    kind: vetApplicationDocumentKind('kind').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_application_document_file_key').on(t.fileId),
+    index('vet_application_document_application_idx').on(t.applicationId),
   ],
 );

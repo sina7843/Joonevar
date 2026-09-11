@@ -11,6 +11,8 @@ export const actorContext = pgEnum('actor_context', [
   // Phase 2 content environments (P2-D11, DEC-0158).
   'AUTHOR',
   'CONTENT_ADMIN',
+  // Phase 2 review operator (DEC-0165).
+  'REVIEW_OPERATOR',
 ]);
 
 /** Roles that can be granted to an account. USER is implicit for every account. */
@@ -22,6 +24,7 @@ export const accountRole = pgEnum('account_role_name', [
   'SUPERADMIN',
   'AUTHOR',
   'CONTENT_ADMIN',
+  'REVIEW_OPERATOR',
 ]);
 
 export const accountRoleStatus = pgEnum('account_role_status', ['PENDING', 'ACTIVE', 'SUSPENDED', 'REJECTED']);
@@ -74,6 +77,8 @@ export const filePurpose = pgEnum('file_purpose', [
   'ANIMAL_PHOTO',
   /** Served publicly only while attached to visible content (DEC-0160). */
   'CONTENT_IMAGE',
+  /** Council card, licence or identity proof of a veterinarian application; reviewers only (DEC-0165). */
+  'VET_APPLICATION_DOCUMENT',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);

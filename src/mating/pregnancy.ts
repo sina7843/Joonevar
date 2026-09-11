@@ -270,7 +270,9 @@ export async function recordVetPregnancyResult(
     .from(vetProfiles)
     .where(eq(vetProfiles.accountId, actor.accountId))
     .limit(1);
-  if (!profile) throw forbidden('پرونده حرفه‌ای دامپزشک پیدا نشد.');
+  // An owned profile always carries its verified council code; only unowned directory profiles lack one.
+  if (!profile || profile.councilCode === null) throw forbidden('پرونده حرفه‌ای دامپزشک پیدا نشد.');
+  const councilCode = profile.councilCode;
   const [location] = await database
     .select({ id: vetLocations.id, licenceStatus: vetLocations.licenceStatus, isActive: vetLocations.isActive })
     .from(vetLocations)
@@ -300,7 +302,7 @@ export async function recordVetPregnancyResult(
         reasonFa: previous ? reason : null,
         vetAccountId: actor.accountId,
         vetNameFa: profile.displayNameFa,
-        councilCode: profile.councilCode,
+        councilCode,
         locationId: request.locationId,
         examinedAt: new Date(),
         replacesVersion: previous?.version ?? null,

@@ -18,6 +18,7 @@ export const ACTOR_CONTEXTS = [
   'SUPERADMIN',
   'AUTHOR',
   'CONTENT_ADMIN',
+  'REVIEW_OPERATOR',
 ] as const;
 export type ActorContextName = (typeof ACTOR_CONTEXTS)[number];
 
@@ -29,6 +30,7 @@ export const ACCOUNT_ROLES = [
   'SUPERADMIN',
   'AUTHOR',
   'CONTENT_ADMIN',
+  'REVIEW_OPERATOR',
 ] as const;
 export type AccountRoleName = (typeof ACCOUNT_ROLES)[number];
 
@@ -44,6 +46,8 @@ export const OPERATIONAL_CONTEXTS: readonly ActorContextName[] = [
   'SUPERADMIN',
   'AUTHOR',
   'CONTENT_ADMIN',
+  // Reviews veterinarian applications, claims and unowned profiles (§3, §8, DEC-0165).
+  'REVIEW_OPERATOR',
 ];
 
 export interface Actor {

@@ -19,6 +19,7 @@ const LABEL: Record<ActorContextName, string> = {
   SUPERADMIN: 'سوپرادمین',
   AUTHOR: 'نویسنده',
   CONTENT_ADMIN: 'ادمین محتوا',
+  REVIEW_OPERATOR: 'اپراتور بررسی',
 };
 
 export function RoleSwitcher({
