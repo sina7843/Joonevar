@@ -119,8 +119,10 @@ async function approveTopKyc(): Promise<void> {
 
 async function completeProfile(page: Page, lastName: string): Promise<void> {
   if (!page.url().includes('/account')) await page.goto(BASE_URL + '/account/complete', { waitUntil: 'load' });
-  // A fixture that already has a profile lands on the profile page, where the
-  // national id is not editable any more; there is nothing to complete there.
+  // A fixture that already has a profile lands on the profile page. Before its
+  // KYC is approved that page still shows the identity fields, but it is an edit
+  // form, not this step; only the completion form is filled here.
+  if (!new URL(page.url()).pathname.startsWith('/account/complete')) return;
   if ((await page.getByTestId('national-id').count()) === 0) return;
   await page.getByTestId('first-name').fill('نمونه');
   await page.getByTestId('last-name').fill(lastName);

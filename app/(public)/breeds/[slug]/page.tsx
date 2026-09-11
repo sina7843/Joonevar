@@ -4,6 +4,8 @@ import { Fragment, cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { db } from '../../../../src/db/client.ts';
 import { breedPageBySlug, type BreedPage } from '../../../../src/breeds/service.ts';
+import { relatedContentForBreed } from '../../../../src/content/service.ts';
+import { KIND_FA, KIND_PATH } from '../../../../src/content/model.ts';
 import {
   BREED_CLAIM_KINDS,
   CLAIM_KIND_FA,
@@ -95,6 +97,8 @@ export default async function BreedPageView({ params }: Params) {
   const claimGroups = BREED_CLAIM_KINDS.map((kind) => ({ kind, items: claims.filter((c) => c.kind === kind) })).filter(
     (entry) => entry.items.length > 0,
   );
+  // Education and news written about this breed (PROMPT-004: content relations).
+  const related = await relatedContentForBreed(db(), breed.id);
 
   return (
     <article className="mx-auto max-w-3xl space-y-xl" data-testid="breed-page">
@@ -212,6 +216,24 @@ export default async function BreedPageView({ params }: Params) {
               </ul>
             </div>
           ))}
+        </section>
+      ) : null}
+
+      {related.length > 0 ? (
+        <section aria-labelledby="breed-related-title" data-testid="breed-related">
+          <h2 id="breed-related-title" className="text-h4">
+            مطالب مرتبط
+          </h2>
+          <ul className="mt-md space-y-sm">
+            {related.map((entry) => (
+              <li key={entry.kind + entry.slug}>
+                <Link href={(KIND_PATH[entry.kind] ?? '') + '/' + entry.slug} className="text-label-md text-text-brand underline underline-offset-4">
+                  {entry.titleFa}
+                </Link>
+                <span className="text-caption text-text-secondary">{' · ' + KIND_FA[entry.kind]}</span>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
     </article>

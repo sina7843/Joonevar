@@ -29,6 +29,7 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   FOREIGN_PEDIGREE_BACK: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
   GENETICS_RECEIPT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
   ANIMAL_PHOTO: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  CONTENT_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

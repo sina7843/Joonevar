@@ -17,6 +17,8 @@ const LABEL: Record<ActorContextName, string> = {
   ASSOCIATION_OPERATOR: 'اپراتور انجمن',
   GENETICS_OPERATOR: 'اپراتور مرکز ژنتیک',
   SUPERADMIN: 'سوپرادمین',
+  AUTHOR: 'نویسنده',
+  CONTENT_ADMIN: 'ادمین محتوا',
 };
 
 export function RoleSwitcher({

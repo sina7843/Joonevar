@@ -115,7 +115,11 @@ export function TextAreaField({
           aria-invalid={invalid || undefined}
           aria-describedby={describedBy}
           aria-required={required || undefined}
-          className={['w-full rounded-md border bg-bg-surface p-md text-body-sm text-text-primary', controlTone(invalid)].join(' ')}
+          className={[
+            'w-full rounded-md border bg-bg-surface p-md text-body-sm text-text-primary',
+            'disabled:bg-bg-disabled disabled:text-text-disabled',
+            controlTone(invalid),
+          ].join(' ')}
           {...rest}
         />
       )}

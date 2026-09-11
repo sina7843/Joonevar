@@ -94,7 +94,8 @@ test('synthetic fixtures are isolated, labelled and refused in production', asyn
     }
 
     const roles = await testDb.db.select().from(accountRoles);
-    assert.equal(roles.length, 5);
+    // One row per fixture role, whatever roles the fixture list holds.
+    assert.equal(roles.length, FIXTURE_ACCOUNTS.reduce((total, fixture) => total + fixture.roles.length, 0));
 
     // Re-running is idempotent.
     const again = await seedDevFixtures(testDb.db, DEV_ENV);

@@ -12,6 +12,7 @@ import { absoluteUrl } from './metadata.ts';
 import { liveSections } from '../public/sections.ts';
 import { db } from '../db/client.ts';
 import { breedSitemapEntries } from '../breeds/service.ts';
+import { contentSitemapEntries } from '../content/service.ts';
 
 export interface SitemapEntry {
   readonly path: string;
@@ -22,6 +23,10 @@ export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly Si
   pages: async () => liveSections().map((section) => ({ path: section.href })),
   // Published, unmerged breed pages with their real modification time (PROMPT-003).
   breeds: () => breedSitemapEntries(db()),
+  // Visible content only; scheduled, hidden, archived and deleted items are left out (PROMPT-004).
+  articles: () => contentSitemapEntries(db(), 'ARTICLE'),
+  news: () => contentSitemapEntries(db(), 'NEWS'),
+  announcements: () => contentSitemapEntries(db(), 'ANNOUNCEMENT'),
 };
 
 export function sitemapSection(id: string): (() => Promise<readonly SitemapEntry[]>) | null {

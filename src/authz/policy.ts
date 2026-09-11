@@ -83,7 +83,8 @@ export type FilePurposeName =
   | 'FOREIGN_PEDIGREE_FRONT'
   | 'FOREIGN_PEDIGREE_BACK'
   | 'GENETICS_RECEIPT'
-  | 'ANIMAL_PHOTO';
+  | 'ANIMAL_PHOTO'
+  | 'CONTENT_IMAGE';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -91,6 +92,8 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   FOREIGN_PEDIGREE_BACK: ['ASSOCIATION_OPERATOR'],
   GENETICS_RECEIPT: ['GENETICS_OPERATOR'],
   ANIMAL_PHOTO: [],
+  // The public reads a content image through /media only while its content is visible (DEC-0160).
+  CONTENT_IMAGE: ['CONTENT_ADMIN'],
 };
 
 export function canReadFile(

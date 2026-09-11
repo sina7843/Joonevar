@@ -25,6 +25,11 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // it; until then its reserved prefix stays unlisted and therefore closed.
   { prefix: '/about', access: 'PUBLIC' },
   { prefix: '/breeds', access: 'PUBLIC' },
+  { prefix: '/articles', access: 'PUBLIC' },
+  { prefix: '/news', access: 'PUBLIC' },
+  { prefix: '/announcements', access: 'PUBLIC' },
+  // Content images: the route itself serves only images of visible content (DEC-0160).
+  { prefix: '/media', access: 'PUBLIC' },
   { prefix: '/robots.txt', access: 'PUBLIC' },
   { prefix: '/sitemap.xml', access: 'PUBLIC' },
   { prefix: '/sitemaps', access: 'PUBLIC' },
@@ -60,6 +65,10 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/assoc', access: ['ASSOCIATION_OPERATOR'] },
   { prefix: '/genetics', access: ['GENETICS_OPERATOR'] },
   { prefix: '/admin', access: ['SUPERADMIN'] },
+
+  // Phase 2 content environments (P2-D11, DEC-0158).
+  { prefix: '/author', access: ['AUTHOR'] },
+  { prefix: '/content', access: ['CONTENT_ADMIN'] },
 ];
 
 function normalize(pathname: string): string {

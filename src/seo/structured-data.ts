@@ -15,6 +15,46 @@ const BACKSLASH = String.fromCharCode(92);
 
 export type JsonLd = Readonly<Record<string, unknown>>;
 
+/**
+ * Article / NewsArticle for one published piece (§19). The author is a Person
+ * only when the author chose to show their name; otherwise the platform is the
+ * author, exactly as the page itself signs it.
+ */
+export function articleLd(
+  input: {
+    type: 'Article' | 'NewsArticle';
+    headline: string;
+    description: string;
+    path: string;
+    datePublished: Date;
+    dateModified: Date;
+    authorName: string;
+    authorIsPerson: boolean;
+    imagePath: string | null;
+  },
+  origin: string,
+): JsonLd {
+  const url = absoluteUrl(origin, input.path);
+  return {
+    '@context': 'https://schema.org',
+    '@type': input.type,
+    headline: input.headline.slice(0, 110),
+    description: input.description,
+    inLanguage: 'fa-IR',
+    url,
+    mainEntityOfPage: url,
+    datePublished: input.datePublished.toISOString(),
+    dateModified: input.dateModified.toISOString(),
+    author: input.authorIsPerson ? { '@type': 'Person', name: input.authorName } : { '@type': 'Organization', name: SITE_NAME },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      logo: { '@type': 'ImageObject', url: absoluteUrl(origin, SITE_IMAGE.path) },
+    },
+    ...(input.imagePath ? { image: [absoluteUrl(origin, input.imagePath)] } : {}),
+  };
+}
+
 export interface Crumb {
   readonly name: string;
   readonly path: string;

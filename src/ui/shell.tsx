@@ -272,5 +272,19 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin/settings', label: 'تنظیمات', icon: 'listChecks' },
   { href: '/admin/vets', label: 'دامپزشکان معتمد', icon: 'firstAidKit' },
   { href: '/admin/breeds', label: 'نژادها', icon: 'dog' },
+  { href: '/admin/roles', label: 'نقش‌های محتوا', icon: 'shieldCheck' },
   { href: '/admin/audit', label: 'تاریخچه', icon: 'clipboardText' },
+];
+
+/** Author environment (P2-D11). */
+export const AUTHOR_NAV: readonly NavItem[] = [
+  { href: '/author', label: 'نوشته‌های من', icon: 'clipboardText' },
+  { href: '/author/new', label: 'نوشته تازه', icon: 'uploadSimple' },
+];
+
+/** Content admin environment. */
+export const CONTENT_NAV: readonly NavItem[] = [
+  { href: '/content', label: 'همه محتوا', icon: 'clipboardText' },
+  { href: '/content/new', label: 'محتوای تازه', icon: 'uploadSimple' },
+  { href: '/content/categories', label: 'دسته‌ها', icon: 'listChecks' },
 ];

@@ -16,6 +16,8 @@ export const ACTOR_CONTEXTS = [
   'ASSOCIATION_OPERATOR',
   'GENETICS_OPERATOR',
   'SUPERADMIN',
+  'AUTHOR',
+  'CONTENT_ADMIN',
 ] as const;
 export type ActorContextName = (typeof ACTOR_CONTEXTS)[number];
 
@@ -25,14 +27,23 @@ export const ACCOUNT_ROLES = [
   'ASSOCIATION_OPERATOR',
   'GENETICS_OPERATOR',
   'SUPERADMIN',
+  'AUTHOR',
+  'CONTENT_ADMIN',
 ] as const;
 export type AccountRoleName = (typeof ACCOUNT_ROLES)[number];
 
-/** Contexts that live in their own operational shell and never appear in the public Role Switcher (D10, D11). */
+/**
+ * Contexts that live in their own operational shell and never appear in the
+ * public Role Switcher (D10, D11). The Phase 2 author and content admin are
+ * environments of the same kind: reached by their own address, independent of
+ * every other role (P2-D11, DEC-0158).
+ */
 export const OPERATIONAL_CONTEXTS: readonly ActorContextName[] = [
   'ASSOCIATION_OPERATOR',
   'GENETICS_OPERATOR',
   'SUPERADMIN',
+  'AUTHOR',
+  'CONTENT_ADMIN',
 ];
 
 export interface Actor {

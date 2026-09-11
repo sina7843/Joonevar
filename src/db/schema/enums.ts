@@ -8,6 +8,9 @@ export const actorContext = pgEnum('actor_context', [
   'ASSOCIATION_OPERATOR',
   'GENETICS_OPERATOR',
   'SUPERADMIN',
+  // Phase 2 content environments (P2-D11, DEC-0158).
+  'AUTHOR',
+  'CONTENT_ADMIN',
 ]);
 
 /** Roles that can be granted to an account. USER is implicit for every account. */
@@ -17,6 +20,8 @@ export const accountRole = pgEnum('account_role_name', [
   'ASSOCIATION_OPERATOR',
   'GENETICS_OPERATOR',
   'SUPERADMIN',
+  'AUTHOR',
+  'CONTENT_ADMIN',
 ]);
 
 export const accountRoleStatus = pgEnum('account_role_status', ['PENDING', 'ACTIVE', 'SUSPENDED', 'REJECTED']);
@@ -65,6 +70,8 @@ export const filePurpose = pgEnum('file_purpose', [
   'FOREIGN_PEDIGREE_BACK',
   'GENETICS_RECEIPT',
   'ANIMAL_PHOTO',
+  /** Served publicly only while attached to visible content (DEC-0160). */
+  'CONTENT_IMAGE',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -78,6 +85,12 @@ export const breedLevel = pgEnum('breed_level', ['LOW', 'MODERATE', 'HIGH']);
 
 /** Whether a breed has a public page — independent of whether forms offer it (DEC-0155). */
 export const breedProfileStatus = pgEnum('breed_profile_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
+
+/** CMS content types — Requirements-Phase-2 §12. */
+export const contentKind = pgEnum('content_kind', ['ARTICLE', 'NEWS', 'ANNOUNCEMENT', 'CLUB_POST']);
+
+/** CMS status — §12. DELETED is the soft delete of P2-D13; no row is removed. */
+export const contentStatus = pgEnum('content_status', ['DRAFT', 'PUBLISHED', 'HIDDEN', 'ARCHIVED', 'DELETED']);
 
 export const breedClaimKind = pgEnum('breed_claim_kind', [
   'HEALTH_NOTE',

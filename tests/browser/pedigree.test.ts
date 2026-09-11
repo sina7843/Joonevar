@@ -127,6 +127,9 @@ async function approveTopKyc(): Promise<void> {
 
 async function completeProfile(page: Page, lastName: string): Promise<void> {
   if (!page.url().includes('/account')) await page.goto(BASE_URL + '/account/complete', { waitUntil: 'load' });
+  // An account that already has a profile is sent on to the edit form, which also
+  // shows the identity fields; only the completion form belongs to this step.
+  if (!new URL(page.url()).pathname.startsWith('/account/complete')) return;
   if ((await page.getByTestId('national-id').count()) === 0) return;
   await page.getByTestId('first-name').fill('نمونه');
   await page.getByTestId('last-name').fill(lastName);

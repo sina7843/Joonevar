@@ -39,6 +39,8 @@ export interface PageSeo {
   /** Required for DUPLICATE: the path of the record this one duplicates. */
   readonly primaryPath?: string;
   readonly type?: 'website' | 'article';
+  /** The page's own image (a content image); otherwise the official symbol. */
+  readonly image?: { readonly path: string; readonly alt: string };
 }
 
 export function absoluteUrl(origin: string, path: string): string {
@@ -66,12 +68,14 @@ export function buildMetadata(page: PageSeo, site: SiteContext): Metadata {
 
   const canonical = absoluteUrl(site.origin, state === 'DUPLICATE' ? page.primaryPath! : page.path);
   const fullTitle = title.includes(SITE_NAME) ? title : title + ' | ' + SITE_NAME;
-  const image = {
-    url: absoluteUrl(site.origin, SITE_IMAGE.path),
-    width: SITE_IMAGE.width,
-    height: SITE_IMAGE.height,
-    alt: SITE_NAME,
-  };
+  const image = page.image
+    ? { url: absoluteUrl(site.origin, page.image.path), alt: page.image.alt }
+    : {
+        url: absoluteUrl(site.origin, SITE_IMAGE.path),
+        width: SITE_IMAGE.width,
+        height: SITE_IMAGE.height,
+        alt: SITE_NAME,
+      };
 
   return {
     title: { absolute: fullTitle },
@@ -87,6 +91,6 @@ export function buildMetadata(page: PageSeo, site: SiteContext): Metadata {
       url: canonical,
       images: [image],
     },
-    twitter: { card: 'summary', title: fullTitle, description, images: [image.url] },
+    twitter: { card: page.image ? 'summary_large_image' : 'summary', title: fullTitle, description, images: [image.url] },
   };
 }

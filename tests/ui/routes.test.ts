@@ -21,6 +21,11 @@ test('only sign-in, health and the built public site are open', () => {
     '/about',
     '/breeds',
     '/breeds/german-shepherd',
+    '/articles',
+    '/articles/مراقبت-از-توله',
+    '/news/some-news',
+    '/announcements',
+    '/media/00000000-0000-4000-8000-000000000000',
     '/login',
     '/api/health',
     '/robots.txt',
@@ -175,7 +180,25 @@ test('trailing slashes and query strings do not change the decision', () => {
   assert.equal(canAccessRoute(actor('USER'), '/admin?x=1'), false);
 });
 
+test('the author and content admin environments are separate shells entered only with their own role', () => {
+  assert.deepEqual(accessForRoute('/author'), ['AUTHOR']);
+  assert.deepEqual(accessForRoute('/author/content/abc'), ['AUTHOR']);
+  assert.deepEqual(accessForRoute('/content'), ['CONTENT_ADMIN']);
+  assert.deepEqual(accessForRoute('/content/categories'), ['CONTENT_ADMIN']);
+
+  assert.equal(canAccessRoute(actor('AUTHOR', ['AUTHOR']), '/author/new'), true);
+  assert.equal(canAccessRoute(actor('AUTHOR', []), '/author'), false, 'a context without the active role is not entered');
+  // No other role implies authorship (P2-D11).
+  for (const role of ['SUPERADMIN', 'TRUSTED_VET', 'BREEDER', 'ASSOCIATION_OPERATOR'] as const) {
+    assert.equal(selectContext(actor('USER', [role]), ['AUTHOR']), null, role);
+  }
+  assert.equal(canAccessRoute(actor('AUTHOR', ['AUTHOR']), '/content'), false);
+  assert.equal(canAccessRoute(actor('CONTENT_ADMIN', ['CONTENT_ADMIN']), '/author'), false);
+  assert.equal(canAccessRoute(null, '/author'), false);
+});
+
 test('the role switcher never offers an operational context', () => {
+  assert.deepEqual(switchableContexts(['AUTHOR', 'CONTENT_ADMIN']), ['USER']);
   assert.deepEqual(switchableContexts(['SUPERADMIN', 'ASSOCIATION_OPERATOR', 'GENETICS_OPERATOR']), ['USER']);
   assert.deepEqual(switchableContexts(['BREEDER', 'SUPERADMIN']), ['USER', 'BREEDER']);
   assert.deepEqual(switchableContexts(['TRUSTED_VET']), ['USER', 'TRUSTED_VET']);

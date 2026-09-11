@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '../../../src/db/client.ts';
 import { currentSession } from '../../../src/authz/request-actor.ts';
 import { setSessionContext } from '../../../src/identity/session.ts';
-import { ACTOR_CONTEXTS, type ActorContextName } from '../../../src/authz/actor.ts';
+import { ACTOR_CONTEXTS, OPERATIONAL_CONTEXTS, type ActorContextName } from '../../../src/authz/actor.ts';
 import { forbidden, toErrorBody, unauthenticated, validation } from '../../../src/domain/errors.ts';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,9 @@ export async function POST(request: Request) {
     const returnTo = String(form.get('returnTo') ?? '/dashboard');
 
     if (!ACTOR_CONTEXTS.includes(requested)) throw validation('Unknown context');
-    if (requested === 'ASSOCIATION_OPERATOR' || requested === 'GENETICS_OPERATOR' || requested === 'SUPERADMIN') {
+    // Every operational environment, including the Phase 2 author and content
+    // admin, is refused by the same list the switcher is built from (DEC-0158).
+    if (OPERATIONAL_CONTEXTS.includes(requested)) {
       throw forbidden('Operational environments are separate shells, not a public role switch');
     }
 

@@ -85,6 +85,24 @@ export const FIXTURE_ACCOUNTS: readonly FixtureAccount[] = [
     nationalId: '9000006856',
     birthDate: '1984-06-06',
   },
+  {
+    label: 'SYNTHETIC author',
+    mobile: '09990000007',
+    roles: ['AUTHOR'],
+    firstName: 'نمونه',
+    lastName: 'نویسنده آزمایشی',
+    nationalId: '9000007003',
+    birthDate: '1989-07-07',
+  },
+  {
+    label: 'SYNTHETIC content admin',
+    mobile: '09990000008',
+    roles: ['CONTENT_ADMIN'],
+    firstName: 'نمونه',
+    lastName: 'ادمین محتوا آزمایشی',
+    nationalId: '9000008001',
+    birthDate: '1983-08-08',
+  },
 ];
 
 export async function seedDevFixtures(database: DbClient, env: Env = loadEnv()): Promise<readonly string[]> {

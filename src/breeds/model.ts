@@ -99,12 +99,13 @@ const PERSIAN_DIGITS = new RegExp('[' + cp(0x06f0) + '-' + cp(0x06f9) + cp(0x066
  * spaces and punctuation stop mattering — so «ژرمن شپرد», «ژرمن‌شپرد» and
  * «german-shepherd» meet. Typo tolerance is PROMPT-012's search.
  */
+/** Arabic yeh and kaf written as their Persian letters, so one word has one spelling. */
+export function unifyPersianLetters(value: string): string {
+  return value.replace(ARABIC_YEH, cp(0x06cc)).replace(ARABIC_KAF, cp(0x06a9));
+}
+
 export function normalizeForSearch(value: string): string {
-  return value
-    .normalize('NFKC')
-    .toLowerCase()
-    .replace(ARABIC_YEH, cp(0x06cc))
-    .replace(ARABIC_KAF, cp(0x06a9))
+  return unifyPersianLetters(value.normalize('NFKC').toLowerCase())
     .replace(IGNORED_MARKS, '')
     .replace(PERSIAN_DIGITS, (digit) => String((digit.charCodeAt(0) - (digit.charCodeAt(0) >= 0x06f0 ? 0x06f0 : 0x0660)) % 10))
     .replace(/[^\p{L}\p{N}]+/gu, '');

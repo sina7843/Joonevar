@@ -131,7 +131,7 @@ function groupLocked(
  * role, on every one of these routes.
  */
 const OPS_ENVIRONMENTS: ReadonlyArray<{
-  role: 'ASSOCIATION_OPERATOR' | 'GENETICS_OPERATOR' | 'SUPERADMIN';
+  role: 'ASSOCIATION_OPERATOR' | 'GENETICS_OPERATOR' | 'SUPERADMIN' | 'AUTHOR' | 'CONTENT_ADMIN';
   label: string;
   description: string;
   href: string;
@@ -153,6 +153,18 @@ const OPS_ENVIRONMENTS: ReadonlyArray<{
     label: 'محیط سوپرادمین',
     description: 'تنظیمات، دامپزشکان معتمد، نژادها و تاریخچه.',
     href: '/admin',
+  },
+  {
+    role: 'AUTHOR',
+    label: 'محیط نویسنده',
+    description: 'نوشتن، زمان‌بندی و انتشار آموزش و خبر.',
+    href: '/author',
+  },
+  {
+    role: 'CONTENT_ADMIN',
+    label: 'محیط ادمین محتوا',
+    description: 'همه محتوا، پنهان‌سازی، بایگانی، حذف نرم و دسته‌ها.',
+    href: '/content',
   },
 ];
 
