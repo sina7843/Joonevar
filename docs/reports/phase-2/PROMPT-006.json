@@ -1,0 +1,86 @@
+{
+  "promptId": "PROMPT-006",
+  "status": "COMPLETE",
+  "summary": "Public veterinary directory built on the Phase 1 vet_profile and vet_location rows, without a parallel veterinarian table. Migration 0020 adds province (31, seeded) and city (31 provincial capitals seeded; superadmin adds others, one name per province) with optional province_code/city_id on vet_location, backfilled from the Phase 1 free text with Arabic yeh/kaf unified and the text left as history; CAT joins the species taxonomy while the breed bank is held to DOG; vet_specialty (15 seeded areas of practice), vet_profile_specialty and vet_profile_species; public columns on vet_profile (DRAFT/PUBLISHED/HIDDEN, stable random slug, headline, experience, consent to show phone and council code) and is_public/hours note on vet_location. The superadmin edits a veterinarian's public page at /admin/vets/[accountId] (linked from the Phase 1 registry): five status axes shown separately (computed Completeness, Ownership, Professional Verification from council_verified_at, Trusted from the active TRUSTED_VET role, Advertising none), profile with specialties, species and consent, location placement and visibility, publication and city creation; every change needs a reason, carries the expected version and is audited field by field with before/after. Publishing needs a bio and a public location with a city; hidden, draft, disabled-account and unknown addresses are 404 and absent from the sitemap. Visitors use /veterinarians with name, specialty, species, province, city, location kind and a single status axis filter, and /veterinarians/[slug] with consent-gated contact, active public locations, announced hours as information only, canonical, Person/VeterinaryCare JSON-LD and breadcrumb; the section is live in the header, footer and sitemap. The Finder's conditions and data are untouched. Phase 1 fix: upsertVetProfile no longer clears the bio when the registry form omits it.",
+  "changedFiles": [
+    "src/db/schema/geography.ts",
+    "src/db/schema/vets.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0020_vet-directory.sql",
+    "src/db/migrations/meta/0020_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/vets/directory-model.ts",
+    "src/vets/directory.ts",
+    "src/vets/registry.ts",
+    "src/breeds/service.ts",
+    "src/authz/routes.ts",
+    "src/public/sections.ts",
+    "src/seo/sitemap.ts",
+    "src/seo/structured-data.ts",
+    "app/admin/vets/page.tsx",
+    "app/admin/vets/[accountId]/page.tsx",
+    "app/admin/vets/[accountId]/actions.ts",
+    "app/admin/vets/[accountId]/forms.tsx",
+    "app/(public)/veterinarians/(list)/page.tsx",
+    "app/(public)/veterinarians/(list)/loading.tsx",
+    "app/(public)/veterinarians/[slug]/page.tsx",
+    "tests/domain/vet-directory.test.ts",
+    "tests/db/vet-directory.test.ts",
+    "tests/db/breeds.test.ts",
+    "tests/browser/vet-directory.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "tests/ui/seo.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-006-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-006/editor-published.png",
+    "docs/reports/screenshots/phase-2/prompt-006/directory-filtered-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-006/profile-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-006/directory-desktop.png"
+  ],
+  "decisions": ["DEC-0163", "DEC-0164"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 before the build and again after npm run build on the final tree (generated .next route types included)."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0; /veterinarians, /veterinarians/[slug] and /admin/vets/[accountId] built as dynamic routes."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/vet-directory.test.ts tests/ui/routes.test.ts tests/ui/seo.test.ts && node --test --test-concurrency=1 tests/db/vet-directory.test.ts tests/db/breeds.test.ts && node --test --test-concurrency=1 tests/db/migrations.test.ts tests/db/referrals.test.ts tests/db/content.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction to not re-run unaffected suites that already passed. Unit: tests 33 · pass 33 · fail 0 (new tests/domain/vet-directory.test.ts: completeness counts and missing items, whitespace is not content, publish blockers independent of completeness, phone only with consent, closed status list; tests/ui/seo.test.ts live section list now includes /veterinarians — its first run failed on the old pinned list and was updated; tests/ui/routes.test.ts reserved namespace stays PUBLIC or closed). Database, fresh migrated databases: tests/db/vet-directory.test.ts 8/8 + tests/db/breeds.test.ts 8/8 = 16/16 (31 provinces each with its capital, 15 specialties, CAT and DOG; the migration's own backfill statements link an Arabic-yeh Phase 1 city to fars/شیراز and leave unknown text unlinked and unchanged; FORBIDDEN for user and TRUSTED_VET contexts, null for non-UUID and non-vet accounts; reason required, unknown specialty/species refused, field-by-field audit with before/after/actor/reason/version, stale version CONFLICT, identical save records nothing, Phase 1 registry save keeps the bio; city must belong to province, province follows city, public needs a city, licence/capabilities/free text unchanged and Finder result identical, closed location cannot be made public; publish blocked without bio and public location, DRAFT and DRAFT→HIDDEN refused, slug vet-[10 hex] kept across hide/republish with first publish time, hidden page and sitemap entry gone, internal id and made-up slug not found, two simultaneous hides: one applied, one CONFLICT; phone and council code only with consent, private and inactive locations not shown, disabled account 404; filters by specialty, species, province, city, kind, TRUSTED (suspended role excluded), VERIFIED, place and kind on the same location, Arabic yeh search, pagination; city added once per province with letter/space normalisation and audit; breeds suite updated for CAT and still passes with the dog-only guard). Regression for shared code touched: tests/db/migrations.test.ts, tests/db/referrals.test.ts (registry upsert) and tests/db/content.test.ts (species list) tests 26 · pass 26 · fail 0. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run test:browser -- tests/browser/vet-directory.test.ts tests/browser/public-shell.test.ts tests/browser/breeds.test.ts tests/browser/finder.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction on the final build, disposable database hamzist_browser_108aaf063285 with its own production server at 127.0.0.1:2054: tests 19 · pass 19 · fail 0. tests/browser/vet-directory.test.ts 3/3: from the Phase 1 registry the superadmin opens a veterinarian's directory editor, sees five separate axes and the blockers, an early publish is refused, places the location in فارس/شیراز with hours and visibility, writes headline, bio, SURGERY, CAT and phone consent, the refreshed page keeps the saved checkboxes and city, publishes and gets a vet-[10 hex] address; a phone-width visitor filters by specialty and province, the card shows verified, trusted, city and specialty with no sideways scroll, the profile shows name, both badges, consented phone, no council code, species, hours, canonical and Person + BreadcrumbList JSON-LD; a non-matching filter shows the empty state; the veterinarians sitemap lists the page; after hiding with a reason the page is 404 and absent from the list; anonymous access to the editor goes to sign-in with the exact next path; a signed-in author gets FORBIDDEN. public-shell (header now links /veterinarians; /centers is the unbuilt 404 example), breeds (breed editor species list now DOG only) and finder (registry page gained the directory link, upsert changed) also pass. Screenshots regenerated for earlier prompts by these suites were restored; only prompt-006 evidence is new. Suites not re-run are unaffected; last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The veterinarian cannot edit their own public page yet; registration, claim and unowned suggested profiles arrive with PROMPT-007 (vet_profile.account_id is still NOT NULL).",
+    "Reporting a veterinarian profile (§13) was not built; moderation_report gains a profile target with the review queue of PROMPT-007 (DEC-0164).",
+    "Related content on the profile was not built: the CMS has no relation to a veterinarian.",
+    "Advertising and the display-type filter arrive with PROMPT-011; the list order is neutral (name) until the versioned ranking of PROMPT-012/015.",
+    "Directory filtering runs in memory over published profiles (marked ponytail in src/vets/directory.ts); indexed search belongs to PROMPT-012.",
+    "Only vet_location is linked to province/city; kennel, residence and postal_request keep free text until PROMPT-015. A Phase 1 location whose city text does not match a seeded city stays unlinked until the superadmin picks its city. No map.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the directory pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "VET_DIRECTORY_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

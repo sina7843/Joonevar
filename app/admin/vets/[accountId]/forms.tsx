@@ -1,0 +1,302 @@
+'use client';
+
+import { startTransition, useActionState, useState, type FormEvent } from 'react';
+import { Card } from '../../../../src/ui/card.tsx';
+import { Button } from '../../../../src/ui/button.tsx';
+import { Alert } from '../../../../src/ui/alert.tsx';
+import { SelectField, TextAreaField, TextField } from '../../../../src/ui/field.tsx';
+import { VET_PUBLIC_STATUS_FA, type VetPublicStatus } from '../../../../src/vets/directory-model.ts';
+import {
+  addCityAction,
+  changeVetPublicStatusAction,
+  updateLocationPublicAction,
+  updateVetPublicProfileAction,
+  type DirectoryEditState,
+} from './actions.ts';
+
+const EMPTY: DirectoryEditState = {};
+
+type Option = { code: string; nameFa: string };
+type CityOption = { id: string; provinceCode: string; nameFa: string };
+
+function Result({ state, testId }: { state: DirectoryEditState; testId: string }) {
+  if (!state.message) return null;
+  return (
+    <div data-testid={testId}>
+      <Alert tone={state.ok ? 'success' : 'error'} title={state.message} />
+    </div>
+  );
+}
+
+/*
+ * Every form here submits from onSubmit rather than the `action` prop: React
+ * resets a form after its action, and reset checkboxes and selects would show
+ * values that were never saved (DEC-0157).
+ */
+function submitWith(dispatch: (data: FormData) => void) {
+  return (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    startTransition(() => dispatch(data));
+  };
+}
+
+function Check({ name, value, label, defaultChecked, testId }: {
+  name: string;
+  value?: string;
+  label: string;
+  defaultChecked: boolean;
+  testId: string;
+}) {
+  return (
+    <label className="flex min-h-[var(--size-control-sm)] items-center gap-sm text-body-sm">
+      <input type="checkbox" name={name} value={value} defaultChecked={defaultChecked} className="size-[18px]" data-testid={testId} />
+      {label}
+    </label>
+  );
+}
+
+const ReasonField = ({ testId }: { testId: string }) => (
+  <TextField label="دلیل تغییر" name="reason" required maxLength={500} hint="در تاریخچه تغییرات ثبت می‌شود." data-testid={testId} />
+);
+
+export interface EditableVetProfile {
+  readonly accountId: string;
+  readonly version: number;
+  readonly headlineFa: string | null;
+  readonly bioFa: string | null;
+  readonly experienceFa: string | null;
+  readonly phone: string | null;
+  readonly showPhone: boolean;
+  readonly showCouncilCode: boolean;
+  readonly specialtyCodes: readonly string[];
+  readonly speciesCodes: readonly string[];
+  readonly publicStatus: VetPublicStatus;
+}
+
+export function VetPublicProfileForm({
+  profile,
+  specialties,
+  species,
+}: {
+  profile: EditableVetProfile;
+  specialties: readonly Option[];
+  species: readonly Option[];
+}) {
+  const [state, submit, pending] = useActionState(updateVetPublicProfileAction, EMPTY);
+  return (
+    <Card>
+      <h2 className="text-label-lg">اطلاعات پروفایل عمومی</h2>
+      <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="directory-profile-form">
+        <input type="hidden" name="accountId" value={profile.accountId} />
+        <input type="hidden" name="expectedVersion" value={profile.version} />
+        <Result state={state} testId="directory-profile-result" />
+
+        <TextField label="عنوان حرفه‌ای" name="headlineFa" maxLength={120} defaultValue={profile.headlineFa ?? ''} data-testid="directory-headline" />
+        <TextAreaField label="معرفی" name="bioFa" maxLength={4000} defaultValue={profile.bioFa ?? ''} data-testid="directory-bio" />
+        <TextAreaField
+          label="سوابق"
+          name="experienceFa"
+          maxLength={4000}
+          defaultValue={profile.experienceFa ?? ''}
+          hint="فقط سابقه‌ای که دامپزشک اعلام و مدرکش بررسی شده است."
+          data-testid="directory-experience"
+        />
+
+        <fieldset>
+          <legend className="text-label-md">تخصص‌ها</legend>
+          <div className="mt-sm grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
+            {specialties.map((row) => (
+              <Check
+                key={row.code}
+                name="specialty"
+                value={row.code}
+                label={row.nameFa}
+                defaultChecked={profile.specialtyCodes.includes(row.code)}
+                testId={'directory-specialty-' + row.code}
+              />
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="text-label-md">گونه‌هایی که پذیرفته می‌شوند</legend>
+          <div className="mt-sm flex flex-wrap gap-lg">
+            {species.map((row) => (
+              <Check
+                key={row.code}
+                name="species"
+                value={row.code}
+                label={row.nameFa}
+                defaultChecked={profile.speciesCodes.includes(row.code)}
+                testId={'directory-species-' + row.code}
+              />
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="text-label-md">رضایت نمایش</legend>
+          <div className="mt-sm space-y-xs">
+            <Check
+              name="showPhone"
+              label={profile.phone ? 'نمایش تلفن ' + profile.phone + ' در صفحه عمومی' : 'نمایش تلفن (تلفنی در پرونده ثبت نشده است)'}
+              defaultChecked={profile.showPhone}
+              testId="directory-show-phone"
+            />
+            <Check
+              name="showCouncilCode"
+              label="نمایش کد نظام دامپزشکی در صفحه عمومی"
+              defaultChecked={profile.showCouncilCode}
+              testId="directory-show-council"
+            />
+          </div>
+        </fieldset>
+
+        <ReasonField testId="directory-profile-reason" />
+        <Button type="submit" disabled={pending} data-testid="save-directory-profile">
+          ذخیره پروفایل عمومی
+        </Button>
+      </form>
+    </Card>
+  );
+}
+
+export function VetPublicStatusForm({ profile, blockers }: { profile: EditableVetProfile; blockers: readonly string[] }) {
+  const [state, submit, pending] = useActionState(changeVetPublicStatusAction, EMPTY);
+  const targets: VetPublicStatus[] = profile.publicStatus === 'PUBLISHED' ? ['HIDDEN'] : ['PUBLISHED'];
+  return (
+    <Card>
+      <h2 className="text-label-lg">انتشار</h2>
+      <p className="mt-xs text-body-sm text-text-secondary">
+        {'وضعیت فعلی: ' + VET_PUBLIC_STATUS_FA[profile.publicStatus]}
+      </p>
+      {blockers.length > 0 && profile.publicStatus !== 'PUBLISHED' ? (
+        <div className="mt-md" data-testid="directory-blockers">
+          <Alert tone="warning" title="پیش از انتشار">
+            <ul className="list-disc space-y-2xs pr-lg">
+              {blockers.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </Alert>
+        </div>
+      ) : null}
+      {/* Remounted when the status changes: its only choice changes with it. */}
+      <form key={profile.publicStatus} onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="directory-status-form">
+        <input type="hidden" name="accountId" value={profile.accountId} />
+        <input type="hidden" name="expectedVersion" value={profile.version} />
+        <Result state={state} testId="directory-status-result" />
+        <SelectField
+          label="وضعیت تازه"
+          name="to"
+          required
+          defaultValue={targets[0]}
+          options={targets.map((value) => ({ value, label: VET_PUBLIC_STATUS_FA[value] }))}
+          data-testid="directory-status-to"
+        />
+        <ReasonField testId="directory-status-reason" />
+        <Button type="submit" disabled={pending} data-testid="change-directory-status">
+          ثبت وضعیت
+        </Button>
+      </form>
+    </Card>
+  );
+}
+
+export interface EditableLocation {
+  readonly id: string;
+  readonly version: number;
+  readonly isPublic: boolean;
+  readonly isActive: boolean;
+  readonly provinceCode: string | null;
+  readonly cityId: string | null;
+  readonly hoursNoteFa: string | null;
+}
+
+export function LocationPublicForm({
+  accountId,
+  location,
+  provinces,
+  cities,
+}: {
+  accountId: string;
+  location: EditableLocation;
+  provinces: readonly Option[];
+  cities: readonly CityOption[];
+}) {
+  const [state, submit, pending] = useActionState(updateLocationPublicAction, EMPTY);
+  const [province, setProvince] = useState(location.provinceCode ?? '');
+  const id = location.id;
+  return (
+    <form onSubmit={submitWith(submit)} className="mt-md space-y-md" data-testid={'location-public-form-' + id}>
+      <input type="hidden" name="accountId" value={accountId} />
+      <input type="hidden" name="locationId" value={id} />
+      <input type="hidden" name="expectedVersion" value={location.version} />
+      <Result state={state} testId={'location-public-result-' + id} />
+      <div className="grid gap-md md:grid-cols-2">
+        <SelectField
+          label="استان"
+          name="provinceCode"
+          value={province}
+          onChange={(event) => setProvince(event.target.value)}
+          options={provinces.map((row) => ({ value: row.code, label: row.nameFa }))}
+          data-testid={'location-province-' + id}
+        />
+        <SelectField
+          key={province}
+          label="شهر"
+          name="cityId"
+          defaultValue={cities.some((c) => c.id === location.cityId && c.provinceCode === province) ? (location.cityId ?? '') : ''}
+          options={cities.filter((c) => c.provinceCode === province).map((c) => ({ value: c.id, label: c.nameFa }))}
+          data-testid={'location-city-' + id}
+        />
+      </div>
+      <TextField
+        label="ساعات اطلاع‌رسانی"
+        name="hoursNoteFa"
+        maxLength={300}
+        defaultValue={location.hoursNoteFa ?? ''}
+        hint="همان‌طور که محل کار اعلام کرده؛ نوبت یا زمان قطعی نیست."
+        data-testid={'location-hours-' + id}
+      />
+      <Check
+        name="isPublic"
+        label={location.isActive ? 'نمایش این محل کار در صفحه عمومی' : 'این محل کار غیرفعال است'}
+        defaultChecked={location.isPublic}
+        testId={'location-public-' + id}
+      />
+      <ReasonField testId={'location-reason-' + id} />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid={'save-location-public-' + id}>
+        ذخیره محل کار
+      </Button>
+    </form>
+  );
+}
+
+export function AddCityForm({ accountId, provinces }: { accountId: string; provinces: readonly Option[] }) {
+  const [state, submit, pending] = useActionState(addCityAction, EMPTY);
+  return (
+    <Card>
+      <h2 className="text-label-lg">افزودن شهر</h2>
+      <p className="mt-xs text-body-sm text-text-secondary">مرکز استان‌ها از قبل ثبت شده‌اند. شهر دیگر را فقط وقتی محل کاری در آن هست اضافه کنید.</p>
+      <form onSubmit={submitWith(submit)} className="mt-lg grid gap-md md:grid-cols-[1fr_1fr_auto] md:items-end" data-testid="add-city-form">
+        <input type="hidden" name="accountId" value={accountId} />
+        <div className="md:col-span-3">
+          <Result state={state} testId="add-city-result" />
+        </div>
+        <SelectField
+          label="استان"
+          name="provinceCode"
+          required
+          options={provinces.map((row) => ({ value: row.code, label: row.nameFa }))}
+          data-testid="city-province"
+        />
+        <TextField label="نام شهر" name="nameFa" required maxLength={80} data-testid="city-name" />
+        <Button type="submit" tone="secondary" disabled={pending} data-testid="add-city">
+          افزودن
+        </Button>
+      </form>
+    </Card>
+  );
+}

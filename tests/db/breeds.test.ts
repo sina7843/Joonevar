@@ -100,9 +100,10 @@ async function published(label: string, patch: Partial<BreedProfileInput> = {}):
 
 test('the migration seeds the species and FCI taxonomy, and an animal species is no longer free text', async () => {
   const speciesRows = await testDb.db.select().from(species);
+  // DOG from PROMPT-003; CAT joins with the veterinary directory of PROMPT-006 (DEC-0163).
   assert.deepEqual(
-    speciesRows.map((row) => row.code),
-    ['DOG'],
+    speciesRows.map((row) => row.code).sort(),
+    ['CAT', 'DOG'],
   );
   const groups = await testDb.db.select().from(breedGroups).orderBy(breedGroups.fciGroup);
   assert.deepEqual(

@@ -13,6 +13,7 @@ import { liveSections } from '../public/sections.ts';
 import { db } from '../db/client.ts';
 import { breedSitemapEntries } from '../breeds/service.ts';
 import { contentSitemapEntries } from '../content/service.ts';
+import { vetSitemapEntries } from '../vets/directory.ts';
 
 export interface SitemapEntry {
   readonly path: string;
@@ -21,6 +22,8 @@ export interface SitemapEntry {
 
 export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly SitemapEntry[]>>> = {
   pages: async () => liveSections().map((section) => ({ path: section.href })),
+  // Published directory profiles of accounts that are not disabled (PROMPT-006).
+  veterinarians: () => vetSitemapEntries(db()),
   // Published, unmerged breed pages with their real modification time (PROMPT-003).
   breeds: () => breedSitemapEntries(db()),
   // Visible content only; scheduled, hidden, archived and deleted items are left out (PROMPT-004).

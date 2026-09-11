@@ -6,12 +6,14 @@ import {
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { accounts } from './core.ts';
+import { accounts, species } from './core.ts';
+import { cities, provinces } from './geography.ts';
 import { animals } from './animals.ts';
 
 const now = sql`now()`;
@@ -47,6 +49,9 @@ export const visitRequestStatus = pgEnum('visit_request_status', [
   'CANCELLED',
 ]);
 
+/** Whether a veterinarian has a public directory page — independent of the Finder and of trust (DEC-0164). */
+export const vetPublicStatus = pgEnum('vet_public_status', ['DRAFT', 'PUBLISHED', 'HIDDEN']);
+
 export const referralStatus = pgEnum('referral_status', [
   'ACTIVE',
   'CONSUMED',
@@ -75,6 +80,19 @@ export const vetProfiles = pgTable(
     councilVerifiedAt: timestamp('council_verified_at', { withTimezone: true }),
     phone: text('phone'),
     bioFa: text('bio_fa'),
+
+    // ── Public directory profile (Phase 2, PROMPT-006) ─────────────────────
+    // The same row the Finder uses; nothing here changes who the Finder shows.
+    /** Assigned on first publication and never changed afterwards, so the address stays stable. */
+    publicSlug: text('public_slug'),
+    publicStatus: vetPublicStatus('public_status').notNull().default('DRAFT'),
+    publicPublishedAt: timestamp('public_published_at', { withTimezone: true }),
+    headlineFa: text('headline_fa'),
+    experienceFa: text('experience_fa'),
+    /** Consent flags (§20): the council code and the phone are shown only when set. */
+    showCouncilCode: boolean('show_council_code').notNull().default(false),
+    showPhone: boolean('show_phone').notNull().default(false),
+
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
@@ -82,6 +100,7 @@ export const vetProfiles = pgTable(
   (t) => [
     uniqueIndex('vet_profile_account_key').on(t.accountId),
     uniqueIndex('vet_profile_council_code_key').on(t.councilCode),
+    uniqueIndex('vet_profile_public_slug_key').on(t.publicSlug),
   ],
 );
 
@@ -114,11 +133,66 @@ export const vetLocations = pgTable(
     canDrawBloodSample: boolean('can_draw_blood_sample').notNull().default(false),
     canPregnancyCheck: boolean('can_pregnancy_check').notNull().default(false),
     isActive: boolean('is_active').notNull().default(true),
+
+    // ── Public directory (Phase 2, PROMPT-006) ─────────────────────────────
+    /** Normalised place; the free-text province and city above stay as recorded (DEC-0163). */
+    provinceCode: text('province_code').references(() => provinces.code, { onDelete: 'restrict' }),
+    cityId: uuid('city_id').references(() => cities.id, { onDelete: 'restrict' }),
+    /** Shown on the public profile. Independent of licence, capabilities and the Finder. */
+    isPublic: boolean('is_public').notNull().default(false),
+    /** Announced hours, as information only — never an appointment slot (P2-D08). */
+    hoursNoteFa: text('hours_note_fa'),
+
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
   },
-  (t) => [index('vet_location_vet_idx').on(t.vetAccountId, t.isActive)],
+  (t) => [
+    index('vet_location_vet_idx').on(t.vetAccountId, t.isActive),
+    index('vet_location_city_idx').on(t.cityId),
+  ],
+);
+
+/**
+ * Areas of practice a directory profile lists (§7). Reference data seeded by
+ * migration; listing one is the profile's statement, not a board certification (DEC-0164).
+ */
+export const vetSpecialties = pgTable(
+  'vet_specialty',
+  {
+    code: text('code').primaryKey(),
+    nameFa: text('name_fa').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+  },
+  (t) => [uniqueIndex('vet_specialty_name_fa_key').on(t.nameFa)],
+);
+
+export const vetProfileSpecialties = pgTable(
+  'vet_profile_specialty',
+  {
+    vetProfileId: uuid('vet_profile_id')
+      .notNull()
+      .references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    specialtyCode: text('specialty_code')
+      .notNull()
+      .references(() => vetSpecialties.code, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.vetProfileId, t.specialtyCode] })],
+);
+
+/** Species a veterinarian accepts, from the species taxonomy of PROMPT-003. */
+export const vetProfileSpecies = pgTable(
+  'vet_profile_species',
+  {
+    vetProfileId: uuid('vet_profile_id')
+      .notNull()
+      .references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    speciesCode: text('species_code')
+      .notNull()
+      .references(() => species.code, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.vetProfileId, t.speciesCode] })],
 );
 
 /**

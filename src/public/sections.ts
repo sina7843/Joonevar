@@ -18,7 +18,7 @@ export interface PublicSection {
 
 export const PUBLIC_SECTIONS: readonly PublicSection[] = [
   { href: '/', label: 'خانه', live: true, prompt: '002' },
-  { href: '/veterinarians', label: 'دامپزشکان', live: false, prompt: '006' },
+  { href: '/veterinarians', label: 'دامپزشکان', live: true, prompt: '006' },
   { href: '/centers', label: 'مراکز دامپزشکی', live: false, prompt: '008' },
   { href: '/breeds', label: 'نژادهای سگ', live: true, prompt: '003' },
   { href: '/articles', label: 'آموزش‌ها', live: true, prompt: '004' },

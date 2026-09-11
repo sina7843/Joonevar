@@ -126,12 +126,13 @@ test('the header links only built sections, marks the current one and offers sig
     const nav = page.locator('nav[aria-label="ناوبری سایت"] a');
     assert.deepEqual(await nav.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('href'))), [
       '/',
+      '/veterinarians',
       '/breeds',
       '/articles',
       '/news',
       '/about',
     ]);
-    assert.equal(await nav.nth(4).getAttribute('aria-current'), 'page');
+    assert.equal(await nav.nth(5).getAttribute('aria-current'), 'page');
     assert.equal(await nav.nth(0).getAttribute('aria-current'), null);
 
     const account = page.getByTestId('site-account-link');
@@ -139,7 +140,7 @@ test('the header links only built sections, marks the current one and offers sig
     assert.equal((await account.textContent())?.trim(), 'ورود / ثبت‌نام');
 
     // No link anywhere on the page leads into a section that is not built yet.
-    for (const planned of ['/veterinarians', '/centers', '/associations', '/verify']) {
+    for (const planned of ['/centers', '/associations', '/verify']) {
       assert.equal(await page.locator('a[href^="' + planned + '"]').count(), 0, planned);
     }
 
@@ -210,7 +211,7 @@ test('robots and the segmented sitemap are served on the configured origin', asy
 });
 
 test('an unknown or unbuilt address answers 404 in Persian and is not indexed', async () => {
-  for (const href of ['/veterinarians', '/no-such-page']) {
+  for (const href of ['/centers', '/no-such-page']) {
     await withPage(MOBILE, async (page) => {
       const response = await page.goto(BASE_URL + href, { waitUntil: 'load' });
       assert.equal(response?.status(), 404, href);
@@ -218,7 +219,7 @@ test('an unknown or unbuilt address answers 404 in Persian and is not indexed', 
       assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
       assert.ok((await page.locator('h1').textContent())?.includes('پیدا نشد'));
       assert.match((await page.locator('meta[name="robots"]').first().getAttribute('content')) ?? '', /noindex/);
-      if (href === '/veterinarians') await page.screenshot({ path: path.join(SHOTS, 'not-found-mobile.png') });
+      if (href === '/centers') await page.screenshot({ path: path.join(SHOTS, 'not-found-mobile.png') });
     });
   }
 });

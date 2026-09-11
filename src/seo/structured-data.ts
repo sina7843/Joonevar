@@ -55,6 +55,55 @@ export function articleLd(
   };
 }
 
+/**
+ * Person for a published veterinarian, working at each public location as a
+ * VeterinaryCare (§19). Contact details appear only where the page shows them.
+ */
+export function vetPersonLd(
+  input: {
+    name: string;
+    path: string;
+    description: string | null;
+    telephone: string | null;
+    specialties: readonly string[];
+    locations: ReadonlyArray<{
+      name: string;
+      city: string | null;
+      province: string | null;
+      address: string | null;
+      telephone: string | null;
+    }>;
+  },
+  origin: string,
+): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: input.name,
+    jobTitle: 'دامپزشک',
+    url: absoluteUrl(origin, input.path),
+    ...(input.description ? { description: input.description } : {}),
+    ...(input.telephone ? { telephone: input.telephone } : {}),
+    ...(input.specialties.length > 0 ? { knowsAbout: [...input.specialties] } : {}),
+    ...(input.locations.length > 0
+      ? {
+          worksFor: input.locations.map((location) => ({
+            '@type': 'VeterinaryCare',
+            name: location.name,
+            address: {
+              '@type': 'PostalAddress',
+              addressCountry: 'IR',
+              ...(location.province ? { addressRegion: location.province } : {}),
+              ...(location.city ? { addressLocality: location.city } : {}),
+              ...(location.address ? { streetAddress: location.address } : {}),
+            },
+            ...(location.telephone ? { telephone: location.telephone } : {}),
+          })),
+        }
+      : {}),
+  };
+}
+
 export interface Crumb {
   readonly name: string;
   readonly path: string;

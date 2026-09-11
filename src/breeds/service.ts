@@ -259,7 +259,7 @@ export async function breedForEditing(database: DbClient, actor: Actor, breedId:
       .where(eq(breedMedicalClaims.breedId, breed.id))
       .orderBy(desc(breedMedicalClaims.createdAt)),
     breedGroupOptions(database, breed.speciesCode),
-    database.select().from(species).orderBy(asc(species.sortOrder)),
+    database.select().from(species).where(eq(species.code, 'DOG')),
     database
       .select({ id: referenceBreeds.id, nameFa: referenceBreeds.nameFa, nameEn: referenceBreeds.nameEn })
       .from(referenceBreeds)
@@ -384,6 +384,8 @@ export async function updateBreedProfile(database: Database, actor: Actor, input
 
       const [speciesRow] = await tx.select().from(species).where(eq(species.code, next.speciesCode)).limit(1);
       if (!speciesRow) throw validation('گونه انتخاب‌شده در فهرست گونه‌ها نیست.');
+      // Species is shared with the directory, but the breed bank covers dogs only (P2-D01, DEC-0163).
+      if (next.speciesCode !== 'DOG') throw validation('بانک نژاد در این نسخه فقط نژادهای سگ را پوشش می‌دهد.');
       if (next.groupId !== null) {
         const [group] = UUID.test(next.groupId)
           ? await tx.select().from(breedGroups).where(eq(breedGroups.id, next.groupId)).limit(1)

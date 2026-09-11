@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { ADMIN_NAV, OpsShell } from '../../../src/ui/shell.tsx';
@@ -7,6 +8,7 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { eligibilityOf, listVetProfiles, locationsOfVet } from '../../../src/vets/registry.ts';
+import { VET_PUBLIC_STATUS_FA } from '../../../src/vets/directory-model.ts';
 import { AddLocationForm, EditLocationForm, VetProfileForm } from './forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -56,6 +58,15 @@ export default async function AdminVetsPage() {
                     <h2 className="text-label-lg">{vet.displayNameFa}</h2>
                     <p className="mt-2xs text-caption text-text-secondary">
                       کد نظام دامپزشکی {vet.councilCode}
+                    </p>
+                    <p className="mt-xs text-body-sm">
+                      <Link
+                        href={'/admin/vets/' + vet.accountId}
+                        className="text-text-brand underline underline-offset-4"
+                        data-testid={'directory-edit-' + vet.accountId}
+                      >
+                        {'پروفایل عمومی · ' + VET_PUBLIC_STATUS_FA[vet.publicStatus]}
+                      </Link>
                     </p>
 
                     {rows.length === 0 ? (

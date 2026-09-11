@@ -119,7 +119,8 @@ export async function upsertVetProfile(
       councilCode: council,
       councilVerifiedAt: new Date(),
       phone: trimmed(input.phone),
-      bioFa: trimmed(input.bioFa),
+      // The registry form has no bio field; the directory writes it (PROMPT-006), so absent means unchanged.
+      bioFa: input.bioFa === undefined ? (existing?.bioFa ?? null) : trimmed(input.bioFa),
       updatedAt: new Date(),
     };
     const [row] = existing

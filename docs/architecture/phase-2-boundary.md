@@ -35,12 +35,12 @@
 |---|---|---|---|---|
 | حساب، OTP، نشست | `account`، `otp_challenge`، `session`، `src/identity/*` | REUSE | ورود عمومی همان OTP فاز یک است؛ حساب دوم ساخته نمی‌شود | 002 |
 | نقش‌های تازه | `account_role`، Enum `account_role_name`، `src/authz/actor.ts` | MIGRATE | افزودن مقدار به Enum؛ هر نقش در پرامپت مصرف‌کننده‌اش (DEC-0145) | 004، 005، 007، 008، 010 |
-| پروفایل عمومی دامپزشک | `vet_profile` (نام، کد نظام یکتا، `council_verified_at`، تلفن، بیو) | MIGRATE | `account_id` امروز NOT NULL است و رکورد «بدون مالک» (P2-D06) را نمی‌پذیرد؛ مالکیت و Claim باید بدون ساخت جدول دامپزشک دوم حل شود | 006، 007 |
+| پروفایل عمومی دامپزشک | `vet_profile` (نام، کد نظام یکتا، `council_verified_at`، تلفن، بیو) | MIGRATE | `account_id` امروز NOT NULL است و رکورد «بدون مالک» (P2-D06) را نمی‌پذیرد؛ مالکیت و Claim باید بدون ساخت جدول دامپزشک دوم حل شود. **006:** ستون‌های پروفایل عمومی، تخصص و گونه روی همین ردیف (DEC-0164) | 006، 007 |
 | محور Professional Verification | `vet_profile.council_verified_at` | REUSE | همان تأیید کد نظام؛ پرداخت آن را نمی‌سازد | 006 |
 | محور Trusted Hamzist | نقش `TRUSTED_VET` فعال | REUSE | فقط از مسیر عملیاتی فاز یک اعطا می‌شود (DEC-0145) | 006 |
 | محل کار / شعبه | `vet_location` (مالک: `vet_account_id` NOT NULL، نوع CLINIC/HOSPITAL/CENTRE، پروانه، امکانات، مختصات) | MIGRATE | Finder و ارجاع‌های فاز یک (`vet_visit_request.location_id`، `pregnancy_check`) به همین ردیف FK دارند؛ ردیف جابه‌جا یا کپی نمی‌شود | 008 |
 | مرکز / سازمان | — | CREATE | شعبه‌ها به `vet_location` پیوند می‌خورند؛ انواع مرکز Requirements-Phase-2 §۹ داده مدیریتی است | 008، 009 |
-| استان و شهر | متن آزاد: `vet_location.province_fa/city_fa`، `kennel`، `residence.province/city`، `postal_request` | CREATE + MIGRATE | جدول نرمال‌شده و FK اختیاری با Backfill؛ متن قبلی به‌عنوان سابقه می‌ماند. اولین مصرف‌کننده فیلتر 006 است، پس حداقل جدول در همان‌جا لازم است و 015 نقشه/صفحات محلی را اضافه می‌کند | 006، 015 |
+| استان و شهر | متن آزاد: `vet_location.province_fa/city_fa`، `kennel`، `residence.province/city`، `postal_request` | CREATE + MIGRATE | جدول نرمال‌شده و FK اختیاری با Backfill؛ متن قبلی به‌عنوان سابقه می‌ماند. اولین مصرف‌کننده فیلتر 006 است، پس حداقل جدول در همان‌جا لازم است و 015 نقشه/صفحات محلی را اضافه می‌کند. **006:** `province`/`city` و پیوند اختیاری `vet_location` با Backfill (DEC-0163) | 006، 015 |
 | گونه | `animal.species` متن با پیش‌فرض `DOG` | CREATE + MIGRATE — **انجام‌شده در 003** | جدول `species` (کلید `code`) و FK از `animal.species`؛ `breed_group` با ده گروه FCI؛ Seed در Migration `0017` (DEC-0154) | 003 |
 | بانک نژاد سگ | `reference_breed` (نام فارسی/انگلیسی، فعال، ترتیب) با FK از `animal.breed_id` و `kennel_breed` | MIGRATE — **انجام‌شده در 003** | همان ردیف: slug، نام‌های دیگر، گروه، ویژگی‌های Enum، محتوا، `profileStatus` مستقل از `isActive`، `version`، تکراری با `merged_into_breed_id`؛ `breed_slug_redirect` و `breed_medical_claim` (DEC-0155، DEC-0156) | 003 |
 | CMS | — | CREATE — **انجام‌شده در 004** | `content_item`، `content_revision`، `content_category`، `content_slug_redirect` (Migration `0018`)؛ نویسنده FK به `account`، نژاد به `reference_breed`، گونه به `species`، تصویر به `stored_file` با هدف `CONTENT_IMAGE` (DEC-0159، DEC-0160) | 004 |
@@ -64,7 +64,7 @@
 
 | مسیر | محتوا | پرامپت |
 |---|---|---|
-| `/veterinarians` | دایرکتوری و پروفایل عمومی دامپزشک | 006 |
+| `/veterinarians` | دایرکتوری و پروفایل عمومی دامپزشک — ساخته شد (PUBLIC) | 006 |
 | `/centers` | دایرکتوری مراکز | 008 |
 | `/breeds` | بانک نژاد سگ | 003 |
 | `/articles`، `/news`، `/announcements` | آموزش، خبر، اطلاعیه | 004 |
