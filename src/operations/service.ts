@@ -17,6 +17,7 @@ import { foreignPedigreeCases } from '../db/schema/animals.ts';
 import { geneticsReceipts, parentageAppeals, samples } from '../db/schema/index.ts';
 import { postalRequests } from '../db/schema/pedigree.ts';
 import { recordAudit } from '../audit/service.ts';
+import { allocateSlug, duplicateCandidates } from '../breeds/service.ts';
 import { forbidden, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
 
@@ -396,15 +397,18 @@ export async function addBreedToRegistry(
   const nameEn = input.nameEn.trim();
   if (nameFa === '' || nameEn === '') throw validation('نام فارسی و لاتین نژاد را وارد کنید.');
 
-  const existing = await database
-    .select({ id: referenceBreeds.id })
-    .from(referenceBreeds)
-    .where(or(eq(referenceBreeds.nameFa, nameFa), eq(referenceBreeds.nameEn, nameEn)))
-    .limit(1);
-  if (existing.length > 0) throw validation('این نژاد قبلاً در فهرست مرجع ثبت شده است.');
+  // Matched by either name, an alternative name or the address, with Persian
+  // letter variants and spacing ignored (§22 Duplicate Candidate, DEC-0155).
+  const existing = await duplicateCandidates(database, [nameFa, nameEn]);
+  if (existing.length > 0) {
+    throw validation(
+      'این نژاد قبلاً در فهرست مرجع ثبت شده است: ' + existing.map((d) => d.nameFa + ' (' + d.nameEn + ')').join('، '),
+    );
+  }
 
   return database.transaction(async (tx) => {
-    const [row] = await tx.insert(referenceBreeds).values({ nameFa, nameEn }).returning();
+    const slug = await allocateSlug(tx, nameEn);
+    const [row] = await tx.insert(referenceBreeds).values({ nameFa, nameEn, slug }).returning();
     if (!row) throw validation('ثبت نژاد انجام نشد.');
     await recordAudit(tx, actor, {
       action: 'REFERENCE_BREED_ADDED',

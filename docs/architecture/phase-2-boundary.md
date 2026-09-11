@@ -41,8 +41,8 @@
 | محل کار / شعبه | `vet_location` (مالک: `vet_account_id` NOT NULL، نوع CLINIC/HOSPITAL/CENTRE، پروانه، امکانات، مختصات) | MIGRATE | Finder و ارجاع‌های فاز یک (`vet_visit_request.location_id`، `pregnancy_check`) به همین ردیف FK دارند؛ ردیف جابه‌جا یا کپی نمی‌شود | 008 |
 | مرکز / سازمان | — | CREATE | شعبه‌ها به `vet_location` پیوند می‌خورند؛ انواع مرکز Requirements-Phase-2 §۹ داده مدیریتی است | 008، 009 |
 | استان و شهر | متن آزاد: `vet_location.province_fa/city_fa`، `kennel`، `residence.province/city`، `postal_request` | CREATE + MIGRATE | جدول نرمال‌شده و FK اختیاری با Backfill؛ متن قبلی به‌عنوان سابقه می‌ماند. اولین مصرف‌کننده فیلتر 006 است، پس حداقل جدول در همان‌جا لازم است و 015 نقشه/صفحات محلی را اضافه می‌کند | 006، 015 |
-| گونه | `animal.species` متن با پیش‌فرض `DOG` | CREATE + MIGRATE | جدول گونه با کد پایدار؛ مقدار `DOG` موجود معتبر می‌ماند | 003 |
-| بانک نژاد سگ | `reference_breed` (نام فارسی/انگلیسی، فعال، ترتیب) با FK از `animal.breed_id` و `kennel_breed` | MIGRATE | افزودن گونه، slug و فیلدهای بانک نژاد روی همین شناسه؛ «کنارگذاشتن» به‌جای حذف (DEC-0113) حفظ می‌شود | 003 |
+| گونه | `animal.species` متن با پیش‌فرض `DOG` | CREATE + MIGRATE — **انجام‌شده در 003** | جدول `species` (کلید `code`) و FK از `animal.species`؛ `breed_group` با ده گروه FCI؛ Seed در Migration `0017` (DEC-0154) | 003 |
+| بانک نژاد سگ | `reference_breed` (نام فارسی/انگلیسی، فعال، ترتیب) با FK از `animal.breed_id` و `kennel_breed` | MIGRATE — **انجام‌شده در 003** | همان ردیف: slug، نام‌های دیگر، گروه، ویژگی‌های Enum، محتوا، `profileStatus` مستقل از `isActive`، `version`، تکراری با `merged_into_breed_id`؛ `breed_slug_redirect` و `breed_medical_claim` (DEC-0155، DEC-0156) | 003 |
 | CMS | — | CREATE | نویسنده به `account` FK می‌دهد؛ نژاد به `reference_breed` | 004 |
 | گزارش و Moderation | `audit_event` برای ثبت تصمیم | CREATE + REUSE | صف گزارش تازه، تصمیم در همان Audit | 005 |
 | Claim | — | CREATE | انتقال کنترل ویرایش آینده، نه مالکیت تاریخچه | 007، 009 |
@@ -119,3 +119,4 @@
 | sitemap و robots | `src/seo/sitemap.ts` (`SITEMAP_SECTIONS`)، `src/seo/robots.ts`، `app/sitemap.xml`، `app/sitemaps/[file]`، `app/robots.ts` | هر پرامپت محتوایی یک بخش با رکوردهای منتشرشده اضافه می‌کند؛ robots از `applicationPrefixes()` ساخته می‌شود |
 | مبدأ سایت | `SITE_URL` در `src/config/env.ts` | در production اجباری و https (DEC-0150) |
 | حالت‌ها | `app/not-found.tsx`، `app/(public)/error.tsx`، `app/(public)/loading.tsx` | ۴۰۴ فارسی و noindex؛ پیام خطا بدون افشای جزئیات |
+| بانک نژاد (003) | `src/breeds/model.ts`، `src/breeds/service.ts`، `app/(public)/breeds`، `app/admin/breeds/[id]` | محتوای 004 به `reference_breed.id` پیوند می‌خورد، نه به نام؛ جست‌وجوی 012 همان `normalizeForSearch` را توسعه می‌دهد؛ بخش `breeds` در `SITEMAP_SECTIONS` |

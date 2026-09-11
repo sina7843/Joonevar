@@ -124,8 +124,12 @@ test('the header links only built sections, marks the current one and offers sig
   await withPage(DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/about', { waitUntil: 'load' });
     const nav = page.locator('nav[aria-label="ناوبری سایت"] a');
-    assert.deepEqual(await nav.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('href'))), ['/', '/about']);
-    assert.equal(await nav.nth(1).getAttribute('aria-current'), 'page');
+    assert.deepEqual(await nav.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('href'))), [
+      '/',
+      '/breeds',
+      '/about',
+    ]);
+    assert.equal(await nav.nth(2).getAttribute('aria-current'), 'page');
     assert.equal(await nav.nth(0).getAttribute('aria-current'), null);
 
     const account = page.getByTestId('site-account-link');
@@ -133,7 +137,7 @@ test('the header links only built sections, marks the current one and offers sig
     assert.equal((await account.textContent())?.trim(), 'ورود / ثبت‌نام');
 
     // No link anywhere on the page leads into a section that is not built yet.
-    for (const planned of ['/veterinarians', '/centers', '/breeds', '/articles', '/news', '/associations', '/verify']) {
+    for (const planned of ['/veterinarians', '/centers', '/articles', '/news', '/associations', '/verify']) {
       assert.equal(await page.locator('a[href^="' + planned + '"]').count(), 0, planned);
     }
 

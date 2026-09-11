@@ -16,7 +16,17 @@ test('unlisted routes are closed by default', () => {
 });
 
 test('only sign-in, health and the built public site are open', () => {
-  for (const path of ['/', '/about', '/login', '/api/health', '/robots.txt', '/sitemap.xml', '/sitemaps/pages.xml']) {
+  for (const path of [
+    '/',
+    '/about',
+    '/breeds',
+    '/breeds/german-shepherd',
+    '/login',
+    '/api/health',
+    '/robots.txt',
+    '/sitemap.xml',
+    '/sitemaps/pages.xml',
+  ]) {
     assert.equal(accessForRoute(path), 'PUBLIC', path);
   }
   assert.equal(canAccessRoute(null, '/'), true);

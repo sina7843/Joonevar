@@ -93,6 +93,36 @@ export function TextField({
   );
 }
 
+export function TextAreaField({
+  label,
+  hint,
+  error,
+  required,
+  rows = 5,
+  ...rest
+}: {
+  label: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+} & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <Field label={label} hint={hint} error={error} required={required}>
+      {({ inputId, describedBy, invalid }) => (
+        <textarea
+          id={inputId}
+          rows={rows}
+          aria-invalid={invalid || undefined}
+          aria-describedby={describedBy}
+          aria-required={required || undefined}
+          className={['w-full rounded-md border bg-bg-surface p-md text-body-sm text-text-primary', controlTone(invalid)].join(' ')}
+          {...rest}
+        />
+      )}
+    </Field>
+  );
+}
+
 export function SelectField({
   label,
   hint,

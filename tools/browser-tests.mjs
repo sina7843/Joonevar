@@ -138,11 +138,13 @@ try {
   await waitForServer(baseUrl, server);
   console.log('Browser suite: database ' + name + ', server ' + baseUrl);
 
-  const suite = spawn(process.execPath, ['--test', '--test-concurrency=1', 'tests/browser/*.test.ts'], {
-    cwd: root,
-    env: { ...childEnv, BROWSER_TEST_URL: baseUrl },
-    stdio: 'inherit',
-  });
+  // `npm run test:browser -- tests/browser/breeds.test.ts` runs chosen suites on the same isolated setup.
+  const suiteFiles = process.argv.slice(2);
+  const suite = spawn(
+    process.execPath,
+    ['--test', '--test-concurrency=1', ...(suiteFiles.length > 0 ? suiteFiles : ['tests/browser/*.test.ts'])],
+    { cwd: root, env: { ...childEnv, BROWSER_TEST_URL: baseUrl }, stdio: 'inherit' },
+  );
   exitCode = await new Promise((resolve) => suite.on('exit', (code) => resolve(code ?? 1)));
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

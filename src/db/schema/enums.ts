@@ -70,3 +70,17 @@ export const filePurpose = pgEnum('file_purpose', [
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
 
 export const deliveryStatus = pgEnum('delivery_status', ['PENDING', 'SENT', 'FAILED', 'SUPPRESSED']);
+
+/** Breed bank attributes (Requirements-Phase-2 §6): closed lists, never free text (DEC-0154). */
+export const breedSize = pgEnum('breed_size', ['TOY', 'SMALL', 'MEDIUM', 'LARGE', 'GIANT']);
+export const breedCoat = pgEnum('breed_coat', ['HAIRLESS', 'SHORT', 'MEDIUM', 'LONG', 'WIRE', 'CURLY']);
+export const breedLevel = pgEnum('breed_level', ['LOW', 'MODERATE', 'HIGH']);
+
+/** Whether a breed has a public page — independent of whether forms offer it (DEC-0155). */
+export const breedProfileStatus = pgEnum('breed_profile_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
+
+export const breedClaimKind = pgEnum('breed_claim_kind', [
+  'HEALTH_NOTE',
+  'PREDISPOSED_CONDITION',
+  'SUGGESTED_GENETIC_TEST',
+]);

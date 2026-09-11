@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
+import { STATUS_FA } from '../../../src/breeds/model.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ADMIN_NAV } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
@@ -47,15 +49,31 @@ export default async function AdminBreedsPage() {
                 <div className="flex items-start justify-between gap-md">
                   <div className="min-w-0">
                     <p className="text-label-md">{row.nameFa}</p>
-                    <p className="mt-2xs text-caption text-text-secondary" dir="ltr">
-                      {row.nameEn}
+                    <p className="mt-2xs text-caption text-text-secondary">
+                      <bdi>{row.nameEn}</bdi>
                     </p>
                   </div>
-                  <StatusBadge tone={row.isActive ? 'success' : 'neutral'}>
-                    <span data-testid={'breed-state-' + row.nameEn}>
-                      {row.isActive ? 'فعال' : 'کنارگذاشته‌شده'}
-                    </span>
-                  </StatusBadge>
+                  <div className="flex flex-wrap justify-end gap-xs">
+                    <StatusBadge tone={row.isActive ? 'success' : 'neutral'}>
+                      <span data-testid={'breed-state-' + row.nameEn}>
+                        {row.isActive ? 'فعال' : 'کنارگذاشته‌شده'}
+                      </span>
+                    </StatusBadge>
+                    {/* Two independent axes: offered in forms, and whether a public page exists (DEC-0155). */}
+                    <StatusBadge tone={row.profileStatus === 'PUBLISHED' ? 'info' : 'neutral'}>
+                      <span data-testid={'breed-profile-' + row.nameEn}>{'صفحه: ' + STATUS_FA[row.profileStatus]}</span>
+                    </StatusBadge>
+                    {row.mergedIntoBreedId ? <StatusBadge tone="warning">تکراری</StatusBadge> : null}
+                  </div>
+                </div>
+                <div className="mt-md flex flex-wrap items-center justify-between gap-sm">
+                  <Link
+                    href={'/admin/breeds/' + row.id}
+                    className="text-label-md text-text-brand underline underline-offset-4"
+                    data-testid={'edit-breed-' + row.nameEn}
+                  >
+                    ویرایش پرونده نژاد
+                  </Link>
                 </div>
                 <BreedStateForm breedId={row.id} active={row.isActive} suffix={row.nameEn} />
               </li>

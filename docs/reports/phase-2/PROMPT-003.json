@@ -1,0 +1,100 @@
+{
+  "promptId": "PROMPT-003",
+  "status": "COMPLETE",
+  "summary": "Species and dog breed bank on the Phase 1 breed row (P2-D15). Migration 0017 adds species (code key; animal.species now references it without rewriting animals) and the ten FCI groups as a versioned taxonomy seed, and extends reference_breed with a unique slug (backfilled), alternative names, FCI group, ISO origin country, closed enums for size, coat and five levels, history, standard summary and link, a public profile status independent of Phase 1 isActive, a merged-into duplicate pointer and an optimistic version; plus breed_slug_redirect and breed_medical_claim (source title and past review date NOT NULL, archive instead of delete). Superadmin services edit with version conflict detection and field-level before/after audit, publish/archive/unpublish with a reason and a content requirement, mark duplicates (retired from new choices, no chains, no animal or kennel rewritten) and add/archive medical claims; duplicate candidates compare names, alternative names and slugs with Persian/Arabic letter, joiner, digit, case and punctuation normalisation. Public /breeds lists published breeds with search, FCI filter, pagination and two empty states; /breeds/[slug] shows facts, history, standard and health/genetics with sources and review dates, answers a real 308 for an old address, 404 for a draft, and archived/duplicate notices with the matching robots and canonical; the breeds sitemap section carries real lastmod. The browser run found and fixed three real defects (DEC-0157): streaming loading boundary turning 308/404 into 200, React form reset emptying saved selects before the next save, and the editor's sign-in return address.",
+  "changedFiles": [
+    "src/db/schema/enums.ts",
+    "src/db/schema/core.ts",
+    "src/db/schema/animals.ts",
+    "src/db/migrations/0017_species-breed-bank.sql",
+    "src/db/migrations/meta/0017_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/seed/index.ts",
+    "src/breeds/model.ts",
+    "src/breeds/service.ts",
+    "src/operations/service.ts",
+    "src/public/sections.ts",
+    "src/authz/routes.ts",
+    "src/seo/sitemap.ts",
+    "src/ui/field.tsx",
+    "app/(public)/breeds/(list)/page.tsx",
+    "app/(public)/breeds/(list)/loading.tsx",
+    "app/(public)/breeds/[slug]/page.tsx",
+    "app/admin/breeds/page.tsx",
+    "app/admin/breeds/[id]/page.tsx",
+    "app/admin/breeds/[id]/forms.tsx",
+    "app/admin/breeds/[id]/actions.ts",
+    "tools/browser-tests.mjs",
+    "tests/domain/breeds.test.ts",
+    "tests/db/breeds.test.ts",
+    "tests/db/migrations.test.ts",
+    "tests/ui/routes.test.ts",
+    "tests/ui/seo.test.ts",
+    "tests/browser/breeds.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "tests/browser/visual.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-003-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-003/admin-breed-editor.png",
+    "docs/reports/screenshots/phase-2/prompt-003/admin-breed-duplicate.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breeds-search-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breeds-no-result-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breeds-empty-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breeds-desktop.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breed-page-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breed-page-desktop.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breed-archived-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-003/breed-duplicate-mobile.png"
+  ],
+  "decisions": ["DEC-0154", "DEC-0155", "DEC-0156", "DEC-0157"],
+  "checks": [
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build after the last app change: Compiled successfully, exit 0; /breeds, /breeds/[slug] and /admin/breeds/[id] built as dynamic routes."
+    },
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "product-tests",
+      "command": "npm test",
+      "result": "PASS",
+      "evidence": "tests 367 · pass 367 · fail 0 · cancelled 0 · skipped 0 (75 s), run alone. New tests/domain/breeds.test.ts (7: slugs incl. diacritics, search normalisation of Arabic yeh/kaf, ZWNJ, short vowels, Persian digits, spacing and punctuation, matching by names/slug/alt names, alt-name parsing, ISO country names, http(s) links and past review dates, status transitions and publish blockers) and tests/db/breeds.test.ts (8 on a migrated database: DOG species and FCI groups 1–10 seeded, baseline breeds keep ids with slug/species/DRAFT, animal.species FK rejects an unknown code; free slug allocation past redirects and duplicate refusal for case/punctuation/Arabic yeh variants; FORBIDDEN for non-superadmin, field-level before/after audit with target version, CONFLICT on a stale version, no-op save records nothing, validation of country, link, enums, group, slug, name, species; publish needs content and a reason, draft invisible, published listed and in sitemap with a real lastmod, emptying a published page refused, archived reachable but unlisted with reason in audit; medical claim requires source and past review date, archive requires reason, keeps the row and hides it publicly; renamed slug resolves as redirect and an address in use is CONFLICT; duplicate needs reason, is retired from breedOptions, list and sitemap, keeps the animal's breed_id, points at its primary, and chains are refused; list search by Arabic variant, uppercase latin and alt name, FCI filter and pagination). tests/db/operations.test.ts (Phase 1 breed register) still passes."
+    },
+    {
+      "id": "browser-tests",
+      "command": "npm run test:browser",
+      "result": "PASS",
+      "evidence": "tests 100 · pass 100 · fail 0 (294 s) on disposable database hamzist_browser_b5f10dcfe7ac with its own production server 127.0.0.1:9772; no test database left. New tests/browser/breeds.test.ts (3): the superadmin adds a breed, sets FCI group, country, size, energy, alt name, standard and a suggested genetic test with source and review date, publishes; a visitor finds it by alias, inside FCI group 8 and not group 1, reads facts (گروه ۸، ایران، متوسط، زیاد), the claim source with nofollow and review date, canonical and a three-item BreadcrumbList, without sideways scroll at 360px; an old address answers a real 308 to the new one, a duplicate shows its notice with canonical and link to the primary and is not listed, a draft answers 404, an archived page shows its notice with noindex and is not listed; the editor sends an anonymous visitor to sign-in with the exact next path and refuses a signed-in ordinary account with FORBIDDEN, and an invalid id is 404. visual.test.ts covers /breeds. Full Phase 1 and PROMPT-002 regression passes. The first full run was 97/100 and exposed the three defects fixed in DEC-0157; two targeted reruns fixed two timing assumptions in the new test before the final 100/100."
+    },
+    {
+      "id": "migration-on-dev-clone",
+      "command": "pg_dump of the development database into a throwaway database → migrateTo → verification queries → drop database",
+      "result": "PASS",
+      "evidence": "migrations 17 → 18; species=DOG; fci_groups=10; breeds=45 valid_slugs=45 distinct_slugs=45 draft=45 version1=45; animal 2374 rows all species DOG (2365 with a breed), kennel_breed 112 rows, identical before and after. The development database itself was not modified."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No breed page is published and no health or genetic content is seeded; writing content with sources is operational work.",
+    "Breed ↔ content (articles, news) relations arrive with the CMS in PROMPT-004; this step provides the stable reference_breed id and slug.",
+    "Full merge with relation transfer and undoing a duplicate mark belong to the admin panel in PROMPT-016; breed bank management stays with SUPERADMIN until content roles exist.",
+    "Typo-tolerant and global search is PROMPT-012; the public list and duplicate candidates filter the whole register in memory, adequate for hundreds of breeds.",
+    "A medical claim is not edited in place; a re-review is a new claim with the old one archived.",
+    "Visual fidelity of breed pages is UNVERIFIED: no Phase 2 Figma frame is in the sources.",
+    "Out of scope finding: twelve Phase 1 form files also place <select> inside action forms and may show the same post-save reset (DEC-0157); they were not changed here."
+  ],
+  "readiness": {
+    "code": "BREED_BANK_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

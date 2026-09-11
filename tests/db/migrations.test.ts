@@ -60,7 +60,9 @@ test('running migrations again is a no-op, not a destructive replay', async () =
     const { db, pool } = createDatabase(testDb.url);
     let firstCount: number;
     try {
-      await db.execute(sql`insert into reference_breed (name_fa, name_en) values ('آزمایشی', 'Fixture Breed')`);
+      await db.execute(
+        sql`insert into reference_breed (name_fa, name_en, slug) values ('آزمایشی', 'Fixture Breed', 'fixture-breed')`,
+      );
       const applied = await db.execute<{ count: string }>(
         sql`select count(*)::text as count from drizzle.__drizzle_migrations`,
       );

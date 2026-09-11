@@ -1,7 +1,10 @@
 import { sql } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import {
   bigint,
   boolean,
+  check,
+  date,
   index,
   integer,
   jsonb,
@@ -16,6 +19,11 @@ import {
   accountRoleStatus,
   accountStatus,
   auditActorType,
+  breedClaimKind,
+  breedCoat,
+  breedLevel,
+  breedProfileStatus,
+  breedSize,
   deliveryStatus,
   filePurpose,
   notificationChannel,
@@ -205,7 +213,46 @@ export const storedFiles = pgTable(
   ],
 );
 
-/** Reference breeds, searchable in Persian and English (§15.2). Managed data, not code. */
+/**
+ * Species — the shared filter for content, vets and centres (Requirements-Phase-2
+ * §6, P2-D01). A taxonomy rather than managed data: rows arrive with versioned
+ * migrations and are keyed by the stable code `animal.species` already stored,
+ * so that column stops being free text without rewriting a single animal
+ * (DEC-0154).
+ */
+export const species = pgTable('species', {
+  code: text('code').primaryKey(),
+  nameFa: text('name_fa').notNull(),
+  nameEn: text('name_en').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+});
+
+/** FCI breed groups — the published FCI nomenclature, seeded by migration (DEC-0154). */
+export const breedGroups = pgTable(
+  'breed_group',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    speciesCode: text('species_code')
+      .notNull()
+      .references(() => species.code, { onDelete: 'restrict' }),
+    fciGroup: integer('fci_group').notNull(),
+    nameFa: text('name_fa').notNull(),
+    nameEn: text('name_en').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('breed_group_fci_key').on(t.speciesCode, t.fciGroup)],
+);
+
+/**
+ * Reference breeds, searchable in Persian and English (§15.2). Managed data, not code.
+ *
+ * Phase 2 grows the breed bank on this same row (P2-D15): animals and kennels
+ * keep pointing at the id they always did. Two independent axes live here —
+ * `isActive` decides whether Phase 1 forms offer the breed, `profileStatus`
+ * whether its public page exists — and a merged duplicate keeps its row so no
+ * recorded animal is rewritten (DEC-0155).
+ */
 export const referenceBreeds = pgTable(
   'reference_breed',
   {
@@ -214,10 +261,83 @@ export const referenceBreeds = pgTable(
     nameEn: text('name_en').notNull(),
     isActive: boolean('is_active').notNull().default(true),
     sortOrder: integer('sort_order').notNull().default(0),
+
+    speciesCode: text('species_code')
+      .notNull()
+      .default('DOG')
+      .references(() => species.code, { onDelete: 'restrict' }),
+    /** Stable public address. A change leaves the old one in `breed_slug_redirect`. */
+    slug: text('slug').notNull(),
+    altNames: text('alt_names').array().notNull().default(sql`'{}'::text[]`),
+    groupId: uuid('group_id').references(() => breedGroups.id, { onDelete: 'restrict' }),
+    /** ISO 3166-1 alpha-2; the Persian name comes from the platform, not a stored string. */
+    originCountry: text('origin_country'),
+    size: breedSize('size'),
+    coat: breedCoat('coat'),
+    energy: breedLevel('energy'),
+    trainability: breedLevel('trainability'),
+    careNeed: breedLevel('care_need'),
+    withChildren: breedLevel('with_children'),
+    withOtherAnimals: breedLevel('with_other_animals'),
+    historyFa: text('history_fa'),
+    standardFa: text('standard_fa'),
+    standardUrl: text('standard_url'),
+
+    profileStatus: breedProfileStatus('profile_status').notNull().default('DRAFT'),
+    publishedAt: timestamp('published_at', { withTimezone: true }),
+    mergedIntoBreedId: uuid('merged_into_breed_id').references((): AnyPgColumn => referenceBreeds.id, {
+      onDelete: 'restrict',
+    }),
+    /** Optimistic concurrency for profile edits: two editors cannot silently overwrite each other. */
+    version: integer('version').notNull().default(1),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
   },
-  (t) => [uniqueIndex('reference_breed_name_en_key').on(t.nameEn)],
+  (t) => [
+    uniqueIndex('reference_breed_name_en_key').on(t.nameEn),
+    uniqueIndex('reference_breed_slug_key').on(t.slug),
+    index('reference_breed_profile_status_idx').on(t.profileStatus),
+    check('reference_breed_origin_country_check', sql`${t.originCountry} ~ '^[A-Z]{2}$'`),
+    check('reference_breed_slug_check', sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
+    check('reference_breed_not_merged_into_itself', sql`${t.mergedIntoBreedId} <> ${t.id}`),
+  ],
+);
+
+/** An old slug keeps resolving after a rename (Requirements-Phase-2 §23). */
+export const breedSlugRedirects = pgTable('breed_slug_redirect', {
+  slug: text('slug').primaryKey(),
+  breedId: uuid('breed_id')
+    .notNull()
+    .references(() => referenceBreeds.id, { onDelete: 'restrict' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+});
+
+/**
+ * Medical content of a breed: health notes, predisposed conditions and suggested
+ * genetic tests. §6 requires a source and a review date for every medical
+ * claim, so both are columns that cannot be empty. A removed claim is archived,
+ * never deleted (P2-D13). A suggested test is information only — it orders
+ * nothing and names no centre (DEC-0156).
+ */
+export const breedMedicalClaims = pgTable(
+  'breed_medical_claim',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    breedId: uuid('breed_id')
+      .notNull()
+      .references(() => referenceBreeds.id, { onDelete: 'restrict' }),
+    kind: breedClaimKind('kind').notNull(),
+    titleFa: text('title_fa').notNull(),
+    noteFa: text('note_fa'),
+    sourceTitle: text('source_title').notNull(),
+    sourceUrl: text('source_url'),
+    reviewedOn: date('reviewed_on').notNull(),
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+    createdByAccountId: uuid('created_by_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [index('breed_medical_claim_breed_idx').on(t.breedId)],
 );
 
 /**

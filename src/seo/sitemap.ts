@@ -10,6 +10,8 @@
  */
 import { absoluteUrl } from './metadata.ts';
 import { liveSections } from '../public/sections.ts';
+import { db } from '../db/client.ts';
+import { breedSitemapEntries } from '../breeds/service.ts';
 
 export interface SitemapEntry {
   readonly path: string;
@@ -18,6 +20,8 @@ export interface SitemapEntry {
 
 export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly SitemapEntry[]>>> = {
   pages: async () => liveSections().map((section) => ({ path: section.href })),
+  // Published, unmerged breed pages with their real modification time (PROMPT-003).
+  breeds: () => breedSitemapEntries(db()),
 };
 
 export function sitemapSection(id: string): (() => Promise<readonly SitemapEntry[]>) | null {

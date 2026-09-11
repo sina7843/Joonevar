@@ -17,6 +17,7 @@ import { eq } from 'drizzle-orm';
 import type { DbClient } from '../client.ts';
 import { productSettings, referenceBreeds } from '../schema/core.ts';
 import { SETTING_DEFINITIONS } from '../../settings/keys.ts';
+import { slugify } from '../../breeds/model.ts';
 
 export interface SeedReport {
   readonly settingsInserted: readonly string[];
@@ -88,7 +89,7 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
   for (const [index, breed] of BASELINE_BREEDS.entries()) {
     const result = await database
       .insert(referenceBreeds)
-      .values({ nameFa: breed.fa, nameEn: breed.en, sortOrder: index })
+      .values({ nameFa: breed.fa, nameEn: breed.en, slug: slugify(breed.en), sortOrder: index })
       .onConflictDoNothing({ target: referenceBreeds.nameEn })
       .returning({ id: referenceBreeds.id });
     breedsInserted += result.length;

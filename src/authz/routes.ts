@@ -24,6 +24,7 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // Public site (Phase 2, DEC-0149). A section opens here when its prompt builds
   // it; until then its reserved prefix stays unlisted and therefore closed.
   { prefix: '/about', access: 'PUBLIC' },
+  { prefix: '/breeds', access: 'PUBLIC' },
   { prefix: '/robots.txt', access: 'PUBLIC' },
   { prefix: '/sitemap.xml', access: 'PUBLIC' },
   { prefix: '/sitemaps', access: 'PUBLIC' },

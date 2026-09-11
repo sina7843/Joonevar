@@ -20,7 +20,7 @@ export const PUBLIC_SECTIONS: readonly PublicSection[] = [
   { href: '/', label: 'خانه', live: true, prompt: '002' },
   { href: '/veterinarians', label: 'دامپزشکان', live: false, prompt: '006' },
   { href: '/centers', label: 'مراکز دامپزشکی', live: false, prompt: '008' },
-  { href: '/breeds', label: 'نژادهای سگ', live: false, prompt: '003' },
+  { href: '/breeds', label: 'نژادهای سگ', live: true, prompt: '003' },
   { href: '/articles', label: 'آموزش‌ها', live: false, prompt: '004' },
   { href: '/news', label: 'اخبار', live: false, prompt: '004' },
   { href: '/associations', label: 'انجمن‌ها و کلاب‌ها', live: false, prompt: '010' },

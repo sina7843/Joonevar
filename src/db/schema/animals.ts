@@ -13,7 +13,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { accounts, referenceBreeds, pedigreeIssuers, storedFiles } from './core.ts';
+import { accounts, referenceBreeds, pedigreeIssuers, species as speciesTable, storedFiles } from './core.ts';
 
 const now = sql`now()`;
 
@@ -57,8 +57,14 @@ export const animals = pgTable(
 
     // ── Step 1: species and breed ──────────────────────────────────────────
     name: text('name'),
-    /** Only dogs are supported for now, as the approved form states. */
-    species: text('species').notNull().default('DOG'),
+    /**
+     * Only dogs are supported for now, as the approved form states. The stored
+     * code is a key of the species taxonomy, not free text (DEC-0154).
+     */
+    species: text('species')
+      .notNull()
+      .default('DOG')
+      .references(() => speciesTable.code, { onDelete: 'restrict' }),
     breedId: uuid('breed_id').references(() => referenceBreeds.id, { onDelete: 'restrict' }),
 
     // ── Step 2: sex and birth ──────────────────────────────────────────────
