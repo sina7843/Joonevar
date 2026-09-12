@@ -858,9 +858,15 @@ export async function relatedContentForBreed(
   breedId: string,
   now: Date = new Date(),
   limit = 5,
-): Promise<Array<{ kind: ContentKind; slug: string; titleFa: string }>> {
+): Promise<Array<{ kind: ContentKind; slug: string; titleFa: string; imageFileId: string | null; imageAltFa: string | null }>> {
   return database
-    .select({ kind: contentItems.kind, slug: contentItems.slug, titleFa: contentItems.titleFa })
+    .select({
+      kind: contentItems.kind,
+      slug: contentItems.slug,
+      titleFa: contentItems.titleFa,
+      imageFileId: contentItems.imageFileId,
+      imageAltFa: contentItems.imageAltFa,
+    })
     .from(contentItems)
     .where(
       and(

@@ -138,4 +138,27 @@ export async function similarVets(
     }));
 }
 
+/**
+ * Other breed pages. Built on the breed bank's published query, so a draft,
+ * archived or merged breed never appears here.
+ */
+export async function similarBreeds(
+  database: DbClient,
+  options: { excludeSlug?: string; limit?: number } = {},
+): Promise<RelatedItem[]> {
+  const limit = options.limit ?? 4;
+  const { publishedBreeds } = await import('../breeds/service.ts');
+  const result = await publishedBreeds(database, { page: 1, pageSize: limit + 1 });
+  return result.items
+    .filter((breed) => breed.slug !== options.excludeSlug)
+    .slice(0, limit)
+    .map((breed) => ({
+      href: '/breeds/' + breed.slug,
+      titleFa: breed.nameFa,
+      noteFa: breed.groupNameFa,
+      imageFileId: breed.imageFileId,
+      imageAltFa: breed.imageAltFa,
+    }));
+}
+
 export const hasAny = (...lists: readonly RelatedItem[][]): boolean => lists.some((list) => list.length > 0);

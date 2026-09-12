@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
+import { RelatedColumn } from '../../../../src/public/related-column.tsx';
+import { relatedContent, similarBreeds, similarCentres } from '../../../../src/public/related.ts';
 import Link from 'next/link';
 import { Fragment, cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -102,9 +104,16 @@ export default async function BreedPageView({ params }: Params) {
   );
   // Education and news written about this breed (PROMPT-004: content relations).
   const related = await relatedContentForBreed(db(), breed.id);
+  const [otherBreeds, centres, latestReading] = await Promise.all([
+    similarBreeds(db(), { excludeSlug: breed.slug, limit: 4 }),
+    similarCentres(db(), { limit: 3 }),
+    // Nothing written about this breed yet is not the same as nothing to read.
+    relatedContent(db(), { limit: 3 }),
+  ]);
 
   return (
-    <article className="mx-auto max-w-3xl space-y-xl" data-testid="breed-page">
+    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
+    <article className="min-w-0 space-y-xl" data-testid="breed-page">
       <Breadcrumbs items={crumbs} origin={origin} />
 
       {primary ? (
@@ -223,23 +232,28 @@ export default async function BreedPageView({ params }: Params) {
         </section>
       ) : null}
 
-      {related.length > 0 ? (
-        <section aria-labelledby="breed-related-title" data-testid="breed-related">
-          <h2 id="breed-related-title" className="text-h4">
-            مطالب مرتبط
-          </h2>
-          <ul className="mt-md space-y-sm">
-            {related.map((entry) => (
-              <li key={entry.kind + entry.slug}>
-                <Link href={(KIND_PATH[entry.kind] ?? '') + '/' + entry.slug} className="text-label-md text-text-brand underline underline-offset-4">
-                  {entry.titleFa}
-                </Link>
-                <span className="text-caption text-text-secondary">{' · ' + KIND_FA[entry.kind]}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </article>
+
+      <RelatedColumn
+        groups={[
+          {
+            // Only the second title claims a connection to this breed.
+            titleFa: related.length > 0 ? 'مطالب مرتبط' : 'خواندنی‌ها',
+            items:
+              related.length > 0
+                ? related.map((entry) => ({
+                    href: (KIND_PATH[entry.kind] ?? '') + '/' + entry.slug,
+                    titleFa: entry.titleFa,
+                    noteFa: KIND_FA[entry.kind] ?? null,
+                    imageFileId: entry.imageFileId,
+                    imageAltFa: entry.imageAltFa,
+                  }))
+                : latestReading,
+          },
+          { titleFa: 'نژادهای دیگر', items: otherBreeds },
+          { titleFa: 'مراکز دامپزشکی', items: centres },
+        ]}
+      />
+    </div>
   );
 }
