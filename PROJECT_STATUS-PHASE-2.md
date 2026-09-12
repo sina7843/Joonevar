@@ -21,4 +21,4 @@ Managed by `node tools/runner.mjs --phase 2 …` (DEC-0142). A row is marked onl
 - [x] PROMPT-017 — حریم خصوصی و مقابله با سوءاستفاده <!-- work-commit:3468a3a47b97113b1208db3a24559b8e7d8c1a76 -->
 - [x] PROMPT-018 — کارایی و دسترس‌پذیری <!-- work-commit:b0c3fccfd8144ea6f26b8e5fcbe5c76fe4d2ffa7 -->
 - [x] PROMPT-019 — مهاجرت داده و تست یکپارچه <!-- work-commit:2fa06f678ba96a5624799421f1cc3af89d48c7ca -->
-- [ ] PROMPT-020 — آمادگی انتشار و تحویل
+- [x] PROMPT-020 — آمادگی انتشار و تحویل <!-- work-commit:3834ff65f028b26dae067a006eb565f4ede356fd -->
