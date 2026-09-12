@@ -2,7 +2,7 @@
 
 Managed by `node tools/runner.mjs --phase 2.5 …` (DEC-0187). The package is read in place from `Hamzist-Phase-2.5-Prompt-Package/` (kept untracked by the user). A row is marked only by `complete` after the committed report `docs/reports/PHASE-2.5-PROMPT-NNN.json` passes the Runner's evidence check.
 
-- [ ] PROMPT-001 — 001-head-baseline-ci-plan
+- [x] PROMPT-001 — 001-head-baseline-ci-plan <!-- work-commit:ee7c994df4ebef19f6db3d91c9e6eb4cc277a4c7 -->
 - [ ] PROMPT-002 — 002-professional-identity-domain
 - [ ] PROMPT-003 — 003-veterinary-profile-migration
 - [ ] PROMPT-004 — 004-student-veterinary-flow
