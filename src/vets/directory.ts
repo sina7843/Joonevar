@@ -30,6 +30,7 @@ import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
 import { promotedTargetIds } from '../advertising/service.ts';
 import { compareRanked, promotedWhenRelevant, rankTier } from '../search/model.ts';
+import { primaryOf } from '../admin/merge.ts';
 import { normalizeForSearch, unifyPersianLetters } from '../breeds/model.ts';
 import {
   completeness,
@@ -599,6 +600,9 @@ async function publishedProfiles(database: DbClient, slug?: string): Promise<Pro
         eq(vetProfiles.publicStatus, 'PUBLISHED'),
         // A disabled account's page goes with it; the profile row stays as history. Unowned profiles have no account.
         or(isNull(vetProfiles.accountId), ne(accounts.status, 'DISABLED')),
+        // A merged duplicate leaves the lists but keeps its own address, so an
+        // existing link still resolves and points at the primary (§21).
+        slug === undefined ? isNull(vetProfiles.mergedIntoProfileId) : undefined,
         slug === undefined ? undefined : eq(vetProfiles.publicSlug, slug),
       ),
     );
@@ -740,6 +744,8 @@ export interface VetPublicPage {
   }[];
   /** An unowned profile's listed city and public contact, shown while it has no locations. */
   readonly listed: { readonly cityNameFa: string; readonly provinceNameFa: string; readonly contactFa: string | null } | null;
+  /** Set when this profile was merged into another: its address points there (§21). */
+  readonly primary: { readonly slug: string; readonly nameFa: string } | null;
   readonly updatedAt: Date;
 }
 
@@ -788,6 +794,7 @@ export async function vetPageBySlug(database: DbClient, slug: string): Promise<V
             contactFa: profile.accountId === null ? profile.listedContactFa : null,
           }
         : null,
+    primary: await primaryOf(database, 'VET', profile.mergedIntoProfileId),
     updatedAt: profile.updatedAt,
   };
 }

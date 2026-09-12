@@ -9,7 +9,8 @@
  * DEC-0170).
  */
 import { sql } from 'drizzle-orm';
-import { boolean, date, index, integer, pgEnum, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { boolean, check, date, index, integer, pgEnum, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { accounts, referenceBreeds, species } from './core.ts';
 import { cities, provinces } from './geography.ts';
 import { licenceStatus, vetPublicStatus } from './vets.ts';
@@ -63,8 +64,20 @@ export const communities = pgTable(
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+
+    /**
+     * Set when this record turned out to be a duplicate of another (§21,
+     * PROMPT-016). The row stays, with its history and its public address.
+     */
+    mergedIntoCommunityId: uuid('merged_into_community_id').references((): AnyPgColumn => communities.id, {
+      onDelete: 'restrict',
+    }),
   },
   (t) => [
+    check(
+      'community_not_merged_into_itself',
+      sql`${t.mergedIntoCommunityId} is null or ${t.mergedIntoCommunityId} <> ${t.id}`,
+    ),
     uniqueIndex('community_public_slug_key').on(t.publicSlug),
     index('community_kind_status_idx').on(t.kind, t.publicStatus),
     index('community_owner_idx').on(t.ownerAccountId),

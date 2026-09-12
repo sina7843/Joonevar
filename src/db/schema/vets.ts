@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   boolean,
+  check,
   doublePrecision,
   index,
   integer,
@@ -112,8 +113,18 @@ export const vetProfiles = pgTable(
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+
+    /**
+     * Set when this profile turned out to be a duplicate of another (§21,
+     * PROMPT-016). The row is never deleted: it keeps its history and its
+     * public address, and that address points at the primary profile.
+     */
+    mergedIntoProfileId: uuid('merged_into_profile_id').references((): AnyPgColumn => vetProfiles.id, {
+      onDelete: 'restrict',
+    }),
   },
   (t) => [
+    check('vet_profile_not_merged_into_itself', sql`${t.mergedIntoProfileId} is null or ${t.mergedIntoProfileId} <> ${t.id}`),
     uniqueIndex('vet_profile_account_key').on(t.accountId),
     uniqueIndex('vet_profile_council_code_key').on(t.councilCode),
     uniqueIndex('vet_profile_public_slug_key').on(t.publicSlug),
@@ -479,8 +490,17 @@ export const centres = pgTable(
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+
+    /**
+     * Set when this centre turned out to be a duplicate of another (§21,
+     * PROMPT-016). The row stays, with its history and its public address.
+     */
+    mergedIntoCentreId: uuid('merged_into_centre_id').references((): AnyPgColumn => centres.id, {
+      onDelete: 'restrict',
+    }),
   },
   (t) => [
+    check('centre_not_merged_into_itself', sql`${t.mergedIntoCentreId} is null or ${t.mergedIntoCentreId} <> ${t.id}`),
     uniqueIndex('centre_public_slug_key').on(t.publicSlug),
     index('centre_status_idx').on(t.publicStatus),
     index('centre_owner_idx').on(t.ownerAccountId),

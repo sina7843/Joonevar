@@ -1,0 +1,79 @@
+{
+  "promptId": "PROMPT-016",
+  "status": "COMPLETE",
+  "summary": "The public-phase admin console. Inspecting the code first showed that almost every queue §21 names already existed with its own permission — veterinarian applications (007), centres and claims (008, 009), user suggestions (009), associations and clubs (010), content reports and restrictions (005), packages (011), prices in settings, and the audit viewer (005). What was missing was a board saying how much work waits in each, and Merge for duplicate records: the only merge in the codebase was markBreedDuplicate for the breed bank. So no queue was rebuilt. The board asks the very functions the queue pages use, so a number on it can never disagree with the page it links to, and it asks as the signed-in actor: a queue the actor may not read is left out rather than shown as zero, because zero is a fact about the queue and we do not hold that fact when we are not allowed to read it. Migration 0028 adds merged_into_profile_id, merged_into_centre_id and merged_into_community_id with self-referencing foreign keys and not-self check constraints, mirroring the breed rule. A merge deletes nothing: the duplicate keeps its row, its relations and its history, its public address still answers, and that address carries a DUPLICATE canonical plus a notice pointing at the primary — the four things §21 asks a merge to preserve. Guards keep a redirect one hop deep: an already merged record is not merged again, a primary that is itself a duplicate is refused, and a record other duplicates point at cannot become one. Every merge is audited with its previous value, its reason and its actor. The ranking settings §21 mentions were deliberately not invented: DEC-0172 keeps the ranking rule a versioned constant in code, and turning it into an editable key would be inventing an unapproved policy.",
+  "changedFiles": [
+    "src/db/schema/vets.ts",
+    "src/db/schema/communities.ts",
+    "src/db/migrations/0028_record-merge.sql",
+    "src/db/migrations/meta/0028_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/admin/merge-model.ts",
+    "src/admin/merge.ts",
+    "src/admin/queues.ts",
+    "src/admin/actions.ts",
+    "src/admin/forms.tsx",
+    "src/vets/directory.ts",
+    "src/centres/service.ts",
+    "src/communities/service.ts",
+    "app/admin/merge/page.tsx",
+    "app/admin/page.tsx",
+    "app/(public)/veterinarians/[slug]/page.tsx",
+    "app/(public)/centers/[slug]/page.tsx",
+    "app/(public)/associations/[slug]/page.tsx",
+    "tests/domain/merge.test.ts",
+    "tests/db/merge.test.ts",
+    "tests/browser/admin.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-016-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-016/admin-overview.png",
+    "docs/reports/screenshots/phase-2/prompt-016/admin-merge.png",
+    "docs/reports/screenshots/phase-2/prompt-016/merged-public-page.png",
+    "docs/reports/screenshots/phase-2/prompt-016/admin-forbidden.png"
+  ],
+  "decisions": ["DEC-0176"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0, with the new /admin/merge route listed."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/merge.test.ts tests/db/merge.test.ts && node --test --test-concurrency=1 tests/db/migrations.test.ts tests/db/communities.test.ts tests/db/centres.test.ts tests/db/vet-directory.test.ts tests/ui/routes.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. New suites: tests 9 · pass 9 · fail 0. tests/domain/merge.test.ts pins the three directories with their public paths, that a record is never its own duplicate, that an already merged record, a primary that is itself a duplicate and a record other duplicates point at are all refused so a redirect never grows a second hop, that identity is reported before policy, that a reason is always required and cannot rescue a broken rule, and that the notice never claims the record was deleted. tests/db/merge.test.ts on a freshly migrated database: a merged club disappears from publishedCommunities while the primary stays, its own address still resolves and names the primary, the primary carries no notice, the row itself is not deleted, and the audit entry holds the previous value and the reason; the one-hop guards and a stale expectedVersion are all refused; only the superadmin may merge or even list candidates, a blank reason and an unknown kind are refused; and the panel lists what was merged with its primary while never offering a merged record as a candidate again. Regression: tests 46 · pass 46 · fail 0 over tests/db/migrations.test.ts (migration 0028 on an empty database), tests/db/communities.test.ts, tests/db/centres.test.ts and tests/db/vet-directory.test.ts (their published predicates now exclude merged rows and their page shapes gained the primary) and tests/ui/routes.test.ts. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/admin.test.ts && node tools/browser-tests.mjs tests/browser/communities.test.ts tests/browser/centres.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/admin.test.ts 3/3: the superadmin overview shows the review queues this role may open and states that a queue it may not read is absent rather than zero; the superadmin publishes two clubs through the real screens, merges one into the other, and the merged record then appears in the merged list while the public /associations list no longer shows it and its own address still answers 200 with a canonical pointing at a public address; an ordinary account is refused both /admin and /admin/merge and sees neither the board nor the merge form. Regression on the same build: tests/browser/communities.test.ts and tests/browser/centres.test.ts 10/10. Three defects were found and fixed during this prompt: a real product defect where the merge update named the select alias instead of the table's own column (hidden by an `as never` cast), so no merge was ever persisted; a form that carried the expected version through client state, replaced by carrying it inside the option value; and a test that asserted on a banner which revalidation clears, now asserting on the merged list that stays. Screenshots regenerated for prompts 008 and 010 by the regression were restored with git checkout; only prompt-016 evidence is new. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "A merge is not reversible from the panel: as with the breed bank, undoing one needs a fresh decision; the column would be cleared and the history would stay.",
+    "Merging user accounts or Phase 1 documents was out of scope; only the three Phase 2 public directories are covered.",
+    "The queue board counts four queues (veterinarian applications, centre claims, suggestions, content reports); the other queues open from their own environment's navigation and no count was invented for them.",
+    "The ranking settings §21 mentions were not turned into an editable key: DEC-0172 keeps the ranking rule a versioned constant, and making it editable would invent an unapproved policy.",
+    "A merged record leaves the public lists, but the directory sitemap sections are built from the same list functions and were not separately verified in this prompt.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the console and merge screens is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "ADMIN_CONSOLE_AND_MERGE_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

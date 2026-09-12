@@ -25,6 +25,7 @@ import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
 import { promotedTargetIds } from '../advertising/service.ts';
+import { primaryOf } from '../admin/merge.ts';
 import { compareRanked, promotedWhenRelevant, rankTier } from '../search/model.ts';
 import { normalizeForSearch, unifyPersianLetters } from '../breeds/model.ts';
 import { isLicenceStatus, type LicenceStatusName } from '../centres/model.ts';
@@ -852,6 +853,8 @@ async function publishedRows(database: DbClient, slug?: string): Promise<Communi
       and(
         eq(communities.publicStatus, 'PUBLISHED'),
         or(isNull(communities.ownerAccountId), ne(accounts.status, 'DISABLED')),
+        // A merged duplicate leaves the lists but keeps its own address (§21).
+        slug === undefined ? isNull(communities.mergedIntoCommunityId) : undefined,
         slug === undefined ? undefined : eq(communities.publicSlug, slug),
       ),
     );
@@ -934,6 +937,8 @@ export async function publishedCommunities(
 
 export interface CommunityPublicPage {
   readonly slug: string;
+  /** Set when this record was merged into another: its address points there (§21). */
+  readonly primary: { readonly slug: string; readonly nameFa: string } | null;
   readonly kind: CommunityKind;
   readonly nameFa: string;
   readonly aboutFa: string | null;
@@ -988,6 +993,7 @@ export async function communityPageBySlug(
 
   return {
     slug,
+    primary: await primaryOf(database, 'COMMUNITY', community.mergedIntoCommunityId),
     kind: community.kind as CommunityKind,
     nameFa: community.displayNameFa,
     aboutFa: community.aboutFa,

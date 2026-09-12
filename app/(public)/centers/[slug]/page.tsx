@@ -9,6 +9,7 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { veterinaryCareLd } from '../../../../src/seo/structured-data.ts';
 import { JsonLdScript } from '../../../../src/seo/json-ld.tsx';
 import { site } from '../../../../src/public/request.ts';
+import { DUPLICATE_NOTICE_FA } from '../../../../src/admin/merge-model.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
@@ -36,6 +37,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: page.nameFa + ' — ' + page.typeFa,
       description: summary(page.nameFa, page.typeFa, page.aboutFa),
       path: '/centers/' + page.slug,
+      // A merged duplicate keeps its address but points at the primary (§21).
+      state: page.primary ? 'DUPLICATE' : 'PUBLISHED',
+      primaryPath: page.primary ? '/centers/' + page.primary.slug : undefined,
     },
     site(),
   );
@@ -111,6 +115,17 @@ export default async function CentrePage({ params }: Params) {
           {page.branches.some((branch) => branch.isOpen24h) ? <StatusBadge tone="neutral">شبانه‌روزی</StatusBadge> : null}
         </div>
       </header>
+
+      {page.primary ? (
+        <div data-testid="centre-merged">
+          <Alert tone="warning" title="این رکورد تکراری بوده است">
+            {DUPLICATE_NOTICE_FA}{' '}
+            <Link href={'/centers/' + page.primary.slug} className="text-text-brand underline underline-offset-4">
+              {page.primary.nameFa}
+            </Link>
+          </Alert>
+        </div>
+      ) : null}
 
       {page.owned ? null : (
         <div data-testid="centre-unowned">

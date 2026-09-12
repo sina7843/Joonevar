@@ -36,6 +36,7 @@ import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
 import { promotedTargetIds } from '../advertising/service.ts';
+import { primaryOf } from '../admin/merge.ts';
 import { compareRanked, promotedWhenRelevant, rankTier } from '../search/model.ts';
 import { normalizeForSearch, unifyPersianLetters } from '../breeds/model.ts';
 import { directoryReferenceData } from '../vets/directory.ts';
@@ -1010,6 +1011,8 @@ async function publishedCentreRows(database: DbClient, slug?: string): Promise<C
       and(
         eq(centres.publicStatus, 'PUBLISHED'),
         or(isNull(centres.ownerAccountId), ne(accounts.status, 'DISABLED')),
+        // A merged duplicate leaves the lists but keeps its own address (§21).
+        slug === undefined ? isNull(centres.mergedIntoCentreId) : undefined,
         slug === undefined ? undefined : eq(centres.publicSlug, slug),
       ),
     );
@@ -1123,6 +1126,8 @@ export async function publishedCentres(database: DbClient, query: CentreQuery): 
 
 export interface CentrePublicPage {
   readonly slug: string;
+  /** Set when this centre was merged into another: its address points there (§21). */
+  readonly primary: { readonly slug: string; readonly nameFa: string } | null;
   readonly nameFa: string;
   readonly typeFa: string;
   readonly aboutFa: string | null;
@@ -1168,6 +1173,7 @@ export async function centrePageBySlug(database: DbClient, slug: string): Promis
   const branches = publicBranchesOf(facts!);
   return {
     slug,
+    primary: await primaryOf(database, 'CENTRE', centre.mergedIntoCentreId),
     nameFa: centre.displayNameFa,
     typeFa: facts!.typeNameFa,
     aboutFa: centre.aboutFa,

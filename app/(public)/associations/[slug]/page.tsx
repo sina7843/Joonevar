@@ -8,6 +8,7 @@ import { COMMUNITY_KIND_FA, COMMUNITY_SCOPE_FA } from '../../../../src/communiti
 import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
+import { DUPLICATE_NOTICE_FA } from '../../../../src/admin/merge-model.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
@@ -33,6 +34,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: page.nameFa + ' — ' + kindFa,
       description: summary(page.nameFa, kindFa, page.aboutFa),
       path: '/associations/' + page.slug,
+      // A merged duplicate keeps its address but points at the primary (§21).
+      state: page.primary ? 'DUPLICATE' : 'PUBLISHED',
+      primaryPath: page.primary ? '/associations/' + page.primary.slug : undefined,
     },
     site(),
   );
@@ -81,6 +85,17 @@ export default async function CommunityPage({ params }: Params) {
           {page.placeFa ? <StatusBadge tone="neutral">{page.placeFa}</StatusBadge> : null}
         </div>
       </header>
+
+      {page.primary ? (
+        <div data-testid="community-merged">
+          <Alert tone="warning" title="این رکورد تکراری بوده است">
+            {DUPLICATE_NOTICE_FA}{' '}
+            <Link href={'/associations/' + page.primary.slug} className="text-text-brand underline underline-offset-4">
+              {page.primary.nameFa}
+            </Link>
+          </Alert>
+        </div>
+      ) : null}
 
       {page.owned ? null : (
         <div data-testid="community-unowned">

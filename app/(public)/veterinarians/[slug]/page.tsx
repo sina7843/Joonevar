@@ -8,6 +8,7 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { vetPersonLd } from '../../../../src/seo/structured-data.ts';
 import { JsonLdScript } from '../../../../src/seo/json-ld.tsx';
 import { site } from '../../../../src/public/request.ts';
+import { DUPLICATE_NOTICE_FA } from '../../../../src/admin/merge-model.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
@@ -31,6 +32,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (page === null) return {};
   return buildMetadata(
     {
+      // A merged duplicate keeps its address but points at the primary (§21).
+      state: page.primary ? 'DUPLICATE' : 'PUBLISHED',
+      primaryPath: page.primary ? '/veterinarians/' + page.primary.slug : undefined,
       title: page.nameFa + ' — دامپزشک',
       description: summary(page.nameFa, page.headlineFa, page.bioFa),
       path: '/veterinarians/' + page.slug,
@@ -116,6 +120,17 @@ export default async function VeterinarianPage({ params }: Params) {
           </Alert>
         </div>
       )}
+
+      {page.primary ? (
+        <div data-testid="vet-merged">
+          <Alert tone="warning" title="این رکورد تکراری بوده است">
+            {DUPLICATE_NOTICE_FA}{' '}
+            <Link href={'/veterinarians/' + page.primary.slug} className="text-text-brand underline underline-offset-4">
+              {page.primary.nameFa}
+            </Link>
+          </Alert>
+        </div>
+      ) : null}
 
       <dl className="grid gap-sm sm:grid-cols-2" data-testid="vet-facts">
         {page.councilCode ? (
