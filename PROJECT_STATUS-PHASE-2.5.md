@@ -4,7 +4,7 @@ Managed by `node tools/runner.mjs --phase 2.5 …` (DEC-0187). The package is re
 
 - [x] PROMPT-001 — 001-head-baseline-ci-plan <!-- work-commit:ee7c994df4ebef19f6db3d91c9e6eb4cc277a4c7 -->
 - [x] PROMPT-002 — 002-professional-identity-domain <!-- work-commit:fd4743df8078b5981632e5429845a6b7d399d78e -->
-- [ ] PROMPT-003 — 003-veterinary-profile-migration
+- [x] PROMPT-003 — 003-veterinary-profile-migration <!-- work-commit:e0728fe0dc5816419cd3a6b36015ecbc86cec4fb -->
 - [ ] PROMPT-004 — 004-student-veterinary-flow
 - [ ] PROMPT-005 — 005-vet-without-license-flow
 - [ ] PROMPT-006 — 006-licensed-vet-submission
