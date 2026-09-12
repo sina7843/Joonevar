@@ -1,0 +1,77 @@
+{
+  "promptId": "PROMPT-015",
+  "status": "COMPLETE",
+  "summary": "Geography, local pages and the map. Cities had no stable public address — only a Persian name — so migration 0027 adds city.slug, backfills it in SQL with exactly the rule the code applies (spaces and the zero-width non-joiner become hyphens) and makes it unique per province; provinces keep the latin code they already had. No romanised city list exists in the sources, so no latin name was invented for a permanent URL. Local pages live at /places, /places/[province] and /places/[province]/[city]: a namespace of their own, because a city page under /veterinarians/[slug] would collide with profile slugs, and «مکان‌ها» is not one of the §4 navigation sections. Every province and city always answers, but a place with nothing published in it is served noindex and left out of the sitemap, which is the §19 rule about thin pages. Counts come only from published records whose place its owner made public, gathered in three grouped queries over vet_location, centre and community, so a draft record or a private location changes nothing. The map is a slot rather than a feature: no provider URL format is in the sources, so none was guessed — a new managed setting holds the operator's embed template with {lat}, {lng} and {key} placeholders, a template without coordinates or without https is refused, and until one is recorded nothing is drawn and the recorded address stays as text. Privacy is checked before display: mapState asks whether the owner published the place before it asks anything else, and a non-public location renders nothing at all — no box, no note — so a private address can never reach a map URL. The centre page's «map comes later» note became the real slot, and the veterinarian page now carries coordinates for public locations only.",
+  "changedFiles": [
+    "src/db/schema/geography.ts",
+    "src/db/migrations/0027_city-slug.sql",
+    "src/db/migrations/meta/0027_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/geo/model.ts",
+    "src/geo/service.ts",
+    "src/ui/map.tsx",
+    "src/settings/keys.ts",
+    "src/authz/routes.ts",
+    "src/seo/sitemap.ts",
+    "src/vets/directory.ts",
+    "app/(public)/places/(list)/page.tsx",
+    "app/(public)/places/(list)/loading.tsx",
+    "app/(public)/places/[province]/page.tsx",
+    "app/(public)/places/[province]/[city]/page.tsx",
+    "app/(public)/centers/[slug]/page.tsx",
+    "app/(public)/veterinarians/[slug]/page.tsx",
+    "tests/domain/geo.test.ts",
+    "tests/db/geo.test.ts",
+    "tests/browser/places.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-015-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-015/places-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-015/province-empty.png",
+    "docs/reports/screenshots/phase-2/prompt-015/city-mobile.png"
+  ],
+  "decisions": ["DEC-0175"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0, with /places, /places/[province] and /places/[province]/[city] listed."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/geo.test.ts tests/db/geo.test.ts && node --test --test-concurrency=1 tests/ui/seo.test.ts tests/ui/routes.test.ts tests/db/migrations.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. New suites: tests 10 · pass 10 · fail 0. tests/domain/geo.test.ts pins the city address built from the Persian name (spaces, the zero-width non-joiner and punctuation), that a place with nothing published is not indexable while one published record of any kind makes it so, that a location its owner did not publish is never drawn whatever else is configured (not-public outranks missing coordinates), that the map address is filled only from an operator template containing both coordinates over https, and that a private address and private coordinates never leave the record. tests/db/geo.test.ts on a freshly migrated database: every seeded city carries the slug the migration filled and it equals what citySlug() computes, all 31 provinces keep latin codes; every province has a page while nothing is published, a draft community changes no count, a published one makes its province and city indexable with the path /places/tehran/تهران while another province stays empty; a city answers by its slug and unknown province or city slugs are not found; the sitemap lists a place only once something is published there, never twice; and the seed leaves both map settings unconfigured. Regression: tests 33 · pass 33 · fail 0 over tests/ui/seo.test.ts (the new places sitemap section), tests/ui/routes.test.ts (the new public /places rule) and tests/db/migrations.test.ts (migration 0027 on an empty database). Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/places.test.ts && node tools/browser-tests.mjs tests/browser/vet-directory.test.ts tests/browser/centres.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/places.test.ts 5/5: the phone-width list shows all 31 provinces with the privacy statement and no sideways scroll; the Tehran province page lists its cities and, with nothing published on a fresh database, reports noindex and says so plainly; the city page answers at its percent-encoded Persian address and keeps its privacy note; an unknown province or city answers a real 404 in Persian; and no iframe appears anywhere while no map template is configured. Regression on the same build: tests/browser/vet-directory.test.ts and tests/browser/centres.test.ts 7/7 — both public pages still publish, filter and hide correctly after gaining the map slot. Two defects found during this prompt were fixed before these runs: the sitemap entry for places was added without its import, which broke typecheck and the build (and therefore skipped the first browser attempt); and mapConfig cannot run inside a unit test because it reaches loadEnv, so the database suite reads the two map settings directly and the browser suite covers the configured path. Screenshots regenerated for prompts 006 and 008 by the regression were restored with git checkout; only prompt-015 evidence is new. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No map is drawn until the superadmin records an embed template: the provider's URL format is not in the sources and was deliberately not guessed.",
+    "A place page links to the existing directory lists filtered by that province or city rather than repeating the records, so the §15 ranking stays in one place.",
+    "Cities are still only the provincial capitals seeded in Phase 2; further cities are added as data by the superadmin and take their slug from the same rule.",
+    "Phase 1 free-text province and city on kennels, residences and postal requests were not normalised: that text is history kept by DEC-0163, and only the directory's own links are normalised.",
+    "mapConfig depends on the application environment and is therefore not called from unit tests; the browser suite covers it.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the place pages and the map slot is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "GEOGRAPHY_AND_LOCAL_PAGES_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

@@ -319,6 +319,16 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     seedValue: null,
   },
   {
+    key: 'integration.map.embed_url_template',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'الگوی نشانی نقشه جاسازی‌شده',
+    noteFa:
+      'نشانی embed سرویس نقشه با جای‌گذارهای {lat}، {lng} و {key}. تا واردنشدن، نقشه‌ای نمایش داده نمی‌شود؛ قالب نشانی حدس زده نمی‌شود و باید از مستندات همان سرویس گرفته شود (DEC-0175).',
+    seedValue: null,
+  },
+  {
     key: 'integration.document_render.engine',
     group: 'INTEGRATIONS',
     kind: 'STRING',

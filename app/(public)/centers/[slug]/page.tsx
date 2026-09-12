@@ -13,6 +13,8 @@ import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
+import { PlaceMap } from '../../../../src/ui/map.tsx';
+import { mapConfig } from '../../../../src/geo/service.ts';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -55,6 +57,8 @@ export default async function CentrePage({ params }: Params) {
   if (page === null) notFound();
 
   const { origin } = site();
+  // No map is drawn until the operator records an embed template (DEC-0175).
+  const map = await mapConfig(db());
   const path = '/centers/' + page.slug;
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -221,6 +225,16 @@ export default async function CentrePage({ params }: Params) {
                     {branch.latitude.toFixed(5) + ', ' + branch.longitude.toFixed(5)}
                   </p>
                 ) : null}
+                {/* Only public branches reach this page, so the map may be drawn. */}
+                <PlaceMap
+                  nameFa={branch.nameFa}
+                  isPublic
+                  latitude={branch.latitude}
+                  longitude={branch.longitude}
+                  template={map.template}
+                  apiKey={map.apiKey}
+                  testId={'centre-branch-map-' + branch.id}
+                />
                 {branch.isOpen24h ? (
                   <p className="mt-xs text-body-sm" data-testid="centre-branch-hours">
                     ساعات اعلام‌شده: شبانه‌روزی
@@ -241,7 +255,7 @@ export default async function CentrePage({ params }: Params) {
           </ul>
           <p className="mt-sm text-caption text-text-secondary">
             ساعات فقط برای اطلاع است. همزیست نوبت نمی‌دهد و درخواست خدمت از این صفحه ثبت نمی‌شود؛ پیش از مراجعه با مرکز تماس بگیرید.
-            نقشه در نسخه بعدی اضافه می‌شود.
+            نقشه فقط محل اعلام‌شده شعبه‌های عمومی را نشان می‌دهد.
           </p>
         </section>
       )}

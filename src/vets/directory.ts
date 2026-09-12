@@ -734,6 +734,9 @@ export interface VetPublicPage {
     readonly addressFa: string | null;
     readonly phone: string | null;
     readonly hoursNoteFa: string | null;
+    /** Only for a place its owner published; used to draw it on a map (§19, §20). */
+    readonly latitude: number | null;
+    readonly longitude: number | null;
   }[];
   /** An unowned profile's listed city and public contact, shown while it has no locations. */
   readonly listed: { readonly cityNameFa: string; readonly provinceNameFa: string; readonly contactFa: string | null } | null;
@@ -773,6 +776,9 @@ export async function vetPageBySlug(database: DbClient, slug: string): Promise<V
       addressFa: location.addressFa,
       phone: location.phone,
       hoursNoteFa: location.hoursNoteFa,
+      // `publicLocationsOf` already dropped everything the owner keeps private.
+      latitude: location.latitude,
+      longitude: location.longitude,
     })),
     listed:
       locations.length === 0 && facts!.listed

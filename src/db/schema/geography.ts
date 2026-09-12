@@ -33,8 +33,19 @@ export const cities = pgTable(
       .notNull()
       .references(() => provinces.code, { onDelete: 'restrict' }),
     nameFa: text('name_fa').notNull(),
+    /**
+     * The address a local page is published at (§19, PROMPT-015).
+     *
+     * Derived from the Persian name rather than from an invented latin one: no
+     * romanised city list exists in the sources, and guessing one would put a
+     * made-up name in a permanent URL. A province keeps its own latin `code`.
+     */
+    slug: text('slug'),
     isActive: boolean('is_active').notNull().default(true),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
   },
-  (t) => [uniqueIndex('city_province_name_key').on(t.provinceCode, t.nameFa)],
+  (t) => [
+    uniqueIndex('city_province_name_key').on(t.provinceCode, t.nameFa),
+    uniqueIndex('city_province_slug_key').on(t.provinceCode, t.slug),
+  ],
 );

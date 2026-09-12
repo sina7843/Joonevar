@@ -37,6 +37,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/services', access: 'PUBLIC' },
   // Document verification (§17): a code or QR, answered with minimal public data.
   { prefix: '/verify', access: 'PUBLIC' },
+  // Local pages (§19): a province or city and what is published there.
+  { prefix: '/places', access: 'PUBLIC' },
   // Content images: the route itself serves only images of visible content (DEC-0160).
   { prefix: '/media', access: 'PUBLIC' },
   { prefix: '/robots.txt', access: 'PUBLIC' },

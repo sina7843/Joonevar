@@ -13,6 +13,8 @@ import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import Link from 'next/link';
 import { Alert } from '../../../../src/ui/alert.tsx';
+import { PlaceMap } from '../../../../src/ui/map.tsx';
+import { mapConfig } from '../../../../src/geo/service.ts';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -53,6 +55,8 @@ export default async function VeterinarianPage({ params }: Params) {
   if (page === null) notFound();
 
   const { origin } = site();
+  // No map is drawn until the operator records an embed template (DEC-0175).
+  const map = await mapConfig(db());
   const path = '/veterinarians/' + page.slug;
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -201,6 +205,16 @@ export default async function VeterinarianPage({ params }: Params) {
                   {'ساعات اعلام‌شده: ' + location.hoursNoteFa}
                 </p>
               ) : null}
+              {/* Only places the veterinarian published reach this page (§20). */}
+              <PlaceMap
+                nameFa={location.nameFa}
+                isPublic
+                latitude={location.latitude}
+                longitude={location.longitude}
+                template={map.template}
+                apiKey={map.apiKey}
+                testId={'vet-location-map-' + location.id}
+              />
             </li>
           ))}
         </ul>

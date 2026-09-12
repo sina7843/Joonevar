@@ -23,10 +23,13 @@ export interface SitemapEntry {
 }
 
 import { servicePaths } from '../services/catalogue.ts';
+import { placeSitemapEntries } from '../geo/service.ts';
 
 export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly SitemapEntry[]>>> = {
   // The service pages of §18: fixed addresses whose figures come from settings.
   services: async () => servicePaths().map((path) => ({ path })),
+  // Local pages (§19), listed only where a place actually holds a record.
+  places: () => placeSitemapEntries(db()),
   pages: async () => liveSections().map((section) => ({ path: section.href })),
   // Published directory profiles of accounts that are not disabled (PROMPT-006).
   veterinarians: () => vetSitemapEntries(db()),
