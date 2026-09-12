@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { RecordImage } from '../../../../src/ui/record-image.tsx';
 import Link from 'next/link';
 import { Fragment, cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -43,6 +44,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: breed.nameFa + ' (' + breed.nameEn + ')',
       description: summary(page),
       path: '/breeds/' + breed.slug,
+      // A real picture in the share card, when the record carries one.
+      image: breed.imageFileId ? { path: '/media/' + breed.imageFileId, alt: breed.imageAltFa ?? breed.nameFa } : undefined,
       state: primary ? 'DUPLICATE' : breed.profileStatus === 'ARCHIVED' ? 'ARCHIVED' : 'PUBLISHED',
       primaryPath: primary ? '/breeds/' + primary.slug : undefined,
       type: 'article',
@@ -121,6 +124,7 @@ export default async function BreedPageView({ params }: Params) {
       ) : null}
 
       <header>
+        <RecordImage priority fileId={breed.imageFileId} altFa={breed.imageAltFa} className="mb-lg" />
         <h1 className="text-h3 md:text-h1">{breed.nameFa}</h1>
         <p className="mt-xs text-body-md text-text-secondary">
           <bdi>{breed.nameEn}</bdi>

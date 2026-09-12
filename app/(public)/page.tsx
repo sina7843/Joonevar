@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { Icon } from '../../src/ui/icon.tsx';
 import { Logo } from '../../src/ui/logo.tsx';
+import { RecordImage } from '../../src/ui/record-image.tsx';
 import { JsonLdScript } from '../../src/seo/json-ld.tsx';
 import { buildMetadata } from '../../src/seo/metadata.ts';
 import { organizationLd, websiteLd } from '../../src/seo/structured-data.ts';
@@ -237,8 +238,9 @@ export default async function HomePage() {
               <li key={breed.slug} className="shrink-0 snap-start">
                 <Link
                   href={'/breeds/' + breed.slug}
-                  className="hz-lift inline-flex flex-col rounded-full border border-border-subtle bg-bg-surface px-lg py-sm"
+                  className="hz-lift inline-flex w-[168px] flex-col gap-sm rounded-lg border border-border-subtle bg-bg-surface p-sm"
                 >
+                  <RecordImage fileId={breed.imageFileId} altFa={breed.imageAltFa} />
                   <span className="text-label-md whitespace-nowrap">{breed.nameFa}</span>
                   {breed.groupNameFa ? (
                     <span className="text-caption whitespace-nowrap text-text-secondary">{breed.groupNameFa}</span>
@@ -258,10 +260,13 @@ export default async function HomePage() {
           <ul className="mt-lg grid gap-x-xl md:grid-cols-2" data-testid="home-reading">
             {reading.map(({ item, path, kind }) => (
               <li key={path + item.slug} className="border-t border-border-subtle py-lg">
-                <Link href={path + item.slug} className="group block">
+                <Link href={path + item.slug} className="group flex gap-md">
+                  <RecordImage variant="thumb" fileId={item.imageFileId} altFa={item.imageAltFa} />
+                  <span className="block min-w-0">
                   <span className="text-caption text-text-secondary">{kind}</span>
                   <span className="mt-2xs block text-label-lg group-hover:text-text-brand">{item.titleFa}</span>
                   <span className="mt-xs block max-w-[60ch] text-body-sm text-text-secondary">{item.summaryFa}</span>
+                  </span>
                 </Link>
               </li>
             ))}
@@ -277,7 +282,8 @@ export default async function HomePage() {
           <ul className="mt-lg flex flex-wrap gap-x-xl gap-y-sm" data-testid="home-communities">
             {communities.items.map((community) => (
               <li key={community.slug}>
-                <Link href={'/associations/' + community.slug} className="group inline-flex items-baseline gap-sm">
+                <Link href={'/associations/' + community.slug} className="group inline-flex items-center gap-sm">
+                  <RecordImage variant="thumb" fileId={community.imageFileId} altFa={community.imageAltFa} />
                   <span className="text-label-lg group-hover:text-text-brand">{community.nameFa}</span>
                   {community.placeFa ? (
                     <span className="text-caption text-text-secondary">{community.placeFa}</span>

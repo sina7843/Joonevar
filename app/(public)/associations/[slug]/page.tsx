@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { RecordImage } from '../../../../src/ui/record-image.tsx';
 import Link from 'next/link';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: page.nameFa + ' — ' + kindFa,
       description: summary(page.nameFa, kindFa, page.aboutFa),
       path: '/associations/' + page.slug,
+      image: page.imageFileId ? { path: '/media/' + page.imageFileId, alt: page.imageAltFa ?? page.nameFa } : undefined,
       // A merged duplicate keeps its address but points at the primary (§21).
       state: page.primary ? 'DUPLICATE' : 'PUBLISHED',
       primaryPath: page.primary ? '/associations/' + page.primary.slug : undefined,
@@ -73,6 +75,7 @@ export default async function CommunityPage({ params }: Params) {
       <Breadcrumbs items={crumbs} origin={origin} />
 
       <header className="space-y-sm">
+        <RecordImage priority fileId={page.imageFileId} altFa={page.imageAltFa} className="mb-lg" />
         <h1 className="text-h3 md:text-h1">{page.nameFa}</h1>
         <p className="text-body-md text-text-secondary">{kindFa + ' · حوزه ' + COMMUNITY_SCOPE_FA[page.scope]}</p>
         {/* Each axis is its own badge; a registration does not verify content and a badge never sells (P2-D05). */}

@@ -11,7 +11,7 @@
 import { sql } from 'drizzle-orm';
 import { boolean, check, date, index, integer, pgEnum, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
-import { accounts, referenceBreeds, species } from './core.ts';
+import { accounts, storedFiles, referenceBreeds, species } from './core.ts';
 import { cities, provinces } from './geography.ts';
 import { licenceStatus, vetPublicStatus } from './vets.ts';
 
@@ -35,6 +35,14 @@ export const communities = pgTable(
     ownerAccountId: uuid('owner_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
     displayNameFa: text('display_name_fa').notNull(),
     aboutFa: text('about_fa'),
+    /**
+     * Public image of the record, stored privately and served through
+     * `/media/[id]` only while the record itself is published, exactly as a
+     * content image is (DEC-0160). The alternative text is mandatory at the
+     * service, because an image nobody can see is worse than no image.
+     */
+    imageFileId: uuid('image_file_id').references(() => storedFiles.id, { onDelete: 'set null' }),
+    imageAltFa: text('image_alt_fa'),
     scope: communityScope('scope').notNull().default('OTHER'),
     provinceCode: text('province_code').references(() => provinces.code, { onDelete: 'restrict' }),
     cityId: uuid('city_id').references(() => cities.id, { onDelete: 'restrict' }),

@@ -81,6 +81,14 @@ export const vetProfiles = pgTable(
      */
     accountId: uuid('account_id').references(() => accounts.id, { onDelete: 'restrict' }),
     displayNameFa: text('display_name_fa').notNull(),
+    /**
+     * Public image of the record, stored privately and served through
+     * `/media/[id]` only while the record itself is published, exactly as a
+     * content image is (DEC-0160). The alternative text is mandatory at the
+     * service, because an image nobody can see is worse than no image.
+     */
+    imageFileId: uuid('image_file_id').references(() => storedFiles.id, { onDelete: 'set null' }),
+    imageAltFa: text('image_alt_fa'),
     /** Unknown for an unowned profile until its claim is approved. */
     councilCode: text('council_code'),
     councilVerifiedAt: timestamp('council_verified_at', { withTimezone: true }),
@@ -467,6 +475,14 @@ export const centres = pgTable(
       .references(() => centreTypes.code, { onDelete: 'restrict' }),
     displayNameFa: text('display_name_fa').notNull(),
     aboutFa: text('about_fa'),
+    /**
+     * Public image of the record, stored privately and served through
+     * `/media/[id]` only while the record itself is published, exactly as a
+     * content image is (DEC-0160). The alternative text is mandatory at the
+     * service, because an image nobody can see is worse than no image.
+     */
+    imageFileId: uuid('image_file_id').references(() => storedFiles.id, { onDelete: 'set null' }),
+    imageAltFa: text('image_alt_fa'),
     phone: text('phone'),
     websiteUrl: text('website_url'),
 

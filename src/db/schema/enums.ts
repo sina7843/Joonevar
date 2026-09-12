@@ -83,6 +83,11 @@ export const filePurpose = pgEnum('file_purpose', [
   'VET_APPLICATION_DOCUMENT',
   /** Licence, authorisation letter or identity proof of a centre claim (DEC-0169). */
   'CENTRE_CLAIM_DOCUMENT',
+  /** Public images of a directory record, served only while that record is published. */
+  'BREED_IMAGE',
+  'CENTRE_IMAGE',
+  'VET_PROFILE_IMAGE',
+  'COMMUNITY_IMAGE',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);

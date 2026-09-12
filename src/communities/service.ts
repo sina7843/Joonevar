@@ -873,6 +873,9 @@ export interface CommunityQuery {
 }
 
 export interface CommunityCard {
+  /** Public image of the record, served through /media while it stays published. */
+  readonly imageFileId: string | null;
+  readonly imageAltFa: string | null;
   readonly slug: string;
   readonly kind: CommunityKind;
   readonly nameFa: string;
@@ -914,6 +917,8 @@ export async function publishedCommunities(
   const request = { page: query.page, pageSize: query.pageSize ?? 24 };
   const cards = filtered.map((entry) => ({
     slug: entry.community.publicSlug!,
+    imageFileId: entry.community.imageFileId,
+    imageAltFa: entry.community.imageAltFa,
     kind: entry.community.kind as CommunityKind,
     nameFa: entry.community.displayNameFa,
     scopeFa: entry.community.scope,
@@ -936,6 +941,9 @@ export async function publishedCommunities(
 }
 
 export interface CommunityPublicPage {
+  /** Public image of the record, served through /media while it stays published. */
+  readonly imageFileId: string | null;
+  readonly imageAltFa: string | null;
   readonly slug: string;
   /** Set when this record was merged into another: its address points there (§21). */
   readonly primary: { readonly slug: string; readonly nameFa: string } | null;
@@ -996,6 +1004,8 @@ export async function communityPageBySlug(
     primary: await primaryOf(database, 'COMMUNITY', community.mergedIntoCommunityId),
     kind: community.kind as CommunityKind,
     nameFa: community.displayNameFa,
+    imageFileId: community.imageFileId,
+    imageAltFa: community.imageAltFa,
     aboutFa: community.aboutFa,
     scope: community.scope as CommunityScope,
     placeFa: facts!.cityNameFa ?? facts!.provinceNameFa,

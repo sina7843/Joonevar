@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '../../../src/db/client.ts';
 import { env } from '../../../src/config/env.ts';
 import { publicContentImage } from '../../../src/content/service.ts';
+import { publicRecordImage } from '../../../src/media/public-image.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,11 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   const { id } = await params;
-  const image = await publicContentImage(db(), env().PRIVATE_STORAGE_DIR, id);
+  // One address for every public image: content first, then the directory
+  // records. Each source applies its own visibility rule and answers null the
+  // same way, so a visitor cannot tell a hidden record from a missing one.
+  const storage = env().PRIVATE_STORAGE_DIR;
+  const image = (await publicContentImage(db(), storage, id)) ?? (await publicRecordImage(db(), storage, id));
   if (image === null) return new NextResponse('Not found', { status: 404 });
 
   /*

@@ -10,6 +10,7 @@ import { EmptyState } from '../../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
+import { RecordImage } from '../../../../src/ui/record-image.tsx';
 
 const TITLE = 'دامپزشکان';
 const DESCRIPTION =
@@ -227,9 +228,13 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
                   className="flex h-full items-start gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
                   data-testid={'vet-card-' + vet.slug}
                 >
-                  <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">
-                    <Icon name="firstAidKit" size="md" />
-                  </span>
+                  {vet.imageFileId !== null ? (
+                    <RecordImage variant="thumb" fileId={vet.imageFileId} altFa={vet.imageAltFa} />
+                  ) : (
+                    <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">
+                      <Icon name="firstAidKit" size="md" />
+                    </span>
+                  )}
                   <span className="min-w-0 space-y-xs">
                     <span className="block text-label-lg text-text-primary">{vet.nameFa}</span>
                     {vet.headlineFa ? <span className="block text-body-sm text-text-secondary">{vet.headlineFa}</span> : null}

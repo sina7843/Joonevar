@@ -93,7 +93,11 @@ export type FilePurposeName =
   | 'ANIMAL_PHOTO'
   | 'CONTENT_IMAGE'
   | 'VET_APPLICATION_DOCUMENT'
-  | 'CENTRE_CLAIM_DOCUMENT';
+  | 'CENTRE_CLAIM_DOCUMENT'
+  | 'BREED_IMAGE'
+  | 'CENTRE_IMAGE'
+  | 'VET_PROFILE_IMAGE'
+  | 'COMMUNITY_IMAGE';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -107,6 +111,17 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   VET_APPLICATION_DOCUMENT: ['REVIEW_OPERATOR', 'SUPERADMIN'],
   // Proof that a representative may speak for a centre: its reviewers only (DEC-0169).
   CENTRE_CLAIM_DOCUMENT: ['REVIEW_OPERATOR', 'SUPERADMIN'],
+  /*
+   * Public images of directory records. The private route grants nothing extra:
+   * these are read through /media only while the record carrying them is
+   * published, and the operator who can edit the record is the one who replaces
+   * the image. Listing a reviewer context here would hand a whole shell access
+   * to files it has no review to do (DEC-0183).
+   */
+  BREED_IMAGE: ['SUPERADMIN'],
+  CENTRE_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
+  VET_PROFILE_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
+  COMMUNITY_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
 };
 
 export function canReadFile(

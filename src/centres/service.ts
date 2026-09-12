@@ -1052,6 +1052,9 @@ export interface CentreQuery {
 }
 
 export interface CentreCard {
+  /** Public image of the record, served through /media while it stays published. */
+  readonly imageFileId: string | null;
+  readonly imageAltFa: string | null;
   readonly slug: string;
   readonly nameFa: string;
   readonly typeFa: string;
@@ -1104,6 +1107,8 @@ export async function publishedCentres(database: DbClient, query: CentreQuery): 
   const cards = filtered.map((entry) => ({
     slug: entry.centre.publicSlug!,
     nameFa: entry.centre.displayNameFa,
+    imageFileId: entry.centre.imageFileId,
+    imageAltFa: entry.centre.imageAltFa,
     typeFa: entry.typeNameFa,
     servicesFa: entry.serviceCodes.map((code) => serviceName.get(code) ?? code),
     placesFa: [...new Set(placesOf(entry).map((place) => place.cityNameFa).filter((city): city is string => city !== null))],
@@ -1125,6 +1130,9 @@ export async function publishedCentres(database: DbClient, query: CentreQuery): 
 }
 
 export interface CentrePublicPage {
+  /** Public image of the record, served through /media while it stays published. */
+  readonly imageFileId: string | null;
+  readonly imageAltFa: string | null;
   readonly slug: string;
   /** Set when this centre was merged into another: its address points there (§21). */
   readonly primary: { readonly slug: string; readonly nameFa: string } | null;
@@ -1175,6 +1183,8 @@ export async function centrePageBySlug(database: DbClient, slug: string): Promis
     slug,
     primary: await primaryOf(database, 'CENTRE', centre.mergedIntoCentreId),
     nameFa: centre.displayNameFa,
+    imageFileId: centre.imageFileId,
+    imageAltFa: centre.imageAltFa,
     typeFa: facts!.typeNameFa,
     aboutFa: centre.aboutFa,
     phone: centre.phone,

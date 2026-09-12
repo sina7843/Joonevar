@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { RecordImage } from '../../../../src/ui/record-image.tsx';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { db } from '../../../../src/db/client.ts';
@@ -38,6 +39,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: page.nameFa + ' — دامپزشک',
       description: summary(page.nameFa, page.headlineFa, page.bioFa),
       path: '/veterinarians/' + page.slug,
+      image: page.imageFileId ? { path: '/media/' + page.imageFileId, alt: page.imageAltFa ?? page.nameFa } : undefined,
     },
     site(),
   );
@@ -92,6 +94,7 @@ export default async function VeterinarianPage({ params }: Params) {
       />
 
       <header className="space-y-sm">
+        <RecordImage priority fileId={page.imageFileId} altFa={page.imageAltFa} className="mb-lg" />
         <h1 className="text-h3 md:text-h1">{page.nameFa}</h1>
         {page.headlineFa ? <p className="text-body-md text-text-secondary">{page.headlineFa}</p> : null}
         {/* Each axis is its own badge; none of them implies another (P2-D05). */}

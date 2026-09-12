@@ -134,6 +134,9 @@ export interface BreedCard {
   readonly size: BreedSize | null;
   readonly fciGroup: number | null;
   readonly groupNameFa: string | null;
+  /** Public image of the record, served through /media while it stays published. */
+  readonly imageFileId: string | null;
+  readonly imageAltFa: string | null;
 }
 
 export async function breedGroupOptions(database: DbClient, speciesCode = 'DOG'): Promise<BreedGroupRow[]> {
@@ -174,6 +177,8 @@ export async function publishedBreeds(
     size: breed.size,
     fciGroup: group?.fciGroup ?? null,
     groupNameFa: group?.nameFa ?? null,
+    imageFileId: breed.imageFileId,
+    imageAltFa: breed.imageAltFa,
   }));
   return { ...pageOf(items, filtered.length, request), publishedTotal: rows.length };
 }

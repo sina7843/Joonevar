@@ -259,6 +259,14 @@ export const referenceBreeds = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     nameFa: text('name_fa').notNull(),
     nameEn: text('name_en').notNull(),
+    /**
+     * Public image of the record, stored privately and served through
+     * `/media/[id]` only while the record itself is published, exactly as a
+     * content image is (DEC-0160). The alternative text is mandatory at the
+     * service, because an image nobody can see is worse than no image.
+     */
+    imageFileId: uuid('image_file_id').references(() => storedFiles.id, { onDelete: 'set null' }),
+    imageAltFa: text('image_alt_fa'),
     isActive: boolean('is_active').notNull().default(true),
     sortOrder: integer('sort_order').notNull().default(0),
 

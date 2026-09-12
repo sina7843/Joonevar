@@ -9,6 +9,7 @@ import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
+import { RecordImage } from '../../../../src/ui/record-image.tsx';
 
 const TITLE = 'نژادهای سگ';
 const DESCRIPTION =
@@ -140,9 +141,11 @@ export default async function BreedsPage({ searchParams }: { searchParams: Promi
               <li key={breed.slug}>
                 <Link
                   href={'/breeds/' + breed.slug}
-                  className="flex h-full items-start gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
+                  className="flex h-full flex-col gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
                   data-testid={'breed-card-' + breed.slug}
                 >
+                  <RecordImage fileId={breed.imageFileId} altFa={breed.imageAltFa} />
+                  <span className="flex items-start gap-md">
                   <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">
                     <Icon name="dog" size="md" />
                   </span>
@@ -161,6 +164,7 @@ export default async function BreedsPage({ searchParams }: { searchParams: Promi
                           .join(' · ')}
                       </span>
                     ) : null}
+                  </span>
                   </span>
                 </Link>
               </li>

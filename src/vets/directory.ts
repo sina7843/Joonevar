@@ -632,6 +632,9 @@ export interface VetDirectoryQuery {
 }
 
 export interface VetCard {
+  /** Public image of the record, served through /media while it stays published. */
+  readonly imageFileId: string | null;
+  readonly imageAltFa: string | null;
   readonly slug: string;
   readonly nameFa: string;
   readonly headlineFa: string | null;
@@ -693,6 +696,8 @@ export async function publishedVets(
   const cards = filtered.map((entry) => ({
     slug: entry.profile.publicSlug!,
     nameFa: entry.profile.displayNameFa,
+    imageFileId: entry.profile.imageFileId,
+    imageAltFa: entry.profile.imageAltFa,
     headlineFa: entry.profile.headlineFa,
     specialtiesFa: entry.specialtyCodes.map((code) => specialtyName.get(code) ?? code),
     placesFa: [...new Set(placesOf(entry).map((p) => p.cityNameFa).filter((c): c is string => c !== null))],
@@ -714,6 +719,9 @@ export async function publishedVets(
 }
 
 export interface VetPublicPage {
+  /** Public image of the record, served through /media while it stays published. */
+  readonly imageFileId: string | null;
+  readonly imageAltFa: string | null;
   readonly slug: string;
   readonly nameFa: string;
   readonly headlineFa: string | null;
@@ -762,6 +770,8 @@ export async function vetPageBySlug(database: DbClient, slug: string): Promise<V
   return {
     slug,
     nameFa: profile.displayNameFa,
+    imageFileId: profile.imageFileId,
+    imageAltFa: profile.imageAltFa,
     headlineFa: profile.headlineFa,
     bioFa: profile.bioFa,
     experienceFa: profile.experienceFa,

@@ -32,6 +32,12 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   CONTENT_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   VET_APPLICATION_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
   CENTRE_CLAIM_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
+  // Public images of directory records: pictures only, never a document, and the
+  // same ceiling a content image has, because they are served the same way.
+  BREED_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  CENTRE_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  VET_PROFILE_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  COMMUNITY_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {
