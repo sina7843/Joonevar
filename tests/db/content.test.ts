@@ -12,6 +12,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { createTestAccount, createTestDb, type TestDb } from '../helpers/db.ts';
 import { JPEG, actorFor } from '../helpers/mating.ts';
@@ -235,6 +236,14 @@ test('publishing needs content; scheduled content stays out of sight until its t
   assert.ok((await contentSitemapEntries(testDb.db, 'ARTICLE')).some((e) => e.path === '/articles/' + live.slug));
   const image = await publicContentImage(testDb.db, storage, live.imageFileId!);
   assert.equal(image?.mime, 'image/jpeg');
+  /*
+   * The digest the route sends as an ETag, so a second view is answered with
+   * 304 while the visibility decision is still made on every request
+   * (PROMPT-018, DEC-0178). It is the file's own stored digest, not a value
+   * computed for the response.
+   */
+  assert.match(image!.sha256, /^[0-9a-f]{64}$/);
+  assert.equal(image!.sha256, createHash('sha256').update(JPEG).digest('hex'));
 
   // Scheduled news: invisible now, visible once its time has come — no job involved.
   const now = new Date();

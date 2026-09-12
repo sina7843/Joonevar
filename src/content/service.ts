@@ -895,7 +895,7 @@ export async function publicContentImage(
   storageRoot: string,
   fileId: string,
   now: Date = new Date(),
-): Promise<{ mime: string; bytes: Buffer } | null> {
+): Promise<{ mime: string; bytes: Buffer; sha256: string } | null> {
   if (!UUID.test(fileId)) return null;
   const [shown] = await database
     .select({ id: contentItems.id })
@@ -912,5 +912,8 @@ export async function publicContentImage(
   if (!file || file.purpose !== 'CONTENT_IMAGE') return null;
   const record = await findFile(database, fileId);
   const bytes = await fs.readFile(resolveWithinRoot(storageRoot, record.storageKey));
-  return { mime: record.mime, bytes };
+  // The digest is already stored for every file; returning it lets the route
+  // answer a repeat view with 304 without ever caching the decision that made
+  // the image visible (DEC-0160, PROMPT-018).
+  return { mime: record.mime, bytes, sha256: record.sha256 };
 }

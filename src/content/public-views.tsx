@@ -137,6 +137,7 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
                       src={'/media/' + item.imageFileId}
                       alt={item.imageAltFa ?? ''}
                       loading="lazy"
+                      decoding="async"
                       className="aspect-[16/9] w-full object-cover"
                     />
                   ) : null}
@@ -240,10 +241,18 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
 
       {item.imageFileId ? (
         <figure>
+          {/*
+            The stored file carries no dimensions, so the space is reserved by
+            aspect ratio instead: without it this image arrives after the text
+            and pushes the article down (CLS). It is the largest element above
+            the fold, so it is fetched eagerly rather than lazily (PROMPT-018).
+          */}
           <img
             src={'/media/' + item.imageFileId}
             alt={item.imageAltFa ?? ''}
-            className="max-h-[480px] w-full rounded-lg object-cover"
+            decoding="async"
+            fetchPriority="high"
+            className="aspect-[16/9] max-h-[480px] w-full rounded-lg object-cover"
             data-testid="content-image"
           />
         </figure>

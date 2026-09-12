@@ -1,0 +1,61 @@
+{
+  "promptId": "PROMPT-018",
+  "status": "COMPLETE",
+  "summary": "Performance and accessibility of the public pages. Reading the code first showed that RTL without horizontal overflow, LTR identifiers inside Persian, announced form errors, focus trapping, action order and touch targets were already proven by tests/browser/rtl.test.ts and tests/browser/visual.test.ts, and that the skip link and the main landmark already existed in the shell. None of that was repeated. Four things were genuinely missing. First, contrast was a claim in the design notes and nothing computed it: src/a11y/contrast.ts now derives the WCAG 2.1 ratio from the real tokens and measures sixteen rendered pairs, and tests/domain/a11y.test.ts pins the reference points (21:1, 1:1, the #767676 boundary), checks every pair against its level, and compares the token table against app/globals.css itself so this file cannot become a second source of truth; disabled text is excluded on purpose under the 1.4.3 exemption, stated explicitly in the test so it does not read as an oversight. Second, no test walked the keyboard path into the pages prompts 012-016 added: tests/browser/a11y.test.ts covers those six addresses for language, direction, exactly one h1 and the main landmark, proves the first Tab reaches the skip link and Enter actually lands on #main, and proves the focus ring survives tabbing. Third, a real performance defect: the hero image is the LCP element and reserved no space, so every article shifted its layout on load; it now carries aspect-[16/9], decoding async and fetchPriority high, and the card image decodes async. Fourth, a content image resent its whole body on every view: app/media/[id]/route.ts now answers with the digest the file already stores, so the bytes cross the wire once. The cache ceiling was deliberately not raised - must-revalidate stays, because a cached copy must never outlive a moderation decision to hide an item.",
+  "changedFiles": [
+    "src/a11y/contrast.ts",
+    "src/content/service.ts",
+    "src/content/public-views.tsx",
+    "app/media/[id]/route.ts",
+    "tests/domain/a11y.test.ts",
+    "tests/browser/a11y.test.ts",
+    "tests/db/content.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-018-REPORT.md"
+  ],
+  "decisions": ["DEC-0178"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0. The only route touched is app/media/[id], whose force-dynamic rendering is unchanged; per-request rendering of the public pages was kept on purpose, since the header shows account state and the canonical address comes from the runtime SITE_URL."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/a11y.test.ts && node --test tests/db/content.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. tests/domain/a11y.test.ts: tests 4 · pass 4 · fail 0 — the ratio function reproduces the WCAG reference points including the #767676 boundary that is exactly 4.5 on white, every rendered pair meets the level it is used at, the token table matches app/globals.css read from disk, and disabled text is excluded under the 1.4.3 exemption rather than silently passing. tests/db/content.test.ts: tests 9 · pass 9 · fail 0 — extended, not duplicated: the existing fixture that attaches a real JPEG now also asserts that publicContentImage returns the file's own stored sha256 and that it equals createHash('sha256') over the same bytes. That is the honest proof of the ETag source, because the browser 304 case depends on a fixture a fresh harness database does not have. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/a11y.test.ts && node tools/browser-tests.mjs tests/browser/rtl.test.ts tests/browser/content.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build (tools/browser-tests.mjs serves an existing .next, so npm run build ran first), each on a disposable database with its own production server. tests/browser/a11y.test.ts 6/6 across the six public addresses prompts 012-016 added. Regression on the same build: tests/browser/rtl.test.ts and tests/browser/content.test.ts 14/14, the suites that own RTL and the content pages whose image markup changed. One honest gap: the 304 test passed in 112 ms, meaning it took its early-return branch because the fresh harness database holds no published article with an image, so the 304 path itself was NOT exercised in the browser — the ETag source is proven in tests/db/content.test.ts instead. A defect in that test of my own was fixed first: it used locator(...).first().getAttribute(), which blocks for 30 s on an empty fixture and reports a missing fixture as a product failure; it now guards with count(). Screenshots regenerated for prompt-003 and prompt-004 by the regression were restored with git checkout. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The browser 304 assertion is conditional on a published article with an image, which a fresh harness database does not have, so the 304 response path was not exercised in the browser; the ETag source (the digest the route sends is the file's own stored sha256) is proven in tests/db/content.test.ts instead. Full coverage would need the harness to seed an article with an image.",
+    "No field measurement of Core Web Vitals was taken. What this prompt did is remove structural causes (reserved space for the LCP image, 304 on repeat views, bounded pagination); real LCP/CLS numbers need measurement on a real environment and were not claimed.",
+    "Image dimensions are not stored, so space is reserved with aspect-ratio rather than real width/height; an image with a different ratio is cropped rather than letterboxed.",
+    "No real screen reader was run. What is checked is semantic structure — landmarks, a single h1, alt text, the keyboard path — not NVDA or VoiceOver output.",
+    "Contrast is computed only for the registered pairs; a colour introduced outside the tokens is not measured, which is why the domain test compares the token table against app/globals.css.",
+    "Per-request rendering was kept for the public pages instead of static generation, because the header shows account state and the canonical address comes from the runtime SITE_URL.",
+    "Checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577."
+  ],
+  "readiness": {
+    "code": "PUBLIC_PAGE_ACCESSIBILITY_AND_CACHING_READY",
+    "visual": "TOKEN_CONTRAST_VERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}
