@@ -41,6 +41,8 @@ import {
   type VetApplicationStatus,
   type VetDocumentKind,
 } from './onboarding-model.ts';
+import { LEGACY_APPLICATION_STATUS, tagForCaseStatus } from './professional-model.ts';
+import { replaceVetTag } from './professional-tags.ts';
 import type { Actor, ActorContextName } from '../authz/actor.ts';
 
 export type VetApplicationRow = typeof vetApplications.$inferSelect;
@@ -618,6 +620,20 @@ export async function decideVetApplication(
             metadata: { applicationId: current.id },
           });
         }
+        // The same decision gives the public tag its standing supports: a verified council code, no
+        // licence. The Phase 2 form never asked general or specialist, so that stays undeclared (DEC-0188).
+        await replaceVetTag(
+          tx,
+          actor,
+          {
+            accountId: current.accountId,
+            tag: tagForCaseStatus(LEGACY_APPLICATION_STATUS.APPROVED, 'DOCTOR')!,
+            practiceScope: 'NOT_DECLARED',
+            reasonFa,
+            source: { type: 'LEGACY_VET_APPLICATION', id: current.id },
+          },
+          now,
+        );
       }
 
       const [row] = await tx

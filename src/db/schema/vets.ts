@@ -422,6 +422,45 @@ export const vetApplicationDocuments = pgTable(
   ],
 );
 
+// ── Veterinary professional tag (Phase 2.5, PROMPT-002) ────────────────────
+
+/** The one public professional description of an account (PHASE_2_5_SPEC_FA §3). Never a permission. */
+export const vetTag = pgEnum('vet_tag', ['STUDENT', 'UNLICENSED', 'LICENSED', 'TRUSTED']);
+/** General or specialist, inside a doctor's tag. NOT_DECLARED only for records older than the question (DEC-0188). */
+export const vetPracticeScope = pgEnum('vet_practice_scope', ['GENERAL', 'SPECIALIST', 'NOT_DECLARED']);
+
+/**
+ * Every tag an account has held. A row is written once and may only be ended
+ * once; a trigger refuses any other update and every delete, so the history is
+ * the record. At most one row per account is current (`ended_at` null).
+ */
+export const vetTagAssignments = pgTable(
+  'vet_tag_assignment',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    tag: vetTag('tag').notNull(),
+    practiceScope: vetPracticeScope('practice_scope'),
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull().default(now),
+    endedAt: timestamp('ended_at', { withTimezone: true }),
+    endReasonFa: text('end_reason_fa'),
+    /** What caused the tag: a review decision, a verified payment, a backfill. */
+    sourceType: text('source_type').notNull(),
+    sourceId: uuid('source_id'),
+    grantedByAccountId: uuid('granted_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    endedByAccountId: uuid('ended_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_tag_assignment_current_key').on(t.accountId).where(sql`${t.endedAt} is null`),
+    index('vet_tag_assignment_account_idx').on(t.accountId, t.startedAt),
+    check('vet_tag_assignment_scope_fits_tag', sql`(${t.tag} = 'STUDENT') = (${t.practiceScope} is null)`),
+    check('vet_tag_assignment_ends_after_start', sql`${t.endedAt} is null or ${t.endedAt} >= ${t.startedAt}`),
+  ],
+);
+
 // ── Veterinary centres (Phase 2, PROMPT-008) ───────────────────────────────
 //
 // Centres live here rather than in their own module because a branch is a

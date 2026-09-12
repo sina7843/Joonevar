@@ -36,7 +36,7 @@ function assertRepo(){if(repoRoot()!==root)fail('Run this package from the targe
 // It is normalised here rather than edited, so the delivered package stays byte-identical. Phase 1 is unchanged by this.
 function manifest(){const m=JSON.parse(read(manifestFile));if(!Array.isArray(m.prompts)||!m.prompts.length)fail('Invalid manifest');
  const pid=x=>/^\d+$/.test(x)?'PROMPT-'+x:x;
- m.prompts=m.prompts.map((p,i,a)=>({...p,id:pid(p.id),title:p.title??path.basename(p.file,'.md'),file:path.basename(p.file),dependsOn:p.dependsOn??(i?[pid(a[i-1].id)]:[]),requiredChecks:p.requiredChecks??phase.checks}));
+ m.prompts=m.prompts.map((p,i,a)=>({...p,id:pid(p.id),title:p.title??path.basename(p.file,'.md'),file:path.basename(p.file),dependsOn:(p.dependsOn??(i?[a[i-1].id]:[])).map(pid),requiredChecks:p.requiredChecks??phase.checks}));
  m.project??='Hamzist phase '+phaseName;return m;}
 function fingerprint(){return hash(read(manifestFile));}
 function locked(){if(!fs.existsSync(lockFile))fail('Run setup first; plan is not locked.');if(JSON.parse(read(lockFile)).manifestHash!==fingerprint())fail('Manifest changed after setup; inspect the intentional plan change before proceeding.');}

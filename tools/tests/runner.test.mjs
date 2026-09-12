@@ -74,9 +74,10 @@ test('phase 2 runs its own package with derived order and checks, leaving phase 
 });
 test('phase 2.5 reads a manifest without titles and requires the PHASE-2.5- report name',()=>{
  const f=fixture();const dir='Hamzist-Phase-2.5-Prompt-Package/prompts';fs.mkdirSync(path.join(f.root,dir),{recursive:true});fs.mkdirSync(path.join(f.root,'.runner/phase-2.5'),{recursive:true});
- const m=JSON.stringify({prompts:[{id:'001',file:'001-baseline.md',dependsOn:[]}]});
- fs.writeFileSync(path.join(f.root,dir,'prompt-manifest.json'),m);fs.writeFileSync(path.join(f.root,dir,'001-baseline.md'),'# PROMPT-001\n\n```text\nBaseline body.\n```\n');
- fs.writeFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-2.5.md'),'- [ ] PROMPT-001 — 001-baseline\n');
+ // Shape of the delivered 2.5 manifest: bare ids in dependsOn too, and no titles.
+ const m=JSON.stringify({prompts:[{id:'001',file:'001-baseline.md',dependsOn:[]},{id:'002',file:'002-next.md',dependsOn:['001']}]});
+ fs.writeFileSync(path.join(f.root,dir,'prompt-manifest.json'),m);fs.writeFileSync(path.join(f.root,dir,'001-baseline.md'),'# PROMPT-001\n\n```text\nBaseline body.\n```\n');fs.writeFileSync(path.join(f.root,dir,'002-next.md'),'# PROMPT-002\n\n```text\nNext body.\n```\n');
+ fs.writeFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-2.5.md'),'- [ ] PROMPT-001 — 001-baseline\n- [ ] PROMPT-002 — 002-next\n');
  fs.writeFileSync(path.join(f.root,'.runner/phase-2.5/plan.lock'),JSON.stringify({manifestHash:crypto.createHash('sha256').update(m).digest('hex')}));
  f.g('add','.');f.g('commit','-m','phase 2.5 fixture');
  ok(run(f,'--phase','2.5','prepare'));

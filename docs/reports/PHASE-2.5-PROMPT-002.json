@@ -1,0 +1,114 @@
+{
+  "promptId": "PROMPT-002",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The Phase 2 veterinarian application folded identity, verification and workflow into one five-value status. Role, Tag and Status are now three separate facts. Role stays account_role and is the only thing that opens a context or an operation; nothing added here reads or writes it. Tag is a new append-only table vet_tag_assignment holding the four professional tags (student; doctor without a practice licence; licensed doctor; trusted doctor), with general or specialist as a description inside a doctor's tag rather than a tag of its own. The database itself enforces one current tag per account with a partial unique index, a check that a student has no scope and a doctor has one, and a trigger that refuses every delete and every update except ending the current row once. Status is a pure model of the section 4 workflow with the legal transitions per actor (applicant, reviewer, server-verified event), required reasons, the tag each standing supports (an approved but unpaid licence stays unlicensed; only an active licence is licensed; waiting for payment never expires) and the compatibility mapping of the old statuses, where a Phase 2 APPROVED reads as VERIFIED_NO_LICENSE and never as licensed or trusted. The service changes a tag inside the caller's transaction under an account row lock, audits it, refuses anyone but the reviewer side or the server, refuses changes to one's own account, and treats a repeated request for the current tag as a no-op so a replayed callback cannot add a row. Migration 0031 backfills only owned, council-verified, unmerged profiles as UNLICENSED from the moment of verification with an undeclared scope, because no record ever said general or specialist; Phase 1 TRUSTED_VET role holders keep their role and get no invented trusted tag. Approving a Phase 2 application now gives the same tag in the same transaction. No advertising, unowned-page or moderation value can be stored as a tag, and there is no badge.",
+  "changedFiles": [
+    "src/vets/professional-model.ts",
+    "src/vets/professional-tags.ts",
+    "src/vets/onboarding.ts",
+    "src/db/schema/vets.ts",
+    "src/db/migrations/0031_vet-professional-tag.sql",
+    "src/db/migrations/meta/0031_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "tests/domain/vet-professional.test.ts",
+    "tests/db/vet-professional-tags.test.ts",
+    "tools/runner.mjs",
+    "tools/tests/runner.test.mjs",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-002.json"
+  ],
+  "migrations": [
+    {
+      "file": "src/db/migrations/0031_vet-professional-tag.sql",
+      "additive": true,
+      "forwardSafe": "Creates two enums, one table, its indexes, a guard trigger and a backfill INSERT; nothing existing is dropped, renamed or tightened. tests/domain/migrations.test.ts passes on it.",
+      "rerun": "Drizzle records it once; tests/db/migrations.test.ts proves a second migrate is a no-op.",
+      "rollbackNote": "The previous release does not read vet_tag_assignment, so it runs unchanged against this schema. To remove the feature entirely: drop trigger vet_tag_assignment_guard, function vet_tag_assignment_guard(), table vet_tag_assignment, types vet_tag and vet_practice_scope; the backfill touched no existing row. Data rollback is snapshot restore per docs/ops/runbook.md."
+    }
+  ],
+  "decisions": ["DEC-0188"],
+  "tests": {
+    "domainVetProfessional": {"command": "node --test tests/domain/vet-professional.test.ts", "total": 8, "pass": 8, "fail": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "durationSeconds": 1.6, "total": 224, "pass": 224, "fail": 0, "skip": 0},
+    "databaseFirstRun": {"command": "node --test tests/db/vet-professional-tags.test.ts", "durationSeconds": 5.9, "total": 8, "pass": 7, "fail": 1, "note": "The failure was the test's own fixture: account counter 1 produced the reviewer's mobile and hit account_mobile_key. The prefix was moved; no product code changed."},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 252.6, "total": 343, "pass": 343, "fail": 0, "skip": 0},
+    "browserVet": {"command": "node tools/browser-tests.mjs tests/browser/vet-onboarding.test.ts tests/browser/vet-directory.test.ts tests/browser/vet-service.test.ts", "durationSeconds": 48, "total": 11, "pass": 11, "fail": 0, "skip": 0},
+    "runner": {"command": "node --test tools/tests/runner.test.mjs", "durationSeconds": 11.4, "total": 18, "pass": 18, "fail": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree including both new test files."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 63.3 s in a detached worktree at HEAD e99bdd0 with every changed and new file of this prompt copied in and npm ci run, because building in the main checkout would overwrite the .next of the user's running server on port 3111."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=4 \"tests/db/*.test.ts\" ; node --test tools/tests/runner.test.mjs",
+      "result": "PASS",
+      "evidence": "Domain+config+UI 224/224 (8 new). The complete database suite 343/343 (8 new), which also runs migration 0031 in every suite and exercises the approval path of tests/db/vet-onboarding.test.ts. Runner 18/18 with the phase 2.5 case extended to a bare dependsOn id."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/vet-onboarding.test.ts tests/browser/vet-directory.test.ts tests/browser/vet-service.test.ts",
+      "result": "PASS",
+      "evidence": "11/11 on an isolated database and production server in the worktree build. Scope is the three suites that pass through the changed server code (application approval, directory profile, trusted vet service). No page, route or form changed in this prompt, so the full 161-test matrix recorded green in PROMPT-001 was not rerun; this is stated in limitations."
+    },
+    {
+      "id": "migration-existing-data",
+      "command": "node --test tests/db/vet-professional-tags.test.ts (test: 0031 runs on a database with Phase 2 data…)",
+      "result": "PASS",
+      "evidence": "Migrations 0000-0030 applied from a copied folder, Phase 2 rows written (a verified owned profile with its APPROVED application, an unverified profile, a verified profile merged into another, an unowned profile), then the real folder applied. Exactly one tag appears, for the verified owned unmerged profile: UNLICENSED, NOT_DECLARED, started at the verification time, source BACKFILL_VET_PROFILE with that profile id. All four profiles remain, and the application is still APPROVED with its profile link."
+    },
+    {
+      "id": "one-tag-concurrency",
+      "command": "node --test tests/db/vet-professional-tags.test.ts (tests: the database refuses a second current tag…; two replacements racing…)",
+      "result": "PASS",
+      "evidence": "Two current-tag inserts on two connections at once: one succeeds and the other fails with 23505. Two service replacements for one account, with the first held uncommitted until the second has reached the lock: both complete, three history rows remain with exactly one current, and the later call replaced the earlier one's tag. The guard trigger refuses changing a tag or start time, deleting, and changing an ended row (23001); a scope that does not fit the tag fails the check (23514)."
+    },
+    {
+      "id": "authorization",
+      "command": "node --test tests/db/vet-professional-tags.test.ts (tests: only the reviewer side or the server…; a trusted tag without the TRUSTED_VET role…) ; node --test tests/domain/vet-professional.test.ts",
+      "result": "PASS",
+      "evidence": "USER, BREEDER, TRUSTED_VET, AUTHOR, CONTENT_ADMIN and GENETICS_OPERATOR contexts, the account itself and a reviewer acting on their own account are refused with FORBIDDEN and write nothing; NOT_DECLARED by hand and an unknown tag are VALIDATION. Another account cannot read the history; the account can. With a current TRUSTED tag and no role, switching the session to TRUSTED_VET is FORBIDDEN, and a session row claiming TRUSTED_VET resolves to USER with no active roles. Domain transitions refuse an applicant starting their own review and a reviewer activating a licence."
+    },
+    {
+      "id": "regression",
+      "command": "the full database suite, the domain+config+UI group, the three vet browser suites and the runner suite above",
+      "result": "PASS",
+      "evidence": "343/343, 224/224, 11/11, 18/18. A failing approval rolls back too: with notification inserts made to fail on the test database, APPROVE throws and leaves no tag, no profile and the application SUBMITTED; the same approval then succeeds and writes UNLICENSED/NOT_DECLARED from LEGACY_VET_APPLICATION with the reviewer as grantor."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Public pages still show the Phase 2 axes (council verification and the Trusted Hamzist role); switching them to the single public tag is PROMPT-014. The tag exists and is readable through publicVetTag.",
+    "Workflow statuses are modelled and tested but not yet persisted on a professional case; the case table and its migration are PROMPT-003.",
+    "Tag authority is REVIEW_OPERATOR and SUPERADMIN, the existing review environment; whether the association operator joins is decided with the association admin panel in PROMPT-007.",
+    "Backfilled and Phase 2-approved doctors carry NOT_DECLARED general/specialist until they declare it in the Phase 2.5 flows (PROMPT-005/006); the public label omits that part rather than guessing.",
+    "Phase 1 TRUSTED_VET role holders received no trusted tag: licence, association membership and periodic trusted payment are not in the data (PROMPT-010/011).",
+    "The full 161-test browser matrix was not rerun for this prompt; only the three vet suites that pass through the changed server code were.",
+    "Build and browser checks ran in a temporary worktree so the user's running server on port 3111 kept its .next; the worktree was removed afterwards.",
+    "The Runner fix for bare dependsOn ids corrects a defect introduced in PROMPT-001 that blocked preparing this prompt."
+  ],
+  "readiness": {
+    "code": "DOMAIN_MODEL_AND_TAG_PERSISTENCE_READY",
+    "visual": "NOT_APPLICABLE_NO_UI_CHANGE",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/domain/vet-professional.test.ts",
+    "tests/db/vet-professional-tags.test.ts",
+    "src/db/migrations/0031_vet-professional-tag.sql",
+    "DECISIONS.md#dec-0188"
+  ]
+}
