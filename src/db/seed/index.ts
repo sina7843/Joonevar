@@ -17,6 +17,8 @@ import { eq } from 'drizzle-orm';
 import type { DbClient } from '../client.ts';
 import { productSettings, referenceBreeds } from '../schema/core.ts';
 import { SETTING_DEFINITIONS } from '../../settings/keys.ts';
+import { AD_PLAN_CATALOGUE } from '../../advertising/model.ts';
+import { ensurePlans } from '../../advertising/service.ts';
 import { slugify } from '../../breeds/model.ts';
 
 export interface SeedReport {
@@ -84,6 +86,11 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
     });
     inserted.push(definition.key);
   }
+
+  // The advertising catalogue of §14: two tiers in three periods. Each row
+  // points at its price setting, which stays NOT_CONFIGURED until the owner
+  // enters a real figure, so seeding a plan never seeds a tariff (P2-D03).
+  await ensurePlans(database, AD_PLAN_CATALOGUE);
 
   let breedsInserted = 0;
   for (const [index, breed] of BASELINE_BREEDS.entries()) {

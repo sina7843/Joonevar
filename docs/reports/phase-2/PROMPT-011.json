@@ -1,0 +1,85 @@
+{
+  "promptId": "PROMPT-011",
+  "status": "COMPLETE",
+  "summary": "Advertising packages. Migration 0025 adds ad_plan and ad_subscription, the ADVERTISING_PACKAGE payment service and the ADVERTISING settings group. The base profile stays free and is not a row: a record with no live subscription simply has none. The catalogue is the six plans of §14 — featured and pro over 30, 90 and 365 days — and each plan stores only the key of its price in product_setting, so a price is one audited settings edit and past purchases keep the amount they froze. All six prices are seeded NOT_CONFIGURED because no real tariff exists in the sources: an unpriced plan is refused rather than sold for nothing. A purchase is an ordinary Phase 1 payment batch that snapshots the managed price; the package is activated inside the very transaction that verifies the gateway on the server, and a replayed return activates nothing a second time. There is no scheduler: expiry is ends_at compared at read time, and an expired row keeps its stored status while readers simply stop treating it as live. Renewing early stacks rather than discarding paid days — the new period starts where the live one ends, and the earlier row stays in the history. Each plan carries a slot capacity that refuses the next sale when it is full, an empty capacity meaning no ceiling was recorded rather than a decision to sell without limit. Only the manager of a claimed record buys (a veterinarian profile, a centre, an association or a club); an unowned record and every operational context are refused. Cancelling keeps the dates and the reason, and no refund rule was invented. The package is its own axis: it changes placement and the «تبلیغ» label only, and the service merely reports which records are promoted — the versioned, auditable search ranking of §15 stays with its own prompt.",
+  "changedFiles": [
+    "src/db/schema/advertising.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/billing.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0025_advertising.sql",
+    "src/db/migrations/meta/0025_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/seed/index.ts",
+    "src/authz/policy.ts",
+    "src/settings/keys.ts",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/domain/resume-context.ts",
+    "src/ui/shell.tsx",
+    "src/advertising/model.ts",
+    "src/advertising/service.ts",
+    "src/advertising/actions.ts",
+    "src/advertising/forms.tsx",
+    "app/account/packages/(list)/page.tsx",
+    "app/account/packages/(list)/loading.tsx",
+    "app/account/packages/return/page.tsx",
+    "app/admin/packages/page.tsx",
+    "tests/domain/advertising.test.ts",
+    "tests/db/advertising.test.ts",
+    "tests/browser/advertising.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-011-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-011/admin-catalogue.png",
+    "docs/reports/screenshots/phase-2/prompt-011/packages-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-011/package-paid.png",
+    "docs/reports/screenshots/phase-2/prompt-011/package-active.png",
+    "docs/reports/screenshots/phase-2/prompt-011/admin-subscriptions.png",
+    "docs/reports/screenshots/phase-2/prompt-011/forbidden.png"
+  ],
+  "decisions": ["DEC-0171"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0. Three new routes: /account/packages, /account/packages/return and /admin/packages."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/advertising.test.ts tests/db/advertising.test.ts && node --test --test-concurrency=1 tests/db/settings.test.ts tests/db/payments.test.ts tests/db/migrations.test.ts tests/db/communities.test.ts tests/ui/routes.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. New suites: tests 13 · pass 13 · fail 0. tests/domain/advertising.test.ts pins the catalogue to the six plans of §14 with one price key each, that a period ends by its own date with nothing writing the expiry down, that renewing early starts at the live end while a lapsed package starts now, that only a claimed record's manager may buy a priced, on-sale plan with a free slot, and that capacity is a whole number the panel may leave unset. tests/db/advertising.test.ts on a freshly migrated database: the seeded catalogue carries no tariff at all and an unpriced plan cannot be sold (and writes nothing when refused); a stranger, an operational context and an unowned record are all refused, the batch item freezes 500000 toman against the right setting key, a second intent for the same record is refused while one is pending, and raising the tariff afterwards does not rewrite the frozen amount; a verified payment activates the package once with a 30-day window, notifies the buyer and audits it, and a replayed return returns performed:false without a second activation or a second audit row; a renewal starts exactly at the live period's end, giving 60 remaining days, and both rows stay in the history; a period moved into the past keeps its stored ACTIVE status while the reader calls it expired, drops out of livePackage and promotedTargetIds, refuses cancellation and does not block the next purchase; only the superadmin configures a plan, a reason is required, a negative capacity and a stale version are refused, a full plan refuses the next sale and a plan taken off sale is refused even with free slots; cancelling keeps startsAt and endsAt with its reason, is single-use, and is closed to anyone but the buyer or the superadmin; each account sees only its own targets and packages while the whole list belongs to the superadmin. Regression: tests 54 · pass 54 · fail 0 over tests/db/settings.test.ts (new group and six keys), tests/db/payments.test.ts (new payment service and effect), tests/db/migrations.test.ts (migration 0025 on an empty database), tests/db/communities.test.ts (seedBaseline now also seeds the plan catalogue) and tests/ui/routes.test.ts. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/advertising.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, on the final build, on a disposable database with its own production server, in the shipped local payment mode (MOCK_AUTO, restored afterwards). tests 3 · pass 3 · fail 0: the superadmin opens /admin/packages on a fresh database and finds six plans that cannot be sold, each marked unpriced, then sets one plan's features, capacity of 5 and availability with a reason; the superadmin records a club and hands it to an ordinary account, the managed price is then set, and that account buys from /account/packages at phone width — the gateway returns, the server verifies, the return page reports the package active and the list then shows «بسته فعال» with the remaining days; the superadmin sees that purchase in the catalogue while the ordinary account is refused /admin/packages and sees no plan form. The first run of the second and third tests failed on a test defect, not a product defect: the locator [data-testid^=\"buy-\"] matched the form before its button, so the click did nothing; the locator now selects button[data-testid^=\"buy-\"]. As in PROMPT-010, the harness does not build — npm run build was run before the browser suite. Only prompt-011 screenshots are new; no earlier evidence was regenerated. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Every package price is NOT_CONFIGURED on purpose: no real tariff exists in the sources, so no plan can be sold until the product owner enters the figures in /admin/settings.",
+    "Discounts are named by §14 but no discount rule exists in the sources; adding one would invent pricing policy, so it is left to the admin panel of PROMPT-016.",
+    "No refund rule: cancelling keeps the paid period with its reason, and money already taken is settled outside the product until a policy exists.",
+    "The advertising ranking of §15 is not built here: the service only reports which records carry a live package; ordering search results with the «تبلیغ» label, versioned and auditable, belongs to the search/ranking prompt.",
+    "No invoice or formal receipt document; the record of a purchase is the Phase 1 payment batch.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the packages and catalogue pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "ADVERTISING_PACKAGES_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

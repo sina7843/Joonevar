@@ -23,6 +23,8 @@ export const paymentService = pgEnum('payment_service', [
   'MATING_PERMIT',
   'KENNEL_REGISTRATION',
   'PUPPY_CARD',
+  /** A directory advertising package (Phase 2, §14). */
+  'ADVERTISING_PACKAGE',
 ]);
 
 /**

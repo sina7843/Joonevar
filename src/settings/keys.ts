@@ -390,6 +390,65 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     min: 1,
     max: 50,
   },
+
+  // ── Advertising packages (Phase 2, §14, P2-D03) ────────────────────────
+  // Every price starts NOT_CONFIGURED on purpose: no package tariff has been
+  // supplied, and an unpriced plan may not be sold rather than being sold for
+  // nothing. The superadmin enters the real figures in /admin/settings.
+  {
+    key: 'advertising.featured_30_toman',
+    group: 'ADVERTISING',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'قیمت بسته ویژه ۳۰ روزه',
+    noteFa: 'تا ثبت مبلغ واقعی، این بسته قابل خرید نیست (§۱۴).',
+    seedValue: null,
+  },
+  {
+    key: 'advertising.featured_90_toman',
+    group: 'ADVERTISING',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'قیمت بسته ویژه ۹۰ روزه',
+    noteFa: 'تا ثبت مبلغ واقعی، این بسته قابل خرید نیست (§۱۴).',
+    seedValue: null,
+  },
+  {
+    key: 'advertising.featured_365_toman',
+    group: 'ADVERTISING',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'قیمت بسته ویژه ۳۶۵ روزه',
+    noteFa: 'تا ثبت مبلغ واقعی، این بسته قابل خرید نیست (§۱۴).',
+    seedValue: null,
+  },
+  {
+    key: 'advertising.pro_30_toman',
+    group: 'ADVERTISING',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'قیمت بسته حرفه‌ای ۳۰ روزه',
+    noteFa: 'تا ثبت مبلغ واقعی، این بسته قابل خرید نیست (§۱۴).',
+    seedValue: null,
+  },
+  {
+    key: 'advertising.pro_90_toman',
+    group: 'ADVERTISING',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'قیمت بسته حرفه‌ای ۹۰ روزه',
+    noteFa: 'تا ثبت مبلغ واقعی، این بسته قابل خرید نیست (§۱۴).',
+    seedValue: null,
+  },
+  {
+    key: 'advertising.pro_365_toman',
+    group: 'ADVERTISING',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'قیمت بسته حرفه‌ای ۳۶۵ روزه',
+    noteFa: 'تا ثبت مبلغ واقعی، این بسته قابل خرید نیست (§۱۴).',
+    seedValue: null,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(

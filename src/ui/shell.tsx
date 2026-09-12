@@ -273,6 +273,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin/vets', label: 'دامپزشکان معتمد', icon: 'firstAidKit' },
   { href: '/admin/centres', label: 'مراکز دامپزشکی', icon: 'mapPin' },
   { href: '/admin/communities', label: 'انجمن و کلاب', icon: 'user' },
+  { href: '/admin/packages', label: 'بسته‌های تبلیغاتی', icon: 'certificate' },
   { href: '/admin/breeds', label: 'نژادها', icon: 'dog' },
   { href: '/admin/roles', label: 'نقش‌های محتوا', icon: 'shieldCheck' },
   { href: '/admin/audit', label: 'تاریخچه', icon: 'clipboardText' },

@@ -32,7 +32,8 @@ export type PaymentService =
   | 'PEDIGREE'
   | 'MATING_PERMIT'
   | 'KENNEL_REGISTRATION'
-  | 'PUPPY_CARD';
+  | 'PUPPY_CARD'
+  | 'ADVERTISING_PACKAGE';
 
 export interface BatchItemInput {
   readonly targetType: string;

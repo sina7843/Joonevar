@@ -64,6 +64,8 @@ export const settingGroup = pgEnum('setting_group', [
   'INTEGRATIONS',
   /** Anti-abuse limits of user reports (Phase 2, DEC-0161). */
   'MODERATION',
+  /** Prices of the advertising packages (Phase 2, §14, P2-D03). */
+  'ADVERTISING',
 ]);
 
 export const settingScopeType = pgEnum('setting_scope_type', ['GLOBAL']);

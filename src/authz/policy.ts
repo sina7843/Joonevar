@@ -18,6 +18,7 @@ export const SETTING_GROUPS = [
   'BREEDING_POLICY',
   'INTEGRATIONS',
   'MODERATION',
+  'ADVERTISING',
 ] as const;
 export type SettingGroupName = (typeof SETTING_GROUPS)[number];
 
@@ -49,6 +50,9 @@ const ACCESS: Record<SettingGroupName, GroupAccess> = {
   BREEDING_POLICY: { read: ['SUPERADMIN', 'ASSOCIATION_OPERATOR'], write: [] },
   // The content admin sees the report limit it works under; only the superadmin changes it.
   MODERATION: { read: ['SUPERADMIN', 'CONTENT_ADMIN'], write: ['SUPERADMIN'] },
+  // Package prices. The review operator reads them to answer a manager's
+  // question; changing what is charged stays with the superadmin (§14, P2-D03).
+  ADVERTISING: { read: ['SUPERADMIN', 'REVIEW_OPERATOR'], write: ['SUPERADMIN'] },
 };
 
 export function canReadSettingGroup(actor: Actor, group: SettingGroupName): boolean {

@@ -39,7 +39,8 @@ export type EntityType =
   | 'DIRECTORY_SUGGESTION'
   | 'CENTRE_CLAIM'
   | 'COMMUNITY'
-  | 'COMMUNITY_MANAGER';
+  | 'COMMUNITY_MANAGER'
+  | 'AD_SUBSCRIPTION';
 
 export interface EntityRef {
   readonly type: EntityType;

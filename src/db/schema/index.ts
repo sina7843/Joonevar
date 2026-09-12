@@ -2,6 +2,7 @@ export * from './enums.ts';
 export * from './core.ts';
 export * from './identity.ts';
 export * from './billing.ts';
+export * from './advertising.ts';
 export * from './animals.ts';
 export * from './communities.ts';
 export * from './geography.ts';

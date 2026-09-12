@@ -16,6 +16,7 @@ import {
 import { markKennelPaid } from '../kennels/service.ts';
 import { markPermitPaid } from '../mating/permits.ts';
 import { issueCardsForBatch, markCardBatchPaid } from '../mating/allocation.ts';
+import { activateSubscriptionFromPayment } from '../advertising/service.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -51,6 +52,11 @@ export const paidEffects: PaidEffects = {
       case 'PUPPY_CARD':
         await markCardBatchPaid(tx, batch.id);
         await issueCardsForBatch(tx, batch);
+        return;
+      // The package starts only where the money was really taken, and a renewal
+      // begins where the live period ends (§14).
+      case 'ADVERTISING_PACKAGE':
+        await activateSubscriptionFromPayment(tx, batch);
         return;
       default:
         return;
