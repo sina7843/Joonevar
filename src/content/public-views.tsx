@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { RichText } from './rich-text.tsx';
+import { RelatedColumn } from '../public/related-column.tsx';
+import { relatedContent, similarCentres } from '../public/related.ts';
 import Link from 'next/link';
 import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -197,6 +199,11 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
 
   const { item, state, byline, categoryNameFa, breed } = page;
   const { origin } = site();
+  // The column beside the article: other reading, and centres to look at.
+  const [moreReading, centres] = await Promise.all([
+    relatedContent(db(), { excludeId: item.id, limit: 4 }),
+    similarCentres(db(), { limit: 3 }),
+  ]);
   const path = pathOf(kind) + '/' + item.slug;
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -205,7 +212,8 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
   ];
 
   return (
-    <article className="mx-auto max-w-3xl space-y-xl" data-testid="content-page">
+    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
+    <article className="min-w-0 space-y-xl" data-testid="content-page">
       <Breadcrumbs items={crumbs} origin={origin} />
       <JsonLdScript
         data={articleLd(
@@ -315,5 +323,13 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
         </p>
       ) : null}
     </article>
+
+      <RelatedColumn
+        groups={[
+          { titleFa: 'خواندنی‌های دیگر', items: moreReading },
+          { titleFa: 'مراکز دامپزشکی', items: centres },
+        ]}
+      />
+    </div>
   );
 }

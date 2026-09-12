@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { RelatedColumn } from '../../../../src/public/related-column.tsx';
+import { relatedContent, similarCentres } from '../../../../src/public/related.ts';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
 import Link from 'next/link';
 import { cache } from 'react';
@@ -63,6 +65,10 @@ export default async function CentrePage({ params }: Params) {
   if (page === null) notFound();
 
   const { origin } = site();
+  const [similar, reading] = await Promise.all([
+    similarCentres(db(), { excludeSlug: page.slug, limit: 4 }),
+    relatedContent(db(), { limit: 3 }),
+  ]);
   // No map is drawn until the operator records an embed template (DEC-0175).
   const map = await mapConfig(db());
   const path = '/centers/' + page.slug;
@@ -73,7 +79,8 @@ export default async function CentrePage({ params }: Params) {
   ];
 
   return (
-    <article className="mx-auto max-w-3xl space-y-xl" data-testid="centre-page">
+    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
+    <article className="min-w-0 space-y-xl" data-testid="centre-page">
       <Breadcrumbs items={crumbs} origin={origin} />
       <JsonLdScript
         data={veterinaryCareLd(
@@ -300,5 +307,13 @@ export default async function CentrePage({ params }: Params) {
         </section>
       ) : null}
     </article>
+
+      <RelatedColumn
+        groups={[
+          { titleFa: 'مراکز مشابه', items: similar },
+          { titleFa: 'خواندنی‌ها', items: reading },
+        ]}
+      />
+    </div>
   );
 }
