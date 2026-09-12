@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { RelatedColumn } from '../../../../src/public/related-column.tsx';
+import { similarCentres, similarVets } from '../../../../src/public/related.ts';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
@@ -61,6 +63,10 @@ export default async function VeterinarianPage({ params }: Params) {
   if (page === null) notFound();
 
   const { origin } = site();
+  const [vets, centres] = await Promise.all([
+    similarVets(db(), { excludeSlug: page.slug, limit: 4 }),
+    similarCentres(db(), { limit: 3 }),
+  ]);
   // No map is drawn until the operator records an embed template (DEC-0175).
   const map = await mapConfig(db());
   const path = '/veterinarians/' + page.slug;
@@ -71,7 +77,8 @@ export default async function VeterinarianPage({ params }: Params) {
   ];
 
   return (
-    <article className="mx-auto max-w-3xl space-y-xl" data-testid="vet-page">
+    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
+    <article className="min-w-0 space-y-xl" data-testid="vet-page">
       <Breadcrumbs items={crumbs} origin={origin} />
       <JsonLdScript
         data={vetPersonLd(
@@ -243,5 +250,13 @@ export default async function VeterinarianPage({ params }: Params) {
       </section>
       )}
     </article>
+
+      <RelatedColumn
+        groups={[
+          { titleFa: 'دامپزشکان مشابه', items: vets },
+          { titleFa: 'مراکز دامپزشکی', items: centres },
+        ]}
+      />
+    </div>
   );
 }

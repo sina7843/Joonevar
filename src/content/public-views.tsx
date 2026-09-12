@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { RichText } from './rich-text.tsx';
 import { RelatedColumn } from '../public/related-column.tsx';
-import { relatedContent, similarCentres } from '../public/related.ts';
+import { relatedContent, similarCentres, similarVets } from '../public/related.ts';
 import Link from 'next/link';
 import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -67,6 +67,14 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
   const result = await publicContentList(db(), { kind, categorySlug, page });
   const { origin } = site();
   const base = pathOf(kind);
+  // The column beside a list offers what the list does not: the other kind of
+  // reading, and the directories.
+  const otherKind = kind === 'ARTICLE' ? 'NEWS' : 'ARTICLE';
+  const [otherReading, listVets, listCentres] = await Promise.all([
+    relatedContent(db(), { kind: otherKind, limit: 3 }),
+    similarVets(db(), { limit: 3 }),
+    similarCentres(db(), { limit: 3 }),
+  ]);
   const crumbs = [
     { name: 'خانه', path: '/' },
     { name: KIND_PLURAL_FA[kind], path: base },
@@ -80,7 +88,8 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
   };
 
   return (
-    <div className="space-y-xl">
+    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="min-w-0 space-y-xl">
       <Breadcrumbs items={crumbs} origin={origin} />
       <header className="space-y-sm">
         <h1 className="text-h3 md:text-h1">{KIND_PLURAL_FA[kind]}</h1>
@@ -163,6 +172,15 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
           ) : null}
         </section>
       )}
+    </div>
+
+      <RelatedColumn
+        groups={[
+          { titleFa: otherKind === 'NEWS' ? 'اخبار تازه' : 'آموزش‌ها', items: otherReading },
+          { titleFa: 'دامپزشکان', items: listVets },
+          { titleFa: 'مراکز دامپزشکی', items: listCentres },
+        ]}
+      />
     </div>
   );
 }

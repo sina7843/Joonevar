@@ -112,4 +112,30 @@ export async function similarCentres(
     }));
 }
 
+/**
+ * Veterinarians a visitor may want next.
+ *
+ * Built on the directory's own published query rather than a second one, so a
+ * profile that is hidden, unowned or merged is excluded here for exactly the
+ * reasons it is excluded there.
+ */
+export async function similarVets(
+  database: DbClient,
+  options: { excludeSlug?: string; limit?: number } = {},
+): Promise<RelatedItem[]> {
+  const limit = options.limit ?? 4;
+  const { publishedVets } = await import('../vets/directory.ts');
+  const result = await publishedVets(database, { page: 1, pageSize: limit + 1 });
+  return result.items
+    .filter((vet) => vet.slug !== options.excludeSlug)
+    .slice(0, limit)
+    .map((vet) => ({
+      href: '/veterinarians/' + vet.slug,
+      titleFa: vet.nameFa,
+      noteFa: vet.headlineFa ?? (vet.specialtiesFa.length > 0 ? vet.specialtiesFa[0]! : null),
+      imageFileId: vet.imageFileId,
+      imageAltFa: vet.imageAltFa,
+    }));
+}
+
 export const hasAny = (...lists: readonly RelatedItem[][]): boolean => lists.some((list) => list.length > 0);
