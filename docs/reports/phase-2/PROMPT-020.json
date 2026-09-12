@@ -1,0 +1,62 @@
+{
+  "promptId": "PROMPT-020",
+  "status": "COMPLETE",
+  "summary": "Release readiness and handover. Reading the code first showed most gates already existed: SEO is covered by 13 unit tests plus the robots and sitemap checks of public-shell.test.ts, backup and restore have two real tests including a snapshot refused against its manifest, the production environment guard refuses a local adapter and a missing secret, and /api/health already named the unset settings and adapters. Four things were missing. First, nothing ever followed a link: the suites asserted which sections the sitemap has, never that the addresses it publishes answer. tests/browser/release.test.ts now reads the real sitemap, requests every published address and requires 200, and additionally requires that no guarded address is published at all — a guarded address leaking into the sitemap is worse than a dead link. It also follows the links on six public pages, where a guarded link must ask for sign-in rather than 404. Second, the health report did not show the taxonomy generations DEC-0179 records, so an operator had to infer them from rows; it does now, and the browser test pins that the report stays degraded while real tariffs and credentials are missing, so nobody later corrects it to ok. Third, the operations documents were entirely Phase 1 and mentioned none of the map, verification, advertising, review, content-admin or author surfaces; Phase 2 got its own handover document with the real commands and numbers, the 13 settings that deliberately start with no value and their owners, and the gaps still open, while the runbook and operator guide gained a Phase 2 section each rather than being rewritten over the Phase 1 record. Fourth, an evidence defect: the content suite waited for success text and reported a bare timeout, so a server refusal was invisible; it now reports what the banner actually said.",
+  "changedFiles": [
+    "tests/browser/release.test.ts",
+    "src/health/service.ts",
+    "tests/db/startup.test.ts",
+    "tests/browser/content.test.ts",
+    "docs/ops/release-readiness-phase-2.md",
+    "docs/ops/runbook.md",
+    "docs/ops/operator-guide.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-020-REPORT.md"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0180"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0. No route was added; the health route gained a field."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" && node --test --test-concurrency=4 \"tests/db/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "The full non-browser matrix on the final tree: 206/206 for domain+config+ui and 332/332 for the database suites, 538 tests, 0 failures. Run as two groups because npm test as one command fails on this Windows machine with spawn UNKNOWN (errno -4094) when the runner spawns a process per file. tests/db/startup.test.ts was extended rather than duplicated: the existing health test now also pins that the report carries a generation for every taxonomy and that province is among them. tests/db/backup-restore.test.ts and the production environment guard tests are part of this run and are the backup and production-settings evidence."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "The complete browser matrix on the final build: 162 tests, 161 pass, 0 fail, 1 skip (the PROMPT-018 content-image 304 case, which announces its missing fixture rather than printing a pass). New: tests/browser/release.test.ts, 3 tests — every address in every sitemap section answers 200 and none of them is a guarded address; every internal link on /, /about, /services, /places, /associations and /breeds resolves, with guarded links required to ask for sign-in rather than 404; and /api/health returns a degraded report naming the unset settings, at least 30 applied migrations and a generation for each taxonomy. One honest caveat recorded rather than smoothed over: tests/browser/content.test.ts timed out at the content-image upload step in two full runs earlier in this session and passed in two others (one full, one alone). Suite order is alphabetical and re-running exactly the eight preceding suites did not reproduce it, so interference from an earlier suite was ruled out and the cause remains unproven. It was neither declared a product defect nor ignored: the suite's waitForText now reports the banner text instead of a bare timeout, so the next occurrence names its cause, and the flake is recorded in the handover document. The final recorded run is green."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "tests/browser/content.test.ts failed intermittently at the image-upload step (two full runs) and passed in two others; the cause is unproven. The diagnostic message was improved and the flake is recorded rather than hidden.",
+    "Phase 2 visual fidelity is UNVERIFIED: no Figma frame for the Phase 2 public surface exists in the sources, so no pixel comparison was claimed.",
+    "Link checking covers what the database holds: on a fresh harness database the content sections of the sitemap are thin, so coverage is much wider in a full run where earlier suites publish records.",
+    "No down migrations exist; the safe rollback path for data is restoring a snapshot.",
+    "13 of 44 settings deliberately start with no value (the genetics payment card, six integration keys and six advertising prices); each capability stays closed until a real value is entered.",
+    "Deployment, publishing to a remote repository, real payments and real messages to a person were not performed: this package had no such authorisation and every commit is local.",
+    "npm test as a single command does not run on this Windows machine; the matrix runs as two groups with --test-concurrency=4."
+  ],
+  "readiness": {
+    "code": "PHASE_2_FEATURE_COMPLETE_AND_TESTED",
+    "visual": "UNVERIFIED_NO_PHASE_2_REFERENCE",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

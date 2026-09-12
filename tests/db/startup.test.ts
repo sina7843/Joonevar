@@ -143,6 +143,11 @@ test('the health report tells the truth about what is missing', async () => {
       report.adapters.some((adapter) => adapter.status === 'NOT_CONFIGURED'),
       'the missing providers are named rather than assumed ready',
     );
+    // The installed taxonomy generations, so an operator reads them instead of
+    // inferring them from rows (DEC-0179).
+    assert.equal(report.taxonomies.length > 0, true);
+    assert.ok(report.taxonomies.every((entry) => entry.version >= 1));
+    assert.ok(report.taxonomies.some((entry) => entry.name === 'province'));
     assert.match(report.checkedAt, /^\d{4}-\d{2}-\d{2}T/);
   } finally {
     await testDb.drop();

@@ -11,6 +11,7 @@ import type { DbClient } from '../db/client.ts';
 import { adapterReports, type AdapterReport } from '../adapters/registry.ts';
 import { adapterReportsWithSettings } from '../adapters/integration-settings.ts';
 import { unconfiguredKeys } from '../settings/service.ts';
+import { taxonomySeeds } from '../db/schema/taxonomy.ts';
 import { env as loadEnv, type Env } from '../config/env.ts';
 
 export interface HealthReport {
@@ -20,6 +21,8 @@ export interface HealthReport {
   readonly integrationMode: Env['INTEGRATION_MODE'];
   readonly database: { readonly reachable: boolean; readonly migrationsApplied: number | null };
   readonly settings: { readonly total: number; readonly notConfigured: readonly string[] };
+  /** The generation of each taxonomy this database holds (§23, DEC-0179). */
+  readonly taxonomies: readonly { readonly name: string; readonly version: number }[];
   readonly adapters: readonly AdapterReport[];
   readonly checkedAt: string;
 }
@@ -29,6 +32,7 @@ export async function healthReport(database: DbClient, env: Env = loadEnv()): Pr
   let migrationsApplied: number | null = null;
   let notConfigured: readonly string[] = [];
   let total = 0;
+  let taxonomies: readonly { name: string; version: number }[] = [];
 
   try {
     await database.execute(sql`select 1`);
@@ -40,6 +44,12 @@ export async function healthReport(database: DbClient, env: Env = loadEnv()): Pr
     const counted = await database.execute<{ count: string }>(sql`select count(*)::text as count from product_setting`);
     total = Number(counted.rows[0]?.count ?? 0);
     notConfigured = await unconfiguredKeys(database);
+    // Which taxonomy generation is installed is an operational fact an operator
+    // otherwise has to guess by reading rows (DEC-0179).
+    taxonomies = await database
+      .select({ name: taxonomySeeds.name, version: taxonomySeeds.version })
+      .from(taxonomySeeds)
+      .orderBy(taxonomySeeds.name);
   } catch {
     reachable = false;
   }
@@ -56,6 +66,7 @@ export async function healthReport(database: DbClient, env: Env = loadEnv()): Pr
     integrationMode: env.INTEGRATION_MODE,
     database: { reachable, migrationsApplied },
     settings: { total, notConfigured },
+    taxonomies,
     adapters,
     checkedAt: new Date().toISOString(),
   };

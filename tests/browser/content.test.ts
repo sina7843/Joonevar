@@ -104,10 +104,21 @@ async function as<T>(
 }
 
 async function waitForText(page: Page, testId: string, text: string): Promise<void> {
-  await page.waitForFunction(
-    ([id, expected]) => document.querySelector('[data-testid="' + id + '"]')?.textContent?.includes(expected) ?? false,
-    [testId, text] as const,
-  );
+  await page
+    .waitForFunction(
+      ([id, expected]) => document.querySelector('[data-testid="' + id + '"]')?.textContent?.includes(expected) ?? false,
+      [testId, text] as const,
+    )
+    .catch(async () => {
+      /*
+       * A bare timeout says only that the words never appeared. When the server
+       * answers with a refusal instead, the refusal is the whole diagnosis, so
+       * report what the banner really said rather than that it was not what we
+       * hoped.
+       */
+      const actual = (await page.locator('[data-testid="' + testId + '"]').textContent().catch(() => null)) ?? '(no such element)';
+      throw new Error(testId + ' never said "' + text + '"; it said: ' + actual.trim().slice(0, 300));
+    });
 }
 
 async function setStatus(page: Page, to: string, expected: string, reason?: string, publishAtLocal?: string) {
