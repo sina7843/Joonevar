@@ -75,26 +75,15 @@ export default async function ServicePage({ params }: Params) {
         </p>
       </section>
 
-      <section aria-labelledby="service-fee-title">
-        <h2 id="service-fee-title" className="text-h4">
-          هزینه
+      {/*
+        No figure is printed on a public service page (DEC-0186). The fee still
+        lives in managed settings and is shown where the payment actually
+        happens; a marketing page is not where a tariff is announced.
+      */}
+      <section aria-labelledby="service-notice-title">
+        <h2 id="service-notice-title" className="sr-only">
+          توضیح هزینه
         </h2>
-        {service.feeSettingKey === null ? (
-          <p className="mt-md text-body-md" data-testid="service-no-fee">
-            همزیست برای این خدمت هزینه‌ای دریافت نمی‌کند.
-          </p>
-        ) : fee?.configured ? (
-          <p className="mt-md text-h4" data-testid="service-fee">
-            {feeFa}
-          </p>
-        ) : (
-          <div className="mt-md" data-testid="service-fee-unconfigured">
-            {/* A missing tariff is never shown as free (§22). */}
-            <Alert tone="warning" title="هزینه این خدمت هنوز ثبت نشده است">
-              تا ثبت مبلغ رسمی، عددی برای این خدمت نمایش داده نمی‌شود.
-            </Alert>
-          </div>
-        )}
         {noticeFa ? (
           <p className="mt-sm text-body-sm text-text-secondary" data-testid="service-notice">
             {noticeFa}

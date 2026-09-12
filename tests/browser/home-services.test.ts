@@ -57,7 +57,7 @@ test('home shows what Hamzist does, how it works and a way into the directories'
   });
 });
 
-test('a service page shows the recorded fee, the steps and no promised time', async () => {
+test('a service page carries the steps and no figure and no promised time', async () => {
   await asVisitor(DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/services', { waitUntil: 'load' });
     await page.getByTestId('service-list').waitFor();
@@ -65,8 +65,13 @@ test('a service page shows the recorded fee, the steps and no promised time', as
 
     await page.getByTestId('service-card-membership').click();
     await page.getByTestId('service-page').waitFor();
-    // The seeded, documented membership figure — read from settings, not written on the page.
-    assert.equal((await page.getByTestId('service-fee').textContent())?.trim(), '۳۰۰٬۰۰۰ تومان');
+    /*
+     * No tariff is printed on a public service page (DEC-0186). The figure still
+     * lives in managed settings and appears where the payment happens, so what
+     * this pins is the absence: neither a number nor a «not recorded» warning.
+     */
+    assert.equal(await page.getByTestId('service-fee').count(), 0);
+    assert.equal(await page.getByTestId('service-fee-unconfigured').count(), 0);
     await page.getByTestId('service-prerequisites').waitFor();
     await page.getByTestId('service-steps').waitFor();
     await page.getByTestId('service-documents').waitFor();
@@ -76,10 +81,10 @@ test('a service page shows the recorded fee, the steps and no promised time', as
   });
 });
 
-test('a service Hamzist does not charge for says so, with the approved notice', async () => {
+test('a service whose price Hamzist does not set says where to ask, with the approved notice', async () => {
   await asVisitor(MOBILE, async (page) => {
     await page.goto(BASE_URL + '/services/vet-visit', { waitUntil: 'load' });
-    await page.getByTestId('service-no-fee').waitFor();
+    await page.getByTestId('service-notice').waitFor();
     assert.equal(await page.getByTestId('service-fee').count(), 0);
     await expectText(page, 'برای اطلاع دقیق از قیمت‌ها با دامپزشک یا مرکز تماس بگیرید.');
     await page.screenshot({ path: path.join(SHOTS, 'service-vet-visit-mobile.png'), fullPage: true });

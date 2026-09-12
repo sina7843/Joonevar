@@ -54,15 +54,6 @@ export default async function ServicesPage() {
               <span className="min-w-0 space-y-xs">
                 <span className="block text-label-lg text-text-primary">{service.titleFa}</span>
                 <span className="block text-body-sm text-text-secondary">{service.summaryFa}</span>
-                <span className="flex flex-wrap gap-xs pt-2xs" data-testid={'service-fee-' + service.slug}>
-                  {service.feeSettingKey === null ? (
-                    <StatusBadge tone="neutral">هزینه‌ای در همزیست ندارد</StatusBadge>
-                  ) : fee?.configured ? (
-                    <StatusBadge tone="info">{feeFa}</StatusBadge>
-                  ) : (
-                    <StatusBadge tone="warning">هزینه ثبت نشده است</StatusBadge>
-                  )}
-                </span>
               </span>
             </Link>
           </li>

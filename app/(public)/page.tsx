@@ -14,6 +14,7 @@ import { publishedBreeds } from '../../src/breeds/service.ts';
 import { publishedVets } from '../../src/vets/directory.ts';
 import { publishedCentres } from '../../src/centres/service.ts';
 import { publishedCommunities } from '../../src/communities/service.ts';
+import { COMMUNITY_KIND_FA } from '../../src/communities/model.ts';
 import { publicContentList } from '../../src/content/service.ts';
 
 export const dynamic = 'force-dynamic';
@@ -170,6 +171,100 @@ export default async function HomePage() {
         </ul>
       </section>
 
+      {breeds.items.length > 0 ? (
+        <section aria-labelledby="breeds-title">
+          <h2 id="breeds-title" className="text-h3">
+            نژادهای سگ
+          </h2>
+          {/* A rail, because breeds are a list to flick through, not to study. */}
+          <ul className="hz-rail mt-lg flex snap-x gap-sm pb-xs" data-testid="home-breeds">
+            {breeds.items.map((breed) => (
+              <li key={breed.slug} className="shrink-0 snap-start">
+                <Link
+                  href={'/breeds/' + breed.slug}
+                  className="hz-lift inline-flex w-[168px] flex-col gap-sm rounded-lg border border-border-subtle bg-bg-surface p-sm"
+                >
+                  <RecordImage fileId={breed.imageFileId} altFa={breed.imageAltFa} />
+                  <span className="text-label-md whitespace-nowrap">{breed.nameFa}</span>
+                  {breed.groupNameFa ? (
+                    <span className="text-caption whitespace-nowrap text-text-secondary">{breed.groupNameFa}</span>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {reading.length > 0 ? (
+        <section aria-labelledby="reading-title">
+          <h2 id="reading-title" className="text-h3">
+            تازه‌ها
+          </h2>
+          <ul className="mt-lg grid gap-x-xl md:grid-cols-2" data-testid="home-reading">
+            {reading.map(({ item, path, kind }) => (
+              <li key={path + item.slug} className="border-t border-border-subtle py-lg">
+                <Link href={path + item.slug} className="group flex gap-md">
+                  <RecordImage variant="thumb" fileId={item.imageFileId} altFa={item.imageAltFa} />
+                  <span className="block min-w-0">
+                  <span className="text-caption text-text-secondary">{kind}</span>
+                  <span className="mt-2xs block text-label-lg group-hover:text-text-brand">{item.titleFa}</span>
+                  <span className="mt-xs block max-w-[60ch] text-body-sm text-text-secondary">{item.summaryFa}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {communities.items.length > 0 ? (
+        <section aria-labelledby="communities-title">
+          <h2 id="communities-title" className="text-h3">
+            انجمن‌ها و کلاب‌ها
+          </h2>
+          <ul className="mt-lg grid gap-md sm:grid-cols-2 lg:grid-cols-3" data-testid="home-communities">
+            {communities.items.map((community) => (
+              <li key={community.slug}>
+                <Link
+                  href={'/associations/' + community.slug}
+                  className="hz-lift flex h-full flex-col gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg"
+                >
+                  <RecordImage fileId={community.imageFileId} altFa={community.imageAltFa} />
+                  <span className="block">
+                    <span className="block text-label-lg">{community.nameFa}</span>
+                    <span className="mt-2xs block text-caption text-text-secondary">
+                      {[COMMUNITY_KIND_FA[community.kind], community.placeFa].filter(Boolean).join(' · ')}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {stats.length > 0 ? (
+        <section aria-labelledby="stats-title">
+          <h2 id="stats-title" className="text-h3">
+            همزیست در یک نگاه
+          </h2>
+          <ul className="mt-xl grid grid-cols-2 gap-lg sm:grid-cols-3 lg:grid-cols-5" data-testid="home-stats">
+            {stats.map((stat) => (
+              <li key={stat.label}>
+                <Link href={stat.href} className="group block">
+                  <span className="block text-h1 text-text-brand group-hover:opacity-80">{fa(stat.value)}</span>
+                  <span className="mt-2xs block text-caption text-text-secondary">{stat.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-lg text-caption text-text-secondary">
+            این عددها از رکوردهای منتشرشده همین لحظه شمرده می‌شوند.
+          </p>
+        </section>
+      ) : null}
+
       {/* Services: the first one carries the section, the rest sit beside it. */}
       <section aria-labelledby="services-title">
         <h2 id="services-title" className="text-h3">
@@ -227,94 +322,6 @@ export default async function HomePage() {
         </ol>
       </section>
 
-      {breeds.items.length > 0 ? (
-        <section aria-labelledby="breeds-title">
-          <h2 id="breeds-title" className="text-h3">
-            نژادهای سگ
-          </h2>
-          {/* A rail, because breeds are a list to flick through, not to study. */}
-          <ul className="hz-rail mt-lg flex snap-x gap-sm pb-xs" data-testid="home-breeds">
-            {breeds.items.map((breed) => (
-              <li key={breed.slug} className="shrink-0 snap-start">
-                <Link
-                  href={'/breeds/' + breed.slug}
-                  className="hz-lift inline-flex w-[168px] flex-col gap-sm rounded-lg border border-border-subtle bg-bg-surface p-sm"
-                >
-                  <RecordImage fileId={breed.imageFileId} altFa={breed.imageAltFa} />
-                  <span className="text-label-md whitespace-nowrap">{breed.nameFa}</span>
-                  {breed.groupNameFa ? (
-                    <span className="text-caption whitespace-nowrap text-text-secondary">{breed.groupNameFa}</span>
-                  ) : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {reading.length > 0 ? (
-        <section aria-labelledby="reading-title">
-          <h2 id="reading-title" className="text-h3">
-            تازه‌ها
-          </h2>
-          <ul className="mt-lg grid gap-x-xl md:grid-cols-2" data-testid="home-reading">
-            {reading.map(({ item, path, kind }) => (
-              <li key={path + item.slug} className="border-t border-border-subtle py-lg">
-                <Link href={path + item.slug} className="group flex gap-md">
-                  <RecordImage variant="thumb" fileId={item.imageFileId} altFa={item.imageAltFa} />
-                  <span className="block min-w-0">
-                  <span className="text-caption text-text-secondary">{kind}</span>
-                  <span className="mt-2xs block text-label-lg group-hover:text-text-brand">{item.titleFa}</span>
-                  <span className="mt-xs block max-w-[60ch] text-body-sm text-text-secondary">{item.summaryFa}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {communities.items.length > 0 ? (
-        <section aria-labelledby="communities-title">
-          <h2 id="communities-title" className="text-h3">
-            انجمن‌ها و کلاب‌ها
-          </h2>
-          <ul className="mt-lg flex flex-wrap gap-x-xl gap-y-sm" data-testid="home-communities">
-            {communities.items.map((community) => (
-              <li key={community.slug}>
-                <Link href={'/associations/' + community.slug} className="group inline-flex items-center gap-sm">
-                  <RecordImage variant="thumb" fileId={community.imageFileId} altFa={community.imageAltFa} />
-                  <span className="text-label-lg group-hover:text-text-brand">{community.nameFa}</span>
-                  {community.placeFa ? (
-                    <span className="text-caption text-text-secondary">{community.placeFa}</span>
-                  ) : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {stats.length > 0 ? (
-        <section aria-labelledby="stats-title">
-          <h2 id="stats-title" className="text-h3">
-            همزیست در یک نگاه
-          </h2>
-          <ul className="mt-xl grid grid-cols-2 gap-lg sm:grid-cols-3 lg:grid-cols-5" data-testid="home-stats">
-            {stats.map((stat) => (
-              <li key={stat.label}>
-                <Link href={stat.href} className="group block">
-                  <span className="block text-h1 text-text-brand group-hover:opacity-80">{fa(stat.value)}</span>
-                  <span className="mt-2xs block text-caption text-text-secondary">{stat.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-lg text-caption text-text-secondary">
-            این عددها از رکوردهای منتشرشده همین لحظه شمرده می‌شوند.
-          </p>
-        </section>
-      ) : null}
     </div>
   );
 }
