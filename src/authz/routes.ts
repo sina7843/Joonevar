@@ -35,6 +35,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/search', access: 'PUBLIC' },
   // Service pages (§18): what each Phase 1 service is, with its managed fee.
   { prefix: '/services', access: 'PUBLIC' },
+  // Document verification (§17): a code or QR, answered with minimal public data.
+  { prefix: '/verify', access: 'PUBLIC' },
   // Content images: the route itself serves only images of visible content (DEC-0160).
   { prefix: '/media', access: 'PUBLIC' },
   { prefix: '/robots.txt', access: 'PUBLIC' },

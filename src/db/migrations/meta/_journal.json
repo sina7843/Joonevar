@@ -183,6 +183,13 @@
       "when": 1789171548911,
       "tag": "0025_advertising",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1789214600020,
+      "tag": "0026_verification",
+      "breakpoints": true
     }
   ]
 }

@@ -24,7 +24,7 @@ export const PUBLIC_SECTIONS: readonly PublicSection[] = [
   { href: '/articles', label: 'آموزش‌ها', live: true, prompt: '004' },
   { href: '/news', label: 'اخبار', live: true, prompt: '004' },
   { href: '/associations', label: 'انجمن‌ها و کلاب‌ها', live: true, prompt: '010' },
-  { href: '/verify', label: 'استعلام اصالت', live: false, prompt: '014' },
+  { href: '/verify', label: 'استعلام اصالت', live: true, prompt: '014' },
   { href: '/about', label: 'درباره همزیست', live: true, prompt: '002' },
 ];
 

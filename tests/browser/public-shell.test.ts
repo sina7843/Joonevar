@@ -132,19 +132,19 @@ test('the header links only built sections, marks the current one and offers sig
       '/articles',
       '/news',
       '/associations',
+      '/verify',
       '/about',
     ]);
-    assert.equal(await nav.nth(7).getAttribute('aria-current'), 'page');
+    assert.equal(await nav.nth(8).getAttribute('aria-current'), 'page');
     assert.equal(await nav.nth(0).getAttribute('aria-current'), null);
 
     const account = page.getByTestId('site-account-link');
     assert.equal(await account.getAttribute('href'), '/login');
     assert.equal((await account.textContent())?.trim(), 'ورود / ثبت‌نام');
 
-    // No link anywhere on the page leads into a section that is not built yet.
-    for (const planned of ['/verify']) {
-      assert.equal(await page.locator('a[href^="' + planned + '"]').count(), 0, planned);
-    }
+    // Every section of §4 is built now, so the header links them all and there
+    // is no planned-but-unbuilt address left to keep out of the page.
+    assert.equal(await nav.count(), 9);
 
     // The breadcrumb reads right to left: home sits to the right of the page.
     const crumbs = page.locator('[data-testid="breadcrumbs"] li');

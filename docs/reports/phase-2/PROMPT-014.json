@@ -1,0 +1,77 @@
+{
+  "promptId": "PROMPT-014",
+  "status": "COMPLETE",
+  "summary": "Public document verification. A visitor types a code or opens a QR address and is told whether a Hamzist document exists and what state it is in. The answer is read directly from the Phase 1 documents — registration_sheet, pedigree and puppy_card — so no public copy of a document was created and nothing can drift from what was issued; the codes are the ones Phase 1 already mints (RS-, PD-, PC- and the animal's own PET- identifier, which answers with its registration sheet). Migration 0026 adds only verification_attempt, a log of questions rather than of documents. The states are VALID, REPLACED, NOT_FOUND and RATE_LIMITED: «باطل» was deliberately not built, because Phase 1 records no revocation of an issued document and claiming one would assert a fact the platform does not hold; REPLACED comes from real data, a pedigree whose parentage result was later corrected, and its notice is shown. The answer carries the least §17 asks — document type, public code, issue date, state and a few animal facts (species, breed, sex and the birth year only) — and never the owner's name or contact, a national id, an address, a file, the microchip number, the sample tracking code or even the animal's name; the forbidden list is kept as data so the test asserts on the same list a reviewer reads. Repeated guessing is limited per place by a managed hourly ceiling, counted against a SHA-256 hash of the forwarded address rather than the address itself, and past the ceiling the answer refuses to say whether a code exists. /verify became a live §4 section with its own public route, published noindex because the answer depends on a code in the query.",
+  "changedFiles": [
+    "src/db/schema/verification.ts",
+    "src/db/schema/index.ts",
+    "src/db/migrations/0026_verification.sql",
+    "src/db/migrations/meta/0026_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/settings/keys.ts",
+    "src/authz/routes.ts",
+    "src/public/sections.ts",
+    "src/verification/model.ts",
+    "src/verification/service.ts",
+    "src/verification/result.tsx",
+    "app/(public)/verify/(list)/page.tsx",
+    "app/(public)/verify/(list)/loading.tsx",
+    "app/(public)/verify/[code]/page.tsx",
+    "tests/domain/verification.test.ts",
+    "tests/db/verification.test.ts",
+    "tests/browser/verification.test.ts",
+    "tests/ui/seo.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-014-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-014/verify-empty-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-014/verify-not-found.png",
+    "docs/reports/screenshots/phase-2/prompt-014/verify-rate-limited.png"
+  ],
+  "decisions": ["DEC-0174"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0, with /verify and /verify/[code] listed."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/verification.test.ts tests/db/verification.test.ts && node --test --test-concurrency=1 tests/ui/seo.test.ts tests/ui/routes.test.ts tests/db/migrations.test.ts tests/db/settings.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. New suites: tests 9 · pass 9 · fail 0. tests/domain/verification.test.ts pins how a code is read whether typed, pasted, or scanned as a full QR address with Persian digits, which prefix belongs to which document (and that a stub or unknown prefix is not a code), the minimal public facts with the birth year only, and that every state has Persian wording while «باطل» is not among them. tests/db/verification.test.ts issues real documents through the actual Phase 1 path (animal, visit, microchip, sample, verified payment, registration sheet, then a pedigree): the sheet answers VALID by its own number, by the animal's Pet ID and through a full QR address, always naming the document rather than the code that was typed, and the answer contains neither the microchip number nor the sample tracking code nor any forbidden field; a pedigree answers VALID and then REPLACED once a corrected result writes its notice, keeping the document and its issue date; unissued codes, a wrong prefix and a stub are all NOT_FOUND while an empty question is refused; a ceiling of two stops the third attempt from one place with no hint whether the code exists, leaves another place unaffected, records all four attempts, and stores only a 64-character hash rather than the address. Regression: tests 43 · pass 43 · fail 0 over tests/ui/seo.test.ts (the now-live /verify section), tests/ui/routes.test.ts, tests/db/migrations.test.ts (migration 0026 on an empty database) and tests/db/settings.test.ts (the new managed ceiling). Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/verification.test.ts && node tools/browser-tests.mjs tests/browser/public-shell.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/verification.test.ts 5/5: the phone-width page opens with its empty state, states that owner data is never shown and does not scroll sideways; a code nobody issued is told plainly that nothing was found and no result card appears; a QR address answers the same question and offers another lookup; with the managed ceiling lowered to two, the third guess is stopped with the rate-limited notice; and the page reports noindex. Regression on the same build: tests/browser/public-shell.test.ts 7/7 — the header now links all nine §4 sections including verification, and the mobile menu, robots, sitemap, 404 and guarded application are unchanged. A valid document was not exercised in the browser because issuing one through the UI needs the full payment and veterinarian path; VALID and REPLACED are covered in the database suite against really issued documents. Screenshots regenerated for prompt-002 by the regression were restored with git checkout; only prompt-014 evidence is new. As before, npm run build was run before the browser suites because the harness serves the existing .next. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No «باطل» state: Phase 1 records no revocation of an issued document, so none is claimed; adding one later only widens the state mapping in this module.",
+    "Other «گواهی‌های مجاز» named by §14 have no code to verify until Phase 1 issues a document for them.",
+    "A puppy card shows no animal facts: it belongs to a puppy inside a litter rather than to a registered animal, and inventing public data for it would be a guess.",
+    "A valid document was not verified through the browser: issuing one from the UI requires the full payment and veterinarian path, so VALID and REPLACED are proven in the database suite instead.",
+    "Attempts are counted per forwarded address, so several visitors behind one NAT count as one place; it is a technical guard, not an approved product policy.",
+    "No QR image is generated here: the page reads a QR address, and printing a QR on a document belongs to the Phase 1 document path.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the verification pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "DOCUMENT_VERIFICATION_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

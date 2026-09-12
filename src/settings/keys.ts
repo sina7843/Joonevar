@@ -380,6 +380,17 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     max: 100,
   },
   {
+    key: 'verification.attempt_hourly_limit',
+    group: 'MODERATION',
+    kind: 'INT',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'سقف استعلام اصالت از یک نشانی در ساعت',
+    noteFa: 'سد فنی در برابر حدس‌زدن کد سند (§۱۷)؛ پیش‌فرض قابل تغییر، نه سیاست تأییدشده مالک محصول.',
+    seedValue: 30,
+    min: 1,
+    max: 1000,
+  },
+  {
     key: 'moderation.suggestion_daily_limit',
     group: 'MODERATION',
     kind: 'INT',
