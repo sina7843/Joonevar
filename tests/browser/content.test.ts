@@ -121,6 +121,22 @@ async function waitForText(page: Page, testId: string, text: string): Promise<vo
     });
 }
 
+const editorVersion = (page: Page) => page.locator('input[name="expectedVersion"]').first().inputValue();
+
+/*
+ * Every editor form carries the item's version, and a successful save bumps it. The
+ * save's banner comes from the action's own answer, a moment before the refreshed page
+ * hands the other forms the new version; acting inside that window sends the old one
+ * and the server rightly refuses it as a concurrent change. That was the intermittent
+ * image-upload failure of Phase 2 (PHASE-2.5 PROMPT-001). Wait for the page, not the banner.
+ */
+async function waitForNewVersion(page: Page, before: string): Promise<void> {
+  await page.waitForFunction(
+    (old) => [...document.querySelectorAll<HTMLInputElement>('input[name="expectedVersion"]')].every((input) => input.value !== old),
+    before,
+  );
+}
+
 async function setStatus(page: Page, to: string, expected: string, reason?: string, publishAtLocal?: string) {
   await page.getByTestId('content-status-to').selectOption(to);
   if (publishAtLocal) await page.getByTestId('content-publish-at').fill(publishAtLocal);
@@ -149,8 +165,10 @@ async function writeBody(page: Page, withSources: boolean) {
     await page.getByTestId('content-sources').fill('SYNTHETIC منبع ' + RUN + ' | https://example.org/synthetic-source');
     await page.getByTestId('content-reviewed-on').fill('2026-01-15');
   }
+  const before = await editorVersion(page);
   await page.getByTestId('save-content').click();
   await waitForText(page, 'content-fields-result', 'ذخیره شد');
+  await waitForNewVersion(page, before);
 }
 
 let article: { id: string; slug: string };
@@ -176,15 +194,19 @@ test('the superadmin grants authorship, and the author publishes education a vis
     // Education cannot go public without a source.
     await page.getByTestId('content-summary').fill('خلاصه');
     await page.getByTestId('content-body').fill('متن');
+    const beforeFields = await editorVersion(page);
     await page.getByTestId('save-content').click();
     await waitForText(page, 'content-fields-result', 'ذخیره شد');
+    await waitForNewVersion(page, beforeFields);
     await setStatus(page, 'PUBLISHED', 'منبع');
 
     await writeBody(page, true);
     await page.getByTestId('content-image-file').setInputFiles({ name: 'puppy.png', mimeType: 'image/png', buffer: PNG });
     await page.getByTestId('content-image-alt-new').fill('SYNTHETIC توله در برف');
+    const beforeImage = await editorVersion(page);
     await page.getByTestId('upload-content-image').click();
     await waitForText(page, 'content-image-result', 'تصویر ذخیره شد');
+    await waitForNewVersion(page, beforeImage);
     await setStatus(page, 'PUBLISHED', 'وضعیت ثبت شد');
     await waitForText(page, 'content-public-state', 'در سایت دیده می‌شود');
     await page.screenshot({ path: path.join(SHOTS, 'author-editor.png'), fullPage: true });
@@ -206,6 +228,18 @@ test('the superadmin grants authorship, and the author publishes education a vis
     const image = page.getByTestId('content-image');
     await image.waitFor();
     assert.ok(await image.evaluate((node) => (node as HTMLImageElement).complete && (node as HTMLImageElement).naturalWidth > 0), 'the image is served');
+
+    // PROMPT-018: a repeat view revalidates instead of resending the bytes. It lives here, beside
+    // the one article that really has an image; a fresh harness database has no other.
+    const source = new URL((await image.getAttribute('src'))!, BASE_URL).toString();
+    const firstView = await page.request.get(source);
+    assert.equal(firstView.status(), 200);
+    const etag = firstView.headers()['etag'];
+    assert.ok(etag, 'the image answers with a digest');
+    // The visibility decision is still made every time: the cache must revalidate.
+    assert.match(firstView.headers()['cache-control'] ?? '', /must-revalidate/);
+    const repeatView = await page.request.get(source, { headers: { 'if-none-match': etag! } });
+    assert.equal(repeatView.status(), 304, 'a repeat view does not resend the bytes');
     assert.equal(await page.getByTestId('content-sources').locator('a').getAttribute('rel'), 'nofollow noopener noreferrer');
 
     const ld = await page

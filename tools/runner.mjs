@@ -8,10 +8,12 @@ const root=path.resolve(process.env.PROMPT_STARTER_ROOT || path.join(path.dirnam
 const argv=process.argv.slice(2);
 const phaseAt=argv.indexOf('--phase');
 const phaseName=phaseAt<0?'1':argv.splice(phaseAt,2)[1];
-// ponytail: two phases hardcoded; move this table to starter.config.json if a third package arrives.
+// ponytail: phases hardcoded; move this table to starter.config.json if the list keeps growing.
 const PHASES={
  '1':{prompts:'prompts',status:'PROJECT_STATUS.md',state:'.runner',reports:'docs/reports',checks:[]},
  '2':{prompts:'prompts-2',status:'PROJECT_STATUS-PHASE-2.md',state:'.runner/phase-2',reports:'docs/reports/phase-2',checks:['typecheck','build','product-tests','browser-tests']},
+ // Phase 2.5 reads its package in place (the user keeps it untracked) and names reports PHASE-2.5-PROMPT-NNN.json (DEC-0187).
+ '2.5':{prompts:'Hamzist-Phase-2.5-Prompt-Package/prompts',status:'PROJECT_STATUS-PHASE-2.5.md',state:'.runner/phase-2.5',reports:'docs/reports',reportPrefix:'PHASE-2.5-',checks:['typecheck','build','product-tests','browser-tests']},
 };
 const phase=PHASES[phaseName];
 if(!phase){console.error('ERROR: Unknown phase: '+phaseName);process.exit(1);}
@@ -34,7 +36,7 @@ function assertRepo(){if(repoRoot()!==root)fail('Run this package from the targe
 // It is normalised here rather than edited, so the delivered package stays byte-identical. Phase 1 is unchanged by this.
 function manifest(){const m=JSON.parse(read(manifestFile));if(!Array.isArray(m.prompts)||!m.prompts.length)fail('Invalid manifest');
  const pid=x=>/^\d+$/.test(x)?'PROMPT-'+x:x;
- m.prompts=m.prompts.map((p,i,a)=>({...p,id:pid(p.id),file:path.basename(p.file),dependsOn:p.dependsOn??(i?[pid(a[i-1].id)]:[]),requiredChecks:p.requiredChecks??phase.checks}));
+ m.prompts=m.prompts.map((p,i,a)=>({...p,id:pid(p.id),title:p.title??path.basename(p.file,'.md'),file:path.basename(p.file),dependsOn:p.dependsOn??(i?[pid(a[i-1].id)]:[]),requiredChecks:p.requiredChecks??phase.checks}));
  m.project??='Hamzist phase '+phaseName;return m;}
 function fingerprint(){return hash(read(manifestFile));}
 function locked(){if(!fs.existsSync(lockFile))fail('Run setup first; plan is not locked.');if(JSON.parse(read(lockFile)).manifestHash!==fingerprint())fail('Manifest changed after setup; inspect the intentional plan change before proceeding.');}
@@ -78,7 +80,7 @@ function complete(args){
  if(sha===s.startHead)fail('No new work commit since prepare.');
  if(s.startHead){const anc=run('git',['merge-base','--is-ancestor',s.startHead,sha]);if(anc.status!==0)fail('Work commit must descend from prepared HEAD.');}
  const msg=git(['show','-s','--format=%B',sha]);if(!msg.includes(pid))fail('Work commit message must include '+pid);
- const reportPath=`${phase.reports}/${pid}.json`;
+ const reportPath=`${phase.reports}/${phase.reportPrefix??''}${pid}.json`;
  let report;try{report=JSON.parse(git(['show',sha+':'+reportPath]));}catch{fail('A valid committed report is required: '+reportPath);}
  if(report.promptId!==pid||report.status!=='COMPLETE')fail('Committed report must identify prompt and status COMPLETE.');
  if(typeof report.summary!=='string'||report.summary.trim().length<12)fail('Concrete completion summary required.');

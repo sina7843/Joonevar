@@ -401,6 +401,8 @@ test('the public list finds breeds by either name, an alternative name or Arabic
     size: 'MEDIUM',
     fciGroup: 8,
     groupNameFa: inGroup.items[0]!.groupNameFa,
+    imageFileId: null,
+    imageAltFa: null,
   });
   assert.equal((await publishedBreeds(testDb.db, { term: breed.nameEn, fciGroup: 1, page: 1 })).total, 0);
 

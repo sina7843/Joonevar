@@ -1,6 +1,6 @@
 # وضعیت واقعی پیاده‌سازی
 
-Status: MEMBERSHIP_READY — ورود، حساب، KYC، پرداخت و عضویت مادام‌العمر کار می‌کنند؛ فلوهای حیوان هنوز ساخته نشده‌اند.
+Status: PHASE_1_DELIVERED — هر ۲۰ مرحله فاز ۱ تحویل شده‌اند (بخش PROMPT-020 پایین). این سرتیتر از PROMPT-005 به‌روز نشده بود و در baseline فاز ۲.۵ اصلاح شد. جدول زیر تصویر همان زمان PROMPT-005 است و تاریخی نگه داشته می‌شود؛ وضعیت فاز ۲ در [release-readiness-phase-2.md](docs/ops/release-readiness-phase-2.md) و baseline فاز ۲.۵ در [phase-2.5-baseline.md](docs/qa/phase-2.5-baseline.md) است.
 
 وضعیت‌ها جدا نگه داشته می‌شوند و به یک checkbox تقلیل پیدا نمی‌کنند:
 

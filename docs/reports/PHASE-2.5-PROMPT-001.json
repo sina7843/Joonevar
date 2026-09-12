@@ -1,0 +1,94 @@
+{
+  "promptId": "PROMPT-001",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "baselineSha": "615be518e496b71d70f9061fef43338c783abcee",
+  "summary": "Baseline of HEAD 615be51 before any Phase 2.5 domain work, run in a clean git worktree with npm ci so the user's uncommitted .gitignore change and their running server on port 3111 were untouched. The first full pass was not green and is recorded as such: 1 database failure and 7 browser failures plus 1 skip. Each was classified with evidence. The database failure was drift from post-handoff commit 5b3ed72, which added imageFileId and imageAltFa to the public breed list row without updating tests/db/breeds.test.ts; the expectation now pins both fields. The 6 communities failures were a Chromium renderer crash (Target crashed) in the before hook and the kennel failure a 30 s stability wait, both under 2.2-2.4 GB free memory, and both suites passed when run alone. The always-skipped content-image 304 test was deterministic: a11y sorts before content and the harness seeds no content, so its assertions moved into content.test.ts right after the article that really has an image. The Phase 2 intermittent content-image upload failure reproduced, and the diagnostic added in Phase 2 named it: an optimistic-lock conflict. The save banner arrives from the action before the revalidated page gives the other editor forms the new expectedVersion, so the test uploaded with the old version and the server correctly refused. The test now waits for every expectedVersion input to change after a successful versioned save; no timeout was widened and no assertion removed. After the fixes the full browser matrix passed 161/161 with no skip. The baseline, audit (no CI, 6 npm audit findings, 31 migrations without per-migration rollback notes, in-memory search, unset integrations, missing field a11y/CWV evidence, 80 abandoned test databases) and report drift are in docs/qa/phase-2.5-baseline.md. The Runner gained a phase 2.5 entry that reads the untracked package in place.",
+  "changedFiles": [
+    "docs/qa/phase-2.5-baseline.md",
+    "docs/reports/PHASE-2.5-PROMPT-001.json",
+    "tests/db/breeds.test.ts",
+    "tests/browser/content.test.ts",
+    "tests/browser/a11y.test.ts",
+    "tools/runner.mjs",
+    "tools/tests/runner.test.mjs",
+    "PROJECT_STATUS-PHASE-2.5.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "DECISIONS.md"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0187"],
+  "tests": {
+    "install": {"command": "npm ci --no-fund", "durationSeconds": 12.2, "result": "exit 0, 6 vulnerabilities (1 high, 5 moderate)"},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "durationSeconds": 1.6, "total": 216, "pass": 216, "fail": 0, "skip": 0},
+    "databaseBeforeFix": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 254.3, "total": 335, "pass": 334, "fail": 1, "skip": 0},
+    "databaseAfterFix": {"command": "node --test \"tests/db/breeds.test.ts\"", "durationSeconds": 3.9, "total": 8, "pass": 8, "fail": 0, "skip": 0},
+    "browserBeforeFix": {"command": "node tools/browser-tests.mjs", "durationSeconds": 417.2, "total": 162, "pass": 154, "fail": 7, "skip": 1},
+    "browserIsolated": {"command": "node tools/browser-tests.mjs tests/browser/communities.test.ts tests/browser/kennel.test.ts tests/browser/content.test.ts", "durationSeconds": 65.4, "total": 13, "pass": 10, "fail": 3, "skip": 0, "note": "communities 6/6 and kennel 4/4 passed; content failed on the reproduced version race before its fix"},
+    "contentRepeats": [
+      {"command": "node tools/browser-tests.mjs tests/browser/a11y.test.ts tests/browser/content.test.ts", "durationSeconds": 14.1, "total": 8, "pass": 8, "fail": 0, "skip": 0},
+      {"command": "node tools/browser-tests.mjs tests/browser/content.test.ts", "durationSeconds": 11.3, "total": 3, "pass": 3, "fail": 0, "skip": 0},
+      {"command": "node tools/browser-tests.mjs tests/browser/content.test.ts", "durationSeconds": 11.7, "total": 3, "pass": 3, "fail": 0, "skip": 0}
+    ],
+    "browserAfterFix": {"command": "node tools/browser-tests.mjs", "durationSeconds": 372.6, "total": 161, "pass": 161, "fail": 0, "skip": 0},
+    "runner": {"command": "node --test tools/tests/runner.test.mjs", "durationSeconds": 12.8, "total": 18, "pass": 18, "fail": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 in 10.4 s on 615be51 after its build, and exit 0 in 3.5 s again after the three test files were changed."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5.25 production build exit 0 in 44 s. The first attempt crashed with a V8 heap out-of-memory in the static page worker while 2.4 GB was free; the identical second attempt passed. Recorded as an environment limitation, not hidden."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=4 \"tests/db/*.test.ts\" ; node --test \"tests/db/breeds.test.ts\" ; node --test tools/tests/runner.test.mjs",
+      "result": "PASS",
+      "evidence": "Domain+config+UI 216/216. Database 334/335 on 615be51 with the single failure being the breed list drift; after aligning the expectation that file passed 8/8, and no other database file changed. Runner 18/18 including the new phase 2.5 case."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "Full isolated matrix on the fixed tree: 161 tests, 161 pass, 0 fail, 0 skip, exit 0, 372.6 s. The earlier unfixed run (154 pass, 7 fail, 1 skip) and the isolated reruns are in tests and in docs/qa/phase-2.5-baseline.md. Includes release.test.ts (every sitemap address answers 200, none guarded) and privacy.test.ts (anonymous, non-owner and malformed private file requests refused)."
+    },
+    {
+      "id": "baseline-truthfulness",
+      "command": "manual review of every failure against log text, git show --stat 5b3ed72, src/content/editor.tsx and the Phase 2 handoff documents",
+      "result": "PASS",
+      "evidence": "Every failing, skipped and crashed run is recorded with its count and cause; environmental failures are labelled environmental only after passing in isolation; the flaky scenario is marked fixed by root cause with the caveat that three green repeats do not prove a timing race absent; drift between docs and HEAD is tabulated in docs/qa/phase-2.5-baseline.md section 5."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Machine memory: 2.2-2.4 GB free of 16 GB during the run. One build crashed with OOM and one full browser run lost the communities suite to a renderer crash; both were environmental and passed on rerun, but the same pressure can recur on this machine.",
+    "The kennel stability timeout did not reproduce alone or in the second full run; its cause is not proven beyond load.",
+    "The content version race is fixed by root cause; three isolated green repeats and one full green run are evidence, not proof, for a timing race.",
+    "No CI exists (.github absent). GitHub Actions is required for Phase 2.5 delivery and belongs to PROMPT-016.",
+    "npm audit: postcss (high, via next, fix is next@16 major) and esbuild (moderate, via drizzle-kit) remain open.",
+    "31 migrations have no per-migration rollback note; rollback is snapshot restore per docs/ops/runbook.md.",
+    "Global and directory search filter in memory; stale comments still say PROMPT-012 would index them.",
+    "No field Core Web Vitals measurement and no real screen reader run.",
+    "80 abandoned hamzist_test_* databases remain in local Postgres from earlier interrupted runs; not deleted because they belong to the user's environment.",
+    "The Phase 2.5 package directory is untracked by the user's own uncommitted .gitignore change; the Runner reads it in place, so a fresh clone cannot run phase 2.5 prompts without the package.",
+    "Real SMS, gateway and map credentials are not configured; nothing was sent, paid, pushed or deployed."
+  ],
+  "readiness": {
+    "code": "BASELINE_VERIFIED",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "docs/qa/phase-2.5-baseline.md",
+    "docs/reports/PHASE-2.5-PROMPT-001.json"
+  ]
+}

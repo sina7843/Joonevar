@@ -89,3 +89,10 @@
 | P2-R20 — آمادگی انتشار و تحویل | PROMPT-020 | [PROMPT-020-REPORT.md](docs/reports/PROMPT-020-REPORT.md) · `tests/browser/release.test.ts` (دنبال‌کردن نشانی‌های sitemap، لینک‌های داخلی، سلامت) · `src/health/service.ts` و `tests/db/startup.test.ts` (نسل Taxonomy در گزارش سلامت) · `tests/browser/content.test.ts` (پیام شکست گویا) · اسناد تحویل: [release-readiness-phase-2.md](docs/ops/release-readiness-phase-2.md)، [runbook.md §۹](docs/ops/runbook.md)، [operator-guide.md §۸](docs/ops/operator-guide.md)، [phase-2-acceptance.md](docs/qa/phase-2-acceptance.md) · DEC-0180 |
 | P2-D05، P2-D09 در برابر D01 | PROMPT-001 | DEC-0145 |
 | P2-D15 | PROMPT-001 | DEC-0146 و [phase-2-boundary.md](docs/architecture/phase-2-boundary.md) §۳ |
+
+## فاز ۲.۵ — شواهد اجرا
+
+| الزام / معیار پذیرش | مراحل | شاهد |
+|---|---|---|
+| A01 — تست کامل HEAD و baseline مستند (R7 کیفیت: تست کامل HEAD، رفع flaky test، migration validation) | PROMPT-001 | [phase-2.5-baseline.md](docs/qa/phase-2.5-baseline.md) روی `615be51` · `docs/reports/PHASE-2.5-PROMPT-001.json` · `tests/db/breeds.test.ts` (drift قرارداد تصویر نژاد) · `tests/browser/content.test.ts` (رفع ریشه‌ای race نسخه در آپلود تصویر و تست ۳۰۴) · `tests/browser/a11y.test.ts` · `tools/runner.mjs`، `tools/tests/runner.test.mjs`، `PROJECT_STATUS-PHASE-2.5.md` · DEC-0187 |
+| R7 — CI، آسیب‌پذیری، rollback migration، امنیت مدارک، a11y/performance | PROMPT-001 (ممیزی)، PROMPT-016 (رفع) | ممیزی در [phase-2.5-baseline.md](docs/qa/phase-2.5-baseline.md) §۴؛ CI وجود ندارد، ۶ یافته `npm audit`، ۳۱ migration بدون یادداشت rollback |
