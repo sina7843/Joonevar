@@ -24,6 +24,8 @@ import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
+import { promotedTargetIds } from '../advertising/service.ts';
+import { compareRanked, promotedWhenRelevant, rankTier } from '../search/model.ts';
 import { normalizeForSearch, unifyPersianLetters } from '../breeds/model.ts';
 import { isLicenceStatus, type LicenceStatusName } from '../centres/model.ts';
 import {
@@ -877,6 +879,9 @@ export interface CommunityCard {
   readonly owned: boolean;
   readonly registered: boolean;
   readonly upcomingEvents: number;
+  readonly complete: boolean;
+  /** A live advertising package, shown with its own label and nothing implied. */
+  readonly promoted: boolean;
 }
 
 export async function publishedCommunities(
@@ -898,11 +903,13 @@ export async function publishedCommunities(
       if (term !== '' && !normalizeForSearch(entry.community.displayNameFa).includes(term)) return false;
       return true;
     })
-    // Neutral order until the versioned ranking of PROMPT-012 (P2-D05).
     .sort((a, b) => a.community.displayNameFa.localeCompare(b.community.displayNameFa, 'fa'));
 
+  // §15 bands. An association or club has no Phase 1 trust axis of its own, so
+  // its recorded registration is the verified band (DEC-0172).
+  const promoted = await promotedTargetIds(database, 'COMMUNITY');
   const request = { page: query.page, pageSize: query.pageSize ?? 24 };
-  const items = filtered.slice(offsetOf(request), offsetOf(request) + request.pageSize).map((entry) => ({
+  const cards = filtered.map((entry) => ({
     slug: entry.community.publicSlug!,
     kind: entry.community.kind as CommunityKind,
     nameFa: entry.community.displayNameFa,
@@ -912,8 +919,17 @@ export async function publishedCommunities(
     owned: entry.community.ownerAccountId !== null,
     registered: entry.community.licenceStatus === 'VALID',
     upcomingEvents: entry.events.filter((event) => event.status === 'PUBLISHED' && isUpcoming(event, today)).length,
+    complete: communityCompleteness(completenessInputOf(entry)).complete,
+    promoted: promotedWhenRelevant(promoted.has(entry.community.id), true),
   }));
-  return { ...pageOf(items, filtered.length, request), publishedTotal: facts.length };
+  const ranked = [...cards].sort((a, b) =>
+    compareRanked(
+      { tier: rankTier({ promoted: a.promoted, trusted: false, verified: a.registered, complete: a.complete }), nameFa: a.nameFa },
+      { tier: rankTier({ promoted: b.promoted, trusted: false, verified: b.registered, complete: b.complete }), nameFa: b.nameFa },
+    ),
+  );
+  const items = ranked.slice(offsetOf(request), offsetOf(request) + request.pageSize);
+  return { ...pageOf(items, ranked.length, request), publishedTotal: facts.length };
 }
 
 export interface CommunityPublicPage {

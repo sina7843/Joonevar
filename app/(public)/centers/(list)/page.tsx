@@ -226,6 +226,11 @@ export default async function CentersPage({ searchParams }: { searchParams: Prom
                       </span>
                     ) : null}
                     <span className="flex flex-wrap gap-xs pt-2xs">
+                      {centre.promoted ? (
+                        <span data-testid={'promoted-' + centre.slug}>
+                          <StatusBadge tone="info">تبلیغ</StatusBadge>
+                        </span>
+                      ) : null}
                       {centre.owned ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
                       {centre.verified ? <StatusBadge tone="info">مجوز معتبر</StatusBadge> : null}
                       {centre.open24h ? <StatusBadge tone="neutral">شبانه‌روزی</StatusBadge> : null}

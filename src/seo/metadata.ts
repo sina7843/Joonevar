@@ -39,6 +39,11 @@ export interface PageSeo {
   /** Required for DUPLICATE: the path of the record this one duplicates. */
   readonly primaryPath?: string;
   readonly type?: 'website' | 'article';
+  /**
+   * A page that must never be indexed whatever its state: a search page is a
+   * view of other pages, not a page of its own (§19).
+   */
+  readonly noindex?: boolean;
   /** The page's own image (a content image); otherwise the official symbol. */
   readonly image?: { readonly path: string; readonly alt: string };
 }
@@ -81,7 +86,7 @@ export function buildMetadata(page: PageSeo, site: SiteContext): Metadata {
     title: { absolute: fullTitle },
     description,
     alternates: { canonical },
-    robots: { index: site.production && state === 'PUBLISHED', follow: site.production },
+    robots: { index: site.production && state === 'PUBLISHED' && page.noindex !== true, follow: site.production },
     openGraph: {
       type: page.type ?? 'website',
       locale: 'fa_IR',

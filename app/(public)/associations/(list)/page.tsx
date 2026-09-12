@@ -209,6 +209,11 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
                       </span>
                     ) : null}
                     <span className="flex flex-wrap gap-xs pt-2xs">
+                      {community.promoted ? (
+                        <span data-testid={'promoted-' + community.slug}>
+                          <StatusBadge tone="info">تبلیغ</StatusBadge>
+                        </span>
+                      ) : null}
                       {community.owned ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
                       {community.registered ? <StatusBadge tone="info">ثبت معتبر</StatusBadge> : null}
                       {community.upcomingEvents > 0 ? <StatusBadge tone="success">{fa(community.upcomingEvents) + ' رویداد پیش‌رو'}</StatusBadge> : null}

@@ -1,0 +1,72 @@
+{
+  "promptId": "PROMPT-012",
+  "status": "COMPLETE",
+  "summary": "Global search, filters and ranking. A new search module holds the two rules that decide what a visitor sees: which records a typed term finds, and in what order matching records are shown. The order is the five bands of §15 — PROMOTED, TRUSTED, VERIFIED, COMPLETE, BASE — implemented as bands rather than a score, so no pair of lower axes ever overtakes a higher band, and inside a band the order stays neutral and alphabetical. An advertising package reaches the top band only through promotedWhenRelevant, the single path to it: a record that does not match the term, the place or the topic is not in the result set at all, so an irrelevant advertisement buys no placement. Every answer and the page itself carry RANKING_VERSION, so an order a visitor saw can be traced to the rule that produced it. Spelling tolerance forgives one edit per word on words of at least four characters, matched word by word: matching the whole typed phrase as one run of letters had made two different names a single edit apart into the same search, which the database test caught and the rule now prevents. A geographic or professional filter is answered only by the directories, because a breed page or an article has no city and no licence, and the page says plainly which kinds were left out and why. The three public directories now rank by the same bands and show the «تبلیغ» label, so one rule orders every list. /search is not a §4 section: it is its own public route, opened from a header search box, carrying its whole query in the address and published with a new noindex option in buildMetadata, since a search page is a view of other pages rather than a page of its own.",
+  "changedFiles": [
+    "src/search/model.ts",
+    "src/search/service.ts",
+    "src/vets/directory.ts",
+    "src/centres/service.ts",
+    "src/communities/service.ts",
+    "src/seo/metadata.ts",
+    "src/authz/routes.ts",
+    "src/public/site-shell.tsx",
+    "app/(public)/search/(list)/page.tsx",
+    "app/(public)/search/(list)/loading.tsx",
+    "app/(public)/veterinarians/(list)/page.tsx",
+    "app/(public)/centers/(list)/page.tsx",
+    "app/(public)/associations/(list)/page.tsx",
+    "tests/domain/search.test.ts",
+    "tests/db/search.test.ts",
+    "tests/browser/search.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-012-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-012/search-desktop.png",
+    "docs/reports/screenshots/phase-2/prompt-012/search-filtered-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-012/search-empty-mobile.png"
+  ],
+  "decisions": ["DEC-0172"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0, with the new /search route listed."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/search.test.ts tests/db/search.test.ts && node --test --test-concurrency=1 tests/ui/seo.test.ts tests/ui/routes.test.ts tests/db/vet-directory.test.ts tests/db/centres.test.ts tests/db/communities.test.ts tests/db/advertising.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. New suites: tests 9 · pass 9 · fail 0. tests/domain/search.test.ts pins the named ranking rule and the five bands, that two lower axes never overtake a higher band, that an advertisement which does not match keeps no higher place, the band-then-alphabetical order, and that one edit is forgiven per word of four characters or more while a short term stays exact. tests/db/search.test.ts on a freshly migrated database: a published club is found by term and by a misspelling while a draft is not searchable at all, and the answer reports the ranking version; a live package moves a record to the top of the matching list with tier PROMOTED while claiming nothing else about it, the same bands order the public directory list, a search the promoted record does not match does not return it, and an expired period drops the promotion; a province filter is answered by the directories only, reports the skipped kinds, and another province does not return the club, while a kind filter narrows the same list; paging walks one ordered list with no record repeated across pages. Regression: tests 64 · pass 64 · fail 0 over tests/ui/seo.test.ts and tests/ui/routes.test.ts (the new public /search rule and the noindex option) and tests/db/vet-directory.test.ts, tests/db/centres.test.ts, tests/db/communities.test.ts and tests/db/advertising.test.ts (the cards gained promoted and complete and the lists gained the band order). Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/search.test.ts && node tools/browser-tests.mjs tests/browser/public-shell.test.ts tests/browser/vet-directory.test.ts tests/browser/centres.test.ts tests/browser/communities.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/search.test.ts 4/4: the superadmin records and publishes a club, which then becomes searchable; a visitor searches from the header search box, lands on /search with the query in the address, reads the result and the named ranking version, and narrows the same list by result type; a phone-width visitor with a province filter is told which kinds cannot be answered geographically, and an empty search offers a way back; the search page reports noindex and keeps its whole query in the address. Regression on the same build: tests/browser/public-shell.test.ts, tests/browser/vet-directory.test.ts, tests/browser/centres.test.ts and tests/browser/communities.test.ts 20/20 — the header gained a search box without disturbing the pinned navigation, and the three directory lists still read correctly under the new band order. Screenshots regenerated for prompts 002, 006, 008 and 010 by the regression were restored with git checkout; only prompt-012 evidence is new. As in PROMPT-010 and PROMPT-011, npm run build was run before the browser suites because the harness serves the existing .next. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No real search index: all six sources are read and ranked in memory with a 500-record ceiling per source, exactly as the existing directories already worked; moving them behind one indexed query is a database change of its own.",
+    "Spelling tolerance is one edit per word on words of four characters or more — not transliteration, phonetics or synonyms; a breed's English name comes from the breed bank and alternative names are matched only in that source.",
+    "Ordering inside a band is alphabetical: no quality signal, geographic distance or recency enters the order, because none of them is defined in the sources.",
+    "Autocomplete and «near me» were not built; neither is asked for in the sources.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the search page is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "SEARCH_AND_RANKING_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

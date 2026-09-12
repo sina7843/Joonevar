@@ -40,6 +40,20 @@ export async function SiteShell({ children }: { children: ReactNode }) {
             <DesktopNav links={links} />
           </div>
           <div className="flex shrink-0 items-center gap-xs">
+            {/* Plain GET form: a search is an address a visitor can share (§16). */}
+            <form method="get" action="/search" role="search" className="hidden sm:flex" data-testid="site-search">
+              <label htmlFor="site-search-input" className="sr-only">
+                جست‌وجو در همزیست
+              </label>
+              <input
+                id="site-search-input"
+                name="q"
+                type="search"
+                placeholder="جست‌وجو"
+                className="w-[9rem] rounded-md border border-border-subtle bg-bg-canvas px-md text-body-sm text-text-primary min-h-[var(--size-control-sm)] focus:border-border-brand lg:w-[14rem]"
+                data-testid="site-search-input"
+              />
+            </form>
             <Link
               href={account.href}
               className="inline-flex min-h-[var(--size-control-sm)] items-center rounded-md bg-action-primary-default px-md text-label-md text-action-primary-on hover:opacity-90"

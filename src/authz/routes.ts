@@ -31,6 +31,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/articles', access: 'PUBLIC' },
   { prefix: '/news', access: 'PUBLIC' },
   { prefix: '/announcements', access: 'PUBLIC' },
+  // Global search across the public sections (§16). Not a section of §4 itself.
+  { prefix: '/search', access: 'PUBLIC' },
   // Content images: the route itself serves only images of visible content (DEC-0160).
   { prefix: '/media', access: 'PUBLIC' },
   { prefix: '/robots.txt', access: 'PUBLIC' },

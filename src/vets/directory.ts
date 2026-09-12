@@ -28,6 +28,8 @@ import {
 import { recordAudit } from '../audit/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
+import { promotedTargetIds } from '../advertising/service.ts';
+import { compareRanked, promotedWhenRelevant, rankTier } from '../search/model.ts';
 import { normalizeForSearch, unifyPersianLetters } from '../breeds/model.ts';
 import {
   completeness,
@@ -634,6 +636,9 @@ export interface VetCard {
   readonly owned: boolean;
   readonly verified: boolean;
   readonly trusted: boolean;
+  readonly complete: boolean;
+  /** A live advertising package, shown with its own label and nothing implied. */
+  readonly promoted: boolean;
 }
 
 export async function publishedVets(
@@ -675,11 +680,13 @@ export async function publishedVets(
       }
       return true;
     })
-    // Neutral order until the versioned ranking of PROMPT-012/015: no axis buys a higher place (P2-D05).
     .sort((a, b) => a.profile.displayNameFa.localeCompare(b.profile.displayNameFa, 'fa'));
 
+  // §15: advertising first among records that match, then trusted, verified,
+  // complete and base. A package buys placement only (P2-D05, DEC-0172).
+  const promoted = await promotedTargetIds(database, 'VET');
   const request = { page: query.page, pageSize: query.pageSize ?? 24 };
-  const items = filtered.slice(offsetOf(request), offsetOf(request) + request.pageSize).map((entry) => ({
+  const cards = filtered.map((entry) => ({
     slug: entry.profile.publicSlug!,
     nameFa: entry.profile.displayNameFa,
     headlineFa: entry.profile.headlineFa,
@@ -688,8 +695,18 @@ export async function publishedVets(
     owned: entry.profile.accountId !== null,
     verified: entry.profile.councilVerifiedAt !== null,
     trusted: entry.trusted,
+    complete: completeness(completenessInputOf(entry)).complete,
+    // Only a record that already matched this search can be promoted (§15).
+    promoted: promotedWhenRelevant(promoted.has(entry.profile.id), true),
   }));
-  return { ...pageOf(items, filtered.length, request), publishedTotal: facts.length };
+  const ranked = [...cards].sort((a, b) =>
+    compareRanked(
+      { tier: rankTier({ promoted: a.promoted, trusted: a.trusted, verified: a.verified, complete: a.complete }), nameFa: a.nameFa },
+      { tier: rankTier({ promoted: b.promoted, trusted: b.trusted, verified: b.verified, complete: b.complete }), nameFa: b.nameFa },
+    ),
+  );
+  const items = ranked.slice(offsetOf(request), offsetOf(request) + request.pageSize);
+  return { ...pageOf(items, ranked.length, request), publishedTotal: facts.length };
 }
 
 export interface VetPublicPage {

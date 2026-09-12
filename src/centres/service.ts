@@ -35,6 +35,8 @@ import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
+import { promotedTargetIds } from '../advertising/service.ts';
+import { compareRanked, promotedWhenRelevant, rankTier } from '../search/model.ts';
 import { normalizeForSearch, unifyPersianLetters } from '../breeds/model.ts';
 import { directoryReferenceData } from '../vets/directory.ts';
 import {
@@ -1056,6 +1058,9 @@ export interface CentreCard {
   readonly verified: boolean;
   readonly open24h: boolean;
   readonly serves: boolean;
+  readonly complete: boolean;
+  /** A live advertising package, shown with its own label and nothing implied. */
+  readonly promoted: boolean;
 }
 
 export async function publishedCentres(database: DbClient, query: CentreQuery): Promise<Page<CentreCard> & { publishedTotal: number }> {
@@ -1087,11 +1092,13 @@ export async function publishedCentres(database: DbClient, query: CentreQuery): 
       }
       return true;
     })
-    // Neutral order until the versioned ranking of PROMPT-012/015 (P2-D05).
     .sort((a, b) => a.centre.displayNameFa.localeCompare(b.centre.displayNameFa, 'fa'));
 
+  // §15 bands: advertising among matching records first, then the recorded
+  // axes. Being a Hamzist service partner is the centre's trust axis (DEC-0172).
+  const promoted = await promotedTargetIds(database, 'CENTRE');
   const request = { page: query.page, pageSize: query.pageSize ?? 24 };
-  const items = filtered.slice(offsetOf(request), offsetOf(request) + request.pageSize).map((entry) => ({
+  const cards = filtered.map((entry) => ({
     slug: entry.centre.publicSlug!,
     nameFa: entry.centre.displayNameFa,
     typeFa: entry.typeNameFa,
@@ -1101,8 +1108,17 @@ export async function publishedCentres(database: DbClient, query: CentreQuery): 
     verified: entry.centre.licenceStatus === 'VALID',
     open24h: placesOf(entry).some((place) => place.isOpen24h),
     serves: servesHamzist(entry),
+    complete: centreCompleteness(completenessInputOf(entry)).complete,
+    promoted: promotedWhenRelevant(promoted.has(entry.centre.id), true),
   }));
-  return { ...pageOf(items, filtered.length, request), publishedTotal: facts.length };
+  const ranked = [...cards].sort((a, b) =>
+    compareRanked(
+      { tier: rankTier({ promoted: a.promoted, trusted: a.serves, verified: a.verified, complete: a.complete }), nameFa: a.nameFa },
+      { tier: rankTier({ promoted: b.promoted, trusted: b.serves, verified: b.verified, complete: b.complete }), nameFa: b.nameFa },
+    ),
+  );
+  const items = ranked.slice(offsetOf(request), offsetOf(request) + request.pageSize);
+  return { ...pageOf(items, ranked.length, request), publishedTotal: facts.length };
 }
 
 export interface CentrePublicPage {
