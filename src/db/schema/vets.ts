@@ -2,9 +2,11 @@ import { sql } from 'drizzle-orm';
 import {
   boolean,
   check,
+  date,
   doublePrecision,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -53,6 +55,12 @@ export const visitRequestStatus = pgEnum('visit_request_status', [
 
 /** Whether a veterinarian has a public directory page — independent of the Finder and of trust (DEC-0164). */
 export const vetPublicStatus = pgEnum('vet_public_status', ['DRAFT', 'PUBLISHED', 'HIDDEN']);
+
+/** General or specialist, inside a doctor's tag. NOT_DECLARED only for records older than the question (DEC-0188). */
+export const vetPracticeScope = pgEnum('vet_practice_scope', ['GENERAL', 'SPECIALIST', 'NOT_DECLARED']);
+
+/** Who the professional profile belongs to (Phase 2.5 R1). Null on an unowned directory suggestion. */
+export const vetApplicantType = pgEnum('vet_applicant_type', ['STUDENT', 'DOCTOR']);
 
 export const referralStatus = pgEnum('referral_status', [
   'ACTIVE',
@@ -118,6 +126,29 @@ export const vetProfiles = pgTable(
     /** Hidden by a reviewer: the owner cannot publish it again on their own (DEC-0166). */
     hiddenByReview: boolean('hidden_by_review').notNull().default(false),
 
+    // ── Canonical professional profile (Phase 2.5, PROMPT-003) ─────────────
+    // The verified or declared current values. What was submitted, version by
+    // version, is kept in `vet_professional_submission` and never overwritten.
+    applicantType: vetApplicantType('applicant_type'),
+    /** Not unique: no official numbering scheme is known across universities (DEC-0189). */
+    studentNumber: text('student_number'),
+    universityFa: text('university_fa'),
+    /** Null for a student or an unowned page; NOT_DECLARED for a doctor who was never asked. */
+    practiceScope: vetPracticeScope('practice_scope'),
+    councilVerifiedByAccountId: uuid('council_verified_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    /** Null means the account never said; nothing about a licence is assumed from its absence. */
+    hasLicence: boolean('has_licence'),
+    /** Independent of the council code. Not unique: the issuers' numbering is not known (DEC-0189). */
+    licenceCode: text('licence_code'),
+    /** «تاریخ پروانه» as the product names it; which date on the licence it is, is not specified. */
+    licenceDate: date('licence_date'),
+    licenceFileId: uuid('licence_file_id').references(() => storedFiles.id, { onDelete: 'restrict' }),
+    licenceVerifiedAt: timestamp('licence_verified_at', { withTimezone: true }),
+    licenceVerifiedByAccountId: uuid('licence_verified_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    websiteUrl: text('website_url'),
+    instagramHandle: text('instagram_handle'),
+    clinicNameFa: text('clinic_name_fa'),
+
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
@@ -133,6 +164,29 @@ export const vetProfiles = pgTable(
   },
   (t) => [
     check('vet_profile_not_merged_into_itself', sql`${t.mergedIntoProfileId} is null or ${t.mergedIntoProfileId} <> ${t.id}`),
+    // The combinations Phase 2.5 rules out, mirrored by `professionalFieldProblems` (DEC-0189).
+    check(
+      'vet_profile_student_fields_only_for_students',
+      // `is not distinct from`, not `=`: a null applicant type would make `=` null, and a null check passes.
+      sql`${t.applicantType} is not distinct from 'STUDENT' or (${t.studentNumber} is null and ${t.universityFa} is null)`,
+    ),
+    check(
+      'vet_profile_student_has_no_doctor_fields',
+      sql`${t.applicantType} is distinct from 'STUDENT' or (${t.councilCode} is null and ${t.councilVerifiedAt} is null and ${t.practiceScope} is null and ${t.hasLicence} is null)`,
+    ),
+    check(
+      'vet_profile_doctor_fields_need_a_doctor',
+      sql`${t.applicantType} is not distinct from 'DOCTOR' or (${t.practiceScope} is null and ${t.hasLicence} is null)`,
+    ),
+    check(
+      'vet_profile_licence_only_when_declared',
+      sql`${t.hasLicence} is true or (${t.licenceCode} is null and ${t.licenceDate} is null and ${t.licenceFileId} is null and ${t.licenceVerifiedAt} is null)`,
+    ),
+    check(
+      'vet_profile_licence_verified_with_evidence',
+      sql`${t.licenceVerifiedAt} is null or (${t.licenceCode} is not null and ${t.licenceDate} is not null and ${t.licenceFileId} is not null)`,
+    ),
+    check('vet_profile_council_verified_with_code', sql`${t.councilVerifiedAt} is null or ${t.councilCode} is not null`),
     uniqueIndex('vet_profile_account_key').on(t.accountId),
     uniqueIndex('vet_profile_council_code_key').on(t.councilCode),
     uniqueIndex('vet_profile_public_slug_key').on(t.publicSlug),
@@ -426,8 +480,6 @@ export const vetApplicationDocuments = pgTable(
 
 /** The one public professional description of an account (PHASE_2_5_SPEC_FA §3). Never a permission. */
 export const vetTag = pgEnum('vet_tag', ['STUDENT', 'UNLICENSED', 'LICENSED', 'TRUSTED']);
-/** General or specialist, inside a doctor's tag. NOT_DECLARED only for records older than the question (DEC-0188). */
-export const vetPracticeScope = pgEnum('vet_practice_scope', ['GENERAL', 'SPECIALIST', 'NOT_DECLARED']);
 
 /**
  * Every tag an account has held. A row is written once and may only be ended
@@ -459,6 +511,181 @@ export const vetTagAssignments = pgTable(
     check('vet_tag_assignment_scope_fits_tag', sql`(${t.tag} = 'STUDENT') = (${t.practiceScope} is null)`),
     check('vet_tag_assignment_ends_after_start', sql`${t.endedAt} is null or ${t.endedAt} >= ${t.startedAt}`),
   ],
+);
+
+// ── Professional cases and evidence (Phase 2.5, PROMPT-003) ────────────────
+
+export const vetCaseType = pgEnum('vet_case_type', ['STUDENT', 'COUNCIL', 'LICENCE', 'CLAIM']);
+export const vetCaseStatus = pgEnum('vet_case_status', [
+  'DRAFT',
+  'SUBMITTED',
+  'UNDER_REVIEW',
+  'NEEDS_CORRECTION',
+  'REJECTED',
+  'WITHDRAWN',
+  'VERIFIED_STUDENT',
+  'VERIFIED_NO_LICENSE',
+  'LICENSE_APPROVED_AWAITING_PAYMENT',
+  'ACTIVE_LICENSED_VET',
+  'EXPIRED',
+  'SUSPENDED',
+]);
+export const vetProfessionalDocumentKind = pgEnum('vet_professional_document_kind', [
+  'STUDENT_CARD',
+  'COUNCIL_CARD',
+  'PRACTICE_LICENCE',
+  'CERTIFICATE',
+  'IDENTITY',
+  'OTHER',
+]);
+
+/** What one account asks to have verified, and where that request stands (PHASE_2_5_SPEC_FA §4). */
+export const vetProfessionalCases = pgTable(
+  'vet_professional_case',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    vetProfileId: uuid('vet_profile_id').references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    caseType: vetCaseType('case_type').notNull(),
+    status: vetCaseStatus('status').notNull().default('DRAFT'),
+    /** The latest submission; 0 while a draft has none. */
+    currentSubmissionVersion: integer('current_submission_version').notNull().default(0),
+    /** The Phase 2 application this case mirrors, if it started as one. */
+    legacyApplicationId: uuid('legacy_application_id').references(() => vetApplications.id, { onDelete: 'restrict' }),
+    reviewNoteFa: text('review_note_fa'),
+    reviewedByAccountId: uuid('reviewed_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_professional_case_legacy_key').on(t.legacyApplicationId),
+    // One open case of each type per account; a closed one stays as history.
+    uniqueIndex('vet_professional_case_open_key')
+      .on(t.accountId, t.caseType)
+      .where(sql`${t.status} in ('DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'NEEDS_CORRECTION')`),
+    index('vet_professional_case_status_idx').on(t.status, t.updatedAt),
+    check('vet_professional_case_version_not_negative', sql`${t.currentSubmissionVersion} >= 0`),
+  ],
+);
+
+/** Exactly what was submitted, version by version. A trigger refuses every update and delete. */
+export const vetProfessionalSubmissions = pgTable(
+  'vet_professional_submission',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => vetProfessionalCases.id, { onDelete: 'restrict' }),
+    version: integer('version').notNull(),
+    submittedByAccountId: uuid('submitted_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }).notNull().default(now),
+    payload: jsonb('payload').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_professional_submission_version_key').on(t.caseId, t.version),
+    check('vet_professional_submission_version_positive', sql`${t.version} >= 1`),
+  ],
+);
+
+/** Private evidence attached to one submission. A trigger refuses every update and delete. */
+export const vetProfessionalDocuments = pgTable(
+  'vet_professional_document',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => vetProfessionalCases.id, { onDelete: 'restrict' }),
+    submissionVersion: integer('submission_version').notNull(),
+    kind: vetProfessionalDocumentKind('kind').notNull(),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => storedFiles.id, { onDelete: 'restrict' }),
+    /** A certificate's name, as the applicant gave it. */
+    titleFa: text('title_fa'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_professional_document_file_key').on(t.fileId),
+    index('vet_professional_document_case_idx').on(t.caseId, t.submissionVersion),
+  ],
+);
+
+/** Services a veterinarian may list. Reference data: rows arrive by migration (DEC-0189). */
+export const vetServices = pgTable(
+  'vet_service',
+  {
+    code: text('code').primaryKey(),
+    nameFa: text('name_fa').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+  },
+  (t) => [uniqueIndex('vet_service_name_fa_key').on(t.nameFa)],
+);
+
+export const vetProfileServices = pgTable(
+  'vet_profile_service',
+  {
+    vetProfileId: uuid('vet_profile_id')
+      .notNull()
+      .references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    serviceCode: text('service_code')
+      .notNull()
+      .references(() => vetServices.code, { onDelete: 'restrict' }),
+  },
+  (t) => [primaryKey({ columns: [t.vetProfileId, t.serviceCode] })],
+);
+
+/** Equipment a veterinarian may declare. Declared, not proven: shown as «تجهیزات اعلام‌شده». */
+export const vetEquipment = pgTable(
+  'vet_equipment',
+  {
+    code: text('code').primaryKey(),
+    nameFa: text('name_fa').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+  },
+  (t) => [uniqueIndex('vet_equipment_name_fa_key').on(t.nameFa)],
+);
+
+export const vetProfileEquipment = pgTable(
+  'vet_profile_equipment',
+  {
+    vetProfileId: uuid('vet_profile_id')
+      .notNull()
+      .references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    equipmentCode: text('equipment_code')
+      .notNull()
+      .references(() => vetEquipment.code, { onDelete: 'restrict' }),
+    declaredAt: timestamp('declared_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [primaryKey({ columns: [t.vetProfileId, t.equipmentCode] })],
+);
+
+/** Certificates on the profile. Removing one keeps the row with `removed_at`; the file stays private. */
+export const vetProfileCertificates = pgTable(
+  'vet_profile_certificate',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    vetProfileId: uuid('vet_profile_id')
+      .notNull()
+      .references(() => vetProfiles.id, { onDelete: 'restrict' }),
+    titleFa: text('title_fa').notNull(),
+    issuerFa: text('issuer_fa'),
+    issuedOn: date('issued_on'),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => storedFiles.id, { onDelete: 'restrict' }),
+    removedAt: timestamp('removed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('vet_profile_certificate_file_key').on(t.fileId), index('vet_profile_certificate_profile_idx').on(t.vetProfileId)],
 );
 
 // ── Veterinary centres (Phase 2, PROMPT-008) ───────────────────────────────

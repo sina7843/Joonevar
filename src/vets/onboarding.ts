@@ -43,6 +43,7 @@ import {
 } from './onboarding-model.ts';
 import { LEGACY_APPLICATION_STATUS, tagForCaseStatus } from './professional-model.ts';
 import { replaceVetTag } from './professional-tags.ts';
+import { attachCaseDocument, syncLegacyCase, type CaseRef } from './professional-cases.ts';
 import type { Actor, ActorContextName } from '../authz/actor.ts';
 
 export type VetApplicationRow = typeof vetApplications.$inferSelect;
@@ -198,6 +199,7 @@ async function attachDocuments(
   storageRoot: string,
   actor: Actor,
   applicationId: string,
+  caseRef: CaseRef,
   documents: readonly ApplicationDocumentInput[],
 ): Promise<void> {
   for (const document of documents) {
@@ -208,6 +210,8 @@ async function attachDocuments(
       originalName: document.originalName ?? null,
     });
     await tx.insert(vetApplicationDocuments).values({ applicationId, fileId: stored.id, kind: document.kind as VetDocumentKind });
+    // The same file, as evidence of the submission it arrived with (PROMPT-003).
+    await attachCaseDocument(tx, caseRef, { fileId: stored.id, kind: document.kind as VetDocumentKind });
   }
 }
 
@@ -237,7 +241,8 @@ export async function submitVetApplication(
         .insert(vetApplications)
         .values({ accountId: actor.accountId, kind, vetProfileId: target?.id ?? null, ...fields, submittedAt: now })
         .returning();
-      await attachDocuments(tx, storageRoot, actor, row!.id, input.documents);
+      const caseRef = await syncLegacyCase(tx, row!, { newSubmission: true }, now);
+      await attachDocuments(tx, storageRoot, actor, row!.id, caseRef, input.documents);
       await recordAudit(tx, actor, {
         action: 'VET_APPLICATION_SUBMITTED',
         targetType: 'VET_APPLICATION',
@@ -319,7 +324,9 @@ export async function resubmitVetApplication(
         .where(and(eq(vetApplications.id, current.id), eq(vetApplications.version, current.version)))
         .returning();
       if (!row) throw conflict(STALE);
-      await attachDocuments(tx, storageRoot, actor, row.id, input.documents);
+      // A correction is a new version of the evidence; the one reviewed before stays as it was.
+      const caseRef = await syncLegacyCase(tx, row, { newSubmission: true }, now);
+      await attachDocuments(tx, storageRoot, actor, row.id, caseRef, input.documents);
       const diff = changed(
         { ...pick(current), status: current.status },
         { ...pick(row), status: row.status },
@@ -363,6 +370,7 @@ export async function withdrawVetApplication(
       .where(and(eq(vetApplications.id, current.id), eq(vetApplications.version, current.version)))
       .returning();
     if (!row) throw conflict(STALE);
+    await syncLegacyCase(tx, row, { newSubmission: false });
     await recordAudit(tx, actor, {
       action: 'VET_APPLICATION_WITHDRAWN',
       targetType: 'VET_APPLICATION',
@@ -407,6 +415,8 @@ export async function appealVetApplication(
         .where(and(eq(vetApplications.id, current.id), eq(vetApplications.version, current.version)))
         .returning();
       if (!row) throw conflict(STALE);
+      // The appeal is something the applicant sent: a new version, with the rejected one kept.
+      await syncLegacyCase(tx, row, { newSubmission: true }, now);
       await recordAudit(tx, actor, {
         action: 'VET_APPLICATION_APPEALED',
         targetType: 'VET_APPLICATION',
@@ -650,6 +660,7 @@ export async function decideVetApplication(
         .where(and(eq(vetApplications.id, current.id), eq(vetApplications.version, current.version)))
         .returning();
       if (!row) throw conflict(STALE);
+      await syncLegacyCase(tx, row, { newSubmission: false }, now);
       await recordAudit(tx, actor, {
         action: 'VET_APPLICATION_DECIDED',
         targetType: 'VET_APPLICATION',

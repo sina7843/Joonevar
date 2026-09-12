@@ -26,7 +26,7 @@ export const VET_PRACTICE_SCOPES = ['GENERAL', 'SPECIALIST', 'NOT_DECLARED'] as 
 export type VetPracticeScope = (typeof VET_PRACTICE_SCOPES)[number];
 
 /** Sources that may carry NOT_DECLARED: the migration backfill and approvals of the Phase 2 form. */
-export const LEGACY_TAG_SOURCES = ['BACKFILL_VET_PROFILE', 'LEGACY_VET_APPLICATION'] as const;
+export const LEGACY_TAG_SOURCES = ['BACKFILL_VET_PROFILE', 'LEGACY_VET_APPLICATION', 'LEGACY_VET_REGISTRY'] as const;
 
 const TAG_FA: Record<VetTag, string> = {
   STUDENT: 'دانشجوی دامپزشکی',

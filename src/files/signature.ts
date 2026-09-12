@@ -31,6 +31,7 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   ANIMAL_PHOTO: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   CONTENT_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   VET_APPLICATION_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
+  VET_PROFESSIONAL_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
   CENTRE_CLAIM_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
   // Public images of directory records: pictures only, never a document, and the
   // same ceiling a content image has, because they are served the same way.

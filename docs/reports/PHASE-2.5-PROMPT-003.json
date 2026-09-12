@@ -1,0 +1,122 @@
+{
+  "promptId": "PROMPT-003",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The canonical veterinary professional profile is the existing vet_profile row, which a unique index already ties one-to-one to its account; P2-D15 forbids a second vet record, so no parallel table was created. It gained applicant type, student number and university, general or specialist, who verified the council code, has-licence (null when never answered), an independent licence code, date and private file with their own verification, website, Instagram handle and clinic name, next to the existing council code, phone, directory fields and the tag history of PROMPT-002. The database refuses every combination the product rules out: a student with a council code, a scope or a licence answer; student or doctor fields without that applicant type; licence data without a declared licence; a licence verified without code, date and file; a council code verified without a code. Services and equipment are normalised catalogues with link tables, seeded only with what the product names (the four Phase 1 Finder service types with their existing labels, and the microchip reader); certificates are rows with private files, removed only by marking. What an applicant submits is kept apart from these current values: a professional case (student, council, licence or claim, with the PROMPT-002 statuses and one open case per type), numbered submissions holding the exact submitted payload, and documents tied to the submission they came with. A trigger refuses any update or delete of submissions and documents, so a correction is a new version and the evidence reviewed before survives. Migration 0032 types owned, council-coded profiles as doctors with an undeclared scope and no licence answer, records the verifier only where a Phase 2 approval did the verifying, and turns every Phase 2 application into a case with its submission and documents; Phase 2 submissions, corrections, appeals, withdrawals and decisions keep mirroring onto their case in the same transaction until PROMPT-004 to 007 replace them. Three read models answer three readers: the account's own dashboard (no reviewer identities), the reviewer view (every version, the other profiles sharing a council code, licence code or student number, and an audit record of the viewing), and the public view, built by listing allowed fields, which never carries a licence detail, a student number, a document or a workflow state and shows equipment as declared. Payloads are plain JSON with bounded lists, and GET /api/account/vet-profile serves the dashboard to a mobile client for the caller only. A new private file purpose is readable only by its owner and the reviewer side, and every read of it or of a Phase 2 application document is audited. The account vet-profile page shows the current tag and case statuses. The Phase 1 superadmin registry now gives a newly verified vet the unlicensed tag, closing a gap PROMPT-002 left, and never lowers a later tag.",
+  "changedFiles": [
+    "src/db/schema/vets.ts",
+    "src/db/schema/enums.ts",
+    "src/db/migrations/0032_vet-professional-profile.sql",
+    "src/db/migrations/meta/0032_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/files/signature.ts",
+    "src/files/storage.ts",
+    "src/authz/policy.ts",
+    "src/vets/professional-model.ts",
+    "src/vets/professional-profile-model.ts",
+    "src/vets/professional-profile.ts",
+    "src/vets/professional-cases.ts",
+    "src/vets/onboarding.ts",
+    "src/vets/registry.ts",
+    "app/api/account/vet-profile/route.ts",
+    "app/account/vet-profile/page.tsx",
+    "tests/domain/vet-professional-profile.test.ts",
+    "tests/db/vet-professional-profile.test.ts",
+    "tests/db/vet-professional-tags.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-003.json"
+  ],
+  "migrations": [
+    {
+      "file": "src/db/migrations/0032_vet-professional-profile.sql",
+      "additive": true,
+      "forwardSafe": "Adds enums, one file purpose value, eight tables, fourteen nullable vet_profile columns, foreign keys, indexes, six checks, two guard triggers, catalogue seed rows and backfills. Nothing is dropped, renamed or made NOT NULL. The checks are added before the backfill UPDATE, which only writes values they accept; the upgrade test proves it on Phase 1 and Phase 2 data.",
+      "rerun": "Recorded once by Drizzle; tests/db/migrations.test.ts proves a second run is a no-op.",
+      "rollbackNote": "The previous release reads none of the new columns or tables and still runs against this schema; Phase 2 application rows are untouched. To remove the feature: drop triggers vet_professional_submission_guard and vet_professional_document_guard, function vet_professional_evidence_guard(), the eight new tables, the fourteen vet_profile columns with their checks and foreign keys, and the four new enum types. The file_purpose value VET_PROFESSIONAL_DOCUMENT cannot be removed from a Postgres enum and is harmless unused. Data rollback is snapshot restore per docs/ops/runbook.md."
+    }
+  ],
+  "decisions": ["DEC-0189"],
+  "tests": {
+    "domainProfile": {"command": "node --test tests/domain/vet-professional-profile.test.ts tests/domain/vet-professional.test.ts tests/domain/migrations.test.ts", "total": 18, "pass": 18, "fail": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "durationSeconds": 1.9, "total": 230, "pass": 230, "fail": 0, "skip": 0},
+    "databaseFirstRun": {"command": "node --test --test-concurrency=2 tests/db/vet-onboarding.test.ts tests/db/vet-professional-tags.test.ts", "total": 15, "pass": 14, "fail": 1, "note": "The PROMPT-002 upgrade test removed only 0031 from its copied migrations folder, so 0032, which needs a type 0031 creates, broke the 'previous release'. Both upgrade tests now cut the journal and files from the target migration onward. No product code changed for it."},
+    "databaseAffected": {"command": "node --test --test-concurrency=3 tests/db/vet-professional-tags.test.ts tests/db/vet-professional-profile.test.ts tests/db/vet-onboarding.test.ts", "durationSeconds": 7.4, "total": 23, "pass": 23, "fail": 0},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 266.7, "total": 351, "pass": 351, "fail": 0, "skip": 0},
+    "browserAffected": {"command": "node tools/browser-tests.mjs tests/browser/vet-onboarding.test.ts tests/browser/vet-directory.test.ts tests/browser/vet-service.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts", "durationSeconds": 54.1, "total": 25, "pass": 25, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree including the route, the page change and both new test files."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 65.9 s in a detached worktree at HEAD 82aa429 with all 19 changed and new source, migration and test files copied in and npm ci run, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=4 \"tests/db/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "Domain+config+UI 230/230 (6 new). The complete database suite 351/351 (8 new), which applies 0032 in every suite and runs the Phase 2 onboarding, directory, merge and migration suites against it."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/vet-onboarding.test.ts tests/browser/vet-directory.test.ts tests/browser/vet-service.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts",
+      "result": "PASS",
+      "evidence": "25/25 on an isolated database and production server built from the worktree. Chosen because they pass through what changed: the account vet-profile page with its new card and the mirrored Phase 2 application (vet-onboarding), the extended vet_profile row (vet-directory, vet-service), and readPrivateFile, which now audits some reads (privacy, identity). The full 161-test matrix was not rerun; see limitations."
+    },
+    {
+      "id": "old-data-migration",
+      "command": "node --test tests/db/vet-professional-profile.test.ts (test: 0032 on Phase 1 and Phase 2 data…)",
+      "result": "PASS",
+      "evidence": "Migrations up to 0031 applied, then Phase 1 and Phase 2 rows written: a registry vet with a listed speciality, an approved applicant with its profile, an application in correction with a council-card document, a rejected claim on an unowned page. After 0032: both owned profiles are DOCTOR, NOT_DECLARED, has_licence null, no licence code or date, no student number; only the approved one has a verifier, the reviewer; the unowned page has no applicant type. Three cases with the mapped types and statuses (COUNCIL/VERIFIED_NO_LICENSE, COUNCIL/NEEDS_CORRECTION, CLAIM/REJECTED on the unowned page), one version-1 submission each with the submitted council code, the document linked to version 1 of its case, applications unchanged, no service or equipment claimed for anyone, and the listed speciality untouched."
+    },
+    {
+      "id": "invalid-cross-field-combinations",
+      "command": "node --test tests/db/vet-professional-profile.test.ts (test: the database refuses every cross-field combination…) ; node --test tests/domain/vet-professional-profile.test.ts",
+      "result": "PASS",
+      "evidence": "Eight combinations refused by the database with 23514 (student with council code; doctor with student number; untyped with student number; untyped with scope; licence code with no licence; licence code with the question unanswered; licence verified without its file; council verified without a code) and the complete verified licence accepted. The domain validator refuses eleven combinations including an impossible calendar date and accepts a legacy doctor with nothing declared."
+    },
+    {
+      "id": "privacy",
+      "command": "node --test tests/db/vet-professional-profile.test.ts (public, dashboard, reviewer and document tests)",
+      "result": "PASS",
+      "evidence": "The public payload has none of the seventeen forbidden keys at any depth, contains neither the licence code nor the licence file id anywhere in its text, shows the council code and phone only after consent, and is null for a hidden page or a malformed slug. The dashboard carries no reviewer, grantor or verifier id and gives a different account nothing at all. The reviewer view is refused to USER, TRUSTED_VET, ASSOCIATION_OPERATOR and CONTENT_ADMIN contexts, shows the profile sharing the licence code, and writes one VET_PROFESSIONAL_PROFILE_VIEWED audit event naming the reviewer. A professional document is read by its owner and the reviewer and refused to three other contexts; exactly two PRIVATE_FILE_READ events exist for it. A correction adds submission version 2 while version 1 still holds the original council code; changing or deleting a submission or document fails with 23001."
+    },
+    {
+      "id": "mobile-safe-payloads",
+      "command": "node --test tests/db/vet-professional-profile.test.ts ; node --test tests/domain/vet-professional-profile.test.ts",
+      "result": "PASS",
+      "evidence": "The public, dashboard and reviewer payloads each survive a JSON round trip unchanged (no Date, bigint or undefined) and stay within 2 KB, 16 KB and 32 KB respectively for a full profile; every list is capped at 50."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Phase 2 corrections overwrote the application in place, so migrated cases hold only the last submitted values as version 1; earlier values exist only as field diffs in the audit trail and were not reconstructed.",
+    "Public pages still render the Phase 2 directory view; publicProfessionalProfile is ready for PROMPT-014 to adopt. The JSON route covers the dashboard only; no public JSON route was added.",
+    "No write service or form yet sets student, scope, licence, website, Instagram, clinic, services, equipment or certificates; those are the PROMPT-004 to 006 flows. Values are therefore only backfilled or set by tests.",
+    "The service and equipment catalogues hold only what the product names; adding an entry is a data migration until a catalogue panel exists.",
+    "Student number and licence code are deliberately not unique; duplicates are surfaced to the reviewer instead.",
+    "Which date «تاریخ پروانه» is (issue or expiry) is not specified by the product; it is stored as one date.",
+    "The full 161-test browser matrix was not rerun; five suites passing through the changed code were.",
+    "Reading the reviewer view writes an audit row on every render."
+  ],
+  "readiness": {
+    "code": "CANONICAL_PROFILE_SCHEMA_MIGRATION_AND_READ_MODELS_READY",
+    "visual": "UNVERIFIED_SMALL_CARD_ADDED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-professional-profile.test.ts",
+    "tests/domain/vet-professional-profile.test.ts",
+    "src/db/migrations/0032_vet-professional-profile.sql",
+    "DECISIONS.md#dec-0189"
+  ]
+}

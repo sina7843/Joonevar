@@ -12,6 +12,7 @@ import { accountRoles, accounts } from '../db/schema/core.ts';
 import { vetLocations, vetProfiles } from '../db/schema/vets.ts';
 import { recordAudit } from '../audit/service.ts';
 import { conflict, forbidden, notFound, validation, versionStale } from '../domain/errors.ts';
+import { currentVetTag, replaceVetTag } from './professional-tags.ts';
 import {
   distanceKm,
   locationEligibility,
@@ -141,6 +142,17 @@ export async function upsertVetProfile(
       targetVersion: row.version,
       after: { accountId: row.accountId, councilCode: row.councilCode },
     });
+    // The registry verifies a council code, which supports the unlicensed tag. Only when the account has
+    // no tag yet: editing a registered vet must never lower a tag a payment or review has since raised.
+    if ((await currentVetTag(tx, account.id)) === null) {
+      await replaceVetTag(tx, actor, {
+        accountId: account.id,
+        tag: 'UNLICENSED',
+        practiceScope: 'NOT_DECLARED',
+        reasonFa: 'ثبت دامپزشک از محیط سوپرادمین با کد نظام تأییدشده',
+        source: { type: 'LEGACY_VET_REGISTRY', id: row.id },
+      });
+    }
     return row;
   });
 }

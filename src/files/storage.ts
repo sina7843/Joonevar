@@ -161,8 +161,20 @@ export async function readPrivateFile(
     }
   }
   const bytes = await fs.readFile(resolveWithinRoot(root, record.storageKey));
+  // Professional evidence is personal and legally meaningful: every view is recorded,
+  // by whom and in which context (PHASE_2_5_SPEC_FA §10, DEC-0189).
+  if (AUDITED_READS.includes(record.purpose)) {
+    await recordAudit(tx, actor, {
+      action: 'PRIVATE_FILE_READ',
+      targetType: 'STORED_FILE',
+      targetId: record.id,
+      metadata: { purpose: record.purpose, context: actor.context, owner: actor.accountId === record.ownerAccountId },
+    });
+  }
   return { record, bytes };
 }
+
+const AUDITED_READS: readonly string[] = ['VET_APPLICATION_DOCUMENT', 'VET_PROFESSIONAL_DOCUMENT'];
 
 /** Soft delete: the row and its audit trail stay, the object is removed. */
 export async function deletePrivateFile(

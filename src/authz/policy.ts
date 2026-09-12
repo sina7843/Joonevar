@@ -97,7 +97,8 @@ export type FilePurposeName =
   | 'BREED_IMAGE'
   | 'CENTRE_IMAGE'
   | 'VET_PROFILE_IMAGE'
-  | 'COMMUNITY_IMAGE';
+  | 'COMMUNITY_IMAGE'
+  | 'VET_PROFESSIONAL_DOCUMENT';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -122,6 +123,8 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   CENTRE_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
   VET_PROFILE_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
   COMMUNITY_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
+  // Evidence of a professional case: the veterinarian and the reviewers, nobody else; every read is audited (DEC-0189).
+  VET_PROFESSIONAL_DOCUMENT: ['REVIEW_OPERATOR', 'SUPERADMIN'],
 };
 
 export function canReadFile(

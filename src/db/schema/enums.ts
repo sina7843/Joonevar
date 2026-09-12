@@ -88,6 +88,8 @@ export const filePurpose = pgEnum('file_purpose', [
   'CENTRE_IMAGE',
   'VET_PROFILE_IMAGE',
   'COMMUNITY_IMAGE',
+  /** Student card, council card, licence or certificate of a Phase 2.5 professional case; owner and reviewers only (DEC-0189). */
+  'VET_PROFESSIONAL_DOCUMENT',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);

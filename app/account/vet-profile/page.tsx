@@ -7,6 +7,7 @@ import { StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { directoryReferenceData, ownVetDirectory } from '../../../src/vets/directory.ts';
 import { myVetApplications } from '../../../src/vets/onboarding.ts';
+import { professionalDashboard } from '../../../src/vets/professional-profile.ts';
 import { myCentreInvitations } from '../../../src/centres/service.ts';
 import { CentreInvitationForm } from '../../../src/centres/forms.tsx';
 import {
@@ -47,11 +48,12 @@ export default async function VetProfileAccountPage() {
   const guard = await guardRoute('/account/vet-profile');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
-  const [own, applications, reference, invitations] = await Promise.all([
+  const [own, applications, reference, invitations, professional] = await Promise.all([
     ownVetDirectory(db(), actor),
     myVetApplications(db(), actor),
     directoryReferenceData(db()),
     myCentreInvitations(db(), actor),
+    professionalDashboard(db(), actor),
   ]);
   const latest = applications[0] ?? null;
   const open = applications.find((application) => isOpenApplication(application.status)) ?? null;
@@ -60,6 +62,26 @@ export default async function VetProfileAccountPage() {
   return (
     <PublicShell actor={actor} title="پروفایل دامپزشکی" pathname="/account/vet-profile">
       <div className="space-y-lg">
+        {professional.currentTag || professional.cases.length > 0 ? (
+          <Card>
+            <h2 className="text-label-lg">هویت حرفه‌ای</h2>
+            {professional.currentTag ? (
+              <p className="mt-xs text-body" data-testid="vet-current-tag">
+                {professional.currentTag.labelFa}
+                <span className="text-caption text-text-secondary">{' · از ' + formatInstantFa(new Date(professional.currentTag.since))}</span>
+              </p>
+            ) : (
+              <p className="mt-xs text-body-sm text-text-secondary">هنوز Tag حرفه‌ای ندارید.</p>
+            )}
+            {professional.cases.length > 0 ? (
+              <ul className="mt-md space-y-2xs text-body-sm" data-testid="vet-professional-cases">
+                {professional.cases.map((item) => (
+                  <li key={item.id}>{item.caseTypeFa + ': ' + item.statusFa}</li>
+                ))}
+              </ul>
+            ) : null}
+          </Card>
+        ) : null}
         {own ? (
           <VetDirectoryEditor data={own} surface="owner" />
         ) : (

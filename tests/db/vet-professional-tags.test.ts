@@ -73,10 +73,12 @@ test('0031 runs on a database with Phase 2 data, backfills verified owned profil
   try {
     // The release before this one: every migration up to 0030.
     await fs.cp(MIGRATIONS_FOLDER, folder, { recursive: true });
-    await fs.rm(path.join(folder, '0031_vet-professional-tag.sql'));
     const journalPath = path.join(folder, 'meta', '_journal.json');
     const journal = JSON.parse(await fs.readFile(journalPath, 'utf8')) as { entries: { tag: string }[] };
-    journal.entries = journal.entries.filter((entry) => entry.tag !== '0031_vet-professional-tag');
+    // The release before 0031 has neither 0031 nor anything written after it.
+    const cut = journal.entries.findIndex((entry) => entry.tag === '0031_vet-professional-tag');
+    for (const entry of journal.entries.slice(cut)) await fs.rm(path.join(folder, entry.tag + '.sql'));
+    journal.entries = journal.entries.slice(0, cut);
     await fs.writeFile(journalPath, JSON.stringify(journal));
     const previous = createDatabase(upgraded.url);
     try {
