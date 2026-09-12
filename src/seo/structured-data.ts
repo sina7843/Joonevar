@@ -16,6 +16,29 @@ const BACKSLASH = String.fromCharCode(92);
 export type JsonLd = Readonly<Record<string, unknown>>;
 
 /**
+ * FAQ for a page that really shows those questions and answers (§19).
+ *
+ * Emitted only from the questions the page itself renders, so the structured
+ * data can never promise an answer a visitor cannot read.
+ */
+export function faqLd(
+  input: { path: string; questions: ReadonlyArray<{ question: string; answer: string }> },
+  origin: string,
+): JsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    inLanguage: 'fa-IR',
+    url: absoluteUrl(origin, input.path),
+    mainEntity: input.questions.map((entry) => ({
+      '@type': 'Question',
+      name: entry.question,
+      acceptedAnswer: { '@type': 'Answer', text: entry.answer },
+    })),
+  };
+}
+
+/**
  * Article / NewsArticle for one published piece (§19). The author is a Person
  * only when the author chose to show their name; otherwise the platform is the
  * author, exactly as the page itself signs it.

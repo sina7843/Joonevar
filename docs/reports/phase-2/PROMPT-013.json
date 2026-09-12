@@ -1,0 +1,69 @@
+{
+  "promptId": "PROMPT-013",
+  "status": "COMPLETE",
+  "summary": "Public home and service pages. Seven Phase 1 services — membership, registration sheet, pedigree, kennel, mating permit, puppy card and the trusted-veterinarian visit — are described in a code catalogue with their definition, audience, prerequisites taken from the existing lock wording, steps, documents, questions and one call to action each. No figure is written on any page: every fee is the key of a managed product_setting read at request time, an unconfigured tariff is shown as unconfigured rather than as zero or free, and a service Hamzist does not charge for says so and shows the approved pricing notice instead. No page promises a time, a duration or an appointment, because §18 allows a time only where real data exists and none does; each page states plainly that Hamzist gives no appointment. Every call to action points at the guarded Phase 1 route that already performs the service, so a public page never becomes a second, unguarded way in — an anonymous visitor clicking it lands on sign-in with the exact next path. No table was added: the catalogue is fixed product text, not operator data, so nothing public was parallelled with a Phase 1 entity and no migration was needed. The home page was rebuilt to §5 with real data — value message, the services, how it works, a search box and the directory lists, featured breeds, the latest article and news, published associations and clubs, and counts taken from published records at request time — where every block disappears entirely when its data does not exist, so no empty shelf or invented number appears. A new faqLd emits FAQ structured data only from the questions a page actually renders, and /services joins the sitemap without becoming a §4 navigation section.",
+  "changedFiles": [
+    "src/services/catalogue.ts",
+    "src/services/service.ts",
+    "src/seo/structured-data.ts",
+    "src/seo/sitemap.ts",
+    "src/authz/routes.ts",
+    "app/(public)/page.tsx",
+    "app/(public)/services/(list)/page.tsx",
+    "app/(public)/services/(list)/loading.tsx",
+    "app/(public)/services/[slug]/page.tsx",
+    "tests/domain/services.test.ts",
+    "tests/db/services.test.ts",
+    "tests/browser/home-services.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-013-REPORT.md",
+    "docs/reports/screenshots/phase-2/prompt-013/home-mobile.png",
+    "docs/reports/screenshots/phase-2/prompt-013/services-desktop.png",
+    "docs/reports/screenshots/phase-2/prompt-013/service-membership.png",
+    "docs/reports/screenshots/phase-2/prompt-013/service-vet-visit-mobile.png"
+  ],
+  "decisions": ["DEC-0173"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0, with /services and /services/[slug] listed."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/services.test.ts tests/db/services.test.ts && node --test --test-concurrency=1 tests/ui/seo.test.ts tests/ui/routes.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. New suites: tests 9 · pass 9 · fail 0. tests/domain/services.test.ts holds every service to §18 (definition, audience, prerequisites, at least three steps, documents, at least one question, a call to action), proves each fee is a real MONEY_TOMAN setting key and that no three-digit tariff appears in the page text at all, rejects any promised time or appointment wording, checks that every call to action resolves to a guarded — never PUBLIC — route so the public pages add no second way in, and pins the stable addresses plus the sitemap list. tests/db/services.test.ts on a freshly migrated database: the membership fee is read from the setting and follows an audited change to 450,000; a tariff cleared back to unconfigured produces no number at all rather than zero; the veterinarian visit has no Hamzist fee and carries the approved managed notice; the list answers for every service and an unknown or badly shaped address is not found. Regression: tests 30 · pass 30 · fail 0 over tests/ui/seo.test.ts (the new services sitemap section) and tests/ui/routes.test.ts (the new public /services rule). Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/home-services.test.ts && node tools/browser-tests.mjs tests/browser/public-shell.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/home-services.test.ts 5/5: the phone-width home shows the value message, the services and how it works, its search box reaches /search, and the page does not scroll sideways; the service list opens the membership page, which shows the seeded documented figure ۳۰۰٬۰۰۰ تومان read from settings together with prerequisites, steps, documents, questions and the statement that Hamzist gives no appointment; the veterinarian visit page shows no figure at all and carries the approved pricing notice; the call to action links to /membership and sends an anonymous visitor to sign-in with next=/membership; an unknown service address answers a real 404 in Persian. Regression on the same build: tests/browser/public-shell.test.ts 7/7 — the rebuilt home still renders right to left without sideways scroll, metadata and robots are unchanged, and the header, mobile menu and guarded application behave as before. Screenshots regenerated for prompt-002 by the regression were restored with git checkout; only prompt-013 evidence is new. As in the previous prompts, npm run build was run before the browser suites because the harness serves the existing .next. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The service catalogue is fixed product text in code and cannot be edited from the panel; wiring it to the Phase 2 CMS is left for a later prompt rather than adding a table that would parallel Phase 1 entities.",
+    "The puppy-card call to action points at /mating because /puppy-cards has no list page: the real flow opens from the mating case and its litter.",
+    "LOCK_REGISTRATION_SHEET_REQUIRED still points at /registration/batch, which does not exist under app/; it is Phase 1 wording left untouched here, and the service pages use the routes that do exist.",
+    "Home statistics are counts of published records only; no other aggregate or performance figure was invented.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "Visual fidelity of the home and service pages is UNVERIFIED: no Phase 2 Figma frame is in the sources."
+  ],
+  "readiness": {
+    "code": "HOME_AND_SERVICES_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

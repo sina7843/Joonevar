@@ -33,6 +33,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/announcements', access: 'PUBLIC' },
   // Global search across the public sections (§16). Not a section of §4 itself.
   { prefix: '/search', access: 'PUBLIC' },
+  // Service pages (§18): what each Phase 1 service is, with its managed fee.
+  { prefix: '/services', access: 'PUBLIC' },
   // Content images: the route itself serves only images of visible content (DEC-0160).
   { prefix: '/media', access: 'PUBLIC' },
   { prefix: '/robots.txt', access: 'PUBLIC' },

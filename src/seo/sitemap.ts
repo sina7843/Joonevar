@@ -22,7 +22,11 @@ export interface SitemapEntry {
   readonly lastModified?: Date;
 }
 
+import { servicePaths } from '../services/catalogue.ts';
+
 export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly SitemapEntry[]>>> = {
+  // The service pages of §18: fixed addresses whose figures come from settings.
+  services: async () => servicePaths().map((path) => ({ path })),
   pages: async () => liveSections().map((section) => ({ path: section.href })),
   // Published directory profiles of accounts that are not disabled (PROMPT-006).
   veterinarians: () => vetSitemapEntries(db()),
