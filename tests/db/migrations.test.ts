@@ -93,6 +93,65 @@ test('running migrations again is a no-op, not a destructive replay', async () =
   }
 });
 
+/**
+ * Everything Phase 2 added (migrations 0017–0029). Listed for the same reason
+ * as the Phase 1 tables: a later migration that drops or renames one of them
+ * fails here rather than in production.
+ */
+const PHASE_2_TABLES = [
+  // 0017 species and breed bank, 0018 CMS, 0019 moderation
+  'species', 'breed_group', 'breed_medical_claim', 'breed_slug_redirect',
+  'content_category', 'content_item', 'content_revision', 'content_slug_redirect',
+  'moderation_report', 'publisher_restriction',
+  // 0020 vet directory and geography, 0021 onboarding
+  'province', 'city', 'vet_specialty', 'vet_profile_specialty', 'vet_profile_species', 'location_hours',
+  'vet_application', 'vet_application_document',
+  // 0022 centres, 0023 suggestions and claims
+  'centre', 'centre_type', 'centre_service', 'centre_service_link', 'centre_facility', 'centre_facility_link',
+  'centre_species', 'centre_member', 'centre_claim', 'centre_claim_document', 'directory_suggestion',
+  // 0024 communities, 0025 advertising, 0026 verification
+  'community', 'community_breed', 'community_species', 'community_manager', 'community_event',
+  'ad_plan', 'ad_subscription', 'verification_attempt',
+  // 0029 versioned taxonomy seed
+  'taxonomy_seed',
+];
+
+/**
+ * P2-D15: Phase 2 links to the Phase 1 record, it never keeps a second copy of
+ * one. A parallel table is hard to name in the abstract, but its absence has a
+ * visible consequence — the Phase 2 tables point their foreign keys at the
+ * Phase 1 anchors. If a parallel vet, breed or location were introduced, these
+ * anchors would stop being referenced.
+ */
+const LINKED_ANCHORS = ['reference_breed', 'vet_profile', 'vet_location', 'account'];
+
+test('migrations create every Phase 2 table, and Phase 2 links to the Phase 1 records', async () => {
+  const testDb = await createTestDb();
+  try {
+    const tables = await testDb.db.execute<{ table_name: string }>(
+      sql`select table_name from information_schema.tables where table_schema = 'public'`,
+    );
+    const names = tables.rows.map((r) => r.table_name);
+    for (const expected of PHASE_2_TABLES) {
+      assert.ok(names.includes(expected), 'missing table ' + expected);
+    }
+
+    const keys = await testDb.db.execute<{ child: string; parent: string }>(
+      sql`select tc.table_name as child, ccu.table_name as parent
+          from information_schema.table_constraints tc
+          join information_schema.constraint_column_usage ccu on ccu.constraint_name = tc.constraint_name
+          where tc.constraint_type = 'FOREIGN KEY' and tc.table_schema = 'public'`,
+    );
+    const phase2 = new Set(PHASE_2_TABLES);
+    for (const anchor of LINKED_ANCHORS) {
+      const referrers = keys.rows.filter((row) => row.parent === anchor && phase2.has(row.child));
+      assert.ok(referrers.length > 0, 'no Phase 2 table links to ' + anchor);
+    }
+  } finally {
+    await testDb.drop();
+  }
+});
+
 test('the schema enforces the constraints the product depends on', async () => {
   const testDb = await createTestDb();
   try {

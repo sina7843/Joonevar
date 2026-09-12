@@ -24,6 +24,8 @@ const JPEG = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 
 
 /** SYNTHETIC — 0999 is not an assigned mobile range. */
 const VET_MOBILE = '09990000003';
+/** The professional file this suite attaches to that account, and the option it must pick. */
+const VET_NAME = 'SYNTHETIC دامپزشک آزمایشی';
 const OPERATOR_MOBILE = '09990000004';
 const ADMIN_MOBILE = '09990000006';
 
@@ -303,14 +305,22 @@ test('the Finder is empty until the superadmin records a licensed location', asy
       await expectText(page, 'این صفحه فرم درخواست معتمدشدن نیست');
 
       await page.getByTestId('vet-mobile').fill(VET_MOBILE);
-      await page.getByTestId('vet-name').fill('SYNTHETIC دامپزشک آزمایشی');
+      await page.getByTestId('vet-name').fill(VET_NAME);
       await page.getByTestId('vet-council-code').fill('SYNTH-VET-BROWSER');
       await page.getByTestId('vet-phone').fill('02100000000');
       await page.getByTestId('save-vet').click();
       await expectText(page, 'پرونده حرفه‌ای دامپزشک ثبت شد');
 
       await page.getByTestId('add-location-form').waitFor();
-      await page.getByTestId('location-vet').selectOption({ index: 1 });
+      /*
+       * By name, never by position. The veterinarian dropdown lists every
+       * veterinarian in the database, so any other suite that seeds one shifts
+       * the positions: picking index 1 silently attached this centre to a
+       * stranger with no active membership, and the Finder — which requires
+       * one — then returned nothing. The failure looked like a product bug and
+       * was a test reading a global list by index.
+       */
+      await page.getByTestId('location-vet').selectOption({ label: VET_NAME });
       await page.getByTestId('location-name').fill(LOCATION_NAME);
       await page.getByTestId('location-city').fill('تهران');
       await page.getByTestId('location-neighborhood').fill(NEIGHBORHOOD);

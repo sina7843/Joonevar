@@ -28,6 +28,13 @@ try {
       report.issuersInserted +
       ' (registry intentionally empty until the association supplies the real list)',
   );
+  const added = report.taxonomies.reduce((total, entry) => total + entry.inserted, 0);
+  console.log(
+    'taxonomies: ' +
+      report.taxonomies.map((entry) => entry.name + ' v' + entry.version).join(', ') +
+      ' — entries added this run: ' +
+      added,
+  );
   if (withFixtures) {
     const ids = await seedDevFixtures(db, env);
     console.log('synthetic fixture accounts: ' + ids.length + ' (SYNTHETIC, 0999 reserved prefix)');

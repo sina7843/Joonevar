@@ -1,0 +1,70 @@
+{
+  "promptId": "PROMPT-019",
+  "status": "COMPLETE",
+  "summary": "Data migration and integrated testing. Reading the code first showed that the linkage half of §23 was already true — Phase 2 points its foreign keys at account, vet_profile, reference_breed and vet_location and keeps no second copy of them, and migration 0020 even backfills the free-text province and city of Phase 1 — but nothing tested it, and the Phase 2 tables themselves were unprotected while the migration suite still listed only the Phase 1 ones. Three things were genuinely missing. First, reversible migration: drizzle-kit generates no down file, and hand-writing thirty rollback scripts that only ever run on the worst day is thirty untested scripts, not evidence. The property that actually lets a release roll back is that no migration removes or renames what the previous code reads, so that invariant is now asserted against the SQL text itself, including the rule that a SET NOT NULL must be preceded by a backfill of that column; loosening with DROP NOT NULL stays allowed. Second, versioned taxonomy seeding: eight taxonomies were inserted once inside migrations 0017, 0020 and 0022 and seedBaseline knew nothing about them, so no entry could ship without a migration and nothing recorded which generation a database held. The catalogues now live in src/db/seed/taxonomy.ts, transcribed verbatim from those migrations; taxonomy_seed (migration 0029) records a version per taxonomy; and re-running inserts only what is missing, so an entry an operator renamed or switched off is never overruled. A test compares the catalogue row by row against what the migrations really installed, so the code cannot invent or drop a specialty. Third, the Phase 2 regression matrix, now recorded in docs/qa/phase-2-acceptance.md with the commands and the real numbers. Running the full matrix for the first time since 7c74577 exposed two latent test defects that both looked like product bugs: a frozen admin navigation list that reported three real pages as dead links, and a Finder test that picked a veterinarian by position from a global dropdown, so any other suite seeding a vet attached the centre to an account without an active membership and six tests timed out. Both were fixed in the tests; the product was correct.",
+  "changedFiles": [
+    "src/db/schema/taxonomy.ts",
+    "src/db/schema/index.ts",
+    "src/db/seed/taxonomy.ts",
+    "src/db/seed/index.ts",
+    "src/db/seed/run.ts",
+    "src/db/migrations/0029_taxonomy-seed.sql",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/migrations/meta/0029_snapshot.json",
+    "tests/domain/migrations.test.ts",
+    "tests/db/taxonomy.test.ts",
+    "tests/db/migrations.test.ts",
+    "tests/browser/operations.test.ts",
+    "tests/browser/finder.test.ts",
+    "tools/browser-tests.mjs",
+    "docs/qa/phase-2-acceptance.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-019-REPORT.md"
+  ],
+  "migrations": ["src/db/migrations/0029_taxonomy-seed.sql"],
+  "decisions": ["DEC-0179"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0. No route was added by this prompt; the changes are schema, seed, tooling and tests."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" && node --test --test-concurrency=4 \"tests/db/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "The full non-browser matrix, which this prompt exists to run: 206/206 for domain+config+ui and 332/332 for the database suites, 538 tests, 0 failures. It is split into two groups on purpose: npm test as a single command fails on this Windows machine with spawn UNKNOWN (errno -4094), because the test runner spawns one process per file and roughly seventy at once exhausts process handles — an environment limit, not a product failure, and the reproducible commands are recorded rather than hidden. New coverage: tests/domain/migrations.test.ts (4 tests) reads the migration SQL from disk and pins that every file is numbered once, that none drops or renames an existing object, that each SET NOT NULL is preceded in its own file by a backfill or a defaulted ADD COLUMN, and that the journal and the files on disk match exactly. tests/db/taxonomy.test.ts (5 tests) proves the catalogue in code equals what migrations 0017, 0020 and 0022 installed row by row, that seeding an already-filled database inserts nothing and records version 1 per taxonomy, that a deleted entry returns on the next run carrying the same citySlug rule migration 0027 backfills with, and that a renamed or deactivated entry is never overruled. tests/db/migrations.test.ts gained the 37 Phase 2 tables and a P2-D15 check that Phase 2 foreign keys reach reference_breed, vet_profile, vet_location and account. Postgres crashed mid-run once (ECONNREFUSED 5433, the container had exited); it was restarted and the matrix rerun from the start."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "The complete browser matrix on the final build: 159 tests, 158 pass, 0 fail, 1 skip (the PROMPT-018 content-image 304 case, which announces its missing fixture instead of printing a pass). This is the first full browser run since 7c74577 and it earned its cost by finding two latent defects, both in tests. tests/browser/operations.test.ts asserted the admin navigation held exactly six entries and no others — a list frozen at the day it was written — so /admin/centres, /admin/communities and /admin/packages were reported as dead links although all three render; it now keeps that list as the minimum and requires every entry the navigation really offers to answer 200 without an access-denied page, which cannot go stale. tests/browser/finder.test.ts chose the veterinarian with selectOption index 1 from a dropdown listing every veterinarian in the database, so once tests/browser/centres.test.ts seeded one of its own the positions shifted and the centre was attached to an account with no active membership; the Finder requires one, returned nothing, and six tests failed on 30-second timeouts that looked exactly like a product bug. It now selects by name. The diagnosis used evidence rather than guesswork: KEEP_BROWSER_DB=1 was added to the harness so a failed run keeps its database, the audit trail of that location showed it was active and licensed at the moment of failure, a direct searchFinder probe against that database returned zero, and vet_account_id showed the centre belonged to a random mobile. Running centres and finder alone reproduced it, and the same pair is 10/10 after the fix."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No down migrations exist and none were written: rollback rests on the additive invariant, which is tested. A future migration that really must drop a column will fail that test and needs its own decision and a two-step migration path.",
+    "npm test as a single command does not run on this Windows machine (spawn UNKNOWN, errno -4094); the matrix runs as two groups with --test-concurrency=4.",
+    "The city catalogue holds the provincial capitals only, exactly as migration 0020 did; every other city is data the superadmin adds with an audit trail.",
+    "The taxonomy seed never updates an existing entry, by design. If an official name changes, that is an operator edit or an explicit migration, not a silent redeploy.",
+    "One browser test is skipped (the content-image 304 from PROMPT-018) because the harness seeds no article with an image.",
+    "Phase 2 visual fidelity was not measured; the visual gate is still the Phase 1 one.",
+    "A file in the prompt package (prompts-2/019-migration-testing.md) carries an accidental typo in the working tree. It was deliberately neither reverted nor staged: it is the user's change, and package files must stay byte-identical."
+  ],
+  "readiness": {
+    "code": "MIGRATIONS_ADDITIVE_AND_TAXONOMIES_VERSIONED",
+    "visual": "PHASE_1_GATE_ONLY",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

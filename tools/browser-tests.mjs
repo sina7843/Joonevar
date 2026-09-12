@@ -154,11 +154,18 @@ try {
     server.kill();
     await new Promise((r) => server.once('exit', r)).catch(() => undefined);
   }
-  await adminQuery('select pg_terminate_backend(pid) from pg_stat_activity where datname = $1', [name]).catch(() => undefined);
-  await adminQuery('drop database if exists "' + name + '"').catch((error) =>
-    console.error('Could not drop ' + name + ': ' + (error instanceof Error ? error.message : error)),
-  );
-  await fsp.rm(storage, { recursive: true, force: true }).catch(() => undefined);
+  if (process.env.KEEP_BROWSER_DB === '1') {
+    // Diagnosing a browser failure means asking the database what the run
+    // actually stored. The run is disposable by default because a leftover
+    // database is a trap for the next one; this keeps it only when asked.
+    console.log('KEEP_BROWSER_DB=1: kept database ' + name + ' and storage ' + storage + '.');
+  } else {
+    await adminQuery('select pg_terminate_backend(pid) from pg_stat_activity where datname = $1', [name]).catch(() => undefined);
+    await adminQuery('drop database if exists "' + name + '"').catch((error) =>
+      console.error('Could not drop ' + name + ': ' + (error instanceof Error ? error.message : error)),
+    );
+    await fsp.rm(storage, { recursive: true, force: true }).catch(() => undefined);
+  }
 }
 
 process.exit(exitCode);

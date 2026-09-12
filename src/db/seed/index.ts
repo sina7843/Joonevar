@@ -20,6 +20,7 @@ import { SETTING_DEFINITIONS } from '../../settings/keys.ts';
 import { AD_PLAN_CATALOGUE } from '../../advertising/model.ts';
 import { ensurePlans } from '../../advertising/service.ts';
 import { slugify } from '../../breeds/model.ts';
+import { seedTaxonomies, type TaxonomySeedResult } from './taxonomy.ts';
 
 export interface SeedReport {
   readonly settingsInserted: readonly string[];
@@ -27,6 +28,8 @@ export interface SeedReport {
   readonly settingsPreserved: readonly string[];
   readonly breedsInserted: number;
   readonly issuersInserted: number;
+  /** One entry per taxonomy: the generation installed and what this run added (§23). */
+  readonly taxonomies: readonly TaxonomySeedResult[];
 }
 
 /**
@@ -102,6 +105,11 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
     breedsInserted += result.length;
   }
 
+  // The taxonomies of §23. Migrations installed the first generation; this puts
+  // back anything missing and records which generation the database holds,
+  // without overruling an entry an operator renamed or switched off.
+  const taxonomies = await seedTaxonomies(database);
+
   // The approved-issuer registry (D14) starts empty on purpose: no issuer name
   // is invented here. An empty registry does not remove the review path, it
   // only means no foreign pedigree can be approved until the association
@@ -112,5 +120,6 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
     settingsPreserved: preserved,
     breedsInserted,
     issuersInserted: 0,
+    taxonomies,
   };
 }

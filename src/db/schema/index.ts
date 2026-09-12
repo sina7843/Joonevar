@@ -7,6 +7,7 @@ export * from './verification.ts';
 export * from './animals.ts';
 export * from './communities.ts';
 export * from './geography.ts';
+export * from './taxonomy.ts';
 export * from './vets.ts';
 export * from './clinical.ts';
 export * from './documents.ts';
