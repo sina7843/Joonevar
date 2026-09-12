@@ -94,7 +94,7 @@ test('metadata is absolute and canonical, and nothing is indexed outside product
     assert.equal(await page.locator('meta[property="og:locale"]').getAttribute('content'), 'fa_IR');
     assert.equal(
       await page.locator('meta[property="og:image"]').getAttribute('content'),
-      BASE_URL + '/brand/logo-symbol.png',
+      BASE_URL + '/brand/app-icon-social.png',
     );
     assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, nofollow');
     assert.equal(await page.title(), 'درباره همزیست');

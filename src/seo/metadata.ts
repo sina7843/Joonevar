@@ -16,11 +16,31 @@
  * Pure: no environment, database or framework runtime, so it is tested directly.
  */
 import type { Metadata } from 'next';
+import { SOCIAL_ICON } from '../brand/assets.ts';
 
 export const SITE_NAME = 'همزیست';
 
-/** The official symbol from the Design System (`public/brand`, 144×162). */
+/**
+ * The official symbol from the Design System (`public/brand`, 144×162).
+ *
+ * This is the organisation's logo for structured data, where the bare mark is
+ * what a consumer expects, so it stays the symbol.
+ */
 export const SITE_IMAGE = { path: '/brand/logo-symbol.png', width: 144, height: 162 } as const;
+
+/**
+ * The default share image.
+ *
+ * Section 05 of the handoff delivers a dedicated social asset; the bare symbol
+ * was only ever a stand-in because no share asset existed. It is square rather
+ * than 1200×630, so a card renders it as a thumbnail instead of a banner - that
+ * is the asset the Design System supplies and nothing wider is invented here.
+ */
+export const SHARE_IMAGE = {
+  path: SOCIAL_ICON.path,
+  width: SOCIAL_ICON.width,
+  height: SOCIAL_ICON.height,
+} as const;
 
 export type IndexState = 'PUBLISHED' | 'ARCHIVED' | 'DUPLICATE';
 
@@ -76,9 +96,9 @@ export function buildMetadata(page: PageSeo, site: SiteContext): Metadata {
   const image = page.image
     ? { url: absoluteUrl(site.origin, page.image.path), alt: page.image.alt }
     : {
-        url: absoluteUrl(site.origin, SITE_IMAGE.path),
-        width: SITE_IMAGE.width,
-        height: SITE_IMAGE.height,
+        url: absoluteUrl(site.origin, SHARE_IMAGE.path),
+        width: SHARE_IMAGE.width,
+        height: SHARE_IMAGE.height,
         alt: SITE_NAME,
       };
 

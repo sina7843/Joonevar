@@ -33,7 +33,8 @@ test('a published page is indexable in production, with Persian OpenGraph on the
   const og = metadata.openGraph as Og;
   assert.equal(og.locale, 'fa_IR');
   assert.equal(og.url, 'https://hamzist.example/breeds');
-  assert.equal(og.images[0]!.url, 'https://hamzist.example/brand/logo-symbol.png');
+  // The dedicated social asset of the handoff, not the bare symbol stand-in.
+  assert.equal(og.images[0]!.url, 'https://hamzist.example/brand/app-icon-social.png');
 
   // A title that already names the site is not suffixed a second time.
   const about = buildMetadata({ title: 'درباره همزیست', description: 'توضیح', path: '/about' }, PROD);
