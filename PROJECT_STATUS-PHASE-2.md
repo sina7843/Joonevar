@@ -17,7 +17,7 @@ Managed by `node tools/runner.mjs --phase 2 …` (DEC-0142). A row is marked onl
 - [x] PROMPT-013 — خانه و معرفی خدمات <!-- work-commit:2f09ea199c8307ac41c0854341ca13bb32a478d9 -->
 - [x] PROMPT-014 — استعلام اصالت اسناد <!-- work-commit:0de9b7c2c715172b32ec79b440065ca413acee4a -->
 - [x] PROMPT-015 — جغرافیا، نقشه و صفحات محلی <!-- work-commit:dfa2b2d327abad0fe54e45f407f1bed56f0499bf -->
-- [ ] PROMPT-016 — پنل مدیریت فاز عمومی
+- [x] PROMPT-016 — پنل مدیریت فاز عمومی <!-- work-commit:7599debb5b9910f39c39126b7a9b8544d6e92a88 -->
 - [ ] PROMPT-017 — حریم خصوصی و مقابله با سوءاستفاده
 - [ ] PROMPT-018 — کارایی و دسترس‌پذیری
 - [ ] PROMPT-019 — مهاجرت داده و تست یکپارچه
