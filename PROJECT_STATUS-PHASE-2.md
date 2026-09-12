@@ -13,7 +13,7 @@ Managed by `node tools/runner.mjs --phase 2 …` (DEC-0142). A row is marked onl
 - [x] PROMPT-009 — پیشنهاد و Claim مرکز <!-- work-commit:6c5f6f374247b7acbe67d36e584ef66852e929ae -->
 - [x] PROMPT-010 — انجمن‌ها و کلاب‌ها <!-- work-commit:b8bd1e873a11dce1bfa38b0410e534f0e022ff5e -->
 - [x] PROMPT-011 — بسته‌های تبلیغاتی <!-- work-commit:5f8bf0e5be9ff764942c846056a866a03edb6b32 -->
-- [ ] PROMPT-012 — جست‌وجو، فیلتر و رتبه‌بندی
+- [x] PROMPT-012 — جست‌وجو، فیلتر و رتبه‌بندی <!-- work-commit:3c177ecf9ae678f48cbe77e7626efe130f2236a4 -->
 - [ ] PROMPT-013 — خانه و معرفی خدمات
 - [ ] PROMPT-014 — استعلام اصالت اسناد
 - [ ] PROMPT-015 — جغرافیا، نقشه و صفحات محلی
