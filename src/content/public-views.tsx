@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { RichText } from './rich-text.tsx';
 import Link from 'next/link';
 import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -259,10 +260,8 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
       ) : null}
 
       <p className="text-body-md text-text-secondary">{item.summaryFa}</p>
-      <div className="space-y-md text-body-md" data-testid="content-body">
-        {item.bodyFa.split(/\n{2,}/).map((paragraph, index) => (
-          <p key={index}>{paragraph}</p>
-        ))}
+      <div className="text-body-md" data-testid="content-body">
+        <RichText source={item.bodyFa} />
       </div>
 
       {item.tags.length > 0 ? (

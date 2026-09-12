@@ -16,6 +16,7 @@ import {
   type ContentFormState,
 } from './actions.ts';
 import type { ContentPanel, ContentStatus } from './model.ts';
+import { BodyEditor } from './body-editor.tsx';
 
 const EMPTY: ContentFormState = {};
 
@@ -129,14 +130,7 @@ export function ContentFieldsForm({
             data-testid="content-slug"
           />
           <TextAreaField label="خلاصه" name="summaryFa" rows={3} defaultValue={item.summaryFa} data-testid="content-summary" />
-          <TextAreaField
-            label="متن"
-            name="bodyFa"
-            rows={12}
-            defaultValue={item.bodyFa}
-            hint="بندها را با یک خط خالی از هم جدا کنید."
-            data-testid="content-body"
-          />
+          <BodyEditor name="bodyFa" defaultValue={item.bodyFa} />
           <TextAreaField
             label="منابع"
             name="sources"
