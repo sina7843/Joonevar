@@ -15,6 +15,7 @@ import { animals } from '../db/schema/animals.ts';
 import { referenceBreeds, species } from '../db/schema/core.ts';
 import { verificationAttempts } from '../db/schema/verification.ts';
 import { readInt } from '../settings/service.ts';
+import { HOUR_MS, windowStart, withinLimit } from '../privacy/limits.ts';
 import { validation } from '../domain/errors.ts';
 import {
   DOCUMENT_KIND_FA,
@@ -138,14 +139,19 @@ export async function verifyDocument(
   const shape = readCode(input.code);
   if (input.code.trim() === '') throw validation('کد سند را بنویسید.');
 
-  const limit = await readInt(database, VERIFICATION_LIMIT_KEY);
-  const since = new Date(now.getTime() - 3_600_000);
+  const ceiling = await readInt(database, VERIFICATION_LIMIT_KEY);
   const [recent] = await database
     .select({ value: count() })
     .from(verificationAttempts)
-    .where(and(eq(verificationAttempts.clientKey, input.clientKey), gte(verificationAttempts.createdAt, since)));
+    .where(
+      and(
+        eq(verificationAttempts.clientKey, input.clientKey),
+        gte(verificationAttempts.createdAt, windowStart(now, HOUR_MS)),
+      ),
+    );
 
-  if (Number(recent?.value ?? 0) >= limit) {
+  // One rule for every ceiling (§20).
+  if (!withinLimit({ used: Number(recent?.value ?? 0), ceiling })) {
     await database
       .insert(verificationAttempts)
       .values({ clientKey: input.clientKey, code: shape?.code ?? '', outcome: 'RATE_LIMITED', createdAt: now });

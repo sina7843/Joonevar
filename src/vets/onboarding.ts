@@ -18,6 +18,7 @@ import { cities, provinces } from '../db/schema/geography.ts';
 import { vetApplicationDocuments, vetApplications, vetProfiles } from '../db/schema/vets.ts';
 import { putPrivateFile } from '../files/storage.ts';
 import { recordAudit } from '../audit/service.ts';
+import { boundedRows } from '../privacy/limits.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
@@ -468,7 +469,8 @@ export async function vetApplicationQueue(
 ) {
   assertReviewer(actor);
   const statuses = [...QUEUE_STATUSES[query.view]];
-  const request = { page: query.page, pageSize: query.pageSize ?? 20 };
+  // §20: one answer never returns a whole table, however large a page is asked for.
+  const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
   const where = inArray(vetApplications.status, statuses);
   const [[total], rows] = await Promise.all([
     database.select({ value: count() }).from(vetApplications).where(where),

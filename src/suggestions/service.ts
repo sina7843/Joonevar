@@ -14,6 +14,7 @@ import { accounts } from '../db/schema/core.ts';
 import { cities, provinces } from '../db/schema/geography.ts';
 import { centreTypes, centres, directorySuggestions, vetProfiles } from '../db/schema/vets.ts';
 import { recordAudit } from '../audit/service.ts';
+import { DAY_MS, boundedRows, limitMessageFa, windowStart, withinLimit } from '../privacy/limits.ts';
 import { createNotification } from '../notifications/service.ts';
 import { readInt } from '../settings/service.ts';
 import { AppError, conflict, forbidden, notFound, validation } from '../domain/errors.ts';
@@ -27,7 +28,6 @@ export type SuggestionRow = typeof directorySuggestions.$inferSelect;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const STALE = 'این پیشنهاد هم‌زمان تغییر کرده است؛ صفحه را دوباره باز کنید.';
-const DAY_MS = 24 * 60 * 60 * 1000;
 const SUGGESTER_CONTEXTS: readonly ActorContextName[] = ['USER', 'BREEDER', 'TRUSTED_VET'];
 const REVIEWER_CONTEXTS: readonly ActorContextName[] = ['REVIEW_OPERATOR', 'SUPERADMIN'];
 const OPEN: readonly VetApplicationStatus[] = ['SUBMITTED', 'NEEDS_CORRECTION'];
@@ -173,18 +173,19 @@ export async function submitSuggestion(
       throw conflict('سه پیشنهاد بازِ در حال بررسی دارید؛ تا تعیین تکلیف آن‌ها پیشنهاد تازه ثبت نمی‌شود.');
     }
 
-    const limit = await readInt(tx, 'moderation.suggestion_daily_limit');
+    const ceiling = await readInt(tx, 'moderation.suggestion_daily_limit');
     const [recent] = await tx
       .select({ value: count() })
       .from(directorySuggestions)
       .where(
         and(
           eq(directorySuggestions.submittedByAccountId, actor.accountId),
-          gt(directorySuggestions.createdAt, new Date(now.getTime() - DAY_MS)),
+          gt(directorySuggestions.createdAt, windowStart(now, DAY_MS)),
         ),
       );
-    if (Number(recent?.value ?? 0) >= limit) {
-      throw new AppError('RATE_LIMITED', 'در ۲۴ ساعت گذشته بیش از حد مجاز پیشنهاد ثبت کرده‌اید؛ بعداً دوباره تلاش کنید.');
+    // One rule for every ceiling (§20).
+    if (!withinLimit({ used: Number(recent?.value ?? 0), ceiling })) {
+      throw new AppError('RATE_LIMITED', limitMessageFa(DAY_MS));
     }
 
     await assertNotDuplicate(tx, kind, fields.displayNameFa, input.confirmedNotDuplicate);
@@ -324,7 +325,8 @@ export async function suggestionQueue(
   query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
 ) {
   assertReviewer(actor);
-  const request = { page: query.page, pageSize: query.pageSize ?? 20 };
+  // §20: one answer never returns a whole table, however large a page is asked for.
+  const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
   const where = inArray(directorySuggestions.status, [...QUEUE_STATUSES[query.view]]);
   const [[total], rows] = await Promise.all([
     database.select({ value: count() }).from(directorySuggestions).where(where),

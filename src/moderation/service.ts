@@ -20,6 +20,7 @@ import { profiles } from '../db/schema/identity.ts';
 import { contentItems } from '../db/schema/content.ts';
 import { moderationReports, publisherRestrictions } from '../db/schema/moderation.ts';
 import { recordAudit } from '../audit/service.ts';
+import { DAY_MS, boundedRows, limitMessageFa, windowStart, withinLimit } from '../privacy/limits.ts';
 import { createNotification } from '../notifications/service.ts';
 import { readInt } from '../settings/service.ts';
 import { AppError, conflict, forbidden, notFound, validation } from '../domain/errors.ts';
@@ -40,7 +41,6 @@ import {
 } from './model.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const DAY_MS = 24 * 60 * 60 * 1000;
 const TARGET = 'CONTENT_ITEM';
 
 function assertContentAdmin(actor: Actor): void {
@@ -112,18 +112,20 @@ export async function submitContentReport(
         .limit(1);
       if (open) throw conflict(DUPLICATE_REPORT);
 
-      const limit = await readInt(tx, 'moderation.report_daily_limit');
+      const ceiling = await readInt(tx, 'moderation.report_daily_limit');
       const [recent] = await tx
         .select({ value: count() })
         .from(moderationReports)
         .where(
           and(
             eq(moderationReports.reporterAccountId, actor.accountId),
-            gt(moderationReports.createdAt, new Date(now.getTime() - DAY_MS)),
+            gt(moderationReports.createdAt, windowStart(now, DAY_MS)),
           ),
         );
-      if (Number(recent?.value ?? 0) >= limit) {
-        throw new AppError('RATE_LIMITED', 'در ۲۴ ساعت گذشته بیش از حد مجاز گزارش ثبت کرده‌اید؛ بعداً دوباره تلاش کنید.');
+      // One rule for every ceiling (§20): count inside the window, compare, and
+      // refuse without telling a guesser how many attempts are left.
+      if (!withinLimit({ used: Number(recent?.value ?? 0), ceiling })) {
+        throw new AppError('RATE_LIMITED', limitMessageFa(DAY_MS));
       }
 
       const [current] = await tx
@@ -178,7 +180,8 @@ export async function openReportQueue(
   request: { page: number; pageSize?: number },
 ): Promise<Page<QueueEntry>> {
   assertContentAdmin(actor);
-  const page = { page: request.page, pageSize: request.pageSize ?? 20 };
+  // §20: one answer never returns a whole table, however large a page is asked for.
+  const page = { page: request.page, pageSize: boundedRows(request.pageSize, 20) };
   const groups = await database
     .select({
       contentId: moderationReports.contentId,
@@ -253,7 +256,8 @@ export async function decidedReports(
   request: { page: number; pageSize?: number },
 ): Promise<Page<DecidedReport>> {
   assertContentAdmin(actor);
-  const page = { page: request.page, pageSize: request.pageSize ?? 20 };
+  // §20: one answer never returns a whole table, however large a page is asked for.
+  const page = { page: request.page, pageSize: boundedRows(request.pageSize, 20) };
   const where = sql`${moderationReports.status} <> 'OPEN'`;
   const rows = await database
     .select({

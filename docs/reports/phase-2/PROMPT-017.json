@@ -1,0 +1,63 @@
+{
+  "promptId": "PROMPT-017",
+  "status": "COMPLETE",
+  "summary": "Privacy and anti-abuse. Reading the code first showed that most of §20 was already enforced by the prompt that owned each feature: object-level access with authorisation running before any filesystem touch, upload control and byte-signature type scanning with per-purpose accept lists and size ceilings, PII minimisation through the audit redaction list, contact-display consent recorded with its previous and new value, impersonation guards (a globally unique national id frozen after KYC approval, a council code held by another profile refused with a redirect to Claim, one veterinarian profile per account), audit on every sensitive change, and public slugs that are never the internal id. Eight of those clauses were already proven against a real database by tests/db/security.test.ts and were deliberately not re-tested. Three things were genuinely missing. First, four rate ceilings each re-derived the same arithmetic, so a fifth caller would have become a fifth variant: the window-and-ceiling rule now lives once in src/privacy/limits.ts and content reports, directory suggestions and document verification use it, while the sign-in flow keeps its own state machine because a lock and a resend interval are a protocol rather than a ceiling. Its refusal message deliberately carries no number, since a count of remaining attempts is a hint to a guesser. Second, a real defect: five operator queues built their page object by hand and never passed through the shared list contract, so a large pageSize read a whole table; they are now bounded, reusing the existing MAX_PAGE_SIZE rather than inventing a third ceiling, with the operational history passing its own documented 200 explicitly. Third, §20's clauses are now stated as data in src/privacy/policy.ts, each naming the code that enforces it, so a test asserts every clause has an owner instead of a report asserting it in prose.",
+  "changedFiles": [
+    "src/privacy/limits.ts",
+    "src/privacy/policy.ts",
+    "src/moderation/service.ts",
+    "src/suggestions/service.ts",
+    "src/verification/service.ts",
+    "src/vets/onboarding.ts",
+    "src/centres/claims.ts",
+    "tests/domain/privacy.test.ts",
+    "tests/db/privacy.test.ts",
+    "tests/browser/privacy.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/architecture/phase-2-boundary.md",
+    "docs/reports/PROMPT-017-REPORT.md"
+  ],
+  "decisions": ["DEC-0177"],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after npm run build so the generated .next route types are included."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "Next.js 15.5 production build on the final tree: Compiled successfully, exit 0. No route was added by this prompt; the changes are service-level."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=1 tests/domain/privacy.test.ts tests/db/privacy.test.ts && node --test --test-concurrency=1 tests/db/moderation.test.ts tests/db/suggestions.test.ts tests/db/verification.test.ts tests/db/security.test.ts tests/db/files.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction not to re-run unaffected suites that already passed. New suites: tests 7 · pass 7 · fail 0. tests/domain/privacy.test.ts pins that a ceiling counts actions so the ceiling-th is the last allowed one and a ceiling of zero closes the action, that the window is counted back from now, that the refusal contains no digit and no remaining count, that one read is cut to the shared page ceiling while a caller's own default and an explicitly passed ceiling are honoured, and that every §20 clause is stated once and points at a real src/ or app/ path. tests/db/privacy.test.ts proves the two things this prompt changed: three operator queues asked for 100000 rows return the shared ceiling instead, while a modest page size and the default are untouched; and a second account taking an already registered national id is refused with the plain Persian conflict. Regression: tests 34 · pass 34 · fail 0 over tests/db/moderation.test.ts, tests/db/suggestions.test.ts and tests/db/verification.test.ts (whose ceilings now run through the shared rule and whose refusal wording changed) plus tests/db/security.test.ts and tests/db/files.test.ts (the §20 behaviours this prompt deliberately did not duplicate). That regression is the main evidence: the behaviour was refactored without changing what any suite observes. Last full npm test: 385/385 at commit 7c74577."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/privacy.test.ts && node tools/browser-tests.mjs tests/browser/verification.test.ts",
+      "result": "PASS",
+      "evidence": "Targeted run by explicit user instruction, both runs on the final build, each on a disposable database with its own production server. tests/browser/privacy.test.ts 3/3, over real HTTP against the private file route: an anonymous caller is answered 401 with no internal detail, so the answer never depends on whether the object exists and cannot be used to probe for one; a signed-in account asking for a file it does not own is refused and the refusal is never publicly cacheable; and a badly shaped address, a traversal attempt and the nil UUID are all refused exactly as a missing file is. Regression on the same build: tests/browser/verification.test.ts 5/5, including the rate-limited path whose wording now comes from the shared rule. This prompt adds no screenshots on purpose: its changes are service-level and its browser test addresses an API route rather than a page, so the evidence is the run output. One test defect of my own was removed rather than repaired: a case passing a null city to submitSuggestion failed validation before reaching any ceiling, and the ceilings it aimed at are already proven by tests/db/suggestions.test.ts. Screenshots regenerated for prompt-014 by the regression were restored with git checkout. Last full browser run 103/103 at commit 7c74577."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No bulk export (CSV or similar) was built: §20 asks for an export limit, and today the product's answer is that no such path exists and every operational read is paged and bounded; a real export would need its own decision, ceiling and audit.",
+    "The sign-in flow was not folded into the shared limiter and keeps its own state machine (lock, resend interval, single use), because that is a protocol rather than a ceiling; it was only documented.",
+    "The rule that a national id is frozen after KYC approval is not covered by this prompt's database test (it needs a full KYC pass); the rule exists in saveProfile and its uniqueness is tested.",
+    "src/privacy/policy.ts states the rules and is asserted to name real code paths, but it does not enforce them and cannot guarantee a named path keeps behaving that way.",
+    "Browser and unit/DB checks were targeted by user instruction; unaffected suites were last run in full at commit 7c74577.",
+    "No screenshots: the changes are service-level and the browser test addresses an API route, not a page."
+  ],
+  "readiness": {
+    "code": "PRIVACY_AND_ABUSE_CONTROLS_READY",
+    "visual": "NOT_APPLICABLE",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  }
+}

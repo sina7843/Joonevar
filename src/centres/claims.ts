@@ -15,6 +15,7 @@ import { cities } from '../db/schema/geography.ts';
 import { centreClaimDocuments, centreClaims, centres } from '../db/schema/vets.ts';
 import { putPrivateFile } from '../files/storage.ts';
 import { recordAudit } from '../audit/service.ts';
+import { boundedRows } from '../privacy/limits.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf } from '../domain/pagination.ts';
@@ -327,7 +328,8 @@ export async function centreClaimQueue(
   query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
 ) {
   assertReviewer(actor);
-  const request = { page: query.page, pageSize: query.pageSize ?? 20 };
+  // §20: one answer never returns a whole table, however large a page is asked for.
+  const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
   const where = inArray(centreClaims.status, [...QUEUE_STATUSES[query.view]]);
   const [[total], rows] = await Promise.all([
     database.select({ value: count() }).from(centreClaims).where(where),
