@@ -108,16 +108,26 @@ test('every image on a public page carries alt text and reserves its space', asy
   });
 });
 
-test('a content image is sent once and answered with 304 on the next view', async () => {
+test('a content image is sent once and answered with 304 on the next view', async (t) => {
   await onPage(DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/articles', { waitUntil: 'load' });
     /*
-     * A fresh harness database may hold no article with an image. Counting
-     * first says so immediately; waiting for the locator would block until it
-     * timed out and report a missing fixture as a product failure.
+     * A fresh harness database holds no article with an image, because the dev
+     * fixtures seed no content. Counting first says so immediately; waiting for
+     * the locator would block until it timed out and report a missing fixture
+     * as a product failure.
+     *
+     * Saying so out loud matters more than it looks: returning quietly here
+     * would print a green tick for an assertion that never ran, which is the
+     * one thing an evidence report must never do. The run says SKIP instead,
+     * and the ETag source is proven against a real stored file by
+     * tests/db/content.test.ts.
      */
     const images = page.locator('img[src^="/media/"]');
-    if ((await images.count()) === 0) return;
+    if ((await images.count()) === 0) {
+      t.skip('no published article with an image in the harness database; 304 unproven here');
+      return;
+    }
     const source = await images.first().getAttribute('src');
     assert.ok(source, 'a content image has a source');
 
