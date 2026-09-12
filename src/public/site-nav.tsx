@@ -17,7 +17,7 @@ function isCurrent(pathname: string, href: string): boolean {
 export function DesktopNav({ links }: { links: readonly NavLink[] }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="ناوبری سایت" className="hidden md:block">
+    <nav aria-label="ناوبری سایت" className="hidden lg:block">
       <ul className="flex items-center gap-xs">
         {links.map((link) => {
           const current = isCurrent(pathname, link.href);
@@ -27,7 +27,7 @@ export function DesktopNav({ links }: { links: readonly NavLink[] }) {
                 href={link.href}
                 aria-current={current ? 'page' : undefined}
                 className={[
-                  'flex min-h-[var(--size-touch-min)] items-center rounded-md px-md text-label-md transition-colors',
+                  'flex min-h-[var(--size-touch-min)] items-center whitespace-nowrap rounded-md px-sm text-label-md transition-colors',
                   current ? 'text-text-brand' : 'text-text-secondary hover:text-text-primary',
                 ].join(' ')}
               >
@@ -70,7 +70,7 @@ export function MobileMenu({ links }: { links: readonly NavLink[] }) {
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         ref={toggle}
         type="button"

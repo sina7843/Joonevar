@@ -32,7 +32,7 @@ export async function SiteShell({ children }: { children: ReactNode }) {
       </a>
 
       <header className="sticky top-0 z-20 border-b border-border-subtle bg-bg-surface">
-        <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-6xl items-center justify-between gap-md px-lg">
+        <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-7xl items-center justify-between gap-md px-lg">
           <div className="flex min-w-0 items-center gap-lg">
             <Link href="/" aria-label="همزیست — صفحه اصلی" className="shrink-0">
               <Logo height={28} />
@@ -41,7 +41,7 @@ export async function SiteShell({ children }: { children: ReactNode }) {
           </div>
           <div className="flex shrink-0 items-center gap-xs">
             {/* Plain GET form: a search is an address a visitor can share (§16). */}
-            <form method="get" action="/search" role="search" className="hidden sm:flex" data-testid="site-search">
+            <form method="get" action="/search" role="search" className="hidden xl:flex" data-testid="site-search">
               <label htmlFor="site-search-input" className="sr-only">
                 جست‌وجو در همزیست
               </label>

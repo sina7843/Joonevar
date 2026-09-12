@@ -124,6 +124,18 @@
   --text-h3--line-height: 36px;
   --text-h1: 32px;
   --text-h1--line-height: 48px;
+
+  /*
+   * Display size — CODE-ONLY (DEC-0182).
+   *
+   * The published scale stops at 32px, which is a heading size, not a display
+   * one. The public landing needs a first line that carries the page, so this
+   * value is added here under the same rule the content widths already follow:
+   * not upstream, marked, traceable. It scales with the viewport so the hero
+   * never needs a second breakpoint to stay on two lines.
+   */
+  --text-display: clamp(30px, 5.2vw, 52px);
+  --text-display--line-height: 1.18;
 }
 
 :root {
