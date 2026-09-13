@@ -13,7 +13,6 @@ import {
   createUnownedVetProfileAction,
   decideVetApplicationAction,
   resubmitVetApplicationAction,
-  submitVetApplicationAction,
   withdrawVetApplicationAction,
   type OnboardingState,
 } from './onboarding-actions.ts';
@@ -99,41 +98,7 @@ function ApplicationFields({
   );
 }
 
-/** A new request: a directory profile of one's own, or a claim of an unowned profile. */
-export function VetApplicationForm({
-  kind,
-  claimSlug,
-  defaults,
-  provinces,
-  cities,
-}: {
-  kind: 'PROFILE' | 'CLAIM';
-  claimSlug?: string;
-  defaults: ApplicationDefaults;
-  provinces: readonly Option[];
-  cities: readonly CityOption[];
-}) {
-  const [state, submit, pending] = useActionState(submitVetApplicationAction, EMPTY);
-  return (
-    <Card>
-      <h2 className="text-label-lg">{kind === 'CLAIM' ? 'درخواست Claim پروفایل' : 'درخواست ساخت پروفایل دامپزشک'}</h2>
-      <p className="mt-xs text-body-sm text-text-secondary">
-        پس از تأیید، پروفایل دایرکتوری و تأیید کد نظام به حساب شما وصل می‌شود. نقش «دامپزشک معتمد» خدمات همزیست جداست و از این مسیر داده
-        نمی‌شود.
-      </p>
-      <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="vet-application-form">
-        <input type="hidden" name="kind" value={kind} />
-        {claimSlug ? <input type="hidden" name="claimSlug" value={claimSlug} /> : null}
-        <Result state={state} testId="vet-application-result" />
-        <ApplicationFields defaults={defaults} provinces={provinces} cities={cities} />
-        <DocumentFields requireCouncilCard />
-        <Button type="submit" disabled={pending} data-testid="submit-vet-application">
-          ارسال برای بررسی
-        </Button>
-      </form>
-    </Card>
-  );
-}
+// A new application is the Phase 2.5 doctor form (doctor-forms.tsx); these finish applications already open.
 
 export function ResubmitApplicationForm({
   application,

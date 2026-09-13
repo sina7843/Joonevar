@@ -53,7 +53,7 @@ export async function associationQueues(
 ): Promise<readonly QueueCount[]> {
   assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
 
-  const [kyc, kennelCases, permits, foreign, postal, vetStudents] = await Promise.all([
+  const [kyc, kennelCases, permits, foreign, postal, vetStudents, vetDoctors] = await Promise.all([
     countRows(
       database,
       database
@@ -87,6 +87,19 @@ export async function associationQueues(
         .from(vetProfessionalCases)
         .where(and(eq(vetProfessionalCases.caseType, 'STUDENT'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
     ),
+    countRows(
+      database,
+      database
+        .select({ value: count() })
+        .from(vetProfessionalCases)
+        .where(
+          and(
+            eq(vetProfessionalCases.caseType, 'COUNCIL'),
+            isNull(vetProfessionalCases.legacyApplicationId),
+            inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']),
+          ),
+        ),
+    ),
   ]);
 
   return [
@@ -103,6 +116,13 @@ export async function associationQueues(
       noteFa: 'بررسی دستی شماره دانشجویی و دانشگاه (Phase 2.5)',
       href: '/assoc/vet-students',
       waiting: vetStudents,
+    },
+    {
+      key: 'vet-doctors',
+      titleFa: 'کد نظام دامپزشکان',
+      noteFa: 'بررسی دستی کد نظام، عمومی/متخصص و Claim پروفایل بدون مالک (Phase 2.5)',
+      href: '/assoc/vet-doctors',
+      waiting: vetDoctors,
     },
     {
       key: 'members',

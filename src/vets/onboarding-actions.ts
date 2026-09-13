@@ -11,7 +11,6 @@ import {
   createUnownedVetProfile,
   decideVetApplication,
   resubmitVetApplication,
-  submitVetApplication,
   withdrawVetApplication,
   type ApplicationDocumentInput,
 } from './onboarding.ts';
@@ -60,21 +59,11 @@ const fields = (form: FormData) => ({
   statementFa: text(form, 'statementFa'),
 });
 
-export async function submitVetApplicationAction(_previous: OnboardingState, form: FormData): Promise<OnboardingState> {
-  try {
-    const actor = await actorAt('/account/vet-profile');
-    await submitVetApplication(db(), env().PRIVATE_STORAGE_DIR, actor, {
-      kind: text(form, 'kind'),
-      claimSlug: text(form, 'claimSlug'),
-      ...fields(form),
-      documents: await documentsOf(form),
-    });
-    refresh();
-    return { ok: true, message: 'درخواست ثبت شد و برای بررسی ارسال شد.' };
-  } catch (error) {
-    return failure(error);
-  }
-}
+/*
+ * There is no action for a new Phase 2 application any more. A new doctor applies
+ * through the Phase 2.5 path, reviewed by the association admin (PROMPT-005,
+ * DEC-0191); applications already open here finish with the actions below.
+ */
 
 export async function resubmitVetApplicationAction(_previous: OnboardingState, form: FormData): Promise<OnboardingState> {
   try {

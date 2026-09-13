@@ -1,0 +1,128 @@
+{
+  "promptId": "PROMPT-005",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The doctor path without a practice licence. A signed-in account chooses the doctor path, or opens the claim page of a published unowned directory profile, and applies with its name, general or specialist (required; NOT_DECLARED is never a choice), a council code normalised as in Phase 2 and a council card; no licence document is accepted on this path. The application is a COUNCIL professional case with an immutable version-1 submission that records declaredLicence false, created under an account row lock. It is refused for an account with any other open professional case, an open Phase 2 application, a doctor or student profile, a tag or the TRUSTED_VET role, and for a council code another profile holds; when that profile is an unowned published page the refusal carries its claim address. A claim may only target a published, unowned, unmerged page, must match the page's council code if it has one, and only one claim of a page may be open. The association admin (ASSOCIATION_OPERATOR or SUPERADMIN, DEC-0190) verifies the council code by hand, asks for a correction or rejects, always with a reason, never on their own case and never on a stale version; a correction is answered with a new submission version while the earlier one stays. Verification rechecks everything, then either creates the doctor's profile or transfers the claimed page with a conditional update that only succeeds while the page is still unowned, so an owned record can never be taken over and a failed transfer rolls the whole approval back. The profile becomes DOCTOR with the declared scope, a verified council code with its verifier and has_licence false; the case becomes VERIFIED_NO_LICENSE; and exactly the unlicensed doctor tag with that scope is given. No role, licence code or licence verification, Finder place or trusted eligibility follows, while directory introduction does: the verified doctor writes, locates and publishes the page. A later licence case can open beside the closed council case and add licence data and a new tag while the council submissions, the council case status and the unlicensed tag row stay. The Phase 2 submission action and form were removed, so every new doctor application goes to the association; applications already open in Phase 2 finish in /review/vets, and their mirrored cases are not decidable from the association queue. The association has a queue with open, correction and decided views, a detail page with every version, the documents, the claimed page, the same council code elsewhere and the history, a count on its overview and a navigation entry; the applicant sees status, reasons, documents and history on the account page and can answer a correction there.",
+  "changedFiles": [
+    "src/vets/doctor-application.ts",
+    "src/vets/doctor-actions.ts",
+    "src/vets/doctor-forms.tsx",
+    "app/assoc/vet-doctors/page.tsx",
+    "app/assoc/vet-doctors/[id]/page.tsx",
+    "app/account/vet-profile/page.tsx",
+    "app/account/vet-profile/claim/[slug]/page.tsx",
+    "src/vets/professional-profile-model.ts",
+    "src/vets/onboarding-actions.ts",
+    "src/vets/onboarding-forms.tsx",
+    "src/operations/service.ts",
+    "src/ui/shell.tsx",
+    "tests/domain/vet-doctor.test.ts",
+    "tests/db/vet-doctor.test.ts",
+    "tests/browser/vet-onboarding.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-005.json"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0191"],
+  "tests": {
+    "domainAffected": {"command": "node --test tests/domain/vet-doctor.test.ts tests/domain/vet-student.test.ts tests/domain/vet-professional-profile.test.ts tests/domain/vet-professional.test.ts", "total": 23, "pass": 23, "fail": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "durationSeconds": 2.2, "total": 239, "pass": 239, "fail": 0, "skip": 0},
+    "databaseAffected": {"command": "node --test --test-concurrency=3 tests/db/vet-doctor.test.ts tests/db/vet-onboarding.test.ts tests/db/vet-student.test.ts tests/db/vet-professional-profile.test.ts tests/db/vet-professional-tags.test.ts tests/db/vet-directory.test.ts tests/db/advertising.test.ts", "durationSeconds": 14.2, "total": 55, "pass": 55, "fail": 0},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 275.5, "total": 367, "pass": 367, "fail": 0, "skip": 0},
+    "browser": {"command": "node tools/browser-tests.mjs tests/browser/vet-onboarding.test.ts tests/browser/vet-student.test.ts tests/browser/centres.test.ts tests/browser/vet-directory.test.ts tests/browser/operations.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts tests/browser/rtl.test.ts", "durationSeconds": 65.2, "total": 44, "pass": 44, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 in 4.8 s on the final tree, including the doctor service, forms, association pages, the rewritten account and claim pages and all new tests."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 71.6 s on the first attempt, in a detached worktree at HEAD dff6c74 with all 15 changed and new source and test files copied in and npm ci run, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=4 \"tests/db/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "Domain+config+UI 239/239 (5 new). The complete database suite 367/367 (8 new), including the Phase 2 onboarding suite whose service still finishes open applications."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/vet-onboarding.test.ts tests/browser/vet-student.test.ts tests/browser/centres.test.ts tests/browser/vet-directory.test.ts tests/browser/operations.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "44/44 on the first run, on an isolated database and production server built from the worktree. vet-onboarding was rewritten onto the doctor path and association review and keeps every behavioural assertion of Phase 2: application, correction with a readable reason, verification, owner location, publication, visitor page, unowned publication by the review operator, claim of the same page, and private documents (applicant 200, other account 403, visitor 401). It now also asserts the unlicensed tag label, the normalised council code and that the review operator is refused the association queue. The full 161-test matrix was not rerun."
+    },
+    {
+      "id": "normalization",
+      "command": "node --test tests/db/vet-doctor.test.ts (test: the council code is normalised…) ; node --test tests/domain/vet-doctor.test.ts ; browser vet-onboarding",
+      "result": "PASS",
+      "evidence": "A code typed ' syn dr ۷۷N ' is stored as SYNDR77N with the scope and declaredLicence false; Persian and Arabic digits, spaces and case read as one code; an empty or NOT_DECLARED scope, an empty or malformed code, a missing council card and a licence document are each VALIDATION and store no case. In the browser 'syn br7 RUN' reaches the reviewer as SYNBR7RUN."
+    },
+    {
+      "id": "duplicates",
+      "command": "node --test tests/db/vet-doctor.test.ts (test: duplicates are refused…)",
+      "result": "PASS",
+      "evidence": "CONFLICT for a second open case, an open student case, an open Phase 2 application, an account with a profile, a code held by another owned profile, and the TRUSTED_VET role; a code held by an unowned published page is CONFLICT carrying that page's claim address; applying from REVIEW_OPERATOR context is FORBIDDEN; two simultaneous submissions leave one case."
+    },
+    {
+      "id": "claim-conflicts",
+      "command": "node --test tests/db/vet-doctor.test.ts (tests: a claim targets only a published unowned page… ; an approval never seizes a page…) ; browser vet-onboarding",
+      "result": "PASS",
+      "evidence": "An address that is no page is NOT_FOUND; a code different from the page code is VALIDATION; a second claim of a page with a claim open is CONFLICT; verification transfers the same row with the same public address and claimedAt, and the page is then not claimable (NOT_FOUND). When the page gains an owner while the claim waits, verification is CONFLICT, the owner is unchanged, the claimant has no tag and the case is still SUBMITTED. In the browser the claimant takes over the same address after association verification."
+    },
+    {
+      "id": "correction-rejection",
+      "command": "node --test tests/db/vet-doctor.test.ts (tests: correction adds a version… ; a mirrored Phase 2 application is not decided…) ; browser vet-onboarding",
+      "result": "PASS",
+      "evidence": "USER, TRUSTED_VET, REVIEW_OPERATOR and GENETICS_OPERATOR are refused the decision and the queue; a decision on one's own case is FORBIDDEN and without a reason VALIDATION. A correction is answered as version 2 (GENERAL then SPECIALIST both kept) with its identity document on version 2 and the council card on version 1; rejection gives no tag and no profile, cannot be resubmitted, and a new application may follow. A mirrored Phase 2 case is NOT_FOUND to the association. In the browser the applicant reads the reason and answers the correction."
+    },
+    {
+      "id": "manual-verification",
+      "command": "node --test tests/db/vet-doctor.test.ts (test: verification gives exactly the unlicensed tag…) ; browser vet-onboarding",
+      "result": "PASS",
+      "evidence": "The case is VERIFIED_NO_LICENSE; the current tag is UNLICENSED with scope SPECIALIST from VET_COUNCIL_CASE of that case; the profile is DOCTOR, SPECIALIST, with the code and the association operator as verifier, has_licence false, no licence code and no licence verification; the decision was notified. The directory editor opens, a public location is added and the page is published. In the browser the owner sees «دکتر دامپزشک - عمومی - بدون پروانه فعالیت», the verified axis and the trusted axis inactive, and a visitor reads the verified page without a trusted mark."
+    },
+    {
+      "id": "trusted-denial",
+      "command": "node --test tests/db/vet-doctor.test.ts (test: verification gives exactly the unlicensed tag… ; duplicates…) ; browser vet-onboarding",
+      "result": "PASS",
+      "evidence": "The verified doctor holds no role, cannot switch the session to TRUSTED_VET (FORBIDDEN), has no trusted work eligibility (vetEligibilityFor null) and is not in the Finder even with a published location; an account that already holds TRUSTED_VET cannot use this path. The owner's directory axis shows trusted inactive and the public page has no trusted mark."
+    },
+    {
+      "id": "licence-upgrade-preserves-history",
+      "command": "node --test tests/db/vet-doctor.test.ts (test: a later licence upgrade adds evidence…)",
+      "result": "PASS",
+      "evidence": "After verification, a LICENCE case opens beside the closed council case, licence code, date, file and verification are accepted on the same profile, and a LICENSED tag replaces the unlicensed one: the tag history is UNLICENSED ended then LICENSED current, the council case is still VERIFIED_NO_LICENSE and its submission still says declaredLicence false."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The Phase 2 service function that creates an application remains in code for applications already open and for its tests; it has no product entry point any more.",
+    "One open claim per page is enforced by the service, not by a database index; two claims cannot both be approved because the transfer is conditional.",
+    "A verified doctor cannot change general/specialist yet, and Phase 2 doctors with NOT_DECLARED have no declaration path in this prompt.",
+    "The new doctor path has no appeal after rejection and no applicant withdrawal; a new application may follow a rejection.",
+    "The real licence flow is PROMPT-006; the upgrade is proven at the data level only.",
+    "Deciding a submitted case performs the start of review and the decision in one step; claiming a case is PROMPT-007.",
+    "The tag label uses the hyphenated form of PHASE_2_5_SPEC_FA §3, while the prompt text writes it with em dashes.",
+    "The full 161-test browser matrix was not rerun; eight suites passing through the changed code were.",
+    "Screenshots were taken only inside the temporary worktree and are not committed; visual fidelity of the new pages is unverified."
+  ],
+  "readiness": {
+    "code": "DOCTOR_WITHOUT_LICENCE_PATH_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-doctor.test.ts",
+    "tests/domain/vet-doctor.test.ts",
+    "tests/browser/vet-onboarding.test.ts",
+    "DECISIONS.md#dec-0191"
+  ]
+}

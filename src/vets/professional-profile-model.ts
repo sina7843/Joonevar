@@ -197,6 +197,59 @@ export const STUDENT_DECISION_FA: Record<StudentDecision, string> = {
 };
 export const isStudentDecision = oneOf(STUDENT_DECISIONS);
 
+// ── Doctor without a practice licence (PROMPT-005) ─────────────────────────
+
+export interface DoctorFields {
+  readonly displayNameFa: string;
+  readonly practiceScope: string;
+  /** Already normalised with `normalizeCouncilCode`. */
+  readonly councilCode: string;
+  readonly phone: string | null;
+  readonly cityId: string | null;
+  readonly statementFa: string | null;
+}
+
+const UUID_SHAPE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Everything wrong with a doctor application. General or specialist must be
+ * declared: NOT_DECLARED belongs to records older than the question and is never
+ * a choice (DEC-0188). The council code shape is the Phase 2 one (DEC-0165).
+ */
+export function doctorFieldProblems(fields: DoctorFields): string[] {
+  const problems: string[] = [];
+  const name = fields.displayNameFa.trim();
+  if (name === '') problems.push('نام و نام خانوادگی دامپزشک را بنویسید.');
+  else if (name.length > 120) problems.push('نام و نام خانوادگی حداکثر ۱۲۰ نویسه است.');
+  if (fields.practiceScope !== 'GENERAL' && fields.practiceScope !== 'SPECIALIST') problems.push('عمومی یا متخصص بودن را انتخاب کنید.');
+  if (fields.councilCode === '') problems.push('کد نظام دامپزشکی را بنویسید.');
+  else if (!/^[A-Z0-9-]{3,20}$/.test(fields.councilCode)) problems.push('کد نظام دامپزشکی فقط رقم، حرف لاتین و خط تیره دارد (۳ تا ۲۰ نویسه).');
+  if (fields.phone !== null && fields.phone.length > 20) problems.push('تلفن حداکثر ۲۰ نویسه است.');
+  if (fields.cityId !== null && !UUID_SHAPE.test(fields.cityId)) problems.push('شهر انتخاب‌شده در فهرست شهرها نیست.');
+  if (fields.statementFa !== null && fields.statementFa.length > 2000) problems.push('توضیح حداکثر ۲۰۰۰ نویسه است.');
+  return problems;
+}
+
+/** Documents a doctor application may carry. No licence: that is a separate, later case (PROMPT-006). */
+export const DOCTOR_DOCUMENT_KINDS = ['COUNCIL_CARD', 'IDENTITY', 'OTHER'] as const;
+export type DoctorDocumentKind = (typeof DOCTOR_DOCUMENT_KINDS)[number];
+export const isDoctorDocumentKind = oneOf(DOCTOR_DOCUMENT_KINDS);
+
+export const DOCTOR_DECISIONS = ['VERIFY', 'REQUEST_CORRECTION', 'REJECT'] as const;
+export type DoctorDecision = (typeof DOCTOR_DECISIONS)[number];
+/** Verifying a council code reaches VERIFIED_NO_LICENSE and nothing further (PHASE_2_5_SPEC_FA §4). */
+export const DOCTOR_DECISION_OUTCOME: Record<DoctorDecision, VetCaseStatus> = {
+  VERIFY: 'VERIFIED_NO_LICENSE',
+  REQUEST_CORRECTION: 'NEEDS_CORRECTION',
+  REJECT: 'REJECTED',
+};
+export const DOCTOR_DECISION_FA: Record<DoctorDecision, string> = {
+  VERIFY: 'تأیید کد نظام (بدون پروانه فعالیت)',
+  REQUEST_CORRECTION: 'درخواست اصلاح',
+  REJECT: 'رد',
+};
+export const isDoctorDecision = oneOf(DOCTOR_DECISIONS);
+
 // ── Public view ────────────────────────────────────────────────────────────
 
 /** Never in a public payload, at any depth. The public-view test walks the payload for these. */

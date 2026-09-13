@@ -1,13 +1,15 @@
 /**
- * Veterinarian onboarding and claims in the browser — Phase 2 PROMPT-007.
+ * Veterinarian onboarding and claims in the browser — Phase 2 PROMPT-007,
+ * moved onto the Phase 2.5 doctor path (PROMPT-005, DEC-0191).
  *
- * A signed-in account requests a directory profile with its council code and
- * council card; the review operator asks for a correction, the applicant
- * answers it and the operator approves; the new owner adds a location, writes
- * the profile and publishes it. Then the operator publishes an unowned profile,
- * a visitor sees «بدون مالک» and the claim link, another veterinarian claims it
- * and takes over the same page. The review environment and the documents stay
- * closed to everyone else.
+ * A signed-in account chooses the doctor path and applies with general or
+ * specialist, its council code and council card; the association admin asks for
+ * a correction, the applicant answers it and the association verifies; the new
+ * owner holds exactly the unlicensed doctor tag, adds a location, writes the
+ * profile and publishes it. Then the review operator publishes an unowned
+ * profile, a visitor sees «بدون مالک» and the claim link, another veterinarian
+ * claims it, the association verifies and the claimant takes over the same page.
+ * The association environment and the documents stay closed to everyone else.
  *
  * Runs on the isolated database and server of `tools/browser-tests.mjs`.
  */
@@ -29,7 +31,7 @@ const DESKTOP = { width: 1440, height: 900 };
 const RUN = String(randomInt(100_000, 999_999));
 
 /** SYNTHETIC fixtures on the reserved 0999 range. */
-const ACCOUNTS = { applicant: '09990000001', claimant: '09990000002', reviewer: '09990000009' } as const;
+const ACCOUNTS = { applicant: '09990000001', claimant: '09990000002', reviewer: '09990000009', association: '09990000004' } as const;
 type Who = keyof typeof ACCOUNTS;
 
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52]);
@@ -92,82 +94,89 @@ async function as<T>(who: Who | 'visitor', viewport: { width: number; height: nu
   }
 }
 
-/** A form's result line changes in place, so wait for the text rather than the element. */
 async function waitForText(page: Page, testId: string, text: string): Promise<void> {
-  await page.waitForFunction(
-    ([id, expected]) => document.querySelector('[data-testid="' + id + '"]')?.textContent?.includes(expected) ?? false,
-    [testId, text] as const,
-  );
+  await page
+    .waitForFunction(([id, expected]) => document.querySelector('[data-testid="' + id + '"]')?.textContent?.includes(expected) ?? false, [testId, text] as const)
+    .catch(async () => {
+      const actual = (await page.locator('[data-testid="' + testId + '"]').first().textContent().catch(() => null)) ?? '(no such element)';
+      throw new Error(testId + ' never said "' + text + '"; it said: ' + actual.trim().slice(0, 300));
+    });
 }
 
 const textOf = async (page: Page, testId: string): Promise<string> => ((await page.getByTestId(testId).textContent()) ?? '').trim();
 
-/** The operator opens the queue item with this name and records a decision. */
-async function decide(page: Page, name: string, decision: string, reason: string, expected: string): Promise<void> {
-  await page.goto(BASE_URL + '/review/vets', { waitUntil: 'load' });
-  const item = page.locator('[data-testid^="review-item-"]', { hasText: name });
+/**
+ * The association admin opens the waiting case with this name and records a
+ * decision. A decided case no longer shows its form, so the persisted status on
+ * the re-rendered page is what proves the decision.
+ */
+async function decide(page: Page, name: string, decision: string, reason: string, expectedStatus: string): Promise<void> {
+  await page.goto(BASE_URL + '/assoc/vet-doctors?view=OPEN', { waitUntil: 'load' });
+  const item = page.locator('[data-testid="doctor-queue"] > li', { hasText: name });
   await item.waitFor();
-  await Promise.all([page.waitForURL((url) => /^\/review\/vets\/[0-9a-f-]{36}$/.test(url.pathname)), item.click()]);
-  await page.getByTestId('review-decision-form').waitFor();
-  await page.getByTestId('review-decision').selectOption(decision);
-  await page.getByTestId('review-reason').fill(reason);
-  await page.getByTestId('submit-review-decision').click();
-  await waitForText(page, 'review-decision-result', expected);
+  await Promise.all([page.waitForURL((url) => /^\/assoc\/vet-doctors\/[0-9a-f-]{36}$/.test(url.pathname)), item.getByTestId('open-doctor-case').click()]);
+  await page.getByTestId('doctor-decision-form').waitFor();
+  await page.getByTestId('doctor-decision-' + decision).check();
+  await page.getByTestId('doctor-decision-reason').fill(reason);
+  await page.getByTestId('submit-doctor-decision').click();
+  await waitForText(page, 'doctor-case-status', expectedStatus);
 }
 
 const APPLICANT_NAME = 'دامپزشک متقاضی SYNTHETIC ' + RUN;
 
-test('a veterinarian applies, answers a correction and, once approved, manages and publishes the profile', async () => {
+test('a veterinarian applies, answers a correction and, once verified, manages and publishes the profile', async () => {
   await as('applicant', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
-    // Phase 2.5 PROMPT-004: the account first chooses its path; the doctor path leads to this same application.
     await Promise.all([page.waitForURL('**/account/vet-profile?path=doctor'), page.getByTestId('path-doctor').click()]);
-    await page.getByTestId('vet-application-form').waitFor();
+    await page.getByTestId('doctor-application-form').waitFor();
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
     await page.getByTestId('app-name').fill(APPLICANT_NAME);
+    await page.getByTestId('app-scope-GENERAL').check();
     await page.getByTestId('app-council-code').fill('syn br7 ' + RUN);
     await page.getByTestId('app-phone').fill('02100000000');
     await page.getByTestId('app-province').selectOption('tehran');
     await page.getByTestId('app-city').selectOption({ label: 'تهران' });
     await page.getByTestId('app-doc-COUNCIL_CARD').setInputFiles(card('council-card.png'));
-    await page.getByTestId('submit-vet-application').click();
-    await waitForText(page, 'vet-application-status', 'در انتظار بررسی');
+    await page.getByTestId('submit-doctor-application').click();
+    await waitForText(page, 'doctor-case-status', 'ارسال‌شده');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= MOBILE.width, 'no sideways scroll on a phone: ' + width);
     await page.screenshot({ path: path.join(SHOTS, 'application-submitted-mobile.png'), fullPage: true });
   });
 
-  await as('reviewer', DESKTOP, async (page) => {
-    await decide(page, APPLICANT_NAME, 'REQUEST_CORRECTION', 'SYNTHETIC تصویر کارت خوانا نیست', 'درخواست اصلاح ثبت شد');
-    documentPath = (await page.getByTestId('review-document-COUNCIL_CARD').getAttribute('href'))!;
+  await as('association', DESKTOP, async (page) => {
+    await decide(page, APPLICANT_NAME, 'REQUEST_CORRECTION', 'SYNTHETIC تصویر کارت خوانا نیست', 'نیازمند اصلاح');
+    assert.equal(await textOf(page, 'review-doctor-council-code'), 'SYNBR7' + RUN, 'the council code was normalised');
+    documentPath = (await page.getByTestId('doctor-document-link-COUNCIL_CARD').getAttribute('href'))!;
     const file = await page.request.get(BASE_URL + documentPath);
-    assert.equal(file.status(), 200, 'the reviewer reads the council card');
+    assert.equal(file.status(), 200, 'the association reads the council card');
     assert.equal(file.headers()['content-type'], 'image/png');
     assert.match(file.headers()['cache-control'] ?? '', /no-store/);
-    assert.match(await textOf(page, 'review-application-status'), /نیازمند اصلاح/);
     await page.screenshot({ path: path.join(SHOTS, 'review-correction.png'), fullPage: true });
   });
 
   await as('applicant', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
-    await waitForText(page, 'vet-application-status', 'نیازمند اصلاح');
-    assert.match(await textOf(page, 'vet-application-note'), /خوانا نیست/);
-    await page.getByTestId('app-statement').fill('SYNTHETIC کارت خوانا دوباره پیوست شد');
-    await page.getByTestId('app-doc-IDENTITY').setInputFiles(card('identity.png'));
-    await page.getByTestId('resubmit-vet-application').click();
-    await waitForText(page, 'vet-application-status', 'در انتظار بررسی');
+    await waitForText(page, 'doctor-case-status', 'نیازمند اصلاح');
+    assert.match(await textOf(page, 'doctor-review-note'), /خوانا نیست/);
+    const form = page.getByTestId('doctor-correction-form');
+    await form.getByTestId('app-statement').fill('SYNTHETIC کارت خوانا دوباره پیوست شد');
+    await form.getByTestId('app-doc-IDENTITY').setInputFiles(card('identity.png'));
+    await form.getByTestId('resubmit-doctor-application').click();
+    await waitForText(page, 'doctor-case-status', 'ارسال‌شده');
   });
 
-  await as('reviewer', DESKTOP, async (page) => {
-    await decide(page, APPLICANT_NAME, 'APPROVE', 'SYNTHETIC کارت نظام با کد تطبیق داده شد', 'درخواست تأیید شد');
+  await as('association', DESKTOP, async (page) => {
+    await decide(page, APPLICANT_NAME, 'VERIFY', 'SYNTHETIC کارت نظام با کد تطبیق داده شد', 'کد نظام تأییدشده');
   });
 
   let slug = '';
   await as('applicant', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
+    await waitForText(page, 'vet-current-tag', 'دکتر دامپزشک - عمومی - بدون پروانه فعالیت');
     await page.getByTestId('directory-axes').waitFor();
     assert.match(await textOf(page, 'axis-verification'), /تأییدشده$/);
-    assert.match(await textOf(page, 'axis-trusted'), /غیرفعال$/, 'approval does not make the veterinarian trusted');
+    assert.match(await textOf(page, 'axis-trusted'), /غیرفعال$/, 'verification does not make the veterinarian trusted');
 
     await page.getByTestId('own-location-name').fill('مطب SYNTHETIC ' + RUN);
     await page.getByTestId('own-location-province').selectOption('tehran');
@@ -233,21 +242,23 @@ test('a reviewer publishes an unowned profile, and a veterinarian claims it and 
 
   await as('claimant', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/account/vet-profile/claim/' + slug, { waitUntil: 'load' });
-    await page.getByTestId('vet-application-form').waitFor();
+    await page.getByTestId('doctor-application-form').waitFor();
     assert.equal(await page.getByTestId('app-name').inputValue(), unownedName);
+    await page.getByTestId('app-scope-SPECIALIST').check();
     await page.getByTestId('app-council-code').fill('SYN-CL7-' + RUN);
     await page.getByTestId('app-doc-COUNCIL_CARD').setInputFiles(card('claim-card.png'));
-    await page.getByTestId('submit-vet-application').click();
+    await page.getByTestId('submit-doctor-application').click();
     await page.getByTestId('claim-in-review').waitFor();
     await page.screenshot({ path: path.join(SHOTS, 'claim-in-review-mobile.png'), fullPage: true });
   });
 
-  await as('reviewer', DESKTOP, async (page) => {
-    await page.goto(BASE_URL + '/review/vets', { waitUntil: 'load' });
-    const item = page.locator('[data-testid^="review-item-"]', { hasText: unownedName });
+  await as('association', DESKTOP, async (page) => {
+    await page.goto(BASE_URL + '/assoc/vet-doctors?view=OPEN', { waitUntil: 'load' });
+    const item = page.locator('[data-testid="doctor-queue"] > li', { hasText: unownedName });
     await item.waitFor();
     assert.match((await item.textContent()) ?? '', /Claim/);
-    await decide(page, unownedName, 'APPROVE', 'SYNTHETIC هویت و کارت نظام تطبیق داده شد', 'درخواست تأیید شد');
+    await decide(page, unownedName, 'VERIFY', 'SYNTHETIC هویت و کارت نظام تطبیق داده شد', 'کد نظام تأییدشده');
+    await page.getByTestId('doctor-claim-target').waitFor();
   });
 
   await as('visitor', MOBILE, async (page) => {
@@ -259,22 +270,27 @@ test('a reviewer publishes an unowned profile, and a veterinarian claims it and 
 
   await as('claimant', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
+    await waitForText(page, 'vet-current-tag', 'دکتر دامپزشک - متخصص - بدون پروانه فعالیت');
     await page.getByTestId('directory-axes').waitFor();
     assert.match(await textOf(page, 'axis-ownership'), /Claim/);
     await page.screenshot({ path: path.join(SHOTS, 'claimed-owner.png'), fullPage: true });
   });
 });
 
-test('the review environment and application documents stay closed to everyone else', async () => {
+test('the association environment and application documents stay closed to everyone else', async () => {
   assert.ok(documentPath, 'the first test captured a document address');
   await as('applicant', DESKTOP, async (page) => {
-    await page.goto(BASE_URL + '/review/vets', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/vet-doctors', { waitUntil: 'load' });
     assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
     // The applicant reads their own document.
     assert.equal((await page.request.get(BASE_URL + documentPath)).status(), 200);
   });
   await as('claimant', DESKTOP, async (page) => {
     assert.equal((await page.request.get(BASE_URL + documentPath)).status(), 403, 'another account cannot read it');
+  });
+  await as('reviewer', DESKTOP, async (page) => {
+    await page.goto(BASE_URL + '/assoc/vet-doctors', { waitUntil: 'load' });
+    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN', 'the Phase 2 review operator does not verify council codes');
   });
   await as('visitor', MOBILE, async (page) => {
     assert.equal((await page.request.get(BASE_URL + documentPath)).status(), 401);

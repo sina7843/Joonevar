@@ -252,6 +252,7 @@ export const ASSOC_NAV: readonly NavItem[] = [
   { href: '/assoc', label: 'صف‌ها', icon: 'listChecks' },
   { href: '/assoc/kyc', label: 'احراز هویت', icon: 'shieldCheck' },
   { href: '/assoc/vet-students', label: 'دانشجویان دامپزشکی', icon: 'certificate' },
+  { href: '/assoc/vet-doctors', label: 'کد نظام دامپزشکان', icon: 'shieldCheck' },
   { href: '/assoc/members', label: 'عضویت', icon: 'user' },
   { href: '/assoc/kennels', label: 'کنل', icon: 'house' },
   { href: '/assoc/permits', label: 'مجوز جفت‌گیری', icon: 'stamp' },
