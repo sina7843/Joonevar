@@ -302,7 +302,8 @@ test('only the reviewer side or the server changes a tag, never for its own acco
   await assert.rejects(grant(accountId, 'BADGE', 'GENERAL'), appCode('VALIDATION'));
   assert.equal(await currentVetTag(testDb.db, accountId), null, 'nothing was written by any refused call');
 
-  await grant(accountId, 'STUDENT', null, null);
+  // The server itself (null actor) may change a tag. STUDENT is not used here: it needs a verified student case (PROMPT-004).
+  await grant(accountId, 'UNLICENSED', 'GENERAL', null);
   await assert.rejects(vetTagHistory(testDb.db, actorFor(await newAccountId(), 'USER'), accountId), appCode('FORBIDDEN'), 'another account cannot read the history');
   assert.equal((await vetTagHistory(testDb.db, actorFor(accountId, 'USER'), accountId)).length, 1, 'the account reads its own');
 

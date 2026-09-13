@@ -16,6 +16,7 @@ import { matingPermits } from '../db/schema/mating.ts';
 import { foreignPedigreeCases } from '../db/schema/animals.ts';
 import { geneticsReceipts, parentageAppeals, samples } from '../db/schema/index.ts';
 import { postalRequests } from '../db/schema/pedigree.ts';
+import { vetProfessionalCases } from '../db/schema/vets.ts';
 import { recordAudit } from '../audit/service.ts';
 import { allocateSlug, duplicateCandidates } from '../breeds/service.ts';
 import { forbidden, notFound, validation } from '../domain/errors.ts';
@@ -52,7 +53,7 @@ export async function associationQueues(
 ): Promise<readonly QueueCount[]> {
   assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
 
-  const [kyc, kennelCases, permits, foreign, postal] = await Promise.all([
+  const [kyc, kennelCases, permits, foreign, postal, vetStudents] = await Promise.all([
     countRows(
       database,
       database
@@ -79,6 +80,13 @@ export async function associationQueues(
         .where(eq(foreignPedigreeCases.status, 'UNDER_REVIEW')),
     ),
     countRows(database, database.select({ value: count() }).from(postalRequests)),
+    countRows(
+      database,
+      database
+        .select({ value: count() })
+        .from(vetProfessionalCases)
+        .where(and(eq(vetProfessionalCases.caseType, 'STUDENT'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
+    ),
   ]);
 
   return [
@@ -88,6 +96,13 @@ export async function associationQueues(
       noteFa: 'پرونده‌های ارسال‌شده برای بررسی مدرک هویتی',
       href: '/assoc/kyc',
       waiting: kyc,
+    },
+    {
+      key: 'vet-students',
+      titleFa: 'دانشجویان دامپزشکی',
+      noteFa: 'بررسی دستی شماره دانشجویی و دانشگاه (Phase 2.5)',
+      href: '/assoc/vet-students',
+      waiting: vetStudents,
     },
     {
       key: 'members',

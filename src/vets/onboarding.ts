@@ -15,7 +15,7 @@ import type { Database, DbClient } from '../db/client.ts';
 import { storedFiles } from '../db/schema/core.ts';
 import { profiles } from '../db/schema/identity.ts';
 import { cities, provinces } from '../db/schema/geography.ts';
-import { vetApplicationDocuments, vetApplications, vetProfiles } from '../db/schema/vets.ts';
+import { vetApplicationDocuments, vetApplications, vetProfessionalCases, vetProfiles } from '../db/schema/vets.ts';
 import { putPrivateFile } from '../files/storage.ts';
 import { recordAudit } from '../audit/service.ts';
 import { boundedRows } from '../privacy/limits.ts';
@@ -175,6 +175,20 @@ async function assertNotDuplicate(
   ) {
     throw conflict('درخواست Claim دیگری برای این پروفایل در حال بررسی است.');
   }
+
+  // A student case in review and a doctor's application cannot run side by side (PROMPT-004).
+  const [studentCase] = await tx
+    .select({ id: vetProfessionalCases.id })
+    .from(vetProfessionalCases)
+    .where(
+      and(
+        eq(vetProfessionalCases.accountId, input.accountId),
+        eq(vetProfessionalCases.caseType, 'STUDENT'),
+        inArray(vetProfessionalCases.status, ['DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'NEEDS_CORRECTION']),
+      ),
+    )
+    .limit(1);
+  if (studentCase) throw conflict('پرونده دانشجویی شما در حال بررسی است؛ درخواست دکتر دامپزشک هم‌زمان ثبت نمی‌شود.');
 
   const [owned] = await tx.select({ id: vetProfiles.id }).from(vetProfiles).where(eq(vetProfiles.accountId, input.accountId)).limit(1);
   if (owned) throw conflict('این حساب همین حالا پروفایل دامپزشک دارد.');

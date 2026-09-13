@@ -145,6 +145,58 @@ export function normalizeInstagram(raw: string | null | undefined): { value: str
   return /^[A-Za-z0-9._]{1,30}$/.test(text) ? { value: text.toLowerCase() } : { problem: 'نام کاربری اینستاگرام معتبر نیست.' };
 }
 
+// ── Student application (PROMPT-004) ───────────────────────────────────────
+
+/**
+ * A student number as typed: Persian or Arabic digits, spaces and letter case do
+ * not make a different number — the same normalisation a council code gets. No
+ * official format is known, so only a plausible shape is required (DEC-0190).
+ */
+export function normalizeStudentNumber(raw: string | null | undefined): string {
+  let out = '';
+  for (const ch of raw ?? '') {
+    const code = ch.charCodeAt(0);
+    if (code >= 0x06f0 && code <= 0x06f9) out += String(code - 0x06f0);
+    else if (code >= 0x0660 && code <= 0x0669) out += String(code - 0x0660);
+    else out += ch;
+  }
+  return out.replace(/\s+/g, '').toUpperCase();
+}
+
+export interface StudentFields {
+  readonly displayNameFa: string;
+  readonly studentNumber: string;
+  readonly universityFa: string;
+}
+
+/** Everything wrong with a student application, in the order a person reads the form. */
+export function studentFieldProblems(fields: StudentFields): string[] {
+  const problems: string[] = [];
+  const name = fields.displayNameFa.trim();
+  if (name === '') problems.push('نام و نام خانوادگی را بنویسید.');
+  else if (name.length > 120) problems.push('نام و نام خانوادگی حداکثر ۱۲۰ نویسه است.');
+  if (fields.studentNumber === '') problems.push('شماره دانشجویی را بنویسید.');
+  else if (!/^[A-Z0-9-]{4,20}$/.test(fields.studentNumber)) problems.push('شماره دانشجویی فقط رقم، حرف لاتین و خط تیره دارد (۴ تا ۲۰ نویسه).');
+  const university = fields.universityFa.trim();
+  if (university === '') problems.push('نام دانشگاه را بنویسید.');
+  else if (university.length < 2 || university.length > 120) problems.push('نام دانشگاه باید ۲ تا ۱۲۰ نویسه باشد.');
+  return problems;
+}
+
+export const STUDENT_DECISIONS = ['VERIFY', 'REQUEST_CORRECTION', 'REJECT'] as const;
+export type StudentDecision = (typeof STUDENT_DECISIONS)[number];
+export const STUDENT_DECISION_OUTCOME: Record<StudentDecision, VetCaseStatus> = {
+  VERIFY: 'VERIFIED_STUDENT',
+  REQUEST_CORRECTION: 'NEEDS_CORRECTION',
+  REJECT: 'REJECTED',
+};
+export const STUDENT_DECISION_FA: Record<StudentDecision, string> = {
+  VERIFY: 'تأیید دانشجو',
+  REQUEST_CORRECTION: 'درخواست اصلاح',
+  REJECT: 'رد',
+};
+export const isStudentDecision = oneOf(STUDENT_DECISIONS);
+
 // ── Public view ────────────────────────────────────────────────────────────
 
 /** Never in a public payload, at any depth. The public-view test walks the payload for these. */

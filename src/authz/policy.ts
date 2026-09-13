@@ -124,7 +124,8 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   VET_PROFILE_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
   COMMUNITY_IMAGE: ['REVIEW_OPERATOR', 'SUPERADMIN'],
   // Evidence of a professional case: the veterinarian and the reviewers, nobody else; every read is audited (DEC-0189).
-  VET_PROFESSIONAL_DOCUMENT: ['REVIEW_OPERATOR', 'SUPERADMIN'],
+  // The association admin (the Phase 1 association operator) reviews student and council cases (DEC-0190).
+  VET_PROFESSIONAL_DOCUMENT: ['ASSOCIATION_OPERATOR', 'REVIEW_OPERATOR', 'SUPERADMIN'],
 };
 
 export function canReadFile(

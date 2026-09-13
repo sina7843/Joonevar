@@ -1,0 +1,139 @@
+{
+  "promptId": "PROMPT-004",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The veterinary student path. After sign-in the dashboard offers an ordinary account a veterinary path, and /account/vet-profile asks whether it is a veterinary student or a veterinarian; choosing nothing is a complete answer, no role is added and the account is never replaced. A student application needs a name, a student number (normalised like a council code, only a plausible shape required because no official format is known) and a university, with an optional private student card. It creates a STUDENT professional case with an immutable version-1 submission, under an account row lock so two simultaneous submissions cannot open two cases. The association admin decides by hand, and the association admin is the Phase 1 association operator (DEC-0190), together with the superadmin; the Phase 2 review operator, a trusted vet and every other context are refused. Every decision (verify, request correction, reject) carries a reason, cannot be taken on one's own case or on a stale version, notifies the applicant, and is recorded in the case audit. A correction is answered with a new submission version while the earlier one stays; a rejection is final for that case and a new application may follow. Verification rechecks eligibility, creates the canonical vet_profile as STUDENT (still a draft, no role), marks the case VERIFIED_STUDENT and gives the one student tag in the same transaction. replaceVetTag itself now accepts the student tag only from a verified student case of the same account and refuses every doctor tag on a student profile. A verified student cannot publish a directory page (from any manager), add a place of practice, be an advertising target or purchase target, see the directory editor, or file a Phase 2 doctor application; the student path in turn is closed to accounts with a doctor profile, a tag, the trusted veterinarian role or any other open case, and a doctor application is refused while a student case is open. The applicant sees status, reviewer reasons and the full history (from the case audit, without reviewer identities) on the account page and in the dashboard JSON; the association has a queue with open, correction and decided views, a detail page with every submitted version, the private card, the same student number on other accounts and the history, a count on its overview and a navigation entry.",
+  "changedFiles": [
+    "src/vets/student-application.ts",
+    "src/vets/student-actions.ts",
+    "src/vets/student-forms.tsx",
+    "app/assoc/vet-students/page.tsx",
+    "app/assoc/vet-students/[id]/page.tsx",
+    "app/account/vet-profile/page.tsx",
+    "app/dashboard/page.tsx",
+    "src/vets/professional-profile-model.ts",
+    "src/vets/professional-profile.ts",
+    "src/vets/professional-tags.ts",
+    "src/vets/directory.ts",
+    "src/vets/onboarding.ts",
+    "src/advertising/service.ts",
+    "src/operations/service.ts",
+    "src/authz/policy.ts",
+    "src/domain/resume-context.ts",
+    "src/ui/shell.tsx",
+    "tests/domain/vet-student.test.ts",
+    "tests/db/vet-student.test.ts",
+    "tests/browser/vet-student.test.ts",
+    "tests/browser/vet-onboarding.test.ts",
+    "tests/db/vet-professional-tags.test.ts",
+    "tests/db/vet-professional-profile.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-004.json"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0190"],
+  "tests": {
+    "domainAffected": {"command": "node --test tests/domain/vet-student.test.ts tests/domain/vet-professional-profile.test.ts tests/domain/vet-professional.test.ts tests/domain/migrations.test.ts", "total": 22, "pass": 22, "fail": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "durationSeconds": 2.0, "total": 234, "pass": 234, "fail": 0, "skip": 0},
+    "databaseAffected": {"command": "node --test --test-concurrency=3 tests/db/vet-student.test.ts tests/db/vet-professional-tags.test.ts tests/db/vet-professional-profile.test.ts tests/db/vet-onboarding.test.ts tests/db/vet-directory.test.ts tests/db/advertising.test.ts", "durationSeconds": 11.4, "total": 47, "pass": 47, "fail": 0},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 277.1, "total": 359, "pass": 359, "fail": 0, "skip": 0},
+    "buildFirstAttempt": {"command": "npm run build", "durationSeconds": 24.5, "result": "CRASHED: the Next.js build worker exited with 0xC0000409 while compiling, with 2.15 GB physical and 1.85 GB commit memory free; typecheck of the same tree had passed. Recorded, not hidden; the identical retry passed."},
+    "browserFirstRun": {"command": "node tools/browser-tests.mjs tests/browser/vet-student.test.ts tests/browser/vet-onboarding.test.ts tests/browser/vet-directory.test.ts tests/browser/advertising.test.ts tests/browser/operations.test.ts tests/browser/identity.test.ts tests/browser/privacy.test.ts tests/browser/rtl.test.ts", "durationSeconds": 237.6, "total": 43, "pass": 38, "fail": 5, "note": "Two real defects, both in tests. vet-onboarding opened /account/vet-profile and waited for the doctor form, which now follows the path choice this prompt adds (its second failure was a cascade). vet-student waited for success banners inside forms that unmount once the case exists, so it waited for an element that no longer existed; its later tests cascaded. vet-directory, advertising, operations, identity, privacy and rtl passed (37 tests)."},
+    "browserAfterFix": {"command": "node tools/browser-tests.mjs tests/browser/vet-student.test.ts tests/browser/vet-onboarding.test.ts tests/browser/centres.test.ts", "durationSeconds": 21.7, "total": 10, "pass": 10, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, including all new pages, forms and the three new test files."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 57 s in a detached worktree at HEAD 3a044ca with all 22 changed and new source and test files copied in and npm ci run, so the user's running server on port 3111 kept its .next. The first attempt crashed natively under memory pressure (see tests.buildFirstAttempt); the retry changed nothing. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=4 \"tests/db/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "Domain+config+UI 234/234 (4 new). The complete database suite 359/359 (8 new), including the PROMPT-002 and PROMPT-003 suites whose association-operator expectations DEC-0190 changed on purpose."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs (the eight suites of tests.browserFirstRun, then vet-student, vet-onboarding and centres after the test fixes)",
+      "result": "PASS",
+      "evidence": "After the two test defects were fixed, vet-student 3/3, vet-onboarding 3/3 and centres 4/4 (10/10); vet-directory, advertising, operations, identity, privacy and rtl had passed in the first run (37 tests) and nothing they exercise changed afterwards. The failing run is recorded in tests.browserFirstRun with its causes. The full 161-test matrix was not rerun."
+    },
+    {
+      "id": "missing-fields",
+      "command": "node --test tests/db/vet-student.test.ts (test: student number and university are required…) ; node --test tests/domain/vet-student.test.ts",
+      "result": "PASS",
+      "evidence": "An empty student number, an empty university, a blank name and a malformed number are each VALIDATION and store no case; the domain rules name all three missing fields at once, read Persian and Arabic digits as the same number and refuse implausible shapes."
+    },
+    {
+      "id": "duplicate-open-application",
+      "command": "node --test tests/db/vet-student.test.ts (test: an open student case, a doctor application, a doctor profile or the trusted role…)",
+      "result": "PASS",
+      "evidence": "A second open student case, a doctor application while the student case is open, a student application while a doctor application is open, an account with a doctor profile and an account with the TRUSTED_VET role are each CONFLICT; applying from ASSOCIATION_OPERATOR context is FORBIDDEN; two submissions at the same moment leave exactly one case, the other being CONFLICT."
+    },
+    {
+      "id": "unauthorized-reviewer",
+      "command": "node --test tests/db/vet-student.test.ts (test: only the association admin decides…)",
+      "result": "PASS",
+      "evidence": "USER, TRUSTED_VET, REVIEW_OPERATOR, GENETICS_OPERATOR and CONTENT_ADMIN are refused the decision, the queue and the detail; an association operator deciding their own case is refused; a blank reason and an unknown decision are VALIDATION, a stale version CONFLICT, and no tag exists afterwards."
+    },
+    {
+      "id": "correction-loop",
+      "command": "node --test tests/db/vet-student.test.ts (test: a correction is answered with a new version…) ; node tools/browser-tests.mjs tests/browser/vet-student.test.ts",
+      "result": "PASS",
+      "evidence": "The case appears in the open queue and the association overview count; a correction moves it to NEEDS_CORRECTION, cannot itself be decided, cannot be answered by another account (NOT_FOUND) or answered twice; the answer is submission version 2 while version 1 still holds the original university. In the browser the student reads the reason and history on a phone and answers the correction, and the correction form is not offered again."
+    },
+    {
+      "id": "rejection",
+      "command": "node --test tests/db/vet-student.test.ts (test: a rejection is final for that case…)",
+      "result": "PASS",
+      "evidence": "The superadmin rejects with a reason: no tag, no profile, the case cannot be resubmitted or decided again, and a new application creates a new case."
+    },
+    {
+      "id": "verification",
+      "command": "node --test tests/db/vet-student.test.ts ; node tools/browser-tests.mjs tests/browser/vet-student.test.ts",
+      "result": "PASS",
+      "evidence": "Verification makes the case VERIFIED_STUDENT, writes vet_profile as STUDENT with the corrected university, no council code and DRAFT, and gives the STUDENT tag with no scope sourced from that case. The history reads back as SUBMITTED, NEEDS_CORRECTION with its reason, SUBMITTED, VERIFIED_STUDENT with its reason; the dashboard payload carries the same four events and does not contain the reviewer's account id; both decisions were notified. The student tag is refused from a client source, from a case still in review and from another account's verified case. In the browser the verified student sees «دانشجوی دامپزشکی» and the verified status."
+    },
+    {
+      "id": "denial-of-professional-actions",
+      "command": "node --test tests/db/vet-student.test.ts (test: a verified student gets nothing a doctor has…) ; node tools/browser-tests.mjs tests/browser/vet-student.test.ts",
+      "result": "PASS",
+      "evidence": "For a verified student: a LICENSED tag is refused even from the superadmin; the account holds no role and cannot switch to the TRUSTED_VET context; ownVetDirectory is null; publishing the profile is FORBIDDEN from the student and from the superadmin; adding a place of practice is FORBIDDEN; myTargets is empty and findTarget is null; a Phase 2 doctor application and a second student application are CONFLICT. In the browser /vet answers with denial code FORBIDDEN, no directory editor renders and the dashboard no longer offers a path. The student card is read by the student and the association operator only (USER, TRUSTED_VET, GENETICS_OPERATOR refused) and both reads are audited."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "There is no path from a verified student to a doctor; no prompt of this package specifies graduation, so a student profile stays a student until a product decision.",
+    "A student case cannot be withdrawn by the applicant; the model allows it but the prompt does not ask for it.",
+    "Deciding a submitted case performs the start of review and the decision in one step; claiming a case for review is PROMPT-007.",
+    "The path choice is not stored on the account: its only real effect is the application it leads to.",
+    "On success the application and decision forms are replaced by the persisted case state instead of showing a success banner; the status card is the confirmation.",
+    "The history shown to the applicant is read from the audit trail, so it depends on audit retention.",
+    "The student number shape is a plausibility check only; no official format or registry check exists.",
+    "The first build attempt crashed natively under memory pressure on this machine; the identical retry passed.",
+    "The full 161-test browser matrix was not rerun; nine suites passing through the changed code were.",
+    "No screenshot evidence was captured for the new pages; visual fidelity is unverified."
+  ],
+  "readiness": {
+    "code": "STUDENT_PATH_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-student.test.ts",
+    "tests/browser/vet-student.test.ts",
+    "tests/domain/vet-student.test.ts",
+    "DECISIONS.md#dec-0190"
+  ]
+}

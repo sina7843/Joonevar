@@ -167,7 +167,8 @@ export async function findTarget(
   if (!isAdTargetType(targetType) || !UUID.test(targetId)) return null;
   if (targetType === 'VET') {
     const [row] = await database.select().from(vetProfiles).where(eq(vetProfiles.id, targetId)).limit(1);
-    return row
+    // A student profile is not a promotable veterinarian; it is not a target at all (PROMPT-004).
+    return row && row.applicantType !== 'STUDENT'
       ? {
           type: 'VET',
           id: row.id,
@@ -217,7 +218,8 @@ export async function myTargets(database: DbClient, actor: Actor): Promise<AdTar
       .orderBy(asc(communities.displayNameFa)),
   ]);
   return [
-    ...vetRows.map((row) => ({
+    // A student profile has no directory page to promote (PROMPT-004).
+    ...vetRows.filter((row) => row.applicantType !== 'STUDENT').map((row) => ({
       type: 'VET' as const,
       id: row.id,
       nameFa: row.displayNameFa,

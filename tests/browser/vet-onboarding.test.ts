@@ -120,6 +120,8 @@ const APPLICANT_NAME = 'دامپزشک متقاضی SYNTHETIC ' + RUN;
 test('a veterinarian applies, answers a correction and, once approved, manages and publishes the profile', async () => {
   await as('applicant', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
+    // Phase 2.5 PROMPT-004: the account first chooses its path; the doctor path leads to this same application.
+    await Promise.all([page.waitForURL('**/account/vet-profile?path=doctor'), page.getByTestId('path-doctor').click()]);
     await page.getByTestId('vet-application-form').waitFor();
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
     await page.getByTestId('app-name').fill(APPLICANT_NAME);

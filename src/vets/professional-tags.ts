@@ -11,7 +11,7 @@
  */
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 import type { DbClient } from '../db/client.ts';
-import { vetTagAssignments } from '../db/schema/vets.ts';
+import { vetProfessionalCases, vetProfiles, vetTagAssignments } from '../db/schema/vets.ts';
 import { recordAudit } from '../audit/service.ts';
 import { conflict, forbidden, validation } from '../domain/errors.ts';
 import type { Actor, ActorContextName } from '../authz/actor.ts';
@@ -21,10 +21,11 @@ export type VetTagRow = typeof vetTagAssignments.$inferSelect;
 
 /**
  * Who may change someone's tag: the reviewer side, or the server itself (null)
- * acting on a verified event. PROMPT-007 decides whether the association
- * operator joins this list; until then it is the existing review environment.
+ * acting on a verified event. The association admin of Phase 2.5 is the Phase 1
+ * association operator (DEC-0145, DEC-0190); the Phase 2 review environment keeps
+ * the cases it already reviews.
  */
-const TAG_AUTHORITY_CONTEXTS: readonly ActorContextName[] = ['REVIEW_OPERATOR', 'SUPERADMIN'];
+const TAG_AUTHORITY_CONTEXTS: readonly ActorContextName[] = ['ASSOCIATION_OPERATOR', 'REVIEW_OPERATOR', 'SUPERADMIN'];
 
 function assertTagAuthority(actor: Actor | null, accountId: string): void {
   if (actor === null) return;
@@ -36,6 +37,7 @@ const uniqueViolation = (error: unknown): boolean =>
   ((error as { code?: string }).code ?? (error as { cause?: { code?: string } }).cause?.code) === '23505';
 
 const TARGET = 'VET_TAG';
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function currentVetTag(database: DbClient, accountId: string): Promise<VetTagRow | null> {
   const [row] = await database
@@ -103,6 +105,17 @@ export async function replaceVetTag(
   if (reasonFa === '') throw validation('دلیل تغییر Tag را بنویسید.');
 
   await lockAccount(tx, input.accountId);
+  if (tag === 'STUDENT') {
+    // The student tag follows a verified student case of this very account, never a request alone (PROMPT-004).
+    const caseId = input.source.type === 'VET_STUDENT_CASE' && UUID.test(input.source.id ?? '') ? input.source.id! : null;
+    const [studentCase] = caseId ? await tx.select().from(vetProfessionalCases).where(eq(vetProfessionalCases.id, caseId)).limit(1) : [];
+    if (!studentCase || studentCase.accountId !== input.accountId || studentCase.caseType !== 'STUDENT' || studentCase.status !== 'VERIFIED_STUDENT') {
+      throw conflict('Tag دانشجو فقط از پرونده دانشجویی تأییدشده همین حساب داده می‌شود.');
+    }
+  } else {
+    const [profile] = await tx.select({ applicantType: vetProfiles.applicantType }).from(vetProfiles).where(eq(vetProfiles.accountId, input.accountId)).limit(1);
+    if (profile?.applicantType === 'STUDENT') throw conflict('دانشجوی دامپزشکی Tag دکتر، دارای پروانه یا معتمد نمی‌گیرد.');
+  }
   const current = await currentVetTag(tx, input.accountId);
   if (current && current.tag === tag && current.practiceScope === practiceScope) return current;
   if (current) await endCurrent(tx, current, actor, reasonFa, now);

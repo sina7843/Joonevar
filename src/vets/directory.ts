@@ -236,7 +236,8 @@ export async function vetDirectoryEditor(database: DbClient, actor: Actor, accou
 export async function ownVetDirectory(database: DbClient, actor: Actor): Promise<DirectoryEditorData | null> {
   if (!OWNER_CONTEXTS.includes(actor.context)) return null;
   const [profile] = await database.select().from(vetProfiles).where(eq(vetProfiles.accountId, actor.accountId)).limit(1);
-  return profile ? editorData(database, profile) : null;
+  // A student's profile holds their verified student record, not a directory page to edit (PROMPT-004).
+  return profile && profile.applicantType !== 'STUDENT' ? editorData(database, profile) : null;
 }
 
 async function profileById(tx: DbClient, profileId: string): Promise<ProfileRow> {
@@ -380,6 +381,10 @@ export async function changeVetPublicStatus(
       throw conflict('این پروفایل را بررسی همزیست پنهان کرده است و فقط همان‌جا دوباره منتشر می‌شود.');
     }
 
+    if (to === 'PUBLISHED' && current.applicantType === 'STUDENT') {
+      // A student is not a veterinarian a visitor can book: no directory page, whoever asks (PROMPT-004).
+      throw forbidden('پروفایل دانشجوی دامپزشکی در دایرکتوری دامپزشکان منتشر نمی‌شود.');
+    }
     if (to === 'PUBLISHED') {
       const [facts] = await loadFacts(tx, [current]);
       const blockers = vetPublishBlockers(completenessInputOf(facts!), ownershipOf(current));
@@ -524,8 +529,14 @@ export async function addOwnLocation(database: Database, actor: Actor, input: Ow
   };
 
   return database.transaction(async (tx) => {
-    const [profile] = await tx.select({ id: vetProfiles.id }).from(vetProfiles).where(eq(vetProfiles.accountId, actor.accountId)).limit(1);
+    const [profile] = await tx
+      .select({ id: vetProfiles.id, applicantType: vetProfiles.applicantType })
+      .from(vetProfiles)
+      .where(eq(vetProfiles.accountId, actor.accountId))
+      .limit(1);
     if (!profile) throw forbidden('این حساب پروفایل دامپزشک ندارد.');
+    // A place of practice is a doctor's; a student has none to list (PROMPT-004).
+    if (profile.applicantType === 'STUDENT') throw forbidden('دانشجوی دامپزشکی محل کار دامپزشکی ثبت نمی‌کند.');
     const place = await placeOf(tx, null, input.cityId);
     if (place.cityId === null) throw validation('شهر محل کار را انتخاب کنید.');
 

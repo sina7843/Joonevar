@@ -40,7 +40,8 @@ export type EntityType =
   | 'CENTRE_CLAIM'
   | 'COMMUNITY'
   | 'COMMUNITY_MANAGER'
-  | 'AD_SUBSCRIPTION';
+  | 'AD_SUBSCRIPTION'
+  | 'VET_PROFESSIONAL_CASE';
 
 export interface EntityRef {
   readonly type: EntityType;

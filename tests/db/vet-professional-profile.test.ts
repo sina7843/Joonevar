@@ -370,7 +370,8 @@ test('the reviewer view is for the reviewer side only, shows every version and t
   const twin = await newAccount();
   await testDb.db.insert(vetProfiles).values({ accountId: twin.id, displayNameFa: 'پروفایل هم‌پروانه', applicantType: 'DOCTOR', practiceScope: 'GENERAL', hasLicence: true, licenceCode: profile.licenceCode });
 
-  for (const context of ['USER', 'TRUSTED_VET', 'ASSOCIATION_OPERATOR', 'CONTENT_ADMIN'] as const) {
+  // The association operator is a reviewer since PROMPT-004 (DEC-0190); the genetics centre is not.
+  for (const context of ['USER', 'TRUSTED_VET', 'GENETICS_OPERATOR', 'CONTENT_ADMIN'] as const) {
     await assert.rejects(professionalProfileForReview(testDb.db, actorFor((await newAccount()).id, context), owner.id), appCode('FORBIDDEN'), context);
   }
   const view = await professionalProfileForReview(testDb.db, reviewer, owner.id);
@@ -393,7 +394,7 @@ test('a professional document is read only by its owner and the reviewer side, a
   );
   await readPrivateFile(testDb.db, storage, ownerActor, stored.id);
   await readPrivateFile(testDb.db, storage, reviewer, stored.id);
-  for (const context of ['USER', 'TRUSTED_VET', 'ASSOCIATION_OPERATOR'] as const) {
+  for (const context of ['USER', 'TRUSTED_VET', 'GENETICS_OPERATOR'] as const) {
     await assert.rejects(readPrivateFile(testDb.db, storage, actorFor((await newAccount()).id, context), stored.id), appCode('FORBIDDEN'), context);
   }
   const reads = await testDb.db.select().from(auditEvents).where(and(eq(auditEvents.action, 'PRIVATE_FILE_READ'), eq(auditEvents.targetId, stored.id)));

@@ -30,6 +30,7 @@ import { forbidden } from '../domain/errors.ts';
 import type { Actor, ActorContextName } from '../authz/actor.ts';
 import { vetTagLabel, type VetCaseStatus, type VetPracticeScope, type VetTag } from './professional-model.ts';
 import { currentVetTag, vetTagHistory } from './professional-tags.ts';
+import { professionalCaseHistory } from './student-application.ts';
 import {
   CASE_STATUS_FA,
   CASE_TYPE_FA,
@@ -41,7 +42,7 @@ import {
   type VetCaseType,
 } from './professional-profile-model.ts';
 
-const REVIEWER_CONTEXTS: readonly ActorContextName[] = ['REVIEW_OPERATOR', 'SUPERADMIN'];
+const REVIEWER_CONTEXTS: readonly ActorContextName[] = ['ASSOCIATION_OPERATOR', 'REVIEW_OPERATOR', 'SUPERADMIN'];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SLUG = /^vet-[0-9a-f]{10}$/;
 /** No list in a payload grows without bound (§20). */
@@ -135,6 +136,8 @@ export async function professionalDashboard(database: DbClient, actor: Actor) {
     vetTagHistory(database, actor, actor.accountId),
     casesOf(database, actor.accountId),
   ]);
+  // Status changes and reviewer reasons, without who the reviewer was (PROMPT-004).
+  const caseHistory = await professionalCaseHistory(database, cases.map((row) => row.id));
   return {
     profile: profile ? { ...ownFields(profile), ...(await catalogueOf(database, profile.id)) } : null,
     currentTag: tag ? { tag: tag.tag as VetTag, labelFa: vetTagLabel(tag.tag, tag.practiceScope), since: iso(tag.startedAt)! } : null,
@@ -154,6 +157,7 @@ export async function professionalDashboard(database: DbClient, actor: Actor) {
       reviewNoteFa: row.reviewNoteFa,
       updatedAt: iso(row.updatedAt)!,
       documents: documents.filter((document) => document.caseId === row.id).map(documentOut),
+      history: caseHistory[row.id] ?? [],
     })),
   };
 }

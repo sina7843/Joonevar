@@ -15,6 +15,7 @@ import { listOwnerRequests } from '../../src/vets/visits.ts';
 import { REQUEST_STATUS_FA, REQUEST_STATUS_TONE, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
 import { generationLabel } from '../../src/domain/lineage.ts';
+import { professionalDashboard } from '../../src/vets/professional-profile.ts';
 
 /** The dashboard is a summary; the full lists live on their own pages. */
 const ANIMALS_ON_DASHBOARD = 3;
@@ -177,6 +178,7 @@ export default async function DashboardPage() {
   const membership = await findMembership(db(), actor.accountId);
   const { services } = await eligibilitySummary(db(), actor.accountId);
   const vet = actor.context === 'TRUSTED_VET' ? await vetEligibilityFor(db(), actor.accountId) : null;
+  const professional = await professionalDashboard(db(), actor);
 
   const membershipStatus = membership?.status ?? 'NONE';
   const membershipActive = membershipStatus === 'ACTIVE';
@@ -221,6 +223,37 @@ export default async function DashboardPage() {
           >
             نام، نام خانوادگی، کد ملی و تاریخ تولد برای ادامه لازم است.
           </Alert>
+        ) : null}
+
+        {/*
+          * Phase 2.5 PROMPT-004: after sign-in, an ordinary account may choose a
+          * veterinary path. Choosing nothing is a complete answer — the account
+          * stays exactly what it is, so this is an offer, never a gate.
+          */}
+        {actor.context === 'USER' && professional.profile === null && professional.cases.length === 0 ? (
+          <Card>
+            <p className="text-label-lg">مسیر حرفه‌ای دامپزشکی</p>
+            <p className="mt-2xs text-caption text-text-secondary">
+              حساب شما یک حساب کاربری عادی است و همان می‌ماند. اگر دانشجو یا دکتر دامپزشک هستید، مسیر خود را انتخاب کنید؛ این انتخاب
+              اختیاری است.
+            </p>
+            <div className="mt-lg flex flex-wrap gap-md" data-testid="dashboard-vet-path">
+              <Link
+                href="/account/vet-profile?path=student"
+                className="text-label-md text-text-brand underline underline-offset-4"
+                data-testid="dashboard-path-student"
+              >
+                دانشجوی دامپزشکی
+              </Link>
+              <Link
+                href="/account/vet-profile?path=doctor"
+                className="text-label-md text-text-brand underline underline-offset-4"
+                data-testid="dashboard-path-doctor"
+              >
+                دکتر دامپزشک
+              </Link>
+            </div>
+          </Card>
         ) : null}
 
         {operational.length > 0 ? (
