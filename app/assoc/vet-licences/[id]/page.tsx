@@ -7,6 +7,8 @@ import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { licenceCaseForReview } from '../../../../src/vets/licence-application.ts';
 import { DecideLicenceCaseForm } from '../../../../src/vets/licence-forms.tsx';
+import { reviewStateFor } from '../../../../src/vets/review-workbench.ts';
+import { DocumentPreview, ReviewPanel } from '../../../../src/vets/review-forms.tsx';
 import { DOCUMENT_KIND_FA, type ProfessionalDocumentKind } from '../../../../src/vets/professional-profile-model.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
@@ -24,7 +26,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
   const { id } = await params;
   const guard = await guardRoute('/assoc/vet-licences/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const detail = await licenceCaseForReview(db(), guard.actor, id);
+  const [detail, review] = await Promise.all([licenceCaseForReview(db(), guard.actor, id), reviewStateFor(db(), guard.actor, id)]);
 
   if (!detail) {
     return (
@@ -109,6 +111,9 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
                   {DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind] + (document.titleFa ? ' «' + document.titleFa + '»' : '') + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
                 </a>
                 {latest?.licenceFileId === document.fileId ? <span className="text-caption text-text-secondary"> (فایل پروانه نسخه جاری)</span> : null}
+                {document.submissionVersion === detail.case.currentSubmissionVersion ? (
+                  <DocumentPreview fileId={document.fileId} labelFa={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind]} testId={'licence-document-preview-' + document.kind} />
+                ) : null}
               </li>
             ))}
           </ul>
@@ -141,7 +146,16 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
           </ol>
         </Card>
 
-        {waiting ? (
+        {review && waiting ? (
+          <Card>
+            <h2 className="text-label-lg">بررسی</h2>
+            <div className="mt-md">
+              <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
+            </div>
+          </Card>
+        ) : null}
+
+        {waiting && !review?.claimedByOther ? (
           <Card>
             <h2 className="text-label-lg">ثبت نتیجه</h2>
             <p className="mt-xs text-caption text-text-secondary">تأیید مدارک، پرونده را «در انتظار پرداخت» می‌کند و Tag دارای پروانه را فعال نمی‌کند.</p>
@@ -149,7 +163,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
               <DecideLicenceCaseForm caseId={detail.case.id} version={detail.case.version} />
             </div>
           </Card>
-        ) : (
+        ) : waiting ? null : (
           <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
             {'وضعیت فعلی: ' + detail.case.statusFa}
             {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}

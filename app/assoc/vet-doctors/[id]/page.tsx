@@ -7,6 +7,8 @@ import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { doctorCaseForReview } from '../../../../src/vets/doctor-application.ts';
 import { DecideDoctorCaseForm } from '../../../../src/vets/doctor-forms.tsx';
+import { reviewStateFor } from '../../../../src/vets/review-workbench.ts';
+import { DocumentPreview, ReviewPanel } from '../../../../src/vets/review-forms.tsx';
 import { DOCUMENT_KIND_FA, type ProfessionalDocumentKind } from '../../../../src/vets/professional-profile-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 
@@ -23,7 +25,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
   const { id } = await params;
   const guard = await guardRoute('/assoc/vet-doctors/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const detail = await doctorCaseForReview(db(), guard.actor, id);
+  const [detail, review] = await Promise.all([doctorCaseForReview(db(), guard.actor, id), reviewStateFor(db(), guard.actor, id)]);
 
   if (!detail) {
     return (
@@ -97,6 +99,9 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
                 >
                   {DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind] + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
                 </a>
+                {document.submissionVersion === detail.case.currentSubmissionVersion ? (
+                  <DocumentPreview fileId={document.fileId} labelFa={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind]} testId={'doctor-document-preview-' + document.kind} />
+                ) : null}
               </li>
             ))}
           </ul>
@@ -128,14 +133,23 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
           </ol>
         </Card>
 
-        {waiting ? (
+        {review && waiting ? (
+          <Card>
+            <h2 className="text-label-lg">بررسی</h2>
+            <div className="mt-md">
+              <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
+            </div>
+          </Card>
+        ) : null}
+
+        {waiting && !review?.claimedByOther ? (
           <Card>
             <h2 className="text-label-lg">ثبت نتیجه</h2>
             <div className="mt-lg">
               <DecideDoctorCaseForm caseId={detail.case.id} version={detail.case.version} />
             </div>
           </Card>
-        ) : (
+        ) : waiting ? null : (
           <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
             {'وضعیت فعلی: ' + detail.case.statusFa}
             {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}

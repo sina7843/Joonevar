@@ -324,6 +324,54 @@ export const LICENCE_DECISION_FA: Record<LicenceDecision, string> = {
 };
 export const isLicenceDecision = oneOf(LICENCE_DECISIONS);
 
+// ── Association review (PROMPT-007) ────────────────────────────────────────
+
+export const REVIEW_CHECK_RESULTS = ['PASS', 'FAIL', 'NOT_APPLICABLE'] as const;
+export type ReviewCheckResult = (typeof REVIEW_CHECK_RESULTS)[number];
+export const isReviewCheckResult = oneOf(REVIEW_CHECK_RESULTS);
+export const REVIEW_CHECK_RESULT_FA: Record<ReviewCheckResult, string> = { PASS: 'درست است', FAIL: 'درست نیست', NOT_APPLICABLE: 'موضوعیت ندارد' };
+
+export interface ReviewCheckDefinition {
+  readonly code: string;
+  readonly labelFa: string;
+}
+
+const IDENTITY_MATCHES: ReviewCheckDefinition = { code: 'IDENTITY_MATCHES_ACCOUNT', labelFa: 'نام و هویت متقاضی با حساب احرازشده یکی است' };
+
+/**
+ * What a reviewer checks, per case type. A closed list: a check the product does
+ * not name cannot be recorded. The trusted-veterinarian review (PROMPT-010/011)
+ * adds its own list when its case type exists.
+ */
+export const REVIEW_CHECKS: Record<VetCaseType, readonly ReviewCheckDefinition[]> = {
+  STUDENT: [
+    { code: 'STUDENT_NUMBER_MATCHES', labelFa: 'شماره دانشجویی با مدرک یا استعلام دانشگاه می‌خواند' },
+    { code: 'UNIVERSITY_MATCHES', labelFa: 'دانشگاه اعلام‌شده با مدرک یکی است' },
+    IDENTITY_MATCHES,
+  ],
+  COUNCIL: [
+    { code: 'COUNCIL_CARD_MATCHES', labelFa: 'کارت نظام خوانا است و با کد نظام اعلام‌شده می‌خواند' },
+    IDENTITY_MATCHES,
+    { code: 'SCOPE_SUPPORTED', labelFa: 'عمومی یا متخصص بودن با مدارک سازگار است' },
+  ],
+  LICENCE: [
+    { code: 'LICENCE_FILE_LEGIBLE', labelFa: 'فایل پروانه خوانا و کامل است' },
+    { code: 'LICENCE_CODE_MATCHES', labelFa: 'کد پروانه با فایل پروانه می‌خواند' },
+    { code: 'LICENCE_DATE_MATCHES', labelFa: 'تاریخ پروانه با فایل پروانه می‌خواند' },
+    { code: 'COUNCIL_CODE_MATCHES', labelFa: 'کد نظام روی پروانه همان کد نظام پرونده است' },
+    IDENTITY_MATCHES,
+  ],
+  CLAIM: [
+    { code: 'COUNCIL_CARD_MATCHES', labelFa: 'کارت نظام خوانا است و با کد نظام اعلام‌شده می‌خواند' },
+    IDENTITY_MATCHES,
+  ],
+};
+
+export const isReviewCheckCode = (caseType: VetCaseType, code: string): boolean => REVIEW_CHECKS[caseType].some((check) => check.code === code);
+
+/** The outcomes that grant something; a recorded failed check on the current version blocks them. */
+export const APPROVAL_OUTCOMES: readonly VetCaseStatus[] = ['VERIFIED_STUDENT', 'VERIFIED_NO_LICENSE', 'LICENSE_APPROVED_AWAITING_PAYMENT'];
+
 // ── Public view ────────────────────────────────────────────────────────────
 
 /** Never in a public payload, at any depth. The public-view test walks the payload for these. */

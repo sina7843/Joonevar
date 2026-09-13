@@ -1,0 +1,125 @@
+{
+  "promptId": "PROMPT-007",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The association review workbench. The reviewer is the association operator (with the superadmin), scoped to the association environment; no second role with the same access was added (DEC-0193). /assoc/vet-review lists every student, council-code and licence case in one server-paginated queue with filters for case type, status group, claim state (mine, unclaimed, others) and a name or code search, oldest waiting case first, linking to each case's review page; the trusted-veterinarian type joins through REVIEW_CASE_TYPES when PROMPT-010 creates it. A reviewer claims a submitted case, which moves it to UNDER_REVIEW with the claimer and time under an optimistic version check, so of two simultaneous claims exactly one succeeds; the holder releases it, and the superadmin may release someone else's claim only with a reason. A database CHECK ties a claim to UNDER_REVIEW, and the migration returns any unheld UNDER_REVIEW case of the workbench to the queue. Only the holder records structured checks from a closed per-type list (PASS, FAIL with a mandatory note, NOT_APPLICABLE), bound to the current submission version in an append-only table. All three decision functions now refuse a case held by another reviewer, refuse an approval while the latest result of any check on the current version is FAIL, and clear the claim; an unclaimed submitted case can still be decided in one step, and the mandatory reason and version lock were already in place. A corrected resubmission starts unchecked. Claim, release, checks and decisions are audited with actor, context, case, old and new status, time and reason; every view of a private professional document now also records the case, submission version, document kind and case status at that moment; audit_event is append-only in the database (a trigger refuses UPDATE and DELETE except the actor foreign key's own ON DELETE SET NULL). Documents of the current version are previewed inline in a lazily loaded frame that loads only when opened; the file route now sends X-Frame-Options SAMEORIGIN, frame-ancestors 'self', and for images a sandbox with default-src 'none'. The payment boundary is enforced at the tag service: the LICENSED and TRUSTED tags are accepted only from the server (null actor), so association operators, reviewers and the superadmin get FORBIDDEN; licence approval reaches only LICENSE_APPROVED_AWAITING_PAYMENT, no reviewer move reaches ACTIVE_LICENSED_VET, billing has no manual paid function and membership activation refuses an unpaid account. The UI is Persian RTL with labelled filters, a search landmark, status roles and a navigation entry, and fits a phone.",
+  "changedFiles": [
+    "src/vets/review-workbench.ts",
+    "src/vets/review-actions.ts",
+    "src/vets/review-forms.tsx",
+    "app/assoc/vet-review/page.tsx",
+    "app/assoc/vet-students/[id]/page.tsx",
+    "app/assoc/vet-doctors/[id]/page.tsx",
+    "app/assoc/vet-licences/[id]/page.tsx",
+    "app/api/files/[id]/route.ts",
+    "src/vets/student-application.ts",
+    "src/vets/doctor-application.ts",
+    "src/vets/licence-application.ts",
+    "src/vets/professional-tags.ts",
+    "src/vets/professional-profile-model.ts",
+    "src/files/storage.ts",
+    "src/ui/shell.tsx",
+    "src/db/schema/vets.ts",
+    "src/db/migrations/0033_vet-review.sql",
+    "src/db/migrations/meta/0033_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "tests/domain/vet-review.test.ts",
+    "tests/db/vet-review.test.ts",
+    "tests/browser/vet-review.test.ts",
+    "tests/db/vet-professional-tags.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-007.json"
+  ],
+  "migrations": ["src/db/migrations/0033_vet-review.sql"],
+  "decisions": ["DEC-0193"],
+  "tests": {
+    "databaseReviewFirstRun": {"command": "node --test tests/db/vet-review.test.ts", "total": 6, "pass": 5, "fail": 1, "note": "The failure was in the new test: it compared vetCaseMove with false/true although the model returns a move or null. The assertion was corrected; no product code changed."},
+    "databaseAffectedFirstRun": {"command": "node --test --test-concurrency=1 tests/db/vet-professional-tags.test.ts tests/db/vet-student.test.ts tests/db/vet-doctor.test.ts tests/db/vet-licence.test.ts tests/db/files.test.ts", "fail": 1, "note": "The one failure was the tag rollback test still granting LICENSED through a reviewer, which the new server-only rule refuses before the test's own simulated failure; it now uses the server actor like the other LICENSED/TRUSTED grants in that file."},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 268, "total": 380, "pass": 380, "fail": 0, "skip": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "durationSeconds": 2.0, "total": 247, "pass": 247, "fail": 0, "skip": 0},
+    "domainReview": {"command": "node --test tests/domain/vet-review.test.ts", "total": 2, "pass": 2, "fail": 0, "note": "Written after the domain+config+UI run above; run on its own."},
+    "browser": {"command": "node tools/browser-tests.mjs tests/browser/vet-review.test.ts tests/browser/vet-student.test.ts tests/browser/vet-onboarding.test.ts tests/browser/vet-licence.test.ts tests/browser/centres.test.ts tests/browser/vet-directory.test.ts tests/browser/operations.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts tests/browser/rtl.test.ts", "durationSeconds": 68.1, "total": 50, "pass": 50, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree including the new browser test."
+    },
+    {
+      "id": "build",
+      "command": "npm ci ; npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 77.5 s (install and build) on the first attempt in a detached worktree at HEAD aaffd93 with every changed and new file copied in, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\" ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test tests/domain/vet-review.test.ts",
+      "result": "PASS",
+      "evidence": "The complete database suite passed 380/380 (6 new review tests) with migration 0033 applied to fresh test databases; domain+config+UI 247/247; the new domain test 2/2. Two earlier failures were test-side and are recorded under tests."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/vet-review.test.ts tests/browser/vet-student.test.ts tests/browser/vet-onboarding.test.ts tests/browser/vet-licence.test.ts tests/browser/centres.test.ts tests/browser/vet-directory.test.ts tests/browser/operations.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "50/50 on the first run on an isolated database and production server built from the worktree. The new suite: a student applies on a phone; the association filters the workbench by type and student number to exactly that case, claims it, opens the inline preview (the file answers 200 with a sandboxing CSP, X-Frame-Options SAMEORIGIN and no-store), records a failed check with a note and a passed one, sees the recorded failure again after reload, is refused VERIFY with the failed-check message while still holding the case, and requests a correction, after which the review panel is gone and the student reads the reason. The workbench is RTL without horizontal overflow at phone width and shows neither filters nor queue to an ordinary account. The existing student, doctor and licence suites, whose decision pages changed, still pass. The full browser matrix was not rerun."
+    },
+    {
+      "id": "role-isolation",
+      "command": "node --test tests/db/vet-review.test.ts (test: only the association reviewer side opens the workbench…)",
+      "result": "PASS",
+      "evidence": "USER, BREEDER, TRUSTED_VET, GENETICS_OPERATOR, CONTENT_ADMIN and AUTHOR are FORBIDDEN for the queue, claim, review state and decision; an association operator cannot claim their own case; nothing moved. Unknown type and claim filters are VALIDATION; the search finds the case by council code, the type filter excludes it and the MINE filter is empty before a claim."
+    },
+    {
+      "id": "concurrent-review",
+      "command": "node --test tests/db/vet-review.test.ts (tests: two reviewers claiming at once… ; an unclaimed submitted case…)",
+      "result": "PASS",
+      "evidence": "Two simultaneous claims: exactly one fulfilled, the other CONFLICT. The other reviewer's decision and check are CONFLICT and their release FORBIDDEN; the superadmin's release without a reason is VALIDATION; MINE and OTHERS filters show the claim from each side. After release a claim with the old version is CONFLICT; after reclaim, two simultaneous decisions by the holder produce exactly one decision, which clears claimed_by and claimed_at. The database refuses a claim on a closed case and UNDER_REVIEW without a holder (23514)."
+    },
+    {
+      "id": "correction-resubmission",
+      "command": "node --test tests/db/vet-review.test.ts (test: checks belong to one submission version…)",
+      "result": "PASS",
+      "evidence": "A check of another case type, an unknown result and a FAIL without a note are VALIDATION; with a recorded FAIL, VERIFY is CONFLICT while REQUEST_CORRECTION succeeds; the applicant resubmits as version 2, whose checks start empty; another reviewer claims, records PASS and verifies. The stored checks are exactly [1 FAIL, 1 PASS, 2 PASS] in order, and updating or deleting one is refused (23001)."
+    },
+    {
+      "id": "audit-immutability",
+      "command": "node --test tests/db/vet-review.test.ts (test: every document view and every review step is audited…)",
+      "result": "PASS",
+      "evidence": "The association's read of a council card is a PRIVATE_FILE_READ event with the reviewer's account and context and metadata caseId, caseStatus SUBMITTED and kind COUNCIL_CARD. The claim event records SUBMITTED to UNDER_REVIEW; the decision event records the reviewer, the reason, the old status and REJECTED with its time. A raw SQL UPDATE and DELETE of that audit row are refused (23001) and the row is unchanged."
+    },
+    {
+      "id": "payment-boundary",
+      "command": "node --test tests/db/vet-review.test.ts (test: association reviewers and admins cannot mark a payment successful…) ; node --test tests/db/vet-professional-tags.test.ts",
+      "result": "PASS",
+      "evidence": "A claimed licence case approved by the association is LICENSE_APPROVED_AWAITING_PAYMENT and the tag is not LICENSED; the model has no REVIEWER move to ACTIVE_LICENSED_VET and has the SYSTEM move. The association operator and the superadmin are FORBIDDEN from writing LICENSED or TRUSTED; setMembershipActive refuses an account without a paid membership (CONFLICT); the billing payments module exports nothing named mark, paid, success or manual. The tag suite's LICENSED/TRUSTED grants now come from the server actor and still pass."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The reviewer role is the existing association operator; there is no separate reviewer role, so every association operator can review every professional case.",
+    "Claiming is optional: an unclaimed submitted case can still be decided in one step, protected by the version lock. A claim has no automatic expiry; a stale claim is released by its holder or by the superadmin with a reason.",
+    "Trusted-veterinarian review is not in the workbench yet; its case type and checks arrive with PROMPT-010/011.",
+    "Checks are advisory except FAIL, which blocks approval; approval does not require every check to be recorded.",
+    "PDF previews are not sandboxed because a sandbox disables the browser's PDF viewer; they are protected by same-origin framing, nosniff and the byte-signature check at upload.",
+    "The audit_event trigger makes the trail append-only for every writer, including future maintenance scripts.",
+    "Pagination beyond one page is covered by the shared query contract but not exercised in the browser.",
+    "The full browser matrix was not rerun; ten suites through the changed code were.",
+    "Screenshots were not captured; visual fidelity of the new page is unverified."
+  ],
+  "readiness": {
+    "code": "ASSOCIATION_REVIEW_WORKBENCH_READY",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-review.test.ts",
+    "tests/domain/vet-review.test.ts",
+    "tests/browser/vet-review.test.ts",
+    "DECISIONS.md#dec-0193"
+  ]
+}

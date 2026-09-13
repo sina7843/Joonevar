@@ -232,6 +232,13 @@
       "when": 1789255135587,
       "tag": "0032_vet-professional-profile",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1789265968122,
+      "tag": "0033_vet-review",
+      "breakpoints": true
     }
   ]
 }

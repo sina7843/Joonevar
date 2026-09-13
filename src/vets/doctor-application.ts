@@ -30,6 +30,7 @@ import { offsetOf, pageOf } from '../domain/pagination.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import type { Actor, ActorContextName } from '../authz/actor.ts';
 import { vetCaseMove, type VetCaseStatus, type VetPracticeScope } from './professional-model.ts';
+import { assertDecisionAllowed } from './review-workbench.ts';
 import {
   CASE_STATUS_FA,
   DOCTOR_DECISION_OUTCOME,
@@ -503,6 +504,7 @@ export async function decideDoctorCase(
         (current.status === 'UNDER_REVIEW' || (current.status === 'SUBMITTED' && vetCaseMove('SUBMITTED', 'UNDER_REVIEW', 'REVIEWER'))) &&
         vetCaseMove('UNDER_REVIEW', outcome, 'REVIEWER');
       if (!reviewable) throw conflict('این پرونده در انتظار بررسی نیست.');
+      await assertDecisionAllowed(tx, current, actor, outcome);
 
       let vetProfileId = current.vetProfileId;
       let scope: VetPracticeScope | null = null;
@@ -566,7 +568,7 @@ export async function decideDoctorCase(
 
       const [row] = await tx
         .update(vetProfessionalCases)
-        .set({ status: outcome, reviewNoteFa: reasonFa, reviewedByAccountId: actor.accountId, reviewedAt: now, vetProfileId, version: current.version + 1, updatedAt: now })
+        .set({ status: outcome, reviewNoteFa: reasonFa, reviewedByAccountId: actor.accountId, reviewedAt: now, vetProfileId, claimedByAccountId: null, claimedAt: null, version: current.version + 1, updatedAt: now })
         .where(and(eq(vetProfessionalCases.id, current.id), eq(vetProfessionalCases.version, current.version)))
         .returning();
       if (!row) throw conflict(STALE);

@@ -7,6 +7,8 @@ import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { studentCaseForReview } from '../../../../src/vets/student-application.ts';
 import { DecideStudentCaseForm } from '../../../../src/vets/student-forms.tsx';
+import { reviewStateFor } from '../../../../src/vets/review-workbench.ts';
+import { DocumentPreview, ReviewPanel } from '../../../../src/vets/review-forms.tsx';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +22,7 @@ export default async function AssocVetStudentCasePage({ params }: { params: Prom
   const { id } = await params;
   const guard = await guardRoute('/assoc/vet-students/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const detail = await studentCaseForReview(db(), guard.actor, id);
+  const [detail, review] = await Promise.all([studentCaseForReview(db(), guard.actor, id), reviewStateFor(db(), guard.actor, id)]);
 
   if (!detail) {
     return (
@@ -74,6 +76,9 @@ export default async function AssocVetStudentCasePage({ params }: { params: Prom
                   <a href={'/api/files/' + document.fileId} target="_blank" rel="noreferrer" className="text-text-brand underline underline-offset-4" data-testid="student-document-link">
                     {'کارت دانشجویی — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
                   </a>
+                  {document.submissionVersion === detail.case.currentSubmissionVersion ? (
+                    <DocumentPreview fileId={document.fileId} labelFa="کارت دانشجویی" testId="student-document-preview" />
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -107,14 +112,23 @@ export default async function AssocVetStudentCasePage({ params }: { params: Prom
           </ol>
         </Card>
 
-        {waiting ? (
+        {review && waiting ? (
+          <Card>
+            <h2 className="text-label-lg">بررسی</h2>
+            <div className="mt-md">
+              <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
+            </div>
+          </Card>
+        ) : null}
+
+        {waiting && !review?.claimedByOther ? (
           <Card>
             <h2 className="text-label-lg">ثبت نتیجه</h2>
             <div className="mt-lg">
               <DecideStudentCaseForm caseId={detail.case.id} version={detail.case.version} />
             </div>
           </Card>
-        ) : (
+        ) : waiting ? null : (
           <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
             {'وضعیت فعلی: ' + detail.case.statusFa}
             {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}

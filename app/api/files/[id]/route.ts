@@ -26,6 +26,14 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
         'cache-control': 'no-store, private',
         'content-disposition': 'inline',
         'x-content-type-options': 'nosniff',
+        // Safe preview (PHASE-2.5 PROMPT-007): only this site may frame a private file, and an image
+        // is rendered as a sandboxed document that can run nothing. A PDF keeps the browser's own
+        // viewer, which a sandbox would disable.
+        'x-frame-options': 'SAMEORIGIN',
+        'content-security-policy':
+          record.mime === 'application/pdf'
+            ? "frame-ancestors 'self'"
+            : "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'self'; sandbox",
       },
     });
   } catch (error) {

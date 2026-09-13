@@ -557,6 +557,9 @@ export const vetProfessionalCases = pgTable(
     reviewNoteFa: text('review_note_fa'),
     reviewedByAccountId: uuid('reviewed_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
     reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    /** The association reviewer holding the case while it is UNDER_REVIEW (PROMPT-007); null otherwise. */
+    claimedByAccountId: uuid('claimed_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    claimedAt: timestamp('claimed_at', { withTimezone: true }),
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
@@ -568,7 +571,43 @@ export const vetProfessionalCases = pgTable(
       .on(t.accountId, t.caseType)
       .where(sql`${t.status} in ('DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'NEEDS_CORRECTION')`),
     index('vet_professional_case_status_idx').on(t.status, t.updatedAt),
+    index('vet_professional_case_claim_idx').on(t.claimedByAccountId),
     check('vet_professional_case_version_not_negative', sql`${t.currentSubmissionVersion} >= 0`),
+    // A claim exists only while a case is under review, and a case of this workbench is under review
+    // only while someone holds it. A mirrored Phase 2 application keeps its own review state unclaimed.
+    check(
+      'vet_professional_case_claim_matches_review',
+      sql`(${t.claimedByAccountId} is null) = (${t.claimedAt} is null) and (${t.claimedByAccountId} is null or ${t.status} = 'UNDER_REVIEW') and (${t.status} <> 'UNDER_REVIEW' or ${t.claimedByAccountId} is not null or ${t.legacyApplicationId} is not null)`,
+    ),
+  ],
+);
+
+export const vetReviewCheckResult = pgEnum('vet_review_check_result', ['PASS', 'FAIL', 'NOT_APPLICABLE']);
+
+/**
+ * A structured check a reviewer recorded against one submission version
+ * (PROMPT-007). Append-only: a trigger refuses every update and delete, and a
+ * later row for the same check supersedes an earlier one only by being later.
+ */
+export const vetCaseReviewChecks = pgTable(
+  'vet_case_review_check',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => vetProfessionalCases.id, { onDelete: 'restrict' }),
+    submissionVersion: integer('submission_version').notNull(),
+    checkCode: text('check_code').notNull(),
+    result: vetReviewCheckResult('result').notNull(),
+    noteFa: text('note_fa'),
+    reviewerAccountId: uuid('reviewer_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    index('vet_case_review_check_case_idx').on(t.caseId, t.submissionVersion, t.checkCode, t.createdAt),
+    check('vet_case_review_check_fail_has_note', sql`${t.result} <> 'FAIL' or ${t.noteFa} is not null`),
   ],
 );
 

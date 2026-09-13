@@ -185,7 +185,8 @@ test('replacing ends the previous tag, and asking for the same tag again writes 
   const same = await grant(accountId, 'UNLICENSED', 'GENERAL');
   assert.equal(same.id, first.id, 'a replayed event does not add a row');
 
-  const licensed = await grant(accountId, 'LICENSED', 'GENERAL');
+  // LICENSED follows a verified payment, so the server (null actor) writes it (PROMPT-007).
+  const licensed = await grant(accountId, 'LICENSED', 'GENERAL', null);
   const history = await vetTagHistory(testDb.db, reviewer, accountId);
   assert.deepEqual(history.map((row) => [row.tag, row.endedAt === null]), [['UNLICENSED', false], ['LICENSED', true]]);
   assert.equal((await currentVetTag(testDb.db, accountId))!.id, licensed.id);
@@ -206,7 +207,7 @@ test('two replacements racing for one account run one after the other and leave 
   const locked = new Promise<void>((resolve) => (firstHoldsLock = resolve));
 
   const first = testDb.db.transaction(async (tx) => {
-    const row = await replaceVetTag(tx, reviewer, { accountId, tag: 'LICENSED', practiceScope: 'SPECIALIST', reasonFa: 'SYNTHETIC پرداخت', source: { type: 'TEST' } });
+    const row = await replaceVetTag(tx, null, { accountId, tag: 'LICENSED', practiceScope: 'SPECIALIST', reasonFa: 'SYNTHETIC پرداخت', source: { type: 'TEST' } });
     firstHoldsLock();
     await gate; // still uncommitted: the second must wait for it
     return row;
@@ -234,7 +235,7 @@ test('a tag changed inside a transaction that fails is not changed at all', asyn
   const before = await grant(accountId, 'UNLICENSED', 'GENERAL');
   await assert.rejects(
     testDb.db.transaction(async (tx) => {
-      await replaceVetTag(tx, reviewer, { accountId, tag: 'LICENSED', practiceScope: 'GENERAL', reasonFa: 'SYNTHETIC', source: { type: 'TEST' } });
+      await replaceVetTag(tx, null, { accountId, tag: 'LICENSED', practiceScope: 'GENERAL', reasonFa: 'SYNTHETIC', source: { type: 'TEST' } });
       throw new Error('the payment effect failed after the tag');
     }),
     /payment effect failed/,
@@ -317,7 +318,7 @@ test('only the reviewer side or the server changes a tag, never for its own acco
 
 test('a trusted tag without the TRUSTED_VET role opens no trusted context', async () => {
   const accountId = await newAccountId();
-  await grant(accountId, 'TRUSTED', 'GENERAL');
+  await grant(accountId, 'TRUSTED', 'GENERAL', null);
 
   const plain = await createSession(testDb.db, accountId, 'USER');
   await assert.rejects(setSessionContext(testDb.db, plain.sessionId, 'TRUSTED_VET'), appCode('FORBIDDEN'));

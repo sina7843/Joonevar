@@ -116,6 +116,11 @@ export async function replaceVetTag(
     const [profile] = await tx.select({ applicantType: vetProfiles.applicantType }).from(vetProfiles).where(eq(vetProfiles.accountId, input.accountId)).limit(1);
     if (profile?.applicantType === 'STUDENT') throw conflict('دانشجوی دامپزشکی Tag دکتر، دارای پروانه یا معتمد نمی‌گیرد.');
   }
+  // The licensed and trusted tags follow a payment the server verified, never a person's decision:
+  // no reviewer, association admin or superadmin writes them by hand (PROMPT-007, DEC-0193).
+  if ((tag === 'LICENSED' || tag === 'TRUSTED') && actor !== null) {
+    throw forbidden('Tag دارای پروانه و معتمد فقط پس از پرداخت تأییدشده سرور ثبت می‌شود، نه با تصمیم دستی.');
+  }
   const current = await currentVetTag(tx, input.accountId);
   if (current && current.tag === tag && current.practiceScope === practiceScope) return current;
   if (current) await endCurrent(tx, current, actor, reasonFa, now);
