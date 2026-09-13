@@ -12,6 +12,7 @@ import { myVetApplications } from '../../../src/vets/onboarding.ts';
 import { professionalDashboard } from '../../../src/vets/professional-profile.ts';
 import { myStudentCase, type CaseHistoryEvent } from '../../../src/vets/student-application.ts';
 import { myDoctorCase } from '../../../src/vets/doctor-application.ts';
+import { myLicenceCase, vetServiceCatalogue } from '../../../src/vets/licence-application.ts';
 import { myCentreInvitations } from '../../../src/centres/service.ts';
 import { CentreInvitationForm } from '../../../src/centres/forms.tsx';
 import {
@@ -22,12 +23,15 @@ import {
   isOpenApplication,
   type VetApplicationStatus,
 } from '../../../src/vets/onboarding-model.ts';
+import { DOCUMENT_KIND_FA as PROFESSIONAL_DOCUMENT_FA, type ProfessionalDocumentKind } from '../../../src/vets/professional-profile-model.ts';
 import type { VetCaseStatus } from '../../../src/vets/professional-model.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
+import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { VetDirectoryEditor } from '../../../src/vets/directory-editor.tsx';
 import { AppealApplicationForm, ResubmitApplicationForm, WithdrawApplicationForm } from '../../../src/vets/onboarding-forms.tsx';
 import { StudentApplicationForm } from '../../../src/vets/student-forms.tsx';
 import { DoctorApplicationForm } from '../../../src/vets/doctor-forms.tsx';
+import { LicenceApplicationForm } from '../../../src/vets/licence-forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,10 +49,12 @@ const CASE_TONE: Partial<Record<VetCaseStatus, StatusTone>> = {
   NEEDS_CORRECTION: 'warning',
   VERIFIED_STUDENT: 'success',
   VERIFIED_NO_LICENSE: 'success',
+  LICENSE_APPROVED_AWAITING_PAYMENT: 'info',
   REJECTED: 'error',
 };
 
 const OPEN: readonly VetCaseStatus[] = ['SUBMITTED', 'UNDER_REVIEW', 'NEEDS_CORRECTION'];
+const LICENCE_HELD: readonly VetCaseStatus[] = ['LICENSE_APPROVED_AWAITING_PAYMENT', 'ACTIVE_LICENSED_VET', 'EXPIRED', 'SUSPENDED'];
 const SCOPE_FA: Record<string, string> = { GENERAL: 'عمومی', SPECIALIST: 'متخصص' };
 
 function CaseHistory({ events, testId }: { events: readonly CaseHistoryEvent[]; testId: string }) {
@@ -67,19 +73,21 @@ function CaseHistory({ events, testId }: { events: readonly CaseHistoryEvent[]; 
 
 /**
  * A veterinarian's or veterinary student's own page — Requirements-Phase-2 §8
- * (PROMPT-007) and Phase 2.5 PROMPT-004 and PROMPT-005.
+ * (PROMPT-007) and Phase 2.5 PROMPT-004, 005 and 006.
  *
  * The account stays an ordinary account. Without a professional path it offers
- * the choice: a veterinary student or a doctor, both verified by hand by the
- * association admin. Neither grants the trusted veterinarian role (DEC-0145); the
- * doctor path grants the unlicensed tag and directory introduction, nothing more.
+ * three: a veterinary student, a doctor without a practice licence, and a doctor
+ * with one; a doctor whose council code is verified may add the licence later.
+ * All are verified by hand by the association admin. None grants the trusted
+ * veterinarian role (DEC-0145), and an approved licence waits for payment before
+ * the licensed tag exists.
  */
 export default async function VetProfileAccountPage({ searchParams }: { searchParams: Promise<{ path?: string }> }) {
   const guard = await guardRoute('/account/vet-profile');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
   const { path } = await searchParams;
-  const [own, applications, reference, invitations, professional, studentCase, doctorCase] = await Promise.all([
+  const [own, applications, reference, invitations, professional, studentCase, doctorCase, licenceCase, services] = await Promise.all([
     ownVetDirectory(db(), actor),
     myVetApplications(db(), actor),
     directoryReferenceData(db()),
@@ -87,14 +95,22 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
     professionalDashboard(db(), actor),
     myStudentCase(db(), actor),
     myDoctorCase(db(), actor),
+    myLicenceCase(db(), actor),
+    vetServiceCatalogue(db()),
   ]);
   const latest = applications[0] ?? null;
   const open = applications.find((application) => isOpenApplication(application.status)) ?? null;
   const provinceOf = (cityId: string | null) => reference.cities.find((city) => city.id === cityId)?.provinceCode ?? null;
   const studentOpen = studentCase !== null && OPEN.includes(studentCase.status);
   const doctorOpen = doctorCase !== null && OPEN.includes(doctorCase.status);
+  const licenceOpen = licenceCase !== null && OPEN.includes(licenceCase.status);
+  const licenceHeld = licenceCase !== null && LICENCE_HELD.includes(licenceCase.status);
   const verifiedStudent = studentCase?.status === 'VERIFIED_STUDENT';
-  const canChoosePath = !own && !open && !studentOpen && !doctorOpen && !verifiedStudent && professional.profile === null;
+  const anyOpen = Boolean(open) || studentOpen || doctorOpen || licenceOpen;
+  const canChoosePath = !own && !anyOpen && !verifiedStudent && professional.profile === null;
+  const profile = professional.profile;
+  const canAddLicence = profile !== null && profile.applicantType === 'DOCTOR' && profile.councilVerified && !anyOpen && !licenceHeld;
+  const serviceOptions = services.map((service) => ({ code: service.code, nameFa: service.nameFa }));
 
   return (
     <PublicShell actor={actor} title="پروفایل دامپزشکی" pathname="/account/vet-profile">
@@ -185,7 +201,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 {doctorCase.documents.map((document) => (
                   <li key={document.id}>
                     <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="text-text-brand underline underline-offset-4">
-                      {DOCUMENT_KIND_FA[document.kind as keyof typeof DOCUMENT_KIND_FA] + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
+                      {PROFESSIONAL_DOCUMENT_FA[document.kind as ProfessionalDocumentKind] + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
                     </a>
                   </li>
                 ))}
@@ -204,15 +220,84 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
           />
         ) : null}
 
+        {licenceCase ? (
+          <Card>
+            <div className="flex flex-wrap items-start justify-between gap-sm">
+              <div>
+                <p className="text-caption text-text-secondary">پرونده پروانه فعالیت</p>
+                <h2 className="text-label-lg">
+                  {'کد پروانه '}
+                  <span dir="ltr">{licenceCase.fields?.licenceCode ?? '—'}</span>
+                </h2>
+              </div>
+              <span data-testid="licence-case-status">
+                <StatusBadge tone={CASE_TONE[licenceCase.status] ?? 'neutral'}>{licenceCase.statusFa}</StatusBadge>
+              </span>
+            </div>
+            {licenceCase.fields ? (
+              <p className="mt-xs text-caption text-text-secondary">
+                {(SCOPE_FA[licenceCase.fields.practiceScope] ?? '') + ' · تاریخ پروانه ' + formatCivilDateFa(licenceCase.fields.licenceDate) + ' · نسخه ' + licenceCase.submissionVersion.toLocaleString('fa-IR')}
+              </p>
+            ) : null}
+            {licenceCase.status === 'LICENSE_APPROVED_AWAITING_PAYMENT' ? (
+              <div className="mt-md" data-testid="licence-awaiting-payment">
+                <Alert tone="info" title="مدارک پروانه تأیید شد؛ در انتظار پرداخت">
+                  Tag «دارای پروانه فعالیت» فقط پس از پرداخت موفق و تأییدشده دوره فعالیت فعال می‌شود. انتظار پرداخت مهلت ندارد.
+                </Alert>
+              </div>
+            ) : null}
+            {licenceCase.reviewNoteFa && licenceCase.status !== 'SUBMITTED' ? (
+              <div className="mt-md" data-testid="licence-review-note">
+                <Alert tone={licenceCase.status === 'NEEDS_CORRECTION' || licenceCase.status === 'REJECTED' ? 'warning' : 'success'} title="نتیجه بررسی انجمن">
+                  {licenceCase.reviewNoteFa}
+                </Alert>
+              </div>
+            ) : null}
+            {licenceCase.documents.length > 0 ? (
+              <ul className="mt-md space-y-2xs text-body-sm">
+                {licenceCase.documents.map((document) => (
+                  <li key={document.id}>
+                    <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="text-text-brand underline underline-offset-4">
+                      {PROFESSIONAL_DOCUMENT_FA[document.kind as ProfessionalDocumentKind] + (document.titleFa ? ' «' + document.titleFa + '»' : '') + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <CaseHistory events={licenceCase.history} testId="licence-history" />
+          </Card>
+        ) : null}
+
+        {licenceOpen && licenceCase?.fields && licenceCase.status !== 'UNDER_REVIEW' ? (
+          <LicenceApplicationForm
+            mode={licenceCase.fields.newDoctor ? 'NEW_DOCTOR' : 'VERIFIED_DOCTOR'}
+            defaults={licenceCase.fields}
+            services={serviceOptions}
+            provinces={reference.provinces}
+            cities={reference.cities}
+            revision={{ caseId: licenceCase.id, version: licenceCase.version }}
+          />
+        ) : null}
+
+        {canAddLicence ? (
+          <LicenceApplicationForm
+            mode="VERIFIED_DOCTOR"
+            defaults={{ councilCode: profile.councilCode, practiceScope: profile.practiceScope === 'NOT_DECLARED' ? null : profile.practiceScope, phone: profile.phone }}
+            services={serviceOptions}
+            provinces={reference.provinces}
+            cities={reference.cities}
+          />
+        ) : null}
+
         {own ? (
           <VetDirectoryEditor data={own} surface="owner" />
         ) : !verifiedStudent ? (
           <Card>
             <h1 className="text-h4">مسیر دامپزشکی در همزیست</h1>
             <p className="mt-xs text-body-sm text-text-secondary">
-              حساب کاربری عادی شما همان می‌ماند و این مسیر اختیاری است. دانشجوی دامپزشکی با شماره دانشجویی و دانشگاه، و دکتر دامپزشک با
-              کد نظام، عمومی یا متخصص بودن و کارت نظام اقدام می‌کند. اگر پروفایلی «بدون مالک» از شما منتشر شده است، از صفحه همان پروفایل
-              درخواست Claim بدهید.
+              حساب کاربری عادی شما همان می‌ماند و این مسیر اختیاری است. دانشجوی دامپزشکی با شماره دانشجویی و دانشگاه، دکتر دامپزشک با کد نظام و
+              کارت نظام، و دکتر دارای پروانه با کد، تاریخ و فایل پروانه نیز اقدام می‌کند. اگر پروفایلی «بدون مالک» از شما منتشر شده است، از صفحه
+              همان پروفایل درخواست Claim بدهید.
             </p>
           </Card>
         ) : null}
@@ -283,22 +368,23 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
           <Card>
             <h2 className="text-label-lg">کدام مسیر؟</h2>
             <div className="mt-md flex flex-wrap gap-md" data-testid="vet-path-choice">
-              <Link
-                href="/account/vet-profile?path=student"
-                aria-current={path === 'student' ? 'page' : undefined}
-                className={path === 'student' ? 'text-label-md text-text-brand underline underline-offset-4' : 'text-label-md text-text-secondary'}
-                data-testid="path-student"
-              >
-                دانشجوی دامپزشکی
-              </Link>
-              <Link
-                href="/account/vet-profile?path=doctor"
-                aria-current={path === 'doctor' ? 'page' : undefined}
-                className={path === 'doctor' ? 'text-label-md text-text-brand underline underline-offset-4' : 'text-label-md text-text-secondary'}
-                data-testid="path-doctor"
-              >
-                دکتر دامپزشک
-              </Link>
+              {(
+                [
+                  ['student', 'دانشجوی دامپزشکی'],
+                  ['doctor', 'دکتر دامپزشک'],
+                  ['licensed', 'دکتر دامپزشک دارای پروانه'],
+                ] as const
+              ).map(([value, label]) => (
+                <Link
+                  key={value}
+                  href={'/account/vet-profile?path=' + value}
+                  aria-current={path === value ? 'page' : undefined}
+                  className={path === value ? 'text-label-md text-text-brand underline underline-offset-4' : 'text-label-md text-text-secondary'}
+                  data-testid={'path-' + value}
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
           </Card>
         ) : null}
@@ -313,10 +399,13 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             cities={reference.cities}
           />
         ) : null}
-        {canChoosePath && path !== 'student' && path !== 'doctor' ? (
+        {canChoosePath && path === 'licensed' ? (
+          <LicenceApplicationForm mode="NEW_DOCTOR" defaults={{}} services={serviceOptions} provinces={reference.provinces} cities={reference.cities} />
+        ) : null}
+        {canChoosePath && path !== 'student' && path !== 'doctor' && path !== 'licensed' ? (
           <p className="text-body-sm text-text-secondary">
-            برای ادامه یکی از دو مسیر بالا را انتخاب کنید، یا <ButtonLink href="/dashboard">به داشبورد برگردید</ButtonLink>؛ حساب شما بدون این
-            انتخاب هم کامل است.
+            برای ادامه یکی از مسیرهای بالا را انتخاب کنید، یا <ButtonLink href="/dashboard">به داشبورد برگردید</ButtonLink>؛ حساب شما بدون این انتخاب
+            هم کامل است.
           </p>
         ) : null}
       </div>

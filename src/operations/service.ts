@@ -53,7 +53,7 @@ export async function associationQueues(
 ): Promise<readonly QueueCount[]> {
   assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
 
-  const [kyc, kennelCases, permits, foreign, postal, vetStudents, vetDoctors] = await Promise.all([
+  const [kyc, kennelCases, permits, foreign, postal, vetStudents, vetDoctors, vetLicences] = await Promise.all([
     countRows(
       database,
       database
@@ -100,6 +100,13 @@ export async function associationQueues(
           ),
         ),
     ),
+    countRows(
+      database,
+      database
+        .select({ value: count() })
+        .from(vetProfessionalCases)
+        .where(and(eq(vetProfessionalCases.caseType, 'LICENCE'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
+    ),
   ]);
 
   return [
@@ -123,6 +130,13 @@ export async function associationQueues(
       noteFa: 'بررسی دستی کد نظام، عمومی/متخصص و Claim پروفایل بدون مالک (Phase 2.5)',
       href: '/assoc/vet-doctors',
       waiting: vetDoctors,
+    },
+    {
+      key: 'vet-licences',
+      titleFa: 'پروانه فعالیت دامپزشکان',
+      noteFa: 'بررسی کد، تاریخ و فایل پروانه؛ تأیید فقط پرداخت دوره را باز می‌کند (Phase 2.5)',
+      href: '/assoc/vet-licences',
+      waiting: vetLicences,
     },
     {
       key: 'members',

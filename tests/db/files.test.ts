@@ -189,8 +189,9 @@ test('storage keys are server-generated and cannot escape the root', async () =>
         originalName: '../../../etc/passwd',
       });
 
-      // The client name is kept for display only; it never becomes a path.
-      assert.equal(stored.originalName, '../../../etc/passwd');
+      // The client name is kept for display only; it never becomes a path. Since
+      // PHASE-2.5 PROMPT-006 the label itself also loses any directory part (DEC-0192).
+      assert.equal(stored.originalName, 'passwd');
       assert.match(stored.storageKey, /^kyc_national_id\/\d{4}\/[0-9a-f-]{36}\.jpg$/);
       const absolute = resolveWithinRoot(root, stored.storageKey);
       assert.ok(absolute.startsWith(path.resolve(root)));

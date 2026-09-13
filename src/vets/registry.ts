@@ -119,6 +119,9 @@ export async function upsertVetProfile(
       displayNameFa: name,
       councilCode: council,
       councilVerifiedAt: new Date(),
+      // A registered, council-verified vet is a doctor; nobody said general or specialist here (DEC-0189, PROMPT-006).
+      applicantType: existing?.applicantType ?? ('DOCTOR' as const),
+      practiceScope: existing?.practiceScope ?? ('NOT_DECLARED' as const),
       phone: trimmed(input.phone),
       // The registry form has no bio field; the directory writes it (PROMPT-006), so absent means unchanged.
       bioFa: input.bioFa === undefined ? (existing?.bioFa ?? null) : trimmed(input.bioFa),

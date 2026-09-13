@@ -1,0 +1,124 @@
+{
+  "promptId": "PROMPT-006",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The licensed veterinarian submission. One LICENCE professional case serves a doctor whose council code is already verified (through PROMPT-005, a Phase 2 approval or the superadmin registry, whose entries are now typed as doctors) and a new doctor applying with council code and licence together. Every submission version carries the five mandatory components — council code (the verified one, unchangeable, for a verified doctor), general or specialist, an independent licence code normalised like a council code, a licence date and a licence file — plus, for a new doctor, a name and a council card; certificates with titles, website, Instagram, clinic, professional phone and services from the catalogue are optional. The licence date must be a real calendar day, not in the future by the Tehran calendar day and not before 1950. All validation happens before any file is written. Files are stored privately with the existing byte-signature check (JPG, PNG, PDF), the 10 MB ceiling, one file per main document, at most three certificates and eight files per submission, and are downloaded only through the authorized route by the owner and the association with every read audited; every stored file name in the product is now reduced to a safe label without path components, control characters or bidi overrides. Any edit after submission — while waiting for review or in answer to a correction — creates a new immutable submission version that keeps the earlier versions and their files, carries the reviewed licence file forward when no new one is attached, and bumps the case version so a decision on a version the reviewer did not see is refused; nothing is editable after a decision. The association admin approves, requests a correction or rejects, always with a reason. Approval writes the reviewed licence facts of the current version, the optional data, services and certificates onto the profile and reaches LICENSE_APPROVED_AWAITING_PAYMENT only: the tag stays UNLICENSED, replaced only to carry a newly declared scope (which also gives Phase 2 NOT_DECLARED doctors their scope), and the licensed tag waits for a verified payment. A new licence case is refused while one is awaiting payment, active, expired or suspended. The account page offers a third path for a licensed doctor, a licence form for a verified doctor, the case card with status, reasons, documents and history, the revision form while editable, and an awaiting-payment notice; the association has a queue, a detail page with every version and file, the applicant's standing, the same licence code elsewhere and the history, an overview count and a navigation entry.",
+  "changedFiles": [
+    "src/vets/licence-application.ts",
+    "src/vets/licence-actions.ts",
+    "src/vets/licence-forms.tsx",
+    "app/assoc/vet-licences/page.tsx",
+    "app/assoc/vet-licences/[id]/page.tsx",
+    "app/account/vet-profile/page.tsx",
+    "src/vets/professional-profile-model.ts",
+    "src/vets/registry.ts",
+    "src/files/storage.ts",
+    "src/operations/service.ts",
+    "src/ui/shell.tsx",
+    "tests/domain/vet-licence.test.ts",
+    "tests/db/vet-licence.test.ts",
+    "tests/browser/vet-licence.test.ts",
+    "tests/db/files.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-006.json"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0192"],
+  "tests": {
+    "domainAffected": {"command": "node --test tests/domain/vet-licence.test.ts tests/domain/vet-doctor.test.ts tests/domain/vet-student.test.ts tests/domain/vet-professional-profile.test.ts tests/domain/vet-professional.test.ts", "total": 31, "pass": 31, "fail": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "durationSeconds": 2.0, "total": 247, "pass": 247, "fail": 0, "skip": 0},
+    "databaseAffectedFirstRun": {"command": "node --test --test-concurrency=3 tests/db/vet-licence.test.ts tests/db/vet-doctor.test.ts tests/db/vet-student.test.ts tests/db/vet-professional-profile.test.ts tests/db/vet-professional-tags.test.ts tests/db/vet-onboarding.test.ts tests/db/vet-directory.test.ts tests/db/advertising.test.ts", "durationSeconds": 15.6, "total": 62, "pass": 59, "fail": 3, "note": "All three failures were in the new licence test itself: two compared against a shared counter after later accounts had moved it, and one expected the old scope although that test's submission declared a different one, which approval correctly applied. The test was rewritten to capture its values once and to declare the scope it asserts; no product code changed."},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 276.2, "total": 374, "pass": 373, "fail": 1, "note": "All seven licence tests passed. The one failure was tests/db/files.test.ts pinning the stored display name '../../../etc/passwd'; the safe-name rule of this prompt now stores 'passwd'. The expectation was updated with its reason, keeping the storage-key and root-escape assertions untouched."},
+    "databaseFilesRerun": {"command": "node --test tests/db/files.test.ts", "durationSeconds": 12.3, "total": 7, "pass": 7, "fail": 0},
+    "browser": {"command": "node tools/browser-tests.mjs tests/browser/vet-licence.test.ts tests/browser/vet-onboarding.test.ts tests/browser/vet-student.test.ts tests/browser/centres.test.ts tests/browser/vet-directory.test.ts tests/browser/operations.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts tests/browser/rtl.test.ts", "durationSeconds": 66.6, "total": 47, "pass": 47, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree (3.2 s), after the licence test rewrite and the files test change."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 66.7 s on the first attempt in a detached worktree at HEAD 868ace6 with the changed and new source and test files copied in and npm ci run, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=4 \"tests/db/*.test.ts\" ; node --test tests/db/files.test.ts",
+      "result": "PASS",
+      "evidence": "Domain+config+UI 247/247 (8 new). The complete database suite ran 374 tests with 373 passing, including all 7 new licence tests; its single failure was the files test expectation for the stored display name, which this prompt's safe-name rule deliberately changes. After updating that one expectation the files suite passed 7/7; no other suite exercises the changed line."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/vet-licence.test.ts tests/browser/vet-onboarding.test.ts tests/browser/vet-student.test.ts tests/browser/centres.test.ts tests/browser/vet-directory.test.ts tests/browser/operations.test.ts tests/browser/privacy.test.ts tests/browser/identity.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "47/47 on the first run on an isolated database and production server built from the worktree. The new suite takes a new account through the licensed-doctor path on a phone with every mandatory part, a clinic and a service; the association requests a correction and reads the PDF licence file (200, application/pdf, no-store); the applicant reads the reason and answers with a new licence date as a new version; the association approves; the page shows awaiting payment, the tag still reads 'بدون پروانه فعالیت' and not 'دارای پروانه فعالیت', and the revision form is gone; the licence file is 403 to another account and 401 to a visitor, and /assoc/vet-licences is FORBIDDEN to that account. The full 161-test matrix was not rerun."
+    },
+    {
+      "id": "files",
+      "command": "node --test tests/db/vet-licence.test.ts (test: files are checked by their bytes and size…) ; node --test tests/domain/vet-licence.test.ts ; node --test tests/db/files.test.ts ; browser vet-licence",
+      "result": "PASS",
+      "evidence": "A text file posing as the licence and a file over 10 MB are VALIDATION and leave no case behind. A PDF licence named '../../etc/lic\\u202Eenc.pdf' is stored as application/pdf with purpose VET_PROFESSIONAL_DOCUMENT, label 'licenc.pdf' and a storage key not derived from the name. The owner and the association read it; USER, TRUSTED_VET, GENETICS_OPERATOR and CONTENT_ADMIN contexts are FORBIDDEN; exactly two PRIVATE_FILE_READ events exist. The domain test pins the safe-label rules (path, control and bidi characters, empty names, 120 characters) and byte-based type detection."
+    },
+    {
+      "id": "dates",
+      "command": "node --test tests/domain/vet-licence.test.ts ; node --test tests/db/vet-licence.test.ts (test: a submission without every mandatory licence component…)",
+      "result": "PASS",
+      "evidence": "2025-02-30, 2024-13-01, 1403/02/01 and 2024-5-1 are refused; tomorrow, 2999-01-01 and 1949-12-31 are refused; today is accepted, and 2026-09-12T21:00Z is already 2026-09-13 in Tehran, so a licence issued this morning there is never 'future'. In the database a future, an impossible and a pre-1950 date are VALIDATION and today's Tehran date is accepted."
+    },
+    {
+      "id": "cross-field-validation",
+      "command": "node --test tests/db/vet-licence.test.ts (tests: a submission without every mandatory licence component… ; the council code of a verified doctor cannot change…) ; node --test tests/domain/vet-licence.test.ts",
+      "result": "PASS",
+      "evidence": "Missing licence file, licence code, licence date, council code or scope, a new doctor without a council card, a certificate without a title, two licence files, an unknown service and a javascript: website are each VALIDATION and store nothing. A verified doctor cannot submit a different council code (VALIDATION); a second open case, a student in review, a code another profile holds and a licence already awaiting payment are CONFLICT. The domain rules name all four missing text components at once, refuse NOT_DECLARED, malformed licence codes, a free-text phone, an over-long clinic name and duplicate or malformed service codes."
+    },
+    {
+      "id": "privacy",
+      "command": "node --test tests/db/vet-licence.test.ts (tests: files… ; the owner sees the licence; the public never does) ; browser vet-licence",
+      "result": "PASS",
+      "evidence": "The owner's dashboard carries the licence code and the LICENSE_APPROVED_AWAITING_PAYMENT case; the published public view of the same profile contains neither the licence code nor the licence file id nor any forbidden key, and still reads the unlicensed tag. Files are private to owner and association (see files)."
+    },
+    {
+      "id": "revisions",
+      "command": "node --test tests/db/vet-licence.test.ts (test: an edit is a new version…) ; browser vet-licence",
+      "result": "PASS",
+      "evidence": "An edit before review becomes version 2 without a new file and keeps version 1's licence code and file; a decision on the version-1 case state is CONFLICT. A correction is answered as version 3 with a new file, while both licence files remain as documents and the certificate carries forward; another account cannot edit (NOT_FOUND); after approval no edit is accepted (CONFLICT); the profile holds the code, date and file of the approved version 3. In the browser the correction answer is a new version and the history shows the correction."
+    },
+    {
+      "id": "state-transitions",
+      "command": "node --test tests/db/vet-licence.test.ts (tests: approval reaches LICENSE_APPROVED_AWAITING_PAYMENT… ; an undeclared Phase 2 scope… ; revisions) ; node --test tests/domain/vet-licence.test.ts ; browser vet-licence",
+      "result": "PASS",
+      "evidence": "USER, REVIEW_OPERATOR, TRUSTED_VET and GENETICS_OPERATOR are refused the decision and the applicant cannot decide their own case; a case waiting for correction cannot be decided; approval makes the case LICENSE_APPROVED_AWAITING_PAYMENT and a second decision is CONFLICT. The tag stays UNLICENSED with the licence's scope (SPECIALIST) from VET_LICENCE_CASE; the profile has has_licence true, the verification and verifier, the normalised website, the Instagram handle, both services and the certificate. A new doctor gets a DOCTOR profile with council code and licence verified and the UNLICENSED tag. A rejection writes nothing to the profile; a later approval gives a Phase 2 NOT_DECLARED doctor the GENERAL scope. The model refuses any reviewer move to ACTIVE_LICENSED_VET and any expiry while awaiting payment."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The licensed tag, the active licensed status and payment are PROMPT-008; approval here only opens that path.",
+    "Changing or renewing an approved licence is refused for now and belongs to the payment and period flow of PROMPT-008.",
+    "An unowned directory page must be claimed through PROMPT-005 before a licence can be added to it; the licence path does not claim pages.",
+    "Optional profile data (website, Instagram, clinic, phone, services, certificates) reaches the profile only through an approved licence case; a doctor without a licence has no separate editor for it yet.",
+    "Licence codes are not unique in the database; the same code on another account is shown to the reviewer.",
+    "Large multi-file submissions are bounded per file (10 MB) but also by the 12 MB server-action body limit, so several large files in one submission can be refused by the framework before the product's own checks.",
+    "The public page still shows no licence information; displaying the licensed tag is PROMPT-008 and PROMPT-014.",
+    "Deciding a submitted case performs the start of review and the decision in one step; claiming a case is PROMPT-007.",
+    "The full 161-test browser matrix was not rerun; nine suites passing through the changed code were.",
+    "Screenshots were not captured; visual fidelity of the new pages is unverified."
+  ],
+  "readiness": {
+    "code": "LICENCE_SUBMISSION_READY_AWAITING_PAYMENT_FLOW",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-licence.test.ts",
+    "tests/domain/vet-licence.test.ts",
+    "tests/browser/vet-licence.test.ts",
+    "DECISIONS.md#dec-0192"
+  ]
+}

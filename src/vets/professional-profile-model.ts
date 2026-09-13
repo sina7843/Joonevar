@@ -250,6 +250,80 @@ export const DOCTOR_DECISION_FA: Record<DoctorDecision, string> = {
 };
 export const isDoctorDecision = oneOf(DOCTOR_DECISIONS);
 
+// ── Licensed veterinarian submission (PROMPT-006) ──────────────────────────
+
+export const MAX_CERTIFICATES = 3;
+/** No licence older than this is plausible; an earlier date is a typing mistake, not a fact. */
+export const LICENCE_DATE_FLOOR = '1950-01-01';
+
+/** A licence code is read the same however it is typed — the student-number normalisation. */
+export const normalizeLicenceCode = (raw: string | null | undefined): string => normalizeStudentNumber(raw);
+
+export interface LicenceFields {
+  /** Only for a doctor who has no verified profile yet; an existing profile keeps its name. */
+  readonly displayNameFa: string | null;
+  readonly practiceScope: string;
+  readonly councilCode: string;
+  readonly licenceCode: string;
+  readonly licenceDate: string;
+  readonly phone: string | null;
+  readonly cityId: string | null;
+  readonly websiteUrl: string | null;
+  readonly instagramHandle: string | null;
+  readonly clinicNameFa: string | null;
+  readonly serviceCodes: readonly string[];
+}
+
+/**
+ * Everything wrong with a licence submission. The five mandatory components —
+ * council code, general or specialist, licence code, licence date and (checked
+ * with the documents) the licence file — are each named. `today` is the calendar
+ * day where the licence was issued, so a licence dated today is never "future".
+ */
+export function licenceFieldProblems(f: LicenceFields, options: { today: string; newDoctor: boolean }): string[] {
+  const problems: string[] = [];
+  if (options.newDoctor) {
+    const name = (f.displayNameFa ?? '').trim();
+    if (name === '') problems.push('نام و نام خانوادگی دامپزشک را بنویسید.');
+    else if (name.length > 120) problems.push('نام و نام خانوادگی حداکثر ۱۲۰ نویسه است.');
+  }
+  if (f.practiceScope !== 'GENERAL' && f.practiceScope !== 'SPECIALIST') problems.push('عمومی یا متخصص بودن را انتخاب کنید.');
+  if (f.councilCode === '') problems.push('کد نظام دامپزشکی را بنویسید.');
+  else if (!/^[A-Z0-9-]{3,20}$/.test(f.councilCode)) problems.push('کد نظام دامپزشکی فقط رقم، حرف لاتین و خط تیره دارد (۳ تا ۲۰ نویسه).');
+  if (f.licenceCode === '') problems.push('کد پروانه فعالیت را بنویسید.');
+  else if (!/^[A-Z0-9/-]{3,30}$/.test(f.licenceCode)) problems.push('کد پروانه فقط رقم، حرف لاتین، خط تیره و / دارد (۳ تا ۳۰ نویسه).');
+  if (f.licenceDate === '') problems.push('تاریخ پروانه را وارد کنید.');
+  else if (!isIsoDate(f.licenceDate)) problems.push('تاریخ پروانه معتبر نیست.');
+  else if (f.licenceDate > options.today) problems.push('تاریخ پروانه نمی‌تواند در آینده باشد.');
+  else if (f.licenceDate < LICENCE_DATE_FLOOR) problems.push('تاریخ پروانه پیش از ۱۹۵۰ پذیرفته نمی‌شود؛ تاریخ را دوباره بررسی کنید.');
+  if (f.phone !== null && (f.phone.length > 20 || !/^[0-9+()\- ]+$/.test(f.phone))) problems.push('تلفن حرفه‌ای فقط رقم، +، پرانتز و خط تیره دارد (حداکثر ۲۰ نویسه).');
+  if (f.clinicNameFa !== null && f.clinicNameFa.length > 120) problems.push('نام کلینیک حداکثر ۱۲۰ نویسه است.');
+  if (f.cityId !== null && !UUID_SHAPE.test(f.cityId)) problems.push('شهر انتخاب‌شده در فهرست شهرها نیست.');
+  if (f.serviceCodes.length > 20 || new Set(f.serviceCodes).size !== f.serviceCodes.length || f.serviceCodes.some((c) => !/^[A-Z_]{2,40}$/.test(c))) {
+    problems.push('فهرست خدمات معتبر نیست.');
+  }
+  return problems;
+}
+
+export const LICENCE_DOCUMENT_KINDS = ['PRACTICE_LICENCE', 'COUNCIL_CARD', 'CERTIFICATE', 'IDENTITY', 'OTHER'] as const;
+export type LicenceDocumentKind = (typeof LICENCE_DOCUMENT_KINDS)[number];
+export const isLicenceDocumentKind = oneOf(LICENCE_DOCUMENT_KINDS);
+
+export const LICENCE_DECISIONS = ['APPROVE', 'REQUEST_CORRECTION', 'REJECT'] as const;
+export type LicenceDecision = (typeof LICENCE_DECISIONS)[number];
+/** Approved documents open payment and nothing more: the licensed tag waits for a verified payment (PROMPT-008). */
+export const LICENCE_DECISION_OUTCOME: Record<LicenceDecision, VetCaseStatus> = {
+  APPROVE: 'LICENSE_APPROVED_AWAITING_PAYMENT',
+  REQUEST_CORRECTION: 'NEEDS_CORRECTION',
+  REJECT: 'REJECTED',
+};
+export const LICENCE_DECISION_FA: Record<LicenceDecision, string> = {
+  APPROVE: 'تأیید مدارک پروانه (در انتظار پرداخت)',
+  REQUEST_CORRECTION: 'درخواست اصلاح',
+  REJECT: 'رد',
+};
+export const isLicenceDecision = oneOf(LICENCE_DECISIONS);
+
 // ── Public view ────────────────────────────────────────────────────────────
 
 /** Never in a public payload, at any depth. The public-view test walks the payload for these. */
