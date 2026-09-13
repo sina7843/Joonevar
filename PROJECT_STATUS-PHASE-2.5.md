@@ -6,7 +6,7 @@ Managed by `node tools/runner.mjs --phase 2.5 …` (DEC-0187). The package is re
 - [x] PROMPT-002 — 002-professional-identity-domain <!-- work-commit:fd4743df8078b5981632e5429845a6b7d399d78e -->
 - [x] PROMPT-003 — 003-veterinary-profile-migration <!-- work-commit:e0728fe0dc5816419cd3a6b36015ecbc86cec4fb -->
 - [x] PROMPT-004 — 004-student-veterinary-flow <!-- work-commit:a40e7e3de67018571f13180b10951844a05fcaea -->
-- [ ] PROMPT-005 — 005-vet-without-license-flow
+- [x] PROMPT-005 — 005-vet-without-license-flow <!-- work-commit:3efd72cb9a41e8b39707833fbd808a3cbc957165 -->
 - [ ] PROMPT-006 — 006-licensed-vet-submission
 - [ ] PROMPT-007 — 007-association-admin-review
 - [ ] PROMPT-008 — 008-periodic-vet-activation-payment
