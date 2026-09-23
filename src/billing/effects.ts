@@ -17,6 +17,7 @@ import { markKennelPaid } from '../kennels/service.ts';
 import { markPermitPaid } from '../mating/permits.ts';
 import { issueCardsForBatch, markCardBatchPaid } from '../mating/allocation.ts';
 import { activateSubscriptionFromPayment } from '../advertising/service.ts';
+import { activateLicencePeriodFromPayment } from '../vets/licence-period.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -57,6 +58,12 @@ export const paidEffects: PaidEffects = {
       // begins where the live period ends (§14).
       case 'ADVERTISING_PACKAGE':
         await activateSubscriptionFromPayment(tx, batch);
+        return;
+      // The licensed tag and the active licence status are made only here, by a
+      // payment the server verified; a renewal starts where the live period ends (§5).
+      case 'VET_LICENSE_ACTIVATION':
+      case 'VET_LICENSE_RENEWAL':
+        await activateLicencePeriodFromPayment(tx, batch);
         return;
       default:
         return;

@@ -239,6 +239,13 @@
       "when": 1789265968122,
       "tag": "0033_vet-review",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790205430316,
+      "tag": "0034_vet-licence-period",
+      "breakpoints": true
     }
   ]
 }

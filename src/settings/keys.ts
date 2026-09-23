@@ -470,6 +470,62 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     noteFa: 'تا ثبت مبلغ واقعی، این بسته قابل خرید نیست (§۱۴).',
     seedValue: null,
   },
+  // ── Veterinary practice licence period (Phase 2.5, PROMPT-008) ──────────
+  // Nothing here has a starting figure: no tariff, period length, reminder
+  // window or grace rule has been supplied for this product. Until the real
+  // values are entered in /admin/settings, activation and renewal stay closed
+  // rather than being sold for nothing or given an invented duration.
+  {
+    key: 'vet_licence.activation_toman',
+    group: 'FEES',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'تعرفه فعال‌سازی پروانه فعالیت دامپزشک',
+    noteFa: 'تا ثبت مبلغ واقعی، فعال‌سازی پروانه باز نمی‌شود. مبلغ در لحظه شروع پرداخت روی همان دوره ثبت می‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'vet_licence.renewal_toman',
+    group: 'FEES',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'تعرفه تمدید پروانه فعالیت دامپزشک',
+    noteFa: 'تا ثبت مبلغ واقعی، تمدید باز نمی‌شود. مبلغ در لحظه شروع پرداخت روی همان دوره ثبت می‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'vet_licence.period_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'طول دوره فعالیت پروانه (روز)',
+    noteFa: 'طول دوره‌ای که یک پرداخت تأییدشده می‌خرد. مقدار واقعی اعلام نشده است؛ تا ثبت آن، فعال‌سازی و تمدید باز نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 3650,
+  },
+  {
+    key: 'vet_licence.reminder_days_before',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'یادآوری پیش از پایان دوره (روز)',
+    noteFa: 'چند روز مانده به پایان دوره، یادآوری تمدید برای دامپزشک ساخته شود. تا ثبت مقدار، هیچ یادآوری ساخته نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 365,
+  },
+  {
+    key: 'vet_licence.grace_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'مهلت ارفاقی پس از پایان دوره (روز)',
+    noteFa: 'چند روز پس از پایان دوره، Tag دارای پروانه پیش از تنزل نگه داشته شود. تا ثبت مقدار، مهلت ارفاقی وجود ندارد و تنزل دقیقاً در پایان دوره است.',
+    seedValue: null,
+    min: 0,
+    max: 365,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(

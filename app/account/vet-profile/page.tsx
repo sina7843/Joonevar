@@ -13,6 +13,9 @@ import { professionalDashboard } from '../../../src/vets/professional-profile.ts
 import { myStudentCase, type CaseHistoryEvent } from '../../../src/vets/student-application.ts';
 import { myDoctorCase } from '../../../src/vets/doctor-application.ts';
 import { myLicenceCase, vetServiceCatalogue } from '../../../src/vets/licence-application.ts';
+import { licenceStanding } from '../../../src/vets/licence-period.ts';
+import { LICENCE_STANDING_FA } from '../../../src/vets/licence-period-model.ts';
+import { PayLicencePeriodForm } from '../../../src/vets/licence-period-forms.tsx';
 import { myCentreInvitations } from '../../../src/centres/service.ts';
 import { CentreInvitationForm } from '../../../src/centres/forms.tsx';
 import {
@@ -98,6 +101,9 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
     myLicenceCase(db(), actor),
     vetServiceCatalogue(db()),
   ]);
+  // Reading the licence also applies whatever time has done to it: the renewal
+  // reminder while a period is live, and the downgrade once it is over (PROMPT-008).
+  const licence = await licenceStanding(db(), actor.accountId);
   const latest = applications[0] ?? null;
   const open = applications.find((application) => isOpenApplication(application.status)) ?? null;
   const provinceOf = (cityId: string | null) => reference.cities.find((city) => city.id === cityId)?.provinceCode ?? null;
@@ -244,6 +250,27 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 <Alert tone="info" title="مدارک پروانه تأیید شد؛ در انتظار پرداخت">
                   Tag «دارای پروانه فعالیت» فقط پس از پرداخت موفق و تأییدشده دوره فعالیت فعال می‌شود. انتظار پرداخت مهلت ندارد.
                 </Alert>
+              </div>
+            ) : null}
+            {licence.canPay ? (
+              <div className="mt-md space-y-sm" data-testid="licence-period">
+                <p className="text-body-sm">
+                  {'وضعیت دوره فعالیت: '}
+                  <span data-testid="licence-period-standing">{LICENCE_STANDING_FA[licence.standing]}</span>
+                  {licence.endsAt ? ' · پایان دوره ' + formatInstantFa(new Date(licence.endsAt)) : ''}
+                  {licence.daysLeft !== null && licence.standing === 'ACTIVE' ? ' · ' + licence.daysLeft.toLocaleString('fa-IR') + ' روز مانده' : ''}
+                </p>
+                {licence.standing === 'GRACE' ? (
+                  <Alert tone="warning" title="دوره فعالیت شما تمام شده و در مهلت ارفاقی است">
+                    تا پایان مهلت ارفاقی Tag دارای پروانه باقی است. با تمدید، دوره تازه از پایان دوره قبلی شروع می‌شود و روزی از بین نمی‌رود.
+                  </Alert>
+                ) : null}
+                {licence.standing === 'EXPIRED' ? (
+                  <Alert tone="warning" title="دوره فعالیت پروانه به پایان رسیده است">
+                    Tag شما «بدون پروانه فعالیت» است. کد نظام تأییدشده و مدارک پروانه سر جای خود می‌مانند و با پرداخت تأییدشده دوباره فعال می‌شوید.
+                  </Alert>
+                ) : null}
+                <PayLicencePeriodForm kind={licence.kind} pendingBatchId={licence.pendingBatchId} />
               </div>
             ) : null}
             {licenceCase.reviewNoteFa && licenceCase.status !== 'SUBMITTED' ? (

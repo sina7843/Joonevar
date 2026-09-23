@@ -25,6 +25,10 @@ export const paymentService = pgEnum('payment_service', [
   'PUPPY_CARD',
   /** A directory advertising package (Phase 2, §14). */
   'ADVERTISING_PACKAGE',
+  /** The first paid period of a veterinarian's practice licence (Phase 2.5, §5). */
+  'VET_LICENSE_ACTIVATION',
+  /** Every later period of the same licence. */
+  'VET_LICENSE_RENEWAL',
 ]);
 
 /**

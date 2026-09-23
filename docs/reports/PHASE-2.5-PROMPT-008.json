@@ -1,0 +1,122 @@
+{
+  "promptId": "PROMPT-008",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The paid period of a practice licence. Two payment services, VET_LICENSE_ACTIVATION and VET_LICENSE_RENEWAL, join the existing machinery, and a vet_licence_period row carries the window, the payment batch and the frozen figures. Nothing about money or duration is invented: five managed settings — the activation tariff, the renewal tariff, the period length, the reminder window and the grace days — are added with no seed value, so until the real numbers are entered in /admin/settings the payment path answers NOT_CONFIGURED instead of selling an unpriced period or inventing a duration. Payment opens only after the association approved the licence, and immediately before a period is created the approval, the verified licence facts on the profile (code, date, file, verification, declared scope), the applicant type and the current tariff are all checked again and then frozen on the period with the settings version; an unpaid period whose frozen figures no longer match today's settings is cancelled and replaced rather than repriced, and an unchanged one is offered again with its batch. Waiting for payment still has no deadline. Only the server-side verification activates anything: the effect runs inside the verifying transaction, so a failed, cancelled, amount-mismatched or replayed callback grants nothing, and a replay finds the work done. Activation sets the period window, moves the case to ACTIVE_LICENSED_VET through the SYSTEM transition and writes the licensed tag with the server actor, which since PROMPT-007 is the only writer of that tag. A renewal starts exactly where the live period ends, so renewing early neither overlaps nor loses paid time, while a lapsed licence buys from the day it is paid. There is no scheduler, as with advertising packages: the standing is read from the frozen window, the renewal reminder is written once inside its configured window, and once the period and its grace are over the next read downgrades the case to EXPIRED and the tag back to the verified no-licence tag, keeping the council code and the licence documents untouched. The account page shows the standing, the end date, the days left, a grace or expiry notice and the pay or renew button, with its own gateway return page.",
+  "changedFiles": [
+    "src/vets/licence-period.ts",
+    "src/vets/licence-period-model.ts",
+    "src/vets/licence-period-actions.ts",
+    "src/vets/licence-period-forms.tsx",
+    "app/account/vet-profile/page.tsx",
+    "app/account/vet-profile/return/page.tsx",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/settings/keys.ts",
+    "src/db/schema/vets.ts",
+    "src/db/schema/billing.ts",
+    "src/db/migrations/0034_vet-licence-period.sql",
+    "src/db/migrations/meta/0034_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "tests/domain/vet-licence-period.test.ts",
+    "tests/db/vet-licence-period.test.ts",
+    "tests/browser/vet-licence.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-008.json"
+  ],
+  "migrations": ["src/db/migrations/0034_vet-licence-period.sql"],
+  "decisions": ["DEC-0194"],
+  "tests": {
+    "domainLicencePeriod": {"command": "node --test tests/domain/vet-licence-period.test.ts", "total": 4, "pass": 4, "fail": 0},
+    "databaseLicencePeriodFirstRun": {"command": "node --test tests/db/vet-licence-period.test.ts", "total": 7, "pass": 6, "fail": 1, "note": "The failure was the test's own time travel: it simulated expiry at a future date and then paid with the real clock, so the tag row would have ended before it started. The renewal-after-expiry leg now applies the payment effect with the same simulated clock; the gateway verification path is covered by the tests above it. No product code changed."},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 278, "total": 387, "pass": 387, "fail": 0, "skip": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "total": 253, "pass": 253, "fail": 0, "skip": 0},
+    "browser": {"command": "node tools/browser-tests.mjs tests/browser/vet-licence.test.ts tests/browser/membership.test.ts tests/browser/payment-mock.test.ts tests/browser/advertising.test.ts tests/browser/vet-review.test.ts tests/browser/vet-student.test.ts tests/browser/vet-onboarding.test.ts tests/browser/rtl.test.ts", "durationSeconds": 52.5, "total": 36, "pass": 36, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, after fixing the scripted gateway's intent shape and the student input in the new database test."
+    },
+    {
+      "id": "build",
+      "command": "npm ci ; npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 83.4 s on the first attempt in a detached worktree at HEAD 0c01ad2 with every changed and new file copied in, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\" ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "The complete database suite passed 387/387 with migration 0034 applied to fresh test databases, including the 7 new licence-period tests; domain, config and UI passed 253/253 including the 4 new period-arithmetic tests."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/vet-licence.test.ts tests/browser/membership.test.ts tests/browser/payment-mock.test.ts tests/browser/advertising.test.ts tests/browser/vet-review.test.ts tests/browser/vet-student.test.ts tests/browser/vet-onboarding.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "36/36 on the first run on an isolated database and production server built from the worktree. The licence suite gains a payment leg: the managed figures are entered, a gateway trip that says no leaves the doctor unlicensed and the case awaiting payment, and a verified payment shows the licensed tag, the active case and the active period, after which only a renewal is offered. The membership, mock-gateway and advertising payment suites, which share the machinery this prompt extended, and the review, student and doctor suites still pass; the full browser matrix was not rerun."
+    },
+    {
+      "id": "managed-settings",
+      "command": "node --test tests/db/vet-licence-period.test.ts (test: payment opens only after approval…)",
+      "result": "PASS",
+      "evidence": "With the activation tariff cleared the payment is NOT_CONFIGURED; with the tariff entered but no period length it is still NOT_CONFIGURED; only with both does a period appear, carrying the configured period length. The five new keys ship with no seed value, so an unconfigured reminder window writes no reminder and an unconfigured grace downgrades exactly at the end of the period."
+    },
+    {
+      "id": "payment-gate",
+      "command": "node --test tests/db/vet-licence-period.test.ts (tests: payment opens only after approval… ; the payment batch of a licence period…)",
+      "result": "PASS",
+      "evidence": "An account with no licence case, a student, and a doctor whose council code is verified but who has no approved licence are each refused. The batch is created under VET_LICENSE_ACTIVATION for the paying account, and another account cannot start an attempt on it (FORBIDDEN). Starting a payment grants nothing: the tag is still the unlicensed one."
+    },
+    {
+      "id": "tariff-snapshot",
+      "command": "node --test tests/db/vet-licence-period.test.ts (test: the amount is frozen from the managed tariff…)",
+      "result": "PASS",
+      "evidence": "The period and its batch carry the tariff as it stood; asking again returns the same unpaid period; after the tariff changes the old period is CANCELLED with an audit event and a new one is created at the new amount, and the case never moved while nothing was paid."
+    },
+    {
+      "id": "idempotent-verification",
+      "command": "node --test tests/db/vet-licence-period.test.ts (tests: a verified payment activates the period… ; a failed, mismatched or cancelled payment…)",
+      "result": "PASS",
+      "evidence": "A verified payment makes exactly one active period of the configured length with the grace frozen on it, the case ACTIVE_LICENSED_VET and the licensed tag with the declared scope; the server asked the gateway rather than trusting the return. A replayed callback reports PAID with performed false and leaves one period, one activation audit event and one notification. An unpaid answer, an amount that does not match and a cancelled attempt each leave no period, the case awaiting payment and the unlicensed tag; a verification arriving after a cancellation grants nothing and never reaches the gateway."
+    },
+    {
+      "id": "renewal",
+      "command": "node --test tests/db/vet-licence-period.test.ts (test: renewing early continues the live period…)",
+      "result": "PASS",
+      "evidence": "Renewing nine months into a live period is charged the renewal tariff and starts exactly at the live period's end, adding a full period with no day lost and no overlap; the tag and the case stay as they were. After the period and its grace have passed the licence lapses, and a renewal then starts from that day rather than from the old window."
+    },
+    {
+      "id": "expiry-downgrade",
+      "command": "node --test tests/db/vet-licence-period.test.ts (test: an ended period keeps the tag through its grace…) ; node --test tests/domain/vet-licence-period.test.ts",
+      "result": "PASS",
+      "evidence": "Inside the configured window one reminder is written and repeated reads do not write a second. During grace the standing reads GRACE and the licensed tag remains. Past the grace the standing reads EXPIRED, the case becomes EXPIRED once, the tag returns to the unlicensed one with the same declared scope, one expiry notice exists, and reading again a month later changes nothing further. The pure rules pin that grace delays only the downgrade, that a renewal still starts at the period's end, and that no reminder exists without a configured window."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No production figure exists for any of the five settings, so the licence payment path is closed until the association enters the real tariff and period length; this is reported as NOT_CONFIGURED rather than defaulted.",
+    "There is no scheduler: the reminder and the expiry downgrade are applied when the licence is next read, so a doctor who never opens the product is downgraded the moment anything reads their standing.",
+    "The expiry downgrade and the reminder are driven from the account page read; the association environment has no licence-period panel yet.",
+    "Grace keeps the tag but buys no time: the next period still starts at the end of the previous one.",
+    "Suspension, revocation and any association-side cancellation of a paid period are not part of this prompt.",
+    "The public page still shows nothing about a licence or its period.",
+    "Screenshots were not captured; visual fidelity of the new card and return page is unverified."
+  ],
+  "readiness": {
+    "code": "LICENCE_PERIOD_PAYMENT_READY_AWAITING_TARIFFS",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-licence-period.test.ts",
+    "tests/domain/vet-licence-period.test.ts",
+    "tests/browser/vet-licence.test.ts",
+    "DECISIONS.md#dec-0194"
+  ]
+}

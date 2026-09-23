@@ -7,6 +7,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   primaryKey,
@@ -17,6 +18,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { accounts, species, storedFiles } from './core.ts';
+import { paymentBatches } from './billing.ts';
 import { cities, provinces } from './geography.ts';
 import { animals } from './animals.ts';
 
@@ -725,6 +727,61 @@ export const vetProfileCertificates = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
   },
   (t) => [uniqueIndex('vet_profile_certificate_file_key').on(t.fileId), index('vet_profile_certificate_profile_idx').on(t.vetProfileId)],
+);
+
+export const vetLicencePeriodKind = pgEnum('vet_licence_period_kind', ['ACTIVATION', 'RENEWAL']);
+export const vetLicencePeriodStatus = pgEnum('vet_licence_period_status', ['PENDING_PAYMENT', 'ACTIVE', 'CANCELLED']);
+
+/**
+ * One paid period of practice-licence activity — Phase 2.5 PROMPT-008.
+ *
+ * A row is created as `PENDING_PAYMENT` together with its payment batch and
+ * becomes `ACTIVE` only inside the transaction that verifies that payment, so a
+ * period exists exactly where money was really taken. The tariff, its settings
+ * version, the period length, the grace days and the reminder window are frozen
+ * on the row when the payment starts, so a later settings edit never rewrites
+ * what was bought. There is no scheduler: `EXPIRED` is read from `ends_at` and
+ * the frozen grace, and the downgrade is applied when the licence is next read.
+ */
+export const vetLicencePeriods = pgTable(
+  'vet_licence_period',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => vetProfessionalCases.id, { onDelete: 'restrict' }),
+    kind: vetLicencePeriodKind('kind').notNull(),
+    status: vetLicencePeriodStatus('status').notNull().default('PENDING_PAYMENT'),
+    paymentBatchId: uuid('payment_batch_id').references(() => paymentBatches.id, { onDelete: 'restrict' }),
+    startsAt: timestamp('starts_at', { withTimezone: true }),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    /** The tariff as it stood when this payment started. */
+    tariffSettingKey: text('tariff_setting_key').notNull(),
+    tariffSettingVersion: integer('tariff_setting_version').notNull(),
+    amountToman: numeric('amount_toman', { precision: 14, scale: 0 }).notNull(),
+    periodDays: integer('period_days').notNull(),
+    graceDays: integer('grace_days'),
+    reminderDaysBefore: integer('reminder_days_before'),
+    reminderSentAt: timestamp('reminder_sent_at', { withTimezone: true }),
+    expiredNoticeAt: timestamp('expired_notice_at', { withTimezone: true }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_licence_period_batch_key').on(t.paymentBatchId),
+    index('vet_licence_period_account_idx').on(t.accountId, t.status, t.endsAt),
+    index('vet_licence_period_case_idx').on(t.caseId),
+    // One unpaid period per case at a time: a second attempt reuses the first.
+    uniqueIndex('vet_licence_period_pending_key').on(t.caseId).where(sql`${t.status} = 'PENDING_PAYMENT'`),
+    check('vet_licence_period_days_positive', sql`${t.periodDays} >= 1`),
+    check('vet_licence_period_grace_not_negative', sql`${t.graceDays} is null or ${t.graceDays} >= 0`),
+    // A paid period always knows its window; an unpaid one never has one.
+    check('vet_licence_period_window_matches_status', sql`(${t.status} = 'ACTIVE') = (${t.startsAt} is not null and ${t.endsAt} is not null)`),
+  ],
 );
 
 // ── Veterinary centres (Phase 2, PROMPT-008) ───────────────────────────────

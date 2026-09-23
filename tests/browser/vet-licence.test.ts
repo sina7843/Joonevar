@@ -15,7 +15,9 @@ import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomInt } from 'node:crypto';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
-import { BASE_URL, DESKTOP, MOBILE, newSyntheticMobile, signIn } from './support.ts';
+import { sql } from 'drizzle-orm';
+import { createDatabase } from '../../src/db/client.ts';
+import { BASE_URL, DATABASE_URL, DESKTOP, MOBILE, newSyntheticMobile, signIn } from './support.ts';
 
 const ASSOCIATION = '09990000004';
 const STRANGER = '09990000005';
@@ -148,5 +150,54 @@ test('approval waits for payment: the licensed tag does not appear, and the file
   });
   await as('visitor', MOBILE, async (page) => {
     assert.equal((await page.request.get(BASE_URL + licencePath)).status(), 401);
+  });
+});
+
+/** The managed figures of a licence period; nothing is sold until they are entered (PROMPT-008). */
+async function configureLicencePeriod(): Promise<void> {
+  const { db, pool } = createDatabase(DATABASE_URL);
+  try {
+    for (const [key, value] of [
+      ['vet_licence.activation_toman', '"250000"'],
+      ['vet_licence.renewal_toman', '"200000"'],
+      ['vet_licence.period_days', '365'],
+      ['vet_licence.grace_days', '10'],
+      ['vet_licence.reminder_days_before', '30'],
+    ] as const) {
+      await db.execute(sql`update product_setting set value = ${value}::jsonb, updated_at = now() where key = ${key}`);
+    }
+  } finally {
+    await pool.end();
+  }
+}
+
+test('an unpaid gateway trip grants nothing, and a verified payment activates the period and the licensed tag', async () => {
+  await configureLicencePeriod();
+
+  await as('applicant', MOBILE, async (page) => {
+    await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
+    await page.getByTestId('licence-period').waitFor();
+
+    // A gateway that says no leaves the doctor exactly where they were.
+    await page.getByTestId('pay-licence-period').click();
+    await page.waitForURL('**/dev/gateway**');
+    await page.getByTestId('gateway-fail').click();
+    await page.getByTestId('licence-period-failed').waitFor();
+    await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
+    await waitForText(page, 'vet-current-tag', 'بدون پروانه فعالیت');
+    await waitForText(page, 'licence-case-status', 'در انتظار پرداخت');
+
+    await page.getByTestId('pay-licence-period').click();
+    await page.waitForURL('**/dev/gateway**');
+    await page.getByTestId('gateway-pay').click();
+    await page.getByTestId('licence-period-paid').waitFor();
+
+    await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
+    await waitForText(page, 'vet-current-tag', 'دارای پروانه فعالیت');
+    await waitForText(page, 'licence-case-status', 'پروانه فعال');
+    await waitForText(page, 'licence-period-standing', 'فعال');
+    // The next step offered is a renewal, not a second activation.
+    await page.getByTestId('renew-licence-period').waitFor();
+    assert.equal(await page.getByTestId('pay-licence-period').count(), 0);
   });
 });
