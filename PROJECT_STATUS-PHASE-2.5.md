@@ -14,7 +14,7 @@ Managed by `node tools/runner.mjs --phase 2.5 …` (DEC-0187). The package is re
 - [x] PROMPT-010 — 010-trusted-vet-eligibility-application <!-- work-commit:541d25c573303d100f67af76312dab3d0e231472 -->
 - [x] PROMPT-011 — 011-trusted-review-payment-renewal <!-- work-commit:a295a71937da67be4314d57993182a76396af1d2 -->
 - [x] PROMPT-012 — 012-club-core-ownership-rbac <!-- work-commit:abba285a105524590e472ec325b45213dfc5648d -->
-- [ ] PROMPT-013 — 013-club-rule-engine-membership
+- [x] PROMPT-013 — 013-club-rule-engine-membership <!-- work-commit:51a1081747230996b33c6a27b184178728a1fac1 -->
 - [ ] PROMPT-014 — 014-public-content-association-clubs
 - [ ] PROMPT-015 — 015-notifications-dashboards-operations
 - [ ] PROMPT-016 — 016-security-ci-release-handoff
