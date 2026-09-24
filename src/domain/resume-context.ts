@@ -43,7 +43,8 @@ export type EntityType =
   | 'AD_SUBSCRIPTION'
   | 'VET_PROFESSIONAL_CASE'
   | 'ANIMAL_LISTING'
-  | 'LISTING_PROMOTION';
+  | 'LISTING_PROMOTION'
+  | 'LISTING_INQUIRY';
 
 export interface EntityRef {
   readonly type: EntityType;

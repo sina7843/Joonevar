@@ -21,6 +21,7 @@ import { activateLicencePeriodFromPayment } from '../vets/licence-period.ts';
 import { activateTrustedPeriodFromPayment } from '../vets/trusted-period.ts';
 import { activateClubMembershipFromPayment } from '../clubs/enrollment.ts';
 import { activatePromotionFromPayment } from '../marketplace/promotions.ts';
+import { reserveFromDeposit } from '../marketplace/inquiries.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -84,6 +85,13 @@ export const paidEffects: PaidEffects = {
       // one ends rather than overlapping it (PROMPT-004).
       case 'ANIMAL_LISTING_PROMOTION':
         await activatePromotionFromPayment(tx, batch);
+        return;
+      // The reservation itself. The advert becomes RESERVED, this request
+      // becomes the deal, the others are closed with a reason and the two sides
+      // get each other's contact details — all inside this transaction, so a
+      // reservation can never exist without the money that made it (PROMPT-005).
+      case 'ANIMAL_DEPOSIT':
+        await reserveFromDeposit(tx, batch);
         return;
       default:
         return;

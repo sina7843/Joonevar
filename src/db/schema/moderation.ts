@@ -13,6 +13,7 @@ import { accounts } from './core.ts';
 import { contentItems } from './content.ts';
 import { communities } from './communities.ts';
 import { animalListingMedia, animalListings } from './marketplace.ts';
+import { inquiryMessages } from './inquiry.ts';
 import {
   moderationAppealStatus,
   moderationDecision,
@@ -41,6 +42,8 @@ export const moderationReports = pgTable(
     listingId: uuid('listing_id').references(() => animalListings.id, { onDelete: 'restrict' }),
     listingMediaId: uuid('listing_media_id').references(() => animalListingMedia.id, { onDelete: 'restrict' }),
     sellerAccountId: uuid('seller_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    /** Chat evidence: one message of one transaction thread (PROMPT-005). */
+    inquiryMessageId: uuid('inquiry_message_id').references(() => inquiryMessages.id, { onDelete: 'restrict' }),
     /** The listing revision the reporter was reading, so a later edit is visible against it. */
     listingRevision: integer('listing_revision'),
     reporterAccountId: uuid('reporter_account_id')
@@ -95,6 +98,9 @@ export const moderationReports = pgTable(
     uniqueIndex('moderation_report_one_open_seller_key')
       .on(t.reporterAccountId, t.sellerAccountId)
       .where(sql`${t.status} = 'OPEN'`),
+    uniqueIndex('moderation_report_one_open_message_key')
+      .on(t.reporterAccountId, t.inquiryMessageId)
+      .where(sql`${t.status} = 'OPEN'`),
     index('moderation_report_listing_idx').on(t.listingId, t.status),
     index('moderation_report_seller_idx').on(t.sellerAccountId, t.status),
     check(
@@ -108,6 +114,10 @@ export const moderationReports = pgTable(
     check(
       'moderation_report_seller_check',
       sql`(${t.targetKind}::text = 'SELLER') = (${t.sellerAccountId} is not null)`,
+    ),
+    check(
+      'moderation_report_message_check',
+      sql`(${t.targetKind}::text = 'INQUIRY_MESSAGE') = (${t.inquiryMessageId} is not null)`,
     ),
   ],
 );

@@ -9,6 +9,7 @@ import { MARKET_REPORT_TARGETS, MARKET_TARGET_FA, LISTING_DECISION_FA } from './
 import {
   decideAppealAction,
   decideListingReportsAction,
+  decideMessageReportAction,
   submitAppealAction,
   submitMarketReportAction,
   type MarketModerationState,
@@ -180,6 +181,45 @@ export function AppealDecisionForm({ appealId }: { appealId: string }) {
       <TextAreaField label="دلیل" name="reason" rows={2} required data-testid={'appeal-decision-reason-' + appealId} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'save-appeal-' + appealId}>
         {pending ? 'در حال ثبت…' : 'ثبت پاسخ'}
+      </Button>
+    </form>
+  );
+}
+
+/**
+ * Decide one reported chat message — PROMPT-005.
+ *
+ * Two outcomes only. There is no listing to suspend here and no publisher to
+ * restrict from one message: a seller whose behaviour is the problem is
+ * reported as a seller, which is a different subject with a different answer.
+ */
+export function MessageDecisionForm({ reportId }: { reportId: string }) {
+  const [state, submit, pending] = useActionState(decideMessageReportAction, EMPTY);
+  return (
+    <form action={submit} className="mt-md space-y-md" data-testid={'message-decision-' + reportId}>
+      <input type="hidden" name="reportId" value={reportId} />
+      {state.message ? (
+        <div data-testid={'message-decision-result-' + reportId}>
+          <Alert tone={state.ok ? 'success' : 'error'} title={state.message} />
+        </div>
+      ) : null}
+      <SelectField
+        label="تصمیم"
+        name="decision"
+        required
+        defaultValue="DISMISS"
+        options={[
+          { value: 'DISMISS', label: 'رد گزارش' },
+          { value: 'HIDE', label: 'پنهان‌کردن پیام برای طرفین' },
+        ]}
+        data-testid={'message-decision-select-' + reportId}
+      />
+      <p className="text-caption text-text-secondary">
+        پنهان‌کردن پیام آن را حذف نمی‌کند؛ متن برای بررسی اختلاف و در تاریخچه باقی می‌ماند.
+      </p>
+      <TextAreaField label="دلیل" name="reason" rows={2} required data-testid={'message-decision-reason-' + reportId} />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid={'save-message-decision-' + reportId}>
+        {pending ? 'در حال ثبت…' : 'ثبت تصمیم'}
       </Button>
     </form>
   );

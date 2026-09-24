@@ -959,6 +959,36 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
   },
 
   // ── Phase 3: merchandise commerce (PROMPT-002, DEC-0204) ──────────────
+  /*
+   * The bounded risk control of PROMPT-005. A buyer who lets an accepted
+   * request expire holds an advert off the market for the length of the payment
+   * window, so repeated non-payment has to have a limit — but the limit is a
+   * number somebody with the authority chooses, and until both of these are set
+   * nothing is enforced. Unset is not zero and not infinite: it is unset.
+   */
+  {
+    key: 'market.animal.failed_deposit_limit',
+    group: 'ANIMAL_MARKET',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'سقف پرداخت‌نشدن بیعانه در بازه',
+    noteFa:
+      'اگر خریدار این تعداد بار مهلت پرداخت بیعانه را از دست بدهد، تا گذشتن بازه زیر درخواست تازه‌اش پذیرفته نمی‌شود. محدودیت خودبه‌خود با حرکت بازه برداشته می‌شود و تا ثبت هر دو مقدار، هیچ محدودیتی اعمال نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 100,
+  },
+  {
+    key: 'market.animal.failed_deposit_window_days',
+    group: 'ANIMAL_MARKET',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'بازه شمارش پرداخت‌نشدن بیعانه (روز)',
+    noteFa: 'تنها موردهای داخل این بازه شمرده می‌شوند؛ موردهای قدیمی‌تر اثری ندارند.',
+    seedValue: null,
+    min: 1,
+    max: 365,
+  },
   {
     key: 'market.shop.commission_percent_bp',
     group: 'COMMERCE',

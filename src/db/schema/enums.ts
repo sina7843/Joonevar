@@ -125,6 +125,8 @@ export const filePurpose = pgEnum('file_purpose', [
   /** Photos and the optional video of an animal listing; served publicly only while the listing is published (PROMPT-003). */
   'ANIMAL_LISTING_IMAGE',
   'ANIMAL_LISTING_VIDEO',
+  /** An image or document shared inside one transaction thread; never public (PROMPT-005). */
+  'INQUIRY_ATTACHMENT',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -158,6 +160,8 @@ export const reportTargetKind = pgEnum('report_target_kind', [
   'ANIMAL_LISTING',
   'LISTING_MEDIA',
   'SELLER',
+  /** Chat evidence. Its table exists from PROMPT-005, so the target is real. */
+  'INQUIRY_MESSAGE',
 ]);
 
 /**
@@ -252,3 +256,49 @@ export const listingDisclosure = pgEnum('listing_disclosure', ['YES', 'NO', 'UNK
 
 /** Media of a listing. The video is optional (PRODUCT_DECISIONS §3). */
 export const listingMediaKind = pgEnum('listing_media_kind', ['IMAGE', 'VIDEO']);
+
+/**
+ * A purchase request on one advert — PROMPT-005.
+ *
+ * Several may be open at once on the same advert; only one may be ACCEPTED,
+ * and only a verified deposit turns that one into CONVERTED. EXPIRED is what a
+ * missed payment deadline produces, and it releases the advert for the others.
+ */
+export const inquiryStatus = pgEnum('inquiry_status', [
+  'OPEN',
+  'ACCEPTED',
+  'DECLINED',
+  'WITHDRAWN',
+  'EXPIRED',
+  'CONVERTED',
+  'CLOSED',
+]);
+
+/** Who made an offer. A counteroffer is an offer by the other party. */
+export const offerParty = pgEnum('offer_party', ['BUYER', 'SELLER']);
+
+/** An offer is never edited: a new one supersedes it, and both stay readable. */
+export const offerStatus = pgEnum('offer_status', [
+  'PROPOSED',
+  'ACCEPTED',
+  'REJECTED',
+  'SUPERSEDED',
+  'WITHDRAWN',
+]);
+
+/** What one message in a transaction thread is. */
+export const inquiryMessageKind = pgEnum('inquiry_message_kind', [
+  'TEXT',
+  'IMAGE',
+  'DOCUMENT',
+  'OFFER',
+  'HANDOVER',
+  'SYSTEM',
+]);
+
+export const handoverProposalStatus = pgEnum('handover_proposal_status', [
+  'PROPOSED',
+  'ACCEPTED',
+  'REJECTED',
+  'SUPERSEDED',
+]);

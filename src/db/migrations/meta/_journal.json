@@ -309,6 +309,13 @@
       "when": 1790269843583,
       "tag": "0043_animal-discovery",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1790276414789,
+      "tag": "0044_animal-inquiry",
+      "breakpoints": true
     }
   ]
 }

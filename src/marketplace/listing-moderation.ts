@@ -24,11 +24,12 @@ import { accounts } from '../db/schema/core.ts';
 import { animals } from '../db/schema/animals.ts';
 import { moderationAppeals, moderationReports, publisherRestrictions } from '../db/schema/moderation.ts';
 import { animalListingMedia, animalListings } from '../db/schema/marketplace.ts';
+import { inquiryMessages, listingInquiries } from '../db/schema/inquiry.ts';
 import { recordAudit } from '../audit/service.ts';
 import { conflict, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
 import { isModerationDecision, reportInputProblems, reportStatusFor } from '../moderation/model.ts';
-import { isMarketReportTarget } from './moderation-model.ts';
+import { INQUIRY_MESSAGE_TARGET, isMarketReportTarget } from './moderation-model.ts';
 
 export * from './moderation-model.ts';
 import { assertMarketplaceCapability } from './model.ts';
@@ -624,4 +625,179 @@ export async function decideAppeal(
   });
 
   return { status };
+}
+
+// ── chat evidence (PROMPT-005) ─────────────────────────────────────────────
+
+/**
+ * Report one message inside a deal thread.
+ *
+ * Only the two people in that thread can report from it, because nobody else
+ * can see it. The same duplicate rule the public reports have applies, decided
+ * by the database rather than by a lookup.
+ */
+export async function reportInquiryMessage(
+  database: Database,
+  actor: Actor,
+  input: { inquiryId: string; messageId: string; reason: string; details: string | null },
+): Promise<{ id: string }> {
+  const problems = reportInputProblems({ reason: input.reason, details: input.details });
+  if (problems.length > 0) throw validation(problems[0]!);
+
+  const inquiry = await loadInquiryForReport(database, input.inquiryId);
+  if (inquiry.buyerAccountId !== actor.accountId && inquiry.sellerAccountId !== actor.accountId) {
+    throw notFound('این گفت‌وگو پیدا نشد.');
+  }
+
+  const [message] = await database
+    .select({ id: inquiryMessages.id, senderAccountId: inquiryMessages.senderAccountId })
+    .from(inquiryMessages)
+    .where(and(eq(inquiryMessages.id, input.messageId), eq(inquiryMessages.inquiryId, inquiry.id)))
+    .limit(1);
+  if (!message) throw notFound('این پیام پیدا نشد.');
+  if (message.senderAccountId === actor.accountId) throw validation('گزارش پیام خودتان ممکن نیست.');
+
+  return database.transaction(async (tx) => {
+    let id: string;
+    try {
+      const [created] = await tx
+        .insert(moderationReports)
+        .values({
+          targetKind: INQUIRY_MESSAGE_TARGET,
+          reporterAccountId: actor.accountId,
+          reason: input.reason as never,
+          details: input.details?.trim() || null,
+          inquiryMessageId: message.id,
+        })
+        .returning({ id: moderationReports.id });
+      id = created!.id;
+    } catch (error) {
+      const text = String(error) + String((error as { cause?: unknown }).cause ?? '');
+      if (text.includes('moderation_report_one_open')) {
+        throw conflict('گزارش باز شما درباره همین پیام ثبت شده است و در حال بررسی است.');
+      }
+      throw error;
+    }
+
+    await recordAudit(tx, actor, {
+      action: 'MARKET_REPORT_SUBMITTED',
+      targetType: INQUIRY_MESSAGE_TARGET,
+      targetId: message.id,
+      after: { reportId: id, reason: input.reason, inquiryId: inquiry.id },
+    });
+    return { id };
+  });
+}
+
+async function loadInquiryForReport(database: DbClient, inquiryId: string) {
+  const [row] = await database
+    .select({
+      id: listingInquiries.id,
+      buyerAccountId: listingInquiries.buyerAccountId,
+      sellerAccountId: listingInquiries.sellerAccountId,
+    })
+    .from(listingInquiries)
+    .where(eq(listingInquiries.id, inquiryId))
+    .limit(1);
+  if (!row) throw notFound('این گفت‌وگو پیدا نشد.');
+  return row;
+}
+
+export interface MessageReportEntry {
+  readonly reportId: string;
+  readonly inquiryId: string;
+  readonly messageId: string;
+  readonly reason: string;
+  readonly detailsFa: string | null;
+  readonly bodyFa: string | null;
+  readonly redactedNoteFa: string | null;
+  readonly hiddenAt: Date | null;
+  readonly createdAt: Date;
+}
+
+/** Open reports about chat messages, oldest first: a small queue of its own. */
+export async function messageReportQueue(
+  database: DbClient,
+  actor: Actor,
+): Promise<readonly MessageReportEntry[]> {
+  assertMarketplaceCapability(actor, 'ANIMAL_LISTING_MODERATE');
+  const rows = await database
+    .select({
+      reportId: moderationReports.id,
+      reason: moderationReports.reason,
+      detailsFa: moderationReports.details,
+      createdAt: moderationReports.createdAt,
+      messageId: inquiryMessages.id,
+      inquiryId: inquiryMessages.inquiryId,
+      bodyFa: inquiryMessages.bodyFa,
+      redactedNoteFa: inquiryMessages.redactedNoteFa,
+      hiddenAt: inquiryMessages.hiddenAt,
+    })
+    .from(moderationReports)
+    .innerJoin(inquiryMessages, eq(inquiryMessages.id, moderationReports.inquiryMessageId))
+    .where(eq(moderationReports.status, 'OPEN'))
+    .orderBy(moderationReports.createdAt);
+  return rows;
+}
+
+/**
+ * Decide one chat report.
+ *
+ * `DISMISS` leaves everything as it is. `HIDE` stops the message being rendered
+ * to either party and says why — it does not delete it, because the transcript
+ * is what a deposit dispute is argued from and evidence that disappears when
+ * somebody objects to it is not evidence.
+ */
+export async function decideMessageReport(
+  database: Database,
+  actor: Actor,
+  input: { reportId: string; decision: string; reasonFa: string },
+): Promise<{ hidden: boolean }> {
+  assertMarketplaceCapability(actor, 'ANIMAL_LISTING_MODERATE');
+  if (input.decision !== 'DISMISS' && input.decision !== 'HIDE') {
+    throw validation('برای گزارش پیام، تصمیم «رد گزارش» یا «پنهان‌کردن پیام» انتخاب می‌شود.');
+  }
+  const decision: 'DISMISS' | 'HIDE' = input.decision;
+  const reasonFa = input.reasonFa.trim();
+  if (reasonFa === '') throw validation('دلیل این تصمیم را بنویسید؛ در تاریخچه ثبت می‌شود.');
+
+  const [report] = await database
+    .select({ id: moderationReports.id, messageId: moderationReports.inquiryMessageId, status: moderationReports.status })
+    .from(moderationReports)
+    .where(eq(moderationReports.id, input.reportId))
+    .limit(1);
+  if (!report || report.messageId === null) throw notFound('این گزارش پیدا نشد.');
+  if (report.status !== 'OPEN') throw conflict('این گزارش قبلاً بررسی شده است.');
+
+  const now = new Date();
+  return database.transaction(async (tx) => {
+    if (decision === 'HIDE') {
+      await tx
+        .update(inquiryMessages)
+        .set({ hiddenAt: now, hiddenByAccountId: actor.accountId, hiddenReasonFa: reasonFa })
+        .where(eq(inquiryMessages.id, report.messageId!));
+    }
+
+    const [closed] = await tx
+      .update(moderationReports)
+      .set({
+        status: reportStatusFor(decision),
+        decision,
+        decisionReason: reasonFa,
+        decidedByAccountId: actor.accountId,
+        decidedAt: now,
+      })
+      .where(and(eq(moderationReports.id, report.id), eq(moderationReports.status, 'OPEN')))
+      .returning({ id: moderationReports.id });
+    if (!closed) throw conflict('این گزارش هم‌زمان بررسی شد.');
+
+    await recordAudit(tx, actor, {
+      action: 'MARKET_MESSAGE_REPORT_DECIDED',
+      targetType: INQUIRY_MESSAGE_TARGET,
+      targetId: report.messageId!,
+      after: { reportId: report.id, decision },
+      reason: reasonFa,
+    });
+    return { hidden: decision === 'HIDE' };
+  });
 }

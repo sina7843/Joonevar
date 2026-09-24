@@ -7,6 +7,7 @@ import { AppError } from '../../src/domain/errors.ts';
 import {
   decideAppeal,
   decideListingReports,
+  decideMessageReport,
   submitAppeal,
   submitMarketReport,
 } from '../../src/marketplace/listing-moderation.ts';
@@ -132,6 +133,36 @@ export async function startPromotionAction(
     });
     revalidatePath('/account/listings/' + listingId);
     return { ok: true, message: 'بسته تبلیغ ثبت شد؛ از صفحه پرداخت‌ها آن را پرداخت کنید.' };
+  } catch (error) {
+    if (error instanceof AppError) return { ok: false, message: error.message };
+    throw error;
+  }
+}
+
+/**
+ * Decide one chat report — PROMPT-005.
+ *
+ * Hiding stops the message being rendered to either party and says why. It
+ * never deletes it: a deposit dispute is argued from the transcript, and
+ * evidence that disappears when somebody objects to it is not evidence.
+ */
+export async function decideMessageReportAction(
+  _previous: MarketModerationState,
+  form: FormData,
+): Promise<MarketModerationState> {
+  try {
+    const guard = await guardRoute('/market/messages');
+    if (!guard.ok) throw guard.denied;
+    const result = await decideMessageReport(db(), guard.actor, {
+      reportId: text(form, 'reportId'),
+      decision: text(form, 'decision'),
+      reasonFa: text(form, 'reason'),
+    });
+    revalidatePath('/market/messages');
+    return {
+      ok: true,
+      message: result.hidden ? 'پیام پنهان شد و گزارش بسته شد.' : 'گزارش بدون اقدام بسته شد.',
+    };
   } catch (error) {
     if (error instanceof AppError) return { ok: false, message: error.message };
     throw error;

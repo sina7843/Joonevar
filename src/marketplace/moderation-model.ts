@@ -7,7 +7,7 @@
  */
 import type { ModerationDecision } from '../moderation/model.ts';
 
-/** The three things a marketplace gets reported for. */
+/** The three things the public market gets reported for. */
 export const MARKET_REPORT_TARGETS = ['ANIMAL_LISTING', 'LISTING_MEDIA', 'SELLER'] as const;
 export type MarketReportTarget = (typeof MARKET_REPORT_TARGETS)[number];
 
@@ -16,6 +16,15 @@ export const MARKET_TARGET_FA: Record<MarketReportTarget, string> = {
   LISTING_MEDIA: 'تصویر یا ویدئوی آگهی',
   SELLER: 'فروشنده',
 };
+
+/*
+ * Chat evidence is deliberately not in that list (PROMPT-005). A message inside
+ * a deal thread is reported from inside the thread by one of its two parties;
+ * it is not a subject the public report form can offer, because nobody outside
+ * those two people can see it in the first place.
+ */
+export const INQUIRY_MESSAGE_TARGET = 'INQUIRY_MESSAGE';
+export const INQUIRY_MESSAGE_TARGET_FA = 'پیام در گفت‌وگوی خرید';
 
 export const isMarketReportTarget = (value: unknown): value is MarketReportTarget =>
   typeof value === 'string' && (MARKET_REPORT_TARGETS as readonly string[]).includes(value);

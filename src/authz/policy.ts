@@ -147,7 +147,8 @@ export type FilePurposeName =
   | 'COMMUNITY_IMAGE'
   | 'VET_PROFESSIONAL_DOCUMENT'
   | 'ANIMAL_LISTING_IMAGE'
-  | 'ANIMAL_LISTING_VIDEO';
+  | 'ANIMAL_LISTING_VIDEO'
+  | 'INQUIRY_ATTACHMENT';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -184,6 +185,14 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
    */
   ANIMAL_LISTING_IMAGE: ['LISTING_MODERATOR', 'SUPERADMIN'],
   ANIMAL_LISTING_VIDEO: ['LISTING_MODERATOR', 'SUPERADMIN'],
+  /*
+   * Something one side of a deal sent the other inside their thread. The table
+   * grants it to the sender and to the moderator who has a reported message in
+   * front of them; the person it was actually sent to is granted it by their
+   * membership of that one thread, which is a question about the record and is
+   * asked there rather than widened into a purpose (PROMPT-005).
+   */
+  INQUIRY_ATTACHMENT: ['LISTING_MODERATOR', 'SUPERADMIN'],
 };
 
 export function canReadFile(

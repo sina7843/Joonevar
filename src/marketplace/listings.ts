@@ -33,6 +33,7 @@ import {
   animalListings,
 } from '../db/schema/marketplace.ts';
 import { recordAudit } from '../audit/service.ts';
+import { violates } from '../db/constraint.ts';
 import { findFile, putPrivateFile, resolveWithinRoot } from '../files/storage.ts';
 import { conflict, notConfigured, notFound, validation } from '../domain/errors.ts';
 import { readInt, snapshotSetting } from '../settings/service.ts';
@@ -64,26 +65,6 @@ export const MAX_LISTINGS_KENNEL_KEY = 'market.animal.max_active_listings_kennel
 export type ListingRow = typeof animalListings.$inferSelect;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/**
- * Whether a database error is this unique index being enforced.
- *
- * The driver's error is wrapped by the query builder, so the constraint name
- * lives on the cause rather than the message. Walked explicitly, because
- * matching the outer message silently stops working the day the wrapper's
- * wording changes — and a concurrency guard that stops working is exactly the
- * kind of failure nobody notices until two adverts exist for one animal.
- */
-function violates(error: unknown, constraint: string): boolean {
-  let current: unknown = error;
-  for (let depth = 0; depth < 5 && current !== null && current !== undefined; depth += 1) {
-    const candidate = current as { constraint?: string; message?: string; cause?: unknown };
-    if (candidate.constraint === constraint) return true;
-    if (typeof candidate.message === 'string' && candidate.message.includes(constraint)) return true;
-    current = candidate.cause;
-  }
-  return false;
-}
 
 // ── revisions ──────────────────────────────────────────────────────────────
 

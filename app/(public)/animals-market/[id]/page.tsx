@@ -13,6 +13,7 @@ import { RecordImage } from '../../../../src/ui/record-image.tsx';
 import { publicListing } from '../../../../src/marketplace/public-listings.ts';
 import { PROMOTED_LABEL_FA } from '../../../../src/marketplace/discovery-model.ts';
 import { SELLER_KIND_FA } from '../../../../src/marketplace/listing-eligibility.ts';
+import { AskToBuyForm } from '../../../account/purchases/forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -202,6 +203,21 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
           می‌شود و همزیست درباره آن داوری نمی‌کند.
         </span>
       </Alert>
+
+      {/*
+        Asking to buy is where the public part ends (PROMPT-005). Reading the
+        advert needs nothing; the request itself needs a verified identity, and
+        the server says so when the form is posted — the page never decides it.
+      */}
+      {listing.reserved ? (
+        <Alert tone="info" title="این حیوان رزرو شده است">
+          <span data-testid="listing-reserved-notice">
+            بیعانه این آگهی پرداخت شده و فعلاً درخواست تازه‌ای پذیرفته نمی‌شود.
+          </span>
+        </Alert>
+      ) : (
+        <AskToBuyForm listingId={listing.id} negotiable={listing.priceMode === 'NEGOTIABLE'} />
+      )}
 
       <p className="text-caption">
         <Link href={'/report/listing/' + listing.id} className="text-text-brand" data-testid="report-listing-link">

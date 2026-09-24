@@ -323,6 +323,7 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   }
   if (hasMarketplaceCapability(actor, 'ANIMAL_LISTING_MODERATE')) {
     items.push({ href: '/market/listings', label: 'گزارش آگهی‌ها', icon: 'warning' });
+    items.push({ href: '/market/messages', label: 'گزارش پیام‌ها', icon: 'warning' });
   }
   return items;
 }

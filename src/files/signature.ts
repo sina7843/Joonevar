@@ -56,6 +56,13 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
    * serving and a storage decision nobody has taken.
    */
   ANIMAL_LISTING_VIDEO: { accept: ['video/mp4'], maxBytes: 20 * MB },
+  /*
+   * A picture or a document one side sends the other inside a deal thread —
+   * a vaccination card, a photo of the animal today. Pictures and PDF only:
+   * a chat is not a file-transfer channel, and every other type would be one
+   * more thing served back to somebody through a route that has to stay small.
+   */
+  INQUIRY_ATTACHMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

@@ -18,6 +18,7 @@ import {
   paymentItems,
 } from '../db/schema/billing.ts';
 import { clubRuleVersions } from '../db/schema/communities.ts';
+import { listingInquiries } from '../db/schema/inquiry.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { snapshotSetting } from '../settings/service.ts';
@@ -44,7 +45,9 @@ export type PaymentService =
   // A club's own joining fee (PROMPT-013).
   | 'CLUB_MEMBERSHIP'
   // A paid promotion of one animal advert (Phase 3, PROMPT-004).
-  | 'ANIMAL_LISTING_PROMOTION';
+  | 'ANIMAL_LISTING_PROMOTION'
+  // The deposit that reserves one animal for one buyer (Phase 3, PROMPT-005).
+  | 'ANIMAL_DEPOSIT';
 
 /**
  * What to charge for, and where the server should read the price.
@@ -66,14 +69,30 @@ export type BatchItemInput =
       readonly targetId: string;
       /** The published club rule version whose fee is charged (PROMPT-013). */
       readonly clubRuleVersionId: string;
+    }
+  | {
+      readonly targetType: string;
+      readonly targetId: string;
+      /**
+       * The deal whose frozen deposit is charged (Phase 3, PROMPT-005).
+       *
+       * The figure was computed once, from the commission settings as they read
+       * when the two sides locked the price, and written onto that row. It is
+       * read back from there for the same reason a club's fee is read from its
+       * published rule version: a tariff edited afterwards must not rewrite what
+       * somebody already agreed to pay.
+       */
+      readonly inquiryId: string;
     };
 
 const fromSetting = (item: BatchItemInput): item is Extract<BatchItemInput, { settingKey: string }> => 'settingKey' in item;
+const fromClubRule = (item: BatchItemInput): item is Extract<BatchItemInput, { clubRuleVersionId: string }> =>
+  'clubRuleVersionId' in item;
 
 interface PricedItem {
   readonly item: BatchItemInput;
   readonly amountToman: bigint;
-  readonly priceSource: 'SETTING' | 'CLUB_RULE_VERSION';
+  readonly priceSource: 'SETTING' | 'CLUB_RULE_VERSION' | 'INQUIRY';
   readonly settingKey: string | null;
   readonly settingVersion: number | null;
   readonly priceSourceId: string | null;
@@ -96,6 +115,44 @@ async function clubRulePrice(database: Database, item: Extract<BatchItemInput, {
     settingKey: null,
     settingVersion: null,
     priceSourceId: rule.id,
+  };
+}
+
+/**
+ * The deposit, read from the deal it belongs to and nowhere else.
+ *
+ * The amount was frozen on that row when the price was locked, together with
+ * the setting versions it came from, so this reads a number rather than
+ * computing one. The status is checked here too: a deal that is no longer
+ * accepted has no deposit to open a payment for.
+ */
+async function inquiryDeposit(
+  database: Database,
+  item: Extract<BatchItemInput, { inquiryId: string }>,
+): Promise<PricedItem> {
+  const [inquiry] = await database
+    .select({
+      id: listingInquiries.id,
+      status: listingInquiries.status,
+      depositAmountToman: listingInquiries.depositAmountToman,
+    })
+    .from(listingInquiries)
+    .where(eq(listingInquiries.id, item.inquiryId))
+    .limit(1);
+  if (!inquiry) throw notFound('این درخواست خرید پیدا نشد.');
+  if (inquiry.status !== 'ACCEPTED') {
+    throw conflict('این درخواست در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.');
+  }
+  if (inquiry.depositAmountToman === null || inquiry.depositAmountToman <= 0n) {
+    throw notConfigured('market.animal.commission');
+  }
+  return {
+    item,
+    amountToman: inquiry.depositAmountToman,
+    priceSource: 'INQUIRY',
+    settingKey: null,
+    settingVersion: null,
+    priceSourceId: inquiry.id,
   };
 }
 
@@ -130,7 +187,8 @@ export async function createBatch(
   // priced or not created at all.
   const priced: PricedItem[] = await Promise.all(
     input.items.map(async (item): Promise<PricedItem> => {
-      if (!fromSetting(item)) return clubRulePrice(database, item);
+      if (fromClubRule(item)) return clubRulePrice(database, item);
+      if (!fromSetting(item)) return inquiryDeposit(database, item);
       const snapshot = await snapshotSetting(database, item.settingKey);
       return {
         item,

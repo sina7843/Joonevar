@@ -1,0 +1,141 @@
+{
+  "promptId": "PROMPT-005",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "f5465d54a3a4415a0ce56ba2adc7e127dc79032c",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "The buyer's half of the animal marketplace: asking, negotiating, talking, and the deposit that turns a conversation into a reservation. Reading an advert stays public; starting a request needs an approved KYC case, because from here on two people are heading towards an animal changing hands. An advert carries several open requests at once and the seller picks one of them: 'only one acceptance at a time' is a partial unique index on the advert, not a read followed by a write, so two tabs pressing accept together leave exactly one acceptance and the one that lost stays open rather than being rejected. An exact-price advert locks its price when the request is made, because there is nothing to disagree about; a negotiable one walks a ladder of offers where a new proposal supersedes the previous and both rows stay readable, and where the person who made an offer can never be the one who accepts it. Accepting an offer locks the final price for both sides at once and freezes the commission inputs with the version of each setting they came from, so a tariff edited afterwards cannot rewrite a deal somebody already agreed to. The deposit is that commission (PRODUCT_DECISIONS §5), computed in exact integers from basis points with an optional floor and ceiling, and it is never passed in by a caller: a new payment-batch item shape reads it from the request row itself, exactly the way a club's joining fee is read from its published rule version. Acceptance produces a deadline computed from the managed window at that moment and frozen on the row, together with the cancellation policy version the deal is bound to; without a recorded policy version the deposit path does not open at all, because otherwise nobody could say afterwards which terms were agreed. A deadline that passes releases the acceptance, leaves the other requests where they were, and is what the bounded risk control counts — a control that is not enforced at all until an operator has entered both its limit and its window, because a cap nobody has chosen is neither zero nor infinite. The reservation itself exists only where money did: CONVERTED is absent from both people's columns in the transition table and is written solely inside the transaction that verified the deposit, which in that same transaction marks the advert RESERVED, closes every other open request with a reason its buyer can read, and reveals the two sides' contact details. A replayed callback finds the work done and the audit shows the reservation recorded exactly once. The thread is transaction-scoped: text, images and PDFs through the private storage, offer events, a proposed time and place for the handover, reporting and blocking. Before a verified deposit every message passes a server-side disclosure policy that withholds telephone numbers, card numbers, IBANs, links and long digit runs written in Persian, Arabic-Indic or Latin digits with separators between them. The policy is honest about being a policy and not a detector: it will not catch somebody writing a number in words, it says so to both the user and the moderator, every enforcement is recorded with the rule that fired, and the removed text is never stored — keeping what the policy exists to withhold would defeat it. A moderator with the listing-moderation capability reads a reported message and can hide it: the row and its text stay for the dispute and the audit trail, and both parties see the reason instead of the message. Nothing transactional is deleted anywhere in this prompt. A stranger asking for a transcript is told it does not exist rather than that it is not theirs, so one account cannot learn who is negotiating over which animal; an attachment is readable by the person it was sent to through a record-scoped exception in the private file route, the same shape the existing 'the vet of an open visit' exception has, rather than by widening a purpose and handing every buyer every other thread's files.",
+  "changedFiles": [
+    "src/db/migrations/0044_animal-inquiry.sql",
+    "src/db/migrations/meta/0044_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/inquiry.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/billing.ts",
+    "src/db/schema/moderation.ts",
+    "src/db/schema/index.ts",
+    "src/db/constraint.ts",
+    "src/marketplace/inquiry-model.ts",
+    "src/marketplace/inquiries.ts",
+    "src/marketplace/listings.ts",
+    "src/marketplace/listing-moderation.ts",
+    "src/marketplace/moderation-model.ts",
+    "src/marketplace/moderation-forms.tsx",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/billing/receipts.ts",
+    "src/settings/keys.ts",
+    "src/files/storage.ts",
+    "src/files/signature.ts",
+    "src/authz/policy.ts",
+    "src/domain/resume-context.ts",
+    "src/ui/shell.tsx",
+    "app/account/purchases/actions.ts",
+    "app/account/purchases/forms.tsx",
+    "app/account/purchases/page.tsx",
+    "app/account/purchases/[id]/page.tsx",
+    "app/account/purchases/[id]/return/page.tsx",
+    "app/account/listings/[id]/requests/page.tsx",
+    "app/account/listings/[id]/page.tsx",
+    "app/(public)/animals-market/[id]/page.tsx",
+    "app/market/messages/page.tsx",
+    "app/market/moderation-actions.ts",
+    "tests/domain/market-inquiry.test.ts",
+    "tests/db/market-inquiry.test.ts",
+    "tests/browser/animal-purchase.test.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-005.json"
+  ],
+  "migrations": ["src/db/migrations/0044_animal-inquiry.sql"],
+  "decisions": ["DEC-0207"],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 341,
+      "pass": 341,
+      "fail": 0,
+      "skip": 0,
+      "note": "325 before this prompt; the sixteen new ones are tests/domain/market-inquiry.test.ts."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "note": "Full product suite, run once on the final tree. Counts under checks.product-tests.",
+      "newSuite": "tests/db/market-inquiry.test.ts — 9 tests covering the frozen commission, the KYC gate, the offer ladder and a stale offer, simultaneous acceptance, the verified deposit and its replay, deadline release feeding the risk control, transcript authorization and the disclosure policy's audit record, report/hide/block, and withdrawal freeing the advert."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/animal-purchase.test.ts — 4 tests walking the real screens: a public advert readable with no account, a buyer asking with a contact detail that the policy removes, an offer ladder ending in a locked price, the seller accepting, the deposit paid at the development gateway, and the reservation with the contact details opening and the transcript freezing.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-005/public-advert-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-005/buyer-thread-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-005/seller-accepted-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-005/reserved-thread-mobile.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0. The stale-build guard added in PROMPT-001 covers the incremental build, so the tree is rebuilt rather than wiped before the browser suites."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "834 tests, 834 pass, 0 fail, 0 skip, duration 1021s, exit 0, on the final tree. 809 before this prompt; the 25 new ones are tests/domain/market-inquiry.test.ts (16) and tests/db/market-inquiry.test.ts (9)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "218 tests, 218 pass, 0 fail, 0 skip, duration 554s, exit 0, against a production server built from this tree. 214 before this prompt; the four new ones are tests/browser/animal-purchase.test.ts. The server log carried repeated 'Connection terminated unexpectedly' lines from the pg pool part-way through the run; no test failed and the runner exited 0. Their origin was not investigated in this prompt, so they are recorded as observed rather than claimed absent or explained."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Releasing a passed deadline is an explicit call (releaseExpiredInquiries), not a scheduler. Nothing in this repository runs it by itself, and the same is already true of listing expiry; an acceptance therefore keeps holding the advert until an operator or a future job calls it. Stated rather than hidden behind a page load that happens often enough to look automatic.",
+    "The contact-disclosure policy is a policy, not a detector. It catches the ordinary written forms of a number, a card, an IBAN and a link, including Persian and Arabic-Indic digits and separators, and it will not catch a determined person spelling a number in words or splitting it across messages. That limit is written on the screen the moderator uses and in the message shown to the person whose text was redacted; no claim of complete detection is made anywhere.",
+    "The deposit path stays shut until an operator enters the commission fixed part, the commission percentage, the payment window and the cancellation policy version. Those are unset managed values, so on a fresh installation a request can be made and a price agreed but not accepted. That is the intended NOT_CONFIGURED behaviour, not a defect.",
+    "The bounded risk control is not enforced until both market.animal.failed_deposit_limit and market.animal.failed_deposit_window_days are set. An unset limit is not treated as zero and not as infinite.",
+    "What happens after a reservation — the handover itself, the transfer of ownership, cancellation with its penalties and the refund path — belongs to PROMPT-006 and later. The handover proposal built here records a time and a place the two sides agree on; it does not move the animal, and the minimum handover age is still enforced where ownership actually changes.",
+    "Retention of a thread is the row itself: messages are append-only and nothing expires them. No retention job exists, so 'retention' here means the transcript is kept, not that it is pruned on a schedule."
+  ],
+  "readiness": {
+    "code": "PHASE_3_DEAL_FLOW_BUILT",
+    "buyerFlows": "REQUEST_NEGOTIATION_AND_RESERVATION_BUILT",
+    "ownershipTransfer": "NOT_STARTED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0044_animal-inquiry.sql",
+    "src/db/schema/inquiry.ts",
+    "src/marketplace/inquiry-model.ts",
+    "src/marketplace/inquiries.ts",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/marketplace/listing-moderation.ts",
+    "src/files/storage.ts",
+    "src/authz/policy.ts",
+    "app/account/purchases/[id]/page.tsx",
+    "app/account/listings/[id]/requests/page.tsx",
+    "app/market/messages/page.tsx",
+    "tests/domain/market-inquiry.test.ts",
+    "tests/db/market-inquiry.test.ts",
+    "tests/browser/animal-purchase.test.ts",
+    "DECISIONS.md#DEC-0207"
+  ]
+}

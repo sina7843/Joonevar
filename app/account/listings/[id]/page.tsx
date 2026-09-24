@@ -79,6 +79,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           <Link href="/account/listings" className="text-text-brand" data-testid="back-to-listings">
             بازگشت به آگهی‌های من
           </Link>
+          <span className="mx-sm text-text-disabled">|</span>
+          <Link href={'/account/listings/' + listing.id + '/requests'} className="text-text-brand" data-testid="listing-requests-link">
+            درخواست‌های خرید این آگهی
+          </Link>
         </p>
 
         <Card>

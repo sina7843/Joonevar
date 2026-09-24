@@ -39,6 +39,8 @@ export const paymentService = pgEnum('payment_service', [
   'CLUB_MEMBERSHIP',
   // A paid promotion of one animal advert (Phase 3, PROMPT-004).
   'ANIMAL_LISTING_PROMOTION',
+  // The deposit on one animal deal, which equals the commission (PROMPT-005).
+  'ANIMAL_DEPOSIT',
 ]);
 
 /**
