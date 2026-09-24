@@ -33,10 +33,12 @@ import {
   listingDisclosure,
   listingMediaKind,
   listingPriceMode,
+  listingPromotionStatus,
   listingSellerKind,
   marketplaceMarket,
 } from './enums.ts';
 import { accounts, species, storedFiles } from './core.ts';
+import { paymentBatches } from './billing.ts';
 import { animals } from './animals.ts';
 import { kennels } from './kennels.ts';
 import { cities, provinces } from './geography.ts';
@@ -220,4 +222,78 @@ export const animalListingRevisions = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
   },
   (t) => [uniqueIndex('animal_listing_revision_number_key').on(t.listingId, t.number)],
+);
+
+/**
+ * A purchasable promotion of one advert — PROMPT-004.
+ *
+ * Deliberately its own pair of tables rather than a fourth target type on the
+ * Phase 2 advertising subscription. An advert is promoted for a handful of days
+ * and disappears when it sells; a veterinary profile is promoted for a tier
+ * across a season. Sharing the table would have meant one row shape that is
+ * half empty in both directions, and one ranking rule that has to know which
+ * half it is looking at.
+ *
+ * The price is a managed setting key, never a figure stored here, so changing a
+ * price is one audited settings edit and a purchase keeps what it froze.
+ */
+export const listingPromotionPackages = pgTable(
+  'listing_promotion_package',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    code: text('code').notNull(),
+    labelFa: text('label_fa').notNull(),
+    durationDays: integer('duration_days').notNull(),
+    priceSettingKey: text('price_setting_key').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    sortOrder: integer('sort_order').notNull().default(0),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('listing_promotion_package_code_key').on(t.code)],
+);
+
+/**
+ * One purchase of one package for one advert.
+ *
+ * A promotion buys placement among adverts that already match the search, and
+ * it is labelled «تبلیغ» wherever it is shown. It never touches the seller's
+ * reputation and it never changes what an advert says. It ends on its own date,
+ * read at request time rather than swept by a job.
+ */
+export const listingPromotions = pgTable(
+  'listing_promotion',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    listingId: uuid('listing_id')
+      .notNull()
+      .references(() => animalListings.id, { onDelete: 'restrict' }),
+    packageId: uuid('package_id')
+      .notNull()
+      .references(() => listingPromotionPackages.id, { onDelete: 'restrict' }),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    status: listingPromotionStatus('status').notNull().default('PENDING_PAYMENT'),
+    /** Written only when the payment is verified; a pending intent has neither. */
+    startsAt: timestamp('starts_at', { withTimezone: true }),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    durationDays: integer('duration_days'),
+    paymentBatchId: uuid('payment_batch_id').references(() => paymentBatches.id, { onDelete: 'set null' }),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+    cancelReasonFa: text('cancel_reason_fa'),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    index('listing_promotion_listing_idx').on(t.listingId, t.status),
+    index('listing_promotion_window_idx').on(t.status, t.endsAt),
+    uniqueIndex('listing_promotion_batch_key').on(t.paymentBatchId),
+    // One live promotion per advert: a second purchase waits for the first to end.
+    uniqueIndex('listing_promotion_live_key')
+      .on(t.listingId)
+      .where(sql`${t.status} in ('PENDING_PAYMENT','ACTIVE')`),
+  ],
 );

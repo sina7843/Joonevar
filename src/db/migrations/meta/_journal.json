@@ -302,6 +302,13 @@
       "when": 1790263712411,
       "tag": "0042_animal-listing",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1790269843583,
+      "tag": "0043_animal-discovery",
+      "breakpoints": true
     }
   ]
 }

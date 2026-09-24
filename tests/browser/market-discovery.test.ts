@@ -1,15 +1,15 @@
 /**
- * Selling an animal, in a real browser — PROMPT-003.
+ * The public marketplace, reporting and moderation in a real browser —
+ * PROMPT-004.
  *
- * The journey is the real one: a real account, real KYC, a real membership, a
- * real veterinary visit that binds a real microchip, and only then an advert.
- * Nothing about eligibility is written into the database by the test, because
- * the thing under test is exactly that the answer comes from those records.
+ * The advert under test is built the real way: a real account, real KYC, a real
+ * membership, a real veterinary visit that binds a real microchip, three real
+ * photos and a real publication. Only then is there something for a stranger to
+ * find, report and have moderated.
  *
- * The setup below repeats the animal-and-desk journey that
- * `tests/browser/registration.test.ts` also walks. That duplication is the
- * suite-local fixture idiom this directory already uses; sharing it would mean
- * refactoring a green suite in the middle of another prompt.
+ * The setup repeats the animal-and-desk journey that `animal-listing.test.ts`
+ * and `registration.test.ts` also walk; that duplication is the suite-local
+ * fixture idiom this directory already uses.
  */
 import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,7 +34,7 @@ import {
   DATABASE_URL,
 } from './support.ts';
 
-const SHOTS = path.join('docs', 'reports', 'screenshots', 'phase-3', 'prompt-003');
+const SHOTS = path.join('docs', 'reports', 'screenshots', 'phase-3', 'prompt-004');
 const JPEG = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
 
@@ -43,8 +43,12 @@ const OPERATOR_MOBILE = '09990000004';
 const ADMIN_MOBILE = '09990000006';
 
 const RUN = String(randomInt(100_000, 999_999));
-const LOCATION_NAME = 'SYNTHETIC کلینیک آگهی ' + RUN;
+const LOCATION_NAME = 'SYNTHETIC کلینیک بازار ' + RUN;
 const REASON = 'SYNTHETIC — اجرای تست ' + RUN;
+const DESCRIPTION =
+  'SYNTHETIC توضیح آگهی عمومی آزمایشی که به‌اندازه کافی طولانی است تا شرط حداقل طول را برآورده کند.';
+/** The synthetic listing moderator fixture account (PROMPT-002). */
+const MODERATOR_MOBILE = '09990000011';
 
 type State = Awaited<ReturnType<BrowserContext['storageState']>>;
 
@@ -55,7 +59,8 @@ let vetState: State | null = null;
 let sellerState: State | null = null;
 let sellerMobile = '';
 let chippedAnimalId = '';
-let plainAnimalId = '';
+let listingId = '';
+let moderatorState: State | null = null;
 
 let chipCounter = 0;
 const nextChip = () => '9' + RUN.padStart(6, '0') + String(1_000_000 + (chipCounter += 1)).padStart(8, '0');
@@ -238,6 +243,7 @@ before(async () => {
   for (const [mobile, assign] of [
     [OPERATOR_MOBILE, (s: State) => (operatorState = s)],
     [ADMIN_MOBILE, (s: State) => (adminState = s)],
+    [MODERATOR_MOBILE, (s: State) => (moderatorState = s)],
   ] as const) {
     const context = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR' });
     try {
@@ -265,14 +271,14 @@ before(async () => {
     const page = await admin.newPage();
     await page.goto(BASE_URL + '/admin/vets', { waitUntil: 'load' });
     await page.getByTestId('vet-mobile').fill(VET_MOBILE);
-    await page.getByTestId('vet-name').fill('SYNTHETIC دامپزشک آگهی');
-    await page.getByTestId('vet-council-code').fill('SYNTH-VET-LISTING');
+    await page.getByTestId('vet-name').fill('SYNTHETIC دامپزشک بازار');
+    await page.getByTestId('vet-council-code').fill('SYNTH-VET-MARKET');
     await page.getByTestId('vet-phone').fill('02100000000');
     await page.getByTestId('save-vet').click();
     await expectText(page, 'پرونده حرفه‌ای دامپزشک ثبت شد');
 
     await page.getByTestId('add-location-form').waitFor();
-    await page.getByTestId('location-vet').selectOption({ label: 'SYNTHETIC دامپزشک آگهی' });
+    await page.getByTestId('location-vet').selectOption({ label: 'SYNTHETIC دامپزشک بازار' });
     await page.getByTestId('location-name').fill(LOCATION_NAME);
     await page.getByTestId('location-city').fill('تهران');
     await page.getByTestId('location-address').fill('نشانی آزمایشی ' + RUN);
@@ -294,8 +300,7 @@ before(async () => {
     await completeProfile(page, 'فروشنده آزمایشی');
     await passKyc(page);
     await payMembership(page);
-    chippedAnimalId = await registerAnimal(page, 'SYNTHETIC سگ فروشی');
-    plainAnimalId = await registerAnimal(page, 'SYNTHETIC سگ بدون چیپ');
+    chippedAnimalId = await registerAnimal(page, 'SYNTHETIC سگ بازار ' + RUN);
 
     const vet = await contextFor(vetState);
     try {
@@ -311,59 +316,22 @@ before(async () => {
   await openFlag('market.flag.animal_market_enabled');
   await openFlag('market.flag.animal_listing_creation_enabled');
   await setMarketSetting('market.animal.listing_duration_days', '30');
-});
 
-after(async () => {
-  await browser?.close();
-});
-
-test('an animal with no registered chip is listed as blocked, with the reason and the way out', async () => {
-  const context = await contextFor(sellerState, MOBILE);
+  // One published advert, built and published through the real screens.
+  const seller = await contextFor(sellerState);
   try {
-    const page = await context.newPage();
-    await page.goto(BASE_URL + '/account/listings', { waitUntil: 'load' });
-    await expectText(page, 'آگهی‌های فروش من');
-
-    const blockers = await page.getByTestId('animal-blockers').first().innerText();
-    assert.match(blockers, /میکروچیپ ثبت‌شده لازم است/);
-    assert.match(blockers, /خوداظهاری کافی نیست/);
-    // The chipped one is offered instead.
-    await expectText(page, 'آماده برای آگهی');
-    assert.equal(await page.getByTestId('start-listing-button-' + chippedAnimalId).count(), 1);
-    assert.equal(await page.getByTestId('start-listing-button-' + plainAnimalId).count(), 0);
-
-    await page.screenshot({ path: path.join(SHOTS, 'listings-dashboard-mobile.png'), fullPage: true });
-  } finally {
-    await context.close();
-  }
-});
-
-test('the advert is built, refuses to publish until it is complete, and then goes live', async () => {
-  const context = await contextFor(sellerState);
-  try {
-    const page = await context.newPage();
+    const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/listings', { waitUntil: 'load' });
     await Promise.all([
       page.waitForURL('**/account/listings/**'),
       page.getByTestId('start-listing-button-' + chippedAnimalId).click(),
     ]);
-    const listingId = new URL(page.url()).pathname.split('/').pop()!;
-
-    // The facts come from the animal record and are not editable here.
-    const facts = await page.getByTestId('derived-facts').innerText();
-    assert.match(facts, /سگ/);
-    assert.equal(await page.getByTestId('fact-microchip').innerText(), 'ثبت‌شده');
-
-    // Everything is still missing, and it is all said at once.
-    const blockers = await page.getByTestId('publication-blockers').innerText();
-    assert.match(blockers, /نوع قیمت/);
-    assert.match(blockers, /تصویر/);
+    listingId = new URL(page.url()).pathname.split('/').pop()!;
+    const listingUrl = BASE_URL + '/account/listings/' + listingId;
 
     await page.getByTestId('listing-price-mode').selectOption('EXACT');
-    await page.getByTestId('listing-price').fill('18000000');
-    await page
-      .getByTestId('listing-description')
-      .fill('SYNTHETIC توضیح آگهی آزمایشی که به‌اندازه کافی طولانی است تا شرط حداقل طول را برآورده کند.');
+    await page.getByTestId('listing-price').fill('24000000');
+    await page.getByTestId('listing-description').fill(DESCRIPTION);
     await page.getByTestId('listing-reason').fill('SYNTHETIC دلیل فروش آزمایشی');
     await page.getByTestId('listing-province').selectOption({ index: 1 });
     await page.getByTestId('listing-city').selectOption({ index: 1 });
@@ -373,151 +341,227 @@ test('the advert is built, refuses to publish until it is complete, and then goe
     await page.getByTestId('save-listing').click();
     await expectText(page, 'اطلاعات آگهی ذخیره شد.');
 
-    // Navigated rather than reloaded throughout: a reload after a server action
-    // re-submits it, which would upload the same photo twice and quietly make
-    // the "below the minimum" case untestable.
-    const listingUrl = BASE_URL + '/account/listings/' + listingId;
-    const addPhoto = async (index: number) => {
+    for (let i = 0; i < 3; i += 1) {
       await page.goto(listingUrl, { waitUntil: 'load' });
       await page
         .getByTestId('media-file-IMAGE')
-        .setInputFiles({ name: 'photo' + index + '.png', mimeType: 'image/png', buffer: PNG });
-      await page.getByTestId('media-alt-IMAGE').fill('SYNTHETIC تصویر ' + (index + 1));
+        .setInputFiles({ name: 'photo' + i + '.png', mimeType: 'image/png', buffer: PNG });
+      await page.getByTestId('media-alt-IMAGE').fill('SYNTHETIC تصویر ' + (i + 1));
       await page.getByTestId('upload-media-IMAGE').click();
       await expectText(page, 'تصویر افزوده شد.');
-    };
+    }
 
-    await addPhoto(0);
-    await addPhoto(1);
-
-    // Two photos is below the managed minimum of three. The refusal appears on
-    // the publish form itself, and the advert stays a draft.
     await page.goto(listingUrl, { waitUntil: 'load' });
-    assert.match(await page.getByTestId('publication-blockers').innerText(), /تصویر/);
     await page.getByTestId('move-PUBLISHED').click();
-    await page.getByTestId('move-result-PUBLISHED').waitFor();
-    assert.match(await page.getByTestId('move-result-PUBLISHED').innerText(), /حداقل/);
-    assert.equal(await page.getByTestId('listing-status').innerText(), 'پیش‌نویس');
-
-    await addPhoto(2);
-    await page.goto(listingUrl, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('publication-blockers').count(), 0);
-    await page.getByTestId('move-PUBLISHED').click();
-    /*
-     * The confirmation a seller actually reads is the status itself: once the
-     * advert is published the publish form is gone and its own message with it.
-     * Matched on the badge rather than on the page text, because other copy on
-     * the page legitimately contains the same word.
-     */
-    await page.getByTestId('listing-status').filter({ hasText: 'منتشرشده' }).waitFor();
-    await page.goto(listingUrl, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('listing-status').innerText(), 'منتشرشده');
-
-    // The revision history holds every step, oldest at the bottom.
-    const revisions = await page.getByTestId('listing-revisions').innerText();
-    assert.match(revisions, /CREATED/);
-    assert.match(revisions, /EDITED/);
-    assert.match(revisions, /PUBLISHED/);
-
-    await page.screenshot({ path: path.join(SHOTS, 'listing-published-desktop.png'), fullPage: true });
-
-    // The pictures are public only while the advert is: pausing takes them down.
-    const media = await page
-      .locator('[data-testid="listing-media"] li')
-      .evaluateAll((nodes) => nodes.length);
-    assert.equal(media, 3);
-
-    await page.getByTestId('move-reason-PAUSED').fill(REASON);
-    await page.getByTestId('move-PAUSED').click();
-    await page.getByTestId('listing-status').filter({ hasText: 'متوقف‌شده توسط فروشنده' }).waitFor();
-    await page.goto(listingUrl, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('listing-status').innerText(), 'متوقف‌شده توسط فروشنده');
-    assert.equal(await page.getByTestId('listing-status-reason').innerText(), REASON);
-
-    // Back to published, so the later tests see a live advert.
-    await page.getByTestId('move-PUBLISHED').click();
+    // Matched on the badge: other copy on the page contains the same word.
     await page.getByTestId('listing-status').filter({ hasText: 'منتشرشده' }).waitFor();
   } finally {
-    await context.close();
+    await seller.close();
   }
 });
 
-test('an advert may be published before the minimum handover age, and the page says so', async () => {
-  const context = await contextFor(sellerState);
+
+
+after(async () => {
+  await browser?.close();
+});
+
+test('the public index shows the advert, filters narrow it and a query string cannot break it', async () => {
+  const context = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR' });
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/account/listings', { waitUntil: 'load' });
-    await page.getByTestId('listing-row-' + (await firstListingId(page))).click();
-    await page.waitForURL('**/account/listings/**');
-    const note = await page.getByTestId('handover-note').innerText();
-    // The fixture animal was born in 2022, so it is past the age; what matters
-    // is that the page states the date rather than staying silent about it.
-    assert.match(note, /تحویل/);
-    assert.match(note, /زودترین تاریخ تحویل/);
+    // No account at all: reading the marketplace needs none.
+    const response = await page.goto(BASE_URL + '/animals-market', { waitUntil: 'load' });
+    assert.equal(response?.status(), 200);
+    await expectText(page, 'بازار فروش حیوان');
+    assert.equal(await page.getByTestId('market-card-' + listingId).count(), 1);
+
+    // The note about promoted results is always present, even with none shown.
+    assert.match(await page.getByTestId('market-ad-note').innerText(), /تبلیغ/);
+    assert.equal(await page.getByTestId('market-ad-label-' + listingId).count(), 0);
+
+    // A filter that cannot match empties the page honestly.
+    await page.goto(BASE_URL + '/animals-market?sex=FEMALE', { waitUntil: 'load' });
+    assert.equal(await page.getByTestId('market-card-' + listingId).count(), 0);
+    await expectText(page, 'آگهی‌ای با این فیلترها پیدا نشد');
+
+    // A filter that does match keeps it.
+    await page.goto(BASE_URL + '/animals-market?sex=MALE&maxPrice=30000000', { waitUntil: 'load' });
+    assert.equal(await page.getByTestId('market-card-' + listingId).count(), 1);
+
+    // A hostile query string is ignored rather than acted on, and the page still
+    // renders: none of it reaches SQL as text.
+    const hostile = await page.goto(
+      BASE_URL + '/animals-market?q=%25%27%3B+drop+table+animal_listing%3B+--&page=999999&species=..%2F..%2Fetc',
+      { waitUntil: 'load' },
+    );
+    assert.equal(hostile?.status(), 200);
+    assert.equal(await page.getByTestId('market-card-' + listingId).count(), 0);
+
+    // And the advert is still there afterwards.
+    await page.goto(BASE_URL + '/animals-market', { waitUntil: 'load' });
+    assert.equal(await page.getByTestId('market-card-' + listingId).count(), 1);
+    await page.screenshot({ path: path.join(SHOTS, 'market-index-desktop.png'), fullPage: true });
   } finally {
     await context.close();
   }
 });
 
-async function firstListingId(page: Page): Promise<string> {
-  const href = await page
-    .locator('[data-testid="my-listings"] a')
-    .first()
-    .getAttribute('href');
-  return href!.split('/').pop()!;
-}
+test('the sitemap section lists the advert at its canonical address', async () => {
+  const context = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR' });
+  try {
+    const page = await context.newPage();
+    const sitemap = await page.goto(BASE_URL + '/sitemaps/animals-market.xml', { waitUntil: 'load' });
+    assert.equal(sitemap?.status(), 200);
+    const xml = await sitemap!.text();
+    assert.ok(xml.includes('/animals-market/' + listingId), 'the published advert is listed');
+    // A filtered permutation of the index is never a sitemap entry.
+    assert.ok(!xml.includes('/animals-market?'), 'no filtered view reaches the sitemap');
+    assert.ok(!xml.includes('/animals-market</loc>'), 'the index itself belongs to the pages section');
 
-test('another account cannot open the advert, and the market banner is honest when it is shut', async () => {
+    /*
+     * The other half of the policy — that a filtered view carries noindex — is
+     * not observable here: outside production every page is noindex by design
+     * (DEC-0152), so both views would look the same. It is pinned as a unit
+     * test in tests/domain/market-discovery.test.ts instead.
+     */
+    const index = await page.goto(BASE_URL + '/animals-market', { waitUntil: 'load' });
+    assert.equal(index?.status(), 200);
+  } finally {
+    await context.close();
+  }
+});
+
+test('the public advert separates what Hamzist holds from what the seller says', async () => {
+  const context = await browser.newContext({ viewport: MOBILE, locale: 'fa-IR' });
+  try {
+    const page = await context.newPage();
+    const response = await page.goto(BASE_URL + '/animals-market/' + listingId, { waitUntil: 'load' });
+    assert.equal(response?.status(), 200);
+
+    assert.equal(await page.getByTestId('listing-fact-chip').innerText(), 'ثبت‌شده');
+    const declarations = await page.getByTestId('listing-declarations').innerText();
+    assert.match(declarations, /نمی‌داند/, 'an unanswered question stays a «do not know»');
+    assert.match(await page.getByTestId('listing-disclaimer').innerText(), /تأیید نشده/);
+    assert.match(await page.getByTestId('listing-safety').innerText(), /بیرون از همزیست/);
+    assert.equal(await page.getByTestId('listing-ad-label').count(), 0);
+
+    // The pictures really are served while the advert is published.
+    const src = await page.locator('[data-testid="listing-images"] img').first().getAttribute('src');
+    assert.ok(src, 'a published advert shows its photo');
+    await page.screenshot({ path: path.join(SHOTS, 'listing-public-mobile.png'), fullPage: true });
+
+    // A stranger with no account is offered the report link but must sign in.
+    await page.goto(BASE_URL + '/report/listing/' + listingId, { waitUntil: 'load' });
+    const body = await page.locator('body').innerText();
+    assert.ok(body.includes('ورود') || body.includes('دسترسی مجاز نیست'), body.slice(0, 200));
+  } finally {
+    await context.close();
+  }
+});
+
+test('a report reaches the queue, the decision hides the advert, and the appeal brings it back', async () => {
+  // A buyer reports it.
+  const buyer = await browser.newContext({ viewport: MOBILE, locale: 'fa-IR' });
+  try {
+    const page = await signIn(buyer, newSyntheticMobile());
+    await page.goto(BASE_URL + '/report/listing/' + listingId, { waitUntil: 'load' });
+    await page.getByTestId('report-target').selectOption('ANIMAL_LISTING');
+    await page.getByTestId('report-reason').selectOption('INCORRECT_INFO');
+    await page.getByTestId('report-details').fill('SYNTHETIC اطلاعات آگهی با پرونده نمی‌خواند ' + RUN);
+    await page.getByTestId('submit-market-report').click();
+    await expectText(page, 'گزارش شما ثبت شد');
+
+    // A second report about the same advert is a duplicate.
+    await page.goto(BASE_URL + '/report/listing/' + listingId, { waitUntil: 'load' });
+    await page.getByTestId('report-reason').selectOption('SPAM');
+    await page.getByTestId('submit-market-report').click();
+    await expectText(page, 'گزارش باز شما');
+  } finally {
+    await buyer.close();
+  }
+
+  // The moderator sees it, with the signals labelled as signals.
+  const moderator = await contextFor(moderatorState);
+  try {
+    const page = await moderator.newPage();
+    await page.goto(BASE_URL + '/market/listings', { waitUntil: 'load' });
+    await expectText(page, 'آگهی‌های گزارش‌شده');
+    assert.match(await page.getByTestId('signals-disclaimer').innerText(), /ثابت نمی‌کند/);
+    const signals = await page.getByTestId('queue-signals-' + listingId).innerText();
+    assert.match(signals, /گزارش باز/);
+    await page.screenshot({ path: path.join(SHOTS, 'moderation-queue-desktop.png'), fullPage: true });
+
+    await page.getByTestId('decision-' + listingId).selectOption('HIDE');
+    await page.getByTestId('decision-reason-' + listingId).fill('SYNTHETIC توقف برای بررسی ' + RUN);
+    await page.getByTestId('save-decision-' + listingId).click();
+    /*
+     * The confirmation a moderator actually reads is the queue emptying: once
+     * the reports are closed the row is gone, and its own success message goes
+     * with the form that carried it.
+     */
+    await page.getByTestId('queue-row-' + listingId).waitFor({ state: 'detached' });
+    await expectText(page, 'گزارش بازی نیست');
+  } finally {
+    await moderator.close();
+  }
+
+  // The public can no longer reach it.
+  const stranger = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR' });
+  try {
+    const page = await stranger.newPage();
+    const gone = await page.goto(BASE_URL + '/animals-market/' + listingId, { waitUntil: 'load' });
+    assert.equal(gone?.status(), 404);
+    await page.goto(BASE_URL + '/animals-market', { waitUntil: 'load' });
+    assert.equal(await page.getByTestId('market-card-' + listingId).count(), 0);
+  } finally {
+    await stranger.close();
+  }
+
+  // The seller objects, and the advert comes back when the objection is accepted.
   const seller = await contextFor(sellerState);
-  let listingId = '';
   try {
     const page = await seller.newPage();
-    await page.goto(BASE_URL + '/account/listings', { waitUntil: 'load' });
-    listingId = await firstListingId(page);
+    await page.goto(BASE_URL + '/account/listings/' + listingId, { waitUntil: 'load' });
+    await expectText(page, 'اعتراض به تصمیم ناظر');
+    const formId = await page
+      .locator('[data-testid="appealable-reports"] form')
+      .first()
+      .getAttribute('data-testid');
+    const id = formId!.replace('appeal-form-', '');
+    await page.getByTestId('appeal-statement-' + id).fill('SYNTHETIC اطلاعات آگهی درست است ' + RUN);
+    await page.getByTestId('submit-appeal-' + id).click();
+    // The objection is recorded, so the decision stops being offered as
+    // appealable and the seller sees it in their own list instead.
+    await page.getByTestId('appeal-form-' + id).waitFor({ state: 'detached' });
+    await page.goto(BASE_URL + '/account/listings/' + listingId, { waitUntil: 'load' });
+    assert.match(await page.getByTestId('my-appeals').innerText(), /در انتظار بررسی/);
   } finally {
     await seller.close();
   }
 
-  // A different signed-in account: the advert answers "not found", not "denied",
-  // so one seller cannot probe for another's identifiers.
-  const otherContext = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR' });
+  const reviewer = await contextFor(moderatorState);
   try {
-    await signIn(otherContext, newSyntheticMobile());
-    const page = await otherContext.newPage();
-    await page.goto(BASE_URL + '/account/listings/' + listingId, { waitUntil: 'load' });
-    const body = await page.locator('body').innerText();
-    assert.ok(
-      body.includes('پیدا نشد') || body.includes('دسترسی مجاز نیست'),
-      'another account must not read the advert: ' + body.slice(0, 300),
-    );
+    const page = await reviewer.newPage();
+    await page.goto(BASE_URL + '/market/listings', { waitUntil: 'load' });
+    await expectText(page, 'اعتراض‌ها');
+    const rowId = await page.locator('[data-testid="appeal-queue"] li').first().getAttribute('data-testid');
+    const appealId = rowId!.replace('appeal-row-', '');
+    await page.getByTestId('appeal-outcome-' + appealId).selectOption('OVERTURN');
+    await page.getByTestId('appeal-decision-reason-' + appealId).fill('SYNTHETIC مدرک پذیرفته شد ' + RUN);
+    await page.getByTestId('save-appeal-' + appealId).click();
+    await page.getByTestId('appeal-row-' + appealId).waitFor({ state: 'detached' });
+    await expectText(page, 'اعتراض بازی نیست');
   } finally {
-    await otherContext.close();
+    await reviewer.close();
   }
 
-  // Closing the market says so on the seller's own page, and leaves the advert.
-  const admin = await contextFor(adminState);
+  const back = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR' });
   try {
-    const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market', { waitUntil: 'load' });
-    await page.getByTestId('flag-reason-market.flag.animal_market_enabled').fill(REASON + ' — بستن');
-    await page.getByTestId('flag-toggle-market.flag.animal_market_enabled').click();
-    await expectText(page, 'مقدار ذخیره شد.');
+    const page = await back.newPage();
+    const response = await page.goto(BASE_URL + '/animals-market/' + listingId, { waitUntil: 'load' });
+    assert.equal(response?.status(), 200, 'the advert is public again');
   } finally {
-    await admin.close();
+    await back.close();
   }
-
-  const sellerAgain = await contextFor(sellerState, MOBILE);
-  try {
-    const page = await sellerAgain.newPage();
-    await page.goto(BASE_URL + '/account/listings', { waitUntil: 'load' });
-    await expectText(page, 'بازار فروش حیوان در حال حاضر بسته است');
-    assert.match(await page.getByTestId('market-closed').innerText(), /حذف نمی‌شوند/);
-    // The advert itself is still there.
-    assert.ok((await page.getByTestId('my-listings').innerText()).length > 0);
-    await page.screenshot({ path: path.join(SHOTS, 'market-closed-mobile.png'), fullPage: true });
-  } finally {
-    await sellerAgain.close();
-  }
-
-  await openFlag('market.flag.animal_market_enabled');
 });

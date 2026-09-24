@@ -5,6 +5,7 @@ import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { FileField, SelectField, TextAreaField, TextField } from '../../../src/ui/field.tsx';
+import { startPromotionAction } from '../../market/moderation-actions.ts';
 import {
   attachListingMediaAction,
   createListingAction,
@@ -334,5 +335,48 @@ export function BlockedAnimalCard({
         ))}
       </ul>
     </Card>
+  );
+}
+
+/** Buy a promotion for one's own published advert (Phase 3, PROMPT-004). */
+export function PromotionForm({
+  listingId,
+  packages,
+}: {
+  listingId: string;
+  packages: readonly { id: string; labelFa: string; priceToman: string | null }[];
+}) {
+  const [state, submit, pending] = useActionState(startPromotionAction, {});
+  const buyable = packages.filter((row) => row.priceToman !== null);
+  return (
+    <form action={submit} className="mt-md space-y-md" data-testid="promotion-form">
+      <input type="hidden" name="listingId" value={listingId} />
+      {state.message ? (
+        <div data-testid="promotion-result">
+          <Alert tone={state.ok ? 'success' : 'error'} title={state.message} />
+        </div>
+      ) : null}
+      {buyable.length === 0 ? (
+        <p className="text-caption text-text-disabled" data-testid="promotion-unpriced">
+          تعرفه بسته‌های تبلیغ هنوز ثبت نشده است؛ تا ثبت مبلغ واقعی، خرید باز نمی‌شود.
+        </p>
+      ) : (
+        <>
+          <SelectField
+            label="بسته تبلیغ"
+            name="packageId"
+            required
+            options={buyable.map((row) => ({
+              value: row.id,
+              label: row.labelFa + ' — ' + Number(row.priceToman).toLocaleString('fa-IR') + ' تومان',
+            }))}
+            data-testid="promotion-package"
+          />
+          <Button type="submit" tone="secondary" disabled={pending} data-testid="buy-promotion">
+            {pending ? 'در حال ثبت…' : 'ثبت بسته تبلیغ'}
+          </Button>
+        </>
+      )}
+    </form>
   );
 }

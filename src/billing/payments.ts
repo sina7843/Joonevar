@@ -42,7 +42,9 @@ export type PaymentService =
   | 'TRUSTED_VET_ACTIVATION'
   | 'TRUSTED_VET_RENEWAL'
   // A club's own joining fee (PROMPT-013).
-  | 'CLUB_MEMBERSHIP';
+  | 'CLUB_MEMBERSHIP'
+  // A paid promotion of one animal advert (Phase 3, PROMPT-004).
+  | 'ANIMAL_LISTING_PROMOTION';
 
 /**
  * What to charge for, and where the server should read the price.

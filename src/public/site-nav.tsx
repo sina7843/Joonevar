@@ -14,11 +14,20 @@ function isCurrent(pathname: string, href: string): boolean {
   return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
 }
 
+/**
+ * The desktop section row.
+ *
+ * The row scrolls instead of widening the page. Fourteen sections already
+ * filled it at the reviewed desktop width and the Phase 3 marketplace was the
+ * fifteenth: without `hz-rail` the header pushed the whole page sideways by
+ * about 57px. It is the idiom the operational shells already use for exactly
+ * this, so the row stays one line and the next section will not break it either.
+ */
 export function DesktopNav({ links }: { links: readonly NavLink[] }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="ناوبری سایت" className="hidden lg:block">
-      <ul className="flex items-center gap-xs">
+    <nav aria-label="ناوبری سایت" className="hidden min-w-0 lg:block">
+      <ul className="hz-rail flex items-center gap-xs">
         {links.map((link) => {
           const current = isCurrent(pathname, link.href);
           return (

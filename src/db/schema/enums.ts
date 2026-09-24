@@ -143,7 +143,39 @@ export const breedProfileStatus = pgEnum('breed_profile_status', ['DRAFT', 'PUBL
 export const contentKind = pgEnum('content_kind', ['ARTICLE', 'NEWS', 'ANNOUNCEMENT', 'CLUB_POST']);
 
 /** What a user report is about. Profiles join when their prompts publish them (006, 008, 010). */
-export const reportTargetKind = pgEnum('report_target_kind', ['CONTENT', 'CLUB']);
+/**
+ * What a user report is about.
+ *
+ * Phase 3 adds the three things a marketplace gets reported for: the advert
+ * itself, one picture in it, and the seller behind it. They are separate
+ * because the answer is different — a wrong photo is not a dishonest seller —
+ * and because a moderator has to be able to act on the smallest thing that is
+ * actually wrong (PROMPT-004).
+ */
+export const reportTargetKind = pgEnum('report_target_kind', [
+  'CONTENT',
+  'CLUB',
+  'ANIMAL_LISTING',
+  'LISTING_MEDIA',
+  'SELLER',
+]);
+
+/**
+ * An appeal against a moderation decision.
+ *
+ * Nothing about a decision is undone by disagreeing with it: the appeal is its
+ * own row with its own outcome, so the original decision, the objection and the
+ * answer all remain readable afterwards (PROMPT-004).
+ */
+export const moderationAppealStatus = pgEnum('moderation_appeal_status', ['OPEN', 'UPHELD', 'OVERTURNED']);
+
+/** A paid promotion of one advert. `EXPIRED` is never stored — it is read from the dates. */
+export const listingPromotionStatus = pgEnum('listing_promotion_status', [
+  'PENDING_PAYMENT',
+  'ACTIVE',
+  'CANCELLED',
+  'PAYMENT_FAILED',
+]);
 
 export const reportReason = pgEnum('report_reason', [
   'INCORRECT_INFO',

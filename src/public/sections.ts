@@ -37,6 +37,9 @@ export const PUBLIC_SECTIONS: readonly PublicSection[] = [
   { href: '/associations', label: 'انجمن‌ها و کلاب‌ها', live: true, nav: true, prompt: '010' },
   // Clubs became a first-class area in PROMPT-012 and get their own entry.
   { href: '/clubs', label: 'کلاب‌ها', live: true, nav: true, prompt: '012' },
+  // The animal marketplace (Phase 3, PROMPT-004). Live and linked; the page
+  // itself says so when the market's kill switch is closed.
+  { href: '/animals-market', label: 'بازار فروش حیوان', live: true, nav: true, prompt: 'P3-004' },
   { href: '/services', label: 'خدمات', live: true, nav: true, prompt: '018' },
   { href: '/guides', label: 'راهنمای سامانه', live: true, nav: true, prompt: '014' },
   { href: '/verify', label: 'استعلام اصالت', live: true, nav: true, prompt: '014' },

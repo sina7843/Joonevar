@@ -52,6 +52,9 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/announcements', access: 'PUBLIC' },
   // Global search across the public sections (§16). Not a section of §4 itself.
   { prefix: '/search', access: 'PUBLIC' },
+  // The public animal marketplace (Phase 3, PROMPT-004). Reading an advert
+  // needs no account; reporting one does, and that lives under /report.
+  { prefix: '/animals-market', access: 'PUBLIC' },
   // Service pages (§18): what each Phase 1 service is, with its managed fee.
   { prefix: '/services', access: 'PUBLIC' },
   // Document verification (§17): a code or QR, answered with minimal public data.

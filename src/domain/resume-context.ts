@@ -41,7 +41,9 @@ export type EntityType =
   | 'COMMUNITY'
   | 'COMMUNITY_MANAGER'
   | 'AD_SUBSCRIPTION'
-  | 'VET_PROFESSIONAL_CASE';
+  | 'VET_PROFESSIONAL_CASE'
+  | 'ANIMAL_LISTING'
+  | 'LISTING_PROMOTION';
 
 export interface EntityRef {
   readonly type: EntityType;

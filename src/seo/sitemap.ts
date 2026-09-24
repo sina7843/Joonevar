@@ -24,6 +24,7 @@ export interface SitemapEntry {
 
 import { servicePaths } from '../services/catalogue.ts';
 import { placeSitemapEntries } from '../geo/service.ts';
+import { listingSitemapEntries } from '../marketplace/public-listings.ts';
 
 export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly SitemapEntry[]>>> = {
   // The service pages of §18: fixed addresses whose figures come from settings.
@@ -46,6 +47,13 @@ export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly Si
   articles: () => contentSitemapEntries(db(), 'ARTICLE'),
   news: () => contentSitemapEntries(db(), 'NEWS'),
   announcements: () => contentSitemapEntries(db(), 'ANNOUNCEMENT'),
+  /*
+   * Published animal adverts (Phase 3, PROMPT-004). Reserved ones are readable
+   * but not listed — there is no point sending new people to an animal that is
+   * already spoken for — and no filtered permutation of the index appears here,
+   * because every one of those points its canonical at the plain index.
+   */
+  'animals-market': () => listingSitemapEntries(db()),
 };
 
 export function sitemapSection(id: string): (() => Promise<readonly SitemapEntry[]>) | null {

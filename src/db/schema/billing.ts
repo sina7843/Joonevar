@@ -37,6 +37,8 @@ export const paymentService = pgEnum('payment_service', [
   'TRUSTED_VET_RENEWAL',
   // A club's own joining fee, priced by that club's published rule version (PROMPT-013).
   'CLUB_MEMBERSHIP',
+  // A paid promotion of one animal advert (Phase 3, PROMPT-004).
+  'ANIMAL_LISTING_PROMOTION',
 ]);
 
 /**

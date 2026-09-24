@@ -20,6 +20,7 @@ import { activateSubscriptionFromPayment } from '../advertising/service.ts';
 import { activateLicencePeriodFromPayment } from '../vets/licence-period.ts';
 import { activateTrustedPeriodFromPayment } from '../vets/trusted-period.ts';
 import { activateClubMembershipFromPayment } from '../clubs/enrollment.ts';
+import { activatePromotionFromPayment } from '../marketplace/promotions.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -77,6 +78,12 @@ export const paidEffects: PaidEffects = {
       // rule, and never grants a membership whose conditions have lapsed.
       case 'CLUB_MEMBERSHIP':
         await activateClubMembershipFromPayment(tx, batch.id);
+        return;
+      // A promotion is placement the seller paid for. It becomes live only here,
+      // inside the verifying transaction, and a renewal starts where the live
+      // one ends rather than overlapping it (PROMPT-004).
+      case 'ANIMAL_LISTING_PROMOTION':
+        await activatePromotionFromPayment(tx, batch);
         return;
       default:
         return;

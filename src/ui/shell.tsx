@@ -321,6 +321,9 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   if (hasMarketplaceCapability(actor, 'MARKET_SPECIES_WRITE')) {
     items.push({ href: '/market/species', label: 'گونه‌های فعال', icon: 'dog' });
   }
+  if (hasMarketplaceCapability(actor, 'ANIMAL_LISTING_MODERATE')) {
+    items.push({ href: '/market/listings', label: 'گزارش آگهی‌ها', icon: 'warning' });
+  }
   return items;
 }
 

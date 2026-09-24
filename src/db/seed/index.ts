@@ -22,6 +22,7 @@ import { ensurePlans } from '../../advertising/service.ts';
 import { slugify } from '../../breeds/model.ts';
 import { seedTaxonomies, type TaxonomySeedResult } from './taxonomy.ts';
 import { ensureMarketSpecies } from '../../marketplace/species.ts';
+import { ensurePromotionPackages } from '../../marketplace/promotions.ts';
 
 export interface SeedReport {
   readonly settingsInserted: readonly string[];
@@ -118,6 +119,10 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
   // the taxonomy gains later arrives closed for animal sale, because opening
   // one is a legal decision nobody can take by adding a taxonomy row.
   const marketSpeciesInserted = await ensureMarketSpecies(database);
+
+  // The two animal-advert promotion packages (PROMPT-004). Each points at its
+  // price setting, which starts unset, so a package is never a tariff.
+  await ensurePromotionPackages(database);
 
   // The approved-issuer registry (D14) starts empty on purpose: no issuer name
   // is invented here. An empty registry does not remove the review path, it

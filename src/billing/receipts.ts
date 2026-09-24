@@ -35,6 +35,7 @@ export const PAYMENT_SERVICE_FA: Record<PaymentService, string> = {
   TRUSTED_VET_ACTIVATION: 'فعال‌سازی دامپزشک معتمد',
   TRUSTED_VET_RENEWAL: 'تمدید دامپزشک معتمد',
   CLUB_MEMBERSHIP: 'حق عضویت کلاب',
+  ANIMAL_LISTING_PROMOTION: 'بسته تبلیغ آگهی حیوان',
 };
 
 export const PAYMENT_STATUS_FA: Record<string, string> = {

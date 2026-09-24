@@ -1,0 +1,222 @@
+{
+  "promptId": "PROMPT-004",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "ef90e9490beb8ff20e95976a200f80ee03cae237",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "The public side of the animal marketplace, its moderation and its paid promotion. The visibility rule is written once, as a single SQL expression, and the list, the detail page, the sitemap and the media route all read it: four things hide an advert — its own status, the market's kill switch, the species being closed for animal sale, and an active publisher restriction on the seller — and a visitor cannot tell which of them applied, because all four answer the same null or 404. Writing it as a condition rather than as a filter applied afterwards means a caller that forgets it gets no rows instead of too many. «Suspended seller» is the publisher_restriction table that already existed; the account keeps its adverts and its history and none of them is served while the restriction is in force. The query string is the one input a stranger fully controls, so it passes through one normaliser that turns every field into a member of a closed list, a UUID, a bounded integer or a cleaned term; anything unrecognised becomes null rather than an error, so a hand-edited link still shows the marketplace. The free-text term is bound as a parameter with its wildcards escaped, so a search for a per-cent sign searches for a per-cent sign. A reversed range is swapped because it is plainly a typo, but a malformed number is dropped rather than coerced — a coerced filter lies about what was asked for. Paging is stable because every order ends with the id, and an unpriced negotiable advert sorts nulls-last in both directions because it is neither the cheapest nor the dearest. Only the plain index invites indexing: every filtered or paged permutation carries noindex and points its canonical at that page, and the sitemap section lists published adverts only — a reserved one stays readable for whoever holds its link but is not somewhere to send new people. Structured data is deliberately limited to the breadcrumb, because a Product or Offer graph would tell a search engine that Hamzist sells an animal at a price and neither is true. Moderation reuses the decision list that already exists rather than inventing a second set of names for the same four actions: HIDE suspends the advert, SOFT_DELETE removes it, RESTRICT_PUBLISHER stops the seller, and nothing transactional is ever deleted. Three new report subjects — the advert, one of its pictures, and the seller — each with a typed foreign key and a one-open-report-per-person index enforced by the database. A media report deliberately does not also name its advert, because otherwise reporting a photo would be refused as a duplicate of an earlier report about the advert; scoping the index by target kind was not possible, since an enum-to-text cast is not immutable and cannot appear in an index predicate. The queue's risk signals are computed at read time from rows that already exist — open reports, distinct reporters, whether the seller has been restricted or acted on before — so there is no flag table to fall out of date and no automated judgement dressed up as a finding; the page says so above the numbers and none of them changes what the public sees. Appeals are their own table: accepting one restores the advert through the same state machine that suspended it, and both the decision and the reversal stay readable. Promotion got its own pair of tables rather than a fourth target type on the Phase 2 advertising subscription, because an advert is promoted for days and disappears when it sells while a profile buys a tier for a season. A promotion is placement only: it moves an advert among results that already matched, it is always labelled «تبلیغ», it touches no other ranking signal, it becomes live only inside the transaction that verifies its payment, and it ends on a date read at request time rather than swept by a job. Checks on one HEAD: typecheck, a clean production build, 1023 tests green — 325 domain/config/UI, 484 database in two halves, 214 browser — and the upgrade rehearsal 18/18 with 0043 over real Phase 1 and Phase 2 records.",
+  "changedFiles": [
+    "src/db/migrations/0043_animal-discovery.sql",
+    "src/db/migrations/meta/0043_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/enums.ts",
+    "src/db/schema/marketplace.ts",
+    "src/db/schema/moderation.ts",
+    "src/db/schema/billing.ts",
+    "src/db/seed/index.ts",
+    "src/marketplace/discovery-model.ts",
+    "src/marketplace/public-listings.ts",
+    "src/marketplace/moderation-model.ts",
+    "src/marketplace/listing-moderation.ts",
+    "src/marketplace/moderation-forms.tsx",
+    "src/marketplace/promotions.ts",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/billing/receipts.ts",
+    "src/domain/resume-context.ts",
+    "src/authz/routes.ts",
+    "src/seo/sitemap.ts",
+    "src/public/sections.ts",
+    "src/public/site-nav.tsx",
+    "src/ui/shell.tsx",
+    "app/(public)/animals-market/(list)/page.tsx",
+    "app/(public)/animals-market/[id]/page.tsx",
+    "app/report/listing/[id]/page.tsx",
+    "app/market/listings/page.tsx",
+    "app/market/moderation-actions.ts",
+    "app/account/listings/[id]/page.tsx",
+    "app/account/listings/forms.tsx",
+    "tests/domain/market-discovery.test.ts",
+    "tests/db/market-discovery.test.ts",
+    "tests/browser/market-discovery.test.ts",
+    "tests/browser/animal-listing.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "tests/ui/seo.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-3-PROMPT-004.json"
+  ],
+  "migrations": [
+    "src/db/migrations/0043_animal-discovery.sql"
+  ],
+  "decisions": [
+    "DEC-0206"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 325,
+      "pass": 325,
+      "fail": 0,
+      "skip": 0,
+      "note": "309 before this prompt; the sixteen new ones are tests/domain/market-discovery.test.ts."
+    },
+    "databaseFirstHalf": {
+      "command": "node --test --test-concurrency=2 <first 31 of 61 tests/db suites>",
+      "total": 269,
+      "pass": 269,
+      "fail": 0,
+      "skip": 0
+    },
+    "databaseSecondHalf": {
+      "command": "node --test --test-concurrency=2 <last 30 of 61 tests/db suites>",
+      "total": 215,
+      "pass": 215,
+      "fail": 0,
+      "skip": 0,
+      "note": "Includes the ten new tests of tests/db/market-discovery.test.ts."
+    },
+    "browserFull": {
+      "command": "node tools/browser-tests.mjs",
+      "total": 214,
+      "pass": 214,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 495,
+      "note": "210 before this prompt; the four new ones are tests/browser/market-discovery.test.ts. The first complete run had four failures, all described under checks: one real layout regression, two stale navigation expectations and one ambiguous wait."
+    },
+    "upgradeRehearsal": {
+      "command": "node tools/upgrade-check.mjs",
+      "total": 18,
+      "pass": 18,
+      "fail": 0,
+      "note": "0043 applied over representative Phase 1 and Phase 2 records; nothing it adds disturbs an existing row."
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "rm -rf .next && npm run build",
+      "result": "PASS",
+      "evidence": "exit 0. Built clean before the browser suites, as the stale-build guard requires. One build failure during the work was a real design error and is recorded under the client-boundary check."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=2 <tests/db in two halves> ; node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "1023 tests on one HEAD: 325 domain/config/UI, 484 database (269 + 215), 214 browser. 0 failures, 0 skips."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "214/214 in 495 s. The new suite builds and publishes an advert through the real screens, then reads it as a signed-out stranger, filters it, feeds it a hostile query string, reads its sitemap entry, reports it, has a moderator decide, watches it disappear from the public side, appeals, and watches it come back."
+    },
+    {
+      "id": "one-visibility-rule",
+      "command": "node --test tests/db/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "One test walks all four reasons in turn — kill switch, species closed, seller restricted, advert status — and after each one both the list and the detail answer as if the advert did not exist, while a malformed id answers identically. A reserved advert stays readable and leaves the sitemap. The same condition is what the sitemap and the media route use, so none of them can drift."
+    },
+    {
+      "id": "filter-normalisation-and-injection",
+      "command": "node --test tests/domain/market-discovery.test.ts tests/db/market-discovery.test.ts ; node tools/browser-tests.mjs tests/browser/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "The domain suite feeds SQL fragments, path traversal, exponent notation, thousands separators, negative numbers, out-of-range pages, repeated parameters and bidirectional override characters into the parser and asserts every one becomes null or a bounded value. The database suite then searches for a bare per-cent sign, a bare underscore and a DELETE statement and gets zero rows with all three adverts still present afterwards. The browser suite sends the same query string at the real page and gets a 200 with the marketplace intact."
+    },
+    {
+      "id": "stable-sorting-and-paging",
+      "command": "node --test tests/db/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "Ascending and descending price both place the unpriced negotiable advert last, and two pages of size two over three adverts together contain each one exactly once — the id tie-break is what makes that true when publication times collide."
+    },
+    {
+      "id": "indexing-and-sitemap-policy",
+      "command": "node --test tests/domain/market-discovery.test.ts ; node tools/browser-tests.mjs tests/browser/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "A unit test drives buildMetadata with a production site context: the plain index is indexable, and a filter, a page, a sort or a term each make the same address noindex with its canonical still pointing at the plain path. The browser suite reads the real sitemap section and finds the published advert at its canonical address and no query string. The rule is pinned as a unit test because outside production every page is noindex by design (DEC-0152), so the browser cannot tell the two apart."
+    },
+    {
+      "id": "report-targets-and-deduplication",
+      "command": "node --test tests/db/market-discovery.test.ts ; node tools/browser-tests.mjs tests/browser/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "A seller cannot report their own advert, an unknown subject is refused, the other-reason needs a description, a hidden advert is not reportable at all, and a second open report about the same subject is refused by the partial unique index. The same account may still report a different subject of the same advert — the photo and the seller are separate complaints. The browser suite shows the duplicate refusal on the real form."
+    },
+    {
+      "id": "signals-are-not-findings",
+      "command": "node --test tests/db/market-discovery.test.ts ; node tools/browser-tests.mjs tests/browser/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "The queue orders by distinct reporters and then by the oldest complaint, and the test asserts that after two reports the advert is still PUBLISHED and still in the public list: a signal changes the order of work and nothing else. Only ANIMAL_LISTING_MODERATE opens the queue — a user, a support agent, the marketplace admin and the finance operator are each refused. The page carries the sentence saying the numbers prove nothing on their own, and the browser suite reads it."
+    },
+    {
+      "id": "decisions-and-appeals-keep-the-evidence",
+      "command": "node --test tests/db/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "One decision closes every open report about the advert and moves it through the listing state machine; afterwards both reports are still rows with their own reason, reporter, decision and the revision each reporter was reading, and all three photos are still attached. Restricting the seller hides every advert of that seller while leaving all of them PUBLISHED, and lifting the restriction brings them back. An appeal may only be made by the seller the decision was about, only against a decision that was acted on, and only once; accepting it restores the advert while the original HIDE decision stays readable on the report."
+    },
+    {
+      "id": "promotion-is-placement-not-reputation",
+      "command": "node --test tests/domain/market-discovery.test.ts tests/db/market-discovery.test.ts",
+      "result": "PASS",
+      "evidence": "The domain test proves the placement function moves rows without adding or removing any and leaves the organic order untouched. The database test starts with the tariff unset and gets NOT_CONFIGURED, refuses promoting somebody else's advert, refuses a second purchase while one is pending, shows that buying is not being promoted until verifyAttempt runs, then finds the advert first in the list with its label and both adverts still present, shows that a filter the promoted advert fails does not bring it back, and finally reads the list one second after the end date and finds nothing promoted."
+    },
+    {
+      "id": "client-boundary",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "The first build failed: the report form is a client component and imported its labels from the moderation service, which reaches the database and node:path. The vocabulary moved to src/marketplace/moderation-model.ts, which is pure values, and both the client form and the server service import it from there."
+    },
+    {
+      "id": "no-regression-in-the-public-shell",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "The first complete run found a real layout regression: fourteen sections already filled the desktop header row, and the fifteenth pushed the page sideways by 57px. The row now uses the hz-rail idiom the operational shells already use, so it scrolls instead of widening the page and the next section will not break it either. Two navigation expectations were updated for the new section, and one wait in the PROMPT-003 suite was made unambiguous after new page copy introduced the same word elsewhere."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Chat evidence has nothing to point at yet. The conversation thread is built in PROMPT-005, so its table and foreign key do not exist; adding a loose reference to a table that is not there is exactly what this project refuses. The three report subjects that do have targets — the advert, its media and the seller — are built.",
+    "There is no buyer-side action on a public advert yet: no enquiry, no offer and no deposit. PROMPT-005 and PROMPT-006 build those; today the detail page explains the deposit rule and stops there.",
+    "The promotion tariffs are unset managed data, so the purchase path answers NOT_CONFIGURED until somebody with the authority enters a figure. The packages are seeded; their prices are not.",
+    "An expired promotion stops being served the moment its end date passes, because the date is read at request time — but nothing sweeps the rows, so a promotion's status column still reads ACTIVE after it has ended. The reader is the truth; the column is history.",
+    "Listing expiry still needs a caller: expireDueListings is real and tested, and no scheduler runs it.",
+    "Full-text search is ILIKE over the animal name, the description and the breed name. It is correct and parameterised, and it is not an index: a real search index is a database decision of its own and belongs with the volume that would justify it.",
+    "Structured data is the breadcrumb only. Anything richer would make a claim about who is selling what at what price that this product cannot stand behind.",
+    "The moderator's confirmation of a decision is the queue emptying, not a message: the success text lives on the form for that row, and the row is gone once the reports are closed.",
+    "The risk signals are counts of real rows, not a model. They do not detect anything; they order work, and the page says so."
+  ],
+  "readiness": {
+    "code": "PHASE_3_PUBLIC_MARKET_BUILT",
+    "buyerFlows": "NOT_STARTED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0043_animal-discovery.sql",
+    "src/marketplace/discovery-model.ts",
+    "src/marketplace/public-listings.ts",
+    "src/marketplace/listing-moderation.ts",
+    "src/marketplace/promotions.ts",
+    "app/(public)/animals-market/(list)/page.tsx",
+    "app/(public)/animals-market/[id]/page.tsx",
+    "app/market/listings/page.tsx",
+    "tests/domain/market-discovery.test.ts",
+    "tests/db/market-discovery.test.ts",
+    "tests/browser/market-discovery.test.ts",
+    "docs/reports/screenshots/phase-3/prompt-004/market-index-desktop.png",
+    "docs/reports/screenshots/phase-3/prompt-004/listing-public-mobile.png",
+    "docs/reports/screenshots/phase-3/prompt-004/moderation-queue-desktop.png",
+    "DECISIONS.md#dec-0206",
+    "REQUIREMENTS_TRACEABILITY.md"
+  ]
+}

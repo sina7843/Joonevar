@@ -20,7 +20,10 @@ import {
   type Disclosure,
   type ListingStatus,
 } from '../../../../src/marketplace/listing-model.ts';
-import { AddMediaForm, ListingContentForm, MoveListingForm, RemoveMediaForm } from '../forms.tsx';
+import { AddMediaForm, ListingContentForm, MoveListingForm, PromotionForm, RemoveMediaForm } from '../forms.tsx';
+import { promotionPackages, promotionsOfListing } from '../../../../src/marketplace/promotions.ts';
+import { appealableReports, myAppeals } from '../../../../src/marketplace/listing-moderation.ts';
+import { AppealForm } from '../../../../src/marketplace/moderation-forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,10 +61,15 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const { listing, animal } = detail;
   const status = listing.status as ListingStatus;
   const editable = isEditable(status);
-  const [reference, eligibility] = await Promise.all([
+  const [reference, eligibility, packages, promotions, appeals] = await Promise.all([
     directoryReferenceData(db()),
     sellerEligibility(db(), actor.accountId, listing.animalId),
+    promotionPackages(db()),
+    promotionsOfListing(db(), listing.id),
+    myAppeals(db(), actor),
   ]);
+  const appealable = status === 'SUSPENDED' ? await appealableReports(db(), actor, listing.id) : [];
+  const listingAppeals = appeals.filter((appeal) => appeal.listingId === listing.id);
   const moves = movesFrom(status, 'SELLER');
 
   return (
@@ -276,6 +284,81 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             ))}
           </div>
         </Card>
+
+        <Card>
+          <h2 className="text-label-lg">تبلیغ آگهی</h2>
+          <p className="mt-2xs text-caption text-text-secondary" data-testid="promotion-note">
+            بسته تبلیغ فقط جایگاه نمایش آگهی را در نتایج مرتبط بالاتر می‌برد و همیشه با برچسب «تبلیغ» دیده
+            می‌شود. روی اعتبار، تأیید یا امتیاز شما هیچ اثری ندارد و در تاریخ خودش تمام می‌شود.
+          </p>
+          {promotions.length > 0 ? (
+            <ul className="mt-lg space-y-sm text-body-sm" data-testid="listing-promotions">
+              {promotions.map((promotion) => (
+                <li
+                  key={promotion.id}
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  data-testid={'promotion-row-' + promotion.id}
+                >
+                  <span>{promotion.packageLabelFa}</span>
+                  <StatusBadge tone={promotion.stateFa === 'فعال' ? 'success' : 'neutral'}>
+                    {promotion.stateFa}
+                  </StatusBadge>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {status === 'PUBLISHED' || status === 'RESERVED' ? (
+            <PromotionForm
+              listingId={listing.id}
+              packages={packages.map((row) => ({
+                id: row.id,
+                labelFa: row.labelFa,
+                priceToman: row.priceToman === null ? null : row.priceToman.toString(),
+              }))}
+            />
+          ) : (
+            <p className="mt-sm text-caption text-text-disabled">فقط آگهی منتشرشده قابل تبلیغ است.</p>
+          )}
+        </Card>
+
+        {listingAppeals.length > 0 ? (
+          <Card>
+            <h2 className="text-label-lg">اعتراض‌های من درباره این آگهی</h2>
+            <ul className="mt-lg space-y-sm text-body-sm" data-testid="my-appeals">
+              {listingAppeals.map((appeal) => (
+                <li key={appeal.id} className="rounded-lg border border-border-subtle p-md">
+                  <p>{appeal.statementFa}</p>
+                  <p className="mt-2xs text-caption text-text-secondary">
+                    {appeal.status === 'OPEN'
+                      ? 'در انتظار بررسی'
+                      : appeal.status === 'UPHELD'
+                        ? 'تصمیم قبلی پابرجا ماند'
+                        : 'اعتراض پذیرفته شد'}
+                    {appeal.decisionReasonFa ? ' — ' + appeal.decisionReasonFa : ''}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null}
+
+        {appealable.length > 0 ? (
+          <Card>
+            <h2 className="text-label-lg">اعتراض به تصمیم ناظر</h2>
+            <p className="mt-2xs text-caption text-text-secondary">
+              اگر این تصمیم را درست نمی‌دانید، دلیلتان را بنویسید. تصمیم قبلی حذف نمی‌شود؛ پاسخ اعتراض کنار
+              آن ثبت می‌شود.
+            </p>
+            <ul className="mt-lg space-y-md" data-testid="appealable-reports">
+              {appealable.map((report) => (
+                <li key={report.id} className="rounded-lg border border-border-subtle p-md">
+                  <p className="text-body-sm">{report.decisionReason ?? 'بدون دلیل ثبت‌شده'}</p>
+                  <AppealForm reportId={report.id} />
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null}
 
         <Card>
           <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>

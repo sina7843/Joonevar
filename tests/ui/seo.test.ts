@@ -145,6 +145,8 @@ test('only built sections are linked; each is public and every planned one stays
       'اطلاعیه‌ها',
       'انجمن‌ها و کلاب‌ها',
       'کلاب‌ها',
+      // The animal marketplace (Phase 3, PROMPT-004).
+      'بازار فروش حیوان',
       'خدمات',
       'راهنمای سامانه',
       'استعلام اصالت',
@@ -174,6 +176,7 @@ test('only built sections are linked; each is public and every planned one stays
       '/announcements',
       '/associations',
       '/clubs',
+      '/animals-market',
       '/services',
       '/guides',
       '/verify',
