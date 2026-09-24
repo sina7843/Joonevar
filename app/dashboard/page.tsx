@@ -8,6 +8,8 @@ import { ButtonLink } from '../../src/ui/button.tsx';
 import { Identifier, StatusBadge } from '../../src/ui/status.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { db } from '../../src/db/client.ts';
+import { unreadCount } from '../../src/notifications/service.ts';
+import { myPayments } from '../../src/billing/receipts.ts';
 import { findProfile } from '../../src/identity/account.ts';
 import { membershipStanding } from '../../src/billing/membership.ts';
 import { listAnimals } from '../../src/animals/service.ts';
@@ -197,6 +199,13 @@ export default async function DashboardPage() {
     actor.activeRoles.includes(environment.role),
   );
 
+  // What is waiting for this person, and the money side of their own account
+  // (PROMPT-015). Both were missing from the dashboard entirely.
+  const [unread, payments] = await Promise.all([
+    unreadCount(db(), actor),
+    myPayments(db(), actor, { page: 1, pageSize: 3 }),
+  ]);
+
   const open = SERVICE_CARDS.filter((entry) => services[entry.service].allowed);
   const locked = SERVICE_CARDS.flatMap((entry) => {
     const eligibility = services[entry.service];
@@ -214,6 +223,18 @@ export default async function DashboardPage() {
         <h2 className="text-h3" data-testid="dashboard-greeting">
           {profile === null ? 'سلام' : 'سلام، ' + profile.firstName + ' ' + profile.lastName}
         </h2>
+
+        {unread > 0 ? (
+          <Alert
+            tone="info"
+            title={'شما ' + unread.toLocaleString('fa-IR') + ' اعلان خوانده‌نشده دارید'}
+            action={<ButtonLink href="/notifications">دیدن اعلان‌ها</ButtonLink>}
+          >
+            <span data-testid="dashboard-unread">
+              هر اعلان به همان پرونده‌ای برمی‌گردد که درباره آن است؛ باز کردن آن، اعلان را خوانده‌شده ثبت می‌کند.
+            </span>
+          </Alert>
+        ) : null}
 
         {profile === null ? (
           <Alert
@@ -285,6 +306,39 @@ export default async function DashboardPage() {
             {vet.reasonFa}
           </Alert>
         ) : null}
+
+        <section aria-labelledby="payments-heading">
+          <h2 id="payments-heading" className="sr-only">
+            پرداخت‌ها و رسیدها
+          </h2>
+          <Card>
+            <div className="flex flex-wrap items-start justify-between gap-md">
+              <div className="min-w-0">
+                <p className="text-label-lg">پرداخت‌ها و رسیدها</p>
+                <p className="mt-2xs text-caption text-text-secondary" data-testid="dashboard-payments-note">
+                  {payments.items.length === 0
+                    ? 'هنوز پرداختی ثبت نشده است. هر پرداخت با مبلغ قفل‌شده و وضعیت تأیید سرور اینجا می‌آید.'
+                    : 'آخرین پرداخت‌های شما، با وضعیتی که سرور تأیید کرده است.'}
+                </p>
+              </div>
+              <ButtonLink tone="secondary" href="/payments">
+                همه پرداخت‌ها
+              </ButtonLink>
+            </div>
+            {payments.items.length > 0 ? (
+              <ul className="mt-lg space-y-xs text-body-sm" data-testid="dashboard-payments">
+                {payments.items.map((line) => (
+                  <li key={line.batchId} className="flex flex-wrap items-center justify-between gap-sm">
+                    <Link href={'/payments/' + line.batchId} className="text-text-brand">
+                      {line.serviceFa}
+                    </Link>
+                    <span className="text-text-secondary">{line.totalToman.toLocaleString('fa-IR') + ' تومان · ' + line.statusFa}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </Card>
+        </section>
 
         <section aria-labelledby="membership-heading">
           <h2 id="membership-heading" className="sr-only">

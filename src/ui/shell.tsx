@@ -282,6 +282,7 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin/packages', label: 'بسته‌های تبلیغاتی', icon: 'certificate' },
   { href: '/admin/breeds', label: 'نژادها', icon: 'dog' },
   { href: '/admin/roles', label: 'نقش‌های محتوا', icon: 'shieldCheck' },
+  { href: '/admin/notifications', label: 'اعلان‌ها و پیامک', icon: 'bell' },
   { href: '/admin/audit', label: 'تاریخچه', icon: 'clipboardText' },
 ];
 

@@ -1,0 +1,154 @@
+{
+  "promptId": "PROMPT-015",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "Notifications became durable and the dashboards became honest. The delivery table existed but was dead outside tests: deliverOnce had no production caller, attempts never incremented, SUPPRESSED was never written, and the SMS channel in the enum had no implementation. Now createNotification writes the delivery rows in the caller's own transaction and the sending happens afterwards, outside it — so a decision that rolls back queues nothing, and a provider that is down delays a message instead of undoing the approval, payment or activation behind it. A worker claims a due row with for-update-skip-locked, counts the attempt, and on failure reschedules with a doubling delay until the policy's attempts run out, after which the row stays FAILED and readable; nothing is ever deleted, because a message that could not be sent is evidence. The idempotency key is derived from the notification and the channel rather than passed in, so one notification is queued once and three concurrent workers send it once. What leaves the product is a complete sentence from a versioned catalogue, stamped with its version on every delivery: no reason, no name, no number, no amount, which a test pins with a notification body full of a national id, a chip number, a figure and a mobile. A kind the catalogue does not speak for stays in the app, and SMS ships OFF because no real provider is configured — a channel that fails silently is worse than one that is honestly closed. Turning it off suppresses what is already queued rather than retrying for ever. Three real defects were fixed on the way: the notifications page never marked anything read, because it linked straight at the case and openNotification had no caller; the association dashboard reported zero waiting memberships however many were in review; and /payments/<batchId>, which PROMPT-013 sends payers to, did not exist. An account can now read its own payments and receipts — somebody else's is not found rather than refused — and the dashboard shows the unread count and the latest payments. The association dashboard counts the Phase 2.5 work it owns (trusted applications, club verification, club ownership, membership applications), and a read-only admin page shows whether the channel is on, what is queued, failed or suppressed, and the exact approved wording.",
+  "changedFiles": [
+    "src/notifications/outbox.ts",
+    "src/notifications/templates.ts",
+    "src/notifications/sms-channel.ts",
+    "src/notifications/service.ts",
+    "src/billing/receipts.ts",
+    "src/operations/service.ts",
+    "src/settings/keys.ts",
+    "src/authz/routes.ts",
+    "src/ui/shell.tsx",
+    "src/db/schema/core.ts",
+    "src/db/migrations/0040_notification-outbox.sql",
+    "src/db/migrations/meta/0040_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "app/payments/page.tsx",
+    "app/payments/[id]/page.tsx",
+    "app/notifications/[id]/page.tsx",
+    "app/notifications/page.tsx",
+    "app/dashboard/page.tsx",
+    "app/admin/notifications/page.tsx",
+    "tests/db/notification-outbox.test.ts",
+    "tests/db/receipts.test.ts",
+    "tests/browser/dashboards.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-015.json"
+  ],
+  "migrations": ["src/db/migrations/0040_notification-outbox.sql"],
+  "decisions": ["DEC-0201"],
+  "tests": {
+    "databaseOutbox": { "command": "node --test tests/db/notification-outbox.test.ts", "total": 10, "pass": 10, "fail": 0, "skip": 0 },
+    "databaseReceipts": { "command": "node --test tests/db/receipts.test.ts", "total": 4, "pass": 4, "fail": 0, "skip": 0 },
+    "affectedDatabase": {
+      "command": "node --test --test-concurrency=2 tests/db/notifications.test.ts tests/db/notification-outbox.test.ts tests/db/receipts.test.ts tests/db/payments.test.ts tests/db/operations.test.ts tests/db/membership.test.ts tests/db/settings.test.ts tests/db/startup.test.ts",
+      "total": 67,
+      "pass": 67,
+      "fail": 0,
+      "skip": 0,
+      "note": "The suites that read notifications, deliveries, payments, the operator queues, the settings catalogue and the seed. Unaffected passing suites were not re-run."
+    },
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 282,
+      "pass": 282,
+      "fail": 0,
+      "skip": 0
+    },
+    "browserIterations": {
+      "command": "node tools/browser-tests.mjs tests/browser/dashboards.test.ts",
+      "note": "Three iterations, each a test defect rather than a product one. The first left the read-state assertion on whichever notification another suite happened to create, so the test seeded its own; the seed then hit a real product rule — a resume route must point at the case, never at /dashboard — and was pointed at /payments; finally the list was re-read in a page of its own so what is asserted is what the server renders rather than anything the first page had already fetched."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs tests/browser/dashboards.test.ts tests/browser/identity.test.ts tests/browser/membership.test.ts tests/browser/rtl.test.ts",
+      "total": 35,
+      "pass": 35,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 37.5
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in a detached worktree at HEAD d371682 with every changed and new file copied in, so the user's running server on port 3111 kept its .next. The four new routes compiled. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/db/notification-outbox.test.ts ; node --test tests/db/receipts.test.ts ; node --test --test-concurrency=2 <8 affected db suites> ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "10/10 outbox, 4/4 receipts, 67/67 across the notification, payment, operations, membership, settings and seed suites, 282/282 domain, config and UI. Migration 0040 applied to every fresh test database."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/dashboards.test.ts tests/browser/identity.test.ts tests/browser/membership.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "35/35 on an isolated database and a production server built from the worktree: the user dashboard and its payment card, the payments page and a 404 for an id that is not the account's, opening a real notification and seeing it marked read, the association queues, the outbox page, and both operator screens refused to an ordinary account."
+    },
+    {
+      "id": "no-rollback-on-provider-failure",
+      "command": "node --test tests/db/notification-outbox.test.ts (test: a provider outage delays the message and leaves the domain change standing)",
+      "result": "PASS",
+      "evidence": "A failing sender leaves the delivery PENDING with its attempt counted, its error recorded and its next attempt at least the configured delay away; the notification row — the domain's own record — is untouched. A second run in the same instant claims nothing. The delay grows and the attempts stop where the policy says, leaving the row FAILED; an operator requeue then sends it."
+    },
+    {
+      "id": "idempotency-and-concurrency",
+      "command": "node --test tests/db/notification-outbox.test.ts (test: the same message is queued once and sent once, however often the worker runs)",
+      "result": "PASS",
+      "evidence": "Enqueuing the same notification twice adds nothing; three concurrent workers produce exactly one message and one spent attempt, arbitrated by the unique key and for-update-skip-locked."
+    },
+    {
+      "id": "redaction",
+      "command": "node --test tests/db/notification-outbox.test.ts (tests: what leaves the product is the catalogue sentence… ; a sender that is handed a message never sees the notification body)",
+      "result": "PASS",
+      "evidence": "With a notification body carrying a national id, a chip number, an amount and a mobile number, the queued text and the text the provider receives are the catalogue sentence and nothing else; the message object handed to a channel contains no body text at all, and the number it goes to is read on the server from the recipient's own account."
+    },
+    {
+      "id": "persian-rendering",
+      "command": "node --test tests/db/notification-outbox.test.ts (test: every templated kind has a real Persian sentence…) ; browser (outbox dashboard)",
+      "result": "PASS",
+      "evidence": "Every templated kind has a Persian sentence that names the sender, fits one message, and contains no interpolation syntax; the admin page renders them with their version and the browser asserts no {…} or ${…} appears."
+    },
+    {
+      "id": "authorization",
+      "command": "node --test tests/db/receipts.test.ts ; node tools/browser-tests.mjs tests/browser/dashboards.test.ts (test: the operator dashboards stay closed…)",
+      "result": "PASS",
+      "evidence": "Another account's receipt is NOT_FOUND rather than FORBIDDEN, and their list never mentions it; a malformed or unknown id answers the same way. The association and admin dashboards render nothing of their content for an ordinary account, and opening somebody else's notification is a 404."
+    },
+    {
+      "id": "never-send-real-sms",
+      "command": "node --test tests/db/notification-outbox.test.ts ; src/adapters/registry.ts",
+      "result": "PASS",
+      "evidence": "The senders used in tests keep messages in memory or write them to the development table, and assertNotProduction refuses to construct either outside a local environment; the PROVIDER path is still unimplemented and throws. SMS also ships OFF, so nothing is queued at all until an operator turns it on."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No real SMS provider exists, so the channel is off by default and the PROVIDER adapter still throws; nothing has been sent to a phone.",
+    "The outbox worker is a function, not a scheduled job: something has to call runOutbox. Wiring it to a schedule is PROMPT-016's ground.",
+    "Requeuing a failed delivery is a service call an operator makes; the admin page is read-only and has no button for it.",
+    "The catalogue speaks for the decisions, money and standing changes this phase names; the remaining notification kinds stay in-app by design.",
+    "The dashboard shows the three most recent payments and the unread count; a fuller per-domain history still lives on each domain's own screen.",
+    "Screenshots cover the dashboard, the notifications list, the association queues and the outbox page; the receipt screen has no screenshot."
+  ],
+  "readiness": {
+    "code": "NOTIFICATIONS_DURABLE_CHANNEL_OFF",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/notification-outbox.test.ts",
+    "tests/db/receipts.test.ts",
+    "tests/browser/dashboards.test.ts",
+    "docs/reports/screenshots/phase-2.5/prompt-015/outbox-desktop.png",
+    "docs/reports/screenshots/phase-2.5/prompt-015/dashboard-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-015/notifications-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-015/assoc-queues-desktop.png",
+    "DECISIONS.md#dec-0201"
+  ]
+}

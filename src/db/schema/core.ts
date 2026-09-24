@@ -181,10 +181,29 @@ export const notificationDeliveries = pgTable(
     status: deliveryStatus('status').notNull().default('PENDING'),
     attempts: integer('attempts').notNull().default(0),
     lastError: text('last_error'),
+    /**
+     * The outbox fields — Phase 2.5 §10 (PROMPT-015).
+     *
+     * The row is written inside the domain transaction and sent afterwards, so a
+     * provider that is down delays a message instead of undoing the decision
+     * that produced it. `nextAttemptAt` is when this row may be tried again and
+     * `maxAttempts` is where trying stops; a row that runs out of attempts is
+     * FAILED and stays readable rather than disappearing.
+     */
+    nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }).notNull().default(now),
+    maxAttempts: integer('max_attempts').notNull().default(5),
+    lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+    /** What was actually handed to the channel, after redaction. */
+    renderedText: text('rendered_text'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
   },
-  (t) => [uniqueIndex('notification_delivery_idem_key').on(t.idempotencyKey)],
+  (t) => [
+    uniqueIndex('notification_delivery_idem_key').on(t.idempotencyKey),
+    // The worker's own query: what is due, oldest first.
+    index('notification_delivery_due_idx').on(t.status, t.nextAttemptAt),
+  ],
 );
 
 /**

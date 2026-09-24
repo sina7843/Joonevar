@@ -12,6 +12,7 @@ import { accounts, auditEvents, referenceBreeds } from '../db/schema/core.ts';
 import { memberships } from '../db/schema/billing.ts';
 import { profiles, kycCases } from '../db/schema/identity.ts';
 import { kennels } from '../db/schema/kennels.ts';
+import { communities, communityOwnershipRequests } from '../db/schema/communities.ts';
 import { matingPermits } from '../db/schema/mating.ts';
 import { foreignPedigreeCases } from '../db/schema/animals.ts';
 import { geneticsReceipts, parentageAppeals, samples } from '../db/schema/index.ts';
@@ -53,7 +54,20 @@ export async function associationQueues(
 ): Promise<readonly QueueCount[]> {
   assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
 
-  const [kyc, kennelCases, permits, foreign, postal, vetStudents, vetDoctors, vetLicences] = await Promise.all([
+  const [
+    kyc,
+    kennelCases,
+    permits,
+    foreign,
+    postal,
+    vetStudents,
+    vetDoctors,
+    vetLicences,
+    trustedCases,
+    membershipApplications,
+    clubsWaiting,
+    clubOwnership,
+  ] = await Promise.all([
     countRows(
       database,
       database
@@ -107,6 +121,32 @@ export async function associationQueues(
         .from(vetProfessionalCases)
         .where(and(eq(vetProfessionalCases.caseType, 'LICENCE'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
     ),
+    // ── Phase 2.5 work the association owns (PROMPT-015) ─────────────────
+    countRows(
+      database,
+      database
+        .select({ value: count() })
+        .from(vetProfessionalCases)
+        .where(and(eq(vetProfessionalCases.caseType, 'TRUSTED'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
+    ),
+    countRows(
+      database,
+      database.select({ value: count() }).from(memberships).where(eq(memberships.status, 'PENDING_REVIEW')),
+    ),
+    countRows(
+      database,
+      database
+        .select({ value: count() })
+        .from(communities)
+        .where(and(eq(communities.kind, 'CLUB'), eq(communities.lifecycle, 'PENDING_VERIFICATION'))),
+    ),
+    countRows(
+      database,
+      database
+        .select({ value: count() })
+        .from(communityOwnershipRequests)
+        .where(eq(communityOwnershipRequests.status, 'PENDING')),
+    ),
   ]);
 
   return [
@@ -139,11 +179,34 @@ export async function associationQueues(
       waiting: vetLicences,
     },
     {
+      key: 'vet-trusted',
+      titleFa: 'درخواست‌های دامپزشک معتمد',
+      noteFa: 'صلاحیت و خوداظهاری تجهیزات؛ تأیید تنها پرداخت دوره را باز می‌کند (Phase 2.5)',
+      href: '/assoc/vet-trusted',
+      waiting: trustedCases,
+    },
+    {
       key: 'members',
       titleFa: 'عضویت و اطلاعات عضو',
-      noteFa: 'مدیریت سوابق و شماره عضویت؛ عضویت پرداخت‌شده به صف تأیید بازنمی‌گردد',
+      // The register used to report zero however many applications were waiting,
+      // which is a dashboard that cannot be trusted (PROMPT-015).
+      noteFa: 'درخواست‌های عضویت در انتظار بررسی، و مدیریت سوابق و شماره عضویت',
       href: '/assoc/members',
-      waiting: 0,
+      waiting: membershipApplications,
+    },
+    {
+      key: 'clubs',
+      titleFa: 'تأیید کلاب‌ها',
+      noteFa: 'کلاب‌های در انتظار تأیید اولیه انجمن (Phase 2.5)',
+      href: '/assoc/clubs',
+      waiting: clubsWaiting,
+    },
+    {
+      key: 'club-ownership',
+      titleFa: 'مالکیت کلاب',
+      noteFa: 'درخواست‌های باز مالکیت و واگذاری کلاب (Phase 2.5)',
+      href: '/assoc/clubs',
+      waiting: clubOwnership,
     },
     {
       key: 'kennels',

@@ -281,6 +281,13 @@
       "when": 1790243646614,
       "tag": "0039_club-rules",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1790248148870,
+      "tag": "0040_notification-outbox",
+      "breakpoints": true
     }
   ]
 }

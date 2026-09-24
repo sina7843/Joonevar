@@ -720,6 +720,39 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     noteFa: 'مقرراتی که انجمن منتشر می‌کند. تا ثبت متن واقعی، صفحه خالی نمی‌ماند بلکه می‌گوید هنوز منتشر نشده است.',
     seedValue: null,
   },
+  // ── Notification channel policy (Phase 2.5, PROMPT-015) ───────────────
+  // Whether a message may leave the product, and how hard the outbox tries.
+  // SMS starts OFF: no real provider is configured, and a channel that silently
+  // fails is worse than one that is honestly closed. The wording itself lives in
+  // the versioned template catalogue, not here, so a sentence that reaches
+  // somebody's phone is reviewed as a whole rather than typed into a settings box.
+  {
+    key: 'notifications.sms_enabled',
+    group: 'INTEGRATIONS',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'ارسال پیامک اعلان‌ها',
+    noteFa: 'مقدار ON یا OFF. تا وقتی OFF است، اعلان‌ها فقط در خود سامانه ثبت می‌شوند و هیچ پیامکی صف نمی‌شود.',
+    seedValue: 'OFF',
+  },
+  {
+    key: 'notifications.sms_max_attempts',
+    group: 'INTEGRATIONS',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'حداکثر تلاش ارسال پیامک',
+    noteFa: 'هر پیامک ناموفق تا این تعداد با فاصله فزاینده دوباره تلاش می‌شود و پس از آن ناموفق ثبت می‌ماند.',
+    seedValue: 5,
+  },
+  {
+    key: 'notifications.sms_retry_seconds',
+    group: 'INTEGRATIONS',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'فاصله نخستین تلاش دوباره (ثانیه)',
+    noteFa: 'فاصله تلاش‌های بعدی از این عدد شروع می‌شود و هر بار دو برابر می‌شود.',
+    seedValue: 60,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(

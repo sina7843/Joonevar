@@ -8,13 +8,14 @@
  * Delivery is idempotent by key: a retried worker, a duplicated domain event or
  * a replayed gateway callback must not send twice.
  */
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import type { DbClient, Database } from '../db/client.ts';
 import { notificationDeliveries, notifications } from '../db/schema/core.ts';
 import type { Actor } from '../authz/actor.ts';
 import { forbidden, notFound } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page, type PageRequest } from '../domain/pagination.ts';
 import { resumeContext, type ResumeContext } from '../domain/resume-context.ts';
+import { channelPolicy, enqueueDeliveries } from './outbox.ts';
 
 export type NotificationChannelName = 'IN_APP' | 'SMS';
 export type DeliveryStatusName = 'PENDING' | 'SENT' | 'FAILED' | 'SUPPRESSED';
@@ -75,7 +76,16 @@ export async function createNotification(
       bodyFa: input.bodyFa,
     })
     .returning();
-  return toRecord(row!);
+  const record = toRecord(row!);
+
+  /*
+   * The delivery rows are written here, in the caller's transaction, and sent
+   * later by the outbox worker (PROMPT-015). That ordering is the whole point:
+   * if the domain change rolls back, no message was queued; if the provider is
+   * down, the change still stands and the message waits.
+   */
+  await enqueueDeliveries(tx, record, await channelPolicy(tx));
+  return record;
 }
 
 /**
@@ -168,6 +178,15 @@ export async function listForActor(
     .offset(offsetOf(request));
   const [counted] = await database.select({ total: sql<string>`count(*)` }).from(notifications).where(where);
   return pageOf(rows.map(toRecord), Number(counted?.total ?? 0), request);
+}
+
+/** How many of this account's notifications are still unread. */
+export async function unreadCount(database: DbClient, actor: Actor): Promise<number> {
+  const [row] = await database
+    .select({ total: sql<string>`count(*)` })
+    .from(notifications)
+    .where(and(eq(notifications.recipientAccountId, actor.accountId), isNull(notifications.readAt)));
+  return Number(row?.total ?? 0);
 }
 
 /**

@@ -4,7 +4,7 @@ import { PublicShell } from '../../src/ui/shell.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
 import { Timeline, type TimelineItem } from '../../src/ui/timeline.tsx';
 import { db } from '../../src/db/client.ts';
-import { listForActor } from '../../src/notifications/service.ts';
+import { listForActor, unreadCount } from '../../src/notifications/service.ts';
 import { formatCivilDateFa, todayCivil } from '../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,7 @@ export default async function NotificationsPage() {
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
 
-  const page = await listForActor(db(), actor, { page: 1, pageSize: 20 });
+  const [page, unread] = await Promise.all([listForActor(db(), actor, { page: 1, pageSize: 20 }), unreadCount(db(), actor)]);
 
   const items: readonly TimelineItem[] = page.items.map((notification) => ({
     id: notification.id,
@@ -36,12 +36,14 @@ export default async function NotificationsPage() {
     status: notification.readAt === null ? { tone: 'info' as const, label: 'خوانده‌نشده' } : { tone: 'neutral' as const, label: 'خوانده‌شده' },
     owner: 'USER' as const,
     summary: notification.bodyFa,
-    href: notification.resume.originRoute,
+    // Opening goes through the server so the notification is marked read and the
+    // unread count actually falls; it redirects on to the case itself.
+    href: '/notifications/' + notification.id,
     ctaLabel: 'ادامه',
   }));
 
   return (
-    <PublicShell actor={actor} title="اعلان‌ها" pathname="/notifications" unreadCount={items.filter((i) => i.status.label === 'خوانده‌نشده').length}>
+    <PublicShell actor={actor} title="اعلان‌ها" pathname="/notifications" unreadCount={unread}>
       {items.length === 0 ? (
         <EmptyState
           title={'اعلانی ندارید (تا ' + formatCivilDateFa(todayCivil()) + ')'}

@@ -65,6 +65,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/vets', access: PUBLIC_APP },
   { prefix: '/declaration', access: PUBLIC_APP },
   { prefix: '/documents', access: PUBLIC_APP },
+  // An account's own payments and receipts (Phase 2.5 §9, PROMPT-015).
+  { prefix: '/payments', access: PUBLIC_APP },
   // Reporting content needs a signed-in account; any account may report (§13, DEC-0161).
   { prefix: '/report', access: PUBLIC_APP },
 
