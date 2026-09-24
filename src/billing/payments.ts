@@ -36,7 +36,10 @@ export type PaymentService =
   | 'ADVERTISING_PACKAGE'
   // A veterinarian's practice licence period: the first one, and every renewal (PROMPT-008).
   | 'VET_LICENSE_ACTIVATION'
-  | 'VET_LICENSE_RENEWAL';
+  | 'VET_LICENSE_RENEWAL'
+  // A trusted veterinarian's period: the first one, and every renewal (PROMPT-011).
+  | 'TRUSTED_VET_ACTIVATION'
+  | 'TRUSTED_VET_RENEWAL';
 
 export interface BatchItemInput {
   readonly targetType: string;

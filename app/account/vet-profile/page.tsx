@@ -18,6 +18,8 @@ import { LICENCE_STANDING_FA } from '../../../src/vets/licence-period-model.ts';
 import { PayLicencePeriodForm } from '../../../src/vets/licence-period-forms.tsx';
 import { myTrustedCase, trustedEligibility, vetEquipmentCatalogue } from '../../../src/vets/trusted-application.ts';
 import { TrustedApplicationForm } from '../../../src/vets/trusted-forms.tsx';
+import { trustedStanding } from '../../../src/vets/trusted-period.ts';
+import { PayTrustedPeriodForm } from '../../../src/vets/trusted-period-forms.tsx';
 import { myCentreInvitations } from '../../../src/centres/service.ts';
 import { CentreInvitationForm } from '../../../src/centres/forms.tsx';
 import {
@@ -113,6 +115,9 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
     myTrustedCase(db(), actor),
     vetEquipmentCatalogue(db()),
   ]);
+  // Reading the trusted standing also applies whatever time has done to it: the
+  // renewal reminder while it is live, and the withdrawal once it is over (§7).
+  const trustedPeriod = await trustedStanding(db(), actor.accountId);
   const latest = applications[0] ?? null;
   const open = applications.find((application) => isOpenApplication(application.status)) ?? null;
   const provinceOf = (cityId: string | null) => reference.cities.find((city) => city.id === cityId)?.provinceCode ?? null;
@@ -153,8 +158,44 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 {trustedCase.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT' ? (
                   <div data-testid="trusted-awaiting-payment">
                     <Alert tone="info" title="درخواست معتمد تأیید شد؛ در انتظار پرداخت دوره">
-                      Tag «دامپزشک معتمد» فقط پس از پرداخت موفق و تأییدشده دوره معتمد فعال می‌شود.
+                      Tag «دامپزشک معتمد» فقط پس از پرداخت موفق و تأییدشده دوره معتمد فعال می‌شود. انتظار پرداخت مهلت ندارد.
                     </Alert>
+                  </div>
+                ) : null}
+
+                {trustedPeriod.endsAt ? (
+                  <p className="text-body-sm">
+                    {'وضعیت دوره معتمد: '}
+                    <span data-testid="trusted-period-standing">{trustedPeriod.isTrustedNow ? (trustedPeriod.inGrace ? 'در مهلت ارفاقی' : 'فعال') : 'فعال نیست'}</span>
+                    {' · پایان دوره ' + formatInstantFa(new Date(trustedPeriod.endsAt))}
+                    {trustedPeriod.daysLeft !== null && trustedPeriod.isTrustedNow ? ' · ' + trustedPeriod.daysLeft.toLocaleString('fa-IR') + ' روز مانده' : ''}
+                  </p>
+                ) : null}
+
+                {trustedCase.status === 'EXPIRED' ? (
+                  <div data-testid="trusted-expired">
+                    <Alert tone="warning" title="دوره دامپزشک معتمد شما به پایان رسیده است">
+                      دسترسی معتمد برداشته شد و Tag شما به وضعیت پروانه برگشت. کارهای انجام‌شده شما دست‌نخورده می‌مانند و با تمدید دوباره فعال می‌شوید.
+                    </Alert>
+                  </div>
+                ) : null}
+                {trustedCase.status === 'SUSPENDED' ? (
+                  <div data-testid="trusted-suspended">
+                    <Alert tone="error" title="دسترسی معتمد شما معلق است">
+                      {trustedCase.reviewNoteFa ?? 'برای پیگیری با انجمن تماس بگیرید.'}
+                    </Alert>
+                  </div>
+                ) : null}
+
+                {trustedPeriod.blockedReasonFa && trustedCase.status !== 'SUSPENDED' ? (
+                  <p className="text-body-sm text-text-secondary" data-testid="trusted-period-blocked">
+                    {trustedPeriod.blockedReasonFa}
+                  </p>
+                ) : null}
+
+                {trustedPeriod.canPay ? (
+                  <div className="mt-md">
+                    <PayTrustedPeriodForm kind={trustedPeriod.kind} pendingBatchId={trustedPeriod.pendingBatchId} />
                   </div>
                 ) : null}
               </div>

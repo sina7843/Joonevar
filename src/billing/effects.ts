@@ -18,6 +18,7 @@ import { markPermitPaid } from '../mating/permits.ts';
 import { issueCardsForBatch, markCardBatchPaid } from '../mating/allocation.ts';
 import { activateSubscriptionFromPayment } from '../advertising/service.ts';
 import { activateLicencePeriodFromPayment } from '../vets/licence-period.ts';
+import { activateTrustedPeriodFromPayment } from '../vets/trusted-period.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -64,6 +65,12 @@ export const paidEffects: PaidEffects = {
       case 'VET_LICENSE_ACTIVATION':
       case 'VET_LICENSE_RENEWAL':
         await activateLicencePeriodFromPayment(tx, batch);
+        return;
+      // The trusted period, the internal role and the single trusted tag are all
+      // made here, by a payment the server verified — never by an approval (§7).
+      case 'TRUSTED_VET_ACTIVATION':
+      case 'TRUSTED_VET_RENEWAL':
+        await activateTrustedPeriodFromPayment(tx, batch);
         return;
       default:
         return;

@@ -1,0 +1,115 @@
+{
+  "promptId": "PROMPT-011",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The paid trusted-veterinarian period. Two payment services, TRUSTED_VET_ACTIVATION and TRUSTED_VET_RENEWAL, join the existing machinery, and vet_trusted_period carries the window, the payment batch and the figures frozen when the payment started; five managed settings (activation tariff, renewal tariff, period length, reminder window, grace days) ship with no seed value, so nothing is sold until the association enters them, and waiting for payment has no deadline. Everything the standing rests on is asked twice — immediately before the payment opens and again inside the transaction that would activate it: an active licence period, a valid association membership, an approved trusted application, and a self-declaration recorded for the current submission version whose accepted terms version is still the published one. Only a payment the server verified makes anything, and it makes all three together inside the verifying transaction: the period, the internal TRUSTED_VET role and the single public trusted tag, which since DEC-0193 only the server may write. A replayed or duplicated callback finds the work done; a refused payment makes none of it. If a prerequisite lapses while the payer is at the gateway the payment is still verified and recorded, but nothing is granted: the refusal is audited with its reason and the doctor is told to take it to the association, rather than inventing a refund the product does not have. Renewing early starts the next period where the live one ends. There is no scheduler: the renewal reminder is written once inside its configured window, and the first read after the period and its bought grace are over withdraws the standing — the role row becomes suspended rather than being deleted, the case becomes EXPIRED, and the tag falls back to the licensed one only while that licence period is itself valid, otherwise to the council-verified unlicensed tag. The association can suspend a trusted standing it granted, with a mandatory reason, an audit event and a notification, through the same withdrawal path. A defect found by the new tests was fixed in the licence period: an expiring licence no longer strips a trusted tag that its own paid period still supports.",
+  "changedFiles": [
+    "src/vets/trusted-period.ts",
+    "src/vets/trusted-period-actions.ts",
+    "src/vets/trusted-period-forms.tsx",
+    "src/vets/licence-period.ts",
+    "src/vets/professional-model.ts",
+    "src/vets/professional-profile-model.ts",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/settings/keys.ts",
+    "src/db/schema/vets.ts",
+    "src/db/schema/billing.ts",
+    "src/db/migrations/0037_trusted-period.sql",
+    "src/db/migrations/meta/0037_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "app/account/vet-profile/page.tsx",
+    "app/assoc/vet-trusted/[id]/page.tsx",
+    "tests/db/vet-trusted-period.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-011.json"
+  ],
+  "migrations": ["src/db/migrations/0037_trusted-period.sql"],
+  "decisions": ["DEC-0197"],
+  "tests": {
+    "databaseTrustedPeriodFirstRun": {"command": "node --test tests/db/vet-trusted-period.test.ts", "total": 8, "pass": 7, "fail": 1, "note": "A real product defect, not a test one: reading the standing at a future instant let the licence expiry overwrite a trusted tag whose own period was still live. enforceLicencePeriod now leaves a trusted tag alone; the second failure of the same test was its own expectation, since two stacked trusted periods outlast one licence period."},
+    "databaseTrustedPeriod": {"command": "node --test tests/db/vet-trusted-period.test.ts", "total": 8, "pass": 8, "fail": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "total": 263, "pass": 263, "fail": 0, "skip": 0},
+    "databaseConcurrencyFour": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "total": 408, "pass": 396, "fail": 12, "note": "Twelve suites failed under four-way concurrency on a loaded machine and every one of them passed on its own; the full run was repeated at concurrency three."},
+    "database": {"command": "node --test --test-concurrency=2 <first 27 db suites> ; node --test --test-concurrency=2 <remaining 26>", "durationSeconds": 1169, "total": 408, "pass": 408, "fail": 0, "skip": 0, "note": "Run as two halves at concurrency two because the machine could not carry the whole suite at once; 226/226 and 182/182."},
+    "browser": {"command": "node tools/browser-tests.mjs tests/browser/vet-licence.test.ts tests/browser/vet-review.test.ts tests/browser/membership.test.ts tests/browser/finder.test.ts tests/browser/rtl.test.ts", "durationSeconds": 113.2, "total": 32, "pass": 32, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm ci ; npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 100 s on the first attempt in a detached worktree at HEAD f90f350 with every changed and new file copied in, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=2 (two halves) ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "Domain, config and UI passed 263/263. The complete database suite passed 408/408, run as two halves at concurrency two (226/226 and 182/182) after twelve suites had failed under four-way concurrency and each passed alone; migration 0037 applied to every fresh test database."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/vet-licence.test.ts tests/browser/vet-review.test.ts tests/browser/membership.test.ts tests/browser/finder.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "32/32 on the first run on an isolated database and production server built from the worktree, covering the licence and trusted application journey, the review workbench, membership payment, the Finder and the RTL shell. No new browser leg was written for the trusted payment itself; the database suite covers it end to end."
+    },
+    {
+      "id": "verified-payment-only",
+      "command": "node --test tests/db/vet-trusted-period.test.ts (tests: an approval alone grants nothing… ; a refused payment grants nothing…)",
+      "result": "PASS",
+      "evidence": "After an approval the tag is still the licensed one and no internal role exists. A verified payment makes one period of the configured length with its grace frozen, the case ACTIVE_TRUSTED_VET, the role ACTIVE and the tag TRUSTED with the declared scope. A replayed callback reports PAID with performed false and leaves one active period, one activation audit event and one notification. A refused payment leaves no period, no role and the licensed tag; an unpriced tariff or unset period length is NOT_CONFIGURED."
+    },
+    {
+      "id": "prerequisites-rechecked",
+      "command": "node --test tests/db/vet-trusted-period.test.ts (tests: a prerequisite that lapses… ; a newer version of the terms…)",
+      "result": "PASS",
+      "evidence": "A membership suspended while the payer is at the gateway leaves the payment verified and recorded but activates nothing: no period, no role, no trusted tag, the case still awaiting payment, one VET_TRUSTED_PERIOD_ACTIVATION_BLOCKED audit event and one notification. Starting a payment in that state is refused outright with the membership named. A terms version published after the application blocks the sale until the new version is accepted."
+    },
+    {
+      "id": "renewal-and-expiry",
+      "command": "node --test tests/db/vet-trusted-period.test.ts (tests: renewing stacks… ; a reminder is written once…)",
+      "result": "PASS",
+      "evidence": "A renewal is charged its own tariff and starts exactly where the live period ends. Inside the bought grace the standing still holds and the tag is still trusted; past it the case becomes EXPIRED, the role row is suspended rather than deleted, both paid periods remain, the expiry notice is written once and repeated reads change nothing. The reminder is silent outside its window and written once inside it."
+    },
+    {
+      "id": "tag-fallback",
+      "command": "node --test tests/db/vet-trusted-period.test.ts (tests: renewing stacks… ; when the licence has lapsed too… ; the association suspends…)",
+      "result": "PASS",
+      "evidence": "Withdrawing the trusted standing falls back to the licensed tag while that licence period is valid (the suspension test) and to the council-verified unlicensed tag when the licence has itself lapsed. The reverse case is pinned too: an expiring licence no longer strips a trusted tag whose own period is still live, which is the defect these tests found."
+    },
+    {
+      "id": "access-revocation-and-history",
+      "command": "node --test tests/db/vet-trusted-period.test.ts (test: the association suspends a trusted standing…)",
+      "result": "PASS",
+      "evidence": "Only the association may suspend, and only with a reason: the applicant is FORBIDDEN and an empty reason is VALIDATION. A suspension makes the case SUSPENDED, the role SUSPENDED, the tag the licensed one, one audit event carrying the reason and one notification; paying again is refused while suspended, and the paid period itself is not destroyed."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "A payment whose prerequisites lapsed at the gateway is recorded and audited but not refunded: the product has no refund path, so the association handles it as a human decision.",
+    "No production tariff or duration exists for the trusted period, so it cannot be bought until the association enters them.",
+    "There is no scheduler: the reminder and the withdrawal are applied when the standing is next read.",
+    "A suspended trusted standing has no product path back: the association's lifting of it is not built in this prompt.",
+    "The trusted payment has no browser leg of its own; the database suite covers the whole journey, and the browser covers the application and the review.",
+    "Screenshots were not captured; visual fidelity of the trusted period card is unverified."
+  ],
+  "readiness": {
+    "code": "TRUSTED_PERIOD_READY_AWAITING_TARIFFS",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-trusted-period.test.ts",
+    "tests/db/vet-trusted.test.ts",
+    "DECISIONS.md#dec-0197"
+  ]
+}

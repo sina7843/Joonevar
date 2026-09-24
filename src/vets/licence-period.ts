@@ -27,7 +27,7 @@ import { AppError, conflict, notConfigured, notFound } from '../domain/errors.ts
 import { toman } from '../domain/money.ts';
 import type { Actor } from '../authz/actor.ts';
 import { vetCaseMove, type VetCaseStatus } from './professional-model.ts';
-import { replaceVetTag } from './professional-tags.ts';
+import { currentVetTag, replaceVetTag } from './professional-tags.ts';
 import {
   GRACE_DAYS_KEY,
   LICENCE_PERIOD_KIND_FA,
@@ -404,6 +404,11 @@ export async function enforceLicencePeriod(database: Database, accountId: string
         after: { status: 'EXPIRED', periodId: period.id, endsAt: period.endsAt!.toISOString(), graceDays: period.graceDays },
       });
     }
+
+    // A trusted veterinarian keeps the trusted tag until that standing itself ends
+    // or is suspended (PROMPT-011); a lapsed licence never quietly strips it.
+    const held = await currentVetTag(tx, accountId);
+    if (held?.tag === 'TRUSTED') return;
 
     // The doctor keeps the standing the association verified: the council code
     // stays, only the paid licence goes (PHASE_2_5_SPEC_FA §5).

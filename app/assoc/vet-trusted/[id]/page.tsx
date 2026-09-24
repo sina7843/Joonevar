@@ -8,6 +8,7 @@ import { trustedCaseForReview } from '../../../../src/vets/trusted-application.t
 import { reviewStateFor } from '../../../../src/vets/review-workbench.ts';
 import { ReviewPanel } from '../../../../src/vets/review-forms.tsx';
 import { DecideTrustedCaseForm } from '../../../../src/vets/trusted-forms.tsx';
+import { SuspendTrustedForm } from '../../../../src/vets/trusted-period-forms.tsx';
 import { DECLARED_EQUIPMENT_FA } from '../../../../src/vets/professional-profile-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 
@@ -125,7 +126,21 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
               <DecideTrustedCaseForm caseId={detail.case.id} version={detail.case.version} />
             </div>
           </Card>
-        ) : waiting ? null : (
+        ) : null}
+
+        {detail.case.status === 'ACTIVE_TRUSTED_VET' || detail.case.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT' ? (
+          <Card>
+            <h2 className="text-label-lg">تعلیق دسترسی معتمد</h2>
+            <p className="mt-xs text-caption text-text-secondary">
+              تعلیق، دسترسی معتمد را برمی‌دارد و Tag را به وضعیت پروانه برمی‌گرداند. هیچ کار انجام‌شده‌ای حذف نمی‌شود و پرداخت‌ها سر جای خود می‌مانند.
+            </p>
+            <div className="mt-lg">
+              <SuspendTrustedForm accountId={detail.case.accountId} />
+            </div>
+          </Card>
+        ) : null}
+
+        {waiting ? null : (
           <Alert tone="info" title="این درخواست در انتظار بررسی نیست">
             {'وضعیت فعلی: ' + detail.case.statusFa}
             {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}

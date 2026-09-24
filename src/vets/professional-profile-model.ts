@@ -50,6 +50,7 @@ export const CASE_STATUS_FA: Record<VetCaseStatus, string> = {
   EXPIRED: 'منقضی',
   SUSPENDED: 'معلق',
   TRUSTED_APPROVED_AWAITING_PAYMENT: 'معتمد تأییدشده، در انتظار پرداخت',
+  ACTIVE_TRUSTED_VET: 'معتمد فعال',
 };
 export const DOCUMENT_KIND_FA: Record<ProfessionalDocumentKind, string> = {
   STUDENT_CARD: 'کارت دانشجویی',

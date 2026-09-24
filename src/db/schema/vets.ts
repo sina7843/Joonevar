@@ -533,6 +533,8 @@ export const vetCaseStatus = pgEnum('vet_case_status', [
   'SUSPENDED',
   /** A trusted application the association accepted; the trusted period is paid for next (PROMPT-011). */
   'TRUSTED_APPROVED_AWAITING_PAYMENT',
+  /** A trusted period a verified payment activated. */
+  'ACTIVE_TRUSTED_VET',
 ]);
 export const vetProfessionalDocumentKind = pgEnum('vet_professional_document_kind', [
   'STUDENT_CARD',
@@ -692,6 +694,59 @@ export const vetTrustedDeclarations = pgTable(
   (t) => [
     uniqueIndex('vet_trusted_declaration_version_key').on(t.caseId, t.submissionVersion),
     check('vet_trusted_declaration_reader_declared', sql`${t.microchipReaderDeclared} = true`),
+  ],
+);
+
+export const vetTrustedPeriodKind = pgEnum('vet_trusted_period_kind', ['ACTIVATION', 'RENEWAL']);
+export const vetTrustedPeriodStatus = pgEnum('vet_trusted_period_status', ['PENDING_PAYMENT', 'ACTIVE', 'CANCELLED']);
+
+/**
+ * One paid period of trusted-veterinarian standing — Phase 2.5 §7 (PROMPT-011).
+ *
+ * The same shape as a licence period: created as `PENDING_PAYMENT` with its
+ * payment batch, made `ACTIVE` only inside the transaction that verifies that
+ * payment, and carrying the tariff, its settings version, the period length, the
+ * grace days and the reminder window frozen at the moment the payment started.
+ * There is no scheduler: expiry is read from `ends_at` and the frozen grace, and
+ * applied the next time the standing is read.
+ */
+export const vetTrustedPeriods = pgTable(
+  'vet_trusted_period',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => vetProfessionalCases.id, { onDelete: 'restrict' }),
+    kind: vetTrustedPeriodKind('kind').notNull(),
+    status: vetTrustedPeriodStatus('status').notNull().default('PENDING_PAYMENT'),
+    paymentBatchId: uuid('payment_batch_id').references(() => paymentBatches.id, { onDelete: 'restrict' }),
+    startsAt: timestamp('starts_at', { withTimezone: true }),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    tariffSettingKey: text('tariff_setting_key').notNull(),
+    tariffSettingVersion: integer('tariff_setting_version').notNull(),
+    amountToman: numeric('amount_toman', { precision: 14, scale: 0 }).notNull(),
+    periodDays: integer('period_days').notNull(),
+    graceDays: integer('grace_days'),
+    reminderDaysBefore: integer('reminder_days_before'),
+    reminderSentAt: timestamp('reminder_sent_at', { withTimezone: true }),
+    expiredNoticeAt: timestamp('expired_notice_at', { withTimezone: true }),
+    /** The declaration version this period was sold against, so a later edit of the terms is visible. */
+    declarationVersion: text('declaration_version'),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_trusted_period_batch_key').on(t.paymentBatchId),
+    index('vet_trusted_period_account_idx').on(t.accountId, t.status, t.endsAt),
+    index('vet_trusted_period_case_idx').on(t.caseId),
+    uniqueIndex('vet_trusted_period_pending_key').on(t.caseId).where(sql`${t.status} = 'PENDING_PAYMENT'`),
+    check('vet_trusted_period_days_positive', sql`${t.periodDays} >= 1`),
+    check('vet_trusted_period_grace_not_negative', sql`${t.graceDays} is null or ${t.graceDays} >= 0`),
+    check('vet_trusted_period_window_matches_status', sql`(${t.status} = 'ACTIVE') = (${t.startsAt} is not null and ${t.endsAt} is not null)`),
   ],
 );
 

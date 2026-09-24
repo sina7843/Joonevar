@@ -31,6 +31,10 @@ export const paymentService = pgEnum('payment_service', [
   'VET_LICENSE_ACTIVATION',
   /** Every later period of the same licence. */
   'VET_LICENSE_RENEWAL',
+  /** The first paid period of trusted-veterinarian standing (Phase 2.5, §7). */
+  'TRUSTED_VET_ACTIVATION',
+  /** Every later period of the same trusted standing. */
+  'TRUSTED_VET_RENEWAL',
 ]);
 
 /**

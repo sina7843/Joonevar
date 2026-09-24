@@ -85,6 +85,8 @@ export const VET_CASE_STATUSES = [
   'SUSPENDED',
   /** A trusted application the association accepted; its period is paid for next (PROMPT-011). */
   'TRUSTED_APPROVED_AWAITING_PAYMENT',
+  /** A trusted period a verified payment activated. */
+  'ACTIVE_TRUSTED_VET',
 ] as const;
 export type VetCaseStatus = (typeof VET_CASE_STATUSES)[number];
 export const isVetCaseStatus = oneOf(VET_CASE_STATUSES);
@@ -137,10 +139,21 @@ const MOVES: Record<VetCaseStatus, readonly Move[]> = {
     { to: 'SUSPENDED', by: 'REVIEWER', reasonRequired: true },
   ],
   // Renewal is a new verified payment for the same approved licence.
-  EXPIRED: [{ to: 'ACTIVE_LICENSED_VET', by: 'SYSTEM', reasonRequired: false }],
+  EXPIRED: [
+    { to: 'ACTIVE_LICENSED_VET', by: 'SYSTEM', reasonRequired: false },
+    { to: 'ACTIVE_TRUSTED_VET', by: 'SYSTEM', reasonRequired: false },
+  ],
   // No deadline here either: the trusted approval waits for its payment (PROMPT-011),
   // and the association may still suspend what it approved.
-  TRUSTED_APPROVED_AWAITING_PAYMENT: [{ to: 'SUSPENDED', by: 'REVIEWER', reasonRequired: true }],
+  TRUSTED_APPROVED_AWAITING_PAYMENT: [
+    { to: 'ACTIVE_TRUSTED_VET', by: 'SYSTEM', reasonRequired: false },
+    { to: 'SUSPENDED', by: 'REVIEWER', reasonRequired: true },
+  ],
+  // A trusted period ends by time or by the association; a renewal starts it again.
+  ACTIVE_TRUSTED_VET: [
+    { to: 'EXPIRED', by: 'SYSTEM', reasonRequired: false },
+    { to: 'SUSPENDED', by: 'REVIEWER', reasonRequired: true },
+  ],
   SUSPENDED: [{ to: 'UNDER_REVIEW', by: 'REVIEWER', reasonRequired: true }],
 };
 
@@ -164,6 +177,7 @@ export function tagForCaseStatus(status: VetCaseStatus, kind: 'STUDENT' | 'DOCTO
   if (kind === 'STUDENT') return status === 'VERIFIED_STUDENT' ? 'STUDENT' : null;
   // An approved trusted application still holds whatever the licence gave it.
   if (status === 'VERIFIED_NO_LICENSE' || status === 'LICENSE_APPROVED_AWAITING_PAYMENT') return 'UNLICENSED';
+  if (status === 'ACTIVE_TRUSTED_VET') return null;
   return status === 'ACTIVE_LICENSED_VET' ? 'LICENSED' : null;
 }
 

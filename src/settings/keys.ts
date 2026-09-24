@@ -605,6 +605,61 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     noteFa: 'نسخه عبارتی که متقاضی با آن داشتن میکروچیپ‌ریدر را خوداظهاری می‌کند. مدرکی لازم نیست؛ همه‌جا «تجهیزات اعلام‌شده» نوشته می‌شود.',
     seedValue: null,
   },
+  // ── Trusted veterinarian period (Phase 2.5, PROMPT-011) ────────────────
+  // As with the licence period, nothing here has a starting figure: no tariff,
+  // duration, reminder window or grace rule has been supplied for the trusted
+  // standing, so until they are entered it cannot be sold or given a length.
+  {
+    key: 'trusted_vet.activation_toman',
+    group: 'FEES',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'تعرفه فعال‌سازی دوره دامپزشک معتمد',
+    noteFa: 'تا ثبت مبلغ واقعی، پرداخت دوره معتمد باز نمی‌شود. مبلغ در لحظه شروع پرداخت روی همان دوره ثبت می‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'trusted_vet.renewal_toman',
+    group: 'FEES',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'تعرفه تمدید دوره دامپزشک معتمد',
+    noteFa: 'تا ثبت مبلغ واقعی، تمدید معتمد باز نمی‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'trusted_vet.period_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'طول دوره دامپزشک معتمد (روز)',
+    noteFa: 'طول دوره‌ای که یک پرداخت تأییدشده معتمد می‌خرد. مقدار واقعی اعلام نشده است.',
+    seedValue: null,
+    min: 1,
+    max: 3650,
+  },
+  {
+    key: 'trusted_vet.reminder_days_before',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'یادآوری پیش از پایان دوره معتمد (روز)',
+    noteFa: 'تا ثبت مقدار، هیچ یادآوری تمدید معتمد ساخته نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 365,
+  },
+  {
+    key: 'trusted_vet.grace_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'مهلت ارفاقی پس از پایان دوره معتمد (روز)',
+    noteFa: 'تا ثبت مقدار، مهلت ارفاقی وجود ندارد و دسترسی معتمد دقیقاً در پایان دوره برداشته می‌شود.',
+    seedValue: null,
+    min: 0,
+    max: 365,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(
