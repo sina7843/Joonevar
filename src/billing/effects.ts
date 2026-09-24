@@ -19,6 +19,7 @@ import { issueCardsForBatch, markCardBatchPaid } from '../mating/allocation.ts';
 import { activateSubscriptionFromPayment } from '../advertising/service.ts';
 import { activateLicencePeriodFromPayment } from '../vets/licence-period.ts';
 import { activateTrustedPeriodFromPayment } from '../vets/trusted-period.ts';
+import { activateClubMembershipFromPayment } from '../clubs/enrollment.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -71,6 +72,11 @@ export const paidEffects: PaidEffects = {
       case 'TRUSTED_VET_ACTIVATION':
       case 'TRUSTED_VET_RENEWAL':
         await activateTrustedPeriodFromPayment(tx, batch);
+        return;
+      // A club's joining fee. Paying it never overrides the club's own approval
+      // rule, and never grants a membership whose conditions have lapsed.
+      case 'CLUB_MEMBERSHIP':
+        await activateClubMembershipFromPayment(tx, batch.id);
         return;
       default:
         return;

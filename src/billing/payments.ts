@@ -17,6 +17,7 @@ import {
   paymentCallbacks,
   paymentItems,
 } from '../db/schema/billing.ts';
+import { clubRuleVersions } from '../db/schema/communities.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { snapshotSetting } from '../settings/service.ts';
@@ -39,13 +40,61 @@ export type PaymentService =
   | 'VET_LICENSE_RENEWAL'
   // A trusted veterinarian's period: the first one, and every renewal (PROMPT-011).
   | 'TRUSTED_VET_ACTIVATION'
-  | 'TRUSTED_VET_RENEWAL';
+  | 'TRUSTED_VET_RENEWAL'
+  // A club's own joining fee (PROMPT-013).
+  | 'CLUB_MEMBERSHIP';
 
-export interface BatchItemInput {
-  readonly targetType: string;
-  readonly targetId: string;
-  /** The settings key the price comes from; the value is never passed in. */
-  readonly settingKey: string;
+/**
+ * What to charge for, and where the server should read the price.
+ *
+ * A product tariff lives in a managed setting. A club's joining fee lives in
+ * that club's published rule version, which is immutable and audited, and is
+ * the only place that number exists. Either way the amount is read here, on
+ * the server, from an authoritative row — never passed in by a caller.
+ */
+export type BatchItemInput =
+  | {
+      readonly targetType: string;
+      readonly targetId: string;
+      /** The settings key the price comes from; the value is never passed in. */
+      readonly settingKey: string;
+    }
+  | {
+      readonly targetType: string;
+      readonly targetId: string;
+      /** The published club rule version whose fee is charged (PROMPT-013). */
+      readonly clubRuleVersionId: string;
+    };
+
+const fromSetting = (item: BatchItemInput): item is Extract<BatchItemInput, { settingKey: string }> => 'settingKey' in item;
+
+interface PricedItem {
+  readonly item: BatchItemInput;
+  readonly amountToman: bigint;
+  readonly priceSource: 'SETTING' | 'CLUB_RULE_VERSION';
+  readonly settingKey: string | null;
+  readonly settingVersion: number | null;
+  readonly priceSourceId: string | null;
+}
+
+/** The club's own fee, read from the version that published it and nowhere else. */
+async function clubRulePrice(database: Database, item: Extract<BatchItemInput, { clubRuleVersionId: string }>): Promise<PricedItem> {
+  const [rule] = await database
+    .select({ id: clubRuleVersions.id, status: clubRuleVersions.status, feeToman: clubRuleVersions.feeToman })
+    .from(clubRuleVersions)
+    .where(eq(clubRuleVersions.id, item.clubRuleVersionId))
+    .limit(1);
+  if (!rule) throw notFound('شرایط عضویت این کلاب پیدا نشد.');
+  if (rule.status !== 'PUBLISHED') throw conflict('شرایط عضویت این کلاب در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.');
+  if (rule.feeToman === null || rule.feeToman <= 0n) throw notConfigured('club.membership_fee');
+  return {
+    item,
+    amountToman: rule.feeToman,
+    priceSource: 'CLUB_RULE_VERSION',
+    settingKey: null,
+    settingVersion: null,
+    priceSourceId: rule.id,
+  };
 }
 
 export interface BatchRecord {
@@ -77,10 +126,18 @@ export async function createBatch(
 
   // Snapshot every price before anything is written, so a batch is either fully
   // priced or not created at all.
-  const priced = await Promise.all(
-    input.items.map(async (item) => {
+  const priced: PricedItem[] = await Promise.all(
+    input.items.map(async (item): Promise<PricedItem> => {
+      if (!fromSetting(item)) return clubRulePrice(database, item);
       const snapshot = await snapshotSetting(database, item.settingKey);
-      return { item, amountToman: toman(String(snapshot.value)), settingVersion: snapshot.version };
+      return {
+        item,
+        amountToman: toman(String(snapshot.value)),
+        priceSource: 'SETTING',
+        settingKey: item.settingKey,
+        settingVersion: snapshot.version,
+        priceSourceId: null,
+      };
     }),
   );
 
@@ -101,8 +158,10 @@ export async function createBatch(
         targetType: row.item.targetType,
         targetId: row.item.targetId,
         amountToman: row.amountToman.toString(),
-        settingKey: row.item.settingKey,
+        priceSource: row.priceSource,
+        settingKey: row.settingKey,
         settingVersion: row.settingVersion,
+        priceSourceId: row.priceSourceId,
       });
     }
 
@@ -117,8 +176,10 @@ export async function createBatch(
           targetType: row.item.targetType,
           targetId: row.item.targetId,
           amountToman: row.amountToman.toString(),
-          settingKey: row.item.settingKey,
+          priceSource: row.priceSource,
+          settingKey: row.settingKey,
           settingVersion: row.settingVersion,
+          priceSourceId: row.priceSourceId,
         })),
       },
     });

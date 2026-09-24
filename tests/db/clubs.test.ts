@@ -210,7 +210,7 @@ test('an unverified club has no public page, however it is published', async () 
 
 async function ownerOf(clubId: string): Promise<Actor> {
   const club = await reload(clubId);
-  return { accountId: club.ownerAccountId!, context: 'USER', activeRoles: [] };
+  return actorFor(club.ownerAccountId!, 'USER');
 }
 
 test('a role in one club grants nothing in another', async () => {

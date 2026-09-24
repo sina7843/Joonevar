@@ -1,0 +1,164 @@
+{
+  "promptId": "PROMPT-013",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "Clubs can now decide who joins them, with rules that are data and never code. A club's rule set is an allowlisted tree of eleven questions — account active, identity verified, valid association membership, owning dogs or dogs of a chosen breed, an approved kennel, issued pedigrees, registered microchips, a veterinary standing, accepting the club's versioned terms, paying its fee and being approved by hand — combined with ALL and ANY groups bounded at three levels and forty nodes. The validator refuses an unknown rule, an unknown parameter, a value out of range and any shape it does not recognise, rather than ignoring it; there is no expression parser, no constructed function and no eval anywhere on the path, and the editor never posts a tree at all: it posts which questions were ticked and their few parameters, and the server builds the tree from the fixed vocabulary. Evaluation is a pure function of a facts record the server gathers from the authoritative read side of each domain, and gathering it writes nothing — a club may ask about a fact and never change one. The veterinary answer is read from the public tag, which is the server-written one, rather than from the standing helpers that apply expiry as they read. What the club gets back is whether its own rules are met and how many are not; the reasons are the applicant's and are shown only to them, which a test pinned and which caught a real leak in the member queue. A rule set is published as a numbered version, the one in force judges new applications, and every member carries the version they were admitted under and keeps being judged by it: new rules do not re-judge anybody until somebody with the club's authority runs a re-evaluation campaign with a reason, which is counted, audited, and suspends rather than deletes whoever no longer qualifies. Fact rules decide eligibility; accepting terms, paying and being approved are stages of joining, so somebody who has only those left is mid-journey rather than INELIGIBLE. The optional fee is charged through the existing payment machinery with a new CLUB_MEMBERSHIP service, and because that number exists only inside the club's own published version, payment_item now records where a price came from: a managed setting or a published club rule version, with a CHECK that keeps the two apart. The amount is still read on the server and never passed in. A verified payment does not override the club's approval rule and grants nothing if a condition lapsed at the gateway — the money is recorded and audited, the membership is not.",
+  "changedFiles": [
+    "src/clubs/rules-model.ts",
+    "src/clubs/enrollment.ts",
+    "src/clubs/membership-model.ts",
+    "src/clubs/rules-forms.tsx",
+    "src/clubs/actions.ts",
+    "src/clubs/model.ts",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/db/schema/communities.ts",
+    "src/db/schema/billing.ts",
+    "src/db/migrations/0039_club-rules.sql",
+    "src/db/migrations/meta/0039_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "app/account/clubs/[id]/rules/page.tsx",
+    "app/account/clubs/[id]/members/page.tsx",
+    "app/account/clubs/[id]/page.tsx",
+    "app/(public)/clubs/[slug]/join/page.tsx",
+    "app/(public)/clubs/[slug]/page.tsx",
+    "tests/domain/club-rules.test.ts",
+    "tests/db/club-enrollment.test.ts",
+    "tests/browser/club-rules.test.ts",
+    "tests/db/clubs.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-013.json"
+  ],
+  "migrations": ["src/db/migrations/0039_club-rules.sql"],
+  "decisions": ["DEC-0199"],
+  "tests": {
+    "domainClubRules": { "command": "node --test tests/domain/club-rules.test.ts", "total": 8, "pass": 8, "fail": 0, "skip": 0 },
+    "databaseClubEnrollment": { "command": "node --test tests/db/club-enrollment.test.ts", "total": 10, "pass": 10, "fail": 0, "skip": 0, "durationSeconds": 4.2 },
+    "databasePaymentPaths": {
+      "command": "node --test --test-concurrency=2 tests/db/payments.test.ts tests/db/membership.test.ts tests/db/membership-period.test.ts tests/db/kennel.test.ts tests/db/pedigree.test.ts tests/db/advertising.test.ts tests/db/registration-sheet.test.ts tests/db/allocation.test.ts tests/db/vet-licence-period.test.ts tests/db/vet-trusted-period.test.ts tests/db/regression.test.ts tests/db/clubs.test.ts tests/db/club-enrollment.test.ts",
+      "total": 117,
+      "pass": 117,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 153.3,
+      "note": "Every suite that creates a payment batch, plus the club suites — the paths the payment_item change could touch. Unaffected passing suites were not re-run."
+    },
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 278,
+      "pass": 278,
+      "fail": 0,
+      "skip": 0
+    },
+    "browserFirstRun": {
+      "command": "node tools/browser-tests.mjs tests/browser/club-rules.test.ts tests/browser/clubs.test.ts tests/browser/membership.test.ts",
+      "total": 17,
+      "pass": 15,
+      "fail": 2,
+      "note": "Both failures were the test's own assertions, not the product: publishing removes the draft card and deciding removes the queue entry, so the success banner unmounts with its form. The assertions now check the state that remains."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs tests/browser/club-rules.test.ts tests/browser/clubs.test.ts tests/browser/rtl.test.ts",
+      "total": 21,
+      "pass": 21,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 23.1
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree. It also caught a type slip left in tests/db/clubs.test.ts by PROMPT-012 (a raw string used as a branded AccountId), fixed here."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in a detached worktree at HEAD 1f12d9f with every changed and new file copied in, so the user's running server on port 3111 kept its .next; rebuilt once more after the last product fix. All three new routes compiled. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/club-rules.test.ts ; node --test tests/db/club-enrollment.test.ts ; node --test --test-concurrency=2 <13 payment-path and club suites> ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "8/8 rule engine, 10/10 enrollment, 117/117 across every suite that creates a payment batch plus the club suites, 278/278 domain, config and UI. Migration 0039 applied to every fresh test database."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/club-rules.test.ts tests/browser/clubs.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "21/21 on an isolated database and a production server built from the worktree. The new leg walks the whole journey: the owner makes and publishes a club, writes its rules from the fixed list, publishes them, somebody else reads what the club asks and applies, the club approves with a reason and the applicant sees it — and the club's member screen is asserted not to contain the applicant's own reasons."
+    },
+    {
+      "id": "no-user-code",
+      "command": "node --test tests/domain/club-rules.test.ts (tests: only the allowlisted questions… ; nothing that looks like code…)",
+      "result": "PASS",
+      "evidence": "An unimplemented rule, an unknown parameter, a count of 0 or 999, a non-uuid breed id and an invalid enum value are each refused. A node typed EXPR carrying a JavaScript string, a rule named eval, a bare string, a number, null, an array, an unknown group operator, an empty group and an own __proto__ key are all rejected by isRuleTree, and the prototype is untouched. The editor posts ticked boxes, not a tree, and the server rebuilds it from the vocabulary."
+    },
+    {
+      "id": "rule-combinations",
+      "command": "node --test tests/domain/club-rules.test.ts (tests: groups nest only so far… ; ALL and ANY combine… ; fact rules decide eligibility…)",
+      "result": "PASS",
+      "evidence": "Four nested groups are refused and three are accepted; forty-five leaves are refused as too many. A failed ANY group explains both of its alternatives and a satisfied one explains nothing; a breed requirement counts that breed rather than dogs in general and names it in words. Fact and flow failures are counted apart, and an older accepted terms version does not satisfy the current one."
+    },
+    {
+      "id": "facts-read-not-written",
+      "command": "node --test tests/db/club-enrollment.test.ts (tests: the facts come from the authoritative records… ; manual approval is a decision…)",
+      "result": "PASS",
+      "evidence": "The facts start empty for a fresh account and follow the real records as a dog, a membership and a suspension are written elsewhere. Nothing in the club path writes them. An approval re-reads them inside the deciding transaction, so a membership suspended while the application waited makes the approval a conflict rather than a granted membership."
+    },
+    {
+      "id": "information-leakage",
+      "command": "node --test tests/db/club-enrollment.test.ts (test: a club sees whether its rules are met…) ; tests/browser/club-rules.test.ts (test: the club decides with a reason…)",
+      "result": "PASS",
+      "evidence": "A real leak was found and fixed: the member queue returned the membership row, which carries the applicant's unmet reasons, and now returns a projection without them. The serialized queue entry contains no fact field and no reason text; the applicant's own view does explain it; and the browser asserts the club's member screen never renders those sentences."
+    },
+    {
+      "id": "cross-club-access",
+      "command": "node --test tests/db/club-enrollment.test.ts (test: a role in one club buys nothing in another) ; tests/browser/club-rules.test.ts (test: a club’s rules are closed…)",
+      "result": "PASS",
+      "evidence": "An ADMIN of club A may open A's workbench and is FORBIDDEN from B's workbench, draft, member queue, preview and re-evaluation. A moderator of A may read the member list but not write the rules. Publishing another club's draft under your own club's id is NOT_FOUND. In the browser, somebody with no role sees neither the editor nor the queue."
+    },
+    {
+      "id": "admitted-version-preserved",
+      "command": "node --test tests/db/club-enrollment.test.ts (test: new rules judge new applications, and old members only on an audited campaign)",
+      "result": "PASS",
+      "evidence": "After a stricter version is published a newcomer is INELIGIBLE while the existing member stays ACTIVE, is still judged by the version they joined under, and is flagged to the club as admitted under an older version. A campaign is refused to an outsider and refused without a reason; when run it examines two members, keeps one, suspends the other with the reason, writes one club_reevaluation row with its counts, one audit event and one notification, and the suspended member keeps their admitted version while the record of the newer evaluation is stored beside it."
+    },
+    {
+      "id": "verified-payment-only",
+      "command": "node --test tests/db/club-enrollment.test.ts (tests: the joining fee is priced… ; a fee payment grants nothing when the conditions lapsed…)",
+      "result": "PASS",
+      "evidence": "The item is priced from the club's published version: price_source CLUB_RULE_VERSION, price_source_id the version, setting_key null, amount 80000. Only the verified payment makes the membership active with its end date; a replayed callback reports PAID with performed false and leaves one activation audit event. A membership suspended while the payer was at the gateway leaves the payment recorded and audited with CLUB_MEMBERSHIP_ACTIVATION_BLOCKED and one notification, and no membership. Expiry is applied on the next read."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The editor offers one ALL list plus a single ANY group; the engine supports three levels of nesting, so a deeper rule set can exist in data but cannot yet be built on screen.",
+    "Club fees are collected through the ordinary checkout; settling that money to the club is not part of the product, and a fee paid when a condition lapsed is recorded rather than refunded — the club handles it as a human decision.",
+    "Re-evaluation runs once, when asked: it is not repeated as facts change afterwards, and there is no scheduler anywhere.",
+    "A suspended club member is reinstated by the club by hand; there is no automatic return when their facts recover.",
+    "Club membership is not a club management role: being a member grants nothing in the management shell, which is intended but means two lists exist for one club.",
+    "The rules cannot yet ask about a specific animal's facts (one chipped dog of a given breed, say): counts are per account.",
+    "Screenshots cover the rule editor, the join screen and the member list; the re-evaluation campaign and the fee checkout have no screenshot."
+  ],
+  "readiness": {
+    "code": "CLUB_ENROLLMENT_READY",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/domain/club-rules.test.ts",
+    "tests/db/club-enrollment.test.ts",
+    "tests/browser/club-rules.test.ts",
+    "docs/reports/screenshots/phase-2.5/prompt-013/club-rules-desktop.png",
+    "docs/reports/screenshots/phase-2.5/prompt-013/club-join-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-013/club-members-desktop.png",
+    "DECISIONS.md#dec-0199"
+  ]
+}

@@ -169,6 +169,18 @@ export default async function ClubPage({ params }: Params) {
         </section>
       ) : null}
 
+      <section aria-labelledby="club-join-title" className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+        <h2 id="club-join-title" className="text-h5">
+          عضویت در این کلاب
+        </h2>
+        <p className="mt-xs text-body-sm text-text-secondary">
+          شرط‌های اعلام‌شده کلاب روی پرونده شما در همزیست بررسی می‌شود و نتیجه را خودتان می‌بینید.
+        </p>
+        <Link href={'/clubs/' + page.slug + '/join'} className="mt-md inline-block text-body-sm text-text-brand" data-testid="club-join-link">
+          دیدن شرایط و درخواست عضویت
+        </Link>
+      </section>
+
       <footer className="border-t border-border-subtle pt-lg">
         <Link href={'/report/club/' + page.id} className="text-body-sm text-text-brand" data-testid="club-report-link">
           گزارش این کلاب

@@ -56,6 +56,8 @@ export const CLUB_CAPABILITIES = [
   'PROFILE',
   /** Ask the association to verify the club, or answer a correction request. */
   'SUBMIT',
+  /** Write and publish the club's own joining rules (PROMPT-013). */
+  'RULES',
   /** Publish or hide the club's own page. */
   'PUBLISH',
   'ASSIGN_ADMIN',
@@ -75,8 +77,8 @@ export type ClubCapability = (typeof CLUB_CAPABILITIES)[number];
 const NOBODY: readonly ClubCapability[] = [];
 
 const BY_ROLE: Record<ClubActorRole, readonly ClubCapability[]> = {
-  OWNER: ['VIEW', 'PROFILE', 'SUBMIT', 'PUBLISH', 'ASSIGN_ADMIN', 'ASSIGN_MODERATOR', 'ASSIGN_MEMBER', 'MODERATE', 'TRANSFER', 'ARCHIVE'],
-  ADMIN: ['VIEW', 'PROFILE', 'SUBMIT', 'PUBLISH', 'ASSIGN_MODERATOR', 'ASSIGN_MEMBER', 'MODERATE'],
+  OWNER: ['VIEW', 'PROFILE', 'SUBMIT', 'RULES', 'PUBLISH', 'ASSIGN_ADMIN', 'ASSIGN_MODERATOR', 'ASSIGN_MEMBER', 'MODERATE', 'TRANSFER', 'ARCHIVE'],
+  ADMIN: ['VIEW', 'PROFILE', 'SUBMIT', 'RULES', 'PUBLISH', 'ASSIGN_MODERATOR', 'ASSIGN_MEMBER', 'MODERATE'],
   MODERATOR: ['VIEW', 'MODERATE'],
   MEMBER: ['VIEW'],
   // The association verifies and disciplines a club; it does not run it. Editing

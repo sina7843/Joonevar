@@ -35,6 +35,8 @@ export const paymentService = pgEnum('payment_service', [
   'TRUSTED_VET_ACTIVATION',
   /** Every later period of the same trusted standing. */
   'TRUSTED_VET_RENEWAL',
+  // A club's own joining fee, priced by that club's published rule version (PROMPT-013).
+  'CLUB_MEMBERSHIP',
 ]);
 
 /**
@@ -149,14 +151,28 @@ export const paymentItems = pgTable(
     targetId: text('target_id').notNull(),
     /** Exact integer Toman, stored as a numeric string so no driver rounds it. */
     amountToman: numeric('amount_toman', { precision: 20, scale: 0 }).notNull(),
-    settingKey: text('setting_key').notNull(),
-    settingVersion: integer('setting_version').notNull(),
+    /**
+     * Where the frozen price came from. A product tariff comes from a managed
+     * setting; a club's joining fee comes from that club's published, audited
+     * rule version, which is the only place that number exists (PROMPT-013).
+     * Either way the amount is read on the server and never passed in.
+     */
+    priceSource: text('price_source').notNull().default('SETTING'),
+    settingKey: text('setting_key'),
+    settingVersion: integer('setting_version'),
+    priceSourceId: uuid('price_source_id'),
     status: paymentItemStatus('status').notNull().default('PENDING'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
   },
   (t) => [
     index('payment_item_batch_idx').on(t.batchId),
     uniqueIndex('payment_item_target_key').on(t.batchId, t.targetType, t.targetId),
+    // Each source names its own origin, and never the other one's.
+    check(
+      'payment_item_price_source_check',
+      sql`(${t.priceSource} = 'SETTING') = (${t.settingKey} is not null and ${t.settingVersion} is not null)`,
+    ),
+    check('payment_item_price_source_id_check', sql`(${t.priceSource} = 'SETTING') = (${t.priceSourceId} is null)`),
   ],
 );
 

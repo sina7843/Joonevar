@@ -83,6 +83,16 @@ export default async function AccountClubPage({ params }: { params: Promise<{ id
               دیدن صفحه عمومی
             </Link>
           ) : null}
+          {can('RULES') ? (
+            <div className="mt-md flex flex-wrap gap-md">
+              <Link href={'/account/clubs/' + club.id + '/rules'} className="text-body-sm text-text-brand" data-testid="club-rules-link">
+                شرایط عضویت کلاب
+              </Link>
+              <Link href={'/account/clubs/' + club.id + '/members'} className="text-body-sm text-text-brand" data-testid="club-members-link">
+                اعضا و درخواست‌ها
+              </Link>
+            </div>
+          ) : null}
           {view.role === 'OWNER' ? (
             <Link href={'/account/communities/' + club.id} className="mt-md block text-body-sm text-text-brand" data-testid="club-profile-link">
               ویرایش معرفی، حوزه، نژادها و رویدادها
