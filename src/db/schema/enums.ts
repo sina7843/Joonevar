@@ -127,6 +127,8 @@ export const filePurpose = pgEnum('file_purpose', [
   'ANIMAL_LISTING_VIDEO',
   /** An image or document shared inside one transaction thread; never public (PROMPT-005). */
   'INQUIRY_ATTACHMENT',
+  /** Evidence attached to a deposit dispute; the two parties and the reviewer only (PROMPT-006). */
+  'DISPUTE_EVIDENCE',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -302,3 +304,77 @@ export const handoverProposalStatus = pgEnum('handover_proposal_status', [
   'REJECTED',
   'SUPERSEDED',
 ]);
+
+// ── the deal after the deposit (PROMPT-006) ────────────────────────────────
+
+/** A published commission rule is the formula a deal was priced by (PROMPT-006). */
+export const commissionRuleStatus = pgEnum('commission_rule_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
+
+/**
+ * Why a reserved deal ended.
+ *
+ * The first two are somebody changing their mind; the next three are claims
+ * about the animal or the advert that have to be shown to a reviewer before
+ * they change where the money goes; the last two are a handover nobody turned
+ * up for.
+ */
+export const dealCancellationReason = pgEnum('deal_cancellation_reason', [
+  'BUYER_CANCELLED',
+  'SELLER_CANCELLED',
+  'INFO_MISMATCH',
+  'FALSE_LISTING',
+  'HEALTH_ISSUE',
+  'BUYER_NO_SHOW',
+  'SELLER_NO_SHOW',
+]);
+
+/** What a cancellation does with the deposit, decided from the frozen policy. */
+export const dealCancellationOutcome = pgEnum('deal_cancellation_outcome', [
+  'FULL_REFUND',
+  'PARTIAL_REFUND',
+  'NO_REFUND',
+  'AWAITING_REVIEW',
+]);
+
+/**
+ * A refund is a record with a life of its own.
+ *
+ * `MANUAL_REQUIRED` is the honest state for a provider that has no automated
+ * refund here: the money is owed and the record says so, rather than a button
+ * claiming it moved.
+ */
+export const depositRefundStatus = pgEnum('deposit_refund_status', [
+  'PENDING',
+  'PROCESSING',
+  'PAID',
+  'FAILED',
+  'MANUAL_REQUIRED',
+  'CANCELLED',
+]);
+
+export const refundAttemptOutcome = pgEnum('refund_attempt_outcome', [
+  'REFUNDED',
+  'FAILED',
+  'UNSUPPORTED',
+]);
+
+/** What Hamzist will arbitrate. The remaining price is deliberately absent. */
+export const disputeScope = pgEnum('dispute_scope', ['DEPOSIT', 'LISTING_FACTS', 'HANDOVER']);
+
+export const disputeStatus = pgEnum('dispute_status', [
+  'OPEN',
+  'UNDER_REVIEW',
+  'RESOLVED',
+  'WITHDRAWN',
+]);
+
+/** A reviewer's answer, always with a reason and always audited. */
+export const disputeDecision = pgEnum('dispute_decision', [
+  'BUYER_FAVOURED',
+  'SELLER_FAVOURED',
+  'NO_FAULT',
+  'OUT_OF_SCOPE',
+]);
+
+/** Money a seller owes Hamzist. The ledger proper arrives with the shop. */
+export const sellerDebtStatus = pgEnum('seller_debt_status', ['OUTSTANDING', 'SETTLED', 'WAIVED']);

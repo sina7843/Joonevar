@@ -8,7 +8,19 @@ import { FileField, SelectField, TextAreaField, TextField } from '../../../src/u
 import { REASON_FA, REPORT_REASONS } from '../../../src/moderation/model.ts';
 import { DELIVERY_METHODS, DELIVERY_METHOD_FA } from '../../../src/marketplace/listing-model.ts';
 import {
+  canGiveReason,
+  CANCELLATION_REASONS,
+  CANCELLATION_REASON_FA,
+  DISPUTE_SCOPES,
+  DISPUTE_SCOPE_FA,
+  OUT_OF_SCOPE_FA,
+} from '../../../src/marketplace/cancellation-model.ts';
+import {
   acceptInquiryAction,
+  addDisputeEvidenceAction,
+  cancelDealAction,
+  openDisputeAction,
+  withdrawDisputeAction,
   blockThreadAction,
   closeInquiryAction,
   createInquiryAction,
@@ -267,6 +279,104 @@ export function ReportMessageForm({ inquiryId, messages }: { inquiryId: string; 
       <TextAreaField label="توضیح" name="details" rows={2} data-testid="report-message-details" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="report-message-submit">
         {pending ? 'در حال ثبت…' : 'گزارش پیام به ناظر'}
+      </Button>
+    </form>
+  );
+}
+
+// ── after the deposit (PROMPT-006) ────────────────────────────────────────
+
+/**
+ * Cancel a reserved deal.
+ *
+ * The form carries a reason and, for the reasons that are claims, the account
+ * of what happened. It never carries an amount: what the cancellation costs is
+ * decided on the server from the policy frozen on this deal.
+ */
+export function CancelDealForm({ inquiryId, party }: { inquiryId: string; party: 'BUYER' | 'SELLER' }) {
+  const [state, submit, pending] = useActionState(cancelDealAction, EMPTY);
+  const reasons = CANCELLATION_REASONS.filter((reason) => canGiveReason(reason, party));
+  return (
+    <form action={submit} className="space-y-sm" data-testid="cancel-deal-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <Result state={state} />
+      <SelectField
+        label="دلیل لغو"
+        name="reason"
+        required
+        options={reasons.map((value) => ({ value, label: CANCELLATION_REASON_FA[value] }))}
+        data-testid="cancel-reason"
+      />
+      <TextAreaField
+        label="شرح ماجرا"
+        name="statement"
+        rows={3}
+        hint="برای دلیل‌هایی که ادعا درباره حیوان، آگهی یا جلسه تحویل‌اند، این شرح لازم است و داور بر اساس آن تصمیم می‌گیرد."
+        data-testid="cancel-statement"
+      />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid="cancel-deal-submit">
+        {pending ? 'در حال ثبت…' : 'لغو معامله'}
+      </Button>
+    </form>
+  );
+}
+
+export function OpenDisputeForm({ inquiryId }: { inquiryId: string }) {
+  const [state, submit, pending] = useActionState(openDisputeAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-sm" data-testid="open-dispute-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <Result state={state} />
+      <SelectField
+        label="موضوع اختلاف"
+        name="scope"
+        required
+        options={DISPUTE_SCOPES.map((value) => ({ value, label: DISPUTE_SCOPE_FA[value] }))}
+        data-testid="dispute-scope"
+      />
+      <TextAreaField label="شرح ادعا" name="claim" rows={4} required data-testid="dispute-claim" />
+      <p className="text-caption text-text-secondary" data-testid="dispute-scope-note">
+        {OUT_OF_SCOPE_FA}
+      </p>
+      <Button type="submit" tone="secondary" disabled={pending} data-testid="open-dispute-submit">
+        {pending ? 'در حال ثبت…' : 'باز کردن پرونده اختلاف'}
+      </Button>
+    </form>
+  );
+}
+
+export function DisputeEvidenceForm({ inquiryId, disputeId }: { inquiryId: string; disputeId: string }) {
+  const [state, submit, pending] = useActionState(addDisputeEvidenceAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-sm" data-testid="dispute-evidence-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <input type="hidden" name="disputeId" value={disputeId} />
+      <Result state={state} />
+      <TextAreaField label="توضیح" name="note" rows={2} data-testid="evidence-note" />
+      <FileField
+        label="مدرک (تصویر یا PDF)"
+        name="evidence"
+        accept="image/jpeg,image/png,application/pdf"
+        maxBytes={10 * 1024 * 1024}
+        data-testid="evidence-file"
+      />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid="evidence-submit">
+        {pending ? 'در حال افزودن…' : 'افزودن مدرک'}
+      </Button>
+    </form>
+  );
+}
+
+export function WithdrawDisputeForm({ inquiryId, disputeId }: { inquiryId: string; disputeId: string }) {
+  const [state, submit, pending] = useActionState(withdrawDisputeAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-sm" data-testid="withdraw-dispute-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <input type="hidden" name="disputeId" value={disputeId} />
+      <Result state={state} />
+      <TextField label="دلیل پس‌گرفتن" name="reason" required data-testid="withdraw-reason" />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid="withdraw-dispute-submit">
+        {pending ? 'در حال ثبت…' : 'پس‌گرفتن پرونده'}
       </Button>
     </form>
   );

@@ -21,6 +21,8 @@ import {
   startDepositPayment,
 } from '../../../src/marketplace/inquiries.ts';
 import { reportInquiryMessage } from '../../../src/marketplace/listing-moderation.ts';
+import { cancelDeal } from '../../../src/marketplace/cancellations.ts';
+import { addDisputeEvidence, openDispute, withdrawDispute } from '../../../src/marketplace/disputes.ts';
 
 export interface InquiryFormState {
   readonly ok?: boolean;
@@ -287,6 +289,102 @@ export async function reportMessageAction(
     });
     revalidatePath(threadPath(inquiryId));
     return { ok: true, message: 'گزارش شما ثبت شد و ناظر آن را بررسی می‌کند.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+// ── after the deposit: cancelling and disputing (PROMPT-006) ───────────────
+
+/**
+ * Cancel a reserved deal.
+ *
+ * The outcome comes from the policy frozen on the deal, so this action carries
+ * a reason and a statement and nothing else; no amount is ever posted from a
+ * form.
+ */
+export async function cancelDealAction(
+  _previous: InquiryFormState,
+  form: FormData,
+): Promise<InquiryFormState> {
+  const inquiryId = text(form, 'inquiryId');
+  try {
+    const guard = await guardRoute('/account/purchases');
+    if (!guard.ok) throw guard.denied;
+    const result = await cancelDeal(db(), guard.actor, {
+      inquiryId,
+      reason: text(form, 'reason'),
+      statementFa: text(form, 'statement') || null,
+    });
+    revalidatePath(threadPath(inquiryId));
+    return {
+      ok: true,
+      message:
+        result.disputeId === null
+          ? 'معامله لغو شد و نتیجه آن طبق سیاست همین معامله ثبت شد.'
+          : 'درخواست شما ثبت و پرونده اختلاف باز شد؛ تا رأی داور، بیعانه جابه‌جا نمی‌شود.',
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function openDisputeAction(
+  _previous: InquiryFormState,
+  form: FormData,
+): Promise<InquiryFormState> {
+  const inquiryId = text(form, 'inquiryId');
+  try {
+    const guard = await guardRoute('/account/purchases');
+    if (!guard.ok) throw guard.denied;
+    await openDispute(db(), guard.actor, {
+      inquiryId,
+      scope: text(form, 'scope'),
+      claimFa: text(form, 'claim'),
+    });
+    revalidatePath(threadPath(inquiryId));
+    return { ok: true, message: 'پرونده اختلاف باز شد؛ می‌توانید مدارک خود را اضافه کنید.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function addDisputeEvidenceAction(
+  _previous: InquiryFormState,
+  form: FormData,
+): Promise<InquiryFormState> {
+  const inquiryId = text(form, 'inquiryId');
+  try {
+    const guard = await guardRoute('/account/purchases');
+    if (!guard.ok) throw guard.denied;
+    const upload = form.get('evidence');
+    const file = upload instanceof File && upload.size > 0 ? upload : null;
+    await addDisputeEvidence(db(), env().PRIVATE_STORAGE_DIR, guard.actor, {
+      disputeId: text(form, 'disputeId'),
+      noteFa: text(form, 'note') || null,
+      file: file ? { bytes: new Uint8Array(await file.arrayBuffer()), originalName: file.name } : null,
+    });
+    revalidatePath(threadPath(inquiryId));
+    return { ok: true, message: 'مدرک شما به پرونده اضافه شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function withdrawDisputeAction(
+  _previous: InquiryFormState,
+  form: FormData,
+): Promise<InquiryFormState> {
+  const inquiryId = text(form, 'inquiryId');
+  try {
+    const guard = await guardRoute('/account/purchases');
+    if (!guard.ok) throw guard.denied;
+    await withdrawDispute(db(), guard.actor, {
+      disputeId: text(form, 'disputeId'),
+      reasonFa: text(form, 'reason'),
+    });
+    revalidatePath(threadPath(inquiryId));
+    return { ok: true, message: 'پرونده اختلاف پس گرفته شد.' };
   } catch (error) {
     return failure(error);
   }

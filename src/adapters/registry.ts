@@ -204,9 +204,36 @@ export interface PaymentVerification {
  * Gateway contract. Verification is deliberately a separate server-side call:
  * a browser returning from the gateway proves nothing (§7, §22).
  */
+/** One try at sending money back, with its own idempotency key (PROMPT-006). */
+export interface RefundRequest {
+  readonly reference: string;
+  readonly providerRef: string;
+  readonly amountRial: bigint;
+  readonly requestRef: string;
+}
+
+/**
+ * What the provider said.
+ *
+ * `UNSUPPORTED` is not a failure of this refund: it means this gateway has no
+ * automated refund here at all, so the money stays owed and a person has to
+ * send it. Recording that honestly is the difference between a refund that is
+ * pending and one that was quietly dropped.
+ */
+export type RefundResult =
+  | { readonly state: 'REFUNDED'; readonly providerRefundRef: string }
+  | { readonly state: 'FAILED'; readonly reasonFa: string }
+  | { readonly state: 'UNSUPPORTED'; readonly reasonFa: string };
+
 export interface PaymentGateway {
   start(input: { reference: string; amountRial: bigint; callbackUrl: string }): Promise<PaymentIntent>;
   verify(input: { reference: string; providerRef: string }): Promise<PaymentVerification>;
+  /**
+   * Optional on purpose. A gateway that cannot refund from here simply does not
+   * implement it, and the refund record says MANUAL_REQUIRED rather than
+   * pretending a bank transfer happened.
+   */
+  refund?(input: RefundRequest): Promise<RefundResult>;
 }
 
 /**
@@ -236,6 +263,10 @@ export function localTestPaymentGateway(env?: Env): PaymentGateway & { markPaid(
         amountRial: amount ?? 0n,
         providerRef: input.providerRef,
       };
+    },
+    async refund(input) {
+      // In-process only, like markPaid above: the simulated bank accepts it.
+      return { state: 'REFUNDED', providerRefundRef: 'local-refund-' + input.requestRef };
     },
   };
 }
@@ -279,6 +310,22 @@ export function devPaymentGateway(database: DbClient, env?: Env): PaymentGateway
         amountRial: row ? BigInt(row.amountRial) : 0n,
         providerRef: input.providerRef || (row ? 'dev-' + input.reference : ''),
       };
+    },
+    /**
+     * The development bank sends money back for a payment it recorded as paid.
+     * A reference it never paid cannot be refunded, which is what a real
+     * provider answers too.
+     */
+    async refund(input) {
+      const [row] = await database
+        .select()
+        .from(devPaymentOutcomes)
+        .where(eq(devPaymentOutcomes.reference, input.reference))
+        .limit(1);
+      if (row?.paid !== 'true') {
+        return { state: 'FAILED', reasonFa: 'درگاه توسعه برای این ارجاع پرداخت موفقی ثبت نکرده است.' };
+      }
+      return { state: 'REFUNDED', providerRefundRef: 'dev-refund-' + input.requestRef };
     },
   };
 }
@@ -326,6 +373,10 @@ export function mockAutoPaymentGateway(database: DbClient, env?: Env): PaymentGa
         amountRial: BigInt(attempt.amountRial),
         providerRef: input.providerRef || 'mock-' + input.reference,
       };
+    },
+    /** The simulated bank accepts the refund; only the bank is simulated. */
+    async refund(input) {
+      return { state: 'REFUNDED', providerRefundRef: 'mock-refund-' + input.requestRef };
     },
   };
 }

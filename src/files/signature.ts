@@ -63,6 +63,8 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
    * more thing served back to somebody through a route that has to stay small.
    */
   INQUIRY_ATTACHMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
+  /** Evidence in a deposit dispute: a photo, a receipt, a veterinary report. */
+  DISPUTE_EVIDENCE: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

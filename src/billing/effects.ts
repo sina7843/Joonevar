@@ -90,7 +90,7 @@ export const paidEffects: PaidEffects = {
       // becomes the deal, the others are closed with a reason and the two sides
       // get each other's contact details — all inside this transaction, so a
       // reservation can never exist without the money that made it (PROMPT-005).
-      case 'ANIMAL_DEPOSIT':
+      case 'ANIMAL_SALE_DEPOSIT':
         await reserveFromDeposit(tx, batch);
         return;
       default:

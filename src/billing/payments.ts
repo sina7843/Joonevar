@@ -47,7 +47,7 @@ export type PaymentService =
   // A paid promotion of one animal advert (Phase 3, PROMPT-004).
   | 'ANIMAL_LISTING_PROMOTION'
   // The deposit that reserves one animal for one buyer (Phase 3, PROMPT-005).
-  | 'ANIMAL_DEPOSIT';
+  | 'ANIMAL_SALE_DEPOSIT';
 
 /**
  * What to charge for, and where the server should read the price.

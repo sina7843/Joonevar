@@ -77,8 +77,19 @@ export const listingInquiries = pgTable(
     commissionMaxToman: bigint('commission_max_toman', { mode: 'bigint' }),
     /** Which setting versions produced the figures above. */
     commissionSettingVersions: text('commission_setting_versions'),
+    /** The published commission rule this deal was priced by (PROMPT-006). */
+    commissionRuleId: uuid('commission_rule_id'),
     /** The cancellation policy version this deal is bound to (PRODUCT_DECISIONS §6). */
     cancellationPolicyVersion: text('cancellation_policy_version'),
+    /*
+     * The cancellation policy itself, frozen at acceptance (PROMPT-006). A
+     * penalty edited afterwards cannot reach back into a deal somebody already
+     * agreed to, and a null here means "nobody had set one", which is not zero
+     * and is recorded as what it is.
+     */
+    buyerPenaltyBp: integer('buyer_penalty_bp'),
+    sellerPenaltyToman: bigint('seller_penalty_toman', { mode: 'bigint' }),
+    sellerRestrictionDays: integer('seller_restriction_days'),
 
     acceptedAt: timestamp('accepted_at', { withTimezone: true }),
     /** Computed from the managed window at acceptance and frozen here. */

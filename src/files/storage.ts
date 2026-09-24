@@ -15,6 +15,8 @@ import { storedFiles } from '../db/schema/core.ts';
 import { animals } from '../db/schema/animals.ts';
 import { vetProfessionalCases, vetProfessionalDocuments, vetVisitRequests } from '../db/schema/vets.ts';
 import { inquiryMessages, listingInquiries } from '../db/schema/inquiry.ts';
+import { dealDisputes, disputeEvidence } from '../db/schema/deals.ts';
+import { hasMarketplaceCapability } from '../marketplace/model.ts';
 import { recordAudit } from '../audit/service.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertCanReadFile, canReadFile, type FilePurposeName } from '../authz/policy.ts';
@@ -173,6 +175,35 @@ async function partyMaySeeAttachment(
 }
 
 /**
+ * The third record-scoped exception: evidence in one deposit dispute.
+ *
+ * The other party to the deal and the reviewer deciding that case may read it;
+ * nobody else, and never a whole role across every case. Asked here against the
+ * schema, for the same reason the two exceptions above are (PROMPT-006).
+ */
+async function partyMaySeeDisputeEvidence(
+  tx: DbClient,
+  actor: Actor,
+  record: StoredFileRecord,
+): Promise<boolean> {
+  if (record.purpose !== 'DISPUTE_EVIDENCE') return false;
+  const rows = await tx
+    .select({
+      buyerAccountId: listingInquiries.buyerAccountId,
+      sellerAccountId: listingInquiries.sellerAccountId,
+    })
+    .from(disputeEvidence)
+    .innerJoin(dealDisputes, eq(dealDisputes.id, disputeEvidence.disputeId))
+    .innerJoin(listingInquiries, eq(listingInquiries.id, dealDisputes.inquiryId))
+    .where(eq(disputeEvidence.fileId, record.id))
+    .limit(1);
+  const row = rows[0];
+  if (!row) return false;
+  if (row.buyerAccountId === actor.accountId || row.sellerAccountId === actor.accountId) return true;
+  return hasMarketplaceCapability(actor, 'ANIMAL_DISPUTE_DECIDE');
+}
+
+/**
  * Authorized read. The permission check happens before any filesystem access,
  * so an unauthorized request cannot even probe whether the object exists.
  */
@@ -188,7 +219,11 @@ export async function readPrivateFile(
     // that animal's photo while the visit is open at their desk (§12.5, §21.1).
     // It is a permission over one record, not over the whole purpose, so it is
     // asked as a question about this file rather than added to the policy table.
-    if (!(await vetMaySeeAnimalPhoto(tx, actor, record)) && !(await partyMaySeeAttachment(tx, actor, record))) {
+    if (
+      !(await vetMaySeeAnimalPhoto(tx, actor, record)) &&
+      !(await partyMaySeeAttachment(tx, actor, record)) &&
+      !(await partyMaySeeDisputeEvidence(tx, actor, record))
+    ) {
       assertCanReadFile(actor, { ownerAccountId: record.ownerAccountId, purpose: record.purpose });
     }
   }

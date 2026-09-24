@@ -75,6 +75,11 @@ export const payingGateway = (amountRial: bigint): PaymentGateway => ({
   async verify(input) {
     return { paid: true, amountRial, providerRef: 'p-' + input.reference };
   },
+  // The stub bank also sends money back, so a refund path under test gets a
+  // provider that answers rather than one that silently cannot (PROMPT-006).
+  async refund(input) {
+    return { state: 'REFUNDED', providerRefundRef: 'r-' + input.requestRef };
+  },
 });
 
 export interface Party {

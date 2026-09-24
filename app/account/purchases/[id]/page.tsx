@@ -18,8 +18,27 @@ import {
   type OfferStatus,
 } from '../../../../src/marketplace/inquiry-model.ts';
 import { DELIVERY_METHOD_FA, type DeliveryMethod } from '../../../../src/marketplace/listing-model.ts';
+import { cancellationOfDeal } from '../../../../src/marketplace/cancellations.ts';
+import { refundOfDeal } from '../../../../src/marketplace/refunds.ts';
+import { disputeOfDeal } from '../../../../src/marketplace/disputes.ts';
+import {
+  CANCELLATION_OUTCOME_FA,
+  CANCELLATION_REASON_FA,
+  DISPUTE_DECISION_FA,
+  DISPUTE_SCOPE_FA,
+  DISPUTE_STATUS_FA,
+  REFUND_STATUS_FA,
+  type CancellationOutcome,
+  type CancellationReason,
+  type DisputeDecision,
+  type DisputeScope,
+} from '../../../../src/marketplace/cancellation-model.ts';
 import {
   AcceptInquiryForm,
+  CancelDealForm,
+  DisputeEvidenceForm,
+  OpenDisputeForm,
+  WithdrawDisputeForm,
   BlockThreadForm,
   CloseInquiryForm,
   HandoverAnswerForm,
@@ -62,6 +81,12 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
   }
 
   const { inquiry, role, liveOffer, liveHandover } = thread;
+  // What happened after the deposit, if anything did (PROMPT-006).
+  const [cancellation, refund, dispute] = await Promise.all([
+    cancellationOfDeal(db(), inquiry.id),
+    refundOfDeal(db(), inquiry.id),
+    disputeOfDeal(db(), inquiry.id),
+  ]);
   const status = inquiry.status as InquiryStatus;
   const party = role === 'MODERATOR' ? null : (role as OfferParty);
   const priceLocked = inquiry.finalPriceLockedAt !== null;
@@ -278,6 +303,103 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
               ) : null}
               {thread.writable || status === 'CONVERTED' ? <HandoverForm inquiryId={inquiry.id} /> : null}
             </div>
+          </Card>
+        ) : null}
+
+        {/* After the deposit: cancelling, what it cost, and the money coming back. */}
+        {party !== null && (inquiry.status === 'CONVERTED' || cancellation !== null) ? (
+          <Card>
+            <h2 className="text-label-lg">لغو معامله و استرداد بیعانه</h2>
+            {cancellation === null ? (
+              <>
+                <p className="mt-sm text-caption text-text-secondary">
+                  نتیجه لغو از سیاست نسخه‌دار همین معامله خوانده می‌شود، نه از تنظیمات امروز. دلیل‌هایی که
+                  ادعا درباره حیوان، آگهی یا جلسه تحویل‌اند، پرونده اختلاف باز می‌کنند و داور تصمیم می‌گیرد.
+                </p>
+                <div className="mt-lg">
+                  <CancelDealForm inquiryId={inquiry.id} party={party} />
+                </div>
+              </>
+            ) : (
+              <dl className="mt-lg grid gap-sm text-body-sm md:grid-cols-2" data-testid="cancellation-facts">
+                <div>
+                  <dt className="text-caption text-text-secondary">دلیل</dt>
+                  <dd data-testid="cancellation-reason">
+                    {CANCELLATION_REASON_FA[cancellation.reason as CancellationReason] ?? cancellation.reason}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-caption text-text-secondary">نتیجه</dt>
+                  <dd data-testid="cancellation-outcome">
+                    {CANCELLATION_OUTCOME_FA[cancellation.outcome as CancellationOutcome] ?? cancellation.outcome}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-caption text-text-secondary">جریمه کسرشده</dt>
+                  <dd data-testid="cancellation-penalty">{moneyFa(cancellation.penaltyAmountToman)} تومان</dd>
+                </div>
+                <div>
+                  <dt className="text-caption text-text-secondary">مبلغ قابل استرداد</dt>
+                  <dd data-testid="cancellation-refund">{moneyFa(cancellation.refundAmountToman)} تومان</dd>
+                </div>
+                <div>
+                  <dt className="text-caption text-text-secondary">نسخه سیاست اعمال‌شده</dt>
+                  <dd>
+                    <bdi className="hz-ltr">{cancellation.policyVersion ?? '—'}</bdi>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-caption text-text-secondary">وضعیت استرداد</dt>
+                  <dd data-testid="refund-status">
+                    {refund === null
+                      ? 'استردادی برای این معامله ثبت نشده است'
+                      : (REFUND_STATUS_FA[refund.status] ?? refund.status) +
+                        ' — ' +
+                        moneyFa(refund.amountToman) +
+                        ' تومان'}
+                  </dd>
+                </div>
+              </dl>
+            )}
+          </Card>
+        ) : null}
+
+        {/* The three things Hamzist will arbitrate, and the one it will not. */}
+        {/*
+          Still reachable after a cancellation: somebody who disagrees with what
+          the policy took, or with a refund that never arrived, has the same
+          three subjects to bring — and no fourth one.
+        */}
+        {party !== null && (inquiry.status === 'CONVERTED' || cancellation !== null || dispute !== null) ? (
+          <Card>
+            <h2 className="text-label-lg">داوری</h2>
+            {dispute === null ? (
+              <div className="mt-lg">
+                <OpenDisputeForm inquiryId={inquiry.id} />
+              </div>
+            ) : (
+              <>
+                <p className="mt-sm text-body-sm" data-testid="dispute-state">
+                  {DISPUTE_SCOPE_FA[dispute.scope as DisputeScope] ?? dispute.scope}
+                  <span className="mx-sm text-text-disabled">|</span>
+                  {DISPUTE_STATUS_FA[dispute.status] ?? dispute.status}
+                </p>
+                {dispute.decision ? (
+                  <p className="mt-sm text-body-sm" data-testid="dispute-decision">
+                    {DISPUTE_DECISION_FA[dispute.decision as DisputeDecision] ?? dispute.decision}
+                    {dispute.decisionReasonFa ? ' — ' + dispute.decisionReasonFa : ''}
+                  </p>
+                ) : null}
+                {dispute.status === 'OPEN' || dispute.status === 'UNDER_REVIEW' ? (
+                  <div className="mt-lg space-y-lg">
+                    <DisputeEvidenceForm inquiryId={inquiry.id} disputeId={dispute.id} />
+                    {dispute.openedByAccountId === guard.actor.accountId ? (
+                      <WithdrawDisputeForm inquiryId={inquiry.id} disputeId={dispute.id} />
+                    ) : null}
+                  </div>
+                ) : null}
+              </>
+            )}
           </Card>
         ) : null}
 

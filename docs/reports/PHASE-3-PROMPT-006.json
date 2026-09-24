@@ -1,0 +1,134 @@
+{
+  "promptId": "PROMPT-006",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "4e8bee8c786e583cc4702615f2fb46e1b76f1ca9",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "What happens to a deposit after it has been taken: the formula that set it, the ways a deal ends, the money going back, and the three things Hamzist will arbitrate. The payment service is renamed ANIMAL_SALE_DEPOSIT, and the migration renames the enum value rather than dropping and recreating the type as the generator proposed — recreating it would fail the cast on any payment already recorded, and a migration must not destroy a verified payment's own record of what it paid for. PRODUCT_DECISIONS §5 makes the commission a fixed amount plus a percentage 'by animal kind and seller kind', which a single pair of global settings cannot express, so the formula became published immutable rows: one live rule per species, optionally narrowed to a seller kind, resolved most-specific-first and falling back to the global settings of PROMPT-002 and then to NOT_CONFIGURED. Publishing archives the previous rule in the same transaction, so there is never a moment with two live formulas or none, and a deal freezes the id of the rule it was priced by alongside the figures that rule produced. The cancellation policy is frozen the same way, at acceptance: the buyer penalty in basis points, the seller penalty and the restriction period are written onto the deal, so a penalty edited tomorrow cannot reach into a deal struck today. An unset penalty stays null all the way to the outcome, where it means no penalty was agreed — never a zero somebody could later mistake for a decision, and never a fee invented at the moment somebody cancels. A buyer who changes their mind pays the frozen penalty, truncated and capped at the deposit. A seller who cancels returns the whole deposit — nothing is deducted from money that is not theirs — and owes the penalty as a separate debt, with a publisher restriction whose period multiplies with each previous cancellation and which reuses the restriction mechanism that already exists. The five reasons that are claims about the animal, the advert or a meeting nobody attended produce AWAITING_REVIEW and a dispute instead of a refund: the animal stays reserved while the argument is open, because releasing it would sell it out from under the case. A refund is a record with a life of its own — pending, attempted, failed, retried — and every attempt leaves a row naming the provider, its idempotency key and what it said. PAID is impossible without a provider or bank reference, enforced by a check constraint as well as by the code; a gateway with no automated refund here produces MANUAL_REQUIRED, which is the truth rather than a silence; three automatic attempts is the limit, after which a person takes it rather than a loop; and the record is claimed under a version guard, so two operators pressing retry together produce one attempt, not two transfers. Arbitration covers the deposit, the truth of the recorded listing facts, and whether the handover happened. Anything about the price settled outside is refused before a row exists, in the same words printed on the reviewer's own page. A decision carries a reason, is written once under a version guard, may return part of the deposit but never more than was paid, and writes the refund it implies inside the same transaction — while sending that money stays a separate, retryable step. Dispute evidence is private storage read through a record-scoped grant: the two parties and the reviewer of that one case, never a whole role across every case.",
+  "changedFiles": [
+    "src/db/migrations/0045_animal-deposit-settlement.sql",
+    "src/db/migrations/meta/0045_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/deals.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/inquiry.ts",
+    "src/db/schema/billing.ts",
+    "src/db/schema/index.ts",
+    "src/marketplace/cancellation-model.ts",
+    "src/marketplace/commission-rules.ts",
+    "src/marketplace/cancellations.ts",
+    "src/marketplace/refunds.ts",
+    "src/marketplace/disputes.ts",
+    "src/marketplace/inquiries.ts",
+    "src/marketplace/settlement-forms.tsx",
+    "src/adapters/registry.ts",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/billing/receipts.ts",
+    "src/files/storage.ts",
+    "src/files/signature.ts",
+    "src/authz/policy.ts",
+    "src/domain/resume-context.ts",
+    "src/ui/shell.tsx",
+    "app/market/settlement-actions.ts",
+    "app/market/refunds/page.tsx",
+    "app/market/disputes/page.tsx",
+    "app/market/commission/page.tsx",
+    "app/account/purchases/actions.ts",
+    "app/account/purchases/forms.tsx",
+    "app/account/purchases/[id]/page.tsx",
+    "tests/domain/deal-cancellation.test.ts",
+    "tests/db/deal-settlement.test.ts",
+    "tests/browser/animal-settlement.test.ts",
+    "tests/helpers/mating.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-006.json"
+  ],
+  "migrations": ["src/db/migrations/0045_animal-deposit-settlement.sql"],
+  "decisions": ["DEC-0208"],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/domain/deal-cancellation.test.ts — 11 tests over the pure rules: which side may give each reason, claims producing AWAITING_REVIEW, the buyer penalty with an unset value, a deliberate zero, a full-deposit cap and truncation, the seller's full refund with a separate debt, the progressive restriction with an unset base, the decision refund clamped at the deposit, the stated limit of arbitration, and when a refund stops being retried automatically."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/db/deal-settlement.test.ts — 11 tests, each building a real reserved deal through the desk, the advert, the request and a verified deposit: rule resolution and archiving with the deal keeping its own rule, the buyer penalty frozen against a later edit, the seller's debt and the 7/14-day progressive restriction, a claim holding the animal reserved and reaching the reviewer queue, a decision made once with a reason and a capped refund, the remaining price refused before a row exists, a refund paid only on a provider reference with a replay adding no second transfer, three failures then a manual close with a bank reference, a gateway without refund support ending MANUAL_REQUIRED, concurrent retries producing one attempt, and nothing at all being reachable before a deposit was verified."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/animal-settlement.test.ts — 4 tests on the real screens: a buyer cancelling and reading what the frozen policy cost them with the advert returning to the market, the refund queue paying through the development gateway and leaving the list of what is owed, the arbitration page stating its own limits, and a commission version published and shown in its history.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-006/cancelled-deal-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-006/refund-queue-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-006/dispute-queue-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-006/commission-rules-desktop.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, before the browser suites."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "856 tests, 856 pass, 0 fail, 0 skip, duration 880s, exit 0, on the final tree. 834 before this prompt; the 22 new ones are tests/domain/deal-cancellation.test.ts (11) and tests/db/deal-settlement.test.ts (11). An earlier run of the same tree reported 851 of 852 with tests/db/vet-trusted.test.ts failing at file level in 419ms — before any of its tests ran, and with no error text beyond 'test failed'. That file then passed 5 of 5 on its own in 11s, and the whole suite passed on the re-run recorded here. It is recorded as an environment failure under concurrency rather than removed or explained away; its cause was not investigated in this prompt."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "222 tests, 222 pass, 0 fail, 0 skip, duration 548s, exit 0, against a production server built from this tree. 218 before this prompt; the four new ones are tests/browser/animal-settlement.test.ts."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No real payment provider refunds anything yet. The gateway contract now has an optional refund method that the development and mock gateways implement; a provider without one produces MANUAL_REQUIRED, and closing that needs a finance operator and a bank reference. Nothing here has been exercised against a live provider, and the report does not claim otherwise.",
+    "Refunds are executed by an operator pressing retry, not by a worker. There is no scheduler in this repository, so a failed refund waits in the queue until somebody acts; the queue exists precisely so that waiting is visible rather than silent.",
+    "The seller debt book is deliberately small: it records what is owed and who decided it, and cannot move money between accounts. Collecting it, offsetting it against payouts and the multi-vendor ledger belong to PROMPT-011.",
+    "A cancellation before the seller accepts needs no code, and none was written: a deposit cannot exist at that point, so PRODUCT_DECISIONS §6's 'full refund before acceptance' is the withdrawal path of PROMPT-005 with nothing to return. That is stated in the service and pinned by a test rather than implemented as dead branches.",
+    "Partial refunds exist as one record for the part owed, not as several partial transfers against one deposit. A provider that pays part of a refund and fails on the rest would be recorded as a failed attempt and retried in full; splitting one refund across several transfers is not modelled.",
+    "The handover itself — the one-time code, the two-sided confirmation, the transfer of ownership — is PROMPT-007. A dispute here can find that the handover did not happen; it cannot yet be answered from a handover record, because there is none."
+  ],
+  "readiness": {
+    "code": "PHASE_3_DEAL_SETTLEMENT_BUILT",
+    "handover": "NOT_STARTED",
+    "ownershipTransfer": "NOT_STARTED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "refundProvider": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0045_animal-deposit-settlement.sql",
+    "src/db/schema/deals.ts",
+    "src/marketplace/cancellation-model.ts",
+    "src/marketplace/commission-rules.ts",
+    "src/marketplace/cancellations.ts",
+    "src/marketplace/refunds.ts",
+    "src/marketplace/disputes.ts",
+    "src/adapters/registry.ts",
+    "app/market/refunds/page.tsx",
+    "app/market/disputes/page.tsx",
+    "app/market/commission/page.tsx",
+    "tests/domain/deal-cancellation.test.ts",
+    "tests/db/deal-settlement.test.ts",
+    "tests/browser/animal-settlement.test.ts",
+    "DECISIONS.md#DEC-0208"
+  ]
+}

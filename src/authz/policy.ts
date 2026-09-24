@@ -148,7 +148,8 @@ export type FilePurposeName =
   | 'VET_PROFESSIONAL_DOCUMENT'
   | 'ANIMAL_LISTING_IMAGE'
   | 'ANIMAL_LISTING_VIDEO'
-  | 'INQUIRY_ATTACHMENT';
+  | 'INQUIRY_ATTACHMENT'
+  | 'DISPUTE_EVIDENCE';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -193,6 +194,13 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
    * asked there rather than widened into a purpose (PROMPT-005).
    */
   INQUIRY_ATTACHMENT: ['LISTING_MODERATOR', 'SUPERADMIN'],
+  /*
+   * Evidence in a deposit dispute. The table grants it to whoever filed it and
+   * to the superadmin; the other party and the reviewer deciding that one case
+   * are granted it by their part in that record, which is asked about the
+   * record rather than widened into a purpose (PROMPT-006).
+   */
+  DISPUTE_EVIDENCE: ['SUPERADMIN'],
 };
 
 export function canReadFile(

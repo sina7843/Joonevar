@@ -38,6 +38,7 @@ import { createBatch, findBatch, type BatchRecord } from '../billing/payments.ts
 import { putPrivateFile, safeOriginalName } from '../files/storage.ts';
 import { findCase } from '../identity/kyc.ts';
 import { readSetting, readText, snapshotSetting } from '../settings/service.ts';
+import { resolveCommission } from './commission-rules.ts';
 import { AppError, conflict, forbidden, notConfigured, notFound, validation } from '../domain/errors.ts';
 import { resumeContext } from '../domain/resume-context.ts';
 import type { Actor } from '../authz/actor.ts';
@@ -71,6 +72,9 @@ export const COMMISSION_FIXED_KEY = 'market.animal.commission_fixed_toman';
 export const COMMISSION_PERCENT_KEY = 'market.animal.commission_percent_bp';
 export const COMMISSION_MIN_KEY = 'market.animal.commission_min_toman';
 export const COMMISSION_MAX_KEY = 'market.animal.commission_max_toman';
+export const BUYER_PENALTY_KEY = 'market.animal.buyer_cancellation_penalty_bp';
+export const SELLER_PENALTY_KEY = 'market.animal.seller_cancellation_penalty_toman';
+export const SELLER_RESTRICTION_KEY = 'market.animal.seller_cancellation_restriction_days';
 export const RISK_LIMIT_KEY = 'market.animal.failed_deposit_limit';
 export const RISK_WINDOW_KEY = 'market.animal.failed_deposit_window_days';
 
@@ -125,48 +129,35 @@ async function assertNotBlocked(database: DbClient, inquiryId: string): Promise<
 
 // ── the money, frozen once ─────────────────────────────────────────────────
 
-interface Commission {
-  readonly inputs: CommissionInputs;
-  /** Which version of each setting produced the figures, kept with them. */
-  readonly versions: string;
+/**
+ * The scope a commission is resolved for.
+ *
+ * Read from the advert and the animal rather than passed around, because the
+ * formula depends on what is being sold and by whom (PRODUCT_DECISIONS §5).
+ */
+async function commissionScope(
+  database: DbClient,
+  listingId: string,
+): Promise<{ speciesCode: string; sellerKind: 'OWNER' | 'KENNEL' }> {
+  const [row] = await database
+    .select({ sellerKind: animalListings.sellerKind, speciesCode: animals.species })
+    .from(animalListings)
+    .innerJoin(animals, eq(animals.id, animalListings.animalId))
+    .where(eq(animalListings.id, listingId))
+    .limit(1);
+  if (!row) throw notFound('این آگهی پیدا نشد.');
+  return { speciesCode: row.speciesCode, sellerKind: row.sellerKind as 'OWNER' | 'KENNEL' };
 }
 
 /**
- * Read the commission inputs as they stand right now.
+ * The fields a price lock writes. Computed once and never recomputed later.
  *
- * The fixed part and the percentage have to be set — without them there is no
- * deposit and therefore no reservation, and that is reported as «تعیین‌نشده»
- * rather than treated as zero. The floor and the ceiling are genuinely
- * optional: no clamp is a clamp nobody asked for.
+ * The formula comes from the published commission rule for this species and
+ * seller kind, or from the global settings when no rule exists (PROMPT-006).
+ * Whichever it was, its identity is frozen here with the figures it produced.
  */
-async function currentCommission(database: DbClient): Promise<Commission> {
-  const fixed = await snapshotSetting(database, COMMISSION_FIXED_KEY);
-  const percent = await snapshotSetting(database, COMMISSION_PERCENT_KEY);
-  const min = await readSetting(database, COMMISSION_MIN_KEY);
-  const max = await readSetting(database, COMMISSION_MAX_KEY);
-
-  const percentBp = Number(percent.value);
-  if (!Number.isInteger(percentBp) || percentBp < 0 || percentBp > 10_000) throw notConfigured(COMMISSION_PERCENT_KEY);
-
-  return {
-    inputs: {
-      fixedToman: BigInt(String(fixed.value)),
-      percentBp,
-      minToman: min.configured ? BigInt(String(min.value)) : null,
-      maxToman: max.configured ? BigInt(String(max.value)) : null,
-    },
-    versions: JSON.stringify({
-      [COMMISSION_FIXED_KEY]: fixed.version,
-      [COMMISSION_PERCENT_KEY]: percent.version,
-      [COMMISSION_MIN_KEY]: min.configured ? min.version : null,
-      [COMMISSION_MAX_KEY]: max.configured ? max.version : null,
-    }),
-  };
-}
-
-/** The fields a price lock writes. Computed once and never recomputed later. */
-async function lockedPriceFields(database: DbClient, finalPriceToman: bigint, now: Date) {
-  const commission = await currentCommission(database);
+async function lockedPriceFields(database: DbClient, listingId: string, finalPriceToman: bigint, now: Date) {
+  const commission = await resolveCommission(database, await commissionScope(database, listingId));
   return {
     finalPriceToman,
     finalPriceLockedAt: now,
@@ -176,6 +167,30 @@ async function lockedPriceFields(database: DbClient, finalPriceToman: bigint, no
     commissionMinToman: commission.inputs.minToman,
     commissionMaxToman: commission.inputs.maxToman,
     commissionSettingVersions: commission.versions,
+    commissionRuleId: commission.ruleId,
+  };
+}
+
+/**
+ * The cancellation policy as it stands now, to be frozen on a deal.
+ *
+ * Each figure is optional and stays null when nobody has set it. That null is
+ * carried all the way to the cancellation outcome, where it means "no penalty
+ * was agreed for this deal" — never zero by accident and never a fee invented
+ * at the moment somebody cancels.
+ */
+async function frozenCancellationPolicy(database: DbClient): Promise<{
+  buyerPenaltyBp: number | null;
+  sellerPenaltyToman: bigint | null;
+  sellerRestrictionDays: number | null;
+}> {
+  const buyer = await readSetting(database, BUYER_PENALTY_KEY);
+  const seller = await readSetting(database, SELLER_PENALTY_KEY);
+  const restriction = await readSetting(database, SELLER_RESTRICTION_KEY);
+  return {
+    buyerPenaltyBp: buyer.configured ? Number(buyer.value) : null,
+    sellerPenaltyToman: seller.configured ? BigInt(String(seller.value)) : null,
+    sellerRestrictionDays: restriction.configured ? Number(restriction.value) : null,
   };
 }
 
@@ -295,7 +310,7 @@ export async function createInquiry(
           status: 'OPEN',
           messageFa: opened?.text ?? null,
           statusChangedAt: now,
-          ...(exact ? await lockedPriceFields(tx, listing.priceToman!, now) : {}),
+          ...(exact ? await lockedPriceFields(tx, listing.id, listing.priceToman!, now) : {}),
         })
         .returning();
       inquiry = row!;
@@ -485,7 +500,7 @@ export async function respondToOffer(
     const [updated] = await tx
       .update(listingInquiries)
       .set({
-        ...(await lockedPriceFields(tx, offer.amountToman, now)),
+        ...(await lockedPriceFields(tx, inquiry.listingId, offer.amountToman, now)),
         version: inquiry.version + 1,
         updatedAt: now,
       })
@@ -553,6 +568,12 @@ export async function acceptInquiry(
   const risk = await buyerRisk(database, inquiry.buyerAccountId);
   if (risk.blocked) throw conflict('این خریدار به دلیل پرداخت‌نشدن بیعانه‌های اخیر فعلاً قابل پذیرش نیست.');
 
+  // The cancellation policy is frozen here with its version (PROMPT-006). A
+  // penalty edited tomorrow must not reach back into this deal, and a penalty
+  // nobody had set stays null rather than becoming a zero somebody could later
+  // mistake for a decision.
+  const policy = await frozenCancellationPolicy(database);
+
   const now = new Date();
   const deadline = paymentDeadline(now, hours);
 
@@ -567,6 +588,9 @@ export async function acceptInquiry(
           paymentDeadlineAt: deadline,
           paymentWindowHours: hours,
           cancellationPolicyVersion: policyVersion,
+          buyerPenaltyBp: policy.buyerPenaltyBp,
+          sellerPenaltyToman: policy.sellerPenaltyToman,
+          sellerRestrictionDays: policy.sellerRestrictionDays,
           statusChangedAt: now,
           version: inquiry.version + 1,
           updatedAt: now,
@@ -595,6 +619,9 @@ export async function acceptInquiry(
         paymentWindowHours: hours,
         paymentWindowSettingVersion: window.version,
         cancellationPolicyVersion: policyVersion,
+        buyerPenaltyBp: policy.buyerPenaltyBp,
+        sellerPenaltyToman: policy.sellerPenaltyToman?.toString() ?? null,
+        sellerRestrictionDays: policy.sellerRestrictionDays,
       },
     });
     await createNotification(tx, {
@@ -705,7 +732,7 @@ export async function startDepositPayment(
 
   return database.transaction(async (tx) => {
     const batch = await createBatch(tx as Database, actor, {
-      service: 'ANIMAL_DEPOSIT',
+      service: 'ANIMAL_SALE_DEPOSIT',
       items: [{ targetType: 'LISTING_INQUIRY', targetId: inquiry.id, inquiryId: inquiry.id }],
       resume: resumeContext({
         entity: { type: 'LISTING_INQUIRY', id: inquiry.id },
@@ -722,7 +749,7 @@ export async function startDepositPayment(
     if (!linked) throw conflict('برای این درخواست پرداخت دیگری باز شده است؛ صفحه را دوباره باز کنید.');
 
     await recordAudit(tx, actor, {
-      action: 'ANIMAL_DEPOSIT_STARTED',
+      action: 'ANIMAL_SALE_DEPOSIT_STARTED',
       targetType: 'LISTING_INQUIRY',
       targetId: inquiry.id,
       after: { batchId: batch.id, amountToman: inquiry.depositAmountToman?.toString() ?? null },

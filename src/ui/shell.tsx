@@ -325,6 +325,15 @@ export function marketNav(actor: Actor): readonly NavItem[] {
     items.push({ href: '/market/listings', label: 'گزارش آگهی‌ها', icon: 'warning' });
     items.push({ href: '/market/messages', label: 'گزارش پیام‌ها', icon: 'warning' });
   }
+  if (hasMarketplaceCapability(actor, 'REFUND_ISSUE')) {
+    items.push({ href: '/market/refunds', label: 'استرداد بیعانه', icon: 'stamp' });
+  }
+  if (hasMarketplaceCapability(actor, 'ANIMAL_DISPUTE_DECIDE')) {
+    items.push({ href: '/market/disputes', label: 'پرونده‌های اختلاف', icon: 'shieldCheck' });
+  }
+  if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
+    items.push({ href: '/market/commission', label: 'قاعده کارمزد', icon: 'listChecks' });
+  }
   return items;
 }
 
