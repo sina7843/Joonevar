@@ -11,6 +11,7 @@ import { sql } from 'drizzle-orm';
 import { check, index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { accounts } from './core.ts';
 import { contentItems } from './content.ts';
+import { communities } from './communities.ts';
 import { moderationDecision, reportReason, reportStatus, reportTargetKind } from './enums.ts';
 
 const now = sql`now()`;
@@ -21,6 +22,8 @@ export const moderationReports = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     targetKind: reportTargetKind('target_kind').notNull().default('CONTENT'),
     contentId: uuid('content_id').references(() => contentItems.id, { onDelete: 'restrict' }),
+    /** A report about a club names the club itself, the way a content report names its item. */
+    communityId: uuid('community_id').references(() => communities.id, { onDelete: 'restrict' }),
     reporterAccountId: uuid('reporter_account_id')
       .notNull()
       .references(() => accounts.id, { onDelete: 'restrict' }),
@@ -43,6 +46,14 @@ export const moderationReports = pgTable(
     index('moderation_report_queue_idx').on(t.status, t.contentId),
     index('moderation_report_reporter_idx').on(t.reporterAccountId, t.createdAt),
     check('moderation_report_target_check', sql`(${t.targetKind} = 'CONTENT') = (${t.contentId} is not null)`),
+    // One open report per person per club, the same rule content already has.
+    uniqueIndex('moderation_report_one_open_club_key')
+      .on(t.reporterAccountId, t.communityId)
+      .where(sql`${t.status} = 'OPEN'`),
+    index('moderation_report_club_idx').on(t.communityId, t.status),
+    // The club key belongs to a club report and to nothing else. Compared as text so
+    // the migration that adds the value does not have to use it as an enum literal.
+    check('moderation_report_club_check', sql`(${t.targetKind}::text = 'CLUB') = (${t.communityId} is not null)`),
   ],
 );
 

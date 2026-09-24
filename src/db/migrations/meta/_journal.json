@@ -267,6 +267,13 @@
       "when": 1790225091480,
       "tag": "0037_trusted-period",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1790228491211,
+      "tag": "0038_club-core",
+      "breakpoints": true
     }
   ]
 }

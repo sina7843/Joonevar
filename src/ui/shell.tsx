@@ -257,6 +257,7 @@ export const ASSOC_NAV: readonly NavItem[] = [
   { href: '/assoc/vet-review', label: 'میز بررسی دامپزشکان', icon: 'listChecks' },
   { href: '/assoc/vet-trusted', label: 'دامپزشک معتمد', icon: 'shieldCheck' },
   { href: '/assoc/members', label: 'عضویت', icon: 'user' },
+  { href: '/assoc/clubs', label: 'کلاب‌ها', icon: 'user' },
   { href: '/assoc/kennels', label: 'کنل', icon: 'house' },
   { href: '/assoc/permits', label: 'مجوز جفت‌گیری', icon: 'stamp' },
   { href: '/assoc/postal', label: 'درخواست‌های پستی', icon: 'mapPin' },
@@ -305,6 +306,7 @@ export const CONTENT_NAV: readonly NavItem[] = [
   { href: '/content', label: 'همه محتوا', icon: 'clipboardText' },
   { href: '/content/new', label: 'محتوای تازه', icon: 'uploadSimple' },
   { href: '/content/reports', label: 'گزارش‌ها', icon: 'warning' },
+  { href: '/content/clubs', label: 'گزارش کلاب‌ها', icon: 'warning' },
   { href: '/content/restrictions', label: 'محدودیت ناشر', icon: 'shieldCheck' },
   { href: '/content/categories', label: 'دسته‌ها', icon: 'listChecks' },
 ];

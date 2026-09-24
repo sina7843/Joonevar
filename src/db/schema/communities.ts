@@ -24,6 +24,35 @@ export const communityScope = pgEnum('community_scope', ['NATIONAL', 'PROVINCIAL
 
 export const communityManagerStatus = pgEnum('community_manager_status', ['INVITED', 'ACCEPTED', 'DECLINED', 'REMOVED']);
 
+/**
+ * Where a club stands — Phase 2.5 §8 (PROMPT-012).
+ *
+ * A club is created as a draft, asks to be verified, and is only public once the
+ * association made it ACTIVE. Suspension, rejection and archiving are recorded
+ * states of the same record: nothing is deleted. Associations keep the Phase 2
+ * behaviour and are migrated straight to ACTIVE.
+ */
+export const communityLifecycle = pgEnum('community_lifecycle', [
+  'DRAFT',
+  'PENDING_VERIFICATION',
+  'NEEDS_CORRECTION',
+  'ACTIVE',
+  'SUSPENDED',
+  'REJECTED',
+  'ARCHIVED',
+]);
+
+/**
+ * What somebody may do inside one club. The assignment lives on
+ * `community_manager`, so a person is never listed twice for the same club, and
+ * it means nothing anywhere else: a role in one club grants no access to another.
+ */
+export const communityRole = pgEnum('community_role', ['OWNER', 'ADMIN', 'MODERATOR', 'MEMBER']);
+
+/** How somebody asks to own a club: taking an unowned one, or receiving a handover. */
+export const communityOwnershipKind = pgEnum('community_ownership_kind', ['CLAIM', 'TRANSFER']);
+export const communityOwnershipStatus = pgEnum('community_ownership_status', ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED']);
+
 export const communityEventStatus = pgEnum('community_event_status', ['DRAFT', 'PUBLISHED', 'CANCELLED']);
 
 export const communities = pgTable(
@@ -61,6 +90,17 @@ export const communities = pgTable(
     /** Only a club, and only with the superadmin's permission, publishes its own posts (§11). */
     canPublishPosts: boolean('can_publish_posts').notNull().default(false),
 
+    /**
+     * The club lifecycle (PROMPT-012). Publication is a separate question: a club
+     * is public only while it is ACTIVE *and* published, so verification cannot be
+     * bypassed by publishing and publishing is not implied by verification.
+     */
+    lifecycle: communityLifecycle('lifecycle').notNull().default('DRAFT'),
+    verifiedAt: timestamp('verified_at', { withTimezone: true }),
+    verifiedByAccountId: uuid('verified_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    /** Why the association decided what it decided; shown to the club's owner. */
+    lifecycleReasonFa: text('lifecycle_reason_fa'),
+
     publicSlug: text('public_slug'),
     publicStatus: vetPublicStatus('public_status').notNull().default('DRAFT'),
     publicPublishedAt: timestamp('public_published_at', { withTimezone: true }),
@@ -88,6 +128,9 @@ export const communities = pgTable(
     ),
     uniqueIndex('community_public_slug_key').on(t.publicSlug),
     index('community_kind_status_idx').on(t.kind, t.publicStatus),
+    index('community_lifecycle_idx').on(t.kind, t.lifecycle),
+    // A verified club knows who verified it and when; an unverified one claims neither.
+    check('community_verified_together', sql`(${t.verifiedAt} is null) = (${t.verifiedByAccountId} is null)`),
     index('community_owner_idx').on(t.ownerAccountId),
   ],
 );
@@ -130,6 +173,8 @@ export const communityManagers = pgTable(
       .notNull()
       .references(() => accounts.id, { onDelete: 'restrict' }),
     roleFa: text('role_fa'),
+    /** What this person may do inside this one club, and nowhere else (PROMPT-012). */
+    role: communityRole('role').notNull().default('MEMBER'),
     status: communityManagerStatus('status').notNull().default('INVITED'),
     invitedByAccountId: uuid('invited_by_account_id')
       .notNull()
@@ -143,6 +188,45 @@ export const communityManagers = pgTable(
   (t) => [
     uniqueIndex('community_manager_unique_key').on(t.communityId, t.accountId),
     index('community_manager_account_idx').on(t.accountId, t.status),
+  ],
+);
+
+/**
+ * Somebody asking to own a club — Phase 2.5 §8 (PROMPT-012).
+ *
+ * A CLAIM asks for a club nobody owns; a TRANSFER is the owner handing it to a
+ * named account, which that account and the association still have to accept.
+ * Only one request is open per club at a time, so two people cannot be given the
+ * same club by two decisions that never saw each other.
+ */
+export const communityOwnershipRequests = pgTable(
+  'community_ownership_request',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    communityId: uuid('community_id')
+      .notNull()
+      .references(() => communities.id, { onDelete: 'restrict' }),
+    kind: communityOwnershipKind('kind').notNull(),
+    /** Who asked: the claimant, or the owner who is handing the club over. */
+    requestedByAccountId: uuid('requested_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    /** Who would end up owning it. For a claim this is the requester. */
+    targetAccountId: uuid('target_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    status: communityOwnershipStatus('status').notNull().default('PENDING'),
+    reasonFa: text('reason_fa'),
+    decisionReasonFa: text('decision_reason_fa'),
+    decidedByAccountId: uuid('decided_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    decidedAt: timestamp('decided_at', { withTimezone: true }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('community_ownership_open_key').on(t.communityId).where(sql`${t.status} = 'PENDING'`),
+    index('community_ownership_target_idx').on(t.targetAccountId, t.status),
   ],
 );
 

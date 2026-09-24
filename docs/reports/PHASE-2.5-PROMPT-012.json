@@ -1,0 +1,139 @@
+{
+  "promptId": "PROMPT-012",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "Clubs became a first-class area without becoming a second record. A club is still one `community` row with kind CLUB, so the profile, events, posts, images, duplicate merge and the public reader of Phase 2 keep working on it unchanged; what was added is the part a club has and an association does not. The row now carries a lifecycle — DRAFT, PENDING_VERIFICATION, NEEDS_CORRECTION, ACTIVE, SUSPENDED, REJECTED, ARCHIVED — with who verified it and when, and the reason of the last decision; `community_manager` carries a club-scoped role of OWNER, ADMIN, MODERATOR or MEMBER; and a new `community_ownership_request` table holds claims and transfers. Anybody with an ordinary account may open a club, which starts as a draft they own and has no public address at all; they send it for verification once it has an introduction and a way to be reached, and only the association's operational environment (or the superadmin as the system authority behind it) verifies, asks for a correction, rejects, suspends or reinstates it, always with a reason that is audited and sent to the owner. Verification and publication stayed two separate questions: a club is public only while it is ACTIVE *and* published, and that gate was put into the one shared query every public path reads — the directory, the club page, /associations and the sitemap — so no route can go round it; leaving ACTIVE takes the publication down with it. Every authorization answer is asked with the club's own id, and there is no query in the module that could return a role for a different club, so a role in one club grants nothing in another. Nobody hands out ownership as if it were a role: it moves only by a claim on an unowned club or a transfer started by the current owner, and only the association decides. A partial unique index allows one open request per club, and the facts are re-read inside the deciding transaction, so a claim on a club that gained an owner meanwhile and a transfer from somebody who is no longer the owner are both conflicts rather than a second owner; the previous owner is left as an ADMIN rather than losing the club silently. Reporting was extended rather than rebuilt: `moderation_report` already names its target with a kind and one typed foreign key per kind, so CLUB and a `community_id` column joined it, with a CHECK that the club key belongs to a club report and to nothing else and the same one-open-report-per-person rule; the content admin decides all the open reports of a club together — dismiss, hide the page, or take the club out of public life, which is the suspension state — and nothing is deleted. The migration is explicit about what it does not know: rows that are published today became ACTIVE because they were published under the Phase 2 rules, but verified_at and verified_by stayed empty, since no such decision was ever recorded and inventing a verifier would be a lie.",
+  "changedFiles": [
+    "src/clubs/model.ts",
+    "src/clubs/service.ts",
+    "src/clubs/actions.ts",
+    "src/clubs/forms.tsx",
+    "src/communities/service.ts",
+    "src/authz/routes.ts",
+    "src/ui/shell.tsx",
+    "src/db/schema/communities.ts",
+    "src/db/schema/moderation.ts",
+    "src/db/schema/enums.ts",
+    "src/db/migrations/0038_club-core.sql",
+    "src/db/migrations/meta/0038_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "app/(public)/clubs/(list)/page.tsx",
+    "app/(public)/clubs/[slug]/page.tsx",
+    "app/account/clubs/page.tsx",
+    "app/account/clubs/[id]/page.tsx",
+    "app/assoc/clubs/page.tsx",
+    "app/assoc/clubs/[id]/page.tsx",
+    "app/content/clubs/page.tsx",
+    "app/report/club/[id]/page.tsx",
+    "tests/domain/club-model.test.ts",
+    "tests/db/clubs.test.ts",
+    "tests/browser/clubs.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-012.json"
+  ],
+  "migrations": ["src/db/migrations/0038_club-core.sql"],
+  "decisions": ["DEC-0198"],
+  "tests": {
+    "domainClubModel": { "command": "node --test tests/domain/club-model.test.ts", "total": 7, "pass": 7, "fail": 0, "skip": 0 },
+    "databaseClubs": { "command": "node --test tests/db/clubs.test.ts", "total": 7, "pass": 7, "fail": 0, "skip": 0, "durationSeconds": 6.9 },
+    "affectedSuites": {
+      "command": "node --test --test-concurrency=2 tests/db/communities.test.ts tests/db/moderation.test.ts tests/db/content.test.ts tests/db/search.test.ts tests/db/advertising.test.ts tests/ui/routes.test.ts tests/domain/migrations.test.ts",
+      "total": 58,
+      "pass": 58,
+      "fail": 0,
+      "skip": 0,
+      "note": "The suites that read the shared community query, the moderation table, the route table and the migration rules — the only existing behaviour this prompt touched. Unaffected passing suites were not re-run."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs tests/browser/clubs.test.ts tests/browser/communities.test.ts tests/browser/rtl.test.ts",
+      "total": 22,
+      "pass": 22,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 23.2
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in a detached worktree at HEAD ff24c83 with every changed and new file copied in, so the user's running server on port 3111 kept its .next. All six new routes compiled. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/club-model.test.ts ; node --test tests/db/clubs.test.ts ; node --test --test-concurrency=2 <7 affected suites>",
+      "result": "PASS",
+      "evidence": "7/7 model, 7/7 database, 58/58 across the suites that read the shared community query, the moderation table, the route table and the migration rules. Migration 0038 applied to every fresh test database."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/clubs.test.ts tests/browser/communities.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "22/22 on the first run on an isolated database and a production server built from the worktree. The new club leg walks the whole journey in a real browser: a person makes a club from their own account and sends it for verification, an account with no role there gets nothing from its management shell, the association verifies it, the owner publishes it, a phone visitor finds it at /clubs while the unverified club is absent, the report link sends an anonymous visitor to sign in, and a suspension turns the public address into a real 404."
+    },
+    {
+      "id": "cross-club-isolation",
+      "command": "node --test tests/db/clubs.test.ts (test: a role in one club grants nothing in another) ; tests/browser/clubs.test.ts (test: a role in another club is no role here)",
+      "result": "PASS",
+      "evidence": "An ADMIN of club A is ADMIN inside A and nobody inside B: the management view of B is null, and assigning a role, publishing or submitting B is FORBIDDEN. The owner of A is likewise nobody in B, and the club list of that account names A alone. An admin may hand out only the rungs below their own, a moderator may hand out nothing, and a removed membership row is kept rather than deleted."
+    },
+    {
+      "id": "unverified-visibility",
+      "command": "node --test tests/db/clubs.test.ts (test: an unverified club has no public page, however it is published)",
+      "result": "PASS",
+      "evidence": "A draft club whose publication columns were forced straight onto the record has no page and is not listed. A verified, published club has both. Suspending it takes the page down and resets publication to draft; reinstating does not republish by itself, because that stays the club's own decision."
+    },
+    {
+      "id": "transfer-conflicts",
+      "command": "node --test tests/db/clubs.test.ts (tests: two people cannot be handed the same club… ; an unowned club is claimed…)",
+      "result": "PASS",
+      "evidence": "A second open request on the same club is a conflict; a claim on an owned club and a transfer started by anyone but the owner are refused; the club cannot decide its own ownership. An approved transfer moves the owner and leaves the previous one as ADMIN. Deciding the same request twice is a conflict, and a transfer whose requester is no longer the owner cannot be approved — only rejected. A claimant may withdraw their own request and nobody else's."
+    },
+    {
+      "id": "moderation-with-audit",
+      "command": "node --test tests/db/clubs.test.ts (tests: a reported club is hidden or taken down… ; a report about a club never looks like a report about content)",
+      "result": "PASS",
+      "evidence": "A club's own owner cannot report it; a second open report by the same person is a conflict; the queue is refused to anyone but the moderation environment. One decision closes every open report of that club with its decision, actor and reason; HIDE hides the page and the owner cannot republish it; SOFT_DELETE suspends the club and takes it out of public life. The record, its name and both reports survive, two CLUB_REPORTS_DECIDED audit events carry the reasons and the owner was notified twice. The database itself refuses a club report with no club and a content report that names one."
+    },
+    {
+      "id": "explicit-migration-backfill",
+      "command": "node --test tests/domain/migrations.test.ts ; src/db/migrations/0038_club-core.sql",
+      "result": "PASS",
+      "evidence": "No drop, rename or destructive statement. Published rows become ACTIVE with verified_at and verified_by left empty, because no verification decision was ever recorded for them; everything else stays DRAFT; existing co-managers become ADMIN, which is what they already were. The CLUB report target is added as an enum value whose CHECK compares the column as text, so the same transaction never uses the new value as an enum literal."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Club membership of ordinary members — joining, requests, fees — is not this prompt: the roles here are the management roles, and joining a club is still arranged by the club itself.",
+    "A club's profile, events and posts are still edited on the Phase 2 screen at /account/communities/<id>, which only its owner may open; a club ADMIN can manage roles and publication but not yet the profile text.",
+    "Club posts keep their Phase 2 address under /associations/<slug>/posts/<post>, so the public club page links there rather than to a /clubs address.",
+    "A rejected club has no product path back: only the archive follows it, as the lifecycle table states.",
+    "The club report queue is a decision surface, not a full report browser: it groups open reports per club, and the per-report history of the content queue was not duplicated for clubs.",
+    "Screenshots were captured for the management shell, the verification screen, the directory and the public page; the moderation queue and the ownership decision screen have no screenshot."
+  ],
+  "readiness": {
+    "code": "CLUB_AREA_READY",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/domain/club-model.test.ts",
+    "tests/db/clubs.test.ts",
+    "tests/browser/clubs.test.ts",
+    "docs/reports/screenshots/phase-2.5/prompt-012/clubs-directory-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-012/club-page-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-012/club-management-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-012/club-verification-desktop.png",
+    "DECISIONS.md#dec-0198"
+  ]
+}

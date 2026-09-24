@@ -27,6 +27,8 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/veterinarians', access: 'PUBLIC' },
   { prefix: '/centers', access: 'PUBLIC' },
   { prefix: '/associations', access: 'PUBLIC' },
+  // The club directory (Phase 2.5 §8). Only verified, active, published clubs are served here.
+  { prefix: '/clubs', access: 'PUBLIC' },
   { prefix: '/breeds', access: 'PUBLIC' },
   { prefix: '/articles', access: 'PUBLIC' },
   { prefix: '/news', access: 'PUBLIC' },

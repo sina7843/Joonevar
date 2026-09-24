@@ -269,9 +269,21 @@ export async function createCommunity(database: Database, actor: Actor, input: C
     if (similar.length > 0 && input.confirmedNotDuplicate !== true) {
       throw conflict('رکوردی با همین نام و نوع ثبت شده است؛ اگر رکورد دیگری است، تأیید «تکراری نیست» را بزنید.');
     }
+    // A record entered here was entered by the review environment or the
+    // superadmin, which is the authority that verifies one, so it starts verified
+    // by that actor. A club a person creates for themselves starts as a draft and
+    // goes through the association (PROMPT-012).
     const [row] = await tx
       .insert(communities)
-      .values({ kind, displayNameFa, scope, sourceFa: bounded(input.sourceFa, 300, 'منبع اطلاعات') })
+      .values({
+        kind,
+        displayNameFa,
+        scope,
+        sourceFa: bounded(input.sourceFa, 300, 'منبع اطلاعات'),
+        lifecycle: 'ACTIVE',
+        verifiedAt: new Date(),
+        verifiedByAccountId: actor.accountId,
+      })
       .returning();
     await recordAudit(tx, actor, {
       action: 'COMMUNITY_CREATED',
@@ -852,6 +864,10 @@ async function publishedRows(database: DbClient, slug?: string): Promise<Communi
     .where(
       and(
         eq(communities.publicStatus, 'PUBLISHED'),
+        // Publication alone is not enough: only a verified, active record is public
+        // (PROMPT-012). A club waiting for verification, suspended or archived has
+        // no public page even while its own publication switch says PUBLISHED.
+        eq(communities.lifecycle, 'ACTIVE'),
         or(isNull(communities.ownerAccountId), ne(accounts.status, 'DISABLED')),
         // A merged duplicate leaves the lists but keeps its own address (§21).
         slug === undefined ? isNull(communities.mergedIntoCommunityId) : undefined,

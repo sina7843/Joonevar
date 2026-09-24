@@ -108,7 +108,7 @@ export const breedProfileStatus = pgEnum('breed_profile_status', ['DRAFT', 'PUBL
 export const contentKind = pgEnum('content_kind', ['ARTICLE', 'NEWS', 'ANNOUNCEMENT', 'CLUB_POST']);
 
 /** What a user report is about. Profiles join when their prompts publish them (006, 008, 010). */
-export const reportTargetKind = pgEnum('report_target_kind', ['CONTENT']);
+export const reportTargetKind = pgEnum('report_target_kind', ['CONTENT', 'CLUB']);
 
 export const reportReason = pgEnum('report_reason', [
   'INCORRECT_INFO',
