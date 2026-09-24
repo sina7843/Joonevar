@@ -21,7 +21,9 @@
     "docs/reports/PHASE-2.5-PROMPT-016.json"
   ],
   "migrations": [],
-  "decisions": ["DEC-0202"],
+  "decisions": [
+    "DEC-0202"
+  ],
   "tests": {
     "domainConfigUi": {
       "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
@@ -75,6 +77,12 @@
       "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=2 \"tests/db/*.test.ts\" (two halves) ; node tools/browser-tests.mjs",
       "result": "PASS",
       "evidence": "925 tests on one HEAD: 282 domain/config/UI, 444 database, 199 browser. No skips anywhere."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "199/199, no skips, in 459 s on an isolated database and a production server built from this HEAD — every browser suite of Phase 1, Phase 2 and Phase 2.5 together, including the new keyboard and performance suite. The first complete run had two stale test expectations and found one real sign-in accessibility defect; all three were fixed and the suite re-run green."
     },
     {
       "id": "ci-workflow",
