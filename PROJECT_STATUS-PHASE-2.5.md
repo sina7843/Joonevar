@@ -12,7 +12,7 @@ Managed by `node tools/runner.mjs --phase 2.5 …` (DEC-0187). The package is re
 - [x] PROMPT-008 — 008-periodic-vet-activation-payment <!-- work-commit:06699fbbe085771d4e2c142513d2bff798360876 -->
 - [x] PROMPT-009 — 009-timed-association-membership <!-- work-commit:89db1e37ca8d12e0522811fea77448b00adcf705 -->
 - [x] PROMPT-010 — 010-trusted-vet-eligibility-application <!-- work-commit:541d25c573303d100f67af76312dab3d0e231472 -->
-- [ ] PROMPT-011 — 011-trusted-review-payment-renewal
+- [x] PROMPT-011 — 011-trusted-review-payment-renewal <!-- work-commit:a295a71937da67be4314d57993182a76396af1d2 -->
 - [ ] PROMPT-012 — 012-club-core-ownership-rbac
 - [ ] PROMPT-013 — 013-club-rule-engine-membership
 - [ ] PROMPT-014 — 014-public-content-association-clubs
