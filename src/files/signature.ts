@@ -8,13 +8,21 @@
 import { validation } from '../domain/errors.ts';
 import type { FilePurposeName } from '../authz/policy.ts';
 
-export type DetectedMime = 'image/jpeg' | 'image/png' | 'application/pdf';
+export type DetectedMime = 'image/jpeg' | 'image/png' | 'application/pdf' | 'video/mp4';
 
 const MAGIC: ReadonlyArray<{ mime: DetectedMime; bytes: readonly number[] }> = [
   { mime: 'image/jpeg', bytes: [0xff, 0xd8, 0xff] },
   { mime: 'image/png', bytes: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
   { mime: 'application/pdf', bytes: [0x25, 0x50, 0x44, 0x46, 0x2d] }, // %PDF-
 ];
+
+/**
+ * MP4 does not start with a magic number: it starts with a box length, and the
+ * type follows at offset 4. Checked separately rather than bent into the table
+ * above, and accepted for exactly one purpose — the optional video of an animal
+ * listing (PROMPT-003). Every other purpose still refuses it.
+ */
+const FTYP = [0x66, 0x74, 0x79, 0x70] as const; // 'ftyp'
 
 export const MB = 1024 * 1024;
 
@@ -39,6 +47,15 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   CENTRE_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   VET_PROFILE_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   COMMUNITY_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  // Listing photos are served the same way every other public image is.
+  ANIMAL_LISTING_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  /*
+   * The one place a video is accepted. The ceiling is deliberately small: this
+   * is a short clip of one animal served whole through the ordinary media
+   * route, not a video platform, and a larger allowance would need byte-range
+   * serving and a storage decision nobody has taken.
+   */
+  ANIMAL_LISTING_VIDEO: { accept: ['video/mp4'], maxBytes: 20 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {
@@ -53,6 +70,7 @@ export function detectMime(bytes: Uint8Array): DetectedMime | null {
     }
     if (matches) return candidate.mime;
   }
+  if (bytes.length >= 12 && FTYP.every((byte, i) => bytes[4 + i] === byte)) return 'video/mp4';
   return null;
 }
 
@@ -60,6 +78,7 @@ export const EXTENSION: Record<DetectedMime, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
   'application/pdf': 'pdf',
+  'video/mp4': 'mp4',
 };
 
 /** Returns the trusted mime, or throws with a reason the UI can show as an accessible error. */
@@ -71,7 +90,10 @@ export function assertAcceptable(purpose: FilePurposeName, bytes: Uint8Array): D
   }
   const detected = detectMime(bytes);
   if (detected === null || !rule.accept.includes(detected)) {
-    throw validation('نوع فایل پذیرفته نمی‌شود. فقط JPG، PNG یا PDF بارگذاری کنید.');
+    // The message names what this purpose accepts, not a fixed list: a listing
+    // video and a national-id scan do not take the same files.
+    const allowed = rule.accept.map((mime) => EXTENSION[mime].toUpperCase()).join('، ');
+    throw validation('نوع فایل پذیرفته نمی‌شود. فقط ' + allowed + ' بارگذاری کنید.');
   }
   return detected;
 }

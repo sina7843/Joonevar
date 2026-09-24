@@ -402,11 +402,23 @@ export default async function DashboardPage() {
             <h2 id="animals-heading" className="text-h4">
               حیوان‌های من
             </h2>
-            {myAnimals.length > 0 ? (
-              <Link href="/animals" className="text-label-md text-text-brand underline underline-offset-4">
-                همه ({myAnimals.length})
+            <div className="flex items-baseline gap-md">
+              {/* The seller's own adverts (Phase 3, PROMPT-003). Always offered:
+                  the page itself explains why an animal cannot be advertised
+                  yet, which is more useful than a link that is not there. */}
+              <Link
+                href="/account/listings"
+                className="text-label-md text-text-brand underline underline-offset-4"
+                data-testid="dashboard-listings-link"
+              >
+                آگهی‌های فروش
               </Link>
-            ) : null}
+              {myAnimals.length > 0 ? (
+                <Link href="/animals" className="text-label-md text-text-brand underline underline-offset-4">
+                  همه ({myAnimals.length})
+                </Link>
+              ) : null}
+            </div>
           </div>
 
           {myAnimals.length === 0 ? (

@@ -145,7 +145,9 @@ export type FilePurposeName =
   | 'CENTRE_IMAGE'
   | 'VET_PROFILE_IMAGE'
   | 'COMMUNITY_IMAGE'
-  | 'VET_PROFESSIONAL_DOCUMENT';
+  | 'VET_PROFESSIONAL_DOCUMENT'
+  | 'ANIMAL_LISTING_IMAGE'
+  | 'ANIMAL_LISTING_VIDEO';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -173,6 +175,15 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   // Evidence of a professional case: the veterinarian and the reviewers, nobody else; every read is audited (DEC-0189).
   // The association admin (the Phase 1 association operator) reviews student and council cases (DEC-0190).
   VET_PROFESSIONAL_DOCUMENT: ['ASSOCIATION_OPERATOR', 'REVIEW_OPERATOR', 'SUPERADMIN'],
+  /*
+   * Listing media. The public reads these through /media only while the listing
+   * is published, exactly as a content image is read (DEC-0160). The private
+   * route grants one context beyond the owner: the listing moderator, who has
+   * to be able to look at a picture that was reported before deciding what to
+   * do about it. Nobody else, and not a whole shell.
+   */
+  ANIMAL_LISTING_IMAGE: ['LISTING_MODERATOR', 'SUPERADMIN'],
+  ANIMAL_LISTING_VIDEO: ['LISTING_MODERATOR', 'SUPERADMIN'],
 };
 
 export function canReadFile(

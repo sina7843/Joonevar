@@ -3,6 +3,7 @@ import { db } from '../../../src/db/client.ts';
 import { env } from '../../../src/config/env.ts';
 import { publicContentImage } from '../../../src/content/service.ts';
 import { publicRecordImage } from '../../../src/media/public-image.ts';
+import { publicListingMedia } from '../../../src/marketplace/listings.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   // records. Each source applies its own visibility rule and answers null the
   // same way, so a visitor cannot tell a hidden record from a missing one.
   const storage = env().PRIVATE_STORAGE_DIR;
-  const image = (await publicContentImage(db(), storage, id)) ?? (await publicRecordImage(db(), storage, id));
+  const image =
+    (await publicContentImage(db(), storage, id)) ??
+    (await publicRecordImage(db(), storage, id)) ??
+    // Listing photos and the optional clip, served only while the advert is
+    // published or reserved; pausing it takes the pictures down (PROMPT-003).
+    (await publicListingMedia(db(), storage, id));
   if (image === null) return new NextResponse('Not found', { status: 404 });
 
   /*

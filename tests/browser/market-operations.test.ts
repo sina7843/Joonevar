@@ -96,11 +96,22 @@ test('the marketplace shell opens for its own role and says what is closed and u
     assert.match(readiness, /هیچ جریان بازار یا فروشگاهی هنوز ساخته نشده است/);
     assert.match(readiness, /مقدار مدیریت‌شده هنوز ثبت نشده است/);
 
-    // Every switch starts closed, and the page says so rather than showing an
-    // empty control that could be read either way.
+    /*
+     * Every switch is rendered with a state a person can read as words rather
+     * than as an empty control. That every flag *starts* closed is a property
+     * of a fresh database, and it is pinned where that holds — the database
+     * suite. This suite shares one database with every other browser suite, and
+     * PROMPT-003's journey legitimately opens the animal market in it.
+     */
     const flags = await page.getByTestId('market-flags').innerText();
-    assert.ok(!flags.includes('باز\n'), 'no flow is open before it is built');
-    assert.match(flags, /بسته/);
+    for (const key of [
+      'market.flag.animal_market_enabled',
+      'market.flag.commerce_checkout_enabled',
+      'market.flag.payout_enabled',
+    ]) {
+      assert.match(await page.getByTestId('flag-' + key).innerText(), /باز|بسته/, key);
+    }
+    assert.match(flags, /بسته/, 'the flows nothing has opened still read as closed');
 
     // The launch state is visible as a fact, not as a promise.
     await expectText(page, 'سگ — فعال');

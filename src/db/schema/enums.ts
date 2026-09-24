@@ -122,6 +122,9 @@ export const filePurpose = pgEnum('file_purpose', [
   'COMMUNITY_IMAGE',
   /** Student card, council card, licence or certificate of a Phase 2.5 professional case; owner and reviewers only (DEC-0189). */
   'VET_PROFESSIONAL_DOCUMENT',
+  /** Photos and the optional video of an animal listing; served publicly only while the listing is published (PROMPT-003). */
+  'ANIMAL_LISTING_IMAGE',
+  'ANIMAL_LISTING_VIDEO',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -171,3 +174,49 @@ export const breedClaimKind = pgEnum('breed_claim_kind', [
   'PREDISPOSED_CONDITION',
   'SUGGESTED_GENETIC_TEST',
 ]);
+
+/**
+ * Animal listing lifecycle — Phase 3, PROMPT-003.
+ *
+ * DRAFT is private to the seller. PUBLISHED is the only state the public sees.
+ * PAUSED is the seller's own pause; SUSPENDED is a moderator's hold and is
+ * deliberately a different state, so "I paused it" and "we stopped it" are
+ * never confused. RESERVED is reached only by a verified deposit (PROMPT-006)
+ * and SOLD only by a completed handover (PROMPT-007).
+ */
+export const animalListingStatus = pgEnum('animal_listing_status', [
+  'DRAFT',
+  'PUBLISHED',
+  'PAUSED',
+  'RESERVED',
+  'SOLD',
+  'EXPIRED',
+  'SUSPENDED',
+  'REMOVED',
+]);
+
+/** Exact or negotiable (PRODUCT_DECISIONS §3). A negotiable listing has no price until it is locked. */
+export const listingPriceMode = pgEnum('listing_price_mode', ['EXACT', 'NEGOTIABLE']);
+
+/** Who is selling (PRODUCT_DECISIONS §2). Decided by the server from real facts, never from the form. */
+export const listingSellerKind = pgEnum('listing_seller_kind', ['OWNER', 'KENNEL']);
+
+/** The delivery options a seller offers; the buyer picks one (PRODUCT_DECISIONS §6). */
+export const listingDeliveryMethod = pgEnum('listing_delivery_method', [
+  'IN_PERSON',
+  'SELLER_LOCATION',
+  'VET_CLINIC',
+]);
+
+/**
+ * A disclosure the seller makes about the animal.
+ *
+ * Three values on purpose. Identity and ownership are facts Hamzist holds;
+ * vaccination and neutering are not, so «نمی‌دانم» has to be sayable instead of
+ * being collapsed into «خیر» — a listing that quietly claims "not vaccinated"
+ * because nobody answered is a false statement about somebody's animal.
+ */
+export const listingDisclosure = pgEnum('listing_disclosure', ['YES', 'NO', 'UNKNOWN']);
+
+/** Media of a listing. The video is optional (PRODUCT_DECISIONS §3). */
+export const listingMediaKind = pgEnum('listing_media_kind', ['IMAGE', 'VIDEO']);

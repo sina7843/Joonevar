@@ -1,0 +1,186 @@
+{
+  "promptId": "PROMPT-003",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "2e6fa81b04de78a22324ddf7fd37eab26a444f06",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "Animal-sale eligibility and the listing aggregate, both built on the records that already own the facts. Eligibility is resolved fresh every time from the identity case, the one membership rule, the animal record, the species enablement table and the microchip register — and a registered microchip means a row in the microchip table, never the declared number the schema itself calls a declaration that binds nothing. Two seller kinds: the KYC-approved owner with a live membership, and the same account when it holds an approved active kennel. The kennel path deliberately does not ask for a membership as well, because PRODUCT_DECISIONS names an active verified kennel as its own qualification; that reading is written down as a decision and pinned by a test rather than left implicit. The listing aggregate stores none of the animal's identity: date of birth, sex, breed, identifiers and current owner are joined on every read, so a correction made through the process that owns that fact reaches the advert immediately — a test changes the animal record and watches the advert follow without a single write to the listing. Eight states, with a transition table keyed by who is moving: RESERVED and SOLD are reachable only by the system, so no seller can claim a reservation or a sale by pressing a button, and SUSPENDED belongs to the moderator alone and is a different state from the seller's own PAUSED. One live listing per animal is a partial unique index rather than a check-then-insert, and the live set includes SUSPENDED so a moderator's hold cannot be escaped by starting again; two concurrent creates end with exactly one listing. The constraint is recognised by walking the error's cause chain, because matching the wrapper's message silently stops working the day its wording changes. Publication needs every required field at once — price mode and figure, description, reason for sale, place, both disclosures, a delivery method and the managed minimum of three photos — and it needs a configured duration, which is answered NOT_CONFIGURED rather than defaulted; the duration and its setting version are frozen on the advert. Publishing before the minimum handover age is allowed and the page states the earliest handover date, while handover itself stays closed. Vaccination and neutering are three-valued: Hamzist holds no such record, so «نمی‌دانم» is sayable and an unanswered question never becomes a claim that the animal is unvaccinated. Media goes through the existing private storage and is served by /media only while the advert is published or reserved, so pausing takes the pictures down; MP4 was added to the signature check for exactly one purpose with a 20 MB ceiling and one video per advert. Every create, edit and state change appends a revision that is never updated. Editing a published advert re-asks the whole eligibility question, and a published advert cannot be dropped below the minimum photo count without pausing first. Checks on one HEAD: typecheck, a clean production build, 994 tests green — 309 domain/config/UI, 474 database in two halves, 210 browser — and the upgrade rehearsal 18/18 with 0042 over real Phase 1 and Phase 2 records.",
+  "changedFiles": [
+    "src/db/migrations/0042_animal-listing.sql",
+    "src/db/migrations/meta/0042_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/enums.ts",
+    "src/db/schema/marketplace.ts",
+    "src/marketplace/listing-model.ts",
+    "src/marketplace/listing-eligibility.ts",
+    "src/marketplace/listings.ts",
+    "src/files/signature.ts",
+    "src/authz/policy.ts",
+    "app/account/listings/page.tsx",
+    "app/account/listings/actions.ts",
+    "app/account/listings/forms.tsx",
+    "app/account/listings/[id]/page.tsx",
+    "app/media/[id]/route.ts",
+    "app/dashboard/page.tsx",
+    "tests/domain/animal-listing-model.test.ts",
+    "tests/db/animal-listing.test.ts",
+    "tests/browser/animal-listing.test.ts",
+    "tests/browser/market-operations.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-3-PROMPT-003.json"
+  ],
+  "migrations": [
+    "src/db/migrations/0042_animal-listing.sql"
+  ],
+  "decisions": [
+    "DEC-0205"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 309,
+      "pass": 309,
+      "fail": 0,
+      "skip": 0,
+      "note": "294 before this prompt; the fifteen new ones are tests/domain/animal-listing-model.test.ts."
+    },
+    "databaseFirstHalf": {
+      "command": "node --test --test-concurrency=2 <first 30 of 60 tests/db suites>",
+      "total": 259,
+      "pass": 259,
+      "fail": 0,
+      "skip": 0
+    },
+    "databaseSecondHalf": {
+      "command": "node --test --test-concurrency=2 <last 30 of 60 tests/db suites>",
+      "total": 215,
+      "pass": 215,
+      "fail": 0,
+      "skip": 0,
+      "note": "Includes the eighteen new tests of tests/db/animal-listing.test.ts, which walk the real Phase 1 fixture: KYC, membership, a veterinary visit and a bound microchip before any advert exists."
+    },
+    "browserFull": {
+      "command": "node tools/browser-tests.mjs",
+      "total": 210,
+      "pass": 210,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 475,
+      "note": "206 before this prompt; the four new ones are tests/browser/animal-listing.test.ts. The first complete run failed one Phase 3 PROMPT-002 assertion that had assumed no other suite touches the kill switches; the browser suites share one database and this prompt's journey legitimately opens the animal market, so that assertion was moved to where it holds."
+    },
+    "upgradeRehearsal": {
+      "command": "node tools/upgrade-check.mjs",
+      "total": 18,
+      "pass": 18,
+      "fail": 0,
+      "note": "0042 applied over representative Phase 1 and Phase 2 records; nothing it adds disturbs an existing row."
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "rm -rf .next && npm run build",
+      "result": "PASS",
+      "evidence": "exit 0, built clean before the browser suites as the stale-build guard requires."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=2 <tests/db in two halves> ; node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "994 tests on one HEAD: 309 domain/config/UI, 474 database (259 + 215), 210 browser. 0 failures, 0 skips."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "210/210 in 475 s. The new suite walks the whole real journey — sign-in, identity, KYC review by the association, a paid membership, two registered animals, a booked veterinary visit and a chip bound at the desk — and only then builds the advert, uploads photos, is refused at two photos, publishes at three, pauses and is refused to another account."
+    },
+    {
+      "id": "eligibility-from-authoritative-records",
+      "command": "node --test tests/db/animal-listing.test.ts ; node tools/browser-tests.mjs tests/browser/animal-listing.test.ts",
+      "result": "PASS",
+      "evidence": "Every condition is proved against the real record and not a fixture row: a chip bound at a real visit satisfies the microchip condition while the declared number does not; another owner's animal answers NOT_OWNER the same way a missing one answers NOT_FOUND; a suspended membership closes the owner path and an approved kennel opens its own while an UNDER_REVIEW kennel does not; closing the dog for animal sale in the species table closes creation with SPECIES_CLOSED; and the kill switch refuses creation before the market is opened. The browser suite shows the same refusal on the seller's own page with the link that clears it."
+    },
+    {
+      "id": "derived-facts-not-copied",
+      "command": "node --test tests/db/animal-listing.test.ts",
+      "result": "PASS",
+      "evidence": "The listing table holds no date of birth, sex, breed, identifier or owner column. A test reads the advert, changes the animal's sex and birth date directly on the animal record, reads the advert again and sees the new values with the listing's own version unchanged — proving the advert joins rather than caches."
+    },
+    {
+      "id": "lifecycle-and-concurrent-duplicates",
+      "command": "node --test tests/domain/animal-listing-model.test.ts tests/db/animal-listing.test.ts",
+      "result": "PASS",
+      "evidence": "The domain suite walks every origin status and asserts that RESERVED, SOLD, SUSPENDED and EXPIRED are never seller moves, that a suspended advert is released only by a moderator, and that a sold advert has no moves at all. The database suite fires two creates for one animal concurrently and ends with exactly one row, refuses a second advert while the first is suspended, and allows one again once the first is removed."
+    },
+    {
+      "id": "publication-requirements-and-managed-values",
+      "command": "node --test tests/db/animal-listing.test.ts ; node tools/browser-tests.mjs tests/browser/animal-listing.test.ts",
+      "result": "PASS",
+      "evidence": "An empty draft is refused with a named missing field; two photos are refused against the managed minimum of three; and with everything else in place a missing duration is answered NOT_CONFIGURED rather than defaulted. Once the duration is entered the advert publishes and freezes the value with its setting version. The browser suite shows the same three steps on the real page."
+    },
+    {
+      "id": "private-media-publication-rule",
+      "command": "node --test tests/db/animal-listing.test.ts",
+      "result": "PASS",
+      "evidence": "A draft's photo is not served; a published advert's is; pausing takes it down again; a malformed id and a KYC file answer null the same way, so a visitor cannot tell a paused advert from one that never existed. One video per advert is a partial unique index, a PNG offered as a video is refused on its magic bytes, and missing alt text is refused."
+    },
+    {
+      "id": "sensitive-edit-revalidation-and-revisions",
+      "command": "node --test tests/db/animal-listing.test.ts",
+      "result": "PASS",
+      "evidence": "Editing a published advert after the membership lapses is refused with the real reason while the advert itself stays up; the same edit on a private draft is allowed. A stale expectedVersion is refused and the newer content survives. Four changes produce revisions numbered 1-4 with the actions CREATED, EDITED, PUBLISHED and STATUS_PAUSED, the edit's snapshot holding the price exactly as entered and the publication's snapshot holding all three photos."
+    },
+    {
+      "id": "moderation-by-capability",
+      "command": "node --test tests/db/animal-listing.test.ts",
+      "result": "PASS",
+      "evidence": "A user, a support agent, a finance operator and even the marketplace admin are each refused the suspension; only ANIMAL_LISTING_MODERATE may make it, and only with a reason. A suspended advert cannot be lifted, edited around or replaced by the seller, and both decisions are in the audit log with their reasons."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Expiry needs a caller. expireDueListings is a real, idempotent function with a test, but nothing in the repository runs it on a schedule, so an advert passes its date only when somebody invokes it.",
+    "The public side of the market does not exist yet: there is no search, no public listing page and no report path. This prompt built the seller's side; PROMPT-004 builds the rest.",
+    "The maximum number of simultaneous adverts is unset managed data, so no cap is enforced today. An unset cap is not zero and not a decided unlimited; the setting note and this report say so rather than a number being invented.",
+    "The listing duration, publication and renewal fees, and the promotion package prices are all unset, so publication needs the duration entered first and the paid paths do not exist yet.",
+    "«Alive and transferable» is checked as far as the data allows: the animal record has no death state in this product, so the condition is that the record is REGISTERED and not archived. Anything stronger would be a claim the schema does not support.",
+    "The optional video is served whole through the ordinary media route with a 20 MB ceiling. Byte-range serving and a real storage decision are not in this prompt.",
+    "The seller's confirmation of a state change is the status itself: the success message lives on the form for that move, and that form is no longer rendered once the move has happened.",
+    "The browser suite repeats the animal-and-desk journey that tests/browser/registration.test.ts also walks. Sharing it would mean refactoring a green suite inside another prompt; the duplication is the fixture idiom this directory already uses.",
+    "One PROMPT-002 browser assertion was corrected here: it had assumed the kill switches are untouched, which is only true of a fresh database. The browser suites share one, and this prompt's journey opens the animal market in it; the 'starts closed' property is pinned in the database suite, where it holds."
+  ],
+  "readiness": {
+    "code": "PHASE_3_ANIMAL_LISTING_BUILT",
+    "publicMarket": "NOT_STARTED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0042_animal-listing.sql",
+    "src/marketplace/listing-eligibility.ts",
+    "src/marketplace/listing-model.ts",
+    "src/marketplace/listings.ts",
+    "app/account/listings/page.tsx",
+    "app/account/listings/[id]/page.tsx",
+    "tests/domain/animal-listing-model.test.ts",
+    "tests/db/animal-listing.test.ts",
+    "tests/browser/animal-listing.test.ts",
+    "docs/reports/screenshots/phase-3/prompt-003/listings-dashboard-mobile.png",
+    "docs/reports/screenshots/phase-3/prompt-003/listing-published-desktop.png",
+    "docs/reports/screenshots/phase-3/prompt-003/market-closed-mobile.png",
+    "DECISIONS.md#dec-0205",
+    "REQUIREMENTS_TRACEABILITY.md"
+  ]
+}
