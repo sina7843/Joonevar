@@ -517,7 +517,7 @@ export const vetTagAssignments = pgTable(
 
 // ── Professional cases and evidence (Phase 2.5, PROMPT-003) ────────────────
 
-export const vetCaseType = pgEnum('vet_case_type', ['STUDENT', 'COUNCIL', 'LICENCE', 'CLAIM']);
+export const vetCaseType = pgEnum('vet_case_type', ['STUDENT', 'COUNCIL', 'LICENCE', 'CLAIM', 'TRUSTED']);
 export const vetCaseStatus = pgEnum('vet_case_status', [
   'DRAFT',
   'SUBMITTED',
@@ -531,6 +531,8 @@ export const vetCaseStatus = pgEnum('vet_case_status', [
   'ACTIVE_LICENSED_VET',
   'EXPIRED',
   'SUSPENDED',
+  /** A trusted application the association accepted; the trusted period is paid for next (PROMPT-011). */
+  'TRUSTED_APPROVED_AWAITING_PAYMENT',
 ]);
 export const vetProfessionalDocumentKind = pgEnum('vet_professional_document_kind', [
   'STUDENT_CARD',
@@ -659,6 +661,40 @@ export const vetProfessionalDocuments = pgTable(
 );
 
 /** Services a veterinarian may list. Reference data: rows arrive by migration (DEC-0189). */
+/**
+ * What a trusted-veterinarian applicant declared, for one submission version —
+ * Phase 2.5 §7 (PROMPT-010).
+ *
+ * The product asks for two things no file can prove: that the applicant accepts a
+ * named version of the terms, and that they say they have a microchip reader. Both
+ * are kept here with the version they were given and the moment they were made, so
+ * a later edit of the terms never rewrites what somebody actually accepted. This
+ * is a declaration, never a verification: anything shown publicly from it says
+ * «تجهیزات اعلام‌شده».
+ */
+export const vetTrustedDeclarations = pgTable(
+  'vet_trusted_declaration',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    caseId: uuid('case_id')
+      .notNull()
+      .references(() => vetProfessionalCases.id, { onDelete: 'restrict' }),
+    submissionVersion: integer('submission_version').notNull(),
+    /** The version of the terms text the applicant was shown and accepted. */
+    termsVersion: text('terms_version').notNull(),
+    /** The version of the declaration wording itself. */
+    declarationVersion: text('declaration_version').notNull(),
+    /** Self-declared, never proven. False is not a valid application. */
+    microchipReaderDeclared: boolean('microchip_reader_declared').notNull(),
+    declaredAt: timestamp('declared_at', { withTimezone: true }).notNull().default(now),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('vet_trusted_declaration_version_key').on(t.caseId, t.submissionVersion),
+    check('vet_trusted_declaration_reader_declared', sql`${t.microchipReaderDeclared} = true`),
+  ],
+);
+
 export const vetServices = pgTable(
   'vet_service',
   {

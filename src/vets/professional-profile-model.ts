@@ -16,7 +16,7 @@ export const VET_APPLICANT_TYPES = ['STUDENT', 'DOCTOR'] as const;
 export type VetApplicantType = (typeof VET_APPLICANT_TYPES)[number];
 
 /** What a case asks to be verified. CLAIM keeps the Phase 2 claim of an unowned page. */
-export const VET_CASE_TYPES = ['STUDENT', 'COUNCIL', 'LICENCE', 'CLAIM'] as const;
+export const VET_CASE_TYPES = ['STUDENT', 'COUNCIL', 'LICENCE', 'CLAIM', 'TRUSTED'] as const;
 export type VetCaseType = (typeof VET_CASE_TYPES)[number];
 
 export const PROFESSIONAL_DOCUMENT_KINDS = ['STUDENT_CARD', 'COUNCIL_CARD', 'PRACTICE_LICENCE', 'CERTIFICATE', 'IDENTITY', 'OTHER'] as const;
@@ -34,6 +34,7 @@ export const CASE_TYPE_FA: Record<VetCaseType, string> = {
   COUNCIL: 'احراز کد نظام',
   LICENCE: 'ثبت پروانه فعالیت',
   CLAIM: 'Claim پروفایل بدون مالک',
+  TRUSTED: 'درخواست دامپزشک معتمد',
 };
 export const CASE_STATUS_FA: Record<VetCaseStatus, string> = {
   DRAFT: 'پیش‌نویس',
@@ -48,6 +49,7 @@ export const CASE_STATUS_FA: Record<VetCaseStatus, string> = {
   ACTIVE_LICENSED_VET: 'پروانه فعال',
   EXPIRED: 'منقضی',
   SUSPENDED: 'معلق',
+  TRUSTED_APPROVED_AWAITING_PAYMENT: 'معتمد تأییدشده، در انتظار پرداخت',
 };
 export const DOCUMENT_KIND_FA: Record<ProfessionalDocumentKind, string> = {
   STUDENT_CARD: 'کارت دانشجویی',
@@ -364,6 +366,13 @@ export const REVIEW_CHECKS: Record<VetCaseType, readonly ReviewCheckDefinition[]
   CLAIM: [
     { code: 'COUNCIL_CARD_MATCHES', labelFa: 'کارت نظام خوانا است و با کد نظام اعلام‌شده می‌خواند' },
     IDENTITY_MATCHES,
+  ],
+  // Nothing here asks for evidence of the reader: it is a declaration (§7).
+  TRUSTED: [
+    { code: 'LICENCE_STILL_ACTIVE', labelFa: 'دوره پروانه فعالیت متقاضی هنوز فعال است' },
+    { code: 'MEMBERSHIP_STILL_VALID', labelFa: 'عضویت انجمن متقاضی هنوز معتبر است' },
+    { code: 'TERMS_ACCEPTED', labelFa: 'نسخه پذیرفته‌شده تعهدنامه همان نسخه منتشرشده است' },
+    { code: 'READER_DECLARED', labelFa: 'خوداظهاری داشتن میکروچیپ‌ریدر ثبت شده است (مدرک لازم نیست)' },
   ],
 };
 

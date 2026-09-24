@@ -38,8 +38,8 @@ import {
 const CASE_TARGET = 'VET_PROFESSIONAL_CASE';
 
 export const REVIEW_CONTEXTS: readonly ActorContextName[] = ['ASSOCIATION_OPERATOR', 'SUPERADMIN'];
-/** The case types the association decides in this environment; the trusted type joins with PROMPT-010. */
-export const REVIEW_CASE_TYPES: readonly VetCaseType[] = ['STUDENT', 'COUNCIL', 'LICENCE'];
+/** The case types the association decides in this environment. */
+export const REVIEW_CASE_TYPES: readonly VetCaseType[] = ['STUDENT', 'COUNCIL', 'LICENCE', 'TRUSTED'];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const STALE = 'این پرونده هم‌زمان تغییر کرده است؛ صفحه را دوباره باز کنید.';
 const HELD_BY_OTHER = 'این پرونده را بررسی‌کننده دیگری در دست دارد؛ تا رها نشود، اقدام دیگری روی آن ممکن نیست.';
@@ -52,7 +52,7 @@ export type ReviewClaim = (typeof REVIEW_CLAIMS)[number];
 const VIEW_STATUSES: Record<Exclude<ReviewView, 'ALL'>, readonly VetCaseStatus[]> = {
   OPEN: ['SUBMITTED', 'UNDER_REVIEW'],
   CORRECTION: ['NEEDS_CORRECTION'],
-  DECIDED: ['VERIFIED_STUDENT', 'VERIFIED_NO_LICENSE', 'LICENSE_APPROVED_AWAITING_PAYMENT', 'REJECTED'],
+  DECIDED: ['VERIFIED_STUDENT', 'VERIFIED_NO_LICENSE', 'LICENSE_APPROVED_AWAITING_PAYMENT', 'TRUSTED_APPROVED_AWAITING_PAYMENT', 'REJECTED'],
 };
 
 export const DETAIL_ROUTE: Record<VetCaseType, string> = {
@@ -60,6 +60,7 @@ export const DETAIL_ROUTE: Record<VetCaseType, string> = {
   COUNCIL: '/assoc/vet-doctors/',
   LICENCE: '/assoc/vet-licences/',
   CLAIM: '/assoc/vet-doctors/',
+  TRUSTED: '/assoc/vet-trusted/',
 };
 
 export type CaseRow = typeof vetProfessionalCases.$inferSelect;

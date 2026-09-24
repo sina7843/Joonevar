@@ -83,6 +83,8 @@ export const VET_CASE_STATUSES = [
   'ACTIVE_LICENSED_VET',
   'EXPIRED',
   'SUSPENDED',
+  /** A trusted application the association accepted; its period is paid for next (PROMPT-011). */
+  'TRUSTED_APPROVED_AWAITING_PAYMENT',
 ] as const;
 export type VetCaseStatus = (typeof VET_CASE_STATUSES)[number];
 export const isVetCaseStatus = oneOf(VET_CASE_STATUSES);
@@ -110,6 +112,8 @@ const MOVES: Record<VetCaseStatus, readonly Move[]> = {
     { to: 'REJECTED', by: 'REVIEWER', reasonRequired: true },
     { to: 'VERIFIED_STUDENT', by: 'REVIEWER', reasonRequired: true },
     { to: 'VERIFIED_NO_LICENSE', by: 'REVIEWER', reasonRequired: true },
+    // A trusted approval opens the trusted period payment; it does not make the trusted tag.
+    { to: 'TRUSTED_APPROVED_AWAITING_PAYMENT', by: 'REVIEWER', reasonRequired: true },
     // A licence approval opens payment; it does not make the licensed tag (PRODUCT_DECISIONS).
     { to: 'LICENSE_APPROVED_AWAITING_PAYMENT', by: 'REVIEWER', reasonRequired: true },
     // A reviewer who stops mid-review returns it to the queue.
@@ -134,6 +138,9 @@ const MOVES: Record<VetCaseStatus, readonly Move[]> = {
   ],
   // Renewal is a new verified payment for the same approved licence.
   EXPIRED: [{ to: 'ACTIVE_LICENSED_VET', by: 'SYSTEM', reasonRequired: false }],
+  // No deadline here either: the trusted approval waits for its payment (PROMPT-011),
+  // and the association may still suspend what it approved.
+  TRUSTED_APPROVED_AWAITING_PAYMENT: [{ to: 'SUSPENDED', by: 'REVIEWER', reasonRequired: true }],
   SUSPENDED: [{ to: 'UNDER_REVIEW', by: 'REVIEWER', reasonRequired: true }],
 };
 
@@ -155,6 +162,7 @@ export const isTerminalVetCase = (status: VetCaseStatus): boolean => MOVES[statu
  */
 export function tagForCaseStatus(status: VetCaseStatus, kind: 'STUDENT' | 'DOCTOR'): Exclude<VetTag, 'TRUSTED'> | null {
   if (kind === 'STUDENT') return status === 'VERIFIED_STUDENT' ? 'STUDENT' : null;
+  // An approved trusted application still holds whatever the licence gave it.
   if (status === 'VERIFIED_NO_LICENSE' || status === 'LICENSE_APPROVED_AWAITING_PAYMENT') return 'UNLICENSED';
   return status === 'ACTIVE_LICENSED_VET' ? 'LICENSED' : null;
 }

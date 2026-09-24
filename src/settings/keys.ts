@@ -573,6 +573,38 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     min: 0,
     max: 365,
   },
+  // ── Trusted veterinarian (Phase 2.5, PROMPT-010) ───────────────────────
+  // The terms a trusted applicant accepts are a document the association writes,
+  // and the version they accepted is stored with their application. No text and
+  // no version is invented here: until both are entered, the application path
+  // stays closed rather than asking somebody to accept an empty undertaking.
+  {
+    key: 'guide_text.trusted_vet_terms',
+    group: 'GUIDE_TEXT',
+    kind: 'TEXT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'متن تعهدنامه دامپزشک معتمد',
+    noteFa: 'متنی که متقاضی معتمد می‌پذیرد. تا ثبت متن واقعی، درخواست معتمد باز نمی‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'trusted_vet.terms_version',
+    group: 'GUIDE_TEXT',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نسخه تعهدنامه دامپزشک معتمد',
+    noteFa: 'هر بار که متن تعهدنامه عوض می‌شود، این نسخه هم باید عوض شود. نسخه پذیرفته‌شده روی همان درخواست ثبت می‌ماند.',
+    seedValue: null,
+  },
+  {
+    key: 'trusted_vet.declaration_version',
+    group: 'GUIDE_TEXT',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نسخه متن خوداظهاری تجهیزات',
+    noteFa: 'نسخه عبارتی که متقاضی با آن داشتن میکروچیپ‌ریدر را خوداظهاری می‌کند. مدرکی لازم نیست؛ همه‌جا «تجهیزات اعلام‌شده» نوشته می‌شود.',
+    seedValue: null,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(

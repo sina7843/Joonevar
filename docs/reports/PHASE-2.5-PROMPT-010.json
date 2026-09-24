@@ -1,0 +1,118 @@
+{
+  "promptId": "PROMPT-010",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The trusted-veterinarian application. Eligibility is built from the two authoritative answers the product already has — an active practice licence period (PROMPT-008) and a valid association membership (PROMPT-009) — and never from a status column; asking for it also applies whatever time has done to both, so a lapsed period is never mistaken for a live one. The request card appears only to an account whose licence period is live; when the membership is what is missing the card stays, the submission is not offered, and the reason names the membership and links to it, one unmet condition at a time. The terms are managed data: the text and two versions (terms and declaration wording) ship with no seed value, so until the association writes them the path is closed with that reason rather than asking anybody to accept an empty undertaking. An application requires accepting the published version of the terms and declaring that a microchip reader exists; no file is required for either, and accepting an older version is refused rather than silently upgraded. What was accepted and declared is stored separately from the submission payload in vet_trusted_declaration — terms version, declaration version, the declaration itself and declaredAt — one row per submission version, append-only by trigger, with a database CHECK that a negative declaration cannot be stored; optional equipment is recorded in the existing declared-equipment table and every public word for it is «تجهیزات اعلام‌شده». The case is a new TRUSTED type of the existing professional case, so SUBMITTED, UNDER_REVIEW, NEEDS_CORRECTION and REJECTED, the version history, the audit trail and the PROMPT-007 review workbench (claim, structured checks, version locks) all apply unchanged. Eligibility is re-evaluated at submission, at the answer to a correction and at approval: a membership or licence that lapsed in between stops the approval and tells the reviewer which one, while requesting a correction or rejecting stays possible because neither hands anything out. An approval reaches TRUSTED_APPROVED_AWAITING_PAYMENT only — the trusted tag still waits for a payment the server verifies (PROMPT-011).",
+  "changedFiles": [
+    "src/vets/trusted-model.ts",
+    "src/vets/trusted-application.ts",
+    "src/vets/trusted-actions.ts",
+    "src/vets/trusted-forms.tsx",
+    "app/assoc/vet-trusted/page.tsx",
+    "app/assoc/vet-trusted/[id]/page.tsx",
+    "app/account/vet-profile/page.tsx",
+    "src/vets/professional-model.ts",
+    "src/vets/professional-profile-model.ts",
+    "src/vets/review-workbench.ts",
+    "src/settings/keys.ts",
+    "src/ui/shell.tsx",
+    "src/db/schema/vets.ts",
+    "src/db/migrations/0036_trusted-application.sql",
+    "src/db/migrations/meta/0036_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "tests/domain/vet-trusted.test.ts",
+    "tests/db/vet-trusted.test.ts",
+    "tests/browser/vet-licence.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-010.json"
+  ],
+  "migrations": ["src/db/migrations/0036_trusted-application.sql"],
+  "decisions": ["DEC-0196"],
+  "tests": {
+    "domainTrusted": {"command": "node --test tests/domain/vet-trusted.test.ts", "total": 4, "pass": 4, "fail": 0},
+    "databaseTrusted": {"command": "node --test tests/db/vet-trusted.test.ts", "total": 5, "pass": 5, "fail": 0},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 304, "total": 400, "pass": 400, "fail": 0, "skip": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "total": 263, "pass": 263, "fail": 0, "skip": 0},
+    "browserTrustedFirstRun": {"command": "node tools/browser-tests.mjs tests/browser/vet-licence.test.ts", "total": 5, "pass": 4, "fail": 1, "note": "The new browser leg failed three times on its own fixture, never on the product: the licence applicant has no identity profile and no approved KYC (the licence path never needed either), and the KYC submit stays disabled until the upload is stored. The test now saves an identity, uploads and waits for the upload, submits, has the association approve the KYC, and then applies for membership."},
+    "browserFull": {"command": "node tools/browser-tests.mjs", "durationSeconds": 441, "total": 172, "pass": 172, "fail": 0, "skip": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm ci ; npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 77.8 s on the first attempt in a detached worktree at HEAD f1f3e60 with every changed and new file copied in, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\" ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "The complete database suite passed 400/400 with migration 0036 applied to fresh test databases, including the 5 new trusted tests; domain, config and UI passed 263/263 including the 4 new condition and declaration tests."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "The full 172-test matrix passed. The new leg: an active licensed veterinarian sees the trusted card with the membership named as the one missing condition and a link to it, and no form; after identity, KYC, an approved membership application and a verified membership payment the form appears, refuses to submit until both the terms and the declaration are ticked, and the application reaches the association; the association reads the declaration, the declared equipment and the conditions as they stand now, approves with a reason, and the applicant then sees «معتمد تأییدشده، در انتظار پرداخت» while the tag is still the licensed one."
+    },
+    {
+      "id": "eligibility-source",
+      "command": "node --test tests/db/vet-trusted.test.ts (test: the request belongs to an active licensed vet…) ; node --test tests/domain/vet-trusted.test.ts",
+      "result": "PASS",
+      "evidence": "An account that is not a licensed veterinarian is not offered the request at all and its submission is CONFLICT. A licensed veterinarian without a membership is offered the card, is refused the submission, and the unmet condition is MEMBERSHIP with the link /membership. Both conditions are read from licenceStanding and membershipStanding, and reading them applies any due expiry first."
+    },
+    {
+      "id": "exact-unmet-reasons",
+      "command": "node --test tests/domain/vet-trusted.test.ts ; browser vet-licence",
+      "result": "PASS",
+      "evidence": "Each condition answers for itself with its own sentence and its own link: the membership reason names the membership standing and links to /membership, the licence reason names the period standing and links to the profile, unpublished terms say the association has not written them and offer no link because the applicant can do nothing about it. When both are missing, both are said. In the browser the reasons are listed and the submit is absent."
+    },
+    {
+      "id": "declaration-and-terms",
+      "command": "node --test tests/db/vet-trusted.test.ts (test: the declaration is required…) ; node --test tests/domain/vet-trusted.test.ts",
+      "result": "PASS",
+      "evidence": "No declaration is VALIDATION; accepting an older terms version is VALIDATION rather than an upgrade; a valid application stores the terms version, the declaration version, the declaration and declaredAt in its own row, and the microchip reader is recorded as declared equipment. The row cannot be updated or deleted (23001), and the database refuses a stored negative declaration. No file is asked for anywhere, and the public wording stays «تجهیزات اعلام‌شده»."
+    },
+    {
+      "id": "states-and-history",
+      "command": "node --test tests/db/vet-trusted.test.ts (test: a correction is answered with a new version…)",
+      "result": "PASS",
+      "evidence": "USER, BREEDER, TRUSTED_VET and GENETICS_OPERATOR cannot read the queue or decide; a decision without a reason is VALIDATION. A correction is answered as submission version 2, each version keeps its own declaration, both decisions are audited with their reasons and both notify the applicant, and the approval reaches TRUSTED_APPROVED_AWAITING_PAYMENT — not a tag."
+    },
+    {
+      "id": "races-with-expiry",
+      "command": "node --test tests/db/vet-trusted.test.ts (tests: a membership that lapses… ; a licence period that runs out…)",
+      "result": "PASS",
+      "evidence": "A membership suspended between applying and deciding makes the approval CONFLICT and moves nothing, while requesting a correction still works and the applicant cannot answer it until the membership is valid again; after reinstatement the approval succeeds. A licence period that runs out past its grace removes the request entirely, makes the approval CONFLICT at that moment, and still allows a rejection. The review page shows the conditions as they stand now and says when they no longer hold."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The trusted period payment, the trusted tag and what happens to it on expiry or suspension are PROMPT-011; approval here only opens that path.",
+    "No terms text or version exists for the product, so the application path stays closed until the association enters all three managed values.",
+    "The trusted case has no separate history page for the applicant beyond the status, the reason and the revision form on the account page.",
+    "Declared equipment is added when an application is submitted and is not removable from this screen; nothing in the product presents it as verified.",
+    "The association's trusted queue has views but no search or pagination controls of its own; the unified workbench of PROMPT-007 covers filtering.",
+    "Screenshots were not captured; visual fidelity of the trusted card and the review page is unverified."
+  ],
+  "readiness": {
+    "code": "TRUSTED_APPLICATION_READY_AWAITING_PAYMENT_FLOW",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/vet-trusted.test.ts",
+    "tests/domain/vet-trusted.test.ts",
+    "tests/browser/vet-licence.test.ts",
+    "DECISIONS.md#dec-0196"
+  ]
+}

@@ -255,6 +255,7 @@ export const ASSOC_NAV: readonly NavItem[] = [
   { href: '/assoc/vet-doctors', label: 'کد نظام دامپزشکان', icon: 'shieldCheck' },
   { href: '/assoc/vet-licences', label: 'پروانه فعالیت', icon: 'stamp' },
   { href: '/assoc/vet-review', label: 'میز بررسی دامپزشکان', icon: 'listChecks' },
+  { href: '/assoc/vet-trusted', label: 'دامپزشک معتمد', icon: 'shieldCheck' },
   { href: '/assoc/members', label: 'عضویت', icon: 'user' },
   { href: '/assoc/kennels', label: 'کنل', icon: 'house' },
   { href: '/assoc/permits', label: 'مجوز جفت‌گیری', icon: 'stamp' },

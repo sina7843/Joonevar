@@ -253,6 +253,13 @@
       "when": 1790207927759,
       "tag": "0035_timed-membership",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790210467303,
+      "tag": "0036_trusted-application",
+      "breakpoints": true
     }
   ]
 }

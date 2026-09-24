@@ -16,6 +16,8 @@ import { myLicenceCase, vetServiceCatalogue } from '../../../src/vets/licence-ap
 import { licenceStanding } from '../../../src/vets/licence-period.ts';
 import { LICENCE_STANDING_FA } from '../../../src/vets/licence-period-model.ts';
 import { PayLicencePeriodForm } from '../../../src/vets/licence-period-forms.tsx';
+import { myTrustedCase, trustedEligibility, vetEquipmentCatalogue } from '../../../src/vets/trusted-application.ts';
+import { TrustedApplicationForm } from '../../../src/vets/trusted-forms.tsx';
 import { myCentreInvitations } from '../../../src/centres/service.ts';
 import { CentreInvitationForm } from '../../../src/centres/forms.tsx';
 import {
@@ -104,6 +106,13 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
   // Reading the licence also applies whatever time has done to it: the renewal
   // reminder while a period is live, and the downgrade once it is over (PROMPT-008).
   const licence = await licenceStanding(db(), actor.accountId);
+  // The trusted request is shown only to an active licensed veterinarian, and the
+  // unmet conditions are named one by one rather than as a single refusal (§7).
+  const [trusted, trustedCase, equipmentCatalogue] = await Promise.all([
+    trustedEligibility(db(), actor.accountId),
+    myTrustedCase(db(), actor),
+    vetEquipmentCatalogue(db()),
+  ]);
   const latest = applications[0] ?? null;
   const open = applications.find((application) => isOpenApplication(application.status)) ?? null;
   const provinceOf = (cityId: string | null) => reference.cities.find((city) => city.id === cityId)?.provinceCode ?? null;
@@ -121,6 +130,82 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
   return (
     <PublicShell actor={actor} title="پروفایل دامپزشکی" pathname="/account/vet-profile">
       <div className="space-y-lg">
+        {trusted.isActiveLicensedVet || trustedCase ? (
+          <Card>
+            <h2 className="text-label-lg">دامپزشک معتمد</h2>
+            <p className="mt-xs text-caption text-text-secondary">
+              معتمد شدن دو شرط دارد: دوره فعال پروانه فعالیت و عضویت معتبر انجمن. برای دستگاه میکروچیپ‌ریدر مدرکی لازم نیست و همه‌جا «تجهیزات اعلام‌شده» نوشته می‌شود.
+            </p>
+
+            {trustedCase ? (
+              <div className="mt-md space-y-sm">
+                <p className="text-body-sm">
+                  {'وضعیت درخواست: '}
+                  <span data-testid="trusted-case-status">{trustedCase.statusFa}</span>
+                </p>
+                {trustedCase.reviewNoteFa && trustedCase.status !== 'SUBMITTED' ? (
+                  <div data-testid="trusted-review-note">
+                    <Alert tone={trustedCase.status === 'NEEDS_CORRECTION' || trustedCase.status === 'REJECTED' ? 'warning' : 'success'} title="نتیجه بررسی انجمن">
+                      {trustedCase.reviewNoteFa}
+                    </Alert>
+                  </div>
+                ) : null}
+                {trustedCase.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT' ? (
+                  <div data-testid="trusted-awaiting-payment">
+                    <Alert tone="info" title="درخواست معتمد تأیید شد؛ در انتظار پرداخت دوره">
+                      Tag «دامپزشک معتمد» فقط پس از پرداخت موفق و تأییدشده دوره معتمد فعال می‌شود.
+                    </Alert>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            {trusted.unmet.length > 0 ? (
+              <ul className="mt-md space-y-2xs text-body-sm" data-testid="trusted-unmet">
+                {trusted.unmet.map((requirement: (typeof trusted.unmet)[number]) => (
+                  <li key={requirement.code}>
+                    {requirement.reasonFa}
+                    {requirement.href ? (
+                      <>
+                        {' '}
+                        <Link href={requirement.href} className="text-text-brand underline underline-offset-4" data-testid={'trusted-link-' + requirement.code}>
+                          رفتن به همان صفحه
+                        </Link>
+                      </>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            {trusted.allowed && trusted.terms.configured ? (
+              <div className="mt-lg">
+                <TrustedApplicationForm
+                  mode="NEW"
+                  termsFa={trusted.terms.textFa!}
+                  termsVersion={trusted.terms.termsVersion!}
+                  declarationVersion={trusted.terms.declarationVersion!}
+                  equipment={equipmentCatalogue.filter((item: (typeof equipmentCatalogue)[number]) => item.code !== 'MICROCHIP_READER')}
+                />
+              </div>
+            ) : null}
+
+            {trustedCase && trustedCase.status === 'NEEDS_CORRECTION' && trusted.terms.configured ? (
+              <div className="mt-lg">
+                <TrustedApplicationForm
+                  mode="REVISION"
+                  caseId={trustedCase.id}
+                  version={trustedCase.version}
+                  termsFa={trusted.terms.textFa!}
+                  termsVersion={trusted.terms.termsVersion!}
+                  declarationVersion={trusted.terms.declarationVersion!}
+                  equipment={equipmentCatalogue.filter((item: (typeof equipmentCatalogue)[number]) => item.code !== 'MICROCHIP_READER')}
+                />
+              </div>
+            ) : null}
+          </Card>
+        ) : null}
+
         {professional.currentTag || professional.cases.length > 0 ? (
           <Card>
             <h2 className="text-label-lg">هویت حرفه‌ای</h2>
