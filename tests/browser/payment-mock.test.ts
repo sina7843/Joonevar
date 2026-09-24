@@ -18,6 +18,7 @@ import { createDatabase } from '../../src/db/client.ts';
 import {
   BASE_URL,
   DATABASE_URL,
+  approveMembershipApplication,
   approvedMember,
   captureOperatorState,
   clearSyntheticOtp,
@@ -54,7 +55,7 @@ test('the mock gateway returns straight to the callback and the server verifies 
   const member = await approvedMember(browser, operatorState, 'عضو درگاه شبیه‌سازی');
   try {
     const { page } = member;
-    await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
+    await approveMembershipApplication(browser, page, operatorState);
     assert.equal(await page.getByTestId('membership-fee').textContent(), '۳۰۰٬۰۰۰ تومان');
 
     await page.getByTestId('pay-membership').click();
@@ -66,8 +67,7 @@ test('the mock gateway returns straight to the callback and the server verifies 
     await expectText(page, 'پرداخت تأیید شد');
 
     await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
-    const body = await page.locator('body').innerText();
-    assert.ok(body.includes('عضویت شما فعال است'));
+    assert.equal(await page.getByTestId('membership-status').textContent(), 'فعال');
     assert.equal(await page.getByTestId('pay-membership').count(), 0, 'paying twice is not offered');
 
     // Replaying the same return, the way a refresh or a retried callback would.
@@ -81,8 +81,9 @@ test('the mock gateway returns straight to the callback and the server verifies 
     const { db, pool } = createDatabase(DATABASE_URL);
     try {
       const activations = await db.execute<{ count: string }>(
-        sql`select count(*)::text as count from audit_event where action = 'MEMBERSHIP_ACTIVATED'
-            and target_id = (select id::text from account where mobile = ${member.mobile})`,
+        // The activation belongs to the period that was paid for (PROMPT-009).
+        sql`select count(*)::text as count from membership_period
+            where status = 'ACTIVE' and account_id = (select id from account where mobile = ${member.mobile})`,
       );
       assert.equal(activations.rows[0]?.count, '1', 'the effect was applied exactly once');
 

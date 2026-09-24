@@ -239,7 +239,7 @@ test('an owner with approved KYC registers a G0 animal without membership or an 
 
     // Membership is still inactive, and it never came up.
     await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
-    assert.ok(!(await page.locator('body').innerText()).includes('عضویت شما فعال است'));
+    assert.notEqual(await page.getByTestId('membership-status').textContent(), 'فعال');
   } finally {
     await owner.context.close();
   }

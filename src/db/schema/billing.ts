@@ -1,5 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -57,7 +59,49 @@ export const paymentAttemptStatus = pgEnum('payment_attempt_status', [
 ]);
 
 /** Lifetime membership (D04). There is no expiry and no renewal state. */
-export const membershipStatus = pgEnum('membership_status', ['NONE', 'PAYMENT_PENDING', 'ACTIVE', 'INACTIVE']);
+/**
+ * Membership standing — Phase 2.5 §6 (PROMPT-009).
+ *
+ * Phase 1 knew only a lifetime membership and stored it in the `membership_status`
+ * enum (`NONE`, `PAYMENT_PENDING`, `ACTIVE`, `INACTIVE`). Phase 2.5 makes
+ * membership reviewed and timed, which needs seven more states. Postgres refuses
+ * to use a value added to an existing enum inside the transaction that adds it,
+ * and this repository refuses to drop or rename a type, so the column becomes
+ * text guarded by a CHECK instead: `0035` maps the old values onto the new
+ * vocabulary in place, and the Phase 1 enum type is simply left unused.
+ */
+/**
+ * The Phase 1 membership type. No column uses it since `0035`; it stays declared
+ * so the database keeps a type it may still hold in old dumps, and so nothing
+ * reads a rename into its disappearance.
+ */
+export const membershipStatusLegacy = pgEnum('membership_status', ['NONE', 'PAYMENT_PENDING', 'ACTIVE', 'INACTIVE']);
+
+export const MEMBERSHIP_STATUS_VALUES = [
+  'NONE',
+  'PENDING_REVIEW',
+  'NEEDS_CORRECTION',
+  'REJECTED',
+  'APPROVED_AWAITING_PAYMENT',
+  'ACTIVE',
+  'EXPIRED',
+  'SUSPENDED',
+  'REVOKED',
+  // Kept so a Phase 1 row that somehow escaped the migration is still readable.
+  'PAYMENT_PENDING',
+  'INACTIVE',
+] as const;
+
+export const membershipApplicationStatus = pgEnum('membership_application_status', [
+  'SUBMITTED',
+  'NEEDS_CORRECTION',
+  'APPROVED',
+  'REJECTED',
+  'WITHDRAWN',
+]);
+
+export const membershipPeriodStatus = pgEnum('membership_period_status', ['PENDING_PAYMENT', 'ACTIVE', 'CANCELLED']);
+export const membershipPeriodKind = pgEnum('membership_period_kind', ['INITIAL', 'RENEWAL']);
 
 /**
  * Issuing the number and activating the membership are separate (§7): a number
@@ -162,11 +206,12 @@ export const paymentCallbacks = pgTable(
 );
 
 /**
- * Membership — D04, §7.
+ * Membership — §7 and Phase 2.5 §6.
  *
- * Lifetime: there is no `expiresAt`, no renewal job and no reminder. `INACTIVE`
- * exists only for the case §7.1 describes and carries no invented policy for
- * how it is reached.
+ * One row per account carrying the current standing. Phase 1 memberships were
+ * lifetime (D04); Phase 2.5 makes new ones timed, and a membership that was
+ * already active keeps `lifetime`, so it is never given an expiry nobody sold it
+ * (DEC-0195). The windows themselves live in `membership_period`.
  */
 export const memberships = pgTable(
   'membership',
@@ -174,16 +219,109 @@ export const memberships = pgTable(
     accountId: uuid('account_id')
       .primaryKey()
       .references(() => accounts.id, { onDelete: 'restrict' }),
-    status: membershipStatus('status').notNull().default('NONE'),
+    status: text('status').notNull().default('NONE'),
     activatedAt: timestamp('activated_at', { withTimezone: true }),
     membershipNo: text('membership_no'),
     numberStatus: membershipNumberStatus('number_status').notNull().default('PENDING'),
     paymentBatchId: uuid('payment_batch_id').references(() => paymentBatches.id, { onDelete: 'set null' }),
+    /** A Phase 1 membership that was already active when membership became timed: it never expires. */
+    lifetime: boolean('lifetime').notNull().default(false),
+    /**
+     * When this membership stops being valid: the live period's end plus whatever
+     * grace was bought with it. Kept on the row so every rule and every query can
+     * ask one question without joining the periods (PROMPT-009).
+     */
+    currentPeriodEndsAt: timestamp('current_period_ends_at', { withTimezone: true }),
+    /** Why the association suspended or revoked it; shown to the member. */
+    statusReasonFa: text('status_reason_fa'),
     version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
   },
-  (t) => [uniqueIndex('membership_no_key').on(t.membershipNo)],
+  (t) => [
+    uniqueIndex('membership_no_key').on(t.membershipNo),
+    index('membership_status_idx').on(t.status, t.currentPeriodEndsAt),
+    // A lifetime membership is a Phase 1 record and never carries a period end.
+    check('membership_lifetime_has_no_end', sql`${t.lifetime} = false or ${t.currentPeriodEndsAt} is null`),
+    check('membership_status_known', sql`${t.status} in ('NONE', 'PENDING_REVIEW', 'NEEDS_CORRECTION', 'REJECTED', 'APPROVED_AWAITING_PAYMENT', 'ACTIVE', 'EXPIRED', 'SUSPENDED', 'REVOKED', 'PAYMENT_PENDING', 'INACTIVE')`),
+  ],
+);
+
+/**
+ * The membership application the association reviews — Phase 2.5 §6.
+ *
+ * Phase 1 had no review at all: paying was joining. A timed membership is
+ * applied for, reviewed with a written reason, and only then opens payment. One
+ * open application per account at a time; decided ones stay as history.
+ */
+export const membershipApplications = pgTable(
+  'membership_application',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    status: membershipApplicationStatus('status').notNull().default('SUBMITTED'),
+    /** What the applicant said about themselves; never a fact the association verified. */
+    statementFa: text('statement_fa'),
+    reviewNoteFa: text('review_note_fa'),
+    reviewedByAccountId: uuid('reviewed_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('membership_application_open_key')
+      .on(t.accountId)
+      .where(sql`${t.status} in ('SUBMITTED', 'NEEDS_CORRECTION')`),
+    index('membership_application_queue_idx').on(t.status, t.updatedAt),
+  ],
+);
+
+/**
+ * One paid period of membership — Phase 2.5 §6.
+ *
+ * Created as `PENDING_PAYMENT` with its payment batch and becomes `ACTIVE` only
+ * inside the transaction that verifies that payment. The tariff, its settings
+ * version, the period length, the grace days and the reminder window are frozen
+ * here when the payment starts, so a later settings edit never rewrites what was
+ * bought. As with a licence period there is no scheduler: expiry is read from
+ * `ends_at` and the frozen grace.
+ */
+export const membershipPeriods = pgTable(
+  'membership_period',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    kind: membershipPeriodKind('kind').notNull(),
+    status: membershipPeriodStatus('status').notNull().default('PENDING_PAYMENT'),
+    paymentBatchId: uuid('payment_batch_id').references(() => paymentBatches.id, { onDelete: 'restrict' }),
+    startsAt: timestamp('starts_at', { withTimezone: true }),
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    tariffSettingKey: text('tariff_setting_key').notNull(),
+    tariffSettingVersion: integer('tariff_setting_version').notNull(),
+    amountToman: numeric('amount_toman', { precision: 14, scale: 0 }).notNull(),
+    periodDays: integer('period_days').notNull(),
+    graceDays: integer('grace_days'),
+    reminderDaysBefore: integer('reminder_days_before'),
+    reminderSentAt: timestamp('reminder_sent_at', { withTimezone: true }),
+    expiredNoticeAt: timestamp('expired_notice_at', { withTimezone: true }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('membership_period_batch_key').on(t.paymentBatchId),
+    index('membership_period_account_idx').on(t.accountId, t.status, t.endsAt),
+    // One unpaid period per account at a time: a second attempt reuses the first.
+    uniqueIndex('membership_period_pending_key').on(t.accountId).where(sql`${t.status} = 'PENDING_PAYMENT'`),
+    check('membership_period_days_positive', sql`${t.periodDays} >= 1`),
+    check('membership_period_grace_not_negative', sql`${t.graceDays} is null or ${t.graceDays} >= 0`),
+    check('membership_period_window_matches_status', sql`(${t.status} = 'ACTIVE') = (${t.startsAt} is not null and ${t.endsAt} is not null)`),
+  ],
 );
 
 /**

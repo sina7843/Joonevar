@@ -11,7 +11,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomInt } from 'node:crypto';
-import { certifyIdentity } from './support.ts';
+// Shared with the membership suites: a membership is applied for and approved before it is paid for.
+import {
+  approveMembershipApplication, certifyIdentity } from './support.ts';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
@@ -145,7 +147,9 @@ async function passKyc(page: Page): Promise<void> {
 
 async function payMembership(page: Page): Promise<void> {
   await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
-  if ((await page.locator('body').innerText()).includes('عضویت شما فعال است')) return;
+  if ((await page.getByTestId('membership-status').textContent()) === 'فعال') return;
+  // Since PROMPT-009 a membership is applied for and approved before it is paid for.
+  await approveMembershipApplication(browser, page, operatorState);
   await page.getByTestId('pay-membership').click();
   await page.waitForURL('**/dev/gateway**');
   await page.getByTestId('gateway-pay').click();

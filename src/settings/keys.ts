@@ -526,6 +526,53 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     min: 0,
     max: 365,
   },
+  // ── Timed association membership (Phase 2.5, PROMPT-009) ───────────────
+  // The first period is charged at the existing `fee.membership_toman`. None of
+  // the figures below has a starting value: no duration, reminder window or
+  // grace rule has been supplied for a timed membership, and until they are
+  // entered a membership period cannot be sold or given an invented length.
+  {
+    key: 'membership.renewal_toman',
+    group: 'FEES',
+    kind: 'MONEY_TOMAN',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'تعرفه تمدید عضویت انجمن',
+    noteFa: 'تا ثبت مبلغ واقعی، تمدید عضویت باز نمی‌شود. مبلغ در لحظه شروع پرداخت روی همان دوره ثبت می‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'membership.period_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'طول دوره عضویت انجمن (روز)',
+    noteFa: 'طول دوره‌ای که یک پرداخت تأییدشده عضویت می‌خرد. مقدار واقعی اعلام نشده است؛ تا ثبت آن، پرداخت عضویت باز نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 3650,
+  },
+  {
+    key: 'membership.reminder_days_before',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'یادآوری پیش از پایان عضویت (روز)',
+    noteFa: 'چند روز مانده به پایان دوره، یادآوری تمدید ساخته شود. تا ثبت مقدار، هیچ یادآوری ساخته نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 365,
+  },
+  {
+    key: 'membership.grace_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'مهلت ارفاقی پس از پایان عضویت (روز)',
+    noteFa: 'چند روز پس از پایان دوره، عضویت پیش از منقضی شدن معتبر بماند. تا ثبت مقدار، مهلت ارفاقی وجود ندارد.',
+    seedValue: null,
+    min: 0,
+    max: 365,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(

@@ -24,7 +24,8 @@ import {
   type PaidEffects,
 } from '../../src/billing/payments.ts';
 import { paidEffects } from '../../src/billing/effects.ts';
-import { findMembership, startMembershipPayment } from '../../src/billing/membership.ts';
+import { applyForMembership, decideMembershipApplication, findMembership, startMembershipPayment } from '../../src/billing/membership.ts';
+import { configureMembership } from '../helpers/membership.ts';
 import { tomanToRial } from '../../src/domain/money.ts';
 import type { Actor } from '../../src/authz/actor.ts';
 import type { AccountId } from '../../src/domain/ids.ts';
@@ -99,6 +100,16 @@ async function withApproved(
   try {
     await withDb(async (testDb) => {
       const member = await approvedAccount(testDb, '09990100001', VALID_ID, root);
+      // Since PROMPT-009 a membership period is payable only after the association
+      // approved the application, and its figures are managed data with no seed.
+      await configureMembership(testDb.db);
+      const application = await applyForMembership(testDb.db, member.actor);
+      await decideMembershipApplication(testDb.db, actorFor(member.operatorId, 'ASSOCIATION_OPERATOR'), {
+        applicationId: application.id,
+        expectedVersion: application.version,
+        decision: 'APPROVE',
+        reasonFa: 'SYNTHETIC تأیید عضویت برای آزمون پرداخت',
+      });
       await fn(testDb, member, root);
     });
   } finally {
@@ -162,8 +173,9 @@ test('a duplicated callback applies the effect only once', async () => {
     assert.ok(third.state === 'PAID' && !third.performed);
 
     // One activation, one notification, one audit row for the verification.
+    // Since PROMPT-009 the activation belongs to the period the payment bought.
     const activations = (await testDb.db.select().from(auditEvents)).filter(
-      (row) => row.action === 'MEMBERSHIP_ACTIVATED',
+      (row) => row.action === 'MEMBERSHIP_PERIOD_ACTIVATED',
     );
     assert.equal(activations.length, 1);
     const verified = (await testDb.db.select().from(auditEvents)).filter((row) => row.action === 'PAYMENT_VERIFIED');
@@ -191,8 +203,9 @@ test('concurrent callbacks for the same attempt settle it once', async () => {
     assert.equal(performed.length, 1, 'exactly one call applied the effect');
     assert.ok(results.every((r) => r.state === 'PAID'));
 
+    // Since PROMPT-009 the activation belongs to the period the payment bought.
     const activations = (await testDb.db.select().from(auditEvents)).filter(
-      (row) => row.action === 'MEMBERSHIP_ACTIVATED',
+      (row) => row.action === 'MEMBERSHIP_PERIOD_ACTIVATED',
     );
     assert.equal(activations.length, 1);
     assert.equal((await findMembership(testDb.db, member.accountId))?.status, 'ACTIVE');
@@ -387,7 +400,7 @@ test('the paid effect runs inside the verifying transaction', async () => {
   });
 });
 
-test('membership is lifetime: activation writes no expiry and nothing renews it', async () => {
+test('a verified membership payment buys one period, with its own window and its activation date', async () => {
   await withApproved(async (testDb, member) => {
     const batch = await startMembershipPayment(testDb.db, member.actor);
     const gateway = scriptedGateway({ paid: true, amountRial: 3_000_000n });
@@ -397,25 +410,30 @@ test('membership is lifetime: activation writes no expiry and nothing renews it'
     const [row] = await testDb.db.select().from(memberships).where(eq(memberships.accountId, member.accountId));
     assert.equal(row?.status, 'ACTIVE');
     assert.ok(row?.activatedAt instanceof Date);
-    // The schema has no expiry column at all, and nothing in the row implies one.
-    assert.ok(!Object.keys(row!).some((key) => /expire|renew/i.test(key)));
+    // Timed since PROMPT-009: the row knows when it stops being valid, and it was
+    // not one of the Phase 1 memberships that stay lifetime.
+    assert.equal(row?.lifetime, false);
+    assert.ok(row?.currentPeriodEndsAt instanceof Date);
+    assert.ok(row!.currentPeriodEndsAt!.getTime() > Date.now());
 
-    // Activation is not gated behind a review after payment (D04). The only
-    // membership event recorded is the activation itself.
-    const membershipAudits = (await testDb.db.select().from(auditEvents))
-      .filter((row) => row.targetType === 'MEMBERSHIP')
-      .map((row) => row.action);
-    assert.deepEqual(membershipAudits, ['MEMBERSHIP_ACTIVATED']);
+    // The activation belongs to the period that was paid for.
+    const activations = (await testDb.db.select().from(auditEvents)).filter((event) => event.action === 'MEMBERSHIP_PERIOD_ACTIVATED');
+    assert.equal(activations.length, 1);
+    assert.equal(activations[0]?.targetType, 'MEMBERSHIP_PERIOD');
   });
 });
 
-test('starting a second membership payment while one is active is refused', async () => {
+test('paying again while a membership is live buys the next period instead of a second one', async () => {
   await withApproved(async (testDb, member) => {
     const batch = await startMembershipPayment(testDb.db, member.actor);
     const gateway = scriptedGateway({ paid: true, amountRial: 3_000_000n });
     const started = await startAttempt(testDb.db, member.actor, { batchId: batch.id, callbackUrl: '/x' }, gateway, PROVIDER);
     await verifyAttempt(testDb.db, { reference: started.reference }, gateway, paidEffects);
 
-    await assert.rejects(() => startMembershipPayment(testDb.db, member.actor), /از قبل فعال است/);
+    // A live membership may be renewed; what it may not do is hold two unpaid intents at once.
+    const renewal = await startMembershipPayment(testDb.db, member.actor);
+    assert.notEqual(renewal.id, batch.id, 'the renewal is its own payment');
+    const again = await startMembershipPayment(testDb.db, member.actor);
+    assert.equal(again.id, renewal.id, 'the same unpaid renewal is offered again rather than a second one');
   });
 });

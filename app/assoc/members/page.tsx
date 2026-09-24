@@ -13,16 +13,25 @@ import {
   memberRecords,
 } from '../../../src/operations/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
-import { IssueNumberForm, MembershipStateForm } from './forms.tsx';
+import { formatInstantFa } from '../../../src/content/model.ts';
+import { membershipQueue } from '../../../src/billing/membership.ts';
+import { MEMBERSHIP_STATUS_FA, type MembershipStatus } from '../../../src/billing/membership-model.ts';
+import { DecideMembershipForm, IssueNumberForm, MembershipStateForm } from './forms.tsx';
 import { MemberSearch } from './search.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const STATUS_FA: Record<string, string> = {
-  NONE: 'بدون عضویت',
-  PAYMENT_PENDING: 'در انتظار پرداخت',
-  ACTIVE: 'فعال',
-  INACTIVE: 'غیرفعال',
+const STATUS_FA: Record<string, string> = MEMBERSHIP_STATUS_FA;
+
+const STATUS_TONE: Partial<Record<MembershipStatus, 'success' | 'info' | 'warning' | 'error' | 'neutral'>> = {
+  ACTIVE: 'success',
+  APPROVED_AWAITING_PAYMENT: 'info',
+  PENDING_REVIEW: 'info',
+  NEEDS_CORRECTION: 'warning',
+  EXPIRED: 'warning',
+  SUSPENDED: 'error',
+  REVOKED: 'error',
+  REJECTED: 'error',
 };
 
 const NUMBER_FA: Record<string, string> = {
@@ -31,11 +40,12 @@ const NUMBER_FA: Record<string, string> = {
 };
 
 /**
- * The membership register — §21.2, §7, D04.
+ * The membership register and its review queue — §21.2, §7, Phase 2.5 §6.
  *
- * A paid F14 membership is already active: this screen manages records and
- * numbers, and never asks the member to wait for an approval that §7 does not
- * have. Issuing the number later changes nothing about what is already open.
+ * Since PROMPT-009 a membership is applied for and reviewed here, then bought
+ * one period at a time. This screen decides applications with a written reason,
+ * records numbers, and suspends or revokes a membership — it never grants a
+ * period nobody paid for.
  */
 export default async function AssocMembersPage({
   searchParams,
@@ -46,22 +56,50 @@ export default async function AssocMembersPage({
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
   const term = (await searchParams).q?.trim() ?? '';
-  const [rows, withoutMembership, total] = await Promise.all([
+  const [rows, withoutMembership, total, waiting, corrections] = await Promise.all([
     memberRecords(db(), guard.actor, { search: term }),
     accountsWithoutMembership(db(), guard.actor),
     memberRecordCount(db(), guard.actor, term),
+    membershipQueue(db(), guard.actor, { status: 'SUBMITTED' }),
+    membershipQueue(db(), guard.actor, { status: 'NEEDS_CORRECTION' }),
   ]);
   const hidden = Math.max(0, total - rows.length);
 
   return (
     <OpsShell actor={guard.actor} title="هم‌زیست — انجمن" pathname="/assoc/members" nav={ASSOC_NAV}>
       <div className="space-y-lg">
-        <Alert tone="info" title="عضویت پرداخت‌شده به صف تأیید بازنمی‌گردد">
+        <Alert tone="info" title="عضویت پس از بررسی و پرداخت تأییدشده فعال می‌شود">
           <span data-testid="members-note">
-            پرداخت موفق، عضویت مادام‌العمر را فعال می‌کند. شماره عضویت پس از آن ثبت می‌شود و نبود شماره هیچ
-            خدمتی را نمی‌بندد.
+            تأیید درخواست فقط پرداخت دوره را باز می‌کند؛ فعال‌سازی با تأیید سروری پرداخت انجام می‌شود. عضویت‌های
+            فعال پیش از دوره‌ای شدن، مادام‌العمر می‌مانند و تاریخ پایان نمی‌گیرند.
           </span>
         </Alert>
+
+        <Card>
+          <h2 className="text-label-lg">درخواست‌های در انتظار بررسی</h2>
+          {waiting.items.length === 0 && corrections.items.length === 0 ? (
+            <p className="mt-md text-body-sm text-text-disabled" data-testid="membership-queue-empty">
+              درخواست بازی در صف نیست.
+            </p>
+          ) : (
+            <ul className="mt-md space-y-lg" data-testid="membership-queue">
+              {waiting.items.map((item) => (
+                <li key={item.id}>
+                  <p className="text-body-sm">
+                    {formatInstantFa(new Date(item.updatedAt))}
+                    {item.statementFa ? ' — ' + item.statementFa : ''}
+                  </p>
+                  <DecideMembershipForm applicationId={item.id} version={item.version} />
+                </li>
+              ))}
+              {corrections.items.map((item) => (
+                <li key={item.id} className="text-body-sm text-text-secondary" data-testid="membership-awaiting-correction">
+                  {'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
 
         <MemberSearch term={term} />
 
@@ -101,7 +139,7 @@ export default async function AssocMembersPage({
                           : ''}
                       </p>
                     </div>
-                    <StatusBadge tone={row.status === 'ACTIVE' ? 'success' : 'warning'}>
+                    <StatusBadge tone={STATUS_TONE[row.status as MembershipStatus] ?? 'neutral'}>
                       <span data-testid={'member-status-' + row.accountId}>
                         {STATUS_FA[row.status] ?? row.status}
                       </span>
@@ -111,12 +149,8 @@ export default async function AssocMembersPage({
                   {row.membershipNo === null ? (
                     <IssueNumberForm accountId={row.accountId} suffix={row.accountId} />
                   ) : null}
-                  {row.status === 'ACTIVE' || row.status === 'INACTIVE' ? (
-                    <MembershipStateForm
-                      accountId={row.accountId}
-                      active={row.status === 'ACTIVE'}
-                      suffix={row.accountId}
-                    />
+                  {row.status === 'ACTIVE' || row.status === 'SUSPENDED' || row.status === 'EXPIRED' ? (
+                    <MembershipStateForm accountId={row.accountId} suspended={row.status === 'SUSPENDED'} suffix={row.accountId} />
                   ) : null}
                 </Card>
               </li>

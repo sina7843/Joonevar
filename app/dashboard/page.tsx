@@ -9,7 +9,7 @@ import { Identifier, StatusBadge } from '../../src/ui/status.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { db } from '../../src/db/client.ts';
 import { findProfile } from '../../src/identity/account.ts';
-import { findMembership } from '../../src/billing/membership.ts';
+import { membershipStanding } from '../../src/billing/membership.ts';
 import { listAnimals } from '../../src/animals/service.ts';
 import { listOwnerRequests } from '../../src/vets/visits.ts';
 import { REQUEST_STATUS_FA, REQUEST_STATUS_TONE, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
@@ -175,13 +175,13 @@ export default async function DashboardPage() {
   const { actor } = guard;
 
   const profile = await findProfile(db(), actor.accountId);
-  const membership = await findMembership(db(), actor.accountId);
+  const membership = await membershipStanding(db(), actor.accountId);
   const { services } = await eligibilitySummary(db(), actor.accountId);
   const vet = actor.context === 'TRUSTED_VET' ? await vetEligibilityFor(db(), actor.accountId) : null;
   const professional = await professionalDashboard(db(), actor);
 
-  const membershipStatus = membership?.status ?? 'NONE';
-  const membershipActive = membershipStatus === 'ACTIVE';
+  // One authoritative answer, already aware of a period that has run out (PROMPT-009).
+  const membershipActive = membership.valid;
 
   const [myAnimals, requestRows] = await Promise.all([
     listAnimals(db(), actor),
@@ -294,15 +294,19 @@ export default async function DashboardPage() {
             <div className="flex items-start justify-between gap-md">
               <div>
                 <p className="text-label-lg">عضویت انجمن</p>
-                <p className="mt-2xs text-caption text-text-secondary">
+                <p className="mt-2xs text-caption text-text-secondary" data-testid="dashboard-membership-note">
                   {membershipActive
-                    ? 'عضویت مادام‌العمر شما فعال است.'
-                    : 'عضویت مادام‌العمر است و پس از تأیید پرداخت روی سرور فعال می‌شود.'}
+                    ? membership.lifetime
+                      ? 'عضویت مادام‌العمر شما برقرار است.'
+                      : membership.endsAt
+                        ? 'عضویت شما تا ' + formatCivilDateFa(membership.endsAt.slice(0, 10)) + ' معتبر است.'
+                        : 'عضویت شما معتبر است.'
+                    : 'عضویت پس از بررسی انجمن و پرداخت تأییدشده، برای یک دوره فعال می‌شود.'}
                 </p>
                 {membershipActive ? (
                   <p className="mt-sm text-caption text-text-secondary" data-testid="dashboard-membership-number">
                     شماره عضویت:{' '}
-                    {membership?.membershipNo ? (
+                    {membership.membershipNo ? (
                       <Identifier value={membership.membershipNo} />
                     ) : (
                       'در انتظار صدور — خدمات فعال شما متوقف نمی‌شود'
@@ -310,16 +314,8 @@ export default async function DashboardPage() {
                   </p>
                 ) : null}
               </div>
-              <StatusBadge
-                tone={membershipActive ? 'success' : membershipStatus === 'PAYMENT_PENDING' ? 'info' : 'neutral'}
-              >
-                {membershipActive
-                  ? 'فعال'
-                  : membershipStatus === 'PAYMENT_PENDING'
-                    ? 'در انتظار پرداخت'
-                    : membershipStatus === 'INACTIVE'
-                      ? 'غیرفعال'
-                      : 'فعال نیست'}
+              <StatusBadge tone={membershipActive ? 'success' : membership.status === 'APPROVED_AWAITING_PAYMENT' || membership.status === 'PENDING_REVIEW' ? 'info' : 'neutral'}>
+                <span data-testid="dashboard-membership-status">{membership.statusFa}</span>
               </StatusBadge>
             </div>
             {/* Prototype OWN-001: a settled state is a line of text, not a

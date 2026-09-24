@@ -16,6 +16,8 @@ import { randomInt } from 'node:crypto';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
+// Shared with the membership suites: a membership is applied for and approved before it is paid for.
+import { approveMembershipApplication } from './support.ts';
 
 const BASE_URL = process.env.BROWSER_TEST_URL ?? 'http://127.0.0.1:3111';
 const DATABASE_URL = process.env.DATABASE_URL ?? 'postgres://hamzist:hamzist_local_dev@127.0.0.1:5433/hamzist';
@@ -143,7 +145,9 @@ async function passKyc(page: Page): Promise<void> {
 
 async function payMembership(page: Page): Promise<void> {
   await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
-  if ((await page.locator('body').innerText()).includes('عضویت شما فعال است')) return;
+  if ((await page.getByTestId('membership-status').textContent()) === 'فعال') return;
+  // Since PROMPT-009 a membership is applied for and approved before it is paid for.
+  await approveMembershipApplication(browser, page, operatorState);
   await page.getByTestId('pay-membership').click();
   await page.waitForURL('**/dev/gateway**');
   await page.getByTestId('gateway-pay').click();
@@ -465,7 +469,7 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
     await vetRow.locator('[data-testid^="membership-reason-"]').fill('بررسی عملیاتی آزمایشی ' + RUN);
     await vetRow.locator('[data-testid^="submit-membership-"]').click();
-    await expectText(page, 'عضویت غیرفعال شد');
+    await expectText(page, 'عضویت معلق شد');
     await page.screenshot({ path: path.join(SHOTS, 'assoc-members.png'), fullPage: true });
   } finally {
     await assoc.close();
@@ -511,7 +515,7 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
     await vetRow.locator('[data-testid^="membership-reason-"]').fill('بازگردانی وضعیت آزمایشی ' + RUN);
     await vetRow.locator('[data-testid^="submit-membership-"]').click();
-    await expectText(page, 'عضویت دوباره فعال شد');
+    await expectText(page, 'تعلیق برداشته شد');
   } finally {
     await restore.close();
   }

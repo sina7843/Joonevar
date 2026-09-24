@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { issueMembershipNumber, setMembershipActive } from '../../../src/billing/membership.ts';
+import { decideMembershipApplication, issueMembershipNumber, setMembershipStanding } from '../../../src/billing/membership.ts';
 import { AppError } from '../../../src/domain/errors.ts';
 
 export interface MemberFormState {
@@ -24,39 +24,60 @@ function failure(error: unknown): MemberFormState {
   throw error;
 }
 
+function refresh(): void {
+  revalidatePath('/assoc/members');
+  revalidatePath('/assoc');
+  revalidatePath('/membership');
+}
+
 /** §7: issuing the number is a record-keeping step, never a gate on the service. */
-export async function issueNumberAction(
-  _previous: MemberFormState,
-  form: FormData,
-): Promise<MemberFormState> {
+export async function issueNumberAction(_previous: MemberFormState, form: FormData): Promise<MemberFormState> {
   try {
-    const actor = await operator();
-    await issueMembershipNumber(db(), actor, {
+    await issueMembershipNumber(db(), await operator(), {
       accountId: text(form, 'accountId'),
       membershipNo: text(form, 'membershipNo'),
     });
-    revalidatePath('/assoc/members');
+    refresh();
     return { ok: true, message: 'شماره عضویت ثبت شد.' };
   } catch (error) {
     return failure(error);
   }
 }
 
-/** §7.1: deactivation and reactivation, each with its recorded reason. */
-export async function setActiveAction(
-  _previous: MemberFormState,
-  form: FormData,
-): Promise<MemberFormState> {
-  const active = text(form, 'active') === 'YES';
+/**
+ * Decide one membership application, always with a written reason the member
+ * reads. An approval opens the payment of a period and nothing more.
+ */
+export async function decideMembershipAction(_previous: MemberFormState, form: FormData): Promise<MemberFormState> {
+  const decision = text(form, 'decision');
   try {
-    const actor = await operator();
-    await setMembershipActive(db(), actor, {
+    await decideMembershipApplication(db(), await operator(), {
+      applicationId: text(form, 'applicationId'),
+      expectedVersion: Number(text(form, 'expectedVersion')),
+      decision,
+      reasonFa: text(form, 'reasonFa'),
+    });
+    refresh();
+    return {
+      ok: true,
+      message: decision === 'APPROVE' ? 'درخواست تأیید شد؛ پرداخت دوره برای متقاضی باز است.' : decision === 'REJECT' ? 'درخواست رد شد.' : 'درخواست اصلاح ثبت شد.',
+    };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/** Suspend, revoke or lift a suspension — never a way to grant an unpaid period. */
+export async function setMembershipStandingAction(_previous: MemberFormState, form: FormData): Promise<MemberFormState> {
+  const action = text(form, 'action') as 'SUSPEND' | 'REVOKE' | 'REINSTATE';
+  try {
+    await setMembershipStanding(db(), await operator(), {
       accountId: text(form, 'accountId'),
-      active,
+      action,
       reasonFa: text(form, 'reason'),
     });
-    revalidatePath('/assoc/members');
-    return { ok: true, message: active ? 'عضویت دوباره فعال شد.' : 'عضویت غیرفعال شد.' };
+    refresh();
+    return { ok: true, message: action === 'SUSPEND' ? 'عضویت معلق شد.' : action === 'REVOKE' ? 'عضویت لغو شد.' : 'تعلیق برداشته شد.' };
   } catch (error) {
     return failure(error);
   }

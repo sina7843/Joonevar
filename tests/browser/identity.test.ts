@@ -347,7 +347,8 @@ test('KYC runs end to end: upload, submit, association review, approval', async 
     const dashboard = await page.locator('body').innerText();
     assert.ok(!dashboard.includes('برای ثبت حیوان هم‌زیست، احراز هویت لازم است'));
     assert.ok(dashboard.includes('برای این کار عضویت لازم نیست'));
-    assert.ok(dashboard.includes('فعال نیست'), 'membership is still inactive and shown separately');
+    // Membership is its own timed standing since PROMPT-009; approved KYC does not start it.
+    assert.equal(await page.getByTestId('dashboard-membership-status').textContent(), 'بدون عضویت');
     await page.screenshot({ path: path.join(SHOTS, 'dashboard-kyc-approved.png'), fullPage: true });
 
     // The applicant was notified, and the notification returns to the same case.

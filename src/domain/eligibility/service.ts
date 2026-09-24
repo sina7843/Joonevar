@@ -11,6 +11,7 @@ import { and, eq, or, sql } from 'drizzle-orm';
 import type { DbClient } from '../../db/client.ts';
 import { accountRoles } from '../../db/schema/core.ts';
 import { memberships } from '../../db/schema/billing.ts';
+import { membershipIsValid } from '../../billing/membership-model.ts';
 import { matingPermits } from '../../db/schema/mating.ts';
 import { countFinalAllocatedPuppies } from '../../mating/allocation.ts';
 import { findCase } from '../../identity/kyc.ts';
@@ -48,15 +49,16 @@ async function countIssuedPermits(database: DbClient, accountId: string): Promis
 export async function loadFacts(database: DbClient, accountId: string): Promise<EligibilityFacts> {
   const kyc = await findCase(database, accountId);
   const [membership] = await database
-    .select({ status: memberships.status })
+    .select({ status: memberships.status, lifetime: memberships.lifetime, currentPeriodEndsAt: memberships.currentPeriodEndsAt })
     .from(memberships)
     .where(eq(memberships.accountId, accountId))
     .limit(1);
 
   return {
     kycApproved: kyc?.status === 'APPROVED',
-    // Membership lives on the account, so it is the same in every context (§7).
-    membershipActive: membership?.status === 'ACTIVE',
+    // Membership lives on the account, so it is the same in every context (§7),
+    // and since PROMPT-009 it is timed: the one rule decides, not the column.
+    membershipActive: membership ? membershipIsValid(membership as never, new Date()) : false,
     registeredAnimals: await countRegisteredAnimals(database, accountId),
     animalsWithRegistrationSheet: await countSheetsOfOwner(database, accountId),
     animalsWithPedigree: await countPedigreesOfOwner(database, accountId),
@@ -102,14 +104,14 @@ export async function vetEligibilityFor(
   if (!role) return null;
 
   const [membership] = await database
-    .select({ status: memberships.status })
+    .select({ status: memberships.status, lifetime: memberships.lifetime, currentPeriodEndsAt: memberships.currentPeriodEndsAt })
     .from(memberships)
     .where(eq(memberships.accountId, accountId))
     .limit(1);
 
   return vetWorkEligibility({
     roleStatus: role.status as 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'REJECTED',
-    membershipActive: membership?.status === 'ACTIVE',
+    membershipActive: membership ? membershipIsValid(membership as never, new Date()) : false,
   });
 }
 

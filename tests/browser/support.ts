@@ -146,6 +146,64 @@ export async function approvedMember(
   return { context, page, mobile };
 }
 
+/**
+ * The managed figures of a membership period — Phase 2.5 PROMPT-009.
+ *
+ * None of them is seeded, because none was supplied for the product, so a suite
+ * that needs to buy a membership states its own synthetic figures first.
+ */
+export async function configureMembershipSettings(): Promise<void> {
+  const { db, pool } = createDatabase(DATABASE_URL);
+  try {
+    for (const [key, value] of [
+      ['fee.membership_toman', '"300000"'],
+      ['membership.renewal_toman', '"200000"'],
+      ['membership.period_days', '365'],
+      ['membership.grace_days', '10'],
+      ['membership.reminder_days_before', '30'],
+    ] as const) {
+      await db.execute(sql`update product_setting set value = ${value}::jsonb, updated_at = now() where key = ${key}`);
+    }
+  } finally {
+    await pool.end();
+  }
+}
+
+/**
+ * Membership is applied for and reviewed before it can be paid for (§6). The
+ * member applies on their own page and the association approves it with a
+ * reason, exactly as a person would.
+ */
+export async function approveMembershipApplication(
+  browser: Browser,
+  page: Page,
+  operatorState: Awaited<ReturnType<BrowserContext['storageState']>> | null,
+): Promise<void> {
+  await configureMembershipSettings();
+  await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
+  await page.getByTestId('membership-statement').fill('SYNTHETIC درخواست عضویت آزمایشی');
+  await page.getByTestId('submit-membership-application').click();
+  await expectText(page, 'در انتظار بررسی انجمن');
+
+  const operatorContext = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR', storageState: operatorState ?? undefined });
+  try {
+    const opsPage = await operatorContext.newPage();
+    await opsPage.goto(BASE_URL + '/assoc/members', { waitUntil: 'load' });
+    const form = opsPage.getByTestId('membership-decision-form').first();
+    await form.waitFor();
+    await form.getByTestId('membership-decision-APPROVE').check();
+    await form.getByTestId('membership-decision-reason').fill('SYNTHETIC مدارک عضویت کامل است');
+    await form.getByTestId('submit-membership-decision').click();
+    // The decided application leaves the queue, taking its form and its banner
+    // with it; what proves the decision is that the queue no longer offers it.
+    await form.waitFor({ state: 'detached' });
+  } finally {
+    await operatorContext.close();
+  }
+  await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
+  await page.getByTestId('pay-membership').waitFor();
+}
+
 /** Reads and writes the managed payment mode, so a suite can pick its gateway. */
 export async function setPaymentMode(mode: 'MOCK_AUTO' | 'DEV_GATEWAY'): Promise<string | null> {
   const { db, pool } = createDatabase(DATABASE_URL);

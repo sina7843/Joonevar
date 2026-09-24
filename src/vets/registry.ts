@@ -375,9 +375,13 @@ export async function searchFinder(
             and r.role = 'TRUSTED_VET'
             and r.status = 'ACTIVE'
         )`,
+        // A timed membership counts only while it is still valid; a Phase 1
+        // lifetime membership has no window to compare (PROMPT-009).
         sql`exists (
           select 1 from membership m
-          where m.account_id = ${vetLocations.vetAccountId} and m.status = 'ACTIVE'
+          where m.account_id = ${vetLocations.vetAccountId}
+            and m.status = 'ACTIVE'
+            and (m.lifetime = true or (m.current_period_ends_at is not null and m.current_period_ends_at > now()))
         )`,
         query.cityFa ? eq(vetLocations.cityFa, query.cityFa) : undefined,
         like

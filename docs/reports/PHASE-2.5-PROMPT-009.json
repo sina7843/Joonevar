@@ -1,0 +1,168 @@
+{
+  "promptId": "PROMPT-009",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "Association membership becomes reviewed and time-bounded. Phase 1 sold a lifetime membership (D04): paying was joining, nothing expired and nobody reviewed anything. The Phase 2.5 product decision and this prompt replace that, and the conflict is recorded rather than resolved silently (DEC-0195). An account now applies, the association approves, asks for a correction or rejects with a written reason the member reads, and only an approval opens payment; the states are NONE, PENDING_REVIEW, NEEDS_CORRECTION, REJECTED, APPROVED_AWAITING_PAYMENT, ACTIVE, EXPIRED, SUSPENDED and REVOKED, with one application row per open case and one row per paid period. Four new managed settings join the existing membership fee — the renewal tariff, the period length, the reminder window and the grace days — all with no seed value, so until the real figures are entered the payment path answers NOT_CONFIGURED instead of selling an unpriced membership or inventing a duration. A period freezes its tariff, settings version, length, grace and reminder window when the payment starts; an unpaid period whose figures no longer match today's settings is cancelled and replaced. Only the server-side verification activates anything: the effect runs inside the verifying transaction, so failed, cancelled, mismatched, replayed and simultaneous callbacks grant nothing beyond the one activation. Renewing early starts the next period exactly where the live one ends, so no paid day is lost or sold twice, while a lapsed membership buys from the day it is paid. There is no scheduler: the reminder is written once inside its window and the expiry is applied when the membership is next read, once its period and bought grace are over. Suspension and revocation are the association's own decisions, each with a reason, and outrank any paid period; reinstating returns the membership to what its periods say. The migration is explicit: memberships that were already active are marked lifetime and are never given an expiry nobody sold them, while INACTIVE becomes SUSPENDED and PAYMENT_PENDING becomes APPROVED_AWAITING_PAYMENT. membershipStanding and hasValidMembership are the single authoritative query, consumed by eligibility, the trusted-veterinarian rules and the Finder query, so no caller reads a status column that time has overtaken. The member page shows the standing, validity, end date, days left, grace and expiry notices, the application and its reasons, the pay or renew action and the receipts of every paid period; the association screen carries the review queue, decisions with reasons, numbers, suspension and revocation; the dashboard states validity and the end date.",
+  "changedFiles": [
+    "src/billing/membership.ts",
+    "src/billing/membership-model.ts",
+    "src/domain/period.ts",
+    "src/db/schema/billing.ts",
+    "src/db/migrations/0035_timed-membership.sql",
+    "src/db/migrations/meta/0035_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/settings/keys.ts",
+    "src/domain/eligibility/service.ts",
+    "src/vets/registry.ts",
+    "src/vets/licence-period-model.ts",
+    "app/membership/page.tsx",
+    "app/membership/actions.ts",
+    "app/membership/membership-forms.tsx",
+    "app/assoc/members/page.tsx",
+    "app/assoc/members/actions.ts",
+    "app/assoc/members/forms.tsx",
+    "app/dashboard/page.tsx",
+    "tests/helpers/membership.ts",
+    "tests/helpers/mating.ts",
+    "tests/domain/membership-period.test.ts",
+    "tests/db/membership-period.test.ts",
+    "tests/db/membership.test.ts",
+    "tests/db/payments.test.ts",
+    "tests/db/genetics.test.ts",
+    "tests/db/kennel.test.ts",
+    "tests/db/microchip.test.ts",
+    "tests/db/pedigree.test.ts",
+    "tests/db/referrals.test.ts",
+    "tests/db/registration-sheet.test.ts",
+    "tests/browser/support.ts",
+    "tests/browser/membership.test.ts",
+    "tests/browser/payment-mock.test.ts",
+    "tests/browser/operations.test.ts",
+    "tests/browser/identity.test.ts",
+    "tests/browser/animals.test.ts",
+    "tests/browser/cross-flow.test.ts",
+    "tests/browser/finder.test.ts",
+    "tests/browser/genetics.test.ts",
+    "tests/browser/kennel.test.ts",
+    "tests/browser/pedigree.test.ts",
+    "tests/browser/permit.test.ts",
+    "tests/browser/personal.test.ts",
+    "tests/browser/pregnancy.test.ts",
+    "tests/browser/puppy-card.test.ts",
+    "tests/browser/registration.test.ts",
+    "tests/browser/vet-service.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-009.json"
+  ],
+  "migrations": ["src/db/migrations/0035_timed-membership.sql"],
+  "decisions": ["DEC-0195"],
+  "tests": {
+    "domainMembershipPeriod": {"command": "node --test tests/domain/membership-period.test.ts", "total": 6, "pass": 6, "fail": 0},
+    "databaseMembershipPeriodFirstRun": {"command": "node --test tests/db/membership-period.test.ts", "total": 8, "pass": 1, "fail": 7, "note": "Two test-side defects: synthetic national ids without a valid check digit, and a fixture paying the initial tariff for a renewal, which the product correctly refused as an amount mismatch. Both were in the new test and its helper; no product code changed."},
+    "databaseFixtureSweep": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "note": "The first full run failed widely because nine suites and the shared mating fixture bought a membership in one step. They now walk the real path — configure the managed figures, apply, have the association approve, then pay — through tests/helpers/membership.ts."},
+    "database": {"command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\"", "durationSeconds": 279, "total": 395, "pass": 395, "fail": 0, "skip": 0},
+    "domainConfigUi": {"command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"", "total": 259, "pass": 259, "fail": 0, "skip": 0},
+    "browserFull": {"command": "node tools/browser-tests.mjs", "durationSeconds": 407, "total": 171, "pass": 170, "fail": 1, "note": "The one failure was the identity suite asserting the dashboard says 'فعال نیست' for membership; the dashboard now names the standing itself. The assertion moved to the dashboard-membership-status testid and the suite then passed 11/11."},
+    "browserIdentityRerun": {"command": "node tools/browser-tests.mjs tests/browser/identity.test.ts", "total": 11, "pass": 11, "fail": 0}
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm ci ; npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 77.4 s on the first attempt in a detached worktree at HEAD 00dbaaf with every changed and new file copied in, so the user's running server on port 3111 kept its .next. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/db/*.test.ts\" ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "The complete database suite passed 395/395 with migration 0035 applied to fresh test databases, including the 8 new membership-period tests; domain, config and UI passed 259/259 including the 6 new boundary and validity tests."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "The full 171-test matrix was rerun because membership is a prerequisite of most journeys: 170/171 on the first run, and 171 after the one obsolete dashboard assertion was updated and its suite reran 11/11. The membership suite now walks application, association approval with a reason, fee review, gateway, verification, the active period with its end date, days left and receipt, and the negative cases (a forged return, a made-up reference, a refused gateway) still grant nothing."
+    },
+    {
+      "id": "state-model",
+      "command": "node --test tests/db/membership-period.test.ts (tests: an application is reviewed… ; a rejected application says why…)",
+      "result": "PASS",
+      "evidence": "Nothing is payable before applying or while a correction is open; a second open application is refused; USER, BREEDER, TRUSTED_VET, GENETICS_OPERATOR and CONTENT_ADMIN cannot read the queue or decide; a decision without a reason is VALIDATION and a decision on a version the reviewer did not see is CONFLICT. Correction, revision and approval move both the application and the membership, and a rejection carries its reason into the standing and the notification while leaving the account free to apply again."
+    },
+    {
+      "id": "managed-data",
+      "command": "node --test tests/db/membership-period.test.ts (test: the tariff and the period length are managed data…)",
+      "result": "PASS",
+      "evidence": "With the period length cleared the payment is NOT_CONFIGURED; with the fee cleared too it stays NOT_CONFIGURED; with both entered the period carries the configured length and the grace frozen on it. Asking again returns the same unpaid period; after the tariff changes the stale one is CANCELLED and replaced at the new amount, and starting a payment grants nothing."
+    },
+    {
+      "id": "idempotent-verification",
+      "command": "node --test tests/db/membership-period.test.ts (test: two callbacks for one attempt…) ; node --test tests/db/payments.test.ts",
+      "result": "PASS",
+      "evidence": "A refusing gateway leaves no period and no validity. Two simultaneous verifications of one attempt both report PAID while exactly one performs the work, leaving one active period, one activation audit row and one notification. The payments suite pins the same for duplicated and concurrent callbacks, the tampered amount, the cancelled attempt and the unknown reference."
+    },
+    {
+      "id": "renewal-stacking",
+      "command": "node --test tests/db/membership-period.test.ts (test: renewing early stacks…) ; node --test tests/domain/membership-period.test.ts",
+      "result": "PASS",
+      "evidence": "A renewal bought while the first period is live starts exactly at its end, adds a full period, is charged the renewal tariff, and sets validity to that end plus the bought grace. The pure rules pin that an early renewal continues the live period, that a lapsed one starts today, and that a zero-day period is refused."
+    },
+    {
+      "id": "boundaries-and-timezones",
+      "command": "node --test tests/domain/membership-period.test.ts ; node --test tests/db/membership-period.test.ts (tests: renewing early stacks… ; a reminder is written once…)",
+      "result": "PASS",
+      "evidence": "A membership is valid a millisecond before its instant and over at the instant itself. The same instant decides the same way in Tehran and in UTC, including one that is already tomorrow in Tehran but still today in UTC. In the database the standing reads ACTIVE inside the window, GRACE inside the bought grace with validity intact, and EXPIRED past it, with the expiry and its notice written exactly once. The reminder is silent outside its configured window and written once inside it."
+    },
+    {
+      "id": "suspension-and-revocation",
+      "command": "node --test tests/db/membership-period.test.ts (test: suspension and revocation outrank a live period…) ; node --test tests/db/membership.test.ts",
+      "result": "PASS",
+      "evidence": "Only the association may suspend, revoke or reinstate, always with a reason; a suspension invalidates a membership that still has a paid period, closes the member services, removes the veterinarian from new work while keeping work already assigned, and refuses a renewal payment. Reinstating restores exactly the period that was already paid for, and a revoked account may apply again."
+    },
+    {
+      "id": "lifetime-migration",
+      "command": "node --test tests/db/membership-period.test.ts (test: a membership that was active before Phase 2.5…) ; node --test tests/domain/migrations.test.ts",
+      "result": "PASS",
+      "evidence": "A membership marked lifetime by the migration is valid in 2099, has no end date, no period rows and no payment offered, and the database refuses to give it a validity window at all (23514). The migration guards still pass: 0035 drops and renames nothing — the column moves to text with a CHECK and the Phase 1 enum type is left in place — and the two obsolete states are mapped explicitly."
+    },
+    {
+      "id": "single-eligibility-query",
+      "command": "node --test tests/db/membership-period.test.ts ; node --test tests/db/membership.test.ts ; node --test --test-concurrency=4 \"tests/db/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "hasValidMembership is the one answer: eligibility facts, the trusted-veterinarian rules and the Finder SQL all decide from the same standing (status plus lifetime plus the validity instant), so an approval, a pending review, an expired window, a suspension and a revocation each close the member services, while a live or grace period opens them. Every dependent suite — permits, pedigree, kennels, genetics, referrals, registration sheets, declarations — passes through the real application, approval and payment path."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "This replaces the lifetime-only semantics of D04 for new memberships; the conflict with that Phase 1 decision is explicit in DEC-0195, and memberships that were already active keep their lifetime promise forever.",
+    "No production figure exists for the renewal tariff, the period length, the reminder window or the grace days, so membership cannot be bought until the association enters them; this is reported as NOT_CONFIGURED rather than defaulted.",
+    "There is no scheduler: the reminder and the expiry are applied when the membership is next read, so a member who never opens the product is expired the moment anything reads their standing.",
+    "The membership status column is text with a CHECK rather than an enum, because a value added to an existing enum cannot be used in the transaction that adds it and this repository forbids dropping or renaming a type.",
+    "A lifetime member cannot buy a timed period; nothing in the product asks them to.",
+    "The review queue on the association screen has no filters or pagination controls beyond the shared page size, and there is no per-application detail page.",
+    "Receipts are the paid periods with their amounts and windows; no printable invoice document is issued.",
+    "Screenshots of the rewritten member page were not captured; visual fidelity is unverified."
+  ],
+  "readiness": {
+    "code": "TIMED_MEMBERSHIP_READY_AWAITING_TARIFFS",
+    "visual": "UNVERIFIED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/db/membership-period.test.ts",
+    "tests/domain/membership-period.test.ts",
+    "tests/db/membership.test.ts",
+    "tests/browser/membership.test.ts",
+    "DECISIONS.md#dec-0195"
+  ]
+}

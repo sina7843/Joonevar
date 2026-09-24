@@ -12,11 +12,13 @@ import { saveProfile, signInWithVerifiedMobile } from '../../src/identity/accoun
 import { attachKycDocument, reviewKyc, submitKyc } from '../../src/identity/kyc.ts';
 import { createSession, resolveSession, setSessionContext } from '../../src/identity/session.ts';
 import {
+  applyForMembership,
   findMembership,
   issueMembershipNumber,
   setMembershipActive,
-  startMembershipPayment,
+  startMembershipPeriodPayment,
 } from '../../src/billing/membership.ts';
+import { becomeMember, configureMembership } from '../helpers/membership.ts';
 import { startAttempt, verifyAttempt } from '../../src/billing/payments.ts';
 import { paidEffects } from '../../src/billing/effects.ts';
 import {
@@ -86,13 +88,9 @@ async function approvedMember(
   return { accountId: account.accountId, actor, reviewerId };
 }
 
-async function payForMembership(testDb: TestDb, actor: Actor) {
-  const batch = await startMembershipPayment(testDb.db, actor);
-  const gateway = payingGateway(3_000_000n);
-  const started = await startAttempt(testDb.db, actor, { batchId: batch.id, callbackUrl: '/x' }, gateway, 'test-gateway');
-  const outcome = await verifyAttempt(testDb.db, { reference: started.reference }, gateway, paidEffects);
-  assert.equal(outcome.state, 'PAID');
-  return batch;
+async function payForMembership(testDb: TestDb, actor: Actor, reviewerId: string) {
+  await configureMembership(testDb.db);
+  return becomeMember(testDb.db, actor, actorFor(reviewerId, 'ASSOCIATION_OPERATOR'));
 }
 
 test('approved KYC opens animal registration while membership stays separate', async () => {
@@ -110,7 +108,7 @@ test('approved KYC opens animal registration while membership stays separate', a
   });
 });
 
-test('a verified payment activates a lifetime membership and opens the member services', async () => {
+test('a verified payment activates one membership period and opens the member services', async () => {
   await withDb(async (testDb, root) => {
     const member = await approvedMember(testDb, root, '09990200002', '0790419904');
 
@@ -118,7 +116,7 @@ test('a verified payment activates a lifetime membership and opens the member se
     assert.equal(before.services.PERSONAL_DECLARATION.allowed, false);
     assert.equal(before.services.PERSONAL_DECLARATION.lock.cta.href, '/membership');
 
-    await payForMembership(testDb, member.actor);
+    await payForMembership(testDb, member.actor, member.reviewerId);
 
     const record = await findMembership(testDb.db, member.accountId);
     assert.equal(record?.status, 'ACTIVE');
@@ -143,7 +141,7 @@ test('a verified payment activates a lifetime membership and opens the member se
 test('a membership number that is still PENDING blocks nothing', async () => {
   await withDb(async (testDb, root) => {
     const member = await approvedMember(testDb, root, '09990200003', '0084575948');
-    await payForMembership(testDb, member.actor);
+    await payForMembership(testDb, member.actor, member.reviewerId);
 
     const record = await findMembership(testDb.db, member.accountId);
     assert.equal(record?.status, 'ACTIVE');
@@ -174,7 +172,7 @@ test('a membership number that is still PENDING blocks nothing', async () => {
 test('only an operational context may issue a membership number', async () => {
   await withDb(async (testDb, root) => {
     const member = await approvedMember(testDb, root, '09990200004', '9000000009');
-    await payForMembership(testDb, member.actor);
+    await payForMembership(testDb, member.actor, member.reviewerId);
 
     await assert.rejects(
       () => issueMembershipNumber(testDb.db, member.actor, { accountId: member.accountId, membershipNo: 'X-1' }),
@@ -194,7 +192,7 @@ test('only an operational context may issue a membership number', async () => {
 test('membership is account level and does not change with the context', async () => {
   await withDb(async (testDb, root) => {
     const member = await approvedMember(testDb, root, '09990200005', '9000001374');
-    await payForMembership(testDb, member.actor);
+    await payForMembership(testDb, member.actor, member.reviewerId);
 
     // Give the same account a breeder role and switch the session into it.
     await testDb.db
@@ -216,10 +214,10 @@ test('membership is account level and does not change with the context', async (
   });
 });
 
-test('an inactive membership stops new vet work but not work already active', async () => {
+test('a suspended membership stops new vet work but not work already active', async () => {
   await withDb(async (testDb, root) => {
     const vet = await approvedMember(testDb, root, '09990200006', '9000002745');
-    await payForMembership(testDb, vet.actor);
+    await payForMembership(testDb, vet.actor, vet.reviewerId);
     await testDb.db
       .insert(accountRoles)
       .values({ accountId: vet.accountId, role: 'TRUSTED_VET', status: 'ACTIVE', grantedAt: new Date() });
@@ -275,18 +273,20 @@ test('an inactive membership stops new vet work but not work already active', as
     const actions = (await testDb.db.select().from(auditEvents))
       .filter((row) => row.targetType === 'MEMBERSHIP')
       .map((row) => row.action);
-    assert.deepEqual(actions, ['MEMBERSHIP_ACTIVATED', 'MEMBERSHIP_DEACTIVATED', 'MEMBERSHIP_REACTIVATED']);
+    assert.deepEqual(actions, ['MEMBERSHIP_SUSPEND', 'MEMBERSHIP_REINSTATE'], 'the association decisions are recorded on the membership itself');
+    const activations = (await testDb.db.select().from(auditEvents)).filter((row) => row.action === 'MEMBERSHIP_PERIOD_ACTIVATED');
+    assert.equal(activations.length, 1, 'the period carries the activation');
 
     const notified = (await testDb.db.select().from(notifications)).map((row) => row.kind);
-    assert.ok(notified.includes('MEMBERSHIP_DEACTIVATED'));
-    assert.ok(notified.includes('MEMBERSHIP_REACTIVATED'));
+    assert.ok(notified.includes('MEMBERSHIP_SUSPEND'));
+    assert.ok(notified.includes('MEMBERSHIP_REINSTATE'));
   });
 });
 
-test('an inactive membership also closes the member services for that account', async () => {
+test('a suspended membership also closes the member services for that account', async () => {
   await withDb(async (testDb, root) => {
     const member = await approvedMember(testDb, root, '09990200007', '9000004111');
-    await payForMembership(testDb, member.actor);
+    await payForMembership(testDb, member.actor, member.reviewerId);
     const open = await eligibilityFor(testDb.db, member.accountId, 'PERSONAL_DECLARATION');
     assert.equal(open.allowed ? '' : open.lock.cta.href, '/animals/new', 'membership is not the blocker');
 
@@ -304,12 +304,17 @@ test('an inactive membership also closes the member services for that account', 
   });
 });
 
-test('membership cannot be deactivated before it was ever activated', async () => {
+test('payment waits for the association, and a membership that never activated cannot be suspended', async () => {
   await withDb(async (testDb, root) => {
     const member = await approvedMember(testDb, root, '09990200008', '9000005485');
-    await startMembershipPayment(testDb.db, member.actor);
+    await configureMembership(testDb.db);
+
+    // Approved KYC is not an approved membership: paying is refused until the association decides.
+    await assert.rejects(() => startMembershipPeriodPayment(testDb.db, member.actor), /پس از تأیید درخواست/);
+    await applyForMembership(testDb.db, member.actor, { statementFa: 'SYNTHETIC' });
     const pending = await findMembership(testDb.db, member.accountId);
-    assert.equal(pending?.status, 'PAYMENT_PENDING');
+    assert.equal(pending?.status, 'PENDING_REVIEW');
+    await assert.rejects(() => startMembershipPeriodPayment(testDb.db, member.actor), /پس از تأیید درخواست/);
 
     await assert.rejects(
       () =>
@@ -327,7 +332,7 @@ test('membership payment is refused before KYC is approved', async () => {
   await withDb(async (testDb) => {
     const account = await signInWithVerifiedMobile(testDb.db, '09990200009');
     const actor = actorFor(account.accountId);
-    await assert.rejects(() => startMembershipPayment(testDb.db, actor), /احراز هویت/);
+    await assert.rejects(() => applyForMembership(testDb.db, actor), /احراز هویت/);
     assert.equal((await testDb.db.select().from(memberships)).length, 0);
   });
 });

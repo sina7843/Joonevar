@@ -246,6 +246,13 @@
       "when": 1790205430316,
       "tag": "0034_vet-licence-period",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1790207927759,
+      "tag": "0035_timed-membership",
+      "breakpoints": true
     }
   ]
 }

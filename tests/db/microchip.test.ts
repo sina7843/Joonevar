@@ -6,12 +6,12 @@ import path from 'node:path';
 import { eq } from 'drizzle-orm';
 import { createTestDb, type TestDb } from '../helpers/db.ts';
 import { seedBaseline } from '../../src/db/seed/index.ts';
+import { becomeMember, configureMembership } from '../helpers/membership.ts';
 import { accountRoles, auditEvents, notifications, referenceBreeds } from '../../src/db/schema/core.ts';
 import { microchipConflicts, microchips, sampleEvents, samples } from '../../src/db/schema/clinical.ts';
 import { vetVisitRequests } from '../../src/db/schema/vets.ts';
 import { saveProfile, signInWithVerifiedMobile } from '../../src/identity/account.ts';
 import { attachKycDocument, reviewKyc, submitKyc } from '../../src/identity/kyc.ts';
-import { startMembershipPayment } from '../../src/billing/membership.ts';
 import { startAttempt, verifyAttempt } from '../../src/billing/payments.ts';
 import { paidEffects } from '../../src/billing/effects.ts';
 import { editAnimal, registerAnimal, saveDraft, startDraft } from '../../src/animals/service.ts';
@@ -103,11 +103,14 @@ async function approved(
   return { accountId: account.accountId, actor };
 }
 
-async function payMembership(testDb: TestDb, actor: Actor): Promise<void> {
-  const batch = await startMembershipPayment(testDb.db, actor);
-  const gateway = payingGateway(3_000_000n);
-  const started = await startAttempt(testDb.db, actor, { batchId: batch.id, callbackUrl: '/x' }, gateway, 'test');
-  assert.equal((await verifyAttempt(testDb.db, { reference: started.reference }, gateway, paidEffects)).state, 'PAID');
+/**
+ * Membership is applied for, approved by the association and then paid for one
+ * period (PROMPT-009), and none of its figures is seeded, so the fixture states
+ * its own before going through the real path.
+ */
+async function payMembership(testDb: TestDb, actor: Actor, reviewer: Actor): Promise<void> {
+  await configureMembership(testDb.db);
+  await becomeMember(testDb.db, actor, reviewer);
 }
 
 async function withCtx(fn: (ctx: Ctx) => Promise<void>) {
@@ -127,14 +130,14 @@ async function withCtx(fn: (ctx: Ctx) => Promise<void>) {
     };
 
     const owner = await approved(testDb, root, operator, '09990500001', '0499370899');
-    await payMembership(testDb, owner.actor);
+    await payMembership(testDb, owner.actor, operator);
 
     const makeVet = async (mobile: string, nationalId: string, name: string, council: string) => {
       const party = await approved(testDb, root, operator, mobile, nationalId);
       await testDb.db
         .insert(accountRoles)
         .values({ accountId: party.accountId, role: 'TRUSTED_VET', status: 'ACTIVE', grantedAt: new Date() });
-      await payMembership(testDb, party.actor);
+      await payMembership(testDb, party.actor, operator);
       await upsertVetProfile(testDb.db, admin.actor, { mobile, displayNameFa: name, councilCode: council });
       const location = await addLocation(testDb.db, admin.actor, party.accountId, {
         nameFa: name + ' — کلینیک',

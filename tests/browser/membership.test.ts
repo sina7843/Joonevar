@@ -1,9 +1,10 @@
 /**
  * Membership and payment in a real browser.
  *
- * Runs the F14 journey end to end against the built application: hero,
- * prerequisites, fee review, gateway, server-side verification, active lifetime
- * membership, and the dashboard opening the services that depend on it.
+ * Runs the membership journey end to end against the built application: hero,
+ * prerequisites, application and association review, fee review, gateway,
+ * server-side verification, the active period, and the dashboard opening the
+ * services that depend on it (§7, Phase 2.5 §6).
  *
  * The point of doing it in a browser is the negative case: returning from the
  * gateway without paying must not activate anything. That case needs a gateway
@@ -22,6 +23,7 @@ import {
   DATABASE_URL,
   DESKTOP,
   MOBILE,
+  approveMembershipApplication,
   approvedMember as newApprovedMember,
   captureOperatorState,
   clearSyntheticOtp,
@@ -60,14 +62,18 @@ test('membership shows the fee from managed data and stays inactive before payme
     const { page } = member;
     await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
 
-    const body = await page.locator('body').innerText();
-    assert.ok(body.includes('عضویت مادام‌العمر است'), 'the hero states the lifetime decision');
+    let body = await page.locator('body').innerText();
+    assert.ok(body.includes('پس از بررسی انجمن و پرداخت تأییدشده'), 'the hero states that membership is reviewed and timed');
     assert.ok(body.includes('پیش‌نیازها'));
     assert.ok(body.includes('با عضویت چه چیزی باز می‌شود'));
-    assert.ok(body.includes('مرور هزینه'));
-    // No expiry, renewal or post-payment approval is offered anywhere (D04).
-    assert.ok(!/تمدید|انقضا|سررسید/.test(body));
+    // Nothing is payable before the association has approved the application.
+    assert.equal(await page.getByTestId('pay-membership').count(), 0);
+    assert.equal(await page.getByTestId('membership-application-form').count(), 1);
 
+    await approveMembershipApplication(browser, page, operatorState);
+    body = await page.locator('body').innerText();
+    assert.ok(body.includes('مرور هزینه عضویت'));
+    assert.equal(await page.getByTestId('membership-status').textContent(), 'تأییدشده، در انتظار پرداخت');
     assert.equal(await page.getByTestId('membership-fee').textContent(), '۳۰۰٬۰۰۰ تومان');
     await page.screenshot({ path: path.join(SHOTS, 'membership-before-payment.png'), fullPage: true });
   } finally {
@@ -79,7 +85,7 @@ test('a browser that returns from the gateway without paying activates nothing',
   const member = await newApprovedMember(browser, operatorState);
   try {
     const { page } = member;
-    await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
+    await approveMembershipApplication(browser, page, operatorState);
     await page.getByTestId('pay-membership').click();
     await page.waitForURL('**/dev/gateway**');
 
@@ -95,8 +101,7 @@ test('a browser that returns from the gateway without paying activates nothing',
     await page.screenshot({ path: path.join(SHOTS, 'payment-not-verified.png'), fullPage: true });
 
     await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
-    const body = await page.locator('body').innerText();
-    assert.ok(!body.includes('عضویت شما فعال است'), 'membership must not be active');
+    assert.notEqual(await page.getByTestId('membership-status').textContent(), 'فعال', 'membership must not be active');
   } finally {
     await member.context.close();
   }
@@ -117,7 +122,7 @@ test('a failed gateway decision leaves the account able to retry', async () => {
   const member = await newApprovedMember(browser, operatorState);
   try {
     const { page } = member;
-    await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
+    await approveMembershipApplication(browser, page, operatorState);
     await page.getByTestId('pay-membership').click();
     await page.waitForURL('**/dev/gateway**');
     await page.getByTestId('gateway-fail').click();
@@ -126,8 +131,7 @@ test('a failed gateway decision leaves the account able to retry', async () => {
     await expectText(page, 'پرداخت تأیید نشد');
 
     await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
-    const body = await page.locator('body').innerText();
-    assert.ok(!body.includes('عضویت شما فعال است'));
+    assert.notEqual(await page.getByTestId('membership-status').textContent(), 'فعال');
     // The retry path is still offered with the same fee.
     assert.equal(await page.getByTestId('membership-fee').textContent(), '۳۰۰٬۰۰۰ تومان');
     assert.equal(await page.getByTestId('pay-membership').count(), 1);
@@ -136,7 +140,7 @@ test('a failed gateway decision leaves the account able to retry', async () => {
   }
 });
 
-test('a verified payment activates the lifetime membership and opens the member services', async () => {
+test('a verified payment activates one membership period and opens the member services', async () => {
   const member = await newApprovedMember(browser, operatorState);
   try {
     const { page } = member;
@@ -149,7 +153,7 @@ test('a verified payment activates the lifetime membership and opens the member 
     assert.ok(before.includes('پس از تأیید احراز هویت باز می‌شود'));
     await page.screenshot({ path: path.join(SHOTS, 'dashboard-before-membership.png'), fullPage: true });
 
-    await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
+    await approveMembershipApplication(browser, page, operatorState);
     await page.getByTestId('pay-membership').click();
     await page.waitForURL('**/dev/gateway**');
 
@@ -163,11 +167,13 @@ test('a verified payment activates the lifetime membership and opens the member 
     await page.screenshot({ path: path.join(SHOTS, 'payment-verified.png'), fullPage: true });
 
     await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
-    const membershipBody = await page.locator('body').innerText();
-    assert.ok(membershipBody.includes('عضویت شما فعال است'));
-    // The number is still pending and that is stated as harmless (§7).
+    assert.equal(await page.getByTestId('membership-status').textContent(), 'فعال');
+    const validity = await page.getByTestId('membership-validity').textContent();
+    assert.ok(validity?.startsWith('معتبر تا'), 'the page says until when it is valid: ' + validity);
+    assert.ok((await page.getByTestId('membership-ends-at').textContent())?.includes('روز مانده'));
+    // The receipt of what was paid for, and the number still pending (§7).
+    assert.equal(await page.getByTestId('membership-receipts').locator('li').count(), 1);
     assert.equal(await page.getByTestId('membership-number').textContent(), 'در انتظار صدور');
-    assert.ok(membershipBody.includes('متوقف نمی‌کند'));
     await page.screenshot({ path: path.join(SHOTS, 'membership-active.png'), fullPage: true });
 
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
@@ -190,7 +196,7 @@ test('a second return for an already verified payment reports it once, without a
   const member = await newApprovedMember(browser, operatorState);
   try {
     const { page } = member;
-    await page.goto(BASE_URL + '/membership', { waitUntil: 'load' });
+    await approveMembershipApplication(browser, page, operatorState);
     await page.getByTestId('pay-membership').click();
     await page.waitForURL('**/dev/gateway**');
     const reference = new URL(page.url()).searchParams.get('reference')!;
@@ -209,8 +215,9 @@ test('a second return for an already verified payment reports it once, without a
     const { db, pool } = createDatabase(DATABASE_URL);
     try {
       const activations = await db.execute<{ count: string }>(
-        sql`select count(*)::text as count from audit_event where action = 'MEMBERSHIP_ACTIVATED'
-            and target_id = (select id::text from account where mobile = ${member.mobile})`,
+        // The activation belongs to the period that was paid for (PROMPT-009).
+        sql`select count(*)::text as count from membership_period
+            where status = 'ACTIVE' and account_id = (select id from account where mobile = ${member.mobile})`,
       );
       assert.equal(activations.rows[0]?.count, '1', 'the effect was applied exactly once');
     } finally {

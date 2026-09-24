@@ -16,10 +16,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { createTestDb, type TestDb } from './db.ts';
 import { seedBaseline } from '../../src/db/seed/index.ts';
+import { becomeMember, configureMembership } from './membership.ts';
 import { accountRoles, referenceBreeds } from '../../src/db/schema/core.ts';
 import { saveProfile, signInWithVerifiedMobile } from '../../src/identity/account.ts';
 import { attachKycDocument, reviewKyc, submitKyc } from '../../src/identity/kyc.ts';
-import { startMembershipPayment } from '../../src/billing/membership.ts';
 import { startAttempt, verifyAttempt } from '../../src/billing/payments.ts';
 import { paidEffects } from '../../src/billing/effects.ts';
 import { updateSetting } from '../../src/settings/service.ts';
@@ -113,11 +113,14 @@ async function approved(testDb: TestDb, root: string, operator: Actor, mobile: s
   return { accountId: account.accountId, actor, mobile };
 }
 
-async function payMembership(testDb: TestDb, actor: Actor) {
-  const batch = await startMembershipPayment(testDb.db, actor);
-  const gateway = payingGateway(3_000_000n);
-  const started = await startAttempt(testDb.db, actor, { batchId: batch.id, callbackUrl: '/x' }, gateway, 'test');
-  assert.equal((await verifyAttempt(testDb.db, { reference: started.reference }, gateway, paidEffects)).state, 'PAID');
+/**
+ * Membership is applied for, approved by the association and then paid for one
+ * period (PROMPT-009); none of its figures is seeded, so the fixture states its
+ * own before walking the real path.
+ */
+async function payMembership(testDb: TestDb, actor: Actor, reviewer: Actor) {
+  await configureMembership(testDb.db);
+  await becomeMember(testDb.db, actor, reviewer);
 }
 
 export interface MatingCtxOptions {
@@ -159,15 +162,15 @@ export async function withMatingCtx(
     };
 
     const first = await approved(testDb, root, association.actor, mobile('01'), '0499370899');
-    await payMembership(testDb, first.actor);
+    await payMembership(testDb, first.actor, association.actor);
     const second = await approved(testDb, root, association.actor, mobile('03'), '0084575948');
-    await payMembership(testDb, second.actor);
+    await payMembership(testDb, second.actor, association.actor);
 
     const vetParty = await approved(testDb, root, association.actor, mobile('02'), '0790419904');
     await testDb.db
       .insert(accountRoles)
       .values({ accountId: vetParty.accountId, role: 'TRUSTED_VET', status: 'ACTIVE', grantedAt: new Date() });
-    await payMembership(testDb, vetParty.actor);
+    await payMembership(testDb, vetParty.actor, association.actor);
     await upsertVetProfile(testDb.db, admin.actor, {
       mobile: mobile('02'),
       displayNameFa: 'دامپزشک نمونه',
