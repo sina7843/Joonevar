@@ -21,6 +21,7 @@ import { AD_PLAN_CATALOGUE } from '../../advertising/model.ts';
 import { ensurePlans } from '../../advertising/service.ts';
 import { slugify } from '../../breeds/model.ts';
 import { seedTaxonomies, type TaxonomySeedResult } from './taxonomy.ts';
+import { ensureMarketSpecies } from '../../marketplace/species.ts';
 
 export interface SeedReport {
   readonly settingsInserted: readonly string[];
@@ -30,6 +31,8 @@ export interface SeedReport {
   readonly issuersInserted: number;
   /** One entry per taxonomy: the generation installed and what this run added (§23). */
   readonly taxonomies: readonly TaxonomySeedResult[];
+  /** Species/market enablement rows created by this run (Phase 3, PROMPT-002). */
+  readonly marketSpeciesInserted: number;
 }
 
 /**
@@ -110,6 +113,12 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
   // without overruling an entry an operator renamed or switched off.
   const taxonomies = await seedTaxonomies(database);
 
+  // Which markets each species is open for (Phase 3, PROMPT-002). Additive:
+  // rows an operator has already switched keep their decision, and a species
+  // the taxonomy gains later arrives closed for animal sale, because opening
+  // one is a legal decision nobody can take by adding a taxonomy row.
+  const marketSpeciesInserted = await ensureMarketSpecies(database);
+
   // The approved-issuer registry (D14) starts empty on purpose: no issuer name
   // is invented here. An empty registry does not remove the review path, it
   // only means no foreign pedigree can be approved until the association
@@ -121,5 +130,6 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
     breedsInserted,
     issuersInserted: 0,
     taxonomies,
+    marketSpeciesInserted,
   };
 }

@@ -15,6 +15,17 @@ export type RouteAccess = 'PUBLIC' | readonly ActorContextName[];
 
 const PUBLIC_APP: readonly ActorContextName[] = ['USER', 'BREEDER', 'TRUSTED_VET'];
 
+/** The Phase 3 marketplace operations shell, open to the superadmin and the six roles (DEC-0204). */
+const MARKET_OPERATIONS: readonly ActorContextName[] = [
+  'SUPERADMIN',
+  'MARKETPLACE_ADMIN',
+  'LISTING_MODERATOR',
+  'SELLER_REVIEWER',
+  'FINANCE_OPERATOR',
+  'DISPUTE_REVIEWER',
+  'SUPPORT_AGENT',
+];
+
 /** Longest prefix wins, so `/breeder/activate` is matched before `/breeder`. */
 const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/', access: 'PUBLIC' },
@@ -94,6 +105,15 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/content', access: ['CONTENT_ADMIN'] },
   // Veterinarian applications, claims and unowned profiles (§8, §10, DEC-0165).
   { prefix: '/review', access: ['REVIEW_OPERATOR'] },
+
+  /*
+   * Phase 3 marketplace operations (DEC-0204). One shell, six roles: the
+   * address opens for any of them, and what may be done inside is decided per
+   * capability in `src/marketplace/model.ts`. Listing every role here rather
+   * than inventing a seventh umbrella role keeps the shell from becoming a
+   * permission of its own (§21.4).
+   */
+  { prefix: '/market', access: MARKET_OPERATIONS },
 ];
 
 function normalize(pathname: string): string {

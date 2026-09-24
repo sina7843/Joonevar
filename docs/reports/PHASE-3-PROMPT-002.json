@@ -1,0 +1,192 @@
+{
+  "promptId": "PROMPT-002",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "62d9cb9eee0cba3090e6899d92ae8ed21c5df011",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "The shared foundations both Phase 3 markets stand on, built on the machinery that already exists rather than beside it. No new table was created for flags or tariffs: product_setting already gives versioning, an audit row inside the same transaction, per-group permissions and an admin surface, so all forty-two new managed values — listing durations and limits, publication and renewal fees, the deposit/commission formula inputs, the request payment window, the cancellation policy version and its penalties, the animal promotion packages, shop commission and seller plans, the sub-order acceptance and return and dispute windows, the shipping bounds, promotion stacking, loyalty, the settlement cadence and hold and minimum payout, and the six kill switches — are settings in four new groups. Exactly two of them carry a number, and both are written in PRODUCT_DECISIONS: the fifty-six day minimum handover age and the three mandatory listing photos. Every other figure is OPERATIONAL_DATA with no value, so the flow that needs it stays shut rather than running on a guess, and all six kill switches start closed because nothing is built behind them yet. The one genuinely new table is marketplace_species, because species enablement is a row per species per market with a foreign key to the taxonomy, its own version and its own reason: the dog is open for animal sale and every species is open for the shop, which are the two product decisions, and a species the taxonomy gains later arrives closed for animal sale because opening one is a legal decision nobody should be able to take by adding a reference row. Six operational contexts were added — marketplace admin, listing moderator, seller reviewer, finance operator, dispute reviewer, support agent — all of them operational shells that never appear in the public role switcher. The shell is deliberately not the permission: /market opens for all six and what may be done inside is decided by a twelve-entry capability table, so only the superadmin holds everything, the money capabilities belong to finance alone and the marketplace admin does not acquire them by being an admin, and support can read and nothing else. Reading a settings group is wider than writing it, because a moderator and a dispute reviewer have to know the window they judge against; the settlement figures are the deliberate exception, read by the finance operator who runs settlement and written only by the superadmin, so the person moving the money is not the person setting the rules for moving it. A marketplace value passes two gates, the capability and the group, and a domain test walks every context to keep them in agreement rather than having one call the other. Role granting was extracted from src/content/roles.ts into src/authz/role-grants.ts so the two families share one implementation with no behaviour change. The admin panel gained a marketplace role form beside the content one; the /market shell has an overview that states plainly that nothing is built and how many figures are unset, a grouped settings page whose every row says where its number comes from, a per-key history page showing the before/after pair and the reason, and a species page. The browser suite found one real defect while it was written: asking for a settings group by URL that the role may not read answered with a 500 rather than the denial screen, because the page did not catch what the service correctly threw. Fixed. Checks on one HEAD: typecheck clean, production build clean, 956 tests green — 294 domain/config/UI, 456 database in two halves, 206 browser — and the upgrade rehearsal 18/18 with migration 0041 applied on top of real Phase 1 and Phase 2 records.",
+  "changedFiles": [
+    "src/db/migrations/0041_marketplace-foundations.sql",
+    "src/db/migrations/meta/0041_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/marketplace.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/index.ts",
+    "src/db/seed/index.ts",
+    "src/db/seed/dev-fixtures.ts",
+    "src/marketplace/model.ts",
+    "src/marketplace/species.ts",
+    "src/marketplace/flags.ts",
+    "src/marketplace/operations.ts",
+    "src/marketplace/roles.ts",
+    "src/authz/role-grants.ts",
+    "src/authz/actor.ts",
+    "src/authz/policy.ts",
+    "src/authz/routes.ts",
+    "src/content/roles.ts",
+    "src/settings/keys.ts",
+    "src/ui/shell.tsx",
+    "src/ui/role-switcher.tsx",
+    "app/market/page.tsx",
+    "app/market/actions.ts",
+    "app/market/forms.tsx",
+    "app/market/settings/page.tsx",
+    "app/market/species/page.tsx",
+    "app/admin/roles/page.tsx",
+    "app/admin/roles/actions.ts",
+    "app/admin/roles/forms.tsx",
+    "tests/domain/marketplace-foundations.test.ts",
+    "tests/db/marketplace-foundations.test.ts",
+    "tests/browser/market-operations.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-3-PROMPT-002.json"
+  ],
+  "migrations": [
+    "src/db/migrations/0041_marketplace-foundations.sql"
+  ],
+  "decisions": [
+    "DEC-0204"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 294,
+      "pass": 294,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 2.0,
+      "note": "282 before this prompt; the twelve new ones are tests/domain/marketplace-foundations.test.ts."
+    },
+    "databaseFirstHalf": {
+      "command": "node --test --test-concurrency=2 <first 30 tests/db suites>",
+      "total": 248,
+      "pass": 248,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 295
+    },
+    "databaseSecondHalf": {
+      "command": "node --test --test-concurrency=2 <last 29 tests/db suites>",
+      "total": 208,
+      "pass": 208,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 230
+    },
+    "browserFull": {
+      "command": "node tools/browser-tests.mjs",
+      "total": 206,
+      "pass": 206,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 473,
+      "note": "199 before this prompt; the seven new ones are tests/browser/market-operations.test.ts. The whole suite was re-run because the superadmin navigation gained a /market entry and the operations suite opens every entry it finds."
+    },
+    "upgradeRehearsal": {
+      "command": "node tools/upgrade-check.mjs",
+      "total": 18,
+      "pass": 18,
+      "fail": 0,
+      "note": "Migrations 0000-0032, then representative Phase 1 and Phase 2 records, then everything from 0033 including 0041 on top. The Phase 2.5 promises still hold and nothing 0041 adds disturbs an existing row."
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "rm -rf .next && npm run build",
+      "result": "PASS",
+      "evidence": "exit 0. Shared First Load JS 103 kB. Built clean rather than incrementally, which is what the stale-build guard added in PROMPT-001 now enforces before the browser suite runs."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=2 <tests/db in two halves> ; node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "956 tests on one HEAD: 294 domain/config/UI, 456 database (248 + 208), 206 browser. 0 failures, 0 skips."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "206/206 in 473 s against an isolated database and a production server built from this HEAD. The new suite signs in as three different marketplace roles and a public account and drives the real pages: the overview, a kill switch and its history diff, a managed value set and then cleared, a species opened and closed, and the two refusals."
+    },
+    {
+      "id": "migration-applies-clean-and-upgraded",
+      "command": "node --test tests/db/migrations.test.ts ; every db suite ; node tools/upgrade-check.mjs",
+      "result": "PASS",
+      "evidence": "0041 applies to 59 fresh databases across the suite run, and 18/18 on a database already holding Phase 1 and Phase 2 records. It is additive only: four enums gain values, one table is created, nothing is dropped or renamed and no row is rewritten."
+    },
+    {
+      "id": "least-privilege-authorization",
+      "command": "node --test tests/domain/marketplace-foundations.test.ts tests/db/marketplace-foundations.test.ts ; node tools/browser-tests.mjs tests/browser/market-operations.test.ts",
+      "result": "PASS",
+      "evidence": "Pinned in three layers. Domain: only the superadmin holds every capability, REFUND_ISSUE/SETTLEMENT_RUN/LEDGER_VIEW belong to FINANCE_OPERATOR alone, SUPPORT_AGENT holds exactly two read capabilities, the capability and the settings group agree for every context, and every marketplace group is readable more widely than it is writable. Database: a moderator, a finance operator, a support agent and a public actor are each refused the species write; four contexts are refused the flag change; a group a role may not read is refused by name rather than answered empty; and the marketplace role family refuses to grant a content role. Browser: the moderator really opens /market, really sees no switch, is really refused the settlement group by URL, and the ordinary account is refused the shell and never offered it in the role switcher."
+    },
+    {
+      "id": "stale-settings-never-rewrite-snapshots",
+      "command": "node --test tests/db/marketplace-foundations.test.ts",
+      "result": "PASS",
+      "evidence": "Two tests. A write carrying an expectedVersion from a page opened before a newer change is rejected with CONFLICT and the newer value survives. A snapshot taken at version N still reads its own value and version after the setting is changed to something else, and a snapshot taken afterwards reads the new one at version N+1 — which is the property every Phase 3 money path will depend on when it freezes a deposit or an order total."
+    },
+    {
+      "id": "no-invented-tariffs-or-legal-species",
+      "command": "node --test tests/domain/marketplace-foundations.test.ts tests/db/marketplace-foundations.test.ts",
+      "result": "PASS",
+      "evidence": "Of the 42 new keys exactly two carry a value and both are PRODUCT_DECISION: market.animal.min_handover_age_days = 56 and market.animal.min_listing_photos = 3. Every other Phase 3 key is OPERATIONAL_DATA with seedValue null, asserted by the catalogue test. All six kill switches seed to false. The animal market test reads the real database and confirms the publication fee and the cancellation policy version are unset, so no flow can open on a default nobody approved."
+    },
+    {
+      "id": "admin-ui-validation-and-history",
+      "command": "node tools/browser-tests.mjs tests/browser/market-operations.test.ts",
+      "result": "PASS",
+      "evidence": "The /market surfaces exist and work in a browser: the overview names the role's capabilities and counts the unset values, a switch is thrown with a mandatory reason and the history page shows false → true with that reason, a value is saved and then cleared back to «تعیین‌نشده» rather than to zero, and a species is opened and closed with the reason surviving a reload. Server-side validation is proved separately in the database suite: a commission above 100%, an empty reason, a Phase 1 tariff reached through the marketplace path and an unknown key are each refused. Screenshots in docs/reports/screenshots/phase-3/prompt-002/."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No marketplace or commerce flow exists yet. This prompt built the configuration, the roles and the switches; every switch is closed and there is nothing behind them until PROMPT-003 onwards.",
+    "Every monetary and legal value of Phase 3 is unset on purpose and must be entered by whoever has the authority to set a tariff: commission constant and percentage, listing fees, penalties, windows, settlement cadence and hold, shipping bounds, promotion stacking, loyalty and the cancellation policy version.",
+    "Opening a species other than the dog for animal sale is a legal decision this package cannot take. The mechanism, the audit trail and the reason field exist; the decision does not.",
+    "The kill switches are read by a helper the later prompts must actually call. Nothing enforces today that a future flow checks its own switch, because no flow exists yet; the check belongs in each flow's own prompt and its tests.",
+    "Seller kinds are modelled as a closed list with the conditions each one must meet. The conditions are names of facts, not yet the eligibility code that reads them — that is PROMPT-003 for the animal market and PROMPT-008 for the shop.",
+    "A money setting written by an operator is stored as a JSON number while a seeded one is stored as a JSON string. readMoney normalises both and Toman amounts stay far inside the safe integer range, so nothing is wrong today; it is an inconsistency inherited from Phase 1 that this prompt did not change.",
+    "The settlement cadence value accepts any string; WEEKLY and MONTHLY are described in the note rather than enforced by the settings kind. Enforcing it belongs with PROMPT-011, which builds the thing that reads it.",
+    "No external integration is verified: the payment gateway, SMS, cloud private storage and the map key remain NOT_CONFIGURED, and a green suite is not evidence any of them works."
+  ],
+  "readiness": {
+    "code": "PHASE_3_FOUNDATIONS_IN_PLACE",
+    "flows": "NOT_STARTED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0041_marketplace-foundations.sql",
+    "src/db/schema/marketplace.ts",
+    "src/marketplace/model.ts",
+    "src/marketplace/species.ts",
+    "src/marketplace/flags.ts",
+    "src/marketplace/operations.ts",
+    "src/authz/role-grants.ts",
+    "src/settings/keys.ts",
+    "app/market/page.tsx",
+    "tests/domain/marketplace-foundations.test.ts",
+    "tests/db/marketplace-foundations.test.ts",
+    "tests/browser/market-operations.test.ts",
+    "docs/reports/screenshots/phase-3/prompt-002/market-overview-desktop.png",
+    "docs/reports/screenshots/phase-3/prompt-002/market-moderator-desktop.png",
+    "docs/reports/screenshots/phase-3/prompt-002/flag-history-desktop.png",
+    "docs/reports/screenshots/phase-3/prompt-002/market-settings-desktop.png",
+    "docs/reports/screenshots/phase-3/prompt-002/market-species-mobile.png",
+    "DECISIONS.md#dec-0204",
+    "REQUIREMENTS_TRACEABILITY.md"
+  ]
+}

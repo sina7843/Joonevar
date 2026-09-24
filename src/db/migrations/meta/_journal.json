@@ -288,6 +288,13 @@
       "when": 1790248148870,
       "tag": "0040_notification-outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1790259480194,
+      "tag": "0041_marketplace-foundations",
+      "breakpoints": true
     }
   ]
 }

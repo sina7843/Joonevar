@@ -20,6 +20,14 @@ const LABEL: Record<ActorContextName, string> = {
   AUTHOR: 'نویسنده',
   CONTENT_ADMIN: 'ادمین محتوا',
   REVIEW_OPERATOR: 'اپراتور بررسی',
+  // Phase 3 marketplace operations (DEC-0204). Present here only so the
+  // operational header can name the environment; they are never switchable.
+  MARKETPLACE_ADMIN: 'مدیر بازار',
+  LISTING_MODERATOR: 'ناظر آگهی',
+  SELLER_REVIEWER: 'بررسی‌کننده فروشنده',
+  FINANCE_OPERATOR: 'اپراتور مالی',
+  DISPUTE_REVIEWER: 'داور اختلاف',
+  SUPPORT_AGENT: 'پشتیبانی',
 };
 
 export function RoleSwitcher({

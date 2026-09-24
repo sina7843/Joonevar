@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { setContentRole } from '../../../src/content/roles.ts';
+import { setMarketplaceRole } from '../../../src/marketplace/roles.ts';
 import { AppError } from '../../../src/domain/errors.ts';
 
 export interface RoleFormState {
@@ -19,6 +20,32 @@ export async function setContentRoleAction(_previous: RoleFormState, form: FormD
     if (!guard.ok) throw guard.denied;
     const active = text(form, 'action') === 'GRANT';
     await setContentRole(db(), guard.actor, {
+      mobile: text(form, 'mobile'),
+      role: text(form, 'role'),
+      active,
+      reason: text(form, 'reason'),
+    });
+    revalidatePath('/admin/roles');
+    return { ok: true, message: active ? 'نقش فعال شد.' : 'نقش تعلیق شد.' };
+  } catch (error) {
+    if (error instanceof AppError) return { ok: false, message: error.message };
+    throw error;
+  }
+}
+
+/**
+ * Marketplace operational roles — Phase 3, PROMPT-002 (DEC-0204).
+ *
+ * Same shell, same grant rules, its own audit action names. The role decides
+ * which address opens; what may be done inside is decided per capability in
+ * `src/marketplace/model.ts`.
+ */
+export async function setMarketplaceRoleAction(_previous: RoleFormState, form: FormData): Promise<RoleFormState> {
+  try {
+    const guard = await guardRoute('/admin/roles');
+    if (!guard.ok) throw guard.denied;
+    const active = text(form, 'action') === 'GRANT';
+    await setMarketplaceRole(db(), guard.actor, {
       mobile: text(form, 'mobile'),
       role: text(form, 'role'),
       active,

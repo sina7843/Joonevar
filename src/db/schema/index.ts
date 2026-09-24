@@ -19,3 +19,4 @@ export * from './breeding.ts';
 export * from './declarations.ts';
 export * from './content.ts';
 export * from './moderation.ts';
+export * from './marketplace.ts';

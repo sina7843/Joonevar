@@ -13,6 +13,18 @@ export const actorContext = pgEnum('actor_context', [
   'CONTENT_ADMIN',
   // Phase 2 review operator (DEC-0165).
   'REVIEW_OPERATOR',
+  /*
+   * Phase 3 marketplace operations (DEC-0204). Six separate contexts rather
+   * than one "marketplace operator", because the work really is separate: the
+   * person who hides an abusive listing is not the person who moves money, and
+   * support answers questions without deciding anything.
+   */
+  'MARKETPLACE_ADMIN',
+  'LISTING_MODERATOR',
+  'SELLER_REVIEWER',
+  'FINANCE_OPERATOR',
+  'DISPUTE_REVIEWER',
+  'SUPPORT_AGENT',
 ]);
 
 /** Roles that can be granted to an account. USER is implicit for every account. */
@@ -25,6 +37,13 @@ export const accountRole = pgEnum('account_role_name', [
   'AUTHOR',
   'CONTENT_ADMIN',
   'REVIEW_OPERATOR',
+  // Phase 3 marketplace operations (DEC-0204).
+  'MARKETPLACE_ADMIN',
+  'LISTING_MODERATOR',
+  'SELLER_REVIEWER',
+  'FINANCE_OPERATOR',
+  'DISPUTE_REVIEWER',
+  'SUPPORT_AGENT',
 ]);
 
 export const accountRoleStatus = pgEnum('account_role_status', ['PENDING', 'ACTIVE', 'SUSPENDED', 'REJECTED']);
@@ -66,7 +85,20 @@ export const settingGroup = pgEnum('setting_group', [
   'MODERATION',
   /** Prices of the advertising packages (Phase 2, §14, P2-D03). */
   'ADVERTISING',
+  /*
+   * Phase 3 (DEC-0204). Four groups rather than one, because the people are
+   * different: the animal market and the shop are run by the marketplace admin,
+   * settlement figures move real money and stay with the superadmin, and the
+   * kill switches are the one group an operator may need to reach in a hurry.
+   */
+  'ANIMAL_MARKET',
+  'COMMERCE',
+  'SETTLEMENT',
+  'MARKETPLACE_OPERATIONS',
 ]);
+
+/** The two Phase 3 markets. They share nothing but the species list (DEC-0203). */
+export const marketplaceMarket = pgEnum('marketplace_market', ['ANIMAL_SALE', 'MERCHANDISE']);
 
 export const settingScopeType = pgEnum('setting_scope_type', ['GLOBAL']);
 

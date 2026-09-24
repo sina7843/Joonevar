@@ -112,6 +112,36 @@ export const FIXTURE_ACCOUNTS: readonly FixtureAccount[] = [
     nationalId: '9000009006',
     birthDate: '1982-09-09',
   },
+  // Phase 3 marketplace operations (PROMPT-002). Three of the six roles are
+  // enough to exercise the arrangement in a browser: the one that configures,
+  // the one that only moderates and the one that only touches money.
+  {
+    label: 'SYNTHETIC marketplace admin',
+    mobile: '09990000010',
+    roles: ['MARKETPLACE_ADMIN'],
+    firstName: 'نمونه',
+    lastName: 'مدیر بازار آزمایشی',
+    nationalId: '9000000106',
+    birthDate: '1981-10-10',
+  },
+  {
+    label: 'SYNTHETIC listing moderator',
+    mobile: '09990000011',
+    roles: ['LISTING_MODERATOR'],
+    firstName: 'نمونه',
+    lastName: 'ناظر آگهی آزمایشی',
+    nationalId: '9000000114',
+    birthDate: '1980-11-11',
+  },
+  {
+    label: 'SYNTHETIC finance operator',
+    mobile: '09990000012',
+    roles: ['FINANCE_OPERATOR'],
+    firstName: 'نمونه',
+    lastName: 'اپراتور مالی آزمایشی',
+    nationalId: '9000000122',
+    birthDate: '1979-12-12',
+  },
 ];
 
 export async function seedDevFixtures(database: DbClient, env: Env = loadEnv()): Promise<readonly string[]> {

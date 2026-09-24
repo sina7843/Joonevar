@@ -19,6 +19,15 @@ export const ACTOR_CONTEXTS = [
   'AUTHOR',
   'CONTENT_ADMIN',
   'REVIEW_OPERATOR',
+  // Phase 3 marketplace operations (DEC-0204). Six separate contexts, because
+  // hiding a listing, approving a shop, moving money, deciding a dispute and
+  // answering a question are five different jobs with five different risks.
+  'MARKETPLACE_ADMIN',
+  'LISTING_MODERATOR',
+  'SELLER_REVIEWER',
+  'FINANCE_OPERATOR',
+  'DISPUTE_REVIEWER',
+  'SUPPORT_AGENT',
 ] as const;
 export type ActorContextName = (typeof ACTOR_CONTEXTS)[number];
 
@@ -31,6 +40,12 @@ export const ACCOUNT_ROLES = [
   'AUTHOR',
   'CONTENT_ADMIN',
   'REVIEW_OPERATOR',
+  'MARKETPLACE_ADMIN',
+  'LISTING_MODERATOR',
+  'SELLER_REVIEWER',
+  'FINANCE_OPERATOR',
+  'DISPUTE_REVIEWER',
+  'SUPPORT_AGENT',
 ] as const;
 export type AccountRoleName = (typeof ACCOUNT_ROLES)[number];
 
@@ -48,6 +63,15 @@ export const OPERATIONAL_CONTEXTS: readonly ActorContextName[] = [
   'CONTENT_ADMIN',
   // Reviews veterinarian applications, claims and unowned profiles (§3, §8, DEC-0165).
   'REVIEW_OPERATOR',
+  // Phase 3 marketplace operations (DEC-0204). Like every other operational
+  // shell, reached by its own address and never offered in the Role Switcher:
+  // the same person visiting the public app is an ordinary user there.
+  'MARKETPLACE_ADMIN',
+  'LISTING_MODERATOR',
+  'SELLER_REVIEWER',
+  'FINANCE_OPERATOR',
+  'DISPUTE_REVIEWER',
+  'SUPPORT_AGENT',
 ];
 
 export interface Actor {

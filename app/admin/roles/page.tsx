@@ -6,7 +6,8 @@ import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { CONTENT_ROLE_FA, contentRoleHolders, type ContentRoleName } from '../../../src/content/roles.ts';
-import { ContentRoleForm } from './forms.tsx';
+import { marketplaceRoleHolders, MARKETPLACE_ROLE_FA, type MarketplaceRoleName } from '../../../src/marketplace/roles.ts';
+import { ContentRoleForm, MarketplaceRoleForm } from './forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,10 @@ export const dynamic = 'force-dynamic';
 export default async function AdminRolesPage() {
   const guard = await guardRoute('/admin/roles');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const holders = await contentRoleHolders(db(), guard.actor);
+  const [holders, marketHolders] = await Promise.all([
+    contentRoleHolders(db(), guard.actor),
+    marketplaceRoleHolders(db(), guard.actor),
+  ]);
 
   return (
     <OpsShell actor={guard.actor} title="سوپرادمین" pathname="/admin/roles" nav={ADMIN_NAV}>
@@ -44,6 +48,44 @@ export default async function AdminRolesPage() {
                   </div>
                   <div className="flex gap-xs">
                     <StatusBadge tone="info">{CONTENT_ROLE_FA[holder.role as ContentRoleName]}</StatusBadge>
+                    <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'}>
+                      {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
+                    </StatusBadge>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+
+        <MarketplaceRoleForm />
+        <Card>
+          <h2 className="text-label-lg">نقش‌های عملیاتی بازار و فروشگاه</h2>
+          {marketHolders.length === 0 ? (
+            <div className="mt-lg">
+              <EmptyState
+                title="هنوز نقشی داده نشده است"
+                description="با فرم بالا یکی از شش نقش عملیاتی بازار را فعال کنید."
+              />
+            </div>
+          ) : (
+            <ul className="mt-lg space-y-sm" data-testid="marketplace-role-holders">
+              {marketHolders.map((holder) => (
+                <li
+                  key={holder.accountId + holder.role}
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  data-testid={'market-role-holder-' + holder.mobile + '-' + holder.role}
+                >
+                  <div className="min-w-0">
+                    <p className="text-label-md">
+                      {holder.firstName ? holder.firstName + ' ' + (holder.lastName ?? '') : 'بدون پروفایل'}
+                    </p>
+                    <p className="text-caption text-text-secondary">
+                      <bdi dir="ltr">{holder.mobile}</bdi>
+                    </p>
+                  </div>
+                  <div className="flex gap-xs">
+                    <StatusBadge tone="info">{MARKETPLACE_ROLE_FA[holder.role as MarketplaceRoleName]}</StatusBadge>
                     <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'}>
                       {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
                     </StatusBadge>

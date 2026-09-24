@@ -19,6 +19,11 @@ export const SETTING_GROUPS = [
   'INTEGRATIONS',
   'MODERATION',
   'ADVERTISING',
+  // Phase 3 (DEC-0204).
+  'ANIMAL_MARKET',
+  'COMMERCE',
+  'SETTLEMENT',
+  'MARKETPLACE_OPERATIONS',
 ] as const;
 export type SettingGroupName = (typeof SETTING_GROUPS)[number];
 
@@ -53,6 +58,48 @@ const ACCESS: Record<SettingGroupName, GroupAccess> = {
   // Package prices. The review operator reads them to answer a manager's
   // question; changing what is charged stays with the superadmin (§14, P2-D03).
   ADVERTISING: { read: ['SUPERADMIN', 'REVIEW_OPERATOR'], write: ['SUPERADMIN'] },
+
+  /*
+   * Phase 3 (DEC-0204). Read is wider than write on purpose: a moderator and a
+   * dispute reviewer have to know the window they are judging against, and
+   * support has to be able to answer "how long do I have to return this"
+   * without being able to change the answer.
+   */
+  ANIMAL_MARKET: {
+    read: ['SUPERADMIN', 'MARKETPLACE_ADMIN', 'LISTING_MODERATOR', 'DISPUTE_REVIEWER', 'SUPPORT_AGENT'],
+    write: ['SUPERADMIN', 'MARKETPLACE_ADMIN'],
+  },
+  COMMERCE: {
+    read: ['SUPERADMIN', 'MARKETPLACE_ADMIN', 'SELLER_REVIEWER', 'DISPUTE_REVIEWER', 'SUPPORT_AGENT'],
+    write: ['SUPERADMIN', 'MARKETPLACE_ADMIN'],
+  },
+  /*
+   * Settlement cadence, hold period and minimum payout decide when somebody
+   * else's money becomes withdrawable. The finance operator runs settlement and
+   * reads these; changing them stays with the superadmin, so the person who
+   * moves the money is not the person who sets the rules for moving it.
+   */
+  SETTLEMENT: {
+    read: ['SUPERADMIN', 'MARKETPLACE_ADMIN', 'FINANCE_OPERATOR'],
+    write: ['SUPERADMIN'],
+  },
+  /*
+   * The kill switches. Every marketplace context reads them, because knowing a
+   * flow is closed is what stops a wrong answer to a user; only the two admins
+   * throw them, and throwing one is audited like any other setting change.
+   */
+  MARKETPLACE_OPERATIONS: {
+    read: [
+      'SUPERADMIN',
+      'MARKETPLACE_ADMIN',
+      'LISTING_MODERATOR',
+      'SELLER_REVIEWER',
+      'FINANCE_OPERATOR',
+      'DISPUTE_REVIEWER',
+      'SUPPORT_AGENT',
+    ],
+    write: ['SUPERADMIN', 'MARKETPLACE_ADMIN'],
+  },
 };
 
 export function canReadSettingGroup(actor: Actor, group: SettingGroupName): boolean {

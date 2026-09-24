@@ -5,6 +5,8 @@ import { Icon } from './icon.tsx';
 import type { IconName } from './icon-paths.ts';
 import { RoleSwitcher, CONTEXT_LABEL_FA } from './role-switcher.tsx';
 import { switchableContexts, type Actor, type ActorContextName } from '../authz/actor.ts';
+import { canReadSettingGroup } from '../authz/policy.ts';
+import { hasMarketplaceCapability } from '../marketplace/model.ts';
 import { db } from '../db/client.ts';
 import { findProfile } from '../identity/account.ts';
 import { signOutAction } from '../identity/sign-out-action.ts';
@@ -284,6 +286,8 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin/roles', label: 'نقش‌های محتوا', icon: 'shieldCheck' },
   { href: '/admin/notifications', label: 'اعلان‌ها و پیامک', icon: 'bell' },
   { href: '/admin/audit', label: 'تاریخچه', icon: 'clipboardText' },
+  // The marketplace operations shell (Phase 3, DEC-0204).
+  { href: '/market', label: 'بازار و فروشگاه', icon: 'listChecks' },
 ];
 
 /** Author environment (P2-D11). */
@@ -301,6 +305,24 @@ export const REVIEW_NAV: readonly NavItem[] = [
   { href: '/review/communities', label: 'انجمن و کلاب', icon: 'user' },
   { href: '/review/suggestions', label: 'پیشنهادهای کاربران', icon: 'uploadSimple' },
 ];
+
+/**
+ * Marketplace operations environment (Phase 3, DEC-0204).
+ *
+ * The rail is built from what this actor may actually do, so a moderator is
+ * never shown a settings link that would deny. Hiding an entry is presentation;
+ * the route table and the capability check are the gate.
+ */
+export function marketNav(actor: Actor): readonly NavItem[] {
+  const items: NavItem[] = [{ href: '/market', label: 'مرور بازار', icon: 'house' }];
+  if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE') || canReadSettingGroup(actor, 'ANIMAL_MARKET')) {
+    items.push({ href: '/market/settings', label: 'تنظیمات بازار', icon: 'listChecks' });
+  }
+  if (hasMarketplaceCapability(actor, 'MARKET_SPECIES_WRITE')) {
+    items.push({ href: '/market/species', label: 'گونه‌های فعال', icon: 'dog' });
+  }
+  return items;
+}
 
 /** Content admin environment. */
 export const CONTENT_NAV: readonly NavItem[] = [
