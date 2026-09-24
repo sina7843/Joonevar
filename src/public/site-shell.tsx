@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Logo } from '../ui/logo.tsx';
 import { DesktopNav, MobileMenu, type NavLink } from './site-nav.tsx';
-import { liveSections } from './sections.ts';
+import { navSections } from './sections.ts';
 import { viewer } from './request.ts';
 
 /**
@@ -18,7 +18,7 @@ import { viewer } from './request.ts';
  */
 export async function SiteShell({ children }: { children: ReactNode }) {
   const actor = await viewer();
-  const links: readonly NavLink[] = liveSections().map(({ href, label }) => ({ href, label }));
+  const links: readonly NavLink[] = navSections().map(({ href, label }) => ({ href, label }));
   const account: NavLink =
     actor === null ? { href: '/login', label: 'ورود / ثبت‌نام' } : { href: '/dashboard', label: 'پنل من' };
 

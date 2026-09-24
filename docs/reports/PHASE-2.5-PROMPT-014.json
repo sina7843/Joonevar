@@ -1,0 +1,160 @@
+{
+  "promptId": "PROMPT-014",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The public site got the pages, the navigation and the taxonomy Phase 2.5 §9 asks for. Content categories were runtime-only until now — a fresh database had nowhere to file anything — so the phase's subjects are written down in src/content/taxonomy.ts and seeded through the same versioned mechanism every other taxonomy uses: a missing category is added, one an admin renamed or switched off is left exactly as they left it. Thirteen education categories cover the system tutorials, the pedigree, the registration sheet, the microchip, the mating permit, the parentage test, dog breeds, the trusted vet, hospitals and clinics, associations and clubs, and the two outside bodies; news and announcements have their own. The Kennel Club and the American Kennel Club are subjects, not partners: their categories carry an EXTERNAL_BODY mark, a rule that such material is not published without a source, and a standing notice on the public page saying the piece is educational, written from the named sources, that Hamzist is not their representative, has no affiliation and republishes none of their protected text. Six public pages were built — contact, guides, the parentage test, and the association's membership terms, regulations and statuses. What belongs to an operator or to the association is read from managed settings that ship with no value: until a real phone number, address, membership text or set of regulations is entered, each page says so plainly and points at the path that actually answers the request, rather than showing an invented one. Text that operators do enter is rendered through the existing safe renderer, so a javascript: link degrades to its own words and an external link carries nofollow noopener noreferrer. Navigation was completed: /announcements and /services were built but linked from nowhere, /clubs became its own entry, and a nav flag lets a page be public, crawled and in the sitemap without taking a slot in the header. A club had two addresses; now /associations/<slug> hands its canonical to /clubs/<slug> and the sitemap lists each record once, under its own section. The public content lists gained a text filter over title and summary — escaped so a % searches for a percent sign, and unified on both sides for the two letters Persian and Arabic keyboards disagree about, instead of the search normaliser that strips spaces and would have made a two-word search match nothing. No public marketing page prints a tariff, which a browser test now enforces across every one of them, and the membership service page — which still described a lifetime membership after PROMPT-009 made it timed and reviewed — was corrected.",
+  "changedFiles": [
+    "src/content/taxonomy.ts",
+    "src/db/seed/taxonomy.ts",
+    "src/content/service.ts",
+    "src/content/public-views.tsx",
+    "src/public/sections.ts",
+    "src/public/site-shell.tsx",
+    "src/seo/sitemap.ts",
+    "src/communities/service.ts",
+    "src/settings/keys.ts",
+    "src/services/catalogue.ts",
+    "src/authz/routes.ts",
+    "app/(public)/contact/page.tsx",
+    "app/(public)/guides/page.tsx",
+    "app/(public)/parentage-test/page.tsx",
+    "app/(public)/association/membership/page.tsx",
+    "app/(public)/association/regulations/page.tsx",
+    "app/(public)/association/status/page.tsx",
+    "app/(public)/associations/[slug]/page.tsx",
+    "tests/domain/content-taxonomy.test.ts",
+    "tests/db/content-taxonomy.test.ts",
+    "tests/browser/public-pages.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "tests/db/communities.test.ts",
+    "tests/ui/seo.test.ts",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-014.json"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0200"],
+  "tests": {
+    "domainTaxonomy": { "command": "node --test tests/domain/content-taxonomy.test.ts", "total": 4, "pass": 4, "fail": 0, "skip": 0 },
+    "databaseTaxonomy": { "command": "node --test tests/db/content-taxonomy.test.ts", "total": 5, "pass": 5, "fail": 0, "skip": 0 },
+    "affectedDatabase": {
+      "command": "node --test --test-concurrency=2 tests/db/content.test.ts tests/db/content-taxonomy.test.ts tests/db/communities.test.ts tests/db/clubs.test.ts tests/db/settings.test.ts tests/db/startup.test.ts tests/db/services.test.ts tests/db/search.test.ts",
+      "total": 53,
+      "pass": 53,
+      "fail": 0,
+      "skip": 0,
+      "note": "The suites that read the content tables, the seed, the settings catalogue, the community sitemap and the service pages. Unaffected passing suites were not re-run."
+    },
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 282,
+      "pass": 282,
+      "fail": 0,
+      "skip": 0
+    },
+    "browserFirstRun": {
+      "command": "node tools/browser-tests.mjs tests/browser/public-pages.test.ts tests/browser/content.test.ts tests/browser/public-shell.test.ts tests/browser/rtl.test.ts",
+      "total": 27,
+      "pass": 25,
+      "fail": 2,
+      "note": "Both failures were the tests' own expectations: the document language is 'fa' not 'fa-IR', and the header list and count were pinned to the nine pre-Phase-2.5 sections. A third, flaky assertion about which empty state a search shows was removed: it depends on whether another suite had published anything into the shared run database, and the wording is pinned in the database suite instead."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs tests/browser/public-pages.test.ts tests/browser/content.test.ts tests/browser/public-shell.test.ts tests/browser/rtl.test.ts",
+      "total": 27,
+      "pass": 27,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 28.1
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in a detached worktree at HEAD acbabea with every changed and new file copied in, so the user's running server on port 3111 kept its .next. All six new routes compiled. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test tests/domain/content-taxonomy.test.ts ; node --test tests/db/content-taxonomy.test.ts ; node --test --test-concurrency=2 <8 affected db suites> ; node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "4/4 taxonomy rules, 5/5 taxonomy against the database, 53/53 across the content, community, settings, seed and service suites, 282/282 domain, config and UI."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs tests/browser/public-pages.test.ts tests/browser/content.test.ts tests/browser/public-shell.test.ts tests/browser/rtl.test.ts",
+      "result": "PASS",
+      "evidence": "27/27 on an isolated database and a production server built from the worktree, covering the six new pages, the content journey, the public shell and the RTL suite."
+    },
+    {
+      "id": "publishing-permissions",
+      "command": "node --test tests/db/content-taxonomy.test.ts (tests: the taxonomy belongs to the content admin alone ; re-seeding adds nothing twice…)",
+      "result": "PASS",
+      "evidence": "An author and an ordinary account are FORBIDDEN from creating a category or retiring one; the content admin may, and the same name twice inside a kind is a conflict while the same name under another kind is fine. Re-seeding inserts nothing a second time, leaves a retired category retired and a renamed one renamed."
+    },
+    {
+      "id": "xss-and-link-policy",
+      "command": "node --test tests/domain/rich-text.test.ts ; node --test tests/db/content-taxonomy.test.ts (search terms) ; existing tests/browser/content.test.ts",
+      "result": "PASS",
+      "evidence": "Operator-entered text on the new pages goes through the same renderer whose suite proves a pasted <script> stays literal, that javascript:, data:, vbscript: and protocol-relative links are refused while keeping their words, and that an external link carries rel=nofollow noopener noreferrer. A search term is data, not SQL: '%', a quote-and-OR injection and a lone backslash each match nothing and break nothing."
+    },
+    {
+      "id": "sitemap-and-canonical",
+      "command": "node --test tests/ui/seo.test.ts ; node tools/browser-tests.mjs tests/browser/public-pages.test.ts (test: the sitemap index and its sections…)",
+      "result": "PASS",
+      "evidence": "The section list, the navigation subset and the non-navigation public pages are pinned; the sitemap index carries the new clubs section; pages.xml lists all six new addresses and no application route; each new page declares a canonical that ends in its own path. A club is listed once, under /clubs, and its /associations copy hands the index over."
+    },
+    {
+      "id": "no-public-tariff",
+      "command": "node tools/browser-tests.mjs tests/browser/public-pages.test.ts (test: no public marketing page prints a tariff)",
+      "result": "PASS",
+      "evidence": "Every new page plus /services, /services/membership and /clubs is scanned for a figure followed by «تومان»; none prints one. The pages say instead that the amount is shown, and locked, at the moment of payment."
+    },
+    {
+      "id": "external-body-attribution",
+      "command": "node --test tests/domain/content-taxonomy.test.ts ; node --test tests/db/content-taxonomy.test.ts (test: a page about an outside body…)",
+      "result": "PASS",
+      "evidence": "Only the two outside bodies carry the EXTERNAL_BODY mark; material filed under them is refused without a source and accepted with one; the public page receives the category slug and renders the notice that the piece is educational, sourced, not a representation and not a republication of protected text."
+    },
+    {
+      "id": "responsive-and-accessibility",
+      "command": "node tools/browser-tests.mjs tests/browser/public-pages.test.ts (test: the pages hold at phone width…)",
+      "result": "PASS",
+      "evidence": "At 360×800 no page overflows horizontally, each has a main landmark and a labelled navigation, exactly one h1 and a flat h2/h3 outline, and no link without words. Screenshots were captured for contact, guides and the status page on a phone, and the home navigation on desktop."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Contact details, the membership terms and the regulations have no production values: until an operator enters them, those pages honestly say so and show the in-product routes instead.",
+    "The guides page lists the fixed service pages and whatever tutorials the content team has published; on a fresh database the tutorial half is empty by design.",
+    "The text filter is a substring match over title and summary, not a ranked search; the global /search page remains the place for ranked results across kinds.",
+    "Phase 2.5 added no dog-only or all-animal filter change: breed scope stays dog-only and the existing species filters elsewhere are untouched.",
+    "Club posts still live under /associations/<slug>/posts/<post>; only the club page itself moved its canonical to /clubs.",
+    "No JSON-LD was added for the contact page, because Hamzist has no verified organisation contact facts to publish yet.",
+    "Screenshots cover four screens; the parentage test and the two association text pages have no screenshot."
+  ],
+  "readiness": {
+    "code": "PUBLIC_PAGES_READY_AWAITING_OPERATOR_TEXT",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tests/domain/content-taxonomy.test.ts",
+    "tests/db/content-taxonomy.test.ts",
+    "tests/browser/public-pages.test.ts",
+    "docs/reports/screenshots/phase-2.5/prompt-014/contact-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-014/guides-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-014/association-status-mobile.png",
+    "docs/reports/screenshots/phase-2.5/prompt-014/home-nav-desktop.png",
+    "DECISIONS.md#dec-0200"
+  ]
+}

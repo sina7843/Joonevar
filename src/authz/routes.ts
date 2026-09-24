@@ -29,6 +29,12 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   { prefix: '/associations', access: 'PUBLIC' },
   // The club directory (Phase 2.5 §8). Only verified, active, published clubs are served here.
   { prefix: '/clubs', access: 'PUBLIC' },
+  // Public pages of Phase 2.5 §9 (PROMPT-014): how to reach Hamzist, how to use
+  // it, what the parentage test is, and what the association publishes.
+  { prefix: '/contact', access: 'PUBLIC' },
+  { prefix: '/guides', access: 'PUBLIC' },
+  { prefix: '/parentage-test', access: 'PUBLIC' },
+  { prefix: '/association', access: 'PUBLIC' },
   { prefix: '/breeds', access: 'PUBLIC' },
   { prefix: '/articles', access: 'PUBLIC' },
   { prefix: '/news', access: 'PUBLIC' },

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { db } from '../../../../src/db/client.ts';
-import { communityPageBySlug } from '../../../../src/communities/service.ts';
+import { canonicalCommunityPath, communityPageBySlug } from '../../../../src/communities/service.ts';
 import { COMMUNITY_KIND_FA, COMMUNITY_SCOPE_FA } from '../../../../src/communities/model.ts';
 import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
@@ -36,9 +36,15 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       description: summary(page.nameFa, kindFa, page.aboutFa),
       path: '/associations/' + page.slug,
       image: page.imageFileId ? { path: '/media/' + page.imageFileId, alt: page.imageAltFa ?? page.nameFa } : undefined,
-      // A merged duplicate keeps its address but points at the primary (§21).
-      state: page.primary ? 'DUPLICATE' : 'PUBLISHED',
-      primaryPath: page.primary ? '/associations/' + page.primary.slug : undefined,
+      // A club is readable here and at its own /clubs address, which is the one
+      // it calls canonical; this copy hands the index over rather than competing
+      // with it (PROMPT-014). A merged duplicate points at its primary (§21).
+      state: page.primary || page.kind === 'CLUB' ? 'DUPLICATE' : 'PUBLISHED',
+      primaryPath: page.primary
+        ? canonicalCommunityPath(page.kind, page.primary.slug)
+        : page.kind === 'CLUB'
+          ? '/clubs/' + page.slug
+          : undefined,
     },
     site(),
   );

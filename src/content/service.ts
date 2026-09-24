@@ -9,7 +9,8 @@
  * the moment they ask — scheduling is a comparison, not a job (DEC-0159).
  */
 import fs from 'node:fs/promises';
-import { and, asc, count, desc, eq, inArray, isNull, lte, ne, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, lte, ne, or, sql } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import type { Database, DbClient } from '../db/client.ts';
 import { contentCategories, contentItems, contentRevisions, contentSlugRedirects } from '../db/schema/content.ts';
 import { referenceBreeds, species, storedFiles } from '../db/schema/core.ts';
@@ -18,7 +19,7 @@ import { recordAudit } from '../audit/service.ts';
 import { findFile, putPrivateFile, resolveWithinRoot } from '../files/storage.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page } from '../domain/pagination.ts';
-import { isReviewDate, normalizeForSearch } from '../breeds/model.ts';
+import { isReviewDate, normalizeForSearch, unifyPersianLetters } from '../breeds/model.ts';
 import type { Actor } from '../authz/actor.ts';
 import type { SitemapEntry } from '../seo/sitemap.ts';
 import { activeRestrictionFor, restrictionMessage } from '../moderation/restrictions.ts';
@@ -743,7 +744,7 @@ export interface ContentCard {
 
 export async function publicContentList(
   database: DbClient,
-  query: { kind: ContentKind; categorySlug?: string | null; page: number; pageSize?: number },
+  query: { kind: ContentKind; categorySlug?: string | null; term?: string | null; page: number; pageSize?: number },
   now: Date = new Date(),
 ) {
   const categories = await database
@@ -753,7 +754,29 @@ export async function publicContentList(
     .orderBy(asc(contentCategories.sortOrder), asc(contentCategories.nameFa));
   const category = query.categorySlug ? (categories.find((row) => row.slug === query.categorySlug) ?? null) : null;
 
-  const where = category ? and(visibleNow(query.kind, now), eq(contentItems.categoryId, category.id)) : visibleNow(query.kind, now);
+  /*
+   * A reader looking for one thing among many searches the title and the
+   * summary (PROMPT-014).
+   *
+   * `normalizeForSearch` is not used here: it strips every space, which turns a
+   * two-word search into one token that matches nothing in stored prose. What
+   * is unified instead is the pair of letters Persian and Arabic keyboards
+   * disagree about — on both sides, so the column and the term meet in the same
+   * spelling — and the LIKE wildcards in what the reader typed are escaped, so
+   * a `%` searches for a percent sign rather than matching everything.
+   */
+  const term = unifyPersianLetters((query.term ?? '').trim()).replace(/\s+/g, ' ');
+  const pattern = '%' + term.replace(/[\\%_]/g, (character) => '\\' + character) + '%';
+  const unified = (column: AnyPgColumn) => sql`translate(${column}, 'يك', 'یک')`;
+  const matching =
+    term === ''
+      ? undefined
+      : sql`(${unified(contentItems.titleFa)} ilike ${pattern} or ${unified(contentItems.summaryFa)} ilike ${pattern})`;
+  const where = and(
+    visibleNow(query.kind, now),
+    category ? eq(contentItems.categoryId, category.id) : undefined,
+    matching,
+  );
   const request = { page: query.page, pageSize: query.pageSize ?? 12 };
   const rows = await database
     .select({ item: contentItems, categoryNameFa: contentCategories.nameFa })
@@ -791,6 +814,8 @@ export type PublicContentPage =
       readonly state: 'VISIBLE' | 'ARCHIVED';
       readonly byline: string;
       readonly categoryNameFa: string | null;
+      /** Kept so the page can say where material about an outside body came from. */
+      readonly categorySlug: string | null;
       readonly breed: { readonly slug: string; readonly nameFa: string } | null;
     };
 
@@ -832,7 +857,11 @@ export async function publicContentBySlug(
     .where(eq(profiles.accountId, row.authorAccountId))
     .limit(1);
   const [category] = row.categoryId
-    ? await database.select({ nameFa: contentCategories.nameFa }).from(contentCategories).where(eq(contentCategories.id, row.categoryId)).limit(1)
+    ? await database
+        .select({ nameFa: contentCategories.nameFa, slug: contentCategories.slug })
+        .from(contentCategories)
+        .where(eq(contentCategories.id, row.categoryId))
+        .limit(1)
     : [];
   const [breed] = row.breedId
     ? await database
@@ -848,6 +877,7 @@ export async function publicContentBySlug(
     state,
     byline: bylineFor(author ?? null),
     categoryNameFa: category?.nameFa ?? null,
+    categorySlug: category?.slug ?? null,
     breed: breed && breed.status !== 'DRAFT' ? { slug: breed.slug, nameFa: breed.nameFa } : null,
   };
 }

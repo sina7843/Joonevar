@@ -32,6 +32,8 @@ import { breedGroups, species } from '../schema/core.ts';
 import { cities, provinces } from '../schema/geography.ts';
 import { centreFacilities, centreServices, centreTypes, vetSpecialties } from '../schema/vets.ts';
 import { taxonomySeeds } from '../schema/taxonomy.ts';
+import { contentCategories } from '../schema/content.ts';
+import { CONTENT_CATEGORY_SEED, CONTENT_CATEGORY_VERSION } from '../../content/taxonomy.ts';
 import { citySlug } from '../../geo/model.ts';
 
 export interface TaxonomySeedResult {
@@ -222,6 +224,28 @@ interface Catalogue {
  * version — no migration, and no other taxonomy is disturbed.
  */
 export const TAXONOMY_CATALOGUES: readonly Catalogue[] = [
+  {
+    // The content categories of Phase 2.5 §9. They were runtime-only before, so
+    // a fresh database had nowhere to file anything; a category an admin
+    // renamed or switched off is still left exactly as they left it.
+    name: 'content_category',
+    version: CONTENT_CATEGORY_VERSION,
+    size: CONTENT_CATEGORY_SEED.length,
+    async ensure(database) {
+      const rows = await database
+        .select({ kind: contentCategories.kind, slug: contentCategories.slug })
+        .from(contentCategories);
+      const present = new Set(rows.map((row) => row.kind + ':' + row.slug));
+      const missing = CONTENT_CATEGORY_SEED.filter((entry) => !present.has(entry.kind + ':' + entry.slug));
+      if (missing.length === 0) return 0;
+      const added = await database
+        .insert(contentCategories)
+        .values(missing.map((entry) => ({ kind: entry.kind, slug: entry.slug, nameFa: entry.nameFa, sortOrder: entry.sortOrder })))
+        .onConflictDoNothing()
+        .returning({ id: contentCategories.id });
+      return added.length;
+    },
+  },
   {
     name: 'species',
     version: 1,

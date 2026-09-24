@@ -8,6 +8,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { db } from '../db/client.ts';
 import { publicContentBySlug, publicContentList } from './service.ts';
 import { KIND_PATH, KIND_PLURAL_FA, TEAM_BYLINE } from './model.ts';
+import { EXTERNAL_BODY_NOTICE_FA, isExternalBodyCategory } from './taxonomy.ts';
 import { formatCivilDateFa } from '../domain/calendar.ts';
 import { buildMetadata } from '../seo/metadata.ts';
 import { articleLd } from '../seo/structured-data.ts';
@@ -16,7 +17,7 @@ import { site } from '../public/request.ts';
 import { Breadcrumbs } from '../ui/breadcrumbs.tsx';
 import { EmptyState } from '../ui/states.tsx';
 import { Alert } from '../ui/alert.tsx';
-import { ButtonLink } from '../ui/button.tsx';
+import { Button, ButtonLink } from '../ui/button.tsx';
 
 /**
  * Public pages of the CMS — Requirements-Phase-2 §12, §19 (PROMPT-004).
@@ -42,7 +43,7 @@ const DATE_FA = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { dateStyle: 'long
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 const pathOf = (kind: PublicKind): string => KIND_PATH[kind]!;
 
-type Search = Promise<{ category?: string | string[]; page?: string | string[] }>;
+type Search = Promise<{ category?: string | string[]; q?: string | string[]; page?: string | string[] }>;
 const one = (value: string | string[] | undefined): string => (Array.isArray(value) ? value[0] : value) ?? '';
 
 /** A Persian slug arrives percent-encoded in the address; every content page decodes it before matching. */
@@ -62,9 +63,10 @@ export function contentListMetadata(kind: PublicKind): Metadata {
 export async function ContentList({ kind, searchParams }: { kind: PublicKind; searchParams: Search }) {
   const search = await searchParams;
   const categorySlug = one(search.category).slice(0, 80) || null;
+  const term = one(search.q).trim().slice(0, 80);
   const pageNumber = Number(one(search.page));
   const page = Number.isInteger(pageNumber) && pageNumber >= 1 ? pageNumber : 1;
-  const result = await publicContentList(db(), { kind, categorySlug, page });
+  const result = await publicContentList(db(), { kind, categorySlug, term, page });
   const { origin } = site();
   const base = pathOf(kind);
   // The column beside a list offers what the list does not: the other kind of
@@ -82,6 +84,7 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
   const hrefFor = (target: number, category: string | null = categorySlug) => {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
+    if (term) params.set('q', term);
     if (target > 1) params.set('page', String(target));
     const encoded = params.toString();
     return base + (encoded ? '?' + encoded : '');
@@ -95,6 +98,25 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
         <h1 className="text-h3 md:text-h1">{KIND_PLURAL_FA[kind]}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">{LIST_DESCRIPTION[kind]}</p>
       </header>
+
+      <form method="get" action={base} role="search" className="flex flex-wrap gap-sm" data-testid="content-search">
+        {categorySlug ? <input type="hidden" name="category" value={categorySlug} /> : null}
+        <label htmlFor="content-q" className="sr-only">
+          {'جست‌وجو در ' + KIND_PLURAL_FA[kind]}
+        </label>
+        <input
+          id="content-q"
+          name="q"
+          type="search"
+          defaultValue={term}
+          placeholder={'جست‌وجو در ' + KIND_PLURAL_FA[kind]}
+          className="min-h-[var(--size-control-md)] w-full max-w-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm text-body-sm focus:border-border-brand"
+          data-testid="content-search-input"
+        />
+        <Button type="submit" data-testid="content-search-submit">
+          جست‌وجو
+        </Button>
+      </form>
 
       {result.categories.length > 0 ? (
         <nav aria-label="دسته‌ها" className="hz-rail flex gap-sm overflow-x-auto pb-xs" data-testid="content-categories">
@@ -127,8 +149,8 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
         <EmptyState title={EMPTY_TITLE[kind]} description="مطالب پس از انتشار اینجا دیده می‌شوند." />
       ) : result.items.length === 0 ? (
         <EmptyState
-          title="اینجا هنوز مطلبی منتشر نشده است"
-          description="دسته دیگری را ببینید."
+          title={term ? 'چیزی با «' + term + '» پیدا نشد' : 'اینجا هنوز مطلبی منتشر نشده است'}
+          description={term ? 'واژه دیگری را امتحان کنید یا فیلتر دسته را بردارید.' : 'دسته دیگری را ببینید.'}
           action={<ButtonLink tone="secondary" href={base}>{'همه ' + KIND_PLURAL_FA[kind]}</ButtonLink>}
         />
       ) : (
@@ -215,7 +237,7 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
   // An address the item used to have answers with the one it has now (§19, §23).
   if (page.kind === 'redirect') permanentRedirect(pathOf(kind) + '/' + encodeURIComponent(page.slug));
 
-  const { item, state, byline, categoryNameFa, breed } = page;
+  const { item, state, byline, categoryNameFa, categorySlug, breed } = page;
   const { origin } = site();
   // The column beside the article: other reading, and centres to look at.
   const [moreReading, centres] = await Promise.all([
@@ -249,6 +271,12 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
           origin,
         )}
       />
+
+      {isExternalBodyCategory(categorySlug) ? (
+        <Alert tone="info" title="مطلب آموزشی درباره یک سازمان دیگر">
+          <span data-testid="content-external-body-notice">{EXTERNAL_BODY_NOTICE_FA}</span>
+        </Alert>
+      ) : null}
 
       {state === 'ARCHIVED' ? (
         <Alert tone="warning" title="این مطلب بایگانی شده است">

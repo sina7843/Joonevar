@@ -4,7 +4,7 @@ import { absoluteUrl, buildMetadata, type SiteContext } from '../../src/seo/meta
 import { breadcrumbLd, organizationLd, serializeJsonLd, websiteLd } from '../../src/seo/structured-data.ts';
 import { robotsFor, robotsRuleMatches } from '../../src/seo/robots.ts';
 import { SITEMAP_SECTIONS, sitemapIndexXml, sitemapSection, urlSetXml } from '../../src/seo/sitemap.ts';
-import { PUBLIC_SECTIONS, liveSections } from '../../src/public/sections.ts';
+import { PUBLIC_SECTIONS, liveSections, navSections } from '../../src/public/sections.ts';
 import { accessForRoute, applicationPrefixes } from '../../src/authz/routes.ts';
 
 const PROD: SiteContext = { origin: 'https://hamzist.example', production: true };
@@ -135,15 +135,57 @@ test('in production robots hides every application route and no public section',
 test('only built sections are linked; each is public and every planned one stays closed', () => {
   assert.deepEqual(
     PUBLIC_SECTIONS.map((section) => section.label),
-    ['خانه', 'دامپزشکان', 'مراکز دامپزشکی', 'نژادهای سگ', 'آموزش‌ها', 'اخبار', 'انجمن‌ها و کلاب‌ها', 'استعلام اصالت', 'درباره همزیست'],
+    [
+      'خانه',
+      'دامپزشکان',
+      'مراکز دامپزشکی',
+      'نژادهای سگ',
+      'آموزش‌ها',
+      'اخبار',
+      'اطلاعیه‌ها',
+      'انجمن‌ها و کلاب‌ها',
+      'کلاب‌ها',
+      'خدمات',
+      'راهنمای سامانه',
+      'استعلام اصالت',
+      'درباره همزیست',
+      'تماس با ما',
+      'تست اصالت نسب',
+      'شرایط عضویت انجمن',
+      'مقررات انجمن',
+      'وضعیت‌ها و مراحل',
+    ],
   );
   for (const section of PUBLIC_SECTIONS) {
     if (section.live) assert.equal(accessForRoute(section.href), 'PUBLIC', section.href);
     else assert.deepEqual(accessForRoute(section.href), [], section.href + ' opens with PROMPT-' + section.prompt);
   }
+  // The navigation carries the sections a visitor starts from; the pages reached
+  // from inside a section are public and crawled without taking a nav slot.
   assert.deepEqual(
-    liveSections().map((section) => section.href),
-    ['/', '/veterinarians', '/centers', '/breeds', '/articles', '/news', '/associations', '/verify', '/about'],
+    navSections().map((section) => section.href),
+    [
+      '/',
+      '/veterinarians',
+      '/centers',
+      '/breeds',
+      '/articles',
+      '/news',
+      '/announcements',
+      '/associations',
+      '/clubs',
+      '/services',
+      '/guides',
+      '/verify',
+      '/about',
+      '/contact',
+    ],
+  );
+  assert.deepEqual(
+    liveSections()
+      .filter((section) => !section.nav)
+      .map((section) => section.href),
+    ['/parentage-test', '/association/membership', '/association/regulations', '/association/status'],
   );
 });
 

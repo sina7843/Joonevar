@@ -131,20 +131,27 @@ test('the header links only built sections, marks the current one and offers sig
       '/breeds',
       '/articles',
       '/news',
+      '/announcements',
       '/associations',
+      '/clubs',
+      '/services',
+      '/guides',
       '/verify',
       '/about',
+      '/contact',
     ]);
-    assert.equal(await nav.nth(8).getAttribute('aria-current'), 'page');
+    // «درباره همزیست» is the page being read, and it marks itself.
+    assert.equal(await nav.nth(12).getAttribute('aria-current'), 'page');
     assert.equal(await nav.nth(0).getAttribute('aria-current'), null);
 
     const account = page.getByTestId('site-account-link');
     assert.equal(await account.getAttribute('href'), '/login');
     assert.equal((await account.textContent())?.trim(), 'ورود / ثبت‌نام');
 
-    // Every section of §4 is built now, so the header links them all and there
-    // is no planned-but-unbuilt address left to keep out of the page.
-    assert.equal(await nav.count(), 9);
+    // Every section a visitor starts from is linked: the nine of §4 plus the
+    // five Phase 2.5 added (PROMPT-014). The public pages reached from inside a
+    // section stay out of the header on purpose.
+    assert.equal(await nav.count(), 14);
 
     // The breadcrumb reads right to left: home sits to the right of the page.
     const crumbs = page.locator('[data-testid="breadcrumbs"] li');

@@ -553,8 +553,16 @@ test('the public directory shows published records only, with its filters and it
   assert.equal(none.items.length, 0);
   assert.ok(none.publishedTotal > 0);
 
-  const sitemap = await communitySitemapEntries(testDb.db);
-  assert.ok(sitemap.some((entry) => entry.path === '/associations/' + published.publicSlug));
+  // Each record is listed once, under the address its own page calls canonical:
+  // a club at /clubs, an association at /associations (PROMPT-014).
+  const clubSitemap = await communitySitemapEntries(testDb.db, 'CLUB');
+  assert.ok(clubSitemap.some((entry) => entry.path === '/clubs/' + published.publicSlug));
+  const sitemap = await communitySitemapEntries(testDb.db, 'ASSOCIATION');
+  assert.equal(
+    sitemap.some((entry) => entry.path.endsWith('/' + published.publicSlug)),
+    false,
+    'a club is not listed a second time under /associations',
+  );
   assert.equal(
     sitemap.some((entry) => entry.path.includes(draft.id)),
     false,

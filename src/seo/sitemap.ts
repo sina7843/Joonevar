@@ -35,8 +35,11 @@ export const SITEMAP_SECTIONS: Readonly<Record<string, () => Promise<readonly Si
   veterinarians: () => vetSitemapEntries(db()),
   // Published centres of accounts that are not disabled (PROMPT-008).
   centers: () => centreSitemapEntries(db()),
-  // Published associations and clubs, and the posts of a club that may publish (PROMPT-010).
-  associations: () => communitySitemapEntries(db()),
+  // Published associations (PROMPT-010). A club is listed under its own section
+  // so each record appears once, at the address its page calls canonical.
+  associations: () => communitySitemapEntries(db(), 'ASSOCIATION'),
+  // Verified, published clubs at /clubs/<slug> (PROMPT-012, PROMPT-014).
+  clubs: () => communitySitemapEntries(db(), 'CLUB'),
   // Published, unmerged breed pages with their real modification time (PROMPT-003).
   breeds: () => breedSitemapEntries(db()),
   // Visible content only; scheduled, hidden, archived and deleted items are left out (PROMPT-004).

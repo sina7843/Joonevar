@@ -1060,7 +1060,24 @@ export async function communityPageBySlug(
   };
 }
 
-export async function communitySitemapEntries(database: DbClient): Promise<{ path: string; lastModified: Date }[]> {
+/**
+ * Sitemap entries for one kind, at that kind's own canonical address.
+ *
+ * A club is readable at both `/associations/<slug>` and `/clubs/<slug>`, so
+ * listing it twice would offer the same page under two addresses. Each record
+ * is listed once, under the address its page declares as canonical (PROMPT-014).
+ */
+export async function communitySitemapEntries(
+  database: DbClient,
+  kind: CommunityKind = 'ASSOCIATION',
+): Promise<{ path: string; lastModified: Date }[]> {
   const rows = await publishedRows(database);
-  return rows.map((row) => ({ path: '/associations/' + row.publicSlug, lastModified: row.updatedAt }));
+  const prefix = kind === 'CLUB' ? '/clubs/' : '/associations/';
+  return rows
+    .filter((row) => row.kind === kind)
+    .map((row) => ({ path: prefix + row.publicSlug, lastModified: row.updatedAt }));
 }
+
+/** The address a community's page calls its own. */
+export const canonicalCommunityPath = (kind: string, slug: string): string =>
+  (kind === 'CLUB' ? '/clubs/' : '/associations/') + slug;

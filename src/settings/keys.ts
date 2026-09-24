@@ -660,6 +660,66 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     min: 0,
     max: 365,
   },
+  // ── Public pages (Phase 2.5, PROMPT-014) ──────────────────────────────
+  // Everything a visitor is told about how to reach Hamzist, and the two texts
+  // the association owns. Not one of them has a starting value: a phone number,
+  // an address or a set of regulations nobody supplied is a fabricated fact, so
+  // until they are entered the public page says plainly that they are not
+  // registered yet rather than showing an invented one.
+  {
+    key: 'contact.email',
+    group: 'GUIDE_TEXT',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نشانی ایمیل تماس همزیست',
+    noteFa: 'در صفحه «تماس با ما» نمایش داده می‌شود. تا ثبت نشانی واقعی، صفحه می‌گوید که ثبت نشده است.',
+    seedValue: null,
+  },
+  {
+    key: 'contact.phone',
+    group: 'GUIDE_TEXT',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'شماره تماس همزیست',
+    noteFa: 'در صفحه «تماس با ما» نمایش داده می‌شود؛ شماره ساختگی نوشته نمی‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'contact.address_fa',
+    group: 'GUIDE_TEXT',
+    kind: 'TEXT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نشانی پستی همزیست',
+    noteFa: 'نشانی‌ای که مکاتبه رسمی به آن فرستاده می‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'contact.hours_fa',
+    group: 'GUIDE_TEXT',
+    kind: 'TEXT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'ساعت پاسخ‌گویی',
+    noteFa: 'ساعت‌هایی که تماس پاسخ داده می‌شود. تا ثبت، چیزی وعده داده نمی‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'guide_text.association_membership_terms',
+    group: 'GUIDE_TEXT',
+    kind: 'TEXT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'شرایط عضویت انجمن (متن عمومی)',
+    noteFa: 'متنی که در صفحه عمومی «شرایط عضویت انجمن» خوانده می‌شود. مبلغ در این متن نوشته نمی‌شود؛ تعرفه فقط در لحظه پرداخت دیده می‌شود.',
+    seedValue: null,
+  },
+  {
+    key: 'guide_text.association_regulations',
+    group: 'GUIDE_TEXT',
+    kind: 'TEXT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'مقررات انجمن (متن عمومی)',
+    noteFa: 'مقرراتی که انجمن منتشر می‌کند. تا ثبت متن واقعی، صفحه خالی نمی‌ماند بلکه می‌گوید هنوز منتشر نشده است.',
+    seedValue: null,
+  },
 ];
 
 export const SETTING_BY_KEY: ReadonlyMap<string, SettingDefinition> = new Map(
