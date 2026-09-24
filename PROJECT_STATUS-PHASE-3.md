@@ -2,7 +2,7 @@
 
 Managed by `node tools/runner.mjs --phase 3 …` (DEC-0203). The package is read in place from `Hamzist-Phase-3-Prompt-Package/` (kept untracked by the user, the same arrangement as phase 2.5). A row is marked only by `complete` after the committed report `docs/reports/PHASE-3-PROMPT-NNN.json` passes the Runner's evidence check.
 
-- [ ] PROMPT-001 — 001-head-baseline-marketplace-architecture
+- [x] PROMPT-001 — 001-head-baseline-marketplace-architecture <!-- work-commit:3a6291544be8f3f7e9e20cb52764f413ed34d4ab -->
 - [ ] PROMPT-002 — 002-marketplace-foundations-settings-roles
 - [ ] PROMPT-003 — 003-animal-seller-eligibility-listing
 - [ ] PROMPT-004 — 004-animal-public-search-moderation-ads
