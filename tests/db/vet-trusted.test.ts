@@ -273,7 +273,12 @@ test('a correction is answered with a new version, and the association decides w
     .from(notifications)
     .where(and(eq(notifications.recipientAccountId, vet.accountId), eq(notifications.kind, 'VET_TRUSTED_CASE_DECIDED')));
   assert.equal(notices.length, 2, 'the correction and the approval were both told');
-  const decided = (await testDb.db.select().from(auditEvents)).filter((event) => event.action === 'VET_TRUSTED_CASE_DECIDED' && event.targetId === row.id);
+  // Ordered explicitly: an unordered select returns rows in whatever order the
+  // plan produces, so `at(-1)` was reading the correction instead of the approval
+  // whenever the scan came back the other way round.
+  const decided = (await testDb.db.select().from(auditEvents).orderBy(auditEvents.occurredAt)).filter(
+    (event) => event.action === 'VET_TRUSTED_CASE_DECIDED' && event.targetId === row.id,
+  );
   assert.equal(decided.length, 2);
   assert.equal(decided.at(-1)!.reason, 'SYNTHETIC شرایط کامل است');
 });

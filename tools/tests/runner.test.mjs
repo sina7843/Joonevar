@@ -70,7 +70,7 @@ test('phase 2 runs its own package with derived order and checks, leaving phase 
  ok(run(f,'--phase','2','complete','--commit','HEAD'));
  assert.match(fs.readFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-2.md'),'utf8'),/^- \[x\] PROMPT-001 — Phase two 1 <!-- work-commit:[0-9a-f]{40} -->$/m);
  assert.equal(fs.readFileSync(path.join(f.root,'PROJECT_STATUS.md'),'utf8'),phase1);
- assert.match(run(f,'--phase','3','status').stderr,/Unknown phase: 3/);
+ assert.match(run(f,'--phase','4','status').stderr,/Unknown phase: 4/);
 });
 test('phase 2.5 reads a manifest without titles and requires the PHASE-2.5- report name',()=>{
  const f=fixture();const dir='Hamzist-Phase-2.5-Prompt-Package/prompts';fs.mkdirSync(path.join(f.root,dir),{recursive:true});fs.mkdirSync(path.join(f.root,'.runner/phase-2.5'),{recursive:true});
@@ -88,5 +88,20 @@ test('phase 2.5 reads a manifest without titles and requires the PHASE-2.5- repo
  commit('docs/reports/PHASE-2.5-PROMPT-001.json','feat: PROMPT-001 prefixed');
  ok(run(f,'--phase','2.5','complete','--commit','HEAD'));
  assert.match(fs.readFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-2.5.md'),'utf8'),/^- \[x\] PROMPT-001 — 001-baseline <!-- work-commit:[0-9a-f]{40} -->$/m);
+});
+test('phase 3 reads its untracked package in place and names reports PHASE-3-PROMPT-NNN.json',()=>{
+ const f=fixture();const dir='Hamzist-Phase-3-Prompt-Package/prompts';fs.mkdirSync(path.join(f.root,dir),{recursive:true});fs.mkdirSync(path.join(f.root,'.runner/phase-3'),{recursive:true});
+ const m=JSON.stringify({prompts:[{id:'001',file:'001-baseline.md',dependsOn:[]},{id:'002',file:'002-next.md',dependsOn:['001']}]});
+ fs.writeFileSync(path.join(f.root,dir,'prompt-manifest.json'),m);fs.writeFileSync(path.join(f.root,dir,'001-baseline.md'),'# PROMPT-001\n\n```text\nBaseline body.\n```\n');fs.writeFileSync(path.join(f.root,dir,'002-next.md'),'# PROMPT-002\n\n```text\nNext body.\n```\n');
+ fs.writeFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-3.md'),'- [ ] PROMPT-001 — 001-baseline\n- [ ] PROMPT-002 — 002-next\n');
+ fs.writeFileSync(path.join(f.root,'.runner/phase-3/plan.lock'),JSON.stringify({manifestHash:crypto.createHash('sha256').update(m).digest('hex')}));
+ f.g('add','.');f.g('commit','-m','phase 3 fixture');
+ ok(run(f,'--phase','3','prepare'));
+ assert.match(fs.readFileSync(path.join(f.root,'.runner/phase-3/current-prompt.txt'),'utf8'),/Baseline body/);
+ const file='docs/reports/PHASE-3-PROMPT-001.json';
+ const data={promptId:'PROMPT-001',status:'COMPLETE',summary:'Concrete phase 3 fixture behavior',changedFiles:[file],checks:['typecheck','build','product-tests','browser-tests'].map(id=>({id,command:'fixture',result:'PASS',evidence:'observed'})),blockers:[],limitations:[],readiness:{}};
+ fs.writeFileSync(path.join(f.root,file),JSON.stringify(data));f.g('add','--',file);f.g('commit','-m','feat: PROMPT-001 phase three');
+ ok(run(f,'--phase','3','complete','--commit','HEAD'));
+ assert.match(fs.readFileSync(path.join(f.root,'PROJECT_STATUS-PHASE-3.md'),'utf8'),/^- \[x\] PROMPT-001 — 001-baseline <!-- work-commit:[0-9a-f]{40} -->$/m);
 });
 test('supports existing Git worktree metadata file',()=>{const f=fixture();const wt=path.join(os.tmpdir(),'hamzist-worktree-'+crypto.randomUUID());roots.push(wt);f.g('worktree','add','--detach',wt);fs.mkdirSync(path.join(wt,'.runner'),{recursive:true});fs.copyFileSync(path.join(f.root,'.runner/plan.lock'),path.join(wt,'.runner/plan.lock'));assert.ok(fs.statSync(path.join(wt,'.git')).isFile());assert.match(ok(run({root:wt},'prepare')).stdout,/PROMPT-001/);});

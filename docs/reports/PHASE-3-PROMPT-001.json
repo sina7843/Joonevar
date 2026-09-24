@@ -1,0 +1,146 @@
+{
+  "promptId": "PROMPT-001",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "32a55e92c811989ec6bf3ddfb7bad54f0ca94177",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "The phase opens on the repository's real HEAD, which is the package's reviewed baseline exactly: 32a55e92, delta zero, nothing arrived after Phase 2.5 was delivered. The complete suite was re-run on that HEAD rather than quoted from the previous phase — 925 tests, 282 domain/config/UI, 444 database in two halves because this machine cannot carry 58 suites at once, 199 browser on a production build — and the run surfaced three things. One was a genuinely flaky test: tests/db/vet-trusted.test.ts read every audit row with no ORDER BY and then asserted at(-1) was the approval, so under --test-concurrency=2 the scan came back the other way and it read the correction instead; it is a test defect, not a product defect, and it is now ordered by occurredAt, the same order auditTrail uses. The second was both browser failures at once, and neither was in the repository: an incremental build over a .next left from an earlier session dropped CentreCreateForm from the React client manifest, so /admin/centres answered 500 with nothing wrong in src/centres/forms.tsx, which has its 'use client' and is correct. A clean rm -rf .next && npm run build turned both green and then the whole suite 199/199. Because that class of failure impersonates a product defect and costs eight minutes to disprove, tools/browser-tests.mjs now refuses to start when .next/BUILD_ID is older than the newest file under src/ or app/. The third was that the Runner did not know phase 3 at all, and its own test asserted so; phase 3 is now registered on the same arrangement as 2.5 — the untracked package read in place, PROJECT_STATUS-PHASE-3.md, .runner/phase-3/, reports prefixed PHASE-3-, four mandatory gates. All ten Phase 2.5 promises Phase 3 leans on were checked against the code and not against the previous report: KYC, hasValidMembership, requireOwnedAnimal with the microchip table's two unique indexes, the kennel lifecycle, the private-file purpose rules and the single serving route, verifyAttempt with its amount check and its unique payment_callbacks row, the managed settings with their four sources, the outbox with its backoff and requeue, the route table and recordAudit, and the CI workflow — which exists and has still never run, because the repository has no remote. Two of them carry a caveat Phase 3 must not assume away and both are written down: there is no animal ownership-history table at all, only animals.owner_account_id, so PROMPT-007 has to build it; and a registered microchip means a row in the microchip table, never animals.declared_microchip_number, which the schema itself calls a declaration that binds nothing. The architecture output defines ANIMAL_MARKETPLACE and COMMERCE as two contexts with no shared new table, their aggregates and invariants, who owns which money — the animal market takes only the deposit, which equals the commission, and never sees the rest of the price; commerce takes the whole order and settles later — the integration events, which are all one-directional, the failure boundaries, twelve additive migrations from 0041 to 0052, the route plan behind the existing route table, and the test plan aimed at the four risks the quality rules name. The hard boundary is stated twice and in both directions: an animal listing never appears in product/offer/sku/inventory or in a cart, and no code path in the commerce context writes animal ownership. No tariff, percentage, deadline, penalty, return policy, seller agreement text or legal species list was invented; all of it stays OPERATIONAL_DATA and the dependent paths stay closed until a superadmin enters it. No Phase 3 product behaviour was built in this prompt, and the status file says so.",
+  "changedFiles": [
+    "docs/architecture/phase-3-bounded-contexts.md",
+    "docs/qa/phase-3-baseline.md",
+    "PROJECT_STATUS-PHASE-3.md",
+    "tools/runner.mjs",
+    "tools/tests/runner.test.mjs",
+    "tools/browser-tests.mjs",
+    "tests/db/vet-trusted.test.ts",
+    "docs/reports/README.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    ".gitignore",
+    "docs/reports/PHASE-3-PROMPT-001.json"
+  ],
+  "migrations": [],
+  "decisions": [
+    "DEC-0203"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 282,
+      "pass": 282,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 2.1
+    },
+    "databaseFirstHalf": {
+      "command": "node --test --test-concurrency=2 <first 29 tests/db suites>",
+      "total": 236,
+      "pass": 236,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 291
+    },
+    "databaseSecondHalf": {
+      "command": "node --test --test-concurrency=2 <last 29 tests/db suites>",
+      "total": 208,
+      "pass": 208,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 230,
+      "note": "The first run of this half had one failure, tests/db/vet-trusted.test.ts, which was an unordered audit read in the test rather than a product defect. Fixed and re-run; these are the numbers after the fix."
+    },
+    "browserFull": {
+      "command": "node tools/browser-tests.mjs",
+      "total": 199,
+      "pass": 199,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 460,
+      "note": "The first complete run had two failures, both caused by an incremental build over a stale .next rather than by anything in the repository. After rm -rf .next && npm run build the two suites passed on their own and then the whole suite passed."
+    },
+    "runnerPackage": {
+      "command": "node --test tools/tests/runner.test.mjs",
+      "total": 19,
+      "pass": 19,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 11.3,
+      "note": "18 before this prompt; the nineteenth drives phase 3 prepare through complete."
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0, run twice: once on the untouched baseline and once on the final tree after the test and tooling changes."
+    },
+    {
+      "id": "build",
+      "command": "rm -rf .next && npm run build",
+      "result": "PASS",
+      "evidence": "exit 0. Shared First Load JS 103 kB. Nothing was listening on port 3111, so no running server's .next was disturbed. The incremental build before it also exited 0 but produced a broken client manifest, which is why the clean rebuild is the recorded one."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=2 <tests/db in two halves> ; node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "925 tests on one HEAD: 282 domain/config/UI, 444 database (236 + 208), 199 browser. 0 failures, 0 skips."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "199/199 in 460 s against an isolated database and a production server built from a clean build of this HEAD. No skips."
+    },
+    {
+      "id": "full-current-suite",
+      "command": "npx tsc --noEmit ; node --test <domain/config/ui> ; node --test <tests/db two halves> ; node tools/browser-tests.mjs ; node --test tools/tests/runner.test.mjs ; node tools/validate-core.mjs",
+      "result": "PASS",
+      "evidence": "Exact counts recorded in docs/qa/phase-3-baseline.md §2: 282 + 236 + 208 + 199 product tests, 19 Runner tests, and the package validator reporting 20 prompts, 29 sections, 19 decisions, 33 acceptance rows with source hashes intact."
+    },
+    {
+      "id": "architecture-boundary-review",
+      "command": "docs/architecture/phase-3-bounded-contexts.md",
+      "result": "PASS",
+      "evidence": "ANIMAL_MARKETPLACE and COMMERCE defined as separate contexts with five and six aggregates, their in-transaction invariants, money and data ownership, eight one-directional integration events, per-context failure boundaries, the reuse table naming the real module and the one extension point each is allowed, twelve additive migrations 0041-0052, the route plan behind src/authz/routes.ts, the test plan, and the R1-R14 mapping. The two-way boundary is explicit: an animal listing never enters product/offer/sku/inventory or a cart, and no commerce code path writes animal ownership."
+    },
+    {
+      "id": "baseline-truthfulness",
+      "command": "git rev-parse HEAD ; git status --short ; diff of the package VERSION.txt against the repository ; docs/qa/phase-3-baseline.md",
+      "result": "PASS",
+      "evidence": "HEAD is 32a55e92c811989ec6bf3ddfb7bad54f0ca94177, identical to the package's reviewed baseline, so the delta review found nothing to reconcile. Every number in the baseline document comes from a run made today; none was copied from the Phase 2.5 report, and the two numbers that coincide with it do so because the suite really produced them again. The three defects the run found are written down with their root cause, including the one that was not a product defect at all, and the failing first runs are recorded next to the passing re-runs rather than replaced by them."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No Phase 3 product behaviour exists yet: this prompt produced a baseline, an architecture boundary and a plan, and one test fix plus one tooling guard. Thirteen prompts remain.",
+    "The migration, route and test plans are a plan. Table and column names in them are proposals for the prompts that build them, not committed schema.",
+    "The CI workflow still has never run: the repository has no remote and pushing is not authorised.",
+    "No external integration is verified: payment gateway, SMS, cloud private storage and the map key are all NOT_CONFIGURED and the PROVIDER adapters throw by design.",
+    "The database suite has to be split into two halves on this machine; a single 58-suite run is not something this environment can carry, so the 444 is a sum of two runs rather than one.",
+    "The outbox worker is still something that must be called; no scheduler runs it, which matters for every Phase 3 deadline.",
+    "Real monetary and legal values for Phase 3 - commission constant and percentage, deadlines, penalties, settlement period, return policy, seller agreement text, the legal species list - are unset operational data and were deliberately not invented.",
+    "The stale-build guard added to tools/browser-tests.mjs compares modification times. It catches the case that cost this run eight minutes; it is not a content hash and will not catch a build made from a different commit whose files happen to be older."
+  ],
+  "readiness": {
+    "code": "PHASE_3_NOT_STARTED",
+    "baseline": "VERIFIED_ON_REAL_HEAD",
+    "visual": "NOT_APPLICABLE",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "docs/architecture/phase-3-bounded-contexts.md",
+    "docs/qa/phase-3-baseline.md",
+    "PROJECT_STATUS-PHASE-3.md",
+    "tools/runner.mjs",
+    "tools/tests/runner.test.mjs",
+    "tools/browser-tests.mjs",
+    "tests/db/vet-trusted.test.ts",
+    "DECISIONS.md#dec-0203",
+    "REQUIREMENTS_TRACEABILITY.md"
+  ]
+}

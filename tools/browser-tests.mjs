@@ -43,6 +43,29 @@ if (!fs.existsSync(path.join(root, '.next', 'BUILD_ID'))) {
   process.exit(1);
 }
 
+/*
+ * A build older than the sources it was made from is the one failure mode that
+ * reads as a product defect and is not one: an incremental rebuild over a stale
+ * .next can leave a client component out of the React client manifest, and the
+ * page then answers 500 with nothing wrong in the repository (DEC-0203). Say so
+ * here rather than let the suite spend eight minutes proving it.
+ */
+function newestSourceTime(dir) {
+  let newest = 0;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+    const full = path.join(dir, entry.name);
+    newest = Math.max(newest, entry.isDirectory() ? newestSourceTime(full) : fs.statSync(full).mtimeMs);
+  }
+  return newest;
+}
+const builtAt = fs.statSync(path.join(root, '.next', 'BUILD_ID')).mtimeMs;
+const sourceAt = Math.max(newestSourceTime(path.join(root, 'src')), newestSourceTime(path.join(root, 'app')));
+if (sourceAt > builtAt) {
+  console.error('The build in .next is older than src/ or app/. Run `npm run build` again — after `rm -rf .next` if a page answers 500 for no reason.');
+  process.exit(1);
+}
+
 async function adminQuery(sql, params = []) {
   const client = new pg.Client({ connectionString: ADMIN_URL });
   await client.connect();

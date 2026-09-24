@@ -1,5 +1,7 @@
 # وضعیت واقعی پیاده‌سازی
 
+Status (فاز ۳): PHASE_3_BASELINE_ESTABLISHED — PROMPT-001 اجرا و کامیت شد: مجموعه کامل روی HEAD `32a55e9` دوباره اجرا شد (۹۲۵ تست سبز؛ اعداد و سه اشکال رفع‌شده در [phase-3-baseline.md](docs/qa/phase-3-baseline.md))، مرز دو bounded context و برنامه migration/API/تست در [phase-3-bounded-contexts.md](docs/architecture/phase-3-bounded-contexts.md) نوشته شد، و فاز ۳ در Runner باز شد. **هیچ رفتار محصولی فاز ۳ هنوز ساخته نشده است**؛ ۱۳ prompt باقی‌مانده در [PROJECT_STATUS-PHASE-3.md](PROJECT_STATUS-PHASE-3.md).
+
 Status: PHASE_2_5_DELIVERED_INTERNALLY — هر ۱۶ prompt فاز ۲.۵ اجرا و کامیت شده‌اند و همه دروازه‌های خودکار روی همان HEAD سبزند (۹۲۵ تست: ۲۸۲ دامنه/پیکربندی/UI، ۴۴۴ پایگاه‌داده، ۱۹۹ مرورگر). این به معنای آمادگی Production نیست: چهار یکپارچه‌سازی بیرونی پیکربندی نشده و داده عملیاتی انجمن ثبت نشده است. جزئیات و اعداد در [release-readiness-phase-2.5.md](docs/ops/release-readiness-phase-2.5.md)، پذیرش در [phase-2.5-acceptance.md](docs/qa/phase-2.5-acceptance.md)، ممیزی امنیتی در [phase-2.5-threat-review.md](docs/security/phase-2.5-threat-review.md).
 
 بخش تاریخی زیر دست‌نخورده می‌ماند.

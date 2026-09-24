@@ -14,6 +14,9 @@ const PHASES={
  '2':{prompts:'prompts-2',status:'PROJECT_STATUS-PHASE-2.md',state:'.runner/phase-2',reports:'docs/reports/phase-2',checks:['typecheck','build','product-tests','browser-tests']},
  // Phase 2.5 reads its package in place (the user keeps it untracked) and names reports PHASE-2.5-PROMPT-NNN.json (DEC-0187).
  '2.5':{prompts:'Hamzist-Phase-2.5-Prompt-Package/prompts',status:'PROJECT_STATUS-PHASE-2.5.md',state:'.runner/phase-2.5',reports:'docs/reports',reportPrefix:'PHASE-2.5-',checks:['typecheck','build','product-tests','browser-tests']},
+ // Phase 3 follows the same arrangement as 2.5: the package stays untracked and is read in place,
+ // and its reports are named PHASE-3-PROMPT-NNN.json (DEC-0203).
+ '3':{prompts:'Hamzist-Phase-3-Prompt-Package/prompts',status:'PROJECT_STATUS-PHASE-3.md',state:'.runner/phase-3',reports:'docs/reports',reportPrefix:'PHASE-3-',checks:['typecheck','build','product-tests','browser-tests']},
 };
 const phase=PHASES[phaseName];
 if(!phase){console.error('ERROR: Unknown phase: '+phaseName);process.exit(1);}
