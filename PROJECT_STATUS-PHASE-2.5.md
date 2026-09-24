@@ -17,4 +17,4 @@ Managed by `node tools/runner.mjs --phase 2.5 …` (DEC-0187). The package is re
 - [x] PROMPT-013 — 013-club-rule-engine-membership <!-- work-commit:51a1081747230996b33c6a27b184178728a1fac1 -->
 - [x] PROMPT-014 — 014-public-content-association-clubs <!-- work-commit:320b9e08aa3bd2d1c5f0774f8960386d9a45d52d -->
 - [x] PROMPT-015 — 015-notifications-dashboards-operations <!-- work-commit:e70c65785e93ba5bb489fa30493dd15430ed2441 -->
-- [ ] PROMPT-016 — 016-security-ci-release-handoff
+- [x] PROMPT-016 — 016-security-ci-release-handoff <!-- work-commit:80aa0cf81c20c1a044f1a3898869f1db83d4fe0f -->
