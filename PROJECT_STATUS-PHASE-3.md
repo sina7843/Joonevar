@@ -4,7 +4,7 @@ Managed by `node tools/runner.mjs --phase 3 …` (DEC-0203). The package is read
 
 - [x] PROMPT-001 — 001-head-baseline-marketplace-architecture <!-- work-commit:3a6291544be8f3f7e9e20cb52764f413ed34d4ab -->
 - [x] PROMPT-002 — 002-marketplace-foundations-settings-roles <!-- work-commit:5a0e5a1f9c7eba83c720ad422dcfa942eea94fcb -->
-- [ ] PROMPT-003 — 003-animal-seller-eligibility-listing
+- [x] PROMPT-003 — 003-animal-seller-eligibility-listing <!-- work-commit:ffdf0e777f12d5a9745da58aaec4cf50eba192f7 -->
 - [ ] PROMPT-004 — 004-animal-public-search-moderation-ads
 - [ ] PROMPT-005 — 005-animal-inquiry-negotiation-chat-reservation
 - [ ] PROMPT-006 — 006-animal-deposit-cancellation-disputes
