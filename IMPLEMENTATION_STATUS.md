@@ -1,6 +1,10 @@
 # وضعیت واقعی پیاده‌سازی
 
-Status: PHASE_1_DELIVERED — هر ۲۰ مرحله فاز ۱ تحویل شده‌اند (بخش PROMPT-020 پایین). این سرتیتر از PROMPT-005 به‌روز نشده بود و در baseline فاز ۲.۵ اصلاح شد. جدول زیر تصویر همان زمان PROMPT-005 است و تاریخی نگه داشته می‌شود؛ وضعیت فاز ۲ در [release-readiness-phase-2.md](docs/ops/release-readiness-phase-2.md) و baseline فاز ۲.۵ در [phase-2.5-baseline.md](docs/qa/phase-2.5-baseline.md) است.
+Status: PHASE_2_5_DELIVERED_INTERNALLY — هر ۱۶ prompt فاز ۲.۵ اجرا و کامیت شده‌اند و همه دروازه‌های خودکار روی همان HEAD سبزند (۹۲۵ تست: ۲۸۲ دامنه/پیکربندی/UI، ۴۴۴ پایگاه‌داده، ۱۹۹ مرورگر). این به معنای آمادگی Production نیست: چهار یکپارچه‌سازی بیرونی پیکربندی نشده و داده عملیاتی انجمن ثبت نشده است. جزئیات و اعداد در [release-readiness-phase-2.5.md](docs/ops/release-readiness-phase-2.5.md)، پذیرش در [phase-2.5-acceptance.md](docs/qa/phase-2.5-acceptance.md)، ممیزی امنیتی در [phase-2.5-threat-review.md](docs/security/phase-2.5-threat-review.md).
+
+بخش تاریخی زیر دست‌نخورده می‌ماند.
+
+Status (فاز ۱): PHASE_1_DELIVERED — هر ۲۰ مرحله فاز ۱ تحویل شده‌اند (بخش PROMPT-020 پایین). این سرتیتر از PROMPT-005 به‌روز نشده بود و در baseline فاز ۲.۵ اصلاح شد. جدول زیر تصویر همان زمان PROMPT-005 است و تاریخی نگه داشته می‌شود؛ وضعیت فاز ۲ در [release-readiness-phase-2.md](docs/ops/release-readiness-phase-2.md) و baseline فاز ۲.۵ در [phase-2.5-baseline.md](docs/qa/phase-2.5-baseline.md) است.
 
 وضعیت‌ها جدا نگه داشته می‌شوند و به یک checkbox تقلیل پیدا نمی‌کنند:
 

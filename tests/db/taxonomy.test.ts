@@ -69,10 +69,19 @@ test('seeding a database the migrations already filled adds nothing and records 
     const report = await seedTaxonomies(testDb.db);
     assert.equal(report.length, TAXONOMY_CATALOGUES.length);
     for (const entry of report) {
-      assert.equal(entry.inserted, 0, entry.name + ' was inserted twice');
-      assert.ok(entry.preserved > 0);
+      // The taxonomies migrations 0017, 0020 and 0022 installed are already
+      // there, so a first seed adds none of them. Content categories are the
+      // exception on purpose: Phase 2.5 ships them through the seed rather than
+      // a migration (DEC-0200), so the first run is where they arrive.
+      if (entry.name === 'content_category') assert.ok(entry.inserted > 0, 'the content categories install on first seed');
+      else assert.equal(entry.inserted, 0, entry.name + ' was inserted twice');
+      assert.ok(entry.preserved >= 0);
       assert.equal(await installedTaxonomyVersion(testDb.db, entry.name), entry.version);
     }
+
+    // And the second run adds nothing at all, for every catalogue.
+    const again = await seedTaxonomies(testDb.db);
+    for (const entry of again) assert.equal(entry.inserted, 0, entry.name + ' was inserted twice');
     // Version 1 is what migrations 0017, 0020 and 0022 installed.
     assert.equal(await installedTaxonomyVersion(testDb.db, 'province'), 1);
     assert.equal(await installedTaxonomyVersion(testDb.db, 'centre_facility'), 1);

@@ -1,0 +1,198 @@
+# Continuous integration — Phase 2.5 §10, §12 (PROMPT-016).
+#
+# The gates a change has to pass before anybody trusts it, in the order that
+# fails fastest: types, then the tests that need no database, then the build,
+# then the database suites against a disposable Postgres, then the browser
+# suites against a production build of the same commit.
+#
+# Two rules this file exists to keep:
+#
+#   - **No secret reaches a log.** Nothing here reads a repository secret. The
+#     database is a throwaway service container with a password written in the
+#     open on purpose, because it lives for the length of one job and is
+#     reachable from nowhere else.
+#   - **A local demo provider never becomes a production fallback.** The
+#     environment below is `development` with `INTEGRATION_MODE=local`, which is
+#     exactly what `assertNotProduction` requires; the adapters refuse to be
+#     constructed in production, so a green CI can never be evidence that a real
+#     provider works.
+name: ci
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+# A newer push supersedes an older run of the same ref rather than queueing.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Local, disposable, and never a production credential (§10).
+  APP_ENV: development
+  INTEGRATION_MODE: local
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  static:
+    name: typecheck, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install exactly what the lockfile says
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # These need no database: the model rules, the settings catalogue and the
+      # route/SEO map. They are the cheapest real signal, so they run first.
+      - name: Domain, configuration and UI tests
+        run: node --test --test-concurrency=4 "tests/domain/*.test.ts" "tests/config/*.test.ts" "tests/ui/*.test.ts"
+
+      - name: Build
+        env:
+          DATABASE_URL: postgres://hamzist:ci_local_only@127.0.0.1:5432/hamzist
+          SITE_URL: https://ci.invalid
+        run: npm run build
+
+      # The build output is handed to the browser job instead of being built
+      # twice, so both jobs test the same artefact.
+      - name: Keep the build for the browser job
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next
+          retention-days: 1
+          include-hidden-files: true
+
+  database:
+    name: migrations and database tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:16
+        # A throwaway database for one job. The password is deliberately in the
+        # open: it exists for minutes, on a private network, and is not a secret.
+        env:
+          POSTGRES_USER: hamzist
+          POSTGRES_PASSWORD: ci_local_only
+          POSTGRES_DB: hamzist
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U hamzist"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgres://hamzist:ci_local_only@127.0.0.1:5432/hamzist
+      TEST_DATABASE_URL: postgres://hamzist:ci_local_only@127.0.0.1:5432/hamzist
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      # Every migration, in order, against a database that has never seen one.
+      - name: Migrate a clean database
+        run: npm run db:migrate
+
+      - name: Seed the baseline
+        run: npm run db:seed
+
+      # Each database suite creates and drops its own database, so this proves
+      # the migrations apply from nothing dozens of times over.
+      - name: Database tests
+        run: node --test --test-concurrency=2 "tests/db/*.test.ts"
+
+  browser:
+    name: browser suites
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: [static]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: hamzist
+          POSTGRES_PASSWORD: ci_local_only
+          POSTGRES_DB: hamzist
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U hamzist"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgres://hamzist:ci_local_only@127.0.0.1:5432/hamzist
+      TEST_DATABASE_URL: postgres://hamzist:ci_local_only@127.0.0.1:5432/hamzist
+      SITE_URL: https://ci.invalid
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Take the build from the static job
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: .next
+
+      - name: Install the browser the suites drive
+        run: npx playwright install --with-deps chromium
+
+      # The runner makes its own database and its own server on a free port, so
+      # the suites never touch anything shared.
+      - name: Browser suites
+        run: node tools/browser-tests.mjs
+
+      - name: Keep the screenshots the suites captured
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-screenshots
+          path: docs/reports/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+  audit:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      # Reported, not enforced: the finding is read by a person, and a transitive
+      # advisory in a dev dependency does not silently block a correct change.
+      # Turning this into a gate is a decision to make with real numbers in hand.
+      - name: npm audit (report only)
+        run: npm audit --audit-level=high || true

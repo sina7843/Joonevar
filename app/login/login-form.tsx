@@ -53,6 +53,12 @@ export function LoginForm({ next }: { next: string | null }) {
             autoComplete="tel"
             placeholder="09xxxxxxxxx"
             hint="کد تأیید به همین شماره پیامک می‌شود."
+            /*
+             * A refusal of this step is the field's own error, not only a banner
+             * at the top: the input then marks itself invalid and points at the
+             * message, which is what a screen reader follows (PROMPT-016).
+             */
+            error={active.tone === 'error' && active.step === 'MOBILE' ? active.message : undefined}
             data-testid="mobile-input"
             defaultValue={active.mobile ?? ''}
           />

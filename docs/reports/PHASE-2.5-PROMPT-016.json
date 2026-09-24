@@ -1,0 +1,156 @@
+{
+  "promptId": "PROMPT-016",
+  "phase": "2.5",
+  "status": "COMPLETE",
+  "commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-2.5.md because a report cannot contain its own hash.",
+  "summary": "The phase closes with the gates written down, the threats reviewed against real tests, the upgrade rehearsed on data rather than on an empty database, and the whole suite re-run on one HEAD. CI is four jobs — typecheck and the database-free tests and the build, then the database suites against a disposable Postgres, then the browser suites against that same build, then a reporting-only dependency audit. It reads no repository secret at all: the database is a throwaway service container whose password is deliberately in the open, and the environment is development with INTEGRATION_MODE=local, which is exactly what assertNotProduction requires — so a green CI can never be evidence that a real provider works, and that is stated rather than implied. tools/upgrade-check.mjs is the rehearsal the delivery actually needs: it applies the migrations that existed before Phase 2.5, writes representative Phase 1 and Phase 2 records, applies the eight Phase 2.5 migrations on top and then checks what the phase promised about those rows — the lifetime membership is still lifetime with no invented expiry, a published community became ACTIVE without claiming a verifier, existing co-managers became ADMIN, an older payment item still says its price came from a setting. Eighteen of eighteen. Recovery is documented as what it really is: the migrations are additive and have no down, so the way back is a snapshot, and the cheaper third way — closing one flow by emptying its operational key without losing data — is written out. Accessibility and performance are measured, not claimed: the keyboard reaches the content, the skip link works, every control is named, and the response times of eight routes are printed and quoted. The complete run surfaced two stale test expectations left by PROMPT-014, where those two suites had not been counted as affected, and one real accessibility defect: the sign-in refusal was only a banner, so the field never marked itself invalid. All three were fixed. Internal delivery: yes, every automatable gate is green on this HEAD. Production: no — four external integrations are unconfigured and the association's operational data is unentered, and until then the paths that depend on them stay closed, which is the correct behaviour rather than a defect.",
+  "changedFiles": [
+    ".github/workflows/ci.yml",
+    "tools/upgrade-check.mjs",
+    "docs/security/phase-2.5-threat-review.md",
+    "docs/ops/recovery-and-rollback.md",
+    "docs/ops/release-readiness-phase-2.5.md",
+    "docs/qa/phase-2.5-acceptance.md",
+    "tests/browser/a11y-performance.test.ts",
+    "tests/browser/admin.test.ts",
+    "tests/db/taxonomy.test.ts",
+    "app/login/login-form.tsx",
+    "IMPLEMENTATION_STATUS.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-2.5-PROMPT-016.json"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0202"],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 282,
+      "pass": 282,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 2.0
+    },
+    "databaseFull": {
+      "command": "node --test --test-concurrency=2 <28 db suites> ; node --test --test-concurrency=2 <30 db suites>",
+      "total": 444,
+      "pass": 444,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 524,
+      "note": "Run as two halves because the machine could not carry all 58 suites at once. The first run had one failure — tests/db/taxonomy.test.ts — which was a stale expectation, not a product defect, and is described under checks."
+    },
+    "browserFull": {
+      "command": "node tools/browser-tests.mjs",
+      "total": 199,
+      "pass": 199,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 459,
+      "note": "The first complete run had two failures: the new accessibility suite refused a hidden input for having no label, and tests/browser/admin.test.ts expected a merged club's canonical under /associations/ although PROMPT-014 moved it to /clubs/. Both were test expectations; a third iteration fixed a real product defect the suite found in the sign-in form."
+    },
+    "upgradeRehearsal": {
+      "command": "node tools/upgrade-check.mjs",
+      "total": 18,
+      "pass": 18,
+      "fail": 0,
+      "note": "33 pre-Phase-2.5 migrations, representative records, then the 8 Phase 2.5 migrations on top."
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in a detached worktree at HEAD 166dfd6 with every changed and new file copied in, so the user's running server on port 3111 kept its .next. Shared First Load JS 103 kB. Rebuilt once after the sign-in fix. The worktree was removed afterwards."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\" ; node --test --test-concurrency=2 \"tests/db/*.test.ts\" (two halves) ; node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "925 tests on one HEAD: 282 domain/config/UI, 444 database, 199 browser. No skips anywhere."
+    },
+    {
+      "id": "ci-workflow",
+      "command": ".github/workflows/ci.yml",
+      "result": "PASS",
+      "evidence": "Four jobs: static (npm ci with cache, typecheck, database-free tests, build, build uploaded as an artifact), database (postgres:16 service container, migrate, seed, every db suite), browser (the same build artifact, Chromium, tools/browser-tests.mjs, screenshots uploaded), audit (npm audit, report only). Concurrency cancels superseded runs; permissions are contents:read.",
+      "note": "Written, never executed: this repository has no remote and pushing is not authorised. The first real run happens after a remote is attached."
+    },
+    {
+      "id": "no-secrets-no-production-fallback",
+      "command": ".github/workflows/ci.yml ; tests/config/env.test.ts ; src/adapters/registry.ts",
+      "result": "PASS",
+      "evidence": "The workflow reads no repository secret; its only credential is the throwaway container's, in the open on purpose. APP_ENV=development and INTEGRATION_MODE=local are what assertNotProduction requires, the PROVIDER paths throw NOT_CONFIGURED, and no code path falls back from a real provider to a demo one — so a green CI is explicitly not evidence that an integration works."
+    },
+    {
+      "id": "threat-review",
+      "command": "docs/security/phase-2.5-threat-review.md",
+      "result": "PASS",
+      "evidence": "Ten areas, each with what prevents it and the test that pins it: private veterinary documents, club rule abuse, IDOR, reviewer concurrency, payment replay and amount mismatch, stored content and link injection, file signature and size, audit integrity, outbound messages, and local providers in production. What is still open is listed as open."
+    },
+    {
+      "id": "migrations-clean-and-upgraded",
+      "command": "node tools/upgrade-check.mjs ; node --test tests/domain/migrations.test.ts ; every db suite",
+      "result": "PASS",
+      "evidence": "Clean: 41 migrations applied to 58 fresh databases across the suite run. Upgraded: 18/18 checks on a database holding Phase 1 and Phase 2 records — the lifetime membership keeps no invented expiry, a published record became ACTIVE with verified_at still null, co-managers became ADMIN, an older payment item still reports price_source SETTING, the new tables start empty, and a second run applies nothing. No migration file contains a drop or a rename."
+    },
+    {
+      "id": "recovery-and-rollback",
+      "command": "docs/ops/recovery-and-rollback.md",
+      "result": "PASS",
+      "evidence": "Documents that the migrations are additive and have no down, so the way back is the snapshot tools/backup.mjs takes of the database and the private files together; four ordered responses from a half-applied migration to a full restore; the per-flow close switches (emptying an operational key) that need no restore at all; and what a restore cannot undo — audit rows, sent messages, and money the gateway has already taken."
+    },
+    {
+      "id": "accessibility-smoke",
+      "command": "node tools/browser-tests.mjs tests/browser/a11y-performance.test.ts",
+      "result": "PASS",
+      "evidence": "The first tab stop is the skip link and Enter moves to #main; no focus lands on a hidden, unsized or wordless element; each page has one main landmark, labelled navigations and at most one h1; every visible control is named; and a refused sign-in marks the field aria-invalid, points at its message and announces it in a live region — which is the defect this suite found and the product now does."
+    },
+    {
+      "id": "performance-evidence",
+      "command": "node tools/browser-tests.mjs tests/browser/a11y-performance.test.ts (printed after the run)",
+      "result": "PASS",
+      "evidence": "Measured server responses on a production build with a local database: / 88–116ms 63KB, /clubs 75–80ms 48KB, /veterinarians 70ms 63KB, /articles 72ms 47KB, /services 73ms 57KB, /dashboard 101–111ms 44KB, /payments 74ms 30KB, /login 64ms 11KB. Recorded as development-machine numbers, not a production benchmark."
+    },
+    {
+      "id": "acceptance-and-traceability",
+      "command": "docs/qa/phase-2.5-acceptance.md ; REQUIREMENTS_TRACEABILITY.md ; IMPLEMENTATION_STATUS.md",
+      "result": "PASS",
+      "evidence": "A01–A13 each mapped to the suites that prove them. The R7 row, opened as an audit finding in PROMPT-001 (no CI, audit findings, migrations without a rollback note), is answered with the workflow, the audit step, the rehearsal and the recovery document. The status header now reads PHASE_2_5_DELIVERED_INTERNALLY with the real counts and the reason it is not production readiness."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The CI workflow has never run: there is no remote and pushing is not authorised, so its first real execution is still ahead.",
+    "No production integration is verified: the payment gateway, the SMS provider, cloud private storage and the map key are all NOT_CONFIGURED, and the PROVIDER adapters throw by design.",
+    "The association's operational data — licence and trusted tariffs, the undertaking text and its version, membership terms, regulations, contact details — is unentered, so those paths stay closed.",
+    "The upgrade rehearsal ran on representative data, not on a copy of production, which does not exist in this environment.",
+    "npm audit runs as a report rather than a gate; turning it into one is a decision to make with real findings in hand.",
+    "The outbox worker is still something that must be called: no scheduler runs it.",
+    "The accessibility smoke is a keyboard and semantics pass, not an audit with assistive technology; no screen reader was actually driven.",
+    "The performance numbers are from one development machine with a local database and one request per route."
+  ],
+  "readiness": {
+    "code": "PHASE_2_5_DELIVERED_INTERNALLY",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "integrations": "NOT_READY",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    ".github/workflows/ci.yml",
+    "tools/upgrade-check.mjs",
+    "docs/security/phase-2.5-threat-review.md",
+    "docs/ops/recovery-and-rollback.md",
+    "docs/ops/release-readiness-phase-2.5.md",
+    "docs/qa/phase-2.5-acceptance.md",
+    "tests/browser/a11y-performance.test.ts",
+    "DECISIONS.md#dec-0202"
+  ]
+}

@@ -125,7 +125,10 @@ test('the superadmin merges a duplicate, and the public list drops it while its 
     assert.equal(response?.status(), 200);
     await expectText(page, PRIMARY);
     const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-    assert.ok(canonical?.includes('/associations/'), 'the duplicate points at a public address');
+    // The duplicate hands its canonical to the primary record, at that record's
+    // own address: a club calls /clubs/<slug> its canonical since PROMPT-014,
+    // so this page points there rather than competing with it.
+    assert.ok(canonical?.includes('/clubs/'), 'the duplicate points at the primary record, at its own address');
     await page.screenshot({ path: path.join(SHOTS, 'merged-public-page.png'), fullPage: true });
   });
 });
