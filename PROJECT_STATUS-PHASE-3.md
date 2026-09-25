@@ -12,7 +12,7 @@ Managed by `node tools/runner.mjs --phase 3 …` (DEC-0203). The package is read
 - [x] PROMPT-008 — 008-commerce-seller-onboarding-plans <!-- work-commit:b237b5dcd19f5187425a859199aaa2bed5dce209 -->
 - [x] PROMPT-009 — 009-commerce-catalog-offers-sku-inventory <!-- work-commit:ea4df9f01411bdb65bc90d77791274e52dafd4ca -->
 - [x] PROMPT-010 — 010-commerce-cart-checkout-orders <!-- work-commit:5039301561e7c43be8f683db2c846c6ae34cfbfc -->
-- [ ] PROMPT-011 — 011-shipping-returns-ledger-settlement
+- [x] PROMPT-011 — 011-shipping-returns-ledger-settlement <!-- work-commit:7488d8bb0995e25bb855903b703ac78bb91e5bf3 -->
 - [ ] PROMPT-012 — 012-commerce-trust-promotions-growth
 - [ ] PROMPT-013 — 013-operations-notifications-analytics-security
 - [ ] PROMPT-014 — 014-ci-release-readiness-handoff
