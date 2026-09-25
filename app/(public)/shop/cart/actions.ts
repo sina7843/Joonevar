@@ -72,6 +72,11 @@ export async function checkoutAction(_previous: CartFormState, form: FormData): 
         noteFa: text(form, 'note') || null,
       },
       confirmedTotalToman: money(form, 'confirmedTotal'),
+      chosenMethods: Object.fromEntries(
+        [...form.entries()]
+          .filter(([key]) => key.startsWith('method-'))
+          .map(([key, value]) => [key.slice('method-'.length), String(value)]),
+      ),
     });
     const batch = await startOrderPayment(db(), guard.actor, placed.order.id);
     const started = await startAttempt(

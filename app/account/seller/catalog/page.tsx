@@ -7,9 +7,15 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { species as speciesTable } from '../../../../src/db/schema/core.ts';
-import { loadSeller, myStores, MAX_SHIPPING_FEE_KEY } from '../../../../src/commerce/sellers.ts';
+import { myStores } from '../../../../src/commerce/sellers.ts';
 import { readMoney } from '../../../../src/settings/service.ts';
-import { ShippingTermsForm } from '../../../../src/commerce/order-forms.tsx';
+import { ShippingMethodForm, SkuWeightForm } from '../../../../src/commerce/order-forms.tsx';
+import { shippingMethodsOf, MAX_SHIPPING_FEE_KEY } from '../../../../src/commerce/shipping.ts';
+import {
+  SHIPPING_METHOD_KIND_FA,
+  type ShippingMethodKind,
+} from '../../../../src/commerce/fulfilment-model.ts';
+import { provinces as provinceTable } from '../../../../src/db/schema/geography.ts';
 import { currentSubscription } from '../../../../src/commerce/plans.ts';
 import {
   allCategories,
@@ -38,7 +44,7 @@ import {
   SubmitProductForm,
   VariantForm,
 } from './forms.tsx';
-import { shippingTermsAction } from './actions.ts';
+import { addShippingMethodAction, setSkuWeightAction } from './actions.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,9 +79,11 @@ export default async function SellerCatalogPage() {
 
   const store = stores[0]!;
   const maxShippingFee = await readMoney(db(), MAX_SHIPPING_FEE_KEY);
-  // The delivery figures live on the store row itself, not on the small shape
-  // the picker returns, so they are read here rather than widened everywhere.
-  const storeRow = await loadSeller(db(), store.id);
+  const methods = await shippingMethodsOf(db(), store.id);
+  const provinceOptions = await db()
+    .select({ code: provinceTable.code, nameFa: provinceTable.nameFa })
+    .from(provinceTable)
+    .orderBy(provinceTable.nameFa);
   const [categories, everyCategory, products, offers, lines, subscription, speciesRows] = await Promise.all([
     sellableCategories(db()),
     allCategories(db()),
@@ -121,20 +129,32 @@ export default async function SellerCatalogPage() {
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">شرایط ارسال</h2>
-          <p className="mt-2xs text-caption text-text-secondary" data-testid="shipping-terms-note">
-            {storeRow.shippingFeeToman === null
-              ? 'تا ثبت هزینه ارسال، کالاهای شما در سبد خرید قابل پرداخت نیستند.'
-              : storeRow.shippingFeeToman === 0n
-                ? 'ارسال کالاهای این فروشگاه رایگان است.'
-                : 'هزینه ارسال فعلی: ' + storeRow.shippingFeeToman.toLocaleString('fa-IR') + ' تومان.'}
+          <h2 className="text-label-lg">روش‌های ارسال</h2>
+          <p className="mt-2xs text-caption text-text-secondary" data-testid="shipping-methods-note">
+            {methods.length === 0
+              ? 'تا ثبت حداقل یک روش ارسال، کالاهای شما در سبد خرید قابل پرداخت نیستند.'
+              : 'روش‌های فعال: ' + methods.map((method) => method.labelFa).join('، ')}
           </p>
+          {methods.length > 0 ? (
+            <ul className="mt-md space-y-2xs text-body-sm" data-testid="method-list">
+              {methods.map((method) => (
+                <li key={method.id} data-testid={'shipping-method-' + method.id}>
+                  {method.labelFa} — {SHIPPING_METHOD_KIND_FA[method.kind as ShippingMethodKind]} —{' '}
+                  {method.pricingKind === 'FIXED'
+                    ? method.baseFeeToman === 0n
+                      ? 'رایگان'
+                      : method.baseFeeToman.toLocaleString('fa-IR') + ' تومان'
+                    : 'وزنی، از ' + method.baseFeeToman.toLocaleString('fa-IR') + ' تومان'}{' '}
+                  — آماده‌سازی {method.preparationDays.toLocaleString('fa-IR')} روز
+                </li>
+              ))}
+            </ul>
+          ) : null}
           <div className="mt-lg">
-            <ShippingTermsForm
-              action={shippingTermsAction}
+            <ShippingMethodForm
+              action={addShippingMethodAction}
               sellerId={store.id}
-              feeToman={storeRow.shippingFeeToman?.toString() ?? null}
-              thresholdToman={storeRow.freeShippingThresholdToman?.toString() ?? null}
+              provinces={provinceOptions}
               maxFeeFa={maxShippingFee.configured ? maxShippingFee.toman.toLocaleString('fa-IR') : null}
             />
           </div>

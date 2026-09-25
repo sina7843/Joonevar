@@ -193,6 +193,25 @@ export const commerceSubOrders = pgTable(
     /** Shipping was free on this one because the basket passed the shop's threshold. */
     shippingWaived: boolean('shipping_waived').notNull().default(false),
 
+    /**
+     * The delivery the buyer chose, frozen — PROMPT-011.
+     *
+     * The method is referenced so it can be looked up, and its name, kind and
+     * promise are copied, because a shop renaming or retiring a method must
+     * not rewrite what somebody was told when they paid.
+     */
+    shippingMethodId: uuid('shipping_method_id'),
+    shippingMethodLabelFa: text('shipping_method_label_fa'),
+    shippingMethodKindCode: text('shipping_method_kind_code'),
+    preparationDays: integer('preparation_days'),
+    /** The moment the shop promised to have it ready by, from that promise. */
+    preparationDueAt: timestamp('preparation_due_at', { withTimezone: true }),
+    /** How the delivery came to be known: the buyer, the shop, or an operator. */
+    deliveryConfirmedBy: text('delivery_confirmed_by'),
+    deliveryEvidenceNoteFa: text('delivery_evidence_note_fa'),
+    /** After this, the return window has closed and the money may settle. */
+    returnWindowEndsAt: timestamp('return_window_ends_at', { withTimezone: true }),
+
     /** After this moment an unanswered sub-order cancels itself and refunds. */
     acceptanceDueAt: timestamp('acceptance_due_at', { withTimezone: true }),
     acceptedAt: timestamp('accepted_at', { withTimezone: true }),
@@ -266,6 +285,16 @@ export const commerceOrderItems = pgTable(
 
     /** How many of this line came back, so a partial return is a real quantity. */
     returnedQuantity: integer('returned_quantity').notNull().default(0),
+    /**
+     * The return terms this line was bought under, frozen — PROMPT-011.
+     *
+     * A policy published next month does not reach backwards, and a category
+     * exception is copied with its reason so the buyer reads the sentence that
+     * actually applied to them.
+     */
+    returnPolicyVersionId: uuid('return_policy_version_id'),
+    returnRuleCode: text('return_rule_code'),
+    returnRuleReasonFa: text('return_rule_reason_fa'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
   },
   (t) => [

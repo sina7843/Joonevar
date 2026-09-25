@@ -1,0 +1,152 @@
+{
+  "promptId": "PROMPT-011",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "18d7318",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "Three things that look separate and are not: how goods get there, how they come back, and what both do to money. A shipping method is the shop's own commercial offer — where it delivers, what it charges, whether by a fixed fee or by weight, the basket size above which it charges nothing, and how many days before the parcel leaves. The platform states a ceiling and nothing else, because where a shop delivers and how long it takes are facts only that shop knows. A shop that has stated no method cannot be checked out from, and the basket refuses by name rather than quietly billing zero. Weight is charged by the started kilogram past whatever the method includes, which is what a courier does, and a line nobody weighed does not become weightless: the quote refuses and says so, because guessing a weight is guessing a price. Collection from the shop costs nothing, because nothing is delivered. The chosen method's name, kind and promise are frozen onto the sub-order, so retiring or renaming it later rewrites nothing about what a buyer was told. Delivery pretends no carrier integration: who confirmed it — the buyer, the shop or an operator — is written on the row, because \"delivered\" means something different depending on which. The right to return is the platform's promise, published as an immutable version, and a shop cannot take it away; a category can narrow it where the goods make returning them unreasonable, and every narrowing carries the sentence the buyer reads. An exception only ever shortens the window — the platform's promise is a floor categories cut into, not a figure they negotiate up — and the rule with its sentence is frozen onto the order line, so a policy published next month does not reach backwards. A return names items and quantities rather than a whole sub-order, because sending one of three things back is the ordinary case, and what comes back decides what is refunded: goods opened where only unopened ones were allowed refund nothing, or the exception would be decorative; damage and a parcel that never arrived refund in full, because neither is the buyer's to lose. The ledger is the part that matters most. No balance is stored: pending, held, available and debt are each the sum of their entries, so any figure can be traced to the event that made it and none can drift from its own history. Every event writes its entries under one group and says whether that group is balanced — whether money merely moved between this shop's own balances or entered and left — and the arithmetic is checked before the write and again by the database. A refund takes from held, then pending, then available, and whatever is left becomes a debt rather than a negative balance, because a negative balance reads like money the shop has. Money on an argued sub-order stays held however long it waits, and a refused return putting the sub-order back to delivered is exactly why the sweep looks at live returns too. A cadence change starts at the end of the period the shop is already in. A settlement batch gathers only settleable entries, and the unique index on its lines is the whole of the idempotency: an entry belongs to one batch and no other. Paying is recorded rather than performed — Hamzist does not move money, so a person sends it and writes down the bank's own reference, and only that writes the payout into the ledger; a failed transfer puts the money back because it never left. While a batch is on its way the shop's bank account is locked, and the batch carries its own copy of where it was sent.",
+  "changedFiles": [
+    "src/db/migrations/0050_fulfilment-ledger.sql",
+    "src/db/migrations/meta/0050_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/fulfilment.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/index.ts",
+    "src/db/schema/orders.ts",
+    "src/db/schema/catalog.ts",
+    "src/db/schema/commerce.ts",
+    "src/commerce/fulfilment-model.ts",
+    "src/commerce/shipping.ts",
+    "src/commerce/returns.ts",
+    "src/commerce/ledger.ts",
+    "src/commerce/finance-forms.tsx",
+    "src/commerce/order-forms.tsx",
+    "src/commerce/cart.ts",
+    "src/commerce/orders.ts",
+    "src/commerce/sellers.ts",
+    "src/authz/policy.ts",
+    "src/files/signature.ts",
+    "src/ui/shell.tsx",
+    "app/(public)/shop/cart/page.tsx",
+    "app/(public)/shop/cart/actions.ts",
+    "app/account/orders/[id]/page.tsx",
+    "app/account/orders/finance-actions.ts",
+    "app/account/seller/finance/page.tsx",
+    "app/account/seller/returns/page.tsx",
+    "app/account/seller/catalog/page.tsx",
+    "app/account/seller/catalog/actions.ts",
+    "app/market/settlement/page.tsx",
+    "app/market/returns/page.tsx",
+    "tests/domain/commerce-fulfilment.test.ts",
+    "tests/db/commerce-fulfilment.test.ts",
+    "tests/browser/commerce-fulfilment.test.ts",
+    "tests/browser/shop-fixture.ts",
+    "tests/db/commerce-orders.test.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-011.json"
+  ],
+  "migrations": [
+    "src/db/migrations/0050_fulfilment-ledger.sql"
+  ],
+  "decisions": [
+    "DEC-0213"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/domain/commerce-fulfilment.test.ts — 15 tests on the arithmetic and the rules: coverage by province with collection outside it, weight charged by the started kilogram, an unweighed line refusing rather than costing nothing, the threshold met exactly and the ceiling refusing before the arithmetic, a preparation promise as a moment, a category exception shortening a window and never lengthening it, what each returned condition is worth, who may move a return from where, a balanced group summing to zero and an unbalanced one having to say so, a sale clearing in two steps, a refund falling through held then pending then available into debt, a payout recovering the debt once, the five things that block paying, a cadence change waiting for the period's end, and a batch locking the account while money is in flight."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/db/commerce-fulfilment.test.ts — 13 tests, each on a store taken all the way to trading with its bank account verified: a weight-based method refusing an unweighed line and pricing it once weighed and a province-limited one refusing the address, the chosen delivery frozen through the method being retired, a category exception frozen onto the line and still refusing after a later policy drops it, a partial return refunding one of three and leaving the sub-order delivered, goods opened under a seal-only rule refunding nothing and opening no refund record, every ledger group's arithmetic checked against its own balanced flag, a refund with nothing left to take from becoming a debt that the next settlement recovers first, a batch gathering each entry once and refusing a payment without a bank reference and refusing to pay twice, a failed transfer returning the money and the batch being retried, the account refusing re-verification while a batch is in flight and opening once reconciled, one shop's entries never carrying another's sub-order with a disputed return still held 400 days later, a cadence change dated to the period's end, and an operator entry that must say why where a shop cannot write one at all."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/commerce-fulfilment.test.ts — 5 tests on the real screens: a basket refusing a shop that has stated no delivery and the shop then stating two, the buyer picking between them and seeing collection cost nothing and the post cost what was said, the shop accepting, preparing and shipping while its money reads as pending rather than settleable, one of two items going back through approval, an argument and an operator's decision, and an operator gathering what is settleable, being refused a payment without the bank's reference, recording it with one, and the shop then seeing that reference and its locked account.",
+      "fixture": "tests/browser/shop-fixture.ts now also has a reviewer verify the settlement account, because a store whose account nobody checked can never be paid — a fixture that stopped short of it built a shop that could not be settled to.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-011/cart-no-method-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-011/shipping-methods-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-011/cart-methods-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-011/seller-finance-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-011/return-requested-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-011/seller-returns-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-011/disputed-return-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-011/settlement-paid-desktop.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree; Compiled successfully."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "976 tests, 975 pass, 1 fail, 0 skip, duration 995s on the first run; the one failure was tests/domain/migrations.test.ts, which forbids a migration removing anything an older release still reads (DEC-0179). It was right: this prompt had dropped the two flat delivery-fee columns PROMPT-010 put on commerce_seller, which shipping methods replaced. The drops were taken back out and the columns are kept, declared and retired, read by nothing and offered on no screen. After that, tests/domain/migrations.test.ts and tests/domain/commerce-fulfilment.test.ts ran together 19 of 19, and the four commerce database suites (commerce-fulfilment, commerce-orders, commerce-catalog, commerce-seller) ran 44 of 44, all on the final tree. 948 tests before this prompt; the 28 new ones are tests/domain/commerce-fulfilment.test.ts (15) and tests/db/commerce-fulfilment.test.ts (13)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "245 tests, 245 pass, 0 fail, 0 skip, duration 561s, exit 0, on the final tree. 240 before this prompt; the 5 new ones are tests/browser/commerce-fulfilment.test.ts. An earlier run of the same work reported 240 of 245 with the whole of tests/browser/commerce-orders.test.ts failing, because the shared fixture still stated a shop's delivery through the flat-fee form this prompt replaced. The fixture now states a shipping method, and both commerce suites ran 10 of 10 together before this full run."
+    }
+  ],
+  "blockers": [],
+  "defectsFoundByTests": [
+    "Shipping weight ignored quantity: two of a 2kg bag were quoted as 2kg. The quote now multiplies each line's unit weight by how many of it are being bought, and the database test that caught it asserts the figure for a two-unit basket.",
+    "A disputed return did not keep its money held. Refusing a return puts the sub-order back to DELIVERED, so the sub-order's own status stopped being the whole answer at exactly the moment holding mattered; the sweep now also refuses to clear a sub-order with a return still open or argued, and the test sweeps 400 days later to prove it.",
+    "A deliberate DROP COLUMN broke the additive-migration rule the project already holds (DEC-0179): a previous release has to keep running against the new schema. The two columns stay, retired rather than removed — the rule wins over tidiness, and the cost is two dead columns rather than a release that cannot be rolled back."
+  ],
+  "limitations": [
+    "No carrier is integrated and none is pretended. A shipment is a tracking code the shop typed, and a delivery is somebody saying so — the buyer, the shop, or an operator — with who said it recorded on the row. Reading a real carrier's status needs a provider and a contract that do not exist yet.",
+    "The bank transfer is recorded, not performed. An operator sends the money outside Hamzist and writes down the bank's reference, and only that writes the payout. A real payout API is a separate integration and a separate authorisation; the settings for cadence, hold days and minimum payout are configured but the sending is not.",
+    "Reconciliation is a status an operator sets after checking, not a statement Hamzist reads. Matching a bank statement against batches automatically needs a feed nobody has configured.",
+    "Nothing runs on a timer. Holds clear when the settlement queue is read, expired reservations release when a line is read, and unaccepted sub-orders are swept when the order queue is opened — the same honest limitation the rest of the phase carries.",
+    "Weight-based delivery needs weights on the SKU and nothing back-fills them. A shop that switches to weight pricing with unweighed lines cannot be checked out from until it enters them, which is stated by name in the basket rather than guessed around.",
+    "A return's own postage is not charged or refunded. Who pays to send goods back is a policy question the source does not settle, so the product neither bills the buyer for it nor promises to cover it.",
+    "The return policy ships with no version published. Until an operator publishes one, no return can be requested at all — a return window is not something to guess, and the screen says so.",
+    "Loyalty points, promotion stacking and the shop's own promotions are configured as settings but not built; the ledger already carries a PROMOTION_CHARGE kind for when PROMPT-012 does."
+  ],
+  "readiness": {
+    "code": "PHASE_3_FULFILMENT_BUILT",
+    "shipping": "SELLER_MANAGED",
+    "returns": "BUILT",
+    "ledger": "BUILT",
+    "settlement": "MANUAL_RECORDED",
+    "carrierIntegration": "NOT_CONFIGURED",
+    "payoutIntegration": "NOT_CONFIGURED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0050_fulfilment-ledger.sql",
+    "src/db/schema/fulfilment.ts",
+    "src/commerce/fulfilment-model.ts",
+    "src/commerce/shipping.ts",
+    "src/commerce/returns.ts",
+    "src/commerce/ledger.ts",
+    "app/account/seller/finance/page.tsx",
+    "app/account/seller/returns/page.tsx",
+    "app/market/settlement/page.tsx",
+    "app/market/returns/page.tsx",
+    "tests/domain/commerce-fulfilment.test.ts",
+    "tests/db/commerce-fulfilment.test.ts",
+    "tests/browser/commerce-fulfilment.test.ts",
+    "DECISIONS.md#DEC-0213"
+  ]
+}

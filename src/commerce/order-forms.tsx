@@ -5,6 +5,7 @@ import { Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
 import { SUB_ORDER_STATUS_FA, type SubOrderStatus } from './order-model.ts';
+import { SHIPPING_METHOD_KINDS, SHIPPING_METHOD_KIND_FA } from './fulfilment-model.ts';
 
 interface FormState {
   readonly ok?: boolean;
@@ -121,16 +122,22 @@ export function CheckoutForm({
   totalToman,
   defaults,
   blocked,
+  chosenMethods,
 }: {
   action: Action;
   totalToman: bigint;
   defaults: { provinceFa: string | null; cityFa: string | null; addressFa: string | null; postalCode: string | null };
   blocked: boolean;
+  /** The delivery each shop's part was quoted under, carried so the server prices the same basket. */
+  chosenMethods: Readonly<Record<string, string>>;
 }) {
   const [state, submit, pending] = useActionState(action, EMPTY);
   return (
     <form action={submit} className="space-y-md" data-testid="checkout-form">
       <input type="hidden" name="confirmedTotal" value={totalToman.toString()} />
+      {Object.entries(chosenMethods).map(([sellerId, methodId]) => (
+        <input key={sellerId} type="hidden" name={'method-' + sellerId} value={methodId} />
+      ))}
       <Result state={state} testId="checkout-result" />
       <TextField label="نام گیرنده" name="recipientName" required data-testid="checkout-name" />
       <TextField
@@ -247,50 +254,155 @@ export function OrderActionForm({
   );
 }
 
-/** What a shop charges to deliver, which is theirs to state and nobody else's to guess. */
-export function ShippingTermsForm({
+/**
+ * One way this shop delivers, stated by the shop.
+ *
+ * Where it reaches, what it charges and how long it takes to prepare are
+ * facts only that shop knows. The platform states a ceiling and nothing else,
+ * so nothing here is filled in on the shop's behalf.
+ */
+export function ShippingMethodForm({
   action,
   sellerId,
-  feeToman,
-  thresholdToman,
+  provinces,
   maxFeeFa,
 }: {
   action: Action;
   sellerId: string;
-  feeToman: string | null;
-  thresholdToman: string | null;
+  provinces: readonly { code: string; nameFa: string }[];
   maxFeeFa: string | null;
 }) {
   const [state, submit, pending] = useActionState(action, EMPTY);
   return (
-    <form action={submit} className="space-y-md" data-testid="shipping-terms-form">
+    <form action={submit} className="space-y-md" data-testid="method-form">
       <input type="hidden" name="sellerId" value={sellerId} />
-      <Result state={state} testId="shipping-terms-result" />
+      <Result state={state} testId="method-result" />
+      <TextField label="نام روش ارسال" name="label" required data-testid="method-label" />
+      <SelectField
+        label="نوع"
+        name="kind"
+        required
+        options={SHIPPING_METHOD_KINDS.map((kind) => ({ value: kind, label: SHIPPING_METHOD_KIND_FA[kind] }))}
+        data-testid="method-kind"
+      />
+      <SelectField
+        label="محدوده"
+        name="coverage"
+        required
+        options={[
+          { value: 'WHOLE_COUNTRY', label: 'سراسر کشور' },
+          { value: 'PROVINCES', label: 'فقط استان‌های انتخاب‌شده' },
+        ]}
+        data-testid="method-coverage"
+      />
+      <fieldset className="space-y-2xs">
+        <legend className="text-label-sm">استان‌های تحت پوشش</legend>
+        <p className="text-caption text-text-secondary">
+          فقط وقتی لازم است که محدوده را «استان‌های انتخاب‌شده» گذاشته باشید.
+        </p>
+        <div className="hz-rail flex flex-wrap gap-sm">
+          {provinces.map((province) => (
+            <label key={province.code} className="flex items-center gap-2xs text-caption">
+              <input
+                type="checkbox"
+                name="provinces"
+                value={province.code}
+                data-testid={'method-province-' + province.code}
+              />
+              {province.nameFa}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <SelectField
+        label="نحوه قیمت‌گذاری"
+        name="pricing"
+        required
+        options={[
+          { value: 'FIXED', label: 'مبلغ ثابت برای هر سفارش' },
+          { value: 'WEIGHT_BASED', label: 'بر اساس وزن' },
+        ]}
+        data-testid="method-pricing"
+      />
       <TextField
-        label="هزینه ارسال هر سفارش (تومان)"
-        name="shippingFee"
+        label="هزینه پایه (تومان)"
+        name="baseFee"
         required
         ltr
         inputMode="numeric"
-        defaultValue={feeToman ?? ''}
-        hint={
-          'تا وقتی این عدد ثبت نشده، خرید از فروشگاه شما ممکن نیست. صفر یعنی ارسال رایگان.' +
-          (maxFeeFa ? ' سقف مجاز: ' + maxFeeFa + ' تومان.' : '')
-        }
-        data-testid="shipping-fee"
+        hint={'صفر یعنی رایگان.' + (maxFeeFa ? ' سقف مجاز: ' + maxFeeFa + ' تومان.' : '')}
+        data-testid="method-base-fee"
+      />
+      <TextField
+        label="نرخ هر کیلوگرم (تومان)"
+        name="perKg"
+        ltr
+        inputMode="numeric"
+        hint="فقط برای قیمت‌گذاری وزنی."
+        data-testid="method-per-kg"
+      />
+      <TextField
+        label="وزن شامل هزینه پایه (گرم)"
+        name="includedGrams"
+        ltr
+        inputMode="numeric"
+        hint="فقط برای قیمت‌گذاری وزنی. صفر هم پذیرفته است."
+        data-testid="method-included-grams"
       />
       <TextField
         label="حد نصاب ارسال رایگان (تومان)"
         name="freeThreshold"
         ltr
         inputMode="numeric"
-        defaultValue={thresholdToman ?? ''}
         hint="خالی بگذارید اگر ارسال رایگان ندارید."
-        data-testid="shipping-threshold"
+        data-testid="method-free-threshold"
       />
-      <Button type="submit" disabled={pending} data-testid="shipping-save">
-        ثبت شرایط ارسال
+      <TextField
+        label="مهلت آماده‌سازی (روز)"
+        name="preparationDays"
+        required
+        ltr
+        inputMode="numeric"
+        hint="چند روز طول می‌کشد تا مرسوله از فروشگاه خارج شود. همین عدد به خریدار نشان داده می‌شود."
+        data-testid="method-preparation-days"
+      />
+      <TextAreaField label="توضیح" name="note" rows={2} data-testid="method-note" />
+      <Button type="submit" disabled={pending} data-testid="method-save">
+        ثبت روش ارسال
       </Button>
+    </form>
+  );
+}
+
+/** The weight of one line, which only weight-based delivery needs. */
+export function SkuWeightForm({
+  action,
+  sellerId,
+  skuId,
+  weightGrams,
+}: {
+  action: Action;
+  sellerId: string;
+  skuId: string;
+  weightGrams: number | null;
+}) {
+  const [state, submit, pending] = useActionState(action, EMPTY);
+  return (
+    <form action={submit} className="flex flex-wrap items-end gap-sm" data-testid={'weight-form-' + skuId}>
+      <input type="hidden" name="sellerId" value={sellerId} />
+      <input type="hidden" name="skuId" value={skuId} />
+      <TextField
+        label="وزن (گرم)"
+        name="weightGrams"
+        ltr
+        inputMode="numeric"
+        defaultValue={weightGrams === null ? '' : String(weightGrams)}
+        data-testid={'weight-value-' + skuId}
+      />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid={'weight-save-' + skuId}>
+        ثبت وزن
+      </Button>
+      <Result state={state} testId={'weight-result-' + skuId} />
     </form>
   );
 }

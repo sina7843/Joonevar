@@ -346,6 +346,10 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   }
   if (hasMarketplaceCapability(actor, 'ORDER_VIEW')) {
     items.push({ href: '/market/orders', label: 'سفارش‌های فروشگاه', icon: 'listChecks' });
+    items.push({ href: '/market/returns', label: 'مرجوعی و سیاست آن', icon: 'clipboardText' });
+  }
+  if (hasMarketplaceCapability(actor, 'SETTLEMENT_RUN')) {
+    items.push({ href: '/market/settlement', label: 'تسویه فروشندگان', icon: 'listChecks' });
   }
   return items;
 }

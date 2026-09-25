@@ -168,6 +168,16 @@ export async function tradingStore(
       await page.getByTestId('seller-decide-' + sellerId).click();
       await expectText(page, 'تصمیم ثبت شد');
     }
+    // A person checks that the account belongs to this shop. Without it
+    // nothing can ever be settled to it, so a fixture that stops short of
+    // this builds a store that cannot be paid (PROMPT-011).
+    await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+    const verify = page.getByTestId('verify-iban-submit-' + sellerId);
+    if ((await verify.count()) > 0) {
+      await page.getByTestId('verify-iban-note-' + sellerId).fill(options.reasonFa);
+      await verify.click();
+      await expectText(page, 'ثبت شد');
+    }
   } finally {
     await ops.close();
   }
@@ -282,22 +292,33 @@ export async function sellableProduct(
   return { productId, offerId };
 }
 
-/** State what this shop charges to deliver, which nothing can guess for it. */
+/**
+ * State one way this shop delivers — PROMPT-011.
+ *
+ * A shop that has stated none cannot be checked out from, so a fixture that
+ * wants a basket to reach a gateway says how the parcel gets there, the way a
+ * real shop would.
+ */
 export async function stateShippingTerms(
   options: ShopFixtureOptions,
   store: TradingStore,
-  input: { feeToman: number; freeThresholdToman?: number | null },
+  input: { feeToman: number; freeThresholdToman?: number | null; labelFa?: string },
 ): Promise<void> {
   const seller = await contextFor(options.browser, store.sellerState);
   try {
     const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/seller/catalog', { waitUntil: 'load' });
-    await page.getByTestId('shipping-fee').fill(String(input.feeToman));
+    await page.getByTestId('method-label').fill(input.labelFa ?? 'SYNTHETIC پست');
+    await page.getByTestId('method-kind').selectOption('POST');
+    await page.getByTestId('method-coverage').selectOption('WHOLE_COUNTRY');
+    await page.getByTestId('method-pricing').selectOption('FIXED');
+    await page.getByTestId('method-base-fee').fill(String(input.feeToman));
     if (input.freeThresholdToman != null) {
-      await page.getByTestId('shipping-threshold').fill(String(input.freeThresholdToman));
+      await page.getByTestId('method-free-threshold').fill(String(input.freeThresholdToman));
     }
-    await page.getByTestId('shipping-save').click();
-    await expectText(page, 'شرایط ارسال فروشگاه ثبت شد');
+    await page.getByTestId('method-preparation-days').fill('1');
+    await page.getByTestId('method-save').click();
+    await expectText(page, 'روش ارسال ثبت شد');
   } finally {
     await seller.close();
   }

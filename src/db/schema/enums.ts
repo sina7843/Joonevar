@@ -135,6 +135,8 @@ export const filePurpose = pgEnum('file_purpose', [
   'SELLER_LOGO',
   /** A product picture; served publicly only while its product is published (PROMPT-009). */
   'PRODUCT_IMAGE',
+  /** What a buyer or a shop showed about a return (PROMPT-011). */
+  'RETURN_EVIDENCE',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -554,4 +556,83 @@ export const commerceSubOrderStatus = pgEnum('commerce_suborder_status', [
   'CANCELLED',
   'REFUNDED',
   'DISPUTED',
+]);
+
+/** How a shop gets goods to a buyer, and where the money for it comes from. */
+export const shippingMethodKind = pgEnum('shipping_method_kind', ['COURIER', 'POST', 'PICKUP']);
+
+/** A fixed charge per order, or one that follows the weight of what is in it. */
+export const shippingPricingKind = pgEnum('shipping_pricing_kind', ['FIXED', 'WEIGHT_BASED']);
+
+/** Everywhere, or only the provinces the shop named. */
+export const shippingCoverageKind = pgEnum('shipping_coverage_kind', ['WHOLE_COUNTRY', 'PROVINCES']);
+
+/**
+ * What a category does to the platform's return right — PROMPT-011.
+ *
+ * The right itself is the platform's and a shop cannot take it away. A
+ * category can narrow it where the goods make returning them unreasonable,
+ * and each narrowing carries its own reason.
+ */
+export const returnRuleKind = pgEnum('return_rule_kind', [
+  /** The platform's ordinary window applies. */
+  'STANDARD',
+  /** Returnable only unopened and unused, e.g. food and hygiene goods. */
+  'SEALED_ONLY',
+  /** Not returnable at all, e.g. goods that perish. */
+  'NOT_RETURNABLE',
+]);
+
+export const returnStatus = pgEnum('order_return_status', [
+  'REQUESTED',
+  'APPROVED',
+  'REJECTED',
+  'SHIPPED_BACK',
+  'RECEIVED',
+  'REFUNDED',
+  'DISPUTED',
+]);
+
+/** What the shop found when the parcel came back. */
+export const returnedCondition = pgEnum('returned_condition', [
+  'AS_SOLD',
+  'OPENED',
+  'DAMAGED',
+  'NOT_AS_DESCRIBED',
+  'MISSING',
+]);
+
+/**
+ * Which balance a ledger entry moves — PROMPT-011.
+ *
+ * PENDING is money taken but not yet earned; HELD is earned but not yet
+ * clear of the return window or of an argument; AVAILABLE is settleable;
+ * DEBT is what the shop owes the platform. Every balance is the sum of its
+ * entries and is never stored as a number anybody writes.
+ */
+export const ledgerBucket = pgEnum('seller_ledger_bucket', ['PENDING', 'HELD', 'AVAILABLE', 'DEBT']);
+
+/** Why an entry exists. The bucket says where it lands; this says what happened. */
+export const ledgerEntryKind = pgEnum('seller_ledger_kind', [
+  'SALE',
+  'COMMISSION',
+  'REFUND',
+  'PROMOTION_CHARGE',
+  'PENALTY',
+  'ADJUSTMENT',
+  'RELEASE',
+  'PAYOUT',
+  'DEBT_RECOVERY',
+]);
+
+/** How often a shop's settleable money is gathered into a batch. */
+export const settlementCadence = pgEnum('settlement_cadence', ['WEEKLY', 'MONTHLY']);
+
+export const settlementBatchStatus = pgEnum('settlement_batch_status', [
+  'DRAFT',
+  'READY',
+  'PAID',
+  'RECONCILED',
+  'FAILED',
+  'CANCELLED',
 ]);

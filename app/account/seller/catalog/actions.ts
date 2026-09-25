@@ -7,7 +7,7 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AppError, validation } from '../../../../src/domain/errors.ts';
 import { addProductImage, addVariant, createProduct, submitProduct } from '../../../../src/commerce/catalog.ts';
 import { addSku, createOffer, moveOffer, recordStockMove } from '../../../../src/commerce/inventory.ts';
-import { setShippingTerms } from '../../../../src/commerce/sellers.ts';
+import { addShippingMethod, setSkuWeight } from '../../../../src/commerce/shipping.ts';
 import type { CommerceOfferStatus } from '../../../../src/commerce/catalog-model.ts';
 
 export interface CatalogFormState {
@@ -213,28 +213,61 @@ export async function stockMoveAction(
 }
 
 /**
- * What this shop charges to deliver — PROMPT-010.
+ * One way this shop delivers — PROMPT-011.
  *
- * Until it is entered, nothing from this shop can be checked out, and the
- * basket says so by name. Zero is a real answer that means free delivery; an
- * empty field is not an answer at all.
+ * Until a shop has stated at least one, nothing of its can be checked out,
+ * and the basket says so by name rather than billing nothing.
  */
-export async function shippingTermsAction(
+export async function addShippingMethodAction(
   _previous: CatalogFormState,
   form: FormData,
 ): Promise<CatalogFormState> {
   try {
     const guard = await guardRoute('/account/seller/catalog');
     if (!guard.ok) throw guard.denied;
+    const pricing = text(form, 'pricing') === 'WEIGHT_BASED' ? 'WEIGHT_BASED' : 'FIXED';
+    const coverage = text(form, 'coverage') === 'PROVINCES' ? 'PROVINCES' : 'WHOLE_COUNTRY';
+    const kind = text(form, 'kind');
+    if (kind !== 'COURIER' && kind !== 'POST' && kind !== 'PICKUP') throw validation('نوع روش ارسال معتبر نیست.');
     const threshold = text(form, 'freeThreshold');
-    await setShippingTerms(db(), guard.actor, {
+    await addShippingMethod(db(), guard.actor, {
       sellerId: text(form, 'sellerId'),
-      feeToman: money(form, 'shippingFee'),
+      labelFa: text(form, 'label'),
+      kind,
+      coverageKind: coverage,
+      provinceCodes: form.getAll('provinces').map(String),
+      pricingKind: pricing,
+      baseFeeToman: money(form, 'baseFee'),
+      perKgToman: pricing === 'WEIGHT_BASED' ? money(form, 'perKg') : null,
+      includedGrams: pricing === 'WEIGHT_BASED' ? count(form, 'includedGrams') : null,
       freeThresholdToman: threshold === '' ? null : money(form, 'freeThreshold'),
+      preparationDays: count(form, 'preparationDays'),
+      noteFa: text(form, 'note') || null,
     });
     revalidatePath('/account/seller/catalog');
     revalidatePath('/shop/cart');
-    return { ok: true, message: 'شرایط ارسال فروشگاه ثبت شد.' };
+    return { ok: true, message: 'روش ارسال ثبت شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/** The weight of one line, which only weight-based delivery needs. */
+export async function setSkuWeightAction(
+  _previous: CatalogFormState,
+  form: FormData,
+): Promise<CatalogFormState> {
+  try {
+    const guard = await guardRoute('/account/seller/catalog');
+    if (!guard.ok) throw guard.denied;
+    const raw = text(form, 'weightGrams');
+    await setSkuWeight(db(), guard.actor, {
+      sellerId: text(form, 'sellerId'),
+      skuId: text(form, 'skuId'),
+      weightGrams: raw === '' ? null : count(form, 'weightGrams'),
+    });
+    revalidatePath('/account/seller/catalog');
+    return { ok: true, message: 'وزن این قلم ثبت شد.' };
   } catch (error) {
     return failure(error);
   }

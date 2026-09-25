@@ -15,6 +15,9 @@ import {
 } from '../../../../src/commerce/order-model.ts';
 import { OrderActionForm, SubOrderMoveForm } from '../../../../src/commerce/order-forms.tsx';
 import { cancelOrderAction, moveAsBuyerAction, retryOrderPaymentAction } from '../actions.ts';
+import { ReturnRequestForm } from '../../../../src/commerce/finance-forms.tsx';
+import { requestReturnAction } from '../finance-actions.ts';
+import { RETURN_RULE_FA, type ReturnRule } from '../../../../src/commerce/fulfilment-model.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -158,6 +161,31 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               moves={part.moves}
               testPrefix="buyer-move"
             />
+
+            {part.subOrder.status === 'DELIVERED' ? (
+              <details data-testid={'return-open-' + part.subOrder.id}>
+                <summary className="text-caption text-text-brand">مرجوع کردن کالا</summary>
+                <div className="mt-sm">
+                  <ReturnRequestForm
+                    action={requestReturnAction}
+                    subOrderId={part.subOrder.id}
+                    items={part.items.map((item) => ({
+                      id: item.id,
+                      labelFa:
+                        item.productNameFa + (item.variantLabelFa ? ' — ' + item.variantLabelFa : ''),
+                      remaining: item.quantity - item.returnedQuantity,
+                      // The sentence frozen onto this line when it was bought,
+                      // not whatever the policy says today (PROMPT-011).
+                      blockedFa:
+                        item.returnRuleCode === 'NOT_RETURNABLE'
+                          ? (item.returnRuleReasonFa ??
+                            RETURN_RULE_FA[item.returnRuleCode as ReturnRule])
+                          : null,
+                    }))}
+                  />
+                </div>
+              </details>
+            ) : null}
 
             <details>
               <summary className="text-caption text-text-secondary">سابقه این زیرسفارش</summary>

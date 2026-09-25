@@ -152,7 +152,8 @@ export type FilePurposeName =
   | 'DISPUTE_EVIDENCE'
   | 'SELLER_DOCUMENT'
   | 'SELLER_LOGO'
-  | 'PRODUCT_IMAGE';
+  | 'PRODUCT_IMAGE'
+  | 'RETURN_EVIDENCE';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -223,6 +224,9 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
    * publishing the product it belongs to (PROMPT-009).
    */
   PRODUCT_IMAGE: ['SELLER_REVIEWER', 'SUPERADMIN'],
+  // A photograph of somebody's returned goods is theirs, the shop's and the
+  // arbiter's — nobody else's, however senior (PROMPT-011).
+  RETURN_EVIDENCE: ['DISPUTE_REVIEWER', 'SUPPORT_AGENT', 'SUPERADMIN'],
 };
 
 export function canReadFile(

@@ -39,6 +39,7 @@ import {
   sellerDocumentKind,
   sellerPlanStatus,
   sellerSubscriptionStatus,
+  settlementCadence,
 } from './enums.ts';
 import { accounts, storedFiles } from './core.ts';
 import { cities, provinces } from './geography.ts';
@@ -117,8 +118,20 @@ export const commerceSellers = pgTable(
      * missing figure rather than quietly billing zero. Zero, entered on
      * purpose, is free delivery and reads that way.
      */
+    /**
+     * Retired by PROMPT-011, kept because migrations here are additive.
+     *
+     * The flat per-store delivery fee of PROMPT-010 was replaced by shipping
+     * methods, which carry coverage, a weight rate, a threshold and a
+     * preparation promise. Nothing reads these two any more and no screen
+     * offers them, but dropping a column is what stops the previous release
+     * from running against the new schema (DEC-0179), so they stay.
+     */
     shippingFeeToman: bigint('shipping_fee_toman', { mode: 'bigint' }),
     freeShippingThresholdToman: bigint('free_shipping_threshold_toman', { mode: 'bigint' }),
+    settlementCadence: settlementCadence('settlement_cadence'),
+    requestedCadence: settlementCadence('requested_cadence'),
+    cadenceEffectiveFrom: timestamp('cadence_effective_from', { withTimezone: true }),
     logoFileId: uuid('logo_file_id').references(() => storedFiles.id, { onDelete: 'set null' }),
 
     /** The versioned seller agreement this store accepted, and when. */

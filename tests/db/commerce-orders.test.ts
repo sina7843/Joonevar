@@ -25,7 +25,6 @@ import {
   decideSellerApplication,
   loadSeller,
   saveSellerApplication,
-  setShippingTerms,
   startSellerApplication,
   submitSellerApplication,
 } from '../../src/commerce/sellers.ts';
@@ -40,6 +39,7 @@ import {
   submitProduct,
 } from '../../src/commerce/catalog.ts';
 import { addSku, availableFor, createOffer, loadSku, moveOffer } from '../../src/commerce/inventory.ts';
+import { addShippingMethod } from '../../src/commerce/shipping.ts';
 import { cancelUnpaidOrder, placeOrder, setCartLine, viewCart } from '../../src/commerce/cart.ts';
 import {
   expireUnacceptedSubOrders,
@@ -145,11 +145,23 @@ async function tradingStore(
     sellerId: seller.id,
     planId: plans.find((plan) => plan.code === 'PRO')!.id,
   });
+  // A shop states how it delivers, or states nothing at all: there is no flat
+  // fee on the store any more, so a fixture that wants one says so as a method
+  // the way a real shop would (PROMPT-011).
   if (facts.shippingFeeToman !== null) {
-    await setShippingTerms(ctx.testDb.db, actor, {
+    await addShippingMethod(ctx.testDb.db, actor, {
       sellerId: seller.id,
-      feeToman: facts.shippingFeeToman ?? 45_000n,
+      labelFa: 'SYNTHETIC پست',
+      kind: 'POST',
+      coverageKind: 'WHOLE_COUNTRY',
+      provinceCodes: [],
+      pricingKind: 'FIXED',
+      baseFeeToman: facts.shippingFeeToman ?? 45_000n,
+      perKgToman: null,
+      includedGrams: null,
       freeThresholdToman: null,
+      preparationDays: 1,
+      noteFa: null,
     });
   }
   const active = await loadSeller(ctx.testDb.db, seller.id);
@@ -339,11 +351,21 @@ test('a shop that has not said what delivery costs cannot be checked out from', 
       code('CONFLICT'),
     );
 
-    // Once the shop states it — zero, chosen on purpose — the basket clears.
-    await setShippingTerms(ctx.testDb.db, ctx.first.actor, {
+    // Once the shop states a way of delivering — free, chosen on purpose —
+    // the basket clears.
+    await addShippingMethod(ctx.testDb.db, ctx.first.actor, {
       sellerId: shop.id,
-      feeToman: 0n,
+      labelFa: 'SYNTHETIC تحویل رایگان',
+      kind: 'POST',
+      coverageKind: 'WHOLE_COUNTRY',
+      provinceCodes: [],
+      pricingKind: 'FIXED',
+      baseFeeToman: 0n,
+      perKgToman: null,
+      includedGrams: null,
       freeThresholdToman: null,
+      preparationDays: 1,
+      noteFa: null,
     });
     const after = await viewCart(ctx.testDb.db, buyer);
     assert.equal(after.blocked, false);

@@ -34,6 +34,7 @@ import {
 } from '../db/schema/catalog.ts';
 import { commerceSellers } from '../db/schema/commerce.ts';
 import { residences } from '../db/schema/identity.ts';
+import { provinces } from '../db/schema/geography.ts';
 import { recordAudit } from '../audit/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { assertFlagEnabled } from '../marketplace/flags.ts';
@@ -41,6 +42,9 @@ import type { Actor } from '../authz/actor.ts';
 import { availableStock } from './catalog-model.ts';
 import { releaseExpiredFor, releaseReservation, reserveStockIn } from './inventory.ts';
 import { tradingTerms } from './plans.ts';
+import { chooseMethod, methodOffersFor, type MethodOffer } from './shipping.ts';
+import { livePolicy, ruleForCategory } from './returns.ts';
+import { preparationDeadline } from './fulfilment-model.ts';
 import {
   CHECKOUT_HOLD_MINUTES,
   checkoutBlocked,
@@ -48,7 +52,6 @@ import {
   lineTotal,
   orderMoney,
   orderReference,
-  shippingFor,
   subOrderMoney,
   subOrderReference,
   type BasketChange,
@@ -92,7 +95,11 @@ export interface CartGroup {
   /** Null when this shop has never said what it charges to deliver. */
   readonly shippingToman: bigint | null;
   readonly shippingWaived: boolean;
-  readonly freeShippingThresholdToman: bigint | null;
+  /** Every way this shop could carry these lines, priced, including the ones that cannot. */
+  readonly methodOffers: readonly MethodOffer[];
+  readonly chosenMethodId: string | null;
+  readonly chosenMethodLabelFa: string | null;
+  readonly preparationDays: number | null;
   readonly buyerTotalToman: bigint;
   readonly sellerTrading: boolean;
 }
@@ -193,8 +200,24 @@ export async function clearCart(database: Database, actor: Actor): Promise<void>
  * available is what is actually available rather than what an abandoned basket
  * somewhere else is still nominally sitting on.
  */
-export async function viewCart(database: Database, actor: Actor): Promise<CartView> {
+export interface CartOptions {
+  /** The method the buyer picked per shop, as the basket page remembers it. */
+  readonly chosenMethods?: Readonly<Record<string, string>>;
+  /** Where the parcel is going, which decides what each method may carry. */
+  readonly provinceFa?: string | null;
+}
+
+export async function viewCart(
+  database: Database,
+  actor: Actor,
+  options: CartOptions = {},
+): Promise<CartView> {
   if (!actor.accountId) return emptyCart(null);
+  const chosenMethods = options.chosenMethods ?? {};
+  // Coverage is decided by province, so the name the buyer typed is resolved
+  // to a code once. A name nothing recognises reaches no province-limited
+  // method, which is the honest answer rather than a guess at what was meant.
+  const provinceCode = await provinceCodeFor(database, options.provinceFa ?? null);
   const [cart] = await database
     .select()
     .from(shoppingCarts)
@@ -225,8 +248,6 @@ export async function viewCart(database: Database, actor: Actor): Promise<CartVi
       sellerNameFa: commerceSellers.displayNameFa,
       sellerSlug: commerceSellers.slug,
       sellerStatus: commerceSellers.status,
-      shippingFeeToman: commerceSellers.shippingFeeToman,
-      freeShippingThresholdToman: commerceSellers.freeShippingThresholdToman,
     })
     .from(cartItems)
     .innerJoin(offerSkus, eq(offerSkus.id, cartItems.offerSkuId))
@@ -325,30 +346,43 @@ export async function viewCart(database: Database, actor: Actor): Promise<CartVi
   for (const [sellerId, bucket] of bySeller) {
     const facts = sellerFacts.get(sellerId)!;
     const itemsTotalToman = bucket.lines.reduce((sum, line) => sum + line.lineTotalToman, 0n);
-    const shipping = shippingFor({
-      feeToman: facts.shippingFeeToman,
-      freeThresholdToman: facts.freeShippingThresholdToman,
+
+    // Every way this shop could carry these particular lines to this
+    // particular province, priced now. A method that cannot is kept with its
+    // reason rather than hidden, because "we do not deliver there" is
+    // something the buyer has to be able to read.
+    const methodOffers = await methodOffersFor(database, {
+      sellerId,
       itemsTotalToman,
+      lines: bucket.lines.map((line) => ({ skuId: line.skuId, quantity: line.quantity })),
+      provinceCode: provinceCode,
     });
-    if (shipping === null && trading.has(sellerId)) {
+    const picked = chooseMethod(methodOffers, chosenMethods[sellerId] ?? null);
+    const failed = 'problemFa' in picked;
+    if (failed && trading.has(sellerId)) {
       changes.push({
         kind: 'SHIPPING_UNKNOWN',
         skuId: null,
         sellerId,
         labelFa: facts.sellerNameFa ?? 'فروشگاه',
-        detailFa: 'این فروشگاه هزینه ارسال خود را اعلام نکرده و تا اعلام آن، خرید از آن ممکن نیست.',
+        detailFa: picked.problemFa,
         blocking: true,
       });
     }
+
+    const shippingToman = failed ? null : picked.offer.toman;
     groups.push({
       sellerId,
       sellerNameFa: facts.sellerNameFa ?? 'فروشگاه',
       lines: bucket.lines,
       itemsTotalToman,
-      shippingToman: shipping?.toman ?? null,
-      shippingWaived: shipping?.waived ?? false,
-      freeShippingThresholdToman: facts.freeShippingThresholdToman,
-      buyerTotalToman: itemsTotalToman + (shipping?.toman ?? 0n),
+      shippingToman,
+      shippingWaived: failed ? false : picked.offer.waived,
+      methodOffers,
+      chosenMethodId: failed ? null : picked.offer.methodId,
+      chosenMethodLabelFa: failed ? null : picked.offer.labelFa,
+      preparationDays: failed ? null : picked.offer.preparationDays,
+      buyerTotalToman: itemsTotalToman + (shippingToman ?? 0n),
       sellerTrading: trading.has(sellerId),
     });
   }
@@ -365,6 +399,18 @@ export async function viewCart(database: Database, actor: Actor): Promise<CartVi
     blocked: checkoutBlocked(changes),
     empty: false,
   };
+}
+
+/** The province code behind a typed province name, or nothing. */
+async function provinceCodeFor(database: DbClient, provinceFa: string | null): Promise<string | null> {
+  const name = (provinceFa ?? '').trim();
+  if (name === '') return null;
+  const [row] = await database
+    .select({ code: provinces.code })
+    .from(provinces)
+    .where(eq(provinces.nameFa, name))
+    .limit(1);
+  return row?.code ?? null;
 }
 
 const emptyCart = (cartId: string | null): CartView => ({
@@ -487,13 +533,23 @@ export interface PlacedOrder {
 export async function placeOrder(
   database: Database,
   actor: Actor,
-  input: { delivery: DeliveryInput; confirmedTotalToman: bigint | null },
+  input: {
+    delivery: DeliveryInput;
+    confirmedTotalToman: bigint | null;
+    /** The delivery each shop's part was quoted under, as the buyer chose it. */
+    chosenMethods?: Readonly<Record<string, string>>;
+  },
 ): Promise<PlacedOrder> {
   if (!actor.accountId) throw forbidden('برای ثبت سفارش باید وارد حساب شوید.');
   await assertFlagEnabled(database, 'market.flag.commerce_checkout_enabled');
 
   const delivery = validDelivery(input.delivery);
-  const view = await viewCart(database, actor);
+  // Priced against the address it is actually going to, under the deliveries
+  // the buyer chose: a quote for somewhere else is not this basket's price.
+  const view = await viewCart(database, actor, {
+    chosenMethods: input.chosenMethods,
+    provinceFa: delivery.provinceFa,
+  });
   if (view.empty) throw validation('سبد خرید خالی است.');
   if (view.blocked) {
     throw conflict('سبد خرید تغییر کرده است؛ تغییرها را ببینید و دوباره تأیید کنید.', {
@@ -512,6 +568,31 @@ export async function placeOrder(
     const term = await tradingTerms(database, group.sellerId);
     if (term === null) throw conflict('این فروشگاه در حال حاضر فروش فعال ندارد.');
     terms.set(group.sellerId, term);
+  }
+
+  // The return terms every line is bought under, frozen here. A policy
+  // published next month does not reach backwards, and a category exception
+  // is copied with the sentence the buyer actually reads.
+  const policy = await livePolicy(database);
+  const returnTerms = new Map<string, { policyVersionId: string | null; rule: string; reasonFa: string | null }>();
+  for (const group of view.groups) {
+    for (const line of group.lines) {
+      if (returnTerms.has(line.productId)) continue;
+      const [product] = await database
+        .select({ categoryId: commerceProducts.categoryId })
+        .from(commerceProducts)
+        .where(eq(commerceProducts.id, line.productId))
+        .limit(1);
+      const rule =
+        product === undefined || policy === null
+          ? { rule: 'STANDARD' as const, windowDays: null, reasonFa: '' }
+          : await ruleForCategory(database, product.categoryId, policy.id);
+      returnTerms.set(line.productId, {
+        policyVersionId: policy?.id ?? null,
+        rule: rule.rule,
+        reasonFa: rule.rule === 'STANDARD' ? null : rule.reasonFa,
+      });
+    }
   }
 
   const now = new Date();
@@ -571,6 +652,11 @@ export async function placeOrder(
           commissionToman: figures.commissionToman,
           payoutToman: figures.payoutToman,
           shippingWaived: group.shippingWaived,
+          shippingMethodId: group.chosenMethodId,
+          shippingMethodLabelFa: group.chosenMethodLabelFa,
+          shippingMethodKindCode:
+            group.methodOffers.find((offer) => offer.methodId === group.chosenMethodId)?.kind ?? null,
+          preparationDays: group.preparationDays,
         })
         .returning();
       subOrders.push(subOrder!);
@@ -585,7 +671,11 @@ export async function placeOrder(
           holdRef: order!.id,
           minutes: CHECKOUT_HOLD_MINUTES,
         });
+        const terms = returnTerms.get(line.productId)!;
         await tx.insert(commerceOrderItems).values({
+          returnPolicyVersionId: terms.policyVersionId,
+          returnRuleCode: terms.rule,
+          returnRuleReasonFa: terms.reasonFa,
           subOrderId: subOrder!.id,
           offerSkuId: line.skuId,
           productId: line.productId,

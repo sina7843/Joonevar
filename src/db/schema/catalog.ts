@@ -259,6 +259,14 @@ export const offerSkus = pgTable(
     /** The seller's own code for this line; unique within their shop. */
     sku: text('sku').notNull(),
     priceToman: bigint('price_toman', { mode: 'bigint' }).notNull(),
+    /**
+     * What one of these weighs, for a shop that charges by weight (PROMPT-011).
+     *
+     * Null is not weightless: it means nobody said, and a shop pricing by
+     * weight cannot sell a line nobody weighed. A shop charging a fixed fee
+     * never needs it.
+     */
+    weightGrams: integer('weight_grams'),
     stockOnHand: integer('stock_on_hand').notNull().default(0),
     stockReserved: integer('stock_reserved').notNull().default(0),
     isActive: boolean('is_active').notNull().default(true),
@@ -270,6 +278,7 @@ export const offerSkus = pgTable(
     uniqueIndex('offer_sku_variant_key').on(t.offerId, t.variantId),
     index('offer_sku_offer_idx').on(t.offerId),
     check('offer_sku_price_positive', sql`${t.priceToman} > 0`),
+    check('offer_sku_weight_positive', sql`${t.weightGrams} is null or ${t.weightGrams} > 0`),
     check('offer_sku_stock_non_negative', sql`${t.stockOnHand} >= 0 and ${t.stockReserved} >= 0`),
     // The oversell guard, in the database rather than in a comparison in code.
     check('offer_sku_reserved_within_stock', sql`${t.stockReserved} <= ${t.stockOnHand}`),

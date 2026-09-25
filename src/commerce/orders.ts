@@ -38,6 +38,9 @@ import type { Actor } from '../authz/actor.ts';
 import { createBatch, type BatchRecord, type PaidEffects } from '../billing/payments.ts';
 import { applyMove, consumeReservation } from './inventory.ts';
 import { assertSellerCapability, membershipOf } from './sellers.ts';
+import { accrueSale, chargeRefund, holdOnDelivery } from './ledger.ts';
+import { preparationDeadline, returnDeadline, type ReturnRule } from './fulfilment-model.ts';
+import { RETURN_WINDOW_KEY } from './returns.ts';
 import {
   acceptanceDeadline,
   acceptanceOverdue,
@@ -178,10 +181,25 @@ export function orderPaidEffects(): PaidEffects {
           .set({
             status: 'PAID',
             acceptanceDueAt: dueAt,
+            // The shop's own promise about when it will be ready, from the
+            // delivery the buyer chose (PROMPT-011).
+            preparationDueAt:
+              subOrder.preparationDays === null
+                ? null
+                : preparationDeadline(paidAt, subOrder.preparationDays),
             version: subOrder.version + 1,
             updatedAt: paidAt,
           })
           .where(eq(commerceSubOrders.id, subOrder.id));
+
+        // The money enters the shop's ledger as pending: taken, not earned.
+        await accrueSale(tx, {
+          sellerId: subOrder.sellerId,
+          subOrderId: subOrder.id,
+          referenceFa: subOrder.reference,
+          buyerTotalToman: subOrder.buyerTotalToman,
+          commissionToman: subOrder.commissionToman,
+        });
         await tx.insert(subOrderEvents).values({
           subOrderId: subOrder.id,
           fromStatus: 'PENDING_PAYMENT',
@@ -330,7 +348,14 @@ export async function moveSubOrder(
     patch.shippedAt = now;
     patch.trackingCode = (input.trackingCode ?? '').trim();
   }
-  if (input.to === 'DELIVERED') patch.deliveredAt = now;
+  if (input.to === 'DELIVERED') {
+    patch.deliveredAt = now;
+    // How the delivery came to be known is recorded, because "delivered"
+    // means something different when the buyer said it and when the shop did
+    // (PROMPT-011). No carrier is integrated and none is pretended.
+    patch.deliveryConfirmedBy = mover;
+    patch.deliveryEvidenceNoteFa = reason || null;
+  }
 
   const moved = await database.transaction(async (tx) => {
     const [row] = await tx
@@ -347,6 +372,38 @@ export async function moveSubOrder(
       actorAccountId: actor.accountId ?? null,
       reasonFa: reason || null,
     });
+
+    // Delivery starts two clocks: the buyer's right to send it back, and the
+    // hold that keeps this money from settling until that right expires.
+    if (input.to === 'DELIVERED') {
+      const windowDays = await readInt(tx, RETURN_WINDOW_KEY).catch(() => null);
+      const holdDays = await readInt(tx, 'market.settlement.hold_days_after_delivery').catch(() => null);
+      const clearsAt =
+        windowDays === null && holdDays === null
+          ? null
+          : new Date(now.getTime() + Math.max(windowDays ?? 0, holdDays ?? 0) * 86_400_000);
+      if (windowDays !== null) {
+        await tx
+          .update(commerceSubOrders)
+          .set({
+            returnWindowEndsAt: returnDeadline({
+              deliveredAt: now,
+              platformWindowDays: windowDays,
+              rule: 'STANDARD' as ReturnRule,
+              categoryWindowDays: null,
+            }),
+          })
+          .where(eq(commerceSubOrders.id, subOrder.id));
+      }
+      // An unconfigured window is not zero: without one, the money is held
+      // with no date rather than becoming settleable at once.
+      await holdOnDelivery(tx, {
+        sellerId: subOrder.sellerId,
+        subOrderId: subOrder.id,
+        referenceFa: subOrder.reference,
+        clearsAt: clearsAt ?? new Date(now.getTime() + 365 * 86_400_000),
+      });
+    }
 
     // Goods coming back go back on the shelf, through the ledger like
     // everything else, so the count and its reason stay readable.
@@ -427,6 +484,16 @@ async function openSubOrderRefund(tx: DbClient, order: OrderRow, subOrder: SubOr
     paymentBatchId: order.paymentBatchId,
     recipientAccountId: order.buyerAccountId,
     amountToman: subOrder.buyerTotalToman,
+  });
+  // And the shop's own balances are charged for it, so the money going back
+  // is visible where the shop reads its money rather than only where the
+  // operator reads the queue (PROMPT-011).
+  await chargeRefund(tx, {
+    sellerId: subOrder.sellerId,
+    subOrderId: subOrder.id,
+    returnId: null,
+    referenceFa: subOrder.reference,
+    refundToman: subOrder.buyerTotalToman,
   });
 }
 

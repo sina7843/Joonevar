@@ -34,15 +34,44 @@ export function generateMetadata(): Metadata {
  * plain words, and anything that cannot be bought at all keeps the checkout
  * closed until it is taken out.
  */
-export default async function CartPage() {
+/** The method chosen per shop, as the address carries it. */
+function chosenFrom(params: Record<string, string | string[] | undefined>): Record<string, string> {
+  const chosen: Record<string, string> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (!key.startsWith('method-')) continue;
+    const picked = Array.isArray(value) ? value[0] : value;
+    if (picked) chosen[key.slice('method-'.length)] = picked;
+  }
+  return chosen;
+}
+
+export default async function CartPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const guard = await guardRoute('/shop/cart');
   if (!guard.ok) throw guard.denied;
 
-  const [cart, defaults, checkoutOpen] = await Promise.all([
-    viewCart(db(), guard.actor),
-    deliveryDefaults(db(), guard.actor.accountId!),
+  const params = await searchParams;
+  const chosenMethods = chosenFrom(params);
+  const defaults = await deliveryDefaults(db(), guard.actor.accountId!);
+  // Priced for where it is actually going: a province decides which methods
+  // can carry it and what they charge (PROMPT-011).
+  const provinceFa = typeof params.province === 'string' ? params.province : defaults.provinceFa;
+  const [cart, checkoutOpen] = await Promise.all([
+    viewCart(db(), guard.actor, { chosenMethods, provinceFa }),
     flagEnabled(db(), 'market.flag.commerce_checkout_enabled'),
   ]);
+
+  const withMethod = (sellerId: string, methodId: string) => {
+    const next = new URLSearchParams();
+    for (const [key, value] of Object.entries({ ...chosenMethods, [sellerId]: methodId })) {
+      next.set('method-' + key, value);
+    }
+    if (provinceFa) next.set('province', provinceFa);
+    return '/shop/cart?' + next.toString();
+  };
 
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -146,6 +175,40 @@ export default async function CartPage() {
                   ))}
                 </ul>
 
+                <fieldset className="space-y-2xs" data-testid={'cart-methods-' + group.sellerId}>
+                  <legend className="text-label-sm">روش ارسال</legend>
+                  {group.methodOffers.length === 0 ? (
+                    <p className="text-caption text-text-danger" data-testid={'cart-no-method-' + group.sellerId}>
+                      این فروشگاه هنوز هیچ روش ارسالی اعلام نکرده است.
+                    </p>
+                  ) : (
+                    <ul className="space-y-2xs">
+                      {group.methodOffers.map((offer) => (
+                        <li key={offer.methodId} className="text-body-sm">
+                          {offer.problem === null ? (
+                            <Link
+                              href={withMethod(group.sellerId, offer.methodId)}
+                              className={
+                                offer.methodId === group.chosenMethodId ? 'text-text-brand' : 'text-text-secondary'
+                              }
+                              data-testid={'cart-method-' + offer.methodId}
+                            >
+                              {offer.methodId === group.chosenMethodId ? '● ' : '○ '}
+                              {offer.labelFa} —{' '}
+                              {offer.waived ? 'رایگان' : fa(offer.toman!) + ' تومان'} — آماده‌سازی{' '}
+                              {fa(offer.preparationDays)} روز
+                            </Link>
+                          ) : (
+                            <span className="text-caption text-text-secondary" data-testid={'cart-method-blocked-' + offer.methodId}>
+                              {offer.labelFa} — {offer.problemFa}
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </fieldset>
+
                 <dl className="grid gap-2xs text-body-sm" data-testid={'cart-money-' + group.sellerId}>
                   <div className="flex justify-between">
                     <dt>جمع کالاها</dt>
@@ -156,7 +219,7 @@ export default async function CartPage() {
                     <dd data-testid={'cart-shipping-' + group.sellerId}>
                       {group.shippingToman === null
                         ? 'اعلام نشده'
-                        : group.shippingWaived
+                        : group.shippingToman === 0n
                           ? 'رایگان'
                           : fa(group.shippingToman) + ' تومان'}
                     </dd>
@@ -196,8 +259,13 @@ export default async function CartPage() {
             <CheckoutForm
               action={checkoutAction}
               totalToman={cart.grandTotalToman}
-              defaults={defaults}
+              defaults={{ ...defaults, provinceFa: provinceFa ?? defaults.provinceFa }}
               blocked={cart.blocked || !checkoutOpen}
+              chosenMethods={Object.fromEntries(
+                cart.groups
+                  .filter((group) => group.chosenMethodId !== null)
+                  .map((group) => [group.sellerId, group.chosenMethodId!]),
+              )}
             />
           </section>
         </>
