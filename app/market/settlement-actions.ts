@@ -9,7 +9,13 @@ import { currentPaymentGateway, currentPaymentProvider } from '../../src/adapter
 import { executeRefund, recordManualRefund } from '../../src/marketplace/refunds.ts';
 import { addDisputeEvidence, decideDispute } from '../../src/marketplace/disputes.ts';
 import { publishCommissionRule } from '../../src/marketplace/commission-rules.ts';
+import { publishPlan } from '../../src/commerce/plans.ts';
 import { recordHandoverByAdmin, releaseHandoverHold } from '../../src/marketplace/handover.ts';
+import {
+  changeSellerStanding,
+  decideSellerApplication,
+  verifySettlementAccount,
+} from '../../src/commerce/sellers.ts';
 import { REFUND_STATUS_FA } from '../../src/marketplace/cancellation-model.ts';
 
 export interface SettlementState {
@@ -199,6 +205,109 @@ export async function releaseHoldAction(
     });
     revalidatePath('/market/handovers');
     return { ok: true, message: 'توقف تحویل برداشته شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+// ── seller applications (PROMPT-008) ──────────────────────────────────────
+
+export async function decideSellerAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/sellers');
+    if (!guard.ok) throw guard.denied;
+    const to = text(form, 'to');
+    if (to !== 'UNDER_REVIEW' && to !== 'NEEDS_CORRECTION' && to !== 'APPROVED' && to !== 'REJECTED') {
+      throw validation('این تصمیم معتبر نیست.');
+    }
+    await decideSellerApplication(db(), guard.actor, {
+      sellerId: text(form, 'sellerId'),
+      to,
+      reasonFa: text(form, 'reason') || null,
+      expectedVersion: Number(text(form, 'version')),
+    });
+    revalidatePath('/market/sellers');
+    return { ok: true, message: 'تصمیم ثبت شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/** Confirm the settlement account from the proof, with the reviewer's name on it. */
+export async function verifyIbanAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/sellers');
+    if (!guard.ok) throw guard.denied;
+    await verifySettlementAccount(db(), guard.actor, {
+      sellerId: text(form, 'sellerId'),
+      noteFa: text(form, 'note'),
+    });
+    revalidatePath('/market/sellers');
+    return { ok: true, message: 'مالکیت حساب تسویه تأیید و ثبت شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function changeSellerStandingAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/sellers');
+    if (!guard.ok) throw guard.denied;
+    const to = text(form, 'to');
+    if (to !== 'SUSPENDED' && to !== 'ACTIVE' && to !== 'TERMINATED') throw validation('این تغییر مجاز نیست.');
+    await changeSellerStanding(db(), guard.actor, {
+      sellerId: text(form, 'sellerId'),
+      to,
+      reasonFa: text(form, 'reason'),
+      expectedVersion: Number(text(form, 'version')),
+    });
+    revalidatePath('/market/sellers');
+    return { ok: true, message: 'وضعیت فروشگاه تغییر کرد. محصولات، سفارش‌ها و تاریخچه حذف نمی‌شوند.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/**
+ * Publish a seller plan version — PROMPT-008.
+ *
+ * Every figure comes from this form. The price does not: it lives in the
+ * managed settings key the plan names, so publishing a plan never invents a
+ * tariff and an unset one keeps the plan unbuyable.
+ */
+export async function publishPlanAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/plans');
+    if (!guard.ok) throw guard.denied;
+    const limit = text(form, 'productLimit');
+    const promotions = text(form, 'maxActivePromotions');
+    await publishPlan(db(), guard.actor, {
+      code: text(form, 'code'),
+      labelFa: text(form, 'label'),
+      durationDays: Number(text(form, 'durationDays')),
+      productLimit: limit === '' ? null : Number(limit),
+      commissionPercentBp: Number(text(form, 'commissionPercentBp')),
+      capabilities: {
+        canPromote: text(form, 'canPromote') === 'YES',
+        ...(promotions === '' ? {} : { maxActivePromotions: Number(promotions) }),
+      },
+      priceSettingKey: text(form, 'priceSettingKey'),
+      noteFa: text(form, 'note'),
+    });
+    revalidatePath('/market/plans');
+    return { ok: true, message: 'نسخه تازه پلن منتشر شد و نسخه قبلی بایگانی شد.' };
   } catch (error) {
     return failure(error);
   }

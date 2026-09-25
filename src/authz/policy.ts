@@ -149,7 +149,9 @@ export type FilePurposeName =
   | 'ANIMAL_LISTING_IMAGE'
   | 'ANIMAL_LISTING_VIDEO'
   | 'INQUIRY_ATTACHMENT'
-  | 'DISPUTE_EVIDENCE';
+  | 'DISPUTE_EVIDENCE'
+  | 'SELLER_DOCUMENT'
+  | 'SELLER_LOGO';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -201,6 +203,18 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
    * record rather than widened into a purpose (PROMPT-006).
    */
   DISPUTE_EVIDENCE: ['SUPERADMIN'],
+  /*
+   * A seller's business papers. The reviewer of seller applications may read
+   * them, and every such read is audited, because these are a business's
+   * licence, identity and bank documents rather than a picture of a product
+   * (PROMPT-008).
+   */
+  SELLER_DOCUMENT: ['SELLER_REVIEWER', 'SUPERADMIN'],
+  /*
+   * A store's logo, served publicly through /media only while that store is
+   * active — the same rule a content image has (DEC-0160).
+   */
+  SELLER_LOGO: ['SELLER_REVIEWER', 'SUPERADMIN'],
 };
 
 export function canReadFile(

@@ -41,6 +41,7 @@ export const paymentService = pgEnum('payment_service', [
   'ANIMAL_LISTING_PROMOTION',
   // The deposit on one animal deal, which equals the commission (PROMPT-005).
   'ANIMAL_SALE_DEPOSIT',
+  'COMMERCE_SELLER_PLAN',
 ]);
 
 /**

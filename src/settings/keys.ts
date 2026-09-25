@@ -1052,6 +1052,26 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     seedValue: 'HANDOVER-STATEMENT-V1',
   },
   {
+    key: 'market.shop.seller_agreement_version',
+    group: 'COMMERCE',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نسخه قرارداد فروشندگی کالا',
+    noteFa:
+      'شناسه نسخه قراردادی که فروشنده هنگام ثبت‌نام می‌پذیرد و روی همان پرونده منجمد می‌شود. تا ثبت نسخه، ارسال پرونده فروشندگی باز نمی‌شود، چون معلوم نیست فروشنده با چه متنی موافقت کرده است.',
+    seedValue: null,
+  },
+  {
+    key: 'market.shop.licence_required',
+    group: 'COMMERCE',
+    kind: 'BOOL',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'بارگذاری مجوز کسب‌وکار الزامی است',
+    noteFa:
+      'همزیست تعیین نمی‌کند کدام مجوز قانوناً الزامی است. تا وقتی این مقدار ثبت نشده باشد، مجوز درخواست می‌شود ولی اجباری نیست؛ ثبت «بله» آن را برای همه پرونده‌های تازه الزامی می‌کند.',
+    seedValue: null,
+  },
+  {
     key: 'market.shop.commission_percent_bp',
     group: 'COMMERCE',
     kind: 'INT',

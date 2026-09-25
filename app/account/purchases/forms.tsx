@@ -196,7 +196,7 @@ export function MessageForm({ inquiryId }: { inquiryId: string }) {
         name="attachment"
         accept="image/jpeg,image/png,application/pdf"
         maxBytes={10 * 1024 * 1024}
-        data-testid="message-attachment"
+        testId="message-attachment"
       />
       <Button type="submit" disabled={pending} data-testid="message-submit">
         {pending ? 'در حال ارسال…' : 'ارسال پیام'}
@@ -363,7 +363,7 @@ export function DisputeEvidenceForm({ inquiryId, disputeId }: { inquiryId: strin
         name="evidence"
         accept="image/jpeg,image/png,application/pdf"
         maxBytes={10 * 1024 * 1024}
-        data-testid="evidence-file"
+        testId="evidence-file"
       />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="evidence-submit">
         {pending ? 'در حال افزودن…' : 'افزودن مدرک'}

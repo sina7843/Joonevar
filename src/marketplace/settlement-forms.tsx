@@ -15,13 +15,17 @@ import {
   DISPUTE_DECISION_FA,
 } from './cancellation-model.ts';
 import {
+  changeSellerStandingAction,
   decideDisputeAction,
+  decideSellerAction,
   executeRefundAction,
   publishCommissionRuleAction,
+  publishPlanAction,
   recordHandoverAction,
   recordManualRefundAction,
   releaseHoldAction,
   reviewerEvidenceAction,
+  verifyIbanAction,
   type SettlementState,
 } from '../../app/market/settlement-actions.ts';
 
@@ -139,7 +143,7 @@ export function ReviewerNoteForm({ disputeId }: { disputeId: string }) {
         name="evidence"
         accept="image/jpeg,image/png,application/pdf"
         maxBytes={10 * 1024 * 1024}
-        data-testid={'reviewer-note-file-' + disputeId}
+        testId={'reviewer-note-file-' + disputeId}
       />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'reviewer-note-submit-' + disputeId}>
         {pending ? 'در حال ثبت…' : 'ثبت یادداشت'}
@@ -240,5 +244,143 @@ export function HandoverRecoveryForm({
         </form>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * A reviewer's decision on one seller application — PROMPT-008.
+ *
+ * Correcting and rejecting demand a reason, because both are answers the
+ * applicant has to act on. Approving does not open a store: that still needs a
+ * plan period, which needs a verified payment.
+ */
+export function SellerDecisionForm({ sellerId, version }: { sellerId: string; version: number }) {
+  const [state, submit, pending] = useActionState(decideSellerAction, EMPTY);
+  return (
+    <form action={submit} className="mt-md space-y-sm" data-testid={'seller-decision-' + sellerId}>
+      <input type="hidden" name="sellerId" value={sellerId} />
+      <input type="hidden" name="version" value={version} />
+      <Result state={state} testId={'seller-decision-result-' + sellerId} />
+      <SelectField
+        label="تصمیم"
+        name="to"
+        required
+        defaultValue="UNDER_REVIEW"
+        options={[
+          { value: 'UNDER_REVIEW', label: 'شروع بررسی' },
+          { value: 'NEEDS_CORRECTION', label: 'نیازمند اصلاح' },
+          { value: 'APPROVED', label: 'تأیید پرونده' },
+          { value: 'REJECTED', label: 'رد پرونده' },
+        ]}
+        data-testid={'seller-decision-select-' + sellerId}
+      />
+      <TextAreaField label="دلیل" name="reason" rows={2} data-testid={'seller-decision-reason-' + sellerId} />
+      <Button type="submit" disabled={pending} data-testid={'seller-decide-' + sellerId}>
+        {pending ? 'در حال ثبت…' : 'ثبت تصمیم'}
+      </Button>
+    </form>
+  );
+}
+
+export function VerifyIbanForm({ sellerId }: { sellerId: string }) {
+  const [state, submit, pending] = useActionState(verifyIbanAction, EMPTY);
+  return (
+    <form action={submit} className="mt-md space-y-sm" data-testid={'verify-iban-' + sellerId}>
+      <input type="hidden" name="sellerId" value={sellerId} />
+      <Result state={state} testId={'verify-iban-result-' + sellerId} />
+      <TextAreaField
+        label="توضیح بررسی مالکیت حساب"
+        name="note"
+        rows={2}
+        required
+        data-testid={'verify-iban-note-' + sellerId}
+      />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid={'verify-iban-submit-' + sellerId}>
+        {pending ? 'در حال ثبت…' : 'تأیید مالکیت حساب تسویه'}
+      </Button>
+    </form>
+  );
+}
+
+export function SellerStandingForm({ sellerId, version }: { sellerId: string; version: number }) {
+  const [state, submit, pending] = useActionState(changeSellerStandingAction, EMPTY);
+  return (
+    <form action={submit} className="mt-md space-y-sm" data-testid={'seller-standing-' + sellerId}>
+      <input type="hidden" name="sellerId" value={sellerId} />
+      <input type="hidden" name="version" value={version} />
+      <Result state={state} testId={'seller-standing-result-' + sellerId} />
+      <SelectField
+        label="وضعیت تازه"
+        name="to"
+        required
+        defaultValue="SUSPENDED"
+        options={[
+          { value: 'SUSPENDED', label: 'تعلیق فروشگاه' },
+          { value: 'ACTIVE', label: 'بازگرداندن به فعال' },
+          { value: 'TERMINATED', label: 'خاتمه همکاری' },
+        ]}
+        data-testid={'seller-standing-select-' + sellerId}
+      />
+      <TextAreaField label="دلیل" name="reason" rows={2} required data-testid={'seller-standing-reason-' + sellerId} />
+      <p className="text-caption text-text-secondary">
+        هیچ‌کدام از این تغییرها محصول، سفارش، تسویه یا تاریخچه فروشگاه را حذف نمی‌کند.
+      </p>
+      <Button type="submit" tone="secondary" disabled={pending} data-testid={'seller-standing-submit-' + sellerId}>
+        {pending ? 'در حال ثبت…' : 'ثبت تغییر وضعیت'}
+      </Button>
+    </form>
+  );
+}
+
+/** Publish a seller plan version — PROMPT-008. Nothing here has a default. */
+export function SellerPlanForm() {
+  const [state, submit, pending] = useActionState(publishPlanAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-md" data-testid="plan-form">
+      <Result state={state} testId="plan-form-result" />
+      <TextField label="کد پلن" name="code" required ltr data-testid="plan-code" />
+      <TextField label="نام پلن" name="label" required data-testid="plan-label" />
+      <TextField label="مدت دوره (روز)" name="durationDays" required ltr inputMode="numeric" data-testid="plan-duration" />
+      <TextField
+        label="سقف محصول"
+        name="productLimit"
+        ltr
+        inputMode="numeric"
+        hint="خالی یعنی این پلن سقفی از خودش نمی‌گذارد."
+        data-testid="plan-limit"
+      />
+      <TextField
+        label="کارمزد پلن (basis point)"
+        name="commissionPercentBp"
+        required
+        ltr
+        inputMode="numeric"
+        data-testid="plan-commission"
+      />
+      <SelectField
+        label="اجازه تبلیغ"
+        name="canPromote"
+        required
+        defaultValue="NO"
+        options={[
+          { value: 'NO', label: 'بدون تبلیغ' },
+          { value: 'YES', label: 'تبلیغ مجاز است' },
+        ]}
+        data-testid="plan-can-promote"
+      />
+      <TextField label="سقف تبلیغ هم‌زمان" name="maxActivePromotions" ltr inputMode="numeric" data-testid="plan-promotions" />
+      <TextField
+        label="کلید تنظیمات تعرفه"
+        name="priceSettingKey"
+        required
+        ltr
+        hint="تعرفه در همان کلید مدیریت‌شده ثبت می‌شود؛ تا ثبت نشدنش، این پلن خریدنی نیست."
+        data-testid="plan-price-key"
+      />
+      <TextAreaField label="توضیح این نسخه" name="note" rows={2} required data-testid="plan-note" />
+      <Button type="submit" disabled={pending} data-testid="plan-publish">
+        {pending ? 'در حال انتشار…' : 'انتشار نسخه پلن'}
+      </Button>
+    </form>
   );
 }

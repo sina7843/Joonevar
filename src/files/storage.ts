@@ -252,7 +252,16 @@ export async function readPrivateFile(
   return { record, bytes };
 }
 
-const AUDITED_READS: readonly string[] = ['VET_APPLICATION_DOCUMENT', 'VET_PROFESSIONAL_DOCUMENT'];
+/*
+ * Reading one of these is recorded: they are somebody's identity, professional
+ * or business papers, and who opened them before which decision is part of the
+ * decision's trail (DEC-0189, PROMPT-008).
+ */
+const AUDITED_READS: readonly string[] = [
+  'VET_APPLICATION_DOCUMENT',
+  'VET_PROFESSIONAL_DOCUMENT',
+  'SELLER_DOCUMENT',
+];
 
 /**
  * The name a person gave a file, kept only as a label (PHASE-2.5 PROMPT-006).

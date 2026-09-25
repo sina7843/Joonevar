@@ -1,0 +1,126 @@
+{
+  "promptId": "PROMPT-008",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "28846afcb594d136368ae8ab8dacb2215369d7d9",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "Becoming a seller of goods, as a tenant rather than as a role. A store is a row, its people are members of that row, and a role inside one store says nothing anywhere else — there is no global shop-staff role to leak, so isolation is a property of the shape rather than a check somebody has to remember. A store nobody invited you to answers 'not found' rather than 'denied', so one account cannot enumerate other people's shops by reading the difference. Inside a store the powers are split where the damage is: staff run the day, an admin edits and submits the file, and only the owner touches billing and membership, because those are the two ways a store can be taken away from its owner. PRODUCT_DECISIONS §8 says Hamzist itself is an ordinary seller tenant, and the way to make that true rather than stated is to give it no table and no branch of its own: PLATFORM is a kind, its store starts in DRAFT like everybody's, and no code reads that kind to decide what a store may do. The application collects what the prompt lists and deliberately does not decide one thing it could have: which licence a business must legally hold. The fields record what the applicant has, under their own label, and a licence becomes mandatory only where an operator has recorded that it is — an unset requirement is neither yes nor no, and the form says so in as many words. The settlement account is verified by a person reading a proof, with their name and note on the row, because no bank API is connected and claiming otherwise would be inventing a verification; editing the account clears that verification, since the reviewer confirmed the account that was there. One national identifier and one IBAN per live store, enforced by partial unique indexes rather than by a lookup that can race, and the IBAN never reaches the audit trail or a list page whole — only masked. Business documents are private storage whose reads are audited, joining the veterinary professional documents under the same rule, and a replaced document is superseded rather than deleted. The lifecycle runs DRAFT, SUBMITTED, UNDER_REVIEW, NEEDS_CORRECTION, APPROVED, ACTIVE, SUSPENDED, REJECTED, TERMINATED, and ACTIVE belongs to the system alone: the transition table has no reviewer path to it at all. A store trades because a plan period began, and a period begins from a payment this server verified or from a plan whose price an operator recorded as zero — which is a decision, written on the subscription as free_of_charge, rather than a missing tariff. An unset tariff keeps the plan unbuyable and says so. Plans are published versions: publishing archives the previous one in the same transaction, and a subscription freezes the duration, product ceiling, commission and promotion capabilities it bought, so a plan edited next month changes nothing for periods already running. Expiry is decided when the subscription is read, and an expired period grants none of its powers. Suspension and termination stop a store selling and delete nothing: the plan period, the members, the documents and every future order stay exactly where they are.",
+  "changedFiles": [
+    "src/db/migrations/0047_commerce-sellers.sql",
+    "src/db/migrations/meta/0047_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/commerce.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/billing.ts",
+    "src/db/schema/index.ts",
+    "src/commerce/seller-model.ts",
+    "src/commerce/sellers.ts",
+    "src/commerce/plans.ts",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/billing/receipts.ts",
+    "src/files/storage.ts",
+    "src/files/signature.ts",
+    "src/authz/policy.ts",
+    "src/domain/resume-context.ts",
+    "src/settings/keys.ts",
+    "src/marketplace/settlement-forms.tsx",
+    "src/ui/shell.tsx",
+    "app/account/seller/actions.ts",
+    "app/account/seller/forms.tsx",
+    "app/account/seller/page.tsx",
+    "app/account/seller/return/page.tsx",
+    "app/account/purchases/forms.tsx",
+    "app/market/settlement-actions.ts",
+    "app/market/sellers/page.tsx",
+    "app/market/plans/page.tsx",
+    "tests/domain/commerce-seller.test.ts",
+    "tests/db/commerce-seller.test.ts",
+    "tests/browser/commerce-seller.test.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-008.json"
+  ],
+  "migrations": ["src/db/migrations/0047_commerce-sellers.sql"],
+  "decisions": ["DEC-0210"],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/domain/commerce-seller.test.ts — 11 tests: only the two kinds the product decision names can apply, ACTIVE unreachable by a reviewer, the correction round trip, suspension reversible and termination not with every status keeping its records, each role's powers with the owner's set being the whole set, every missing field reported at once, a licence demanded only where recorded as required, two spellings of one IBAN being one account and masked when shown, a plan window with expiry decided at read time, and the figures a plan cannot be published with."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/db/commerce-seller.test.ts — 11 tests: identity, complete form and accepted agreement before submission; duplicate national identifier and duplicate IBAN both refused; editing the account undoing its verification; the whole IBAN absent from the audit trail; a correction round trip keeping the file; a business document private to its store with the reviewer's read recorded and a replacement superseding rather than deleting; a role in one store granting nothing in another and staff being unable to edit even their own; a store trading only after a verified payment with manual activation refused and an unset tariff shutting the path; an expired period granting nothing; suspension keeping the plan, the members and the history; and the platform's own store being one ordinary row."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/commerce-seller.test.ts — 5 tests on the real screens: the application stating what Hamzist does not decide and listing what it still needs, the seller completing the file and accepting the versioned agreement and uploading a document, a reviewer verifying the settlement account from a masked display and approving without the store trading, the store becoming active only after the plan payment was verified at the development gateway, and a stranger seeing no trace of somebody else's store.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-008/seller-application-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-008/seller-review-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-008/seller-active-desktop.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, before the browser suites."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "898 tests, 898 pass, 0 fail, 0 skip, duration 811s, exit 0, on the final tree. 876 before this prompt; the 22 new ones are tests/domain/commerce-seller.test.ts (11) and tests/db/commerce-seller.test.ts (11)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "231 tests, 231 pass, 0 fail, 0 skip, duration 563s, exit 0, against a production server built from this tree. 226 before this prompt; the five new ones are tests/browser/commerce-seller.test.ts."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "A defect this prompt's browser run found was fixed rather than left: the FileField component takes a `testId` prop, and three forms — the deal-thread attachment of PROMPT-005, the dispute evidence of PROMPT-006 and this prompt's seller document — were passing `data-testid`, which the component ignores. The uploads worked; they were simply untargetable from a test, and no earlier browser test had exercised them. All three now pass `testId`.",
+    "No bank verifies a settlement account. `ibanVerifiedAt` records that a reviewer read a proof and said so, and the screens say that is what it means. The IBAN's shape is checked and nothing else.",
+    "Hamzist's own store exists as an ordinary row, and this prompt proves it has no separate table, no lifecycle of its own and no extra capability. It cannot yet prove the absence of a ranking privilege, because ranking arrives with the catalogue in PROMPT-009; what is asserted here is only what exists here.",
+    "The store's logo has a file purpose and a public-serving rule but no upload form yet: the catalogue prompt is where a storefront starts showing one.",
+    "Plan periods are closed by reading them, not by a worker. `expireDuePeriods` exists for tidying, but nothing runs it, and `currentSubscription` already reports an ended period as expired without it.",
+    "Seeding the two launch plans exists as `ensureLaunchPlans`, but nothing calls it at startup: a plan is published through the operational screen, so no tariff or ceiling appears in a fresh installation unless somebody records one."
+  ],
+  "readiness": {
+    "code": "PHASE_3_COMMERCE_SELLERS_BUILT",
+    "catalogue": "NOT_STARTED",
+    "checkout": "NOT_STARTED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "bankVerification": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0047_commerce-sellers.sql",
+    "src/db/schema/commerce.ts",
+    "src/commerce/seller-model.ts",
+    "src/commerce/sellers.ts",
+    "src/commerce/plans.ts",
+    "app/account/seller/page.tsx",
+    "app/market/sellers/page.tsx",
+    "app/market/plans/page.tsx",
+    "tests/domain/commerce-seller.test.ts",
+    "tests/db/commerce-seller.test.ts",
+    "tests/browser/commerce-seller.test.ts",
+    "DECISIONS.md#DEC-0210"
+  ]
+}

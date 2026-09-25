@@ -37,6 +37,7 @@ export const PAYMENT_SERVICE_FA: Record<PaymentService, string> = {
   CLUB_MEMBERSHIP: 'حق عضویت کلاب',
   ANIMAL_LISTING_PROMOTION: 'بسته تبلیغ آگهی حیوان',
   ANIMAL_SALE_DEPOSIT: 'بیعانه خرید حیوان',
+  COMMERCE_SELLER_PLAN: 'پلن فروشندگی کالا',
 };
 
 export const PAYMENT_STATUS_FA: Record<string, string> = {

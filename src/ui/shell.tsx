@@ -335,6 +335,12 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
     items.push({ href: '/market/commission', label: 'قاعده کارمزد', icon: 'listChecks' });
   }
+  if (hasMarketplaceCapability(actor, 'SELLER_APPLICATION_REVIEW')) {
+    items.push({ href: '/market/sellers', label: 'پرونده فروشندگان', icon: 'clipboardText' });
+  }
+  if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
+    items.push({ href: '/market/plans', label: 'پلن فروشندگی', icon: 'listChecks' });
+  }
   return items;
 }
 

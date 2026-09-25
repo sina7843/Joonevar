@@ -129,6 +129,10 @@ export const filePurpose = pgEnum('file_purpose', [
   'INQUIRY_ATTACHMENT',
   /** Evidence attached to a deposit dispute; the two parties and the reviewer only (PROMPT-006). */
   'DISPUTE_EVIDENCE',
+  /** Licence, identity or bank proof of a seller application; the store and its reviewers only (PROMPT-008). */
+  'SELLER_DOCUMENT',
+  /** A store's logo; served publicly only while that store is active (PROMPT-008). */
+  'SELLER_LOGO',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -405,4 +409,55 @@ export const handoverStatus = pgEnum('handover_status', [
 export const ownershipTransferReason = pgEnum('ownership_transfer_reason', [
   'MARKETPLACE_SALE',
   'ADMIN_CORRECTION',
+]);
+
+// ── the merchandise shop's sellers (PROMPT-008) ────────────────────────────
+
+/**
+ * Who may sell goods.
+ *
+ * PRODUCT_DECISIONS §8 names pet shops and verified businesses, and says
+ * Hamzist itself is an ordinary seller tenant in the same model — so the
+ * platform's own store is a kind here rather than a privileged exception
+ * somewhere in the code.
+ */
+export const commerceSellerKind = pgEnum('commerce_seller_kind', [
+  'PET_SHOP',
+  'VERIFIED_BUSINESS',
+  'PLATFORM',
+]);
+
+/** The whole life of a store, from a draft form to a terminated tenant. */
+export const commerceSellerStatus = pgEnum('commerce_seller_status', [
+  'DRAFT',
+  'SUBMITTED',
+  'UNDER_REVIEW',
+  'NEEDS_CORRECTION',
+  'APPROVED',
+  'ACTIVE',
+  'SUSPENDED',
+  'REJECTED',
+  'TERMINATED',
+]);
+
+/** What somebody may do inside one store, and nowhere else. */
+export const commerceSellerRole = pgEnum('commerce_seller_role', ['OWNER', 'ADMIN', 'STAFF']);
+
+export const commerceMemberStatus = pgEnum('commerce_member_status', ['INVITED', 'ACTIVE', 'REMOVED']);
+
+/** What a document attached to a seller application is. */
+export const sellerDocumentKind = pgEnum('seller_document_kind', [
+  'BUSINESS_LICENCE',
+  'REPRESENTATIVE_ID',
+  'BANK_PROOF',
+  'OTHER',
+]);
+
+export const sellerPlanStatus = pgEnum('seller_plan_status', ['DRAFT', 'PUBLISHED', 'ARCHIVED']);
+
+export const sellerSubscriptionStatus = pgEnum('seller_subscription_status', [
+  'PENDING_PAYMENT',
+  'ACTIVE',
+  'EXPIRED',
+  'CANCELLED',
 ]);

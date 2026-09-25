@@ -65,6 +65,10 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   INQUIRY_ATTACHMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
   /** Evidence in a deposit dispute: a photo, a receipt, a veterinary report. */
   DISPUTE_EVIDENCE: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
+  /** A business licence, an identity document or a bank proof (PROMPT-008). */
+  SELLER_DOCUMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
+  /** A store's logo: a picture, never a document. */
+  SELLER_LOGO: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

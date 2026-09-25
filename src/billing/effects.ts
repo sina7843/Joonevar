@@ -22,6 +22,7 @@ import { activateTrustedPeriodFromPayment } from '../vets/trusted-period.ts';
 import { activateClubMembershipFromPayment } from '../clubs/enrollment.ts';
 import { activatePromotionFromPayment } from '../marketplace/promotions.ts';
 import { reserveFromDeposit } from '../marketplace/inquiries.ts';
+import { activatePlanFromPayment } from '../commerce/plans.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -92,6 +93,12 @@ export const paidEffects: PaidEffects = {
       // reservation can never exist without the money that made it (PROMPT-005).
       case 'ANIMAL_SALE_DEPOSIT':
         await reserveFromDeposit(tx, batch);
+        return;
+      // A store starts trading because a plan period began, and a period begins
+      // here, inside the verifying transaction — never because an operator said
+      // the seller had paid (PROMPT-008).
+      case 'COMMERCE_SELLER_PLAN':
+        await activatePlanFromPayment(tx, batch);
         return;
       default:
         return;
