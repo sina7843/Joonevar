@@ -11,7 +11,7 @@ Managed by `node tools/runner.mjs --phase 3 …` (DEC-0203). The package is read
 - [x] PROMPT-007 — 007-animal-handover-ownership-transfer <!-- work-commit:2ef321ba7c9f64517a04906daa845b2c214ad7d3 -->
 - [x] PROMPT-008 — 008-commerce-seller-onboarding-plans <!-- work-commit:b237b5dcd19f5187425a859199aaa2bed5dce209 -->
 - [x] PROMPT-009 — 009-commerce-catalog-offers-sku-inventory <!-- work-commit:ea4df9f01411bdb65bc90d77791274e52dafd4ca -->
-- [ ] PROMPT-010 — 010-commerce-cart-checkout-orders
+- [x] PROMPT-010 — 010-commerce-cart-checkout-orders <!-- work-commit:5039301561e7c43be8f683db2c846c6ae34cfbfc -->
 - [ ] PROMPT-011 — 011-shipping-returns-ledger-settlement
 - [ ] PROMPT-012 — 012-commerce-trust-promotions-growth
 - [ ] PROMPT-013 — 013-operations-notifications-analytics-security
