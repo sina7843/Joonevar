@@ -1,0 +1,122 @@
+{
+  "promptId": "PROMPT-007",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "9c26d5b6b8daaea2bc747e5d9c9adddb6dc650ef",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "The animal changes hands, and the product records that it happened without pretending to have been there. The prompt asks for the transfer to use 'the existing animal ownership/history model'; there was none. An animal had a single mutable owner column and no record of the owners before it, which PROMPT-001's architecture review had already noted. So the history is now rows: animal_ownership_transfer keeps the previous owner, the new owner, the reason, the deal, the meeting and the price it was recorded at, and nothing in it is ever edited or removed. The current-owner column stays as the fast answer and this is the record behind it. One deal transfers one animal once, enforced by a unique index rather than by a check before the write, so two confirmations arriving together leave exactly one transfer. The meeting is arranged only from the methods the seller actually declared on the advert, so a way of handing over that was agreed in chat but never offered is refused when it is chosen rather than at the door. A veterinary place is validated against the directory itself and must be active; the page says in as many words that choosing a clinic as a meeting point is not that clinic examining, certifying or endorsing the animal. The one-time code belongs to the buyer and the seller types it in front of them, mirroring the referral code of §11.2: a code the seller could mint for themselves would prove nothing about the animal being there. Only a salted hash is stored, the plain code is returned once to the buyer's own screen, and a test asserts it never reaches the row, a notification or the audit trail. Attempts are counted, the ceiling locks the code for a managed period that lifts by itself, the lifetime and the ceiling are frozen on the row at issue so a later settings change cannot shorten a code somebody is holding, and the number of codes one meeting may issue is itself bounded. Completion belongs to the buyer alone — the transition table has no seller path to COMPLETED, whatever they entered a moment earlier. At that instant, inside the transaction that writes the transfer, every condition is read again: the verified deposit, the minimum handover age, a registered microchip, the seller still being the owner or the authorised kennel, the animal being alive and transferable, no other completed transfer, and no open dispute. An animal that changed hands between the arrangement and the meeting is not the seller's to give, and the test for that case asserts not only the refusal but that nothing moved. The transfer, the animal's owner, the advert becoming SOLD and the deal becoming COMPLETED are one transaction. Refusing at the door or cancelling the meeting ends the meeting and not the deal: the deposit, the thread and the cancellation rules of PROMPT-006 are untouched and another meeting can be arranged. Opening a dispute holds the handover, and releasing that hold is an administrator's decision rather than a side effect. Administrative recovery exists for the meeting that really happened and could not be completed here — and it skips the one-time code and nothing else: every condition is checked again, a reason is required, and the transfer records which administrator wrote it.",
+  "changedFiles": [
+    "src/db/migrations/0046_animal-handover.sql",
+    "src/db/migrations/meta/0046_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/handover.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/index.ts",
+    "src/marketplace/handover-model.ts",
+    "src/marketplace/handover.ts",
+    "src/marketplace/inquiry-model.ts",
+    "src/marketplace/disputes.ts",
+    "src/marketplace/cancellations.ts",
+    "src/marketplace/settlement-forms.tsx",
+    "src/settings/keys.ts",
+    "src/ui/shell.tsx",
+    "app/account/purchases/actions.ts",
+    "app/account/purchases/forms.tsx",
+    "app/account/purchases/[id]/page.tsx",
+    "app/market/settlement-actions.ts",
+    "app/market/handovers/page.tsx",
+    "app/animals/[id]/page.tsx",
+    "tests/domain/animal-handover.test.ts",
+    "tests/domain/market-inquiry.test.ts",
+    "tests/domain/marketplace-foundations.test.ts",
+    "tests/db/animal-handover.test.ts",
+    "tests/browser/animal-handover.test.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-007.json"
+  ],
+  "migrations": ["src/db/migrations/0046_animal-handover.sql"],
+  "decisions": ["DEC-0209"],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/domain/animal-handover.test.ts — 10 tests: the seller having no path to completion, only the buyer asking for a code, a completed handover being final while a refused one can be rearranged, a hold released by an administrator alone, a code refused before its digits are compared, attempts counted to a lock with the ceiling frozen on the row winning over a later setting, every false condition reported at once, and the statement stating what Hamzist did not witness.",
+      "changed": "tests/domain/market-inquiry.test.ts and tests/domain/marketplace-foundations.test.ts were updated rather than left failing: the first because a reserved deal now has exactly one way forward (CONVERTED → COMPLETED, system only) and the test now pins that; the second because five technical defaults were seeded, and the test now pins the split — the PRODUCT_DECISION figures are still exactly the two written down, the new ones are TECHNICAL_DEFAULT, none of them is money or a rate, and the cancellation policy version that names an external document is still unset."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/db/animal-handover.test.ts — 10 tests, each building a real reserved deal through the desk, the advert, the request and a verified deposit: only offered methods and a validated active clinic, rescheduling editing the same meeting, the code held by the buyer and never written down with guessing bounded to a lock and a superseded code refused, an expired code refused and re-issued, the confirmation moving ownership plus advert plus deal with the previous owner kept as a row, two confirmations leaving one transfer, the underage and owner-changed cases refused with nothing moved, a dispute holding the meeting and the queue only a reviewer can read, administrative recording naming its author, refusal ending the meeting but not the deal, and nothing reachable before the deposit was verified."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/animal-handover.test.ts — 4 tests on the real screens: the buyer arranging the meeting from the single method this advert offers, the code shown once and a wrong entry refused before the right one is accepted, the statement read before it is agreed to and frozen after, the animal appearing under the buyer's own account with its ownership history, and the recovery page stating what an administrative record does not skip.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-007/handover-scheduled-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-007/handover-code-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-007/handover-completed-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-007/ownership-history-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-007/handover-recovery-desktop.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, before the browser suites."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "876 tests, 876 pass, 0 fail, 0 skip, duration 944s, exit 0, on the final tree. An earlier run of the same work reported 874 of 876 with two pre-existing domain tests failing — both because this prompt legitimately changed what they asserted, not because of a defect. They were updated to pin the new, still-honest properties and the whole suite passed on the run recorded here."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "226 tests, 226 pass, 0 fail, 0 skip, duration 592s, exit 0, against a production server built from this tree. 222 before this prompt; the four new ones are tests/browser/animal-handover.test.ts."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Expiring a handover code is decided when somebody tries it, not by a job. An untouched expired code sits as CODE_ISSUED until the seller attempts it or the buyer asks for a new one; the same is already true of listing expiry and accepted-request release, and there is still no scheduler in this repository.",
+    "The handover statement is text generated from the recorded facts and frozen on the row. It is not a signed document, there is no PDF and no signature: DEC-0019 keeps the digital-signature gate out of the product, so what exists is a versioned record both sides confirmed, and the wording says exactly that.",
+    "The code reaches the buyer through the screen that issued it. There is no SMS delivery of a handover code, because the SMS provider is NOT_CONFIGURED and sending one would be a promise the product cannot keep today.",
+    "Administrative recovery can record a handover that happened; it cannot reverse one. Undoing a transfer would be a second transfer with its own reason, and nothing in the source describes who may order that or on what evidence, so it was not invented.",
+    "The four code limits and the statement version are seeded technical defaults, like the one-time login code's limits (DEC-0006). They are changeable operational values, not approved product policy, and the settings page says so.",
+    "A transfer outside a marketplace sale — an inheritance, a gift, a correction after a dispute — has a reason value in the schema but no flow of its own. Only the sale path and the administrative recording exist."
+  ],
+  "readiness": {
+    "code": "PHASE_3_HANDOVER_AND_TRANSFER_BUILT",
+    "ownershipHistory": "RECORDED_AS_ROWS",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "smsDelivery": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0046_animal-handover.sql",
+    "src/db/schema/handover.ts",
+    "src/marketplace/handover-model.ts",
+    "src/marketplace/handover.ts",
+    "src/marketplace/inquiry-model.ts",
+    "app/account/purchases/[id]/page.tsx",
+    "app/market/handovers/page.tsx",
+    "app/animals/[id]/page.tsx",
+    "tests/domain/animal-handover.test.ts",
+    "tests/db/animal-handover.test.ts",
+    "tests/browser/animal-handover.test.ts",
+    "DECISIONS.md#DEC-0209"
+  ]
+}

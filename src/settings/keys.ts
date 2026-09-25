@@ -989,6 +989,68 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     min: 1,
     max: 365,
   },
+  /*
+   * The handover code (PROMPT-007). These four are technical safety limits of
+   * the same kind as the one-time login code's (DEC-0006): the source names no
+   * figure for them, and leaving a core flow shut over a number nobody was ever
+   * going to supply would be worse than a changeable default. They are labelled
+   * as technical defaults, not as approved product policy.
+   */
+  {
+    key: 'market.animal.handover_code_minutes',
+    group: 'ANIMAL_MARKET',
+    kind: 'INT',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'مهلت کد تحویل (دقیقه)',
+    noteFa:
+      'کد تحویل برای همین مدت معتبر است و پس از آن خریدار می‌تواند کد تازه بگیرد. مقدار روی هر تحویل در لحظه صدور منجمد می‌شود؛ تغییر بعدی کدهای صادرشده را کوتاه نمی‌کند.',
+    seedValue: 15,
+    min: 1,
+    max: 240,
+  },
+  {
+    key: 'market.animal.handover_code_max_attempts',
+    group: 'ANIMAL_MARKET',
+    kind: 'INT',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'حداکثر تلاش برای ورود کد تحویل',
+    noteFa: 'پس از این تعداد تلاش ناموفق، ورود کد برای مدت قفل بسته می‌شود.',
+    seedValue: 5,
+    min: 1,
+    max: 20,
+  },
+  {
+    key: 'market.animal.handover_code_lock_minutes',
+    group: 'ANIMAL_MARKET',
+    kind: 'INT',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'مدت قفل پس از تلاش‌های ناموفق کد تحویل (دقیقه)',
+    noteFa: 'قفل خودبه‌خود با گذشت زمان برداشته می‌شود و نیازی به اقدام اپراتور ندارد.',
+    seedValue: 15,
+    min: 1,
+    max: 1440,
+  },
+  {
+    key: 'market.animal.handover_code_max_issues',
+    group: 'ANIMAL_MARKET',
+    kind: 'INT',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'حداکثر صدور کد برای یک تحویل',
+    noteFa: 'سقف تعداد دفعاتی که برای یک معامله کد تحویل تازه صادر می‌شود؛ جلوی صدور بی‌پایان کد را می‌گیرد.',
+    seedValue: 5,
+    min: 1,
+    max: 50,
+  },
+  {
+    key: 'market.animal.handover_statement_version',
+    group: 'ANIMAL_MARKET',
+    kind: 'STRING',
+    source: 'TECHNICAL_DEFAULT',
+    labelFa: 'نسخه متن صورت‌جلسه تحویل',
+    noteFa:
+      'شناسه نسخه متنی که هنگام تحویل به طرفین نشان داده و روی همان تحویل منجمد می‌شود. متن در کد محصول است و این کلید فقط نسخه آن را نام می‌برد.',
+    seedValue: 'HANDOVER-STATEMENT-V1',
+  },
   {
     key: 'market.shop.commission_percent_bp',
     group: 'COMMERCE',

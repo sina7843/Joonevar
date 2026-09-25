@@ -138,13 +138,43 @@ test('no Phase 3 tariff, deadline or policy is invented', () => {
   );
   assert.ok(phase3.length >= 30, 'the foundations should cover the values the phase needs');
 
-  // Exactly two carry a number, and both are written down in PRODUCT_DECISIONS:
-  // the eight-week handover age and the three mandatory photos.
-  const seeded = phase3.filter((d) => d.seedValue !== null).map((d) => d.key).sort();
-  assert.deepEqual(seeded, ['market.animal.min_handover_age_days', 'market.animal.min_listing_photos']);
-  for (const key of seeded) assert.equal(SETTING_BY_KEY.get(key)!.source, 'PRODUCT_DECISION');
+  /*
+   * Exactly two product figures carry a number, and both are written down in
+   * PRODUCT_DECISIONS: the eight-week handover age and the three mandatory
+   * photos. No tariff, deadline or policy of the phase is among them.
+   */
+  const productSeeded = phase3
+    .filter((d) => d.seedValue !== null && d.source === 'PRODUCT_DECISION')
+    .map((d) => d.key)
+    .sort();
+  assert.deepEqual(productSeeded, ['market.animal.min_handover_age_days', 'market.animal.min_listing_photos']);
   assert.equal(SETTING_BY_KEY.get('market.animal.min_handover_age_days')!.seedValue, 56);
   assert.equal(SETTING_BY_KEY.get('market.animal.min_listing_photos')!.seedValue, 3);
+
+  /*
+   * The only other seeded values are the handover code's safety limits and the
+   * version of the statement text that ships in the code (PROMPT-007). They are
+   * technical defaults of the same kind the one-time login code has (DEC-0006):
+   * none of them is money, a deadline somebody owes, or a policy document.
+   */
+  const technicalSeeded = phase3
+    .filter((d) => d.seedValue !== null && d.source === 'TECHNICAL_DEFAULT')
+    .map((d) => d.key)
+    .sort();
+  assert.deepEqual(technicalSeeded, [
+    'market.animal.handover_code_lock_minutes',
+    'market.animal.handover_code_max_attempts',
+    'market.animal.handover_code_max_issues',
+    'market.animal.handover_code_minutes',
+    'market.animal.handover_statement_version',
+  ]);
+  for (const key of technicalSeeded) {
+    assert.ok(!key.includes('_toman'), key + ' must not be money');
+    assert.ok(!key.includes('_bp'), key + ' must not be a rate');
+  }
+  // The policy version a deal is bound to is still unset: that one names an
+  // external document nobody has supplied.
+  assert.equal(SETTING_BY_KEY.get('market.animal.cancellation_policy_version')!.seedValue, null);
 
   // Everything else is operational data with no value, so the flow that needs
   // it stays closed instead of running on a guess.

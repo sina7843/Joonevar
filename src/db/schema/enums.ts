@@ -273,6 +273,8 @@ export const inquiryStatus = pgEnum('inquiry_status', [
   'WITHDRAWN',
   'EXPIRED',
   'CONVERTED',
+  /** The animal actually changed hands and the ownership moved (PROMPT-007). */
+  'COMPLETED',
   'CLOSED',
 ]);
 
@@ -378,3 +380,29 @@ export const disputeDecision = pgEnum('dispute_decision', [
 
 /** Money a seller owes Hamzist. The ledger proper arrives with the shop. */
 export const sellerDebtStatus = pgEnum('seller_debt_status', ['OUTSTANDING', 'SETTLED', 'WAIVED']);
+
+// ── the handover itself (PROMPT-007) ───────────────────────────────────────
+
+/**
+ * Where a deal stands at the moment of handing the animal over.
+ *
+ * `CODE_ISSUED` and `SELLER_ENTERED` are separate because the two sides act at
+ * different moments: the seller enters the buyer's code in front of them, and
+ * only the buyer's own confirmation completes the transfer.
+ */
+export const handoverStatus = pgEnum('handover_status', [
+  'SCHEDULED',
+  'CODE_ISSUED',
+  'SELLER_ENTERED',
+  'COMPLETED',
+  'REFUSED',
+  'EXPIRED',
+  'CANCELLED',
+  'ON_HOLD',
+]);
+
+/** Why an animal changed hands. A sale is one of several possible reasons. */
+export const ownershipTransferReason = pgEnum('ownership_transfer_reason', [
+  'MARKETPLACE_SALE',
+  'ADMIN_CORRECTION',
+]);

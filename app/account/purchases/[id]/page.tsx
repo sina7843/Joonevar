@@ -21,6 +21,8 @@ import { DELIVERY_METHOD_FA, type DeliveryMethod } from '../../../../src/marketp
 import { cancellationOfDeal } from '../../../../src/marketplace/cancellations.ts';
 import { refundOfDeal } from '../../../../src/marketplace/refunds.ts';
 import { disputeOfDeal } from '../../../../src/marketplace/disputes.ts';
+import { handoverLocations, handoverView, offeredDeliveryMethods } from '../../../../src/marketplace/handover.ts';
+import { HANDOVER_STATUS_FA, type HandoverStatus } from '../../../../src/marketplace/handover-model.ts';
 import {
   CANCELLATION_OUTCOME_FA,
   CANCELLATION_REASON_FA,
@@ -35,6 +37,11 @@ import {
 } from '../../../../src/marketplace/cancellation-model.ts';
 import {
   AcceptInquiryForm,
+  ConfirmHandoverForm,
+  EndHandoverForm,
+  EnterHandoverCodeForm,
+  IssueHandoverCodeForm,
+  ScheduleHandoverForm,
   CancelDealForm,
   DisputeEvidenceForm,
   OpenDisputeForm,
@@ -82,11 +89,17 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
 
   const { inquiry, role, liveOffer, liveHandover } = thread;
   // What happened after the deposit, if anything did (PROMPT-006).
-  const [cancellation, refund, dispute] = await Promise.all([
+  const [cancellation, refund, dispute, handover, offeredMethods] = await Promise.all([
     cancellationOfDeal(db(), inquiry.id),
     refundOfDeal(db(), inquiry.id),
     disputeOfDeal(db(), inquiry.id),
+    handoverView(db(), inquiry),
+    offeredDeliveryMethods(db(), inquiry.listingId),
   ]);
+  // Only fetched when a place actually has to be chosen.
+  const vetLocationOptions = offeredMethods.includes('VET_CLINIC') ? await handoverLocations(db()) : [];
+  const statementPreview = handover?.statementPreviewFa ?? '';
+  const handoverStatus = (handover?.handover.status ?? null) as HandoverStatus | null;
   const status = inquiry.status as InquiryStatus;
   const party = role === 'MODERATOR' ? null : (role as OfferParty);
   const priceLocked = inquiry.finalPriceLockedAt !== null;
@@ -191,7 +204,9 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
               <p className="mt-sm text-body-sm" data-testid="deal-state-note">
                 {status === 'CONVERTED'
                   ? 'بیعانه تأیید شده و این حیوان رزرو است؛ تسویه باقی مبلغ بیرون از همزیست انجام می‌شود.'
-                  : 'این درخواست بسته شده است و اقدام تازه‌ای روی آن باقی نمانده.'}
+                  : status === 'COMPLETED'
+                    ? 'تحویل ثبت و مالکیت منتقل شد. صورت‌جلسه در همین صفحه و انتقال در پرونده حیوان باقی می‌ماند.'
+                    : 'این درخواست بسته شده است و اقدام تازه‌ای روی آن باقی نمانده.'}
               </p>
             ) : null}
             <div className="mt-lg space-y-lg">
@@ -283,8 +298,11 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
           ) : null}
         </Card>
 
-        {/* Where and when the animal changes hands. */}
-        {party !== null ? (
+        {/* Where and when the animal changes hands — the chat-level proposal of
+            PROMPT-005, for coordinating before the deposit. Once the deal is
+            reserved the handover panel above owns this, so the two forms never
+            disagree about which arrangement is real. */}
+        {party !== null && inquiry.status !== 'CONVERTED' && inquiry.status !== 'COMPLETED' ? (
           <Card>
             <h2 className="text-label-lg">زمان و محل تحویل</h2>
             {liveHandover ? (
@@ -303,6 +321,87 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
               ) : null}
               {thread.writable || status === 'CONVERTED' ? <HandoverForm inquiryId={inquiry.id} /> : null}
             </div>
+          </Card>
+        ) : null}
+
+        {/* The meeting itself: a method the seller offered, a one-time code the
+            buyer holds, and the buyer's own confirmation (PROMPT-007). */}
+        {party !== null && (inquiry.status === 'CONVERTED' || inquiry.status === 'COMPLETED') ? (
+          <Card>
+            <h2 className="text-label-lg">تحویل حیوان و انتقال مالکیت</h2>
+            {handover === null ? (
+              <>
+                <p className="mt-sm text-caption text-text-secondary">
+                  ابتدا یکی از روش‌های تحویلی که فروشنده در آگهی اعلام کرده انتخاب می‌شود. مالکیت فقط با کد
+                  یک‌بارمصرف خریدار و تأیید خودش منتقل می‌شود.
+                </p>
+                <div className="mt-lg">
+                  <ScheduleHandoverForm
+                    inquiryId={inquiry.id}
+                    methods={offeredMethods}
+                    locations={vetLocationOptions}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="mt-sm text-body-sm" data-testid="handover-state">
+                  {HANDOVER_STATUS_FA[handoverStatus!] ?? handoverStatus}
+                  {handover.handover.scheduledAt ? ' — ' + dateTimeFa(handover.handover.scheduledAt) : ''}
+                  {handover.locationNameFa ? ' — ' + handover.locationNameFa : ''}
+                </p>
+                {handover.handover.endedReasonFa ? (
+                  <p className="mt-2xs text-caption text-text-secondary" data-testid="handover-ended-reason">
+                    {handover.handover.endedReasonFa}
+                  </p>
+                ) : null}
+                {handover.blockers.length > 0 && handoverStatus !== 'COMPLETED' ? (
+                  <ul className="mt-sm space-y-2xs text-caption text-text-secondary" data-testid="handover-blockers">
+                    {handover.blockers.map((blocker) => (
+                      <li key={blocker}>{blocker}</li>
+                    ))}
+                  </ul>
+                ) : null}
+
+                {handoverStatus === 'COMPLETED' ? (
+                  <pre
+                    className="hz-rail mt-lg whitespace-pre-wrap rounded-md border border-border-subtle p-md text-body-sm"
+                    data-testid="handover-statement-final"
+                  >
+                    {handover.handover.statementFa}
+                  </pre>
+                ) : (
+                  <div className="mt-lg space-y-lg">
+                    {role === 'BUYER' && (handoverStatus === 'SCHEDULED' || handoverStatus === 'CODE_ISSUED' || handoverStatus === 'EXPIRED') ? (
+                      <IssueHandoverCodeForm inquiryId={inquiry.id} />
+                    ) : null}
+                    {role === 'SELLER' && handoverStatus === 'CODE_ISSUED' ? (
+                      <EnterHandoverCodeForm inquiryId={inquiry.id} />
+                    ) : null}
+                    {role === 'BUYER' && handoverStatus === 'SELLER_ENTERED' ? (
+                      <ConfirmHandoverForm
+                        inquiryId={inquiry.id}
+                        version={handover.handover.version}
+                        statementFa={statementPreview}
+                      />
+                    ) : null}
+                    {handoverStatus === 'CODE_ISSUED' || handoverStatus === 'SELLER_ENTERED' ? (
+                      <EndHandoverForm inquiryId={inquiry.id} to="REFUSED" label="ثبت اینکه تحویل انجام نشد" />
+                    ) : null}
+                    {handoverStatus === 'SCHEDULED' || handoverStatus === 'CODE_ISSUED' ? (
+                      <EndHandoverForm inquiryId={inquiry.id} to="CANCELLED" label="لغو این قرار تحویل" />
+                    ) : null}
+                    {(handoverStatus === 'REFUSED' || handoverStatus === 'EXPIRED') && party !== null ? (
+                      <ScheduleHandoverForm
+                        inquiryId={inquiry.id}
+                        methods={offeredMethods}
+                        locations={vetLocationOptions}
+                      />
+                    ) : null}
+                  </div>
+                )}
+              </>
+            )}
           </Card>
         ) : null}
 

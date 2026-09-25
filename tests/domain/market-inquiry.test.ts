@@ -39,8 +39,17 @@ test('a reservation is never something a person presses', () => {
   assert.ok(canMoveInquiry('ACCEPTED', 'EXPIRED', 'SYSTEM'));
   assert.ok(!canMoveInquiry('ACCEPTED', 'EXPIRED', 'SELLER'));
 
+  /*
+   * A reserved deal has exactly one way forward, and it is not a button: the
+   * handover of PROMPT-007 writes COMPLETED inside the transaction that moved
+   * the ownership, so the system owns that step the way it owns CONVERTED.
+   */
+  assert.deepEqual(inquiryMovesFrom('CONVERTED', 'SYSTEM'), ['COMPLETED']);
+  assert.deepEqual(inquiryMovesFrom('CONVERTED', 'BUYER'), []);
+  assert.deepEqual(inquiryMovesFrom('CONVERTED', 'SELLER'), []);
+
   // And nothing comes back from a finished request.
-  for (const status of ['CONVERTED', 'EXPIRED', 'DECLINED', 'WITHDRAWN', 'CLOSED'] as const) {
+  for (const status of ['COMPLETED', 'EXPIRED', 'DECLINED', 'WITHDRAWN', 'CLOSED'] as const) {
     assert.deepEqual(inquiryMovesFrom(status, 'SELLER'), []);
     assert.deepEqual(inquiryMovesFrom(status, 'BUYER'), []);
     assert.deepEqual(inquiryMovesFrom(status, 'SYSTEM'), []);

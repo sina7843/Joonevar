@@ -30,6 +30,7 @@ import { assertMarketplaceCapability, hasMarketplaceCapability } from './model.t
 import { threadRole, type InquiryRow } from './inquiries.ts';
 import { openRefund } from './refunds.ts';
 import { releaseListing } from './cancellations.ts';
+import { holdHandoverForDispute } from './handover.ts';
 import {
   decisionRefund,
   DISPUTE_DECISIONS,
@@ -125,6 +126,10 @@ export async function openDispute(
       }
       throw error;
     }
+
+    // A meeting arranged for a deal now under dispute is held, so nobody turns
+    // up to hand over an animal whose case is being decided (PROMPT-007).
+    await holdHandoverForDispute(tx, deal.id);
 
     await recordAudit(tx, actor, {
       action: 'ANIMAL_DEAL_DISPUTE_OPENED',

@@ -16,6 +16,7 @@ export const INQUIRY_STATUSES = [
   'WITHDRAWN',
   'EXPIRED',
   'CONVERTED',
+  'COMPLETED',
   'CLOSED',
 ] as const;
 export type InquiryStatus = (typeof INQUIRY_STATUSES)[number];
@@ -27,6 +28,7 @@ export const INQUIRY_STATUS_FA: Record<InquiryStatus, string> = {
   WITHDRAWN: 'توسط خریدار پس گرفته شد',
   EXPIRED: 'مهلت پرداخت گذشت',
   CONVERTED: 'بیعانه پرداخت شد و رزرو انجام شد',
+  COMPLETED: 'تحویل انجام و مالکیت منتقل شد',
   CLOSED: 'بسته شد',
 };
 
@@ -67,6 +69,12 @@ const MOVES: readonly Move[] = [
   { from: 'OPEN', to: 'WITHDRAWN', by: ['BUYER'] },
   { from: 'OPEN', to: 'CLOSED', by: ['SYSTEM'] },
   { from: 'ACCEPTED', to: 'CONVERTED', by: ['SYSTEM'] },
+  /*
+   * The deal ends where the animal actually changes hands (PROMPT-007). Like
+   * CONVERTED it belongs to the system alone: it is written inside the
+   * transaction that moved the ownership, never by somebody pressing a button.
+   */
+  { from: 'CONVERTED', to: 'COMPLETED', by: ['SYSTEM'] },
   { from: 'ACCEPTED', to: 'EXPIRED', by: ['SYSTEM'] },
   { from: 'ACCEPTED', to: 'WITHDRAWN', by: ['BUYER'] },
   { from: 'ACCEPTED', to: 'DECLINED', by: ['SELLER'] },

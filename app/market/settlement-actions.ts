@@ -9,6 +9,7 @@ import { currentPaymentGateway, currentPaymentProvider } from '../../src/adapter
 import { executeRefund, recordManualRefund } from '../../src/marketplace/refunds.ts';
 import { addDisputeEvidence, decideDispute } from '../../src/marketplace/disputes.ts';
 import { publishCommissionRule } from '../../src/marketplace/commission-rules.ts';
+import { recordHandoverByAdmin, releaseHandoverHold } from '../../src/marketplace/handover.ts';
 import { REFUND_STATUS_FA } from '../../src/marketplace/cancellation-model.ts';
 
 export interface SettlementState {
@@ -153,6 +154,51 @@ export async function publishCommissionRuleAction(
     });
     revalidatePath('/market/commission');
     return { ok: true, message: 'نسخه تازه قاعده کارمزد منتشر شد و نسخه قبلی بایگانی شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+// ── handover recovery (PROMPT-007) ────────────────────────────────────────
+
+/**
+ * Record a handover that really happened but could not be completed in the
+ * product. It skips the one-time code and nothing else: every condition is
+ * checked again, the reason is required, and the transfer names the
+ * administrator who recorded it.
+ */
+export async function recordHandoverAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/handovers');
+    if (!guard.ok) throw guard.denied;
+    await recordHandoverByAdmin(db(), guard.actor, {
+      inquiryId: text(form, 'inquiryId'),
+      reasonFa: text(form, 'reason'),
+      expectedVersion: Number(text(form, 'version')),
+    });
+    revalidatePath('/market/handovers');
+    return { ok: true, message: 'تحویل با ثبت دستی کامل شد و مالکیت منتقل شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+export async function releaseHoldAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/handovers');
+    if (!guard.ok) throw guard.denied;
+    await releaseHandoverHold(db(), guard.actor, {
+      inquiryId: text(form, 'inquiryId'),
+      reasonFa: text(form, 'reason'),
+    });
+    revalidatePath('/market/handovers');
+    return { ok: true, message: 'توقف تحویل برداشته شد.' };
   } catch (error) {
     return failure(error);
   }

@@ -18,7 +18,9 @@ import {
   decideDisputeAction,
   executeRefundAction,
   publishCommissionRuleAction,
+  recordHandoverAction,
   recordManualRefundAction,
+  releaseHoldAction,
   reviewerEvidenceAction,
   type SettlementState,
 } from '../../app/market/settlement-actions.ts';
@@ -180,5 +182,63 @@ export function CommissionRuleForm({ speciesOptions }: { speciesOptions: readonl
         {pending ? 'در حال انتشار…' : 'انتشار نسخه تازه'}
       </Button>
     </form>
+  );
+}
+
+/**
+ * Administrative recovery of one handover — PROMPT-007.
+ *
+ * Two separate actions, because they mean different things: releasing a hold
+ * lets the two people meet again, while recording a handover asserts that the
+ * meeting already happened. The second needs a reason and is written onto the
+ * ownership transfer itself.
+ */
+export function HandoverRecoveryForm({
+  inquiryId,
+  version,
+  canRelease,
+  canRecord,
+}: {
+  inquiryId: string;
+  version: number;
+  canRelease: boolean;
+  canRecord: boolean;
+}) {
+  const [recordState, recordSubmit, recording] = useActionState(recordHandoverAction, EMPTY);
+  const [releaseState, releaseSubmit, releasing] = useActionState(releaseHoldAction, EMPTY);
+  return (
+    <div className="mt-md space-y-lg">
+      {canRelease ? (
+        <form action={releaseSubmit} className="space-y-sm" data-testid={'release-hold-' + inquiryId}>
+          <input type="hidden" name="inquiryId" value={inquiryId} />
+          <Result state={releaseState} testId={'release-hold-result-' + inquiryId} />
+          <TextField label="دلیل رفع توقف" name="reason" required data-testid={'release-reason-' + inquiryId} />
+          <Button type="submit" tone="secondary" disabled={releasing} data-testid={'release-hold-submit-' + inquiryId}>
+            {releasing ? 'در حال ثبت…' : 'رفع توقف تحویل'}
+          </Button>
+        </form>
+      ) : null}
+      {canRecord ? (
+        <form action={recordSubmit} className="space-y-sm" data-testid={'record-handover-' + inquiryId}>
+          <input type="hidden" name="inquiryId" value={inquiryId} />
+          <input type="hidden" name="version" value={version} />
+          <Result state={recordState} testId={'record-handover-result-' + inquiryId} />
+          <TextAreaField
+            label="دلیل ثبت دستی تحویل"
+            name="reason"
+            rows={2}
+            required
+            data-testid={'record-reason-' + inquiryId}
+          />
+          <p className="text-caption text-text-secondary">
+            ثبت دستی فقط کد یک‌بارمصرف را کنار می‌گذارد؛ همه شرط‌های انتقال دوباره بررسی می‌شوند و نام
+            ثبت‌کننده روی انتقال مالکیت می‌ماند.
+          </p>
+          <Button type="submit" disabled={recording} data-testid={'record-handover-submit-' + inquiryId}>
+            {recording ? 'در حال ثبت…' : 'ثبت تحویل و انتقال مالکیت'}
+          </Button>
+        </form>
+      ) : null}
+    </div>
   );
 }

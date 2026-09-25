@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Card } from '../../../src/ui/card.tsx';
@@ -19,7 +19,12 @@ import {
   acceptInquiryAction,
   addDisputeEvidenceAction,
   cancelDealAction,
+  confirmHandoverAction,
+  endHandoverAction,
+  enterHandoverCodeAction,
+  issueHandoverCodeAction,
   openDisputeAction,
+  scheduleHandoverAction,
   withdrawDisputeAction,
   blockThreadAction,
   closeInquiryAction,
@@ -377,6 +382,161 @@ export function WithdrawDisputeForm({ inquiryId, disputeId }: { inquiryId: strin
       <TextField label="دلیل پس‌گرفتن" name="reason" required data-testid="withdraw-reason" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="withdraw-dispute-submit">
         {pending ? 'در حال ثبت…' : 'پس‌گرفتن پرونده'}
+      </Button>
+    </form>
+  );
+}
+
+// ── the handover (PROMPT-007) ─────────────────────────────────────────────
+
+/**
+ * Arrange the meeting.
+ *
+ * The method list is what this seller actually declared on the advert, so a
+ * buyer cannot choose a way of handing over that was never offered.
+ */
+export function ScheduleHandoverForm({
+  inquiryId,
+  methods,
+  locations,
+}: {
+  inquiryId: string;
+  methods: readonly string[];
+  locations: readonly { value: string; label: string }[];
+}) {
+  const [state, submit, pending] = useActionState(scheduleHandoverAction, EMPTY);
+  const [method, setMethod] = useState(methods[0] ?? '');
+  return (
+    <form action={submit} className="space-y-sm" data-testid="schedule-handover-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <Result state={state} />
+      <SelectField
+        label="روش تحویل"
+        name="method"
+        required
+        defaultValue={methods[0]}
+        onChange={(event) => setMethod(event.target.value)}
+        options={methods.map((value) => ({
+          value,
+          label: DELIVERY_METHOD_FA[value as keyof typeof DELIVERY_METHOD_FA] ?? value,
+        }))}
+        data-testid="schedule-method"
+      />
+      {method === 'VET_CLINIC' ? (
+        <>
+          <SelectField
+            label="مرکز دامپزشکی محل تحویل"
+            name="vetLocationId"
+            required
+            options={locations}
+            data-testid="schedule-location"
+          />
+          <p className="text-caption text-text-secondary" data-testid="schedule-location-note">
+            انتخاب یک مرکز فقط محل قرار را مشخص می‌کند. این انتخاب به معنی معاینه، تأیید سلامت یا تأیید
+            حیوان از سوی آن مرکز نیست.
+          </p>
+        </>
+      ) : null}
+      <TextField label="زمان تحویل" name="scheduledAt" type="datetime-local" required ltr data-testid="schedule-at" />
+      <TextField label="نشانی یا توضیح محل" name="place" data-testid="schedule-place" />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid="schedule-handover-submit">
+        {pending ? 'در حال ثبت…' : 'ثبت زمان و محل تحویل'}
+      </Button>
+    </form>
+  );
+}
+
+/** The buyer takes the code, reads it once, and says it at the handover. */
+export function IssueHandoverCodeForm({ inquiryId }: { inquiryId: string }) {
+  const [state, submit, pending] = useActionState(issueHandoverCodeAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-sm" data-testid="issue-code-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      {state.message ? (
+        <div data-testid="issued-code">
+          <Alert tone={state.ok ? 'success' : 'error'} title={state.message} />
+        </div>
+      ) : null}
+      <Button type="submit" disabled={pending} data-testid="issue-code-submit">
+        {pending ? 'در حال صدور…' : 'گرفتن کد تحویل'}
+      </Button>
+      <p className="text-caption text-text-secondary">
+        کد فقط همین یک بار نشان داده می‌شود و در اعلان یا تاریخچه ثبت نمی‌شود. آن را جز هنگام تحویل به
+        کسی نگویید.
+      </p>
+    </form>
+  );
+}
+
+export function EnterHandoverCodeForm({ inquiryId }: { inquiryId: string }) {
+  const [state, submit, pending] = useActionState(enterHandoverCodeAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-sm" data-testid="enter-code-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <Result state={state} />
+      <TextField
+        label="کد تحویل خریدار"
+        name="code"
+        required
+        ltr
+        inputMode="numeric"
+        hint="کد شش‌رقمی را هنگام تحویل از خریدار بپرسید."
+        data-testid="handover-code"
+      />
+      <Button type="submit" disabled={pending} data-testid="enter-code-submit">
+        {pending ? 'در حال بررسی…' : 'ثبت کد تحویل'}
+      </Button>
+    </form>
+  );
+}
+
+/** The buyer's own confirmation: the only thing that moves the ownership. */
+export function ConfirmHandoverForm({
+  inquiryId,
+  version,
+  statementFa,
+}: {
+  inquiryId: string;
+  version: number;
+  statementFa: string;
+}) {
+  const [state, submit, pending] = useActionState(confirmHandoverAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-sm" data-testid="confirm-handover-form">
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <input type="hidden" name="version" value={version} />
+      <Result state={state} />
+      <pre
+        className="hz-rail whitespace-pre-wrap rounded-md border border-border-subtle p-md text-body-sm"
+        data-testid="handover-statement"
+      >
+        {statementFa}
+      </pre>
+      <Button type="submit" disabled={pending} data-testid="confirm-handover-submit">
+        {pending ? 'در حال ثبت…' : 'تأیید تحویل و انتقال مالکیت'}
+      </Button>
+    </form>
+  );
+}
+
+export function EndHandoverForm({
+  inquiryId,
+  to,
+  label,
+}: {
+  inquiryId: string;
+  to: 'REFUSED' | 'CANCELLED';
+  label: string;
+}) {
+  const [state, submit, pending] = useActionState(endHandoverAction, EMPTY);
+  return (
+    <form action={submit} className="space-y-sm" data-testid={'end-handover-' + to.toLowerCase()}>
+      <input type="hidden" name="inquiryId" value={inquiryId} />
+      <input type="hidden" name="to" value={to} />
+      <Result state={state} />
+      <TextField label="دلیل" name="reason" required data-testid={'end-handover-reason-' + to.toLowerCase()} />
+      <Button type="submit" tone="secondary" disabled={pending} data-testid={'end-handover-submit-' + to.toLowerCase()}>
+        {pending ? 'در حال ثبت…' : label}
       </Button>
     </form>
   );

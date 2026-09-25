@@ -17,6 +17,7 @@ import { findForeignCase, FOREIGN_STATUS_FA } from '../../../src/animals/foreign
 import { auditTrail } from '../../../src/audit/service.ts';
 import { permitsOfAnimal, PERMIT_STATUS_FA } from '../../../src/mating/permits.ts';
 import { confirmedDatesOfAnimal } from '../../../src/mating/dates.ts';
+import { ownershipHistory } from '../../../src/marketplace/handover.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { animalChipView } from '../../../src/clinical/microchip.ts';
 import { SAMPLE_TAKEN_NOTE_FA, sheetOfAnimal } from '../../../src/documents/registration-sheet.ts';
@@ -82,6 +83,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   const parentage = await resultOfAnimal(db(), animal.id);
   const permits = await permitsOfAnimal(db(), animal.id);
   const matingDates = await confirmedDatesOfAnimal(db(), animal.id);
+  const ownership = await ownershipHistory(db(), animal.id);
   const sampleRows = await db()
     .select()
     .from(samples)
@@ -464,6 +466,33 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
             <p className="mt-md text-body-sm text-text-disabled">اطلاعاتی برای نمایش وجود ندارد.</p>
           </Card>
         ))}
+
+        {/* Who owned this animal, as rows rather than as one mutable column
+            (PROMPT-007). A previous owner is never removed. */}
+        {ownership.length > 0 ? (
+          <Card>
+            <h3 className="text-label-lg">تاریخچه مالکیت</h3>
+            <p className="mt-2xs text-caption text-text-secondary">
+              هر انتقال مالکیت یک ردیف جداست و حذف نمی‌شود؛ مدارک صادرشده در دوره هر مالک هم در پرونده
+              می‌مانند.
+            </p>
+            <ul className="mt-lg space-y-sm" data-testid="ownership-history">
+              {ownership.map((entry) => (
+                <li key={entry.id} className="flex flex-wrap items-center gap-sm text-body-sm">
+                  <span>{new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium' }).format(entry.transferredAt)}</span>
+                  <span className="text-caption text-text-secondary">
+                    {entry.reason === 'MARKETPLACE_SALE' ? 'فروش در بازار همزیست' : 'اصلاح توسط پشتیبانی'}
+                  </span>
+                  {entry.priceToman !== null ? (
+                    <span className="text-caption text-text-secondary">
+                      قیمت ثبت‌شده: {entry.priceToman.toLocaleString('fa-IR')} تومان
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null}
 
         <section aria-labelledby="timeline-heading" className="space-y-md">
           <h3 id="timeline-heading" className="text-h4">

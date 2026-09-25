@@ -330,6 +330,7 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   }
   if (hasMarketplaceCapability(actor, 'ANIMAL_DISPUTE_DECIDE')) {
     items.push({ href: '/market/disputes', label: 'پرونده‌های اختلاف', icon: 'shieldCheck' });
+    items.push({ href: '/market/handovers', label: 'تحویل‌های متوقف', icon: 'dog' });
   }
   if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
     items.push({ href: '/market/commission', label: 'قاعده کارمزد', icon: 'listChecks' });

@@ -24,6 +24,7 @@ import { resumeContext } from '../domain/resume-context.ts';
 import type { Actor } from '../authz/actor.ts';
 import { threadRole, type InquiryRow } from './inquiries.ts';
 import { openRefund } from './refunds.ts';
+import { holdHandoverForDispute } from './handover.ts';
 import {
   canGiveReason,
   cancellationEffect,
@@ -150,6 +151,9 @@ export async function cancelDeal(
         })
         .returning({ id: dealDisputes.id });
       disputeId = dispute!.id;
+      // The same hold the dispute service applies: a meeting for a deal under
+      // review does not go ahead (PROMPT-007).
+      await holdHandoverForDispute(tx, deal.id);
     }
 
     let refundId: string | null = null;
