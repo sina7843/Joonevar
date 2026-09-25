@@ -8,7 +8,7 @@ Managed by `node tools/runner.mjs --phase 3 …` (DEC-0203). The package is read
 - [x] PROMPT-004 — 004-animal-public-search-moderation-ads <!-- work-commit:356574638f34b6ca17dc5bf1f9bcc1436c0cd15d -->
 - [x] PROMPT-005 — 005-animal-inquiry-negotiation-chat-reservation <!-- work-commit:9ae450d922b92cca354fa1b0f44aee6127630539 -->
 - [x] PROMPT-006 — 006-animal-deposit-cancellation-disputes <!-- work-commit:ef221c50128ef011cfa62a36c51608bf514cbd4c -->
-- [ ] PROMPT-007 — 007-animal-handover-ownership-transfer
+- [x] PROMPT-007 — 007-animal-handover-ownership-transfer <!-- work-commit:2ef321ba7c9f64517a04906daa845b2c214ad7d3 -->
 - [ ] PROMPT-008 — 008-commerce-seller-onboarding-plans
 - [ ] PROMPT-009 — 009-commerce-catalog-offers-sku-inventory
 - [ ] PROMPT-010 — 010-commerce-cart-checkout-orders
