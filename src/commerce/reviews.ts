@@ -25,6 +25,7 @@ import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { assertMarketplaceCapability } from '../marketplace/model.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertSellerCapability, membershipOf } from './sellers.ts';
+import { assertWithinLimit } from '../security/rate-limit.ts';
 import {
   aggregateOf,
   reviewBlockers,
@@ -155,6 +156,8 @@ export async function leaveReview(
   }
   const bodyFa = (input.bodyFa ?? '').trim();
   if (bodyFa.length > 0 && bodyFa.length < 5) throw validation('متن نظر را کامل‌تر بنویسید یا خالی بگذارید.');
+
+  await assertWithinLimit(database, { action: 'REVIEW_SUBMIT', actor });
 
   const eligibility = await reviewEligibility(database, actor, {
     inquiryId: input.inquiryId,

@@ -682,3 +682,20 @@ export const discountStatus = pgEnum('discount_status', ['DRAFT', 'ACTIVE', 'PAU
 
 /** Points are not money: they are earned, spent, expire, and are corrected. */
 export const loyaltyKind = pgEnum('loyalty_kind', ['EARN', 'REDEEM', 'EXPIRE', 'ADJUST']);
+
+/**
+ * What a rate limit is protecting — PROMPT-013.
+ *
+ * Each one is a thing somebody could do too often: asking to buy, asking a
+ * question, reporting, or trying codes until one works. They are named rather
+ * than free text so a limit cannot be silently added for something nobody
+ * reviewed, and so the settings that govern them can be listed.
+ */
+export const rateLimitAction = pgEnum('rate_limit_action', [
+  'LISTING_INQUIRY_CREATE',
+  'QUESTION_ASK',
+  'REPORT_SUBMIT',
+  'DISCOUNT_CODE_TRY',
+  'REVIEW_SUBMIT',
+  'SEARCH_QUERY',
+]);

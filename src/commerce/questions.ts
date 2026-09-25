@@ -18,6 +18,7 @@ import { assertMarketplaceCapability } from '../marketplace/model.ts';
 import { applyContactPolicy } from '../marketplace/inquiry-model.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertSellerCapability } from './sellers.ts';
+import { assertWithinLimit } from '../security/rate-limit.ts';
 
 export type QuestionRow = typeof questions.$inferSelect;
 
@@ -37,6 +38,7 @@ export async function askQuestion(
   const bodyFa = input.bodyFa.trim();
   if (bodyFa.length < 5) throw validation('پرسش را کامل‌تر بنویسید.');
   if (bodyFa.length > 600) throw validation('پرسش طولانی‌تر از حد مجاز است.');
+  await assertWithinLimit(database, { action: 'QUESTION_ASK', actor });
 
   const sellerId = input.sellerId ?? null;
   const productId = input.productId ?? null;

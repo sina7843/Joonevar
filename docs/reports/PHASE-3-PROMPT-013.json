@@ -1,0 +1,147 @@
+{
+  "promptId": "PROMPT-013",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "8ffdb61",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "A rate limit held in memory resets when a process does, which is the same as no limit at all for anybody patient enough to wait for a deploy, so the limiter is a durable counter per subject per action per window and the upsert against its unique index is the counting. Every ceiling is a managed setting and an unconfigured one is not enforced rather than read as zero or as infinity — a limit invented in code is a limit nobody reviewed — and an unconfigured ceiling writes no rows at all, because keeping a log of what people do for a limit that does not exist is keeping it for no reason. A refused attempt still counts, so refusals cannot be used to wait out a window, and a visitor with no account is counted against a salted, non-reversible fingerprint rather than an address, because a table of addresses is a table somebody eventually asks for. Redaction now has one implementation instead of two: the audit service's narrower list was replaced by the shared module, which matches keys by suffix so `settlementIban` and `buyerNationalId` are caught as well as `iban`, and which scans free text for mobile numbers, national ids, IBANs and card numbers in either digit set. In a record both secrets and identifying numbers are replaced entirely — a national id in an audit row is not evidence of anything, since the row already names what it is about — with two deliberate limits the existing suites established rather than I did. Suffix matching applies only to terms that cannot mean anything else, so `code` and `session` match exactly and a province code stays a province code; a rule that ate reference data would make the records useless while protecting nothing. And only strings and numbers are candidates at all, so `showPhone` stays the flag it is. A value the caller already masked is left as it is, because masking is a decision somebody made on purpose and replacing it takes away the only thing that lets an operator recognise the row. Masking itself exists separately for the screens where an operator has to recognise an account they are already entitled to see. Analytics is aggregate and nothing else: a breakdown smaller than the configured cohort keeps its row and loses its number, because the row's absence would be as telling as its value, and a province with one sale in it is not a statistic but a fact about somebody. A share of an empty population is null rather than zero per cent, since zero per cent is a claim about a population that exists. Risk signals are counts that passed a threshold, each carrying the sentence saying what it might mean — and the screen has no submit button at all, because a number that quietly closes an account is a number nobody can argue with. Support shows counts rather than contents and deliberately cannot search by telephone number, since listing accounts by number is exactly the door a leak goes through; a malformed id is refused before it reaches a query and an account nobody has is told to be missing rather than answered with a page of zeros. The notification catalogue now registers every Phase 3 event, including the sixteen that are deliberately in-app only — those kept in their own list rather than as templates carrying no sentence, because a template is the thing that carries a sentence and a rule with exceptions stops catching the template somebody forgets to write — so \"what does Hamzist send by SMS?\" is answered by one short list rather than a search; the twelve that go out are money, a deadline and goods changing hands, and none of their sentences has a slot for record text. No role can declare money moved outside its contract: gateway verification only through `verifyAttempt`, a refund only with a provider response or a manual entry carrying a bank reference, a settlement only with the bank's own reference — each a database check or an exclusive path rather than a rule in code, and the test refuses the finance operator without evidence and three other roles outright. The threat review is written down and says what it does not certify: it is a code and test review, not a penetration test, no automated security tool was run, and there is no malware scanning — a file signature says this really is a JPEG, not that its contents are safe.",
+  "changedFiles": [
+    "src/db/migrations/0052_operations-security.sql",
+    "src/db/migrations/meta/0052_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/security.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/index.ts",
+    "src/security/rate-limit.ts",
+    "src/security/redaction.ts",
+    "src/security/risk.ts",
+    "src/security/retention.ts",
+    "src/analytics/metrics.ts",
+    "src/analytics/service.ts",
+    "src/audit/service.ts",
+    "src/notifications/templates.ts",
+    "src/settings/keys.ts",
+    "src/marketplace/inquiries.ts",
+    "src/marketplace/listing-moderation.ts",
+    "src/commerce/questions.ts",
+    "src/commerce/reviews.ts",
+    "src/commerce/discounts.ts",
+    "src/commerce/ledger.ts",
+    "src/ui/shell.tsx",
+    "app/market/analytics/page.tsx",
+    "app/market/risk/page.tsx",
+    "app/market/support/page.tsx",
+    "docs/security/phase-3-threat-review.md",
+    "tests/domain/operations-security.test.ts",
+    "tests/db/operations-security.test.ts",
+    "tests/browser/market-operations-phase3.test.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-013.json"
+  ],
+  "migrations": [
+    "src/db/migrations/0052_operations-security.sql"
+  ],
+  "decisions": [
+    "DEC-0215"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/domain/operations-security.test.ts — 14 tests: a share of nothing being null rather than zero per cent, an average over no rows, a funnel measured against both the previous step and the top, a small group keeping its row and losing its number, a signal that never fires on nothing and always carries its caveat, a record keeping neither secrets nor identifying numbers with suffix matching proved, numbers typed into free text in both digit sets, masking that keeps enough and no more, a window as a bucket and a fingerprint that differs per action, every limited action naming its managed settings, an unregistered kind staying in the app however it is asked, every SMS sentence being complete and interpolation-free, the Phase 3 kinds all registered with the loud ones being money and deadlines, and SMS staying off entirely while the channel is off."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/db/operations-security.test.ts — 11 tests: an order, its invoice, its sub-order and a shop's queue all answering NOT_FOUND to a stranger, an invoice refused before the payment is verified, the finance operator refused a settlement without the bank's reference and three other roles refused outright, decisions leaving audit rows that carry no full IBAN, an unconfigured ceiling allowing everything and writing nothing, a configured one counting refused attempts and naming a retry time and leaving other people alone, a signed-out visitor limited with no address anywhere in the table, counters forgotten once their windows passed, analytics containing no name, number, address or IBAN and suppressing a group of one and refusing an account without the capability, support masking even the number it shows and refusing both the summary and the risk queue to an ordinary account, and an account export that is refused for somebody else's and audited when support takes it."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/market-operations-phase3.test.ts — 6 tests: the analytics screen carrying every panel the prompt asks for with no bare mobile number anywhere on it, the risk screen stating its numbers are not a verdict and having no submit control in its own content, support refusing a lookup and saying it cannot search by telephone number, all three workbenches sending a signed-out visitor to sign in, an operator without the overview capability seeing no figures, and the queues the earlier prompts built still answering.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-013/analytics-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-013/risk-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-013/support-desktop.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree; Compiled successfully."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "exit 0 — tests 1028, pass 1028, fail 0, skipped 0, duration_ms 1242761.95 on the final tree."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "exit 0 — tests 257, pass 257, fail 0, skipped 0, duration_ms 620258.26 on the final tree, including the six new PROMPT-013 tests and every suite the earlier prompts built."
+    }
+  ],
+  "blockers": [],
+  "defectsFoundByTests": [
+    "Redaction missed mobile numbers written in Persian digits, which is how they are actually typed here: the pattern required an ASCII leading zero or nine. Both the leading zero and the country code now accept either digit set.",
+    "The support lookup passed a malformed id straight to a query, so a typo produced a database error instead of a sentence. The shape is checked first, and an account nobody has is told to be missing rather than answered with a page of zeros that reads like a real and very quiet account.",
+    "Redaction matched `code` and `session` by suffix, so `provinceCode` and every other reference code was replaced with [redacted]. Caught by tests/db/vet-directory.test.ts, which expected a province code to survive. Those two terms now match exactly; only terms that cannot mean anything else are matched by suffix.",
+    "Redaction judged a key without looking at its value, so the boolean `showPhone` was replaced because the key ends in `phone`. Caught by the same suite. Only strings and numbers are candidates now — a flag is not an identifier however it is spelled.",
+    "Replacing identifiers outright destroyed values the caller had already masked, so the audit trail lost the `0912***80` form it is documented to keep. Caught by tests/db/identity.test.ts. An already-masked value is left alone: replacing it protects nothing the mask does not and removes the only thing that lets an operator recognise the row.",
+    "The sixteen deliberate silences were added to the template list with no sentence, which broke the standing invariant that every template carries one. Caught by tests/db/notification-outbox.test.ts. They live in their own registered list instead, so the invariant still catches a template somebody forgets to write while `templatedKinds()` still answers what is registered."
+  ],
+  "incidents": [
+    "While writing the new browser suite I wrote it to tests/browser/operations.test.ts, which already held a 518-line Phase 2 suite, and overwrote it. The Write tool's result said 'updated' rather than 'created', which is how it was caught immediately. The original was restored with `git restore` and verified at 580 lines against HEAD, and the new suite was placed at tests/browser/market-operations-phase3.test.ts. No work was lost, and the full browser run below covers both."
+  ],
+  "limitations": [
+    "There is no malware scanning. A file signature proves the bytes really are a JPEG, not that the contents are safe. Until a real scanner exists the policy is the one written into the threat review: files are never executed or opened server-side, are served only to somebody entitled to them, and this gap is stated rather than implied.",
+    "The threat review is a code and test review, not a penetration test. No automated security tool was run against this repository and no independent assessment was made; every 'mitigated' line is about code that was read and a test that went green, not about an attacker who tried.",
+    "Rate limits live in the application, not at the edge. A flood at the network level is infrastructure's problem and nothing here claims to solve it.",
+    "Limits are per account or per coarse fingerprint, so somebody with several accounts can reach the ceiling from each. Noticing that pattern is the risk screen's job rather than the limiter's, and the risk screen only reports it.",
+    "Risk signals are counts against fixed thresholds — they are not tuned, not weighted, and not learned. They are deliberately unable to act, so a mistaken signal costs an operator a minute rather than costing somebody their account.",
+    "Analytics reads live tables on every request. Nothing is pre-aggregated, so a very large marketplace would need materialised figures; at this size a second copy of a number would be the bigger risk.",
+    "The account export exists and is audited, but has no screen of its own: today it is reachable only through the support path. A person asking for their own data has no button to press.",
+    "Retention sweeps run when something calls them and nothing calls them on a schedule — the same honest limitation the holds, the reservations, the acceptance deadlines and the price alerts carry throughout this phase.",
+    "SMS retry behaviour is the outbox's, built in Phase 2.5: a failed send is retried with backoff and never rolls back the domain fact that caused it. This prompt extended the catalogue it draws on rather than changing that machinery."
+  ],
+  "readiness": {
+    "code": "PHASE_3_OPERATIONS_HARDENED",
+    "workbenches": "BUILT",
+    "analytics": "AGGREGATE_ONLY",
+    "rateLimits": "BUILT_UNCONFIGURED",
+    "malwareScanning": "NOT_IMPLEMENTED",
+    "penetrationTest": "NOT_PERFORMED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0052_operations-security.sql",
+    "src/security/rate-limit.ts",
+    "src/security/redaction.ts",
+    "src/security/risk.ts",
+    "src/security/retention.ts",
+    "src/analytics/metrics.ts",
+    "src/analytics/service.ts",
+    "src/notifications/templates.ts",
+    "app/market/analytics/page.tsx",
+    "app/market/risk/page.tsx",
+    "app/market/support/page.tsx",
+    "docs/security/phase-3-threat-review.md",
+    "tests/domain/operations-security.test.ts",
+    "tests/db/operations-security.test.ts",
+    "tests/browser/market-operations-phase3.test.ts",
+    "DECISIONS.md#DEC-0215"
+  ]
+}

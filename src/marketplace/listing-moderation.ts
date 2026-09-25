@@ -26,6 +26,7 @@ import { moderationAppeals, moderationReports, publisherRestrictions } from '../
 import { animalListingMedia, animalListings } from '../db/schema/marketplace.ts';
 import { inquiryMessages, listingInquiries } from '../db/schema/inquiry.ts';
 import { recordAudit } from '../audit/service.ts';
+import { assertWithinLimit } from '../security/rate-limit.ts';
 import { conflict, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
 import { isModerationDecision, reportInputProblems, reportStatusFor } from '../moderation/model.ts';
@@ -65,6 +66,10 @@ export async function submitMarketReport(
   if (!isMarketReportTarget(target)) throw validation('موضوع گزارش معتبر نیست.');
   const problems = reportInputProblems({ reason: input.reason, details: input.details });
   if (problems.length > 0) throw validation(problems[0]!);
+  // Reporting must never be closed — a ceiling here only stops an automatic
+  // flood, and the number is a managed setting rather than one in code
+  // (PROMPT-013).
+  await assertWithinLimit(database, { action: 'REPORT_SUBMIT', actor });
 
   const listing = await publicListing(database, input.listingId);
   if (listing === null) throw notFound('این آگهی پیدا نشد.');
@@ -643,6 +648,10 @@ export async function reportInquiryMessage(
 ): Promise<{ id: string }> {
   const problems = reportInputProblems({ reason: input.reason, details: input.details });
   if (problems.length > 0) throw validation(problems[0]!);
+  // Reporting must never be closed — a ceiling here only stops an automatic
+  // flood, and the number is a managed setting rather than one in code
+  // (PROMPT-013).
+  await assertWithinLimit(database, { action: 'REPORT_SUBMIT', actor });
 
   const inquiry = await loadInquiryForReport(database, input.inquiryId);
   if (inquiry.buyerAccountId !== actor.accountId && inquiry.sellerAccountId !== actor.accountId) {

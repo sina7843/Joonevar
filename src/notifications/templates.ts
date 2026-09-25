@@ -103,6 +103,103 @@ export const NOTIFICATION_TEMPLATES: readonly NotificationTemplate[] = [
     smsFa: 'همزیست: پرداخت شما ثبت شد ولی شرایط عضویت کلاب برقرار نبود. پیگیری با مدیر کلاب است.',
   },
   { kind: 'CLUB_OWNERSHIP_APPROVED', channels: ['SMS'], smsFa: 'همزیست: مالکیت کلاب به شما واگذار شد.' },
+
+  // ── Phase 3: the marketplace (PROMPT-013) ────────────────────────────────
+  //
+  // Most of what a marketplace says belongs in the app, where the record is.
+  // What leaves it is the short list where somebody loses something by not
+  // knowing in time: a deadline that will pass, money that moved, goods that
+  // changed hands, and a standing that started or stopped.
+  {
+    kind: 'LISTING_INQUIRY_ACCEPTED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: درخواست خرید شما پذیرفته شد و مهلت پرداخت بیعانه آغاز شده است. جزئیات در حساب شماست.',
+  },
+  {
+    kind: 'ANIMAL_LISTING_RESERVED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: بیعانه تأیید شد و حیوان برای شما رزرو شد. ادامه مسیر در حساب شماست.',
+  },
+  {
+    kind: 'ANIMAL_HANDOVER_CODE_ACCEPTED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: کد تحویل ثبت شد. برای تأیید نهایی تحویل وارد حساب خود شوید.',
+  },
+  {
+    kind: 'ANIMAL_OWNERSHIP_TRANSFERRED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: مالکیت حیوان منتقل شد. پرونده در حساب شما در دسترس است.',
+  },
+  {
+    kind: 'ANIMAL_DEAL_CANCELLED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: این معامله لغو شد. وضعیت بیعانه در حساب شما نوشته شده است.',
+  },
+  {
+    kind: 'ANIMAL_DEPOSIT_REFUNDED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: مبلغی به شما بازگردانده شد. جزئیات در حساب شماست.',
+  },
+  {
+    kind: 'ANIMAL_DEAL_DISPUTE_DECIDED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: درباره اختلاف این معامله تصمیم گرفته شد. متن تصمیم در حساب شماست.',
+  },
+  {
+    kind: 'COMMERCE_ORDER_PAID',
+    channels: ['SMS'],
+    smsFa: 'همزیست: پرداخت سفارش شما تأیید شد و برای فروشندگان ارسال شد.',
+  },
+  {
+    kind: 'COMMERCE_SUBORDER_PAID',
+    channels: ['SMS'],
+    smsFa: 'همزیست: سفارش تازه‌ای برای فروشگاه شما ثبت شد و در انتظار پذیرش است.',
+  },
+  {
+    kind: 'COMMERCE_SELLER_ACTIVATED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: فروشگاه شما فعال شد و می‌توانید کالا عرضه کنید.',
+  },
+  {
+    kind: 'COMMERCE_SELLER_STANDING_CHANGED',
+    channels: ['SMS'],
+    smsFa: 'همزیست: وضعیت فروشگاه شما تغییر کرد. دلیل آن در حساب شما نوشته شده است.',
+  },
+  {
+    kind: 'COMMERCE_SETTLEMENT_PAID',
+    channels: ['SMS'],
+    smsFa: 'همزیست: تسویه فروشگاه شما واریز شد. شماره پیگیری در حساب شماست.',
+  },
+];
+
+/**
+ * Registered, and deliberately silent.
+ *
+ * These are kept out of the template list rather than listed there with no
+ * sentence, because a template is the thing that carries a sentence — an
+ * entry with none would make "every template has one" a rule with exceptions,
+ * and a rule with exceptions stops catching the template somebody forgets to
+ * write. Each of these is frequent, or something the person is already
+ * looking at, or both: an SMS for every message in a negotiation is how
+ * people turn notifications off entirely.
+ */
+export const IN_APP_ONLY_KINDS: readonly string[] = [
+  'LISTING_INQUIRY_CREATED',
+  'LISTING_INQUIRY_STATUS_CHANGED',
+  'LISTING_OFFER_PROPOSED',
+  'LISTING_OFFER_ACCEPTED',
+  'INQUIRY_MESSAGE_POSTED',
+  'ANIMAL_DEAL_DISPUTE_OPENED',
+  'COMMERCE_SUBORDER_MOVED',
+  'COMMERCE_RETURN_MOVED',
+  'COMMERCE_SELLER_REVIEWED',
+  'COMMERCE_PRODUCT_REVIEWED',
+  'COMMERCE_SELLER_MEMBER_ADDED',
+  'COMMERCE_LEDGER_ENTRY',
+  'COMMERCE_REVIEW_REPLIED',
+  'COMMERCE_QUESTION_ANSWERED',
+  'COMMERCE_PRICE_DROP',
+  'COMMERCE_LOYALTY_ADJUSTED',
 ];
 
 const BY_KIND: ReadonlyMap<string, NotificationTemplate> = new Map(
@@ -142,5 +239,30 @@ export function renderSms(kind: string): string | null {
   return text === '' ? null : text;
 }
 
-/** Every kind the catalogue speaks for, for the operator's own review. */
-export const templatedKinds = (): readonly string[] => NOTIFICATION_TEMPLATES.map((template) => template.kind);
+/**
+ * Every kind the catalogue speaks for, silent ones included.
+ *
+ * "Is this event registered?" and "does this event send an SMS?" are different
+ * questions, and a kind missing from here is a kind nobody reviewed.
+ */
+export const templatedKinds = (): readonly string[] => [
+  ...NOTIFICATION_TEMPLATES.map((template) => template.kind),
+  ...IN_APP_ONLY_KINDS,
+];
+
+/**
+ * The kinds that may leave the product, and the kinds that may not.
+ *
+ * Listed separately so the review question — "what does Hamzist send by
+ * SMS?" — has an answer that is one short list rather than a search through
+ * a file. A kind listed with no channels is a deliberate silence: somebody
+ * decided it stays in the app, and the decision is written down rather than
+ * implied by absence.
+ */
+export const smsKinds = (): readonly string[] =>
+  NOTIFICATION_TEMPLATES.filter((template) => template.channels.includes('SMS')).map((t) => t.kind);
+
+export const inAppOnlyKinds = (): readonly string[] => [
+  ...NOTIFICATION_TEMPLATES.filter((template) => !template.channels.includes('SMS')).map((t) => t.kind),
+  ...IN_APP_ONLY_KINDS,
+];

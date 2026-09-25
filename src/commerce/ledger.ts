@@ -626,6 +626,27 @@ export async function moveBatch(
         actorAccountId: actor.accountId,
         lines,
       });
+
+      // The shop is told the money left, with the reference it left under
+      // (PROMPT-013). This is one of the few things worth an SMS.
+      const [owner] = await tx
+        .select({ ownerAccountId: commerceSellers.ownerAccountId })
+        .from(commerceSellers)
+        .where(eq(commerceSellers.id, batch.sellerId))
+        .limit(1);
+      if (owner) {
+        await createNotification(tx, {
+          recipientAccountId: owner.ownerAccountId,
+          kind: 'COMMERCE_SETTLEMENT_PAID',
+          titleFa: 'تسویه فروشگاه شما واریز شد',
+          bodyFa: 'دسته ' + batch.reference + ' با شماره پیگیری ' + bankReference + ' واریز شد.',
+          resume: {
+            entity: { type: 'COMMERCE_SELLER', id: batch.sellerId },
+            step: 'SETTLEMENT',
+            originRoute: '/account/seller/finance',
+          },
+        });
+      }
     }
 
     // A transfer that failed never left, so the money goes back to being

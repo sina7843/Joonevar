@@ -357,6 +357,13 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
     items.push({ href: '/market/promotions', label: 'کمپین و تخفیف', icon: 'listChecks' });
   }
+  if (hasMarketplaceCapability(actor, 'MARKET_OVERVIEW_VIEW')) {
+    items.push({ href: '/market/analytics', label: 'گزارش‌ها', icon: 'listChecks' });
+    items.push({ href: '/market/risk', label: 'نشانه‌های پرخطر', icon: 'warning' });
+  }
+  if (hasMarketplaceCapability(actor, 'ORDER_VIEW')) {
+    items.push({ href: '/market/support', label: 'پشتیبانی', icon: 'clipboardText' });
+  }
   return items;
 }
 

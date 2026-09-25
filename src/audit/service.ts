@@ -26,35 +26,18 @@ export interface AuditWrite {
  * Keys that must never reach the audit log or any other log (§23.3, security
  * rules). Redaction happens here so a caller cannot forget it.
  */
-const REDACTED_KEYS = [
-  'otp',
-  'code',
-  'token',
-  'secret',
-  'password',
-  'nationalid',
-  'national_id',
-  'cardnumber',
-  'card_number',
-  'accountnumber',
-  'account_number',
-  'iban',
-  'receipt',
-  'filebytes',
-  'authorization',
-];
+/**
+ * Redaction lives in one place now (PROMPT-013).
+ *
+ * The rule an audit row needs is the same rule every other record needs, and
+ * two implementations of it would eventually disagree. The shared one matches
+ * by suffix rather than exact spelling and scans free text for numbers, so it
+ * is strictly stronger than the list that used to be here; the marker is
+ * unchanged, so rows written before today read the same as rows written after.
+ */
+import { redact } from '../security/redaction.ts';
 
-export function redact(value: unknown, depth = 0): unknown {
-  if (depth > 6 || value === null || value === undefined) return value ?? null;
-  if (Array.isArray(value)) return value.map((v) => redact(v, depth + 1));
-  if (typeof value === 'bigint') return value.toString();
-  if (typeof value !== 'object') return value;
-  const out: Record<string, unknown> = {};
-  for (const [key, raw] of Object.entries(value as Record<string, unknown>)) {
-    out[key] = REDACTED_KEYS.includes(key.toLowerCase()) ? '[redacted]' : redact(raw, depth + 1);
-  }
-  return out;
-}
+export { redact };
 
 export async function recordAudit(tx: DbClient, actor: Actor | null, event: AuditWrite): Promise<void> {
   await tx.insert(auditEvents).values({

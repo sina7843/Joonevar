@@ -20,6 +20,7 @@ import { conflict, notFound, validation } from '../domain/errors.ts';
 import { assertMarketplaceCapability } from '../marketplace/model.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertSellerCapability } from './sellers.ts';
+import { assertWithinLimit } from '../security/rate-limit.ts';
 import {
   applyDiscounts,
   bornByPlatform,
@@ -366,6 +367,12 @@ export async function quoteDiscounts(database: Database, input: QuoteInput): Pro
 
   const typed = (input.code ?? '').trim().toUpperCase();
   if (typed !== '') {
+    // Trying codes until one works is the thing this ceiling exists for, and
+    // a refused try still counts (PROMPT-013).
+    await assertWithinLimit(database, {
+      action: 'DISCOUNT_CODE_TRY',
+      actor: { accountId: input.accountId } as never,
+    });
     const [rule] = await database
       .select()
       .from(discountRules)

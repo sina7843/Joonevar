@@ -44,6 +44,7 @@ import { resumeContext } from '../domain/resume-context.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertMarketplaceCapability, hasMarketplaceCapability } from './model.ts';
 import { assertFlagEnabled } from './flags.ts';
+import { assertWithinLimit } from '../security/rate-limit.ts';
 import { isDeliveryMethod, type DeliveryMethod } from './listing-model.ts';
 import {
   acceptsInquiries,
@@ -259,6 +260,9 @@ export async function createInquiry(
   input: CreateInquiryInput,
 ): Promise<InquiryRow> {
   await assertFlagEnabled(database, 'market.flag.animal_market_enabled');
+  // Asking to buy is cheap to do and expensive to receive, so it is counted
+  // against a managed ceiling (PROMPT-013).
+  await assertWithinLimit(database, { action: 'LISTING_INQUIRY_CREATE', actor });
   await assertKycVerified(database, actor.accountId);
 
   const [listing] = await database
