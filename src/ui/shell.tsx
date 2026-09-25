@@ -341,6 +341,9 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
     items.push({ href: '/market/plans', label: 'پلن فروشندگی', icon: 'listChecks' });
   }
+  if (hasMarketplaceCapability(actor, 'SELLER_APPLICATION_REVIEW')) {
+    items.push({ href: '/market/catalog', label: 'بررسی کاتالوگ', icon: 'clipboardText' });
+  }
   return items;
 }
 

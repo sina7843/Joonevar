@@ -4,6 +4,7 @@ import { env } from '../../../src/config/env.ts';
 import { publicContentImage } from '../../../src/content/service.ts';
 import { publicRecordImage } from '../../../src/media/public-image.ts';
 import { publicListingMedia } from '../../../src/marketplace/listings.ts';
+import { publicProductImage } from '../../../src/commerce/catalog.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     (await publicRecordImage(db(), storage, id)) ??
     // Listing photos and the optional clip, served only while the advert is
     // published or reserved; pausing it takes the pictures down (PROMPT-003).
-    (await publicListingMedia(db(), storage, id));
+    (await publicListingMedia(db(), storage, id)) ??
+    // Product pictures, served only while their product is published (PROMPT-009).
+    (await publicProductImage(db(), storage, id));
   if (image === null) return new NextResponse('Not found', { status: 404 });
 
   /*

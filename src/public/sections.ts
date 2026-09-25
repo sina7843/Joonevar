@@ -40,6 +40,8 @@ export const PUBLIC_SECTIONS: readonly PublicSection[] = [
   // The animal marketplace (Phase 3, PROMPT-004). Live and linked; the page
   // itself says so when the market's kill switch is closed.
   { href: '/animals-market', label: 'بازار فروش حیوان', live: true, nav: true, prompt: 'P3-004' },
+  // The merchandise shop (Phase 3, PROMPT-009).
+  { href: '/shop', label: 'فروشگاه کالا', live: true, nav: true, prompt: 'P3-009' },
   { href: '/services', label: 'خدمات', live: true, nav: true, prompt: '018' },
   { href: '/guides', label: 'راهنمای سامانه', live: true, nav: true, prompt: '014' },
   { href: '/verify', label: 'استعلام اصالت', live: true, nav: true, prompt: '014' },

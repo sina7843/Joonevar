@@ -151,7 +151,8 @@ export type FilePurposeName =
   | 'INQUIRY_ATTACHMENT'
   | 'DISPUTE_EVIDENCE'
   | 'SELLER_DOCUMENT'
-  | 'SELLER_LOGO';
+  | 'SELLER_LOGO'
+  | 'PRODUCT_IMAGE';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -215,6 +216,13 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
    * active — the same rule a content image has (DEC-0160).
    */
   SELLER_LOGO: ['SELLER_REVIEWER', 'SUPERADMIN'],
+  /*
+   * A product picture. The public reads it through /media only while its
+   * product is published, exactly as a content image is (DEC-0160); the private
+   * route grants the catalogue reviewer, who has to look at a picture before
+   * publishing the product it belongs to (PROMPT-009).
+   */
+  PRODUCT_IMAGE: ['SELLER_REVIEWER', 'SUPERADMIN'],
 };
 
 export function canReadFile(

@@ -1,0 +1,131 @@
+{
+  "promptId": "PROMPT-009",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "4784f2d",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "The catalogue, in three layers, because the thing being sold, the terms somebody sells it on and the price of one particular size are three different facts. A product owns the brand, name, barcode, category, animal compatibility, specifications and pictures and is shared between sellers. An offer is one seller's terms: condition, whether they ship, and whether they are selling at all. A SKU is one variant of one offer, and that is where a price and a quantity live, because a 2kg bag and a 10kg bag are not the same thing to sell or to count. Stock is never a number somebody sets. Every change is a row in an append-only ledger with its kind, its signed quantity, its reason and its actor, and the two counters on the SKU are a reading of that ledger kept in step inside the same transaction — a correction is another row, never an edit of what was written before. The rule that mattered most was that two checkouts cannot oversell the last item, and that is not a comparison in code, because two transactions can both pass one: it is a conditional update that only one can win, with a check constraint holding `stock_reserved <= stock_on_hand` behind it. The test for it runs two reservations at the same instant against a single unit and asserts exactly one hold exists afterwards. A hold carries its own expiry and is released when the line is next read, so an abandoned basket stops holding the last bag without anything running on a timer, and the release is itself a movement rather than a deleted row. Medicine is not a category that happens to be switched off. PRODUCT_DECISIONS puts public pharmaceutical sale outside this phase and says enabling it needs a separate legal and product decision, so the prohibition is a value on the taxonomy carrying its own reason: the category is never offered to a seller, never listed publicly, and the refusal quotes that sentence, which the reviewer's screen and the public shop print too. Seller-proposed products are reviewed before anybody sees them, and a duplicate can be folded into a shared base without breaking anything: the duplicate keeps its row and its address, points at the base, and its sellers' offers move across in the same transaction so nobody's stock is stranded on a row that is no longer shown. The barcode index excludes merged and rejected rows, so folding a duplicate frees its barcode instead of making the catalogue permanently unable to record it. A category is a small schema — it declares which attributes are specifications and which are the axes variants vary along — so an unknown specification is refused rather than stored where nothing could compare it, and one combination of attribute values has one canonical spelling, which is what the unique index compares. Bulk price editing is bounded twice: at most a hundred lines, and a change of more than half is refused in one step, because at that size it is far likelier to be a slip than an intention. Every line must belong to the shop making the change, since a bulk tool is exactly where one stray id would otherwise reach into somebody else's prices. The public shop has one visibility rule — published product, sellable category, at least one active offer from a trading store — written as a condition so a caller who forgets it gets no rows rather than too many, and the offer comparison sorts on availability, price and name with no way of knowing which seller is the platform's own.",
+  "changedFiles": [
+    "src/db/migrations/0048_commerce-catalog.sql",
+    "src/db/migrations/meta/0048_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/catalog.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/index.ts",
+    "src/db/seed/index.ts",
+    "src/commerce/catalog-model.ts",
+    "src/commerce/catalog.ts",
+    "src/commerce/inventory.ts",
+    "src/commerce/shop-discovery.ts",
+    "src/authz/policy.ts",
+    "src/authz/routes.ts",
+    "src/files/signature.ts",
+    "src/domain/resume-context.ts",
+    "src/public/sections.ts",
+    "src/marketplace/settlement-forms.tsx",
+    "src/ui/shell.tsx",
+    "app/account/seller/catalog/actions.ts",
+    "app/account/seller/catalog/forms.tsx",
+    "app/account/seller/catalog/page.tsx",
+    "app/market/settlement-actions.ts",
+    "app/market/catalog/page.tsx",
+    "app/(public)/shop/page.tsx",
+    "app/(public)/shop/[slug]/page.tsx",
+    "app/media/[id]/route.ts",
+    "tests/domain/commerce-catalog.test.ts",
+    "tests/db/commerce-catalog.test.ts",
+    "tests/browser/commerce-catalog.test.ts",
+    "tests/ui/seo.test.ts",
+    "tests/browser/public-shell.test.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-009.json"
+  ],
+  "migrations": [
+    "src/db/migrations/0048_commerce-catalog.sql"
+  ],
+  "decisions": [
+    "DEC-0211"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/domain/commerce-catalog.test.ts — 14 tests: review before publication, merging as a one-way reviewer act, an archived offer being history, medicine blocked with a reason rather than a switch, a category deciding what a product may state, one canonical spelling per variant combination, stock arithmetic and the delta of each movement kind, a hold expiring by its moment, SKU and barcode shapes checked no further than their shape, a bulk change bounded in size and reach, and the offer comparison having nothing to favour a seller with.",
+      "changed": "tests/ui/seo.test.ts pins the public sections and their nav order; the shop legitimately joined both lists and the test was updated rather than left failing."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/db/commerce-catalog.test.ts — 9 tests, each on a store taken all the way to trading: a blocked category refusing with its own reason, a product refusing an undefined specification and a duplicate barcode and a duplicate variant combination, review then merge with the old address still resolving and the seller's offers moved across, the ledger holding every movement with its actor and refusing to go below zero, two simultaneous reservations leaving exactly one hold, an expired hold freeing stock with no job having run, a shop's bulk tool unable to reach another shop's prices or move one more than half, a paused offer and an unpublished product being off sale, and a store without a plan period unable to list anything."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/commerce-catalog.test.ts — 4 tests on the real screens: a seller building a product with its variant and picture and sending it for review while medicine is absent from the category list and named as blocked, a reviewer publishing it and the seller then pricing and activating an offer, the public shop showing it with the offers compared and saying plainly that ordering arrives next, and a stock correction moving the displayed count through the ledger.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-009/seller-catalog-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-009/catalog-review-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-009/shop-product-mobile.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree, before the browser suites."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "921 tests, 921 pass, 0 fail, 0 skip, duration 1246s, exit 0, on the final tree. 898 before this prompt; the 23 new ones are tests/domain/commerce-catalog.test.ts (14) and tests/db/commerce-catalog.test.ts (9). An earlier run of the same work reported 920 of 921 with tests/ui/seo.test.ts failing, because adding the shop to the public sections is exactly what that test pins; it was updated to the new list and the suite passed on the run recorded here."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "The full suite ran 235 tests: 234 pass, 1 fail, 0 skip, duration 615s. 231 before this prompt; the 4 new ones are tests/browser/commerce-catalog.test.ts. The one failure was tests/browser/public-shell.test.ts, which pins the exact header links and the index of the current one: adding the shop to the public sections is precisely what that test exists to catch, and the earlier edit had raised its count to 16 without adding '/shop' to the list or moving the aria-current index from 13 to 14. Both were corrected and that suite re-ran alone: 7 tests, 7 pass, 0 fail, exit 0. The correction touched only that test file, so no other suite's outcome depends on it; the 234 recorded above stand as run."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "Nothing can be bought yet. Reservations, the ledger and the oversell guard are built and tested, but the basket, the single payment and the independent sub-orders are PROMPT-010; the public product page says so in its own words rather than showing a button that does nothing.",
+    "`consumeReservation` exists for the order flow to call inside its own transaction and is covered only by the unit reasoning behind it: no order exists yet to call it, so its end-to-end path is proved in the next prompt rather than claimed here.",
+    "Expired holds are released when a line is read, and `releaseExpiredReservations` sweeps the whole shop for an operator. Nothing runs either on a timer, which is the same honest limitation the listing expiry and the deposit deadline carry.",
+    "Promotion of an offer is not built. The plan already carries the capability flags that will govern it, and the promotion records of the animal market are a separate mechanism; the shop's own promotions belong to PROMPT-012.",
+    "The category taxonomy ships six rows, five sellable and one blocked. They are structure rather than commerce — no price, no tariff — and an operator can add more; nothing about which categories a real shop needs was invented beyond what the launch obviously sells.",
+    "Barcode validation is shape only: eight to fourteen digits. Whether a number is actually registered to an article is not something this product can know, and the code does not pretend to check it."
+  ],
+  "readiness": {
+    "code": "PHASE_3_CATALOG_BUILT",
+    "checkout": "NOT_STARTED",
+    "promotions": "NOT_STARTED",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "integrations": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0048_commerce-catalog.sql",
+    "src/db/schema/catalog.ts",
+    "src/commerce/catalog-model.ts",
+    "src/commerce/catalog.ts",
+    "src/commerce/inventory.ts",
+    "src/commerce/shop-discovery.ts",
+    "app/account/seller/catalog/page.tsx",
+    "app/market/catalog/page.tsx",
+    "app/(public)/shop/page.tsx",
+    "tests/domain/commerce-catalog.test.ts",
+    "tests/db/commerce-catalog.test.ts",
+    "tests/browser/commerce-catalog.test.ts",
+    "DECISIONS.md#DEC-0211"
+  ]
+}

@@ -10,6 +10,7 @@ import { executeRefund, recordManualRefund } from '../../src/marketplace/refunds
 import { addDisputeEvidence, decideDispute } from '../../src/marketplace/disputes.ts';
 import { publishCommissionRule } from '../../src/marketplace/commission-rules.ts';
 import { publishPlan } from '../../src/commerce/plans.ts';
+import { decideProduct, mergeProduct } from '../../src/commerce/catalog.ts';
 import { recordHandoverByAdmin, releaseHandoverHold } from '../../src/marketplace/handover.ts';
 import {
   changeSellerStanding,
@@ -308,6 +309,56 @@ export async function publishPlanAction(
     });
     revalidatePath('/market/plans');
     return { ok: true, message: 'نسخه تازه پلن منتشر شد و نسخه قبلی بایگانی شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+// ── the catalogue (PROMPT-009) ────────────────────────────────────────────
+
+export async function decideProductAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/catalog');
+    if (!guard.ok) throw guard.denied;
+    const to = text(form, 'to');
+    if (to !== 'PUBLISHED' && to !== 'REJECTED' && to !== 'DRAFT') throw validation('این تصمیم معتبر نیست.');
+    await decideProduct(db(), guard.actor, {
+      productId: text(form, 'productId'),
+      to,
+      reasonFa: text(form, 'reason') || null,
+      expectedVersion: Number(text(form, 'version')),
+    });
+    revalidatePath('/market/catalog');
+    return { ok: true, message: 'تصمیم ثبت شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/**
+ * Fold a duplicate into a shared base.
+ *
+ * The duplicate keeps its address and its orders; its offers move to the base
+ * so nobody's stock is stranded on a row that is no longer shown.
+ */
+export async function mergeProductAction(
+  _previous: SettlementState,
+  form: FormData,
+): Promise<SettlementState> {
+  try {
+    const guard = await guardRoute('/market/catalog');
+    if (!guard.ok) throw guard.denied;
+    await mergeProduct(db(), guard.actor, {
+      productId: text(form, 'productId'),
+      intoProductId: text(form, 'intoProductId'),
+      reasonFa: text(form, 'reason'),
+      expectedVersion: Number(text(form, 'version')),
+    });
+    revalidatePath('/market/catalog');
+    return { ok: true, message: 'کالا در کالای پایه ادغام شد؛ نشانی قبلی همچنان کار می‌کند.' };
   } catch (error) {
     return failure(error);
   }

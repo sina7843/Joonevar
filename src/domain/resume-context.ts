@@ -46,7 +46,8 @@ export type EntityType =
   | 'LISTING_PROMOTION'
   | 'LISTING_INQUIRY'
   | 'DEAL_DISPUTE'
-  | 'COMMERCE_SELLER';
+  | 'COMMERCE_SELLER'
+  | 'COMMERCE_PRODUCT';
 
 export interface EntityRef {
   readonly type: EntityType;

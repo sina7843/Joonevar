@@ -337,6 +337,13 @@
       "when": 1790303344254,
       "tag": "0047_commerce-sellers",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1790338276184,
+      "tag": "0048_commerce-catalog",
+      "breakpoints": true
     }
   ]
 }

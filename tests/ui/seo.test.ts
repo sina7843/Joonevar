@@ -147,6 +147,8 @@ test('only built sections are linked; each is public and every planned one stays
       'کلاب‌ها',
       // The animal marketplace (Phase 3, PROMPT-004).
       'بازار فروش حیوان',
+      // The merchandise shop (Phase 3, PROMPT-009).
+      'فروشگاه کالا',
       'خدمات',
       'راهنمای سامانه',
       'استعلام اصالت',
@@ -177,6 +179,7 @@ test('only built sections are linked; each is public and every planned one stays
       '/associations',
       '/clubs',
       '/animals-market',
+      '/shop',
       '/services',
       '/guides',
       '/verify',

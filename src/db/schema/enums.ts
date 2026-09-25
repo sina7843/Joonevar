@@ -133,6 +133,8 @@ export const filePurpose = pgEnum('file_purpose', [
   'SELLER_DOCUMENT',
   /** A store's logo; served publicly only while that store is active (PROMPT-008). */
   'SELLER_LOGO',
+  /** A product picture; served publicly only while its product is published (PROMPT-009). */
+  'PRODUCT_IMAGE',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -460,4 +462,59 @@ export const sellerSubscriptionStatus = pgEnum('seller_subscription_status', [
   'ACTIVE',
   'EXPIRED',
   'CANCELLED',
+]);
+
+// ── the catalogue (PROMPT-009) ─────────────────────────────────────────────
+
+/**
+ * Whether a category may be sold in the public shop at all.
+ *
+ * Medicine is not an ordinary category that happens to be switched off:
+ * PRODUCT_DECISIONS says public pharmaceutical sale is outside this phase and
+ * that enabling it later needs a separate legal and product decision. The
+ * prohibition is therefore a value on the taxonomy, with its reason attached,
+ * rather than a flag somebody could flip.
+ */
+export const categorySalePolicy = pgEnum('category_sale_policy', [
+  'ALLOWED',
+  'BLOCKED_PHARMACEUTICAL',
+]);
+
+/** A shared base product, or one a single seller proposed. */
+export const productKind = pgEnum('product_kind', ['SHARED', 'SELLER_EXCLUSIVE']);
+
+export const productStatus = pgEnum('product_status', [
+  'DRAFT',
+  'PENDING_REVIEW',
+  'PUBLISHED',
+  'REJECTED',
+  /** Folded into a shared base; its address still resolves (PROMPT-009). */
+  'MERGED',
+]);
+
+/** What a seller is selling: a new item, a used one, or a refurbished one. */
+export const offerCondition = pgEnum('offer_condition', ['NEW', 'USED', 'REFURBISHED']);
+
+export const offerStatus2 = pgEnum('commerce_offer_status', ['DRAFT', 'ACTIVE', 'PAUSED', 'ARCHIVED']);
+
+/**
+ * Every way stock moves.
+ *
+ * The ledger is append-only, so these are the only verbs that exist and each
+ * row says which one happened, by how much, why and who did it.
+ */
+export const inventoryMoveKind = pgEnum('inventory_move_kind', [
+  'RECEIVE',
+  'ADJUST',
+  'RESERVE',
+  'RELEASE',
+  'SELL',
+  'RETURN',
+]);
+
+export const reservationStatus = pgEnum('reservation_status', [
+  'ACTIVE',
+  'RELEASED',
+  'CONSUMED',
+  'EXPIRED',
 ]);

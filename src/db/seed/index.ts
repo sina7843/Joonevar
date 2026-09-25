@@ -23,6 +23,7 @@ import { slugify } from '../../breeds/model.ts';
 import { seedTaxonomies, type TaxonomySeedResult } from './taxonomy.ts';
 import { ensureMarketSpecies } from '../../marketplace/species.ts';
 import { ensurePromotionPackages } from '../../marketplace/promotions.ts';
+import { ensureCategories } from '../../commerce/catalog.ts';
 
 export interface SeedReport {
   readonly settingsInserted: readonly string[];
@@ -123,6 +124,15 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
   // The two animal-advert promotion packages (PROMPT-004). Each points at its
   // price setting, which starts unset, so a package is never a tariff.
   await ensurePromotionPackages(database);
+
+  /*
+   * The shop's category taxonomy (PROMPT-009). Structure rather than commerce:
+   * it carries no price and no tariff. The medicine row is the one prohibition
+   * of this phase, seeded with its own reason attached, so a seller trying to
+   * list one is refused by a named policy instead of finding the category
+   * quietly absent.
+   */
+  await ensureCategories(database);
 
   // The approved-issuer registry (D14) starts empty on purpose: no issuer name
   // is invented here. An empty registry does not remove the review path, it

@@ -136,6 +136,8 @@ test('the header links only built sections, marks the current one and offers sig
       '/clubs',
       // The animal marketplace (Phase 3, PROMPT-004).
       '/animals-market',
+      // The goods shop (Phase 3, PROMPT-009).
+      '/shop',
       '/services',
       '/guides',
       '/verify',
@@ -143,7 +145,7 @@ test('the header links only built sections, marks the current one and offers sig
       '/contact',
     ]);
     // «درباره همزیست» is the page being read, and it marks itself.
-    assert.equal(await nav.nth(13).getAttribute('aria-current'), 'page');
+    assert.equal(await nav.nth(14).getAttribute('aria-current'), 'page');
     assert.equal(await nav.nth(0).getAttribute('aria-current'), null);
 
     const account = page.getByTestId('site-account-link');
@@ -151,9 +153,10 @@ test('the header links only built sections, marks the current one and offers sig
     assert.equal((await account.textContent())?.trim(), 'ورود / ثبت‌نام');
 
     // Every section a visitor starts from is linked: the nine of §4, the five
-    // Phase 2.5 added (PROMPT-014) and the Phase 3 marketplace (PROMPT-004).
-    // The public pages reached from inside a section stay out of the header.
-    assert.equal(await nav.count(), 15);
+    // Phase 2.5 added (PROMPT-014) and the two Phase 3 markets — the animal
+    // marketplace (PROMPT-004) and the shop (PROMPT-009). The public pages
+    // reached from inside a section stay out of the header.
+    assert.equal(await nav.count(), 16);
 
     // The breadcrumb reads right to left: home sits to the right of the page.
     const crumbs = page.locator('[data-testid="breadcrumbs"] li');

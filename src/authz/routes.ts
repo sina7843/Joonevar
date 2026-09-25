@@ -55,6 +55,9 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // The public animal marketplace (Phase 3, PROMPT-004). Reading an advert
   // needs no account; reporting one does, and that lives under /report.
   { prefix: '/animals-market', access: 'PUBLIC' },
+  // The public shop of goods (Phase 3, PROMPT-009). Reading is public; selling
+  // and buying both happen behind guarded routes.
+  { prefix: '/shop', access: 'PUBLIC' },
   // Service pages (§18): what each Phase 1 service is, with its managed fee.
   { prefix: '/services', access: 'PUBLIC' },
   // Document verification (§17): a code or QR, answered with minimal public data.

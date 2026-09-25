@@ -17,9 +17,11 @@ import {
 import {
   changeSellerStandingAction,
   decideDisputeAction,
+  decideProductAction,
   decideSellerAction,
   executeRefundAction,
   publishCommissionRuleAction,
+  mergeProductAction,
   publishPlanAction,
   recordHandoverAction,
   recordManualRefundAction,
@@ -380,6 +382,64 @@ export function SellerPlanForm() {
       <TextAreaField label="توضیح این نسخه" name="note" rows={2} required data-testid="plan-note" />
       <Button type="submit" disabled={pending} data-testid="plan-publish">
         {pending ? 'در حال انتشار…' : 'انتشار نسخه پلن'}
+      </Button>
+    </form>
+  );
+}
+
+/** Decide one proposed product — PROMPT-009. */
+export function ProductDecisionForm({ productId, version }: { productId: string; version: number }) {
+  const [state, submit, pending] = useActionState(decideProductAction, EMPTY);
+  return (
+    <form action={submit} className="mt-md space-y-sm" data-testid={'product-decision-' + productId}>
+      <input type="hidden" name="productId" value={productId} />
+      <input type="hidden" name="version" value={version} />
+      <Result state={state} testId={'product-decision-result-' + productId} />
+      <SelectField
+        label="تصمیم"
+        name="to"
+        required
+        defaultValue="PUBLISHED"
+        options={[
+          { value: 'PUBLISHED', label: 'انتشار کالا' },
+          { value: 'DRAFT', label: 'بازگرداندن برای اصلاح' },
+          { value: 'REJECTED', label: 'رد کالا' },
+        ]}
+        data-testid={'product-decision-select-' + productId}
+      />
+      <TextAreaField label="دلیل" name="reason" rows={2} data-testid={'product-decision-reason-' + productId} />
+      <Button type="submit" disabled={pending} data-testid={'product-decide-' + productId}>
+        {pending ? 'در حال ثبت…' : 'ثبت تصمیم'}
+      </Button>
+    </form>
+  );
+}
+
+/** Merge a duplicate into a shared base, keeping the old address working. */
+export function ProductMergeForm({
+  productId,
+  version,
+  targets,
+}: {
+  productId: string;
+  version: number;
+  targets: readonly { value: string; label: string }[];
+}) {
+  const [state, submit, pending] = useActionState(mergeProductAction, EMPTY);
+  if (targets.length === 0) return null;
+  return (
+    <form action={submit} className="mt-md space-y-sm" data-testid={'product-merge-' + productId}>
+      <input type="hidden" name="productId" value={productId} />
+      <input type="hidden" name="version" value={version} />
+      <Result state={state} testId={'product-merge-result-' + productId} />
+      <SelectField label="ادغام در کالای پایه" name="intoProductId" required options={targets} data-testid={'merge-target-' + productId} />
+      <TextAreaField label="دلیل ادغام" name="reason" rows={2} required data-testid={'merge-reason-' + productId} />
+      <p className="text-caption text-text-secondary">
+        نشانی کالای ادغام‌شده و سفارش‌های ثبت‌شده روی آن از کار نمی‌افتند؛ عرضه‌های فروشندگان به کالای پایه
+        منتقل می‌شوند.
+      </p>
+      <Button type="submit" tone="secondary" disabled={pending} data-testid={'merge-submit-' + productId}>
+        {pending ? 'در حال ادغام…' : 'ادغام در کالای پایه'}
       </Button>
     </form>
   );
