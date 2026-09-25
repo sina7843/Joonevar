@@ -62,6 +62,9 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // particular person's, and the longer prefix wins over the rule above
   // (PROMPT-010).
   { prefix: '/shop/cart', access: PUBLIC_APP },
+  // Comparing products is reading the catalogue, so it is as public as the
+  // catalogue is (PROMPT-012).
+  { prefix: '/shop/compare', access: 'PUBLIC' },
   // Service pages (§18): what each Phase 1 service is, with its managed fee.
   { prefix: '/services', access: 'PUBLIC' },
   // Document verification (§17): a code or QR, answered with minimal public data.

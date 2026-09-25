@@ -123,6 +123,8 @@ export function CheckoutForm({
   defaults,
   blocked,
   chosenMethods,
+  code,
+  redeemPoints,
 }: {
   action: Action;
   totalToman: bigint;
@@ -130,11 +132,16 @@ export function CheckoutForm({
   blocked: boolean;
   /** The delivery each shop's part was quoted under, carried so the server prices the same basket. */
   chosenMethods: Readonly<Record<string, string>>;
+  /** The code and the points the basket was priced under (PROMPT-012). */
+  code: string;
+  redeemPoints: number;
 }) {
   const [state, submit, pending] = useActionState(action, EMPTY);
   return (
     <form action={submit} className="space-y-md" data-testid="checkout-form">
       <input type="hidden" name="confirmedTotal" value={totalToman.toString()} />
+      <input type="hidden" name="code" value={code} />
+      <input type="hidden" name="redeemPoints" value={String(redeemPoints)} />
       {Object.entries(chosenMethods).map(([sellerId, methodId]) => (
         <input key={sellerId} type="hidden" name={'method-' + sellerId} value={methodId} />
       ))}

@@ -27,3 +27,5 @@ export * from './commerce.ts';
 export * from './catalog.ts';
 export * from './orders.ts';
 export * from './fulfilment.ts';
+export * from './trust.ts';
+export * from './promotions.ts';

@@ -351,6 +351,12 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   if (hasMarketplaceCapability(actor, 'SETTLEMENT_RUN')) {
     items.push({ href: '/market/settlement', label: 'تسویه فروشندگان', icon: 'listChecks' });
   }
+  if (hasMarketplaceCapability(actor, 'ANIMAL_LISTING_MODERATE')) {
+    items.push({ href: '/market/trust', label: 'نظرها و پرسش‌ها', icon: 'warning' });
+  }
+  if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
+    items.push({ href: '/market/promotions', label: 'کمپین و تخفیف', icon: 'listChecks' });
+  }
   return items;
 }
 

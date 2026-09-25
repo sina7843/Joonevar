@@ -13,6 +13,8 @@ import { CHANGE_TITLE_FA } from '../../../../src/commerce/order-model.ts';
 import { CartLineForm, CheckoutForm, RemoveLineForm } from '../../../../src/commerce/order-forms.tsx';
 import { flagEnabled } from '../../../../src/marketplace/flags.ts';
 import { checkoutAction, setCartLineAction } from './actions.ts';
+import { BasketDiscountForm } from '../../../../src/commerce/trust-forms.tsx';
+import { applyBasketDiscountAction } from './actions.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,8 +61,10 @@ export default async function CartPage({
   // Priced for where it is actually going: a province decides which methods
   // can carry it and what they charge (PROMPT-011).
   const provinceFa = typeof params.province === 'string' ? params.province : defaults.provinceFa;
+  const code = typeof params.code === 'string' ? params.code : '';
+  const redeemPoints = typeof params.points === 'string' ? Number(params.points) || 0 : 0;
   const [cart, checkoutOpen] = await Promise.all([
-    viewCart(db(), guard.actor, { chosenMethods, provinceFa }),
+    viewCart(db(), guard.actor, { chosenMethods, provinceFa, code, redeemPoints }),
     flagEnabled(db(), 'market.flag.commerce_checkout_enabled'),
   ]);
 
@@ -245,6 +249,32 @@ export default async function CartPage({
                 <dd>{fa(cart.shippingTotalToman)} تومان</dd>
               </div>
             </dl>
+            <BasketDiscountForm
+              action={applyBasketDiscountAction}
+              code={code}
+              points={cart.loyaltyPoints}
+              availablePoints={cart.loyaltyAvailable}
+              pointValueFa={null}
+            />
+            {cart.discountTotalToman > 0n ? (
+              <p className="text-body-sm" data-testid="cart-discount">
+                تخفیف: {fa(cart.discountTotalToman)} تومان
+              </p>
+            ) : null}
+            {cart.loyaltyToman > 0n ? (
+              <p className="text-body-sm" data-testid="cart-loyalty">
+                امتیاز خرج‌شده: {fa(cart.loyaltyPoints)} امتیاز — {fa(cart.loyaltyToman)} تومان
+              </p>
+            ) : null}
+            {cart.refusedDiscounts.length > 0 ? (
+              <ul className="space-y-2xs text-caption text-text-danger" data-testid="cart-refused-discounts">
+                {cart.refusedDiscounts.map((refusal, index) => (
+                  <li key={index}>
+                    {refusal.labelFa} — {refusal.reasonFa}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             <p className="text-caption text-text-secondary" data-testid="cart-split-note">
               این سبد از {fa(cart.groups.length)} فروشگاه است. پرداخت یک‌بار انجام می‌شود و هر فروشگاه سفارش خودش
               را جداگانه آماده و ارسال می‌کند.
@@ -261,6 +291,8 @@ export default async function CartPage({
               totalToman={cart.grandTotalToman}
               defaults={{ ...defaults, provinceFa: provinceFa ?? defaults.provinceFa }}
               blocked={cart.blocked || !checkoutOpen}
+              code={code}
+              redeemPoints={cart.loyaltyPoints}
               chosenMethods={Object.fromEntries(
                 cart.groups
                   .filter((group) => group.chosenMethodId !== null)

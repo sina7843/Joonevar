@@ -19,12 +19,24 @@ export interface DocumentField {
   readonly value: string;
 }
 
+/**
+ * A table of lines, for a document that itemises rather than merely states —
+ * an invoice, where the fields alone would flatten three purchases into one
+ * paragraph (PROMPT-012).
+ */
+export interface DocumentTable {
+  readonly captionFa: string;
+  readonly headersFa: readonly string[];
+  readonly rows: readonly (readonly string[])[];
+}
+
 export interface DocumentSpec {
   readonly titleFa: string;
   readonly subtitleFa?: string | null;
   readonly identifierLabelFa: string;
   readonly identifier: string;
   readonly fields: readonly DocumentField[];
+  readonly table?: DocumentTable | null;
   readonly footerFa: string;
 }
 
@@ -49,6 +61,19 @@ export function documentHtml(spec: DocumentSpec): string {
     )
     .join('');
 
+  const table =
+    spec.table && spec.table.rows.length > 0
+      ? '<h2 class="caption">' +
+        escapeHtml(spec.table.captionFa) +
+        '</h2><table class="lines"><thead><tr>' +
+        spec.table.headersFa.map((header) => '<th>' + escapeHtml(header) + '</th>').join('') +
+        '</tr></thead><tbody>' +
+        spec.table.rows
+          .map((row) => '<tr>' + row.map((cell) => '<td>' + escapeHtml(cell) + '</td>').join('') + '</tr>')
+          .join('') +
+        '</tbody></table>'
+      : '';
+
   return `<!doctype html>
 <html lang="fa" dir="rtl">
 <head><meta charset="utf-8"><title>${escapeHtml(spec.titleFa)}</title>
@@ -63,6 +88,9 @@ export function documentHtml(spec: DocumentSpec): string {
   table { width: 100%; border-collapse: collapse; }
   th, td { border-bottom: 1px solid #d1d5db; padding: 10px 6px; text-align: right; vertical-align: top; }
   th { width: 34%; color: #4b5563; font-weight: 500; }
+  h2.caption { font-size: 15px; margin: 24px 0 8px; }
+  table.lines th { width: auto; color: #10241f; font-weight: 600; }
+  table.lines td { text-align: right; }
   footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid #d1d5db; color: #6b7280; font-size: 12px; }
 </style></head>
 <body>
@@ -72,6 +100,7 @@ export function documentHtml(spec: DocumentSpec): string {
   </header>
   <p class="identifier">${escapeHtml(spec.identifierLabelFa)}: <code>${escapeHtml(spec.identifier)}</code></p>
   <table>${rows}</table>
+  ${table}
   <footer>${escapeHtml(spec.footerFa)}</footer>
 </body></html>`;
 }

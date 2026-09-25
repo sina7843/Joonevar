@@ -39,6 +39,8 @@ import { createBatch, type BatchRecord, type PaidEffects } from '../billing/paym
 import { applyMove, consumeReservation } from './inventory.ts';
 import { assertSellerCapability, membershipOf } from './sellers.ts';
 import { accrueSale, chargeRefund, holdOnDelivery } from './ledger.ts';
+import { earnFromOrder, reverseForOrder } from './loyalty.ts';
+import { releaseDiscounts } from './discounts.ts';
 import { preparationDeadline, returnDeadline, type ReturnRule } from './fulfilment-model.ts';
 import { RETURN_WINDOW_KEY } from './returns.ts';
 import {
@@ -219,6 +221,16 @@ export function orderPaidEffects(): PaidEffects {
           subOrderId: subOrder.id,
         });
       }
+
+      // Points are earned by a payment the server verified, not by placing an
+      // order; the unique index means a replayed callback earns nothing more
+      // (PROMPT-012).
+      await earnFromOrder(tx, {
+        accountId: order.buyerAccountId,
+        orderId: order.id,
+        paidToman: order.grandTotalToman,
+        referenceFa: order.reference,
+      });
 
       await createNotification(tx, {
         recipientAccountId: order.buyerAccountId,

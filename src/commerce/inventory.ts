@@ -28,6 +28,7 @@ import type { Actor } from '../authz/actor.ts';
 import { assertSellerCapability, loadSeller } from './sellers.ts';
 import { currentSubscription } from './plans.ts';
 import { loadProduct, resolveProduct } from './catalog.ts';
+import { recordPrice } from './alerts.ts';
 import {
   availableStock,
   bulkPriceProblems,
@@ -242,6 +243,10 @@ export async function addSku(
       row = await loadSku(tx, row.id);
     }
 
+    // Every price this line has had is written down, so a later drop is a
+    // fact about a history rather than a sentence in an email (PROMPT-012).
+    await recordPrice(tx, row.id, input.priceToman);
+
     await recordAudit(tx, actor, {
       action: 'COMMERCE_SKU_CREATED',
       targetType: 'COMMERCE_OFFER',
@@ -308,6 +313,7 @@ export async function bulkUpdatePrices(
         .where(eq(offerSkus.id, line.skuId))
         .returning({ id: offerSkus.id });
       changed += updated.length;
+      if (updated.length > 0) await recordPrice(tx, line.skuId, line.priceToman);
     }
     await recordAudit(tx, actor, {
       action: 'COMMERCE_SKU_PRICES_BULK_UPDATED',

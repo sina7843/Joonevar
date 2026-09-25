@@ -43,6 +43,8 @@ import { availableStock } from './catalog-model.ts';
 import { releaseExpiredFor, releaseReservation, reserveStockIn } from './inventory.ts';
 import { tradingTerms } from './plans.ts';
 import { chooseMethod, methodOffersFor, type MethodOffer } from './shipping.ts';
+import { quoteDiscounts, redeemDiscounts, releaseDiscounts, type DiscountQuote } from './discounts.ts';
+import { quoteRedemption, redeemForOrder, reverseForOrder } from './loyalty.ts';
 import { livePolicy, ruleForCategory } from './returns.ts';
 import { preparationDeadline } from './fulfilment-model.ts';
 import {
@@ -100,6 +102,9 @@ export interface CartGroup {
   readonly chosenMethodId: string | null;
   readonly chosenMethodLabelFa: string | null;
   readonly preparationDays: number | null;
+  /** What came off this shop's lines, and under which rules (PROMPT-012). */
+  readonly discountToman: bigint;
+  readonly discounts: DiscountQuote;
   readonly buyerTotalToman: bigint;
   readonly sellerTrading: boolean;
 }
@@ -113,6 +118,13 @@ export interface CartView {
   readonly changes: readonly BasketChange[];
   readonly blocked: boolean;
   readonly empty: boolean;
+  /** Every discount that applied, across every shop in the basket. */
+  readonly discountTotalToman: bigint;
+  readonly refusedDiscounts: readonly { labelFa: string; reasonFa: string }[];
+  /** Points spent, and what they were worth. Never more than the basket. */
+  readonly loyaltyPoints: number;
+  readonly loyaltyToman: bigint;
+  readonly loyaltyAvailable: number;
 }
 
 /** Find this person's open basket, or make one. */
@@ -205,6 +217,10 @@ export interface CartOptions {
   readonly chosenMethods?: Readonly<Record<string, string>>;
   /** Where the parcel is going, which decides what each method may carry. */
   readonly provinceFa?: string | null;
+  /** A discount code the buyer typed (PROMPT-012). */
+  readonly code?: string | null;
+  /** How many loyalty points they want to spend. */
+  readonly redeemPoints?: number;
 }
 
 export async function viewCart(
@@ -275,6 +291,7 @@ export async function viewCart(
   const trading = await tradingSellers(database, rows.map((row) => row.sellerId));
 
   const changes: BasketChange[] = [];
+  const refusedDiscounts: { labelFa: string; reasonFa: string }[] = [];
   const bySeller = new Map<string, { rows: typeof rows; lines: CartLine[] }>();
 
   for (const row of rows) {
@@ -370,7 +387,20 @@ export async function viewCart(
       });
     }
 
-    const shippingToman = failed ? null : picked.offer.toman;
+    // What comes off this shop's lines: its own reductions and codes, plus any
+    // platform campaign that reaches them. Free delivery from a rule beats the
+    // method's own charge (PROMPT-012).
+    const discounts = await quoteDiscounts(database, {
+      accountId: actor.accountId,
+      sellerId,
+      itemsTotalToman,
+      productIds: bucket.lines.map((line) => line.productId),
+      code: options.code ?? null,
+    });
+    for (const entry of discounts.refused) refusedDiscounts.push(entry);
+
+    const quoted = failed ? null : picked.offer.toman;
+    const shippingToman = quoted === null ? null : discounts.freeShipping ? 0n : quoted;
     groups.push({
       sellerId,
       sellerNameFa: facts.sellerNameFa ?? 'فروشگاه',
@@ -382,19 +412,36 @@ export async function viewCart(
       chosenMethodId: failed ? null : picked.offer.methodId,
       chosenMethodLabelFa: failed ? null : picked.offer.labelFa,
       preparationDays: failed ? null : picked.offer.preparationDays,
-      buyerTotalToman: itemsTotalToman + (shippingToman ?? 0n),
+      discountToman: discounts.totalToman,
+      discounts,
+      buyerTotalToman: itemsTotalToman - discounts.totalToman + (shippingToman ?? 0n),
       sellerTrading: trading.has(sellerId),
     });
   }
 
   const itemsTotalToman = groups.reduce((sum, group) => sum + group.itemsTotalToman, 0n);
   const shippingTotalToman = groups.reduce((sum, group) => sum + (group.shippingToman ?? 0n), 0n);
+  const discountTotalToman = groups.reduce((sum, group) => sum + group.discountToman, 0n);
+
+  // Points come off what is left, never more than it: points do not become
+  // change, and an unconfigured point value spends nothing at all.
+  const beforePoints = groups.reduce((sum, group) => sum + group.buyerTotalToman, 0n);
+  const loyalty = await quoteRedemption(database, {
+    accountId: actor.accountId,
+    wantedPoints: options.redeemPoints ?? 0,
+    basketToman: beforePoints,
+  });
   return {
     cartId: cart.id,
     groups,
     itemsTotalToman,
     shippingTotalToman,
-    grandTotalToman: itemsTotalToman + shippingTotalToman,
+    discountTotalToman,
+    refusedDiscounts,
+    loyaltyPoints: loyalty.pointsToSpend,
+    loyaltyToman: loyalty.toman,
+    loyaltyAvailable: loyalty.availablePoints,
+    grandTotalToman: beforePoints - loyalty.toman,
     changes,
     blocked: checkoutBlocked(changes),
     empty: false,
@@ -418,6 +465,11 @@ const emptyCart = (cartId: string | null): CartView => ({
   groups: [],
   itemsTotalToman: 0n,
   shippingTotalToman: 0n,
+  discountTotalToman: 0n,
+  refusedDiscounts: [],
+  loyaltyPoints: 0,
+  loyaltyToman: 0n,
+  loyaltyAvailable: 0,
   grandTotalToman: 0n,
   changes: [],
   blocked: false,
@@ -538,6 +590,9 @@ export async function placeOrder(
     confirmedTotalToman: bigint | null;
     /** The delivery each shop's part was quoted under, as the buyer chose it. */
     chosenMethods?: Readonly<Record<string, string>>;
+    /** The discount code the basket was priced under (PROMPT-012). */
+    code?: string | null;
+    readonly redeemPoints?: number;
   },
 ): Promise<PlacedOrder> {
   if (!actor.accountId) throw forbidden('برای ثبت سفارش باید وارد حساب شوید.');
@@ -549,6 +604,8 @@ export async function placeOrder(
   const view = await viewCart(database, actor, {
     chosenMethods: input.chosenMethods,
     provinceFa: delivery.provinceFa,
+    code: input.code ?? null,
+    redeemPoints: input.redeemPoints ?? 0,
   });
   if (view.empty) throw validation('سبد خرید خالی است.');
   if (view.blocked) {
@@ -599,10 +656,21 @@ export async function placeOrder(
   const reference = orderReference(now, randomBytes(6).toString('hex'));
   const holdsExpireAt = new Date(now.getTime() + CHECKOUT_HOLD_MINUTES * 60_000);
 
-  const money: SubOrderMoney[] = view.groups.map((group) =>
+  // Points come off the sub-orders one after another until they are spent, in
+  // whole toman each time. Greedy rather than proportional, so every figure is
+  // exact and the parent stays the sum of its parts (PROMPT-012).
+  let pointsLeft = view.loyaltyToman;
+  const loyaltyPerGroup = view.groups.map((group) => {
+    const take = pointsLeft > group.buyerTotalToman ? group.buyerTotalToman : pointsLeft;
+    pointsLeft -= take;
+    return take;
+  });
+
+  const money: SubOrderMoney[] = view.groups.map((group, index) =>
     subOrderMoney({
       lines: group.lines.map((line) => ({ unitPriceToman: line.unitPriceToman, quantity: line.quantity })),
       shippingToman: group.shippingToman ?? 0n,
+      discountToman: group.discountToman + loyaltyPerGroup[index]!,
       commissionPercentBp: terms.get(group.sellerId)!.percentBp,
       commissionMinimumToman: terms.get(group.sellerId)!.minimumToman,
     }),
@@ -694,12 +762,35 @@ export async function placeOrder(
         });
       }
 
+      // The rules this shop's part used are recorded inside this transaction,
+      // so a code whose last use went to somebody else while the buyer was
+      // typing their address fails here and the whole order rolls back rather
+      // than standing at a price nobody was entitled to.
+      await redeemDiscounts(tx, {
+        accountId: actor.accountId!,
+        orderId: order!.id,
+        subOrderId: subOrder!.id,
+        applied: group.discounts.applied,
+      });
+
       await tx.insert(subOrderEvents).values({
         subOrderId: subOrder!.id,
         fromStatus: null,
         toStatus: 'PENDING_PAYMENT',
         actorAccountId: actor.accountId,
         reasonFa: 'ثبت سفارش',
+      });
+    }
+
+    // Points are spent here too, against a balance re-read inside this
+    // transaction: points spent on another basket a moment ago are gone.
+    if (view.loyaltyPoints > 0) {
+      await redeemForOrder(tx, {
+        accountId: actor.accountId!,
+        orderId: order!.id,
+        points: view.loyaltyPoints,
+        toman: view.loyaltyToman,
+        referenceFa: reference,
       });
     }
 
@@ -773,6 +864,13 @@ export async function cancelUnpaidOrder(
     .update(commerceSubOrders)
     .set({ status: 'CANCELLED', statusReasonFa: reasonFa, updatedAt: new Date() })
     .where(and(eq(commerceSubOrders.orderId, order.id), eq(commerceSubOrders.status, 'PENDING_PAYMENT')));
+
+  // A cancelled order gives back the uses its codes took and the points it
+  // spent: a ceiling counts orders that stood, not attempts (PROMPT-012).
+  await database.transaction(async (tx) => {
+    await releaseDiscounts(tx, order.id);
+    await reverseForOrder(tx, order.id);
+  });
 
   await recordAudit(database, actor, {
     action: 'COMMERCE_ORDER_CANCELLED',

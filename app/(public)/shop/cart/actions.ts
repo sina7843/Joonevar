@@ -72,6 +72,8 @@ export async function checkoutAction(_previous: CartFormState, form: FormData): 
         noteFa: text(form, 'note') || null,
       },
       confirmedTotalToman: money(form, 'confirmedTotal'),
+      code: text(form, 'code') || null,
+      redeemPoints: text(form, 'redeemPoints') === '' ? 0 : Number(text(form, 'redeemPoints')) || 0,
       chosenMethods: Object.fromEntries(
         [...form.entries()]
           .filter(([key]) => key.startsWith('method-'))
@@ -91,4 +93,25 @@ export async function checkoutAction(_previous: CartFormState, form: FormData): 
     return failure(error);
   }
   redirect(destination);
+}
+
+/**
+ * Apply a code or spend points, by putting the choice in the address.
+ *
+ * The basket is priced from the address, so a reload shows the same figures
+ * and nothing has to be remembered anywhere: the choice is made and used on
+ * one page (PROMPT-012).
+ */
+export async function applyBasketDiscountAction(
+  _previous: CartFormState,
+  form: FormData,
+): Promise<CartFormState> {
+  const guard = await guardRoute('/shop/cart');
+  if (!guard.ok) throw guard.denied;
+  const next = new URLSearchParams();
+  const code = text(form, 'code');
+  const points = text(form, 'redeemPoints');
+  if (code) next.set('code', code);
+  if (points) next.set('points', points);
+  redirect('/shop/cart' + (next.size > 0 ? '?' + next.toString() : ''));
 }

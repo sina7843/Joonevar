@@ -14,6 +14,7 @@ import { contentItems } from './content.ts';
 import { communities } from './communities.ts';
 import { animalListingMedia, animalListings } from './marketplace.ts';
 import { inquiryMessages } from './inquiry.ts';
+import { questions, reviews } from './trust.ts';
 import {
   moderationAppealStatus,
   moderationDecision,
@@ -44,6 +45,14 @@ export const moderationReports = pgTable(
     sellerAccountId: uuid('seller_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
     /** Chat evidence: one message of one transaction thread (PROMPT-005). */
     inquiryMessageId: uuid('inquiry_message_id').references(() => inquiryMessages.id, { onDelete: 'restrict' }),
+    /*
+     * Phase 3 (PROMPT-012). What buyers write in public gets reported for the
+     * same reasons everything else does, and keeps a real reference for the
+     * same reason: the page it was reported from will have changed by the
+     * time anybody reads the report.
+     */
+    reviewId: uuid('review_id').references(() => reviews.id, { onDelete: 'restrict' }),
+    questionId: uuid('question_id').references(() => questions.id, { onDelete: 'restrict' }),
     /** The listing revision the reporter was reading, so a later edit is visible against it. */
     listingRevision: integer('listing_revision'),
     reporterAccountId: uuid('reporter_account_id')

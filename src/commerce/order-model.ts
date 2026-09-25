@@ -218,14 +218,27 @@ export interface SubOrderMoney {
 export function subOrderMoney(input: {
   lines: readonly LinePrice[];
   shippingToman: bigint;
+  /**
+   * Taken off the whole of this shop's part rather than off one line: a code,
+   * a campaign or spent points apply to the basket, not to a bag of food
+   * (PROMPT-012).
+   */
+  discountToman?: bigint;
   commissionPercentBp: number;
   commissionMinimumToman?: bigint | null;
 }): SubOrderMoney {
   const itemsGross = input.lines.reduce((sum, line) => sum + line.unitPriceToman * BigInt(line.quantity), 0n);
-  const discount = input.lines.reduce((sum, line) => sum + (line.discountToman ?? 0n), 0n);
+  const lineDiscounts = input.lines.reduce((sum, line) => sum + (line.discountToman ?? 0n), 0n);
   const itemsNet = input.lines.reduce((sum, line) => sum + lineTotal(line), 0n);
-  if (itemsNet !== itemsGross - discount) throw new RangeError('the line totals do not add up');
-  const buyerTotal = itemsNet + input.shippingToman;
+  if (itemsNet !== itemsGross - lineDiscounts) throw new RangeError('the line totals do not add up');
+
+  const basketDiscount = input.discountToman ?? 0n;
+  if (basketDiscount < 0n) throw new RangeError('a discount cannot be negative');
+  const discount = lineDiscounts + basketDiscount;
+  // Never more than the goods: a discount larger than what it discounts would
+  // make a basket owe the buyer money.
+  if (basketDiscount > itemsNet) throw new RangeError('a discount cannot exceed the lines it comes off');
+  const buyerTotal = itemsNet - basketDiscount + input.shippingToman;
   const commission = commissionFor({
     buyerTotalToman: buyerTotal,
     percentBp: input.commissionPercentBp,

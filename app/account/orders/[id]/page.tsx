@@ -102,6 +102,18 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </Alert>
       ) : null}
 
+      {order.status !== 'PENDING_PAYMENT' && order.status !== 'CANCELLED' ? (
+        <p className="text-caption">
+          <a
+            href={'/account/orders/' + order.id + '/invoice'}
+            className="text-text-brand"
+            data-testid="order-invoice"
+          >
+            دریافت فاکتور (PDF)
+          </a>
+        </p>
+      ) : null}
+
       <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
         <h2 className="text-label-lg">نشانی تحویل</h2>
         <p className="text-body-sm" data-testid="order-address">

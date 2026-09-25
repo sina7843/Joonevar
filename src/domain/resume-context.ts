@@ -49,7 +49,9 @@ export type EntityType =
   | 'COMMERCE_SELLER'
   | 'COMMERCE_PRODUCT'
   | 'COMMERCE_ORDER'
-  | 'COMMERCE_SUBORDER';
+  | 'COMMERCE_SUBORDER'
+  | 'COMMERCE_REVIEW'
+  | 'COMMERCE_QUESTION';
 
 export interface EntityRef {
   readonly type: EntityType;

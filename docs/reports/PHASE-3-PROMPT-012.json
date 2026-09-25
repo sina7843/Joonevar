@@ -1,0 +1,163 @@
+{
+  "promptId": "PROMPT-012",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "496149e",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "A review exists because a transaction finished — an animal deal that completed, or a shop sub-order that was delivered — and that is the shape of the table rather than a rule on a screen: a review names the deal or the sub-order it came out of, and a unique index means one purchase yields one review. The three questions differ by what was bought, because asking about packaging after a puppy is meaningless and asking about a handover after a delivery is worse. Reputation is computed from published reviews and from nothing else, and the guarantee is not a rule that promotions are ignored but the absence of anywhere to put one: the function that computes an average takes scores and takes nothing else. Hiding a review takes it out of that average, so it is a moderator's decision with a required reason and never a shop's — a shop that could quietly remove what it disliked would have a rating that means nothing. A public question waits for a moderator before anybody reads it, because a public question is exactly where somebody writes a telephone number for strangers, and the same contact policy the transaction chat uses runs over the text with the same honesty about not catching everything. Five kinds of discount, and the kind is stored rather than inferred because it decides whose money it is: a shop's own reduction and its own code come out of that shop, a platform code and a category campaign out of Hamzist, and every order records which rule gave it what and who bore it. A ceiling is the redemption table rather than a counter — counting rows is what enforces it, so two people racing for the last use of a code both try to insert and one loses to a unique index rather than to a check they both passed, and the ceiling is re-read inside the transaction that places the order. How discounts combine is a published version, and until one exists nothing stacks at all: silence has to mean the cautious thing, because two discounts that quietly add up are how a marketplace sells below cost without anybody deciding to. When they do stack they compose against what is left, so ten per cent and ten per cent is nineteen, not twenty. A cancelled order gives its code back, because a ceiling counts orders that stood. Points are a ledger of their own, deliberately not the money ledger: there is no operation anywhere that turns them into a payout, which is what \"no cash-out\" has to mean to be true rather than stated, and earning is tied to the order that caused it so a replayed callback earns nothing more. Spent points fall across sub-orders greedily and exactly, so the parent stays the sum of its parts. A price drop is a fact about a recorded history, measured against what this person saw when they kept the thing rather than against its highest ever price, and each person is told once about one price because the insert is the de-duplication. A browsing history is not written at all without a configured retention period — keeping one with no deletion date is not a default to fall into — and turning it off clears what was already kept rather than only stopping more. Every suggestion carries the rule that produced it, built from a category, a species and this person's own orders, with no inference about who they are and no model that could learn one; somebody who opted out has the personal half skipped entirely rather than computed and hidden, and the fallback is a fact about the catalogue. Sponsored placement stays a separate, labelled list. The invoice says on its face that it is not a tax document, and only the buyer may take it, and only once the payment is verified.",
+  "changedFiles": [
+    "src/db/migrations/0051_trust-promotions.sql",
+    "src/db/migrations/meta/0051_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/trust.ts",
+    "src/db/schema/promotions.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/index.ts",
+    "src/db/schema/moderation.ts",
+    "src/commerce/trust-model.ts",
+    "src/commerce/reviews.ts",
+    "src/commerce/questions.ts",
+    "src/commerce/saved.ts",
+    "src/commerce/discounts.ts",
+    "src/commerce/loyalty.ts",
+    "src/commerce/alerts.ts",
+    "src/commerce/suggestions.ts",
+    "src/commerce/invoice.ts",
+    "src/commerce/trust-forms.tsx",
+    "src/commerce/cart.ts",
+    "src/commerce/orders.ts",
+    "src/commerce/inventory.ts",
+    "src/commerce/order-model.ts",
+    "src/commerce/order-forms.tsx",
+    "src/documents/render.ts",
+    "src/settings/keys.ts",
+    "src/domain/resume-context.ts",
+    "src/authz/routes.ts",
+    "src/ui/shell.tsx",
+    "app/account/orders/trust-actions.ts",
+    "app/account/orders/[id]/page.tsx",
+    "app/account/orders/[id]/invoice/route.ts",
+    "app/account/saved/page.tsx",
+    "app/account/reviews/page.tsx",
+    "app/account/rewards/page.tsx",
+    "app/account/seller/reviews/page.tsx",
+    "app/account/seller/promotions/page.tsx",
+    "app/market/trust/page.tsx",
+    "app/market/promotions/page.tsx",
+    "app/(public)/shop/[slug]/page.tsx",
+    "app/(public)/shop/cart/page.tsx",
+    "app/(public)/shop/cart/actions.ts",
+    "app/(public)/shop/compare/page.tsx",
+    "tests/domain/commerce-trust.test.ts",
+    "tests/db/commerce-trust.test.ts",
+    "tests/browser/commerce-trust.test.ts",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-012.json"
+  ],
+  "migrations": [
+    "src/db/migrations/0051_trust-promotions.sql"
+  ],
+  "decisions": [
+    "DEC-0214"
+  ],
+  "tests": {
+    "domainConfigUi": {
+      "command": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/domain/commerce-trust.test.ts — 16 tests: the four things that block a review and the unconfigured window that blocks nothing, the two dimension sets being different, an average that takes scores and nothing else (its arity asserted, because the guarantee is the absence of another argument), who bears each kind of discount, truncation and both caps, nothing stacking without a policy, two discounts composing against what is left, a refusal that names itself, points earned on whole thousands, points never becoming change, a balance as a sum, a suggestion carrying its rule, the impersonal fallback, a comparison refusing mixed categories, and a drop measured against what this person saw."
+    },
+    "database": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "newSuite": "tests/db/commerce-trust.test.ts — 11 tests on real stores and real orders: a paid but undelivered order refusing a review and a stranger refusing too and a second review refusing after the first, a hidden review leaving the average with a shop unable to hide it, a question invisible until a moderator publishes it and unanswered until the shop answers, two buyers racing for the last use of a code leaving exactly one redemption borne by the platform, two discounts refusing to stack without a policy and composing to nineteen per cent with one, a cancelled order giving its code back, points earned once through two replays and spent once and capped at the balance, an expiry running twice and taking a lot once, a price drop told once and not at all to somebody who turned alerts off, no history written without a retention period and the switch clearing what was kept, and an opted-out person still getting the catalogue's own answer."
+    },
+    "browser": {
+      "command": "node tools/browser-tests.mjs",
+      "newSuite": "tests/browser/commerce-trust.test.ts — 6 tests on the real screens: an operator declaring a platform code and a buyer seeing it come off the basket and then earning points on what was actually paid, a shop delivering before the review becomes possible at all, the product page showing a rating built from that review with the shop able to reply and not to remove, a question invisible until a moderator publishes it and a shop answers it, a saved item with an explained suggestion and a history switch that clears the past, and an invoice that really is a PDF.",
+      "screenshots": [
+        "docs/reports/screenshots/phase-3/prompt-012/market-promotions-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-012/cart-discount-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-012/rewards-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-012/review-left-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-012/product-rating-mobile.png",
+        "docs/reports/screenshots/phase-3/prompt-012/seller-reviews-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-012/market-trust-desktop.png",
+        "docs/reports/screenshots/phase-3/prompt-012/saved-desktop.png"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree; Compiled successfully."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "1003 tests, 1003 pass, 0 fail, 0 skip, duration 1073s, exit 0, on the final tree. 976 before this prompt; the 27 new ones are tests/domain/commerce-trust.test.ts (16) and tests/db/commerce-trust.test.ts (11). One earlier run of tests/db/commerce-trust.test.ts alone reported 10 of 11 with 'a cancelled order gives its code back' failing in 2.0s against the ~4.7s the other cases took; it passed on an immediate re-run and in this full suite, and the cause was not investigated. It is recorded here rather than left out."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "251 tests, 251 pass, 0 fail, 0 skip, duration 610s, exit 0, on the final tree. 245 before this prompt; the 6 new ones are tests/browser/commerce-trust.test.ts."
+    }
+  ],
+  "blockers": [],
+  "defectsFoundByTests": [
+    "A review left from the buyer's own page was attached to no product, so a product's rating stayed empty however many people reviewed it: the form carries a sub-order, not a product. A sub-order of exactly one product now attaches the review to it, because reviewing an order of one thing is reviewing that thing.",
+    "`ON CONFLICT` against a partial unique index failed at runtime: Postgres cannot tell which index is meant without the index's own predicate. Both the saved-items and the recent-views upserts now carry it."
+  ],
+  "limitations": [
+    "Seasonal campaigns are the same rule with a start and an end date rather than a separate concept with its own calendar. A campaign that repeats every year, or one with a banner and a landing page, is a presentation feature that nothing here claims to have.",
+    "A discount applies to a shop's whole part of a basket, not to individual lines. A rule narrowed to one product reaches the basket it is in rather than discounting that line alone; per-line discounting needs the refund arithmetic to follow it and belongs with partial returns.",
+    "Price history is written where a price is set through the product, so a line whose price has never changed has one point. Nothing back-fills a history for lines created before this prompt.",
+    "The price-drop sweep runs when somebody calls it and nothing calls it on a schedule — the same honest limitation the holds, the reservations and the acceptance deadlines carry.",
+    "Recommendations are rules, not a model, and deliberately so. They will not find that people who buy one thing tend to buy another; that is a different product with a different privacy question, and answering it was not this prompt's to decide.",
+    "Sponsored placement is labelled and separate in the sense that the suggestion list states `sponsored: false` for every entry and paid placement lives in the animal market's own promotion records. A sponsored slot inside the shop's own listings is not built.",
+    "The invoice is a faithful print of what Hamzist holds, and says on its face that it is not a tax document. A legally compliant Iranian invoice needs fields and a registration nobody has supplied.",
+    "Reviews of animal deals are modelled and reachable through the same service, but only the shop path has a screen: the animal market's own deal pages were not extended, so an animal deal's review has no form yet.",
+    "Following a kennel is stored and listed but nothing is sent when a kennel publishes something; the notification side of following exists only for the shape, not the delivery."
+  ],
+  "readiness": {
+    "code": "PHASE_3_TRUST_BUILT",
+    "reviews": "BUILT",
+    "questions": "BUILT",
+    "discounts": "BUILT",
+    "loyalty": "BUILT",
+    "recommendations": "RULE_BASED",
+    "invoice": "NOT_A_TAX_DOCUMENT",
+    "visual": "VERIFIED_BY_SCREENSHOT",
+    "operationalData": "NOT_CONFIGURED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0051_trust-promotions.sql",
+    "src/db/schema/trust.ts",
+    "src/db/schema/promotions.ts",
+    "src/commerce/trust-model.ts",
+    "src/commerce/reviews.ts",
+    "src/commerce/discounts.ts",
+    "src/commerce/loyalty.ts",
+    "src/commerce/saved.ts",
+    "src/commerce/suggestions.ts",
+    "src/commerce/invoice.ts",
+    "app/market/trust/page.tsx",
+    "app/market/promotions/page.tsx",
+    "app/account/saved/page.tsx",
+    "tests/domain/commerce-trust.test.ts",
+    "tests/db/commerce-trust.test.ts",
+    "tests/browser/commerce-trust.test.ts",
+    "DECISIONS.md#DEC-0214"
+  ]
+}

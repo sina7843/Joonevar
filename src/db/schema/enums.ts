@@ -172,6 +172,9 @@ export const reportTargetKind = pgEnum('report_target_kind', [
   'SELLER',
   /** Chat evidence. Its table exists from PROMPT-005, so the target is real. */
   'INQUIRY_MESSAGE',
+  /** What buyers write in public, from PROMPT-012. */
+  'REVIEW',
+  'QUESTION',
 ]);
 
 /**
@@ -636,3 +639,46 @@ export const settlementBatchStatus = pgEnum('settlement_batch_status', [
   'FAILED',
   'CANCELLED',
 ]);
+
+// ── trust and growth — PROMPT-012 ─────────────────────────────────────────
+
+/** What a review is about. The dimensions differ, so the subject has to be known. */
+export const reviewSubject = pgEnum('review_subject', ['ANIMAL_DEAL', 'COMMERCE_SUBORDER']);
+
+export const reviewStatus = pgEnum('review_status', ['PUBLISHED', 'HIDDEN', 'REMOVED']);
+
+/** A question is asked of a shop or about one product. */
+export const questionSubject = pgEnum('question_subject', ['SELLER', 'PRODUCT']);
+
+export const questionStatus = pgEnum('question_status', [
+  'PENDING',
+  'PUBLISHED',
+  'REJECTED',
+  /** Answered and published; the answer is part of the record. */
+  'ANSWERED',
+]);
+
+/** What somebody kept for later, or is following. */
+export const savedSubject = pgEnum('saved_subject', ['ANIMAL_LISTING', 'COMMERCE_PRODUCT']);
+export const followSubject = pgEnum('follow_subject', ['COMMERCE_SELLER', 'KENNEL']);
+
+/**
+ * The five ways a price comes down — PROMPT-012.
+ *
+ * A shop's own reduction and its own code are the shop's money; a platform
+ * code and a category campaign are Hamzist's; free delivery is either,
+ * depending on who declared it. Which one paid for a discount decides who is
+ * charged for it, which is why the kind is on the rule rather than inferred.
+ */
+export const discountKind = pgEnum('discount_kind', [
+  'SELLER_DISCOUNT',
+  'SELLER_CODE',
+  'PLATFORM_CODE',
+  'CATEGORY_CAMPAIGN',
+  'FREE_SHIPPING',
+]);
+
+export const discountStatus = pgEnum('discount_status', ['DRAFT', 'ACTIVE', 'PAUSED', 'ENDED']);
+
+/** Points are not money: they are earned, spent, expire, and are corrected. */
+export const loyaltyKind = pgEnum('loyalty_kind', ['EARN', 'REDEEM', 'EXPIRE', 'ADJUST']);

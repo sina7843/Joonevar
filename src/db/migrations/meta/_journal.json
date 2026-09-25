@@ -358,6 +358,13 @@
       "when": 1790352040631,
       "tag": "0050_fulfilment-ledger",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1790360106635,
+      "tag": "0051_trust-promotions",
+      "breakpoints": true
     }
   ]
 }
