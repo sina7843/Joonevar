@@ -174,9 +174,9 @@ test('a bulk change is bounded in size and in reach', () => {
 
 test('offers are compared on price and stock, with no way to know whose they are', () => {
   const offers: readonly OfferComparison[] = [
-    { offerId: 'a', sellerId: 's1', sellerNameFa: 'الف', priceToman: 90_000n, available: 2, condition: 'NEW' },
-    { offerId: 'b', sellerId: 's2', sellerNameFa: 'ب', priceToman: 80_000n, available: 0, condition: 'NEW' },
-    { offerId: 'c', sellerId: 's3', sellerNameFa: 'پ', priceToman: 85_000n, available: 5, condition: 'NEW' },
+    { offerId: 'a', skuId: 'sku-a', sellerId: 's1', sellerNameFa: 'الف', priceToman: 90_000n, available: 2, condition: 'NEW' },
+    { offerId: 'b', skuId: 'sku-b', sellerId: 's2', sellerNameFa: 'ب', priceToman: 80_000n, available: 0, condition: 'NEW' },
+    { offerId: 'c', skuId: 'sku-c', sellerId: 's3', sellerNameFa: 'پ', priceToman: 85_000n, available: 5, condition: 'NEW' },
   ];
   const order = compareOffers(offers).map((offer) => offer.offerId);
   // In stock first, then cheapest: the out-of-stock cheapest one is last.
@@ -185,8 +185,8 @@ test('offers are compared on price and stock, with no way to know whose they are
   // The comparison takes no seller identity beyond a name to sort ties by, so
   // there is nothing here that could favour the platform's own store.
   const tie = compareOffers([
-    { offerId: 'x', sellerId: 'platform', sellerNameFa: 'ب', priceToman: 50_000n, available: 1, condition: 'NEW' },
-    { offerId: 'y', sellerId: 'other', sellerNameFa: 'الف', priceToman: 50_000n, available: 1, condition: 'NEW' },
+    { offerId: 'x', skuId: 'sku-x', sellerId: 'platform', sellerNameFa: 'ب', priceToman: 50_000n, available: 1, condition: 'NEW' },
+    { offerId: 'y', skuId: 'sku-y', sellerId: 'other', sellerNameFa: 'الف', priceToman: 50_000n, available: 1, condition: 'NEW' },
   ]).map((offer) => offer.offerId);
   assert.deepEqual(tie, ['y', 'x']);
 });

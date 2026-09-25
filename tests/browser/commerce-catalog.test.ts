@@ -11,17 +11,24 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomInt } from 'node:crypto';
-import { chromium, type Browser, type BrowserContext } from 'playwright';
+import { chromium, type Browser } from 'playwright';
 import {
-  approvedMember,
   clearSyntheticOtp,
   DESKTOP,
   MOBILE,
   expectText,
   setPaymentMode,
-  signIn,
   BASE_URL,
 } from './support.ts';
+import {
+  openFlag,
+  publishPlan,
+  setMarketSetting,
+  stateFor,
+  tradingStore,
+  type ShopFixtureOptions,
+  type State,
+} from './shop-fixture.ts';
 
 const SHOTS = path.join('docs', 'reports', 'screenshots', 'phase-3', 'prompt-009');
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
@@ -30,46 +37,16 @@ const OPERATOR_MOBILE = '09990000004';
 const ADMIN_MOBILE = '09990000006';
 const RUN = String(randomInt(100_000, 999_999));
 const REASON = 'SYNTHETIC — اجرای تست ' + RUN;
-
-type State = Awaited<ReturnType<BrowserContext['storageState']>>;
+const AGREEMENT = 'SYNTHETIC-AGREEMENT-' + RUN;
 
 let browser!: Browser;
-let operatorState: State | null = null;
-let adminState: State | null = null;
-let sellerState: State | null = null;
+let adminState!: State;
+let sellerState!: State;
+let fixture!: ShopFixtureOptions & { operatorState: State };
 let previousPaymentMode: string | null = null;
 
 const contextFor = (state: State | null, viewport = DESKTOP) =>
   browser.newContext({ viewport, locale: 'fa-IR', storageState: state ?? undefined });
-
-async function setMarketSetting(key: string, value: string): Promise<void> {
-  const admin = await contextFor(adminState);
-  try {
-    const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
-    await page.getByTestId('market-setting-value-' + key).fill(value);
-    await page.getByTestId('market-setting-reason-' + key).fill(REASON);
-    await page.getByTestId('market-setting-save-' + key).click();
-    await expectText(page, value === '' ? 'مقدار پاک شد' : 'مقدار ذخیره شد');
-  } finally {
-    await admin.close();
-  }
-}
-
-async function openFlag(key: string): Promise<void> {
-  const admin = await contextFor(adminState);
-  try {
-    const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market', { waitUntil: 'load' });
-    const button = page.getByTestId('flag-toggle-' + key);
-    if ((await button.innerText()).includes('بستن')) return;
-    await page.getByTestId('flag-reason-' + key).fill(REASON);
-    await button.click();
-    await expectText(page, 'مقدار ذخیره شد.');
-  } finally {
-    await admin.close();
-  }
-}
 
 before(async () => {
   await fs.mkdir(SHOTS, { recursive: true });
@@ -77,120 +54,37 @@ before(async () => {
   previousPaymentMode = await setPaymentMode('DEV_GATEWAY');
   browser = await chromium.launch();
 
-  for (const [mobile, assign] of [
-    [OPERATOR_MOBILE, (s: State) => (operatorState = s)],
-    [ADMIN_MOBILE, (s: State) => (adminState = s)],
-  ] as const) {
-    const context = await browser.newContext({ viewport: DESKTOP, locale: 'fa-IR' });
-    try {
-      await signIn(context, mobile);
-      assign(await context.storageState());
-    } finally {
-      await context.close();
-    }
-  }
+  const operatorState = await stateFor(browser, OPERATOR_MOBILE);
+  adminState = await stateFor(browser, ADMIN_MOBILE);
+  fixture = {
+    browser,
+    adminState,
+    operatorState,
+    reasonFa: REASON,
+    agreementVersion: AGREEMENT,
+  };
 
-  await openFlag('market.flag.seller_onboarding_enabled');
-  await setMarketSetting('market.shop.seller_agreement_version', 'SYNTHETIC-AGREEMENT-' + RUN);
-  await setMarketSetting('market.shop.seller_plan_basic_monthly_toman', '900000');
+  await openFlag(fixture, 'market.flag.seller_onboarding_enabled');
+  await setMarketSetting(fixture, 'market.shop.seller_agreement_version', AGREEMENT);
+  await setMarketSetting(fixture, 'market.shop.seller_plan_basic_monthly_toman', '900000');
+  await publishPlan(fixture, {
+    code: 'BASIC',
+    labelFa: 'پلن پایه فروشنده',
+    durationDays: 30,
+    productLimit: 50,
+    commissionBp: 500,
+    priceKey: 'market.shop.seller_plan_basic_monthly_toman',
+  });
 
-  // A plan has to exist before anybody can buy one, and it is published through
-  // the real operational screen rather than written into the database.
-  const admin = await contextFor(adminState);
-  try {
-    const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/plans', { waitUntil: 'load' });
-    await page.getByTestId('plan-code').fill('BASIC');
-    await page.getByTestId('plan-label').fill('پلن پایه فروشنده');
-    await page.getByTestId('plan-duration').fill('30');
-    await page.getByTestId('plan-limit').fill('50');
-    await page.getByTestId('plan-commission').fill('500');
-    await page.getByTestId('plan-price-key').fill('market.shop.seller_plan_basic_monthly_toman');
-    await page.getByTestId('plan-note').fill(REASON);
-    await page.getByTestId('plan-publish').click();
-    await expectText(page, 'نسخه تازه پلن منتشر شد');
-  } finally {
-    await admin.close();
-  }
-
-  // The seller: a verified member whose store is taken all the way to trading,
-  // because nothing can be listed until a plan period has begun.
-  const seller = await approvedMember(browser, operatorState, 'فروشنده کاتالوگ');
-  try {
-    sellerState = await seller.context.storageState();
-  } finally {
-    await seller.context.close();
-  }
-
-  const store = await contextFor(sellerState);
-  try {
-    const page = await store.newPage();
-    await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
-    await page.getByTestId('seller-display-name').fill('SYNTHETIC فروشگاه کاتالوگ ' + RUN);
-    await page.getByTestId('start-seller-submit').click();
-    await page.getByTestId('seller-status').waitFor();
-
-    await page.getByTestId('field-legal-name').fill('SYNTHETIC کسب‌وکار ' + RUN);
-    await page.getByTestId('field-business-type').fill('پت‌شاپ');
-    await page.getByTestId('field-identifier').fill('2' + RUN.padStart(10, '0'));
-    await page.getByTestId('field-rep-name').fill('SYNTHETIC نماینده');
-    await page.getByTestId('field-rep-phone').fill('02100000000');
-    await page.getByTestId('field-province').selectOption({ index: 1 });
-    await page.getByTestId('field-city').selectOption({ index: 1 });
-    await page.getByTestId('field-address').fill('SYNTHETIC نشانی');
-    await page.getByTestId('field-iban').fill('IR060540102680020817909002');
-    await page.getByTestId('field-iban-holder').fill('SYNTHETIC صاحب حساب');
-    await page.getByTestId('field-shipping').fill('SYNTHETIC ارسال');
-    await page.getByTestId('field-return').fill('SYNTHETIC مرجوعی');
-    await page.getByTestId('save-seller').click();
-    await expectText(page, 'اطلاعات فروشگاه ذخیره شد');
-
-    await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
-    await page.getByTestId('accept-agreement').click();
-    await expectText(page, 'SYNTHETIC-AGREEMENT-' + RUN);
-
-    await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
-    await page.getByTestId('submit-seller').click();
-    await page.getByTestId('seller-status').filter({ hasText: 'ارسال‌شده برای بررسی' }).waitFor();
-  } finally {
-    await store.close();
-  }
-
-  const ops = await contextFor(adminState);
-  try {
-    const page = await ops.newPage();
-    await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
-    const sellerId = (await page
-      .locator('[data-testid^="seller-decision-select-"]')
-      .first()
-      .getAttribute('data-testid'))!.replace('seller-decision-select-', '');
-    await page.getByTestId('seller-decision-select-' + sellerId).selectOption('UNDER_REVIEW');
-    await page.getByTestId('seller-decide-' + sellerId).click();
-    await expectText(page, 'تصمیم ثبت شد');
-    await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
-    await page.getByTestId('seller-decision-select-' + sellerId).selectOption('APPROVED');
-    await page.getByTestId('seller-decide-' + sellerId).click();
-    await expectText(page, 'تصمیم ثبت شد');
-  } finally {
-    await ops.close();
-  }
-
-  const buying = await contextFor(sellerState);
-  try {
-    const page = await buying.newPage();
-    await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
-    const planValues = await page
-      .getByTestId('plan-select')
-      .locator('option')
-      .evaluateAll((nodes) => nodes.map((node) => (node as HTMLOptionElement).value).filter(Boolean));
-    await page.getByTestId('plan-select').selectOption(planValues[0]!);
-    await page.getByTestId('buy-plan').click();
-    await page.waitForURL('**/dev/gateway**');
-    await page.getByTestId('gateway-pay').click();
-    await page.waitForURL('**/account/seller/return**');
-  } finally {
-    await buying.close();
-  }
+  // The store is taken all the way to trading, because nothing can be listed
+  // until a plan period has begun.
+  const store = await tradingStore(fixture, {
+    nameFa: 'SYNTHETIC فروشگاه کاتالوگ ' + RUN,
+    identifier: '2' + RUN.padStart(10, '0'),
+    iban: 'IR060540102680020817909002',
+    ownerLabelFa: 'فروشنده کاتالوگ',
+  });
+  sellerState = store.sellerState;
 });
 
 after(async () => {
@@ -318,7 +212,9 @@ test('the public shop shows it, compares the offers, and says what it does not y
     await page.goto(BASE_URL + href, { waitUntil: 'load' });
     assert.match(await page.getByTestId('product-price').innerText(), /۴۸۰٬۰۰۰/);
     assert.match(await page.getByTestId('product-offers').innerText(), /موجود/);
-    assert.match(await page.getByTestId('product-order-note').innerText(), /مرحله بعدی/);
+    // A visitor is told how to buy rather than shown a button that cannot work;
+    // the basket itself belongs to somebody, so it needs an account (PROMPT-010).
+    assert.match(await page.getByTestId('product-order-note').innerText(), /وارد حساب خود شوید/);
     await page.screenshot({ path: path.join(SHOTS, 'shop-product-mobile.png'), fullPage: true });
   } finally {
     await anonymous.close();

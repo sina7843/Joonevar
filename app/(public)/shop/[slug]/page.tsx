@@ -11,6 +11,9 @@ import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
 import { publicProduct } from '../../../../src/commerce/shop-discovery.ts';
 import { OFFER_CONDITION_FA, type OfferCondition } from '../../../../src/commerce/catalog-model.ts';
+import { AddToCartForm } from '../../../../src/commerce/order-forms.tsx';
+import { setCartLineAction } from '../cart/actions.ts';
+import { currentSession } from '../../../../src/authz/request-actor.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +56,9 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
   const { slug } = await params;
   const product = await publicProduct(db(), slug);
   if (product === null) notFound();
+  // A basket belongs to somebody, so the buttons appear only once there is
+  // somebody for it to belong to. Nothing about the product itself is hidden.
+  const signedIn = (await currentSession(db()))?.actor != null;
 
   const cheapest = product.offers.find((offer) => offer.available > 0) ?? product.offers[0] ?? null;
   const origin = site().origin;
@@ -135,13 +141,28 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
               <StatusBadge tone={offer.available > 0 ? 'success' : 'neutral'}>
                 {offer.available > 0 ? 'موجود: ' + fa(offer.available) : 'ناموجود'}
               </StatusBadge>
+              {signedIn ? (
+                <AddToCartForm
+                  action={setCartLineAction}
+                  skuId={offer.skuId}
+                  available={offer.available}
+                  labelFa={offer.sellerNameFa}
+                />
+              ) : null}
             </li>
           ))}
         </ul>
-        <p className="text-caption text-text-secondary" data-testid="product-order-note">
-          سبد خرید و ثبت سفارش در مرحله بعدی محصول اضافه می‌شود؛ در این مرحله قیمت و موجودی فروشندگان فقط
-          نمایش داده می‌شود.
-        </p>
+        {signedIn ? (
+          <p className="text-caption">
+            <Link href="/shop/cart" className="text-text-brand" data-testid="product-go-to-cart">
+              رفتن به سبد خرید
+            </Link>
+          </p>
+        ) : (
+          <p className="text-caption text-text-secondary" data-testid="product-order-note">
+            برای افزودن به سبد خرید وارد حساب خود شوید.
+          </p>
+        )}
       </section>
 
       <p className="text-caption">

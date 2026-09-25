@@ -344,6 +344,13 @@
       "when": 1790338276184,
       "tag": "0048_commerce-catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1790346461785,
+      "tag": "0049_commerce-orders",
+      "breakpoints": true
     }
   ]
 }

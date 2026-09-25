@@ -72,7 +72,7 @@ export default async function SellerReviewPage() {
               const detail = details[index]!;
               const status = entry.status as SellerStatus;
               return (
-                <li key={entry.id}>
+                <li key={entry.id} data-testid={'seller-row-' + entry.id}>
                   <Card>
                     <div className="flex flex-wrap items-center gap-sm">
                       <StatusBadge tone={status === 'APPROVED' ? 'success' : 'neutral'}>

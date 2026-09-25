@@ -19,6 +19,7 @@ import {
 } from '../db/schema/billing.ts';
 import { clubRuleVersions } from '../db/schema/communities.ts';
 import { listingInquiries } from '../db/schema/inquiry.ts';
+import { commerceOrders } from '../db/schema/orders.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { snapshotSetting } from '../settings/service.ts';
@@ -49,7 +50,9 @@ export type PaymentService =
   // The deposit that reserves one animal for one buyer (Phase 3, PROMPT-005).
   | 'ANIMAL_SALE_DEPOSIT'
   // A seller's plan period in the merchandise shop (Phase 3, PROMPT-008).
-  | 'COMMERCE_SELLER_PLAN';
+  | 'COMMERCE_SELLER_PLAN'
+  // One basket, across however many shops it holds (Phase 3, PROMPT-010).
+  | 'COMMERCE_ORDER';
 
 /**
  * What to charge for, and where the server should read the price.
@@ -85,16 +88,30 @@ export type BatchItemInput =
        * somebody already agreed to pay.
        */
       readonly inquiryId: string;
+    }
+  | {
+      readonly targetType: string;
+      readonly targetId: string;
+      /**
+       * The order whose total is charged (Phase 3, PROMPT-010).
+       *
+       * The figure was computed at checkout from the lines as they read then,
+       * checked against the buyer's own confirmation and written onto the
+       * order. Reading it back from there is what makes a rewritten hidden
+       * field change nothing: the browser never carries the amount.
+       */
+      readonly orderId: string;
     };
 
 const fromSetting = (item: BatchItemInput): item is Extract<BatchItemInput, { settingKey: string }> => 'settingKey' in item;
 const fromClubRule = (item: BatchItemInput): item is Extract<BatchItemInput, { clubRuleVersionId: string }> =>
   'clubRuleVersionId' in item;
+const fromOrder = (item: BatchItemInput): item is Extract<BatchItemInput, { orderId: string }> => 'orderId' in item;
 
 interface PricedItem {
   readonly item: BatchItemInput;
   readonly amountToman: bigint;
-  readonly priceSource: 'SETTING' | 'CLUB_RULE_VERSION' | 'INQUIRY';
+  readonly priceSource: 'SETTING' | 'CLUB_RULE_VERSION' | 'INQUIRY' | 'COMMERCE_ORDER';
   readonly settingKey: string | null;
   readonly settingVersion: number | null;
   readonly priceSourceId: string | null;
@@ -158,6 +175,43 @@ async function inquiryDeposit(
   };
 }
 
+/**
+ * The order total, read from the order and nowhere else.
+ *
+ * The status matters as much as the figure: an order already paid, cancelled
+ * or past the moment its stock was held has no payment to open, and saying so
+ * here is cheaper than discovering it after the buyer has been at a gateway.
+ */
+async function orderTotal(
+  database: Database,
+  item: Extract<BatchItemInput, { orderId: string }>,
+): Promise<PricedItem> {
+  const [order] = await database
+    .select({
+      id: commerceOrders.id,
+      status: commerceOrders.status,
+      grandTotalToman: commerceOrders.grandTotalToman,
+      holdsExpireAt: commerceOrders.holdsExpireAt,
+    })
+    .from(commerceOrders)
+    .where(eq(commerceOrders.id, item.orderId))
+    .limit(1);
+  if (!order) throw notFound('این سفارش پیدا نشد.');
+  if (order.status !== 'PENDING_PAYMENT') throw conflict('این سفارش دیگر در انتظار پرداخت نیست.');
+  if (order.holdsExpireAt.getTime() <= Date.now()) {
+    throw conflict('مهلت نگه‌داشتن کالاهای این سفارش تمام شده است؛ سبد را دوباره ببندید.');
+  }
+  if (order.grandTotalToman <= 0n) throw validation('مبلغ این سفارش معتبر نیست.');
+  return {
+    item,
+    amountToman: order.grandTotalToman,
+    priceSource: 'COMMERCE_ORDER',
+    settingKey: null,
+    settingVersion: null,
+    priceSourceId: order.id,
+  };
+}
+
 export interface BatchRecord {
   readonly id: string;
   readonly accountId: string;
@@ -190,6 +244,7 @@ export async function createBatch(
   const priced: PricedItem[] = await Promise.all(
     input.items.map(async (item): Promise<PricedItem> => {
       if (fromClubRule(item)) return clubRulePrice(database, item);
+      if (fromOrder(item)) return orderTotal(database, item);
       if (!fromSetting(item)) return inquiryDeposit(database, item);
       const snapshot = await snapshotSetting(database, item.settingKey);
       return {

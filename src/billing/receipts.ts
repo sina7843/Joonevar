@@ -38,6 +38,7 @@ export const PAYMENT_SERVICE_FA: Record<PaymentService, string> = {
   ANIMAL_LISTING_PROMOTION: 'بسته تبلیغ آگهی حیوان',
   ANIMAL_SALE_DEPOSIT: 'بیعانه خرید حیوان',
   COMMERCE_SELLER_PLAN: 'پلن فروشندگی کالا',
+  COMMERCE_ORDER: 'سفارش فروشگاه کالا',
 };
 
 export const PAYMENT_STATUS_FA: Record<string, string> = {

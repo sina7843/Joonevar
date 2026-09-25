@@ -321,7 +321,7 @@ export async function bulkUpdatePrices(
 
 // ── the ledger ─────────────────────────────────────────────────────────────
 
-interface MoveInput {
+export interface MoveInput {
   readonly skuId: string;
   readonly kind: 'RECEIVE' | 'ADJUST' | 'RESERVE' | 'RELEASE' | 'SELL' | 'RETURN';
   readonly quantity: number;
@@ -338,7 +338,7 @@ interface MoveInput {
  * ledger row and the new counters are one transaction: there is no moment where
  * the count and its explanation disagree.
  */
-async function applyMove(tx: DbClient, actor: Actor | null, input: MoveInput): Promise<void> {
+export async function applyMove(tx: DbClient, actor: Actor | null, input: MoveInput): Promise<void> {
   const delta = moveDelta(input.kind, input.quantity);
 
   const updated = await tx
@@ -442,42 +442,56 @@ export async function reserveStock(
   if (offer.status !== 'ACTIVE') throw conflict('این عرضه در حال فروش نیست.');
   if (!sku.isActive) throw conflict('این قلم کالا در حال حاضر قابل خرید نیست.');
 
+  return database.transaction(async (tx) => reserveStockIn(tx, actor, input));
+}
+
+/**
+ * The same hold, taken inside a transaction the caller already owns.
+ *
+ * Placing an order reserves every one of its lines together with writing the
+ * order itself: either the whole basket is held and recorded, or none of it is
+ * and nothing was taken off the shelf.
+ */
+export async function reserveStockIn(
+  tx: DbClient,
+  actor: Actor,
+  input: ReserveInput,
+): Promise<ReservationRow> {
   const expiresAt = new Date(Date.now() + input.minutes * 60_000);
-  return database.transaction(async (tx) => {
-    // Anything this basket was already holding on this line is released first,
-    // so a repeated click holds one lot rather than two.
-    await releaseExpiredFor(tx, sku.id);
 
-    let reservation: ReservationRow;
-    try {
-      const [row] = await tx
-        .insert(stockReservations)
-        .values({
-          offerSkuId: sku.id,
-          holderAccountId: actor.accountId,
-          holdRef: input.holdRef,
-          quantity: input.quantity,
-          expiresAt,
-        })
-        .returning();
-      reservation = row!;
-    } catch (error) {
-      if (violates(error, 'stock_reservation_hold_key')) {
-        throw conflict('برای همین سبد، این قلم از قبل رزرو شده است.');
-      }
-      throw error;
+  // Anything this basket was already holding on this line is released first,
+  // so a repeated click holds one lot rather than two.
+  await releaseExpiredFor(tx, input.skuId);
+
+  let reservation: ReservationRow;
+  try {
+    const [row] = await tx
+      .insert(stockReservations)
+      .values({
+        offerSkuId: input.skuId,
+        holderAccountId: actor.accountId,
+        holdRef: input.holdRef,
+        quantity: input.quantity,
+        expiresAt,
+      })
+      .returning();
+    reservation = row!;
+  } catch (error) {
+    if (violates(error, 'stock_reservation_hold_key')) {
+      throw conflict('برای همین سبد، این قلم از قبل رزرو شده است.');
     }
+    throw error;
+  }
 
-    await applyMove(tx, actor, {
-      skuId: sku.id,
-      kind: 'RESERVE',
-      quantity: input.quantity,
-      reasonFa: 'رزرو برای تکمیل خرید',
-      refType: 'STOCK_RESERVATION',
-      refId: reservation.id,
-    });
-    return reservation;
+  await applyMove(tx, actor, {
+    skuId: input.skuId,
+    kind: 'RESERVE',
+    quantity: input.quantity,
+    reasonFa: 'رزرو برای تکمیل خرید',
+    refType: 'STOCK_RESERVATION',
+    refId: reservation.id,
   });
+  return reservation;
 }
 
 /** Give held stock back, whether the basket was abandoned or the hold expired. */

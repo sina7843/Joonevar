@@ -108,6 +108,17 @@ export const commerceSellers = pgTable(
     // ── what the store promises buyers ─────────────────────────────────────
     shippingPolicyFa: text('shipping_policy_fa'),
     returnPolicyFa: text('return_policy_fa'),
+    /**
+     * What this shop charges to deliver one order, and the basket size above
+     * which it charges nothing (PROMPT-010).
+     *
+     * Null is not free delivery. It means the shop has not said, and a shop
+     * that has not said cannot be checked out from: the refusal names the
+     * missing figure rather than quietly billing zero. Zero, entered on
+     * purpose, is free delivery and reads that way.
+     */
+    shippingFeeToman: bigint('shipping_fee_toman', { mode: 'bigint' }),
+    freeShippingThresholdToman: bigint('free_shipping_threshold_toman', { mode: 'bigint' }),
     logoFileId: uuid('logo_file_id').references(() => storedFiles.id, { onDelete: 'set null' }),
 
     /** The versioned seller agreement this store accepted, and when. */

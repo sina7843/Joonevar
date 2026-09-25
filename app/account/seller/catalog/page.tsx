@@ -7,7 +7,9 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { species as speciesTable } from '../../../../src/db/schema/core.ts';
-import { myStores } from '../../../../src/commerce/sellers.ts';
+import { loadSeller, myStores, MAX_SHIPPING_FEE_KEY } from '../../../../src/commerce/sellers.ts';
+import { readMoney } from '../../../../src/settings/service.ts';
+import { ShippingTermsForm } from '../../../../src/commerce/order-forms.tsx';
 import { currentSubscription } from '../../../../src/commerce/plans.ts';
 import {
   allCategories,
@@ -36,6 +38,7 @@ import {
   SubmitProductForm,
   VariantForm,
 } from './forms.tsx';
+import { shippingTermsAction } from './actions.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,6 +72,10 @@ export default async function SellerCatalogPage() {
   }
 
   const store = stores[0]!;
+  const maxShippingFee = await readMoney(db(), MAX_SHIPPING_FEE_KEY);
+  // The delivery figures live on the store row itself, not on the small shape
+  // the picker returns, so they are read here rather than widened everywhere.
+  const storeRow = await loadSeller(db(), store.id);
   const [categories, everyCategory, products, offers, lines, subscription, speciesRows] = await Promise.all([
     sellableCategories(db()),
     allCategories(db()),
@@ -112,6 +119,26 @@ export default async function SellerCatalogPage() {
             </span>
           </Alert>
         ) : null}
+
+        <Card>
+          <h2 className="text-label-lg">شرایط ارسال</h2>
+          <p className="mt-2xs text-caption text-text-secondary" data-testid="shipping-terms-note">
+            {storeRow.shippingFeeToman === null
+              ? 'تا ثبت هزینه ارسال، کالاهای شما در سبد خرید قابل پرداخت نیستند.'
+              : storeRow.shippingFeeToman === 0n
+                ? 'ارسال کالاهای این فروشگاه رایگان است.'
+                : 'هزینه ارسال فعلی: ' + storeRow.shippingFeeToman.toLocaleString('fa-IR') + ' تومان.'}
+          </p>
+          <div className="mt-lg">
+            <ShippingTermsForm
+              action={shippingTermsAction}
+              sellerId={store.id}
+              feeToman={storeRow.shippingFeeToman?.toString() ?? null}
+              thresholdToman={storeRow.freeShippingThresholdToman?.toString() ?? null}
+              maxFeeFa={maxShippingFee.configured ? maxShippingFee.toman.toLocaleString('fa-IR') : null}
+            />
+          </div>
+        </Card>
 
         {blocked.length > 0 ? (
           <Alert tone="info" title="دسته‌هایی که در این فاز فروش عمومی ندارند">

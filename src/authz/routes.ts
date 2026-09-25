@@ -58,6 +58,10 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // The public shop of goods (Phase 3, PROMPT-009). Reading is public; selling
   // and buying both happen behind guarded routes.
   { prefix: '/shop', access: 'PUBLIC' },
+  // The basket is the one address under the shop that is not public: it is a
+  // particular person's, and the longer prefix wins over the rule above
+  // (PROMPT-010).
+  { prefix: '/shop/cart', access: PUBLIC_APP },
   // Service pages (§18): what each Phase 1 service is, with its managed fee.
   { prefix: '/services', access: 'PUBLIC' },
   // Document verification (§17): a code or QR, answered with minimal public data.

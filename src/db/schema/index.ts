@@ -25,3 +25,4 @@ export * from './deals.ts';
 export * from './handover.ts';
 export * from './commerce.ts';
 export * from './catalog.ts';
+export * from './orders.ts';

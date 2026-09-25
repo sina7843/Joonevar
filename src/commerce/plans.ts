@@ -496,3 +496,31 @@ export async function expireDuePeriods(database: Database, now: Date = new Date(
   }
   return expired;
 }
+
+/**
+ * The terms a store is trading on right now, or nothing at all.
+ *
+ * "Nothing" covers every way a store can fail to be open — no period, one that
+ * was never paid for, one that has ended — because the checkout does not care
+ * which of those it is: it cannot sell on terms that are not in force. The
+ * commission floor comes from the plan the period was bought on, which is
+ * immutable once published, so reading it there is reading a frozen figure.
+ */
+export async function tradingTerms(
+  database: DbClient,
+  sellerId: string,
+  now: Date = new Date(),
+): Promise<{ subscriptionId: string; percentBp: number; minimumToman: bigint | null } | null> {
+  const view = await currentSubscription(database, sellerId, now);
+  if (view.subscription === null || view.subscription.status !== 'ACTIVE' || view.expired) return null;
+  const [plan] = await database
+    .select({ minimumToman: sellerPlans.commissionMinToman })
+    .from(sellerPlans)
+    .where(eq(sellerPlans.id, view.subscription.planId))
+    .limit(1);
+  return {
+    subscriptionId: view.subscription.id,
+    percentBp: view.subscription.commissionPercentBp,
+    minimumToman: plan?.minimumToman ?? null,
+  };
+}

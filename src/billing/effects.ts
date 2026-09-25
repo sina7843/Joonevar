@@ -23,6 +23,7 @@ import { activateClubMembershipFromPayment } from '../clubs/enrollment.ts';
 import { activatePromotionFromPayment } from '../marketplace/promotions.ts';
 import { reserveFromDeposit } from '../marketplace/inquiries.ts';
 import { activatePlanFromPayment } from '../commerce/plans.ts';
+import { orderPaidEffects } from '../commerce/orders.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -99,6 +100,13 @@ export const paidEffects: PaidEffects = {
       // the seller had paid (PROMPT-008).
       case 'COMMERCE_SELLER_PLAN':
         await activatePlanFromPayment(tx, batch);
+        return;
+      // Every hold in the basket becomes a sale here, and the sub-orders start
+      // their own lives. Because this runs inside the transaction that moves
+      // the attempt out of PENDING, a replayed callback never reaches it and
+      // therefore can never sell the same units twice (PROMPT-010).
+      case 'COMMERCE_ORDER':
+        await orderPaidEffects().onPaid(tx, batch);
         return;
       default:
         return;

@@ -7,6 +7,7 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AppError, validation } from '../../../../src/domain/errors.ts';
 import { addProductImage, addVariant, createProduct, submitProduct } from '../../../../src/commerce/catalog.ts';
 import { addSku, createOffer, moveOffer, recordStockMove } from '../../../../src/commerce/inventory.ts';
+import { setShippingTerms } from '../../../../src/commerce/sellers.ts';
 import type { CommerceOfferStatus } from '../../../../src/commerce/catalog-model.ts';
 
 export interface CatalogFormState {
@@ -206,6 +207,34 @@ export async function stockMoveAction(
     });
     revalidatePath('/account/seller/catalog');
     return { ok: true, message: 'تغییر موجودی در دفتر ثبت شد.' };
+  } catch (error) {
+    return failure(error);
+  }
+}
+
+/**
+ * What this shop charges to deliver — PROMPT-010.
+ *
+ * Until it is entered, nothing from this shop can be checked out, and the
+ * basket says so by name. Zero is a real answer that means free delivery; an
+ * empty field is not an answer at all.
+ */
+export async function shippingTermsAction(
+  _previous: CatalogFormState,
+  form: FormData,
+): Promise<CatalogFormState> {
+  try {
+    const guard = await guardRoute('/account/seller/catalog');
+    if (!guard.ok) throw guard.denied;
+    const threshold = text(form, 'freeThreshold');
+    await setShippingTerms(db(), guard.actor, {
+      sellerId: text(form, 'sellerId'),
+      feeToman: money(form, 'shippingFee'),
+      freeThresholdToman: threshold === '' ? null : money(form, 'freeThreshold'),
+    });
+    revalidatePath('/account/seller/catalog');
+    revalidatePath('/shop/cart');
+    return { ok: true, message: 'شرایط ارسال فروشگاه ثبت شد.' };
   } catch (error) {
     return failure(error);
   }

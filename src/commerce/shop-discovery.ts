@@ -295,6 +295,7 @@ export async function publicProduct(
   const offerRows = await database
     .select({
       offerId: sellerOffers.id,
+      skuId: offerSkus.id,
       sellerId: commerceSellers.id,
       sellerNameFa: commerceSellers.displayNameFa,
       priceToman: offerSkus.priceToman,
@@ -322,6 +323,7 @@ export async function publicProduct(
     if (offer.variantId && offer.variantLabelFa) variantLabels[offer.offerId] = offer.variantLabelFa;
     return {
       offerId: offer.offerId,
+      skuId: offer.skuId,
       sellerId: offer.sellerId,
       sellerNameFa: offer.sellerNameFa ?? 'فروشگاه',
       priceToman: offer.priceToman,

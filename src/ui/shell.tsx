@@ -344,6 +344,9 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   if (hasMarketplaceCapability(actor, 'SELLER_APPLICATION_REVIEW')) {
     items.push({ href: '/market/catalog', label: 'بررسی کاتالوگ', icon: 'clipboardText' });
   }
+  if (hasMarketplaceCapability(actor, 'ORDER_VIEW')) {
+    items.push({ href: '/market/orders', label: 'سفارش‌های فروشگاه', icon: 'listChecks' });
+  }
   return items;
 }
 

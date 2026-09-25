@@ -518,3 +518,40 @@ export const reservationStatus = pgEnum('reservation_status', [
   'CONSUMED',
   'EXPIRED',
 ]);
+
+/**
+ * A basket. One is open per account at a time; checking out closes it, so the
+ * lines that became an order stay attached to the order rather than moving.
+ */
+export const cartStatus = pgEnum('cart_status', ['ACTIVE', 'CHECKED_OUT', 'ABANDONED']);
+
+/**
+ * The parent order — Phase 3, PROMPT-010.
+ *
+ * It holds the one payment and nothing else that can move on its own. Whether
+ * goods were accepted, shipped or returned belongs to each seller's sub-order,
+ * because two sellers in one basket have nothing to do with each other.
+ */
+export const commerceOrderStatus = pgEnum('commerce_order_status', [
+  'PENDING_PAYMENT',
+  'PAID',
+  /** Never paid: abandoned, cancelled by the buyer, or its holds expired. */
+  'CANCELLED',
+  /** Paid, and every sub-order in it ended in money going back. */
+  'REFUNDED',
+]);
+
+/** One seller's part of one order, which lives its own life from PAID onwards. */
+export const commerceSubOrderStatus = pgEnum('commerce_suborder_status', [
+  'PENDING_PAYMENT',
+  'PAID',
+  'ACCEPTED_BY_SELLER',
+  'PREPARING',
+  'SHIPPED',
+  'DELIVERED',
+  'RETURN_REQUESTED',
+  'RETURNED',
+  'CANCELLED',
+  'REFUNDED',
+  'DISPUTED',
+]);

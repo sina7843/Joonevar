@@ -22,7 +22,7 @@ import { createNotification } from '../notifications/service.ts';
 import { violates } from '../db/constraint.ts';
 import { findCase } from '../identity/kyc.ts';
 import { putPrivateFile, safeOriginalName } from '../files/storage.ts';
-import { readSetting, readText } from '../settings/service.ts';
+import { readMoney, readSetting, readText } from '../settings/service.ts';
 import { resumeContext } from '../domain/resume-context.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
@@ -929,4 +929,72 @@ export async function otherStores(database: DbClient, sellerId: string) {
     .select({ id: commerceSellers.id })
     .from(commerceSellers)
     .where(ne(commerceSellers.id, sellerId));
+}
+
+export const MAX_SHIPPING_FEE_KEY = 'market.shop.max_shipping_fee_toman';
+export const MAX_FREE_SHIPPING_THRESHOLD_KEY = 'market.shop.max_free_shipping_threshold_toman';
+
+/**
+ * What this shop charges to deliver an order — PROMPT-010.
+ *
+ * The figure is the shop's own commercial term, so it is theirs to enter; the
+ * platform only says how high it may go, and only when somebody has configured
+ * that ceiling. An unconfigured ceiling does not become "no limit" silently:
+ * it is simply not enforced, and the settings screen says the figure is
+ * missing, which is the same discipline every other managed number follows.
+ *
+ * Zero is a real answer — free delivery, chosen. Not having answered is a
+ * different state entirely, and it is the one that stops a checkout.
+ */
+export async function setShippingTerms(
+  database: Database,
+  actor: Actor,
+  input: { sellerId: string; feeToman: bigint; freeThresholdToman: bigint | null },
+): Promise<void> {
+  await assertSellerCapability(database, actor, input.sellerId, 'STORE_EDIT');
+  if (input.feeToman < 0n) throw validation('هزینه ارسال نمی‌تواند منفی باشد.');
+  if (input.freeThresholdToman !== null && input.freeThresholdToman < 0n) {
+    throw validation('حد نصاب ارسال رایگان نمی‌تواند منفی باشد.');
+  }
+
+  const ceiling = await readMoney(database, MAX_SHIPPING_FEE_KEY);
+  if (ceiling.configured && input.feeToman > ceiling.toman) {
+    throw validation('سقف مجاز هزینه ارسال ' + ceiling.toman.toLocaleString('fa-IR') + ' تومان است.');
+  }
+  const thresholdCeiling = await readMoney(database, MAX_FREE_SHIPPING_THRESHOLD_KEY);
+  if (
+    input.freeThresholdToman !== null &&
+    thresholdCeiling.configured &&
+    input.freeThresholdToman > thresholdCeiling.toman
+  ) {
+    throw validation(
+      'سقف مجاز حد نصاب ارسال رایگان ' + thresholdCeiling.toman.toLocaleString('fa-IR') + ' تومان است.',
+    );
+  }
+
+  const seller = await loadSeller(database, input.sellerId);
+  await database
+    .update(commerceSellers)
+    .set({
+      shippingFeeToman: input.feeToman,
+      freeShippingThresholdToman: input.freeThresholdToman,
+      version: seller.version + 1,
+      updatedAt: new Date(),
+    })
+    .where(eq(commerceSellers.id, seller.id));
+
+  await recordAudit(database, actor, {
+    action: 'COMMERCE_SELLER_SHIPPING_TERMS_SET',
+    targetType: 'COMMERCE_SELLER',
+    targetId: seller.id,
+    targetVersion: seller.version + 1,
+    before: {
+      feeToman: seller.shippingFeeToman?.toString() ?? null,
+      freeThresholdToman: seller.freeShippingThresholdToman?.toString() ?? null,
+    },
+    after: {
+      feeToman: input.feeToman.toString(),
+      freeThresholdToman: input.freeThresholdToman?.toString() ?? null,
+    },
+  });
 }

@@ -31,7 +31,7 @@ import { latestAttempt } from '../billing/payments.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { tomanToRial } from '../domain/money.ts';
-import { resumeContext } from '../domain/resume-context.ts';
+import { resumeContext, type ResumeContext } from '../domain/resume-context.ts';
 import { conflict, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
 import type { PaymentGateway } from '../adapters/registry.ts';
@@ -41,7 +41,10 @@ import { MAX_AUTOMATIC_REFUND_ATTEMPTS, refundRetryable } from './cancellation-m
 export type RefundRow = typeof depositRefunds.$inferSelect;
 
 export interface OpenRefundInput {
-  readonly inquiryId: string;
+  /** The animal deal this money came out of, when that is what it was. */
+  readonly inquiryId: string | null;
+  /** The shop sub-order it came out of, when that is what it was (PROMPT-010). */
+  readonly subOrderId?: string | null;
   readonly cancellationId: string | null;
   readonly paymentBatchId: string;
   readonly recipientAccountId: string;
@@ -57,10 +60,17 @@ export interface OpenRefundInput {
  */
 export async function openRefund(tx: DbClient, input: OpenRefundInput): Promise<string> {
   if (input.amountToman <= 0n) throw validation('مبلغ استرداد باید بزرگ‌تر از صفر باشد.');
+  const subOrderId = input.subOrderId ?? null;
+  // One subject, always: the database enforces it, and saying so here means a
+  // caller finds out at the call rather than through a constraint name.
+  if ((input.inquiryId === null) === (subOrderId === null)) {
+    throw validation('هر استرداد دقیقاً به یک معامله یا یک زیرسفارش تعلق دارد.');
+  }
   const [row] = await tx
     .insert(depositRefunds)
     .values({
       inquiryId: input.inquiryId,
+      subOrderId,
       cancellationId: input.cancellationId,
       paymentBatchId: input.paymentBatchId,
       recipientAccountId: input.recipientAccountId,
@@ -69,16 +79,54 @@ export async function openRefund(tx: DbClient, input: OpenRefundInput): Promise<
     .returning({ id: depositRefunds.id });
 
   await recordAudit(tx, null, {
-    action: 'ANIMAL_DEPOSIT_REFUND_OPENED',
+    action: subOrderId === null ? 'ANIMAL_DEPOSIT_REFUND_OPENED' : 'COMMERCE_ORDER_REFUND_OPENED',
     targetType: 'DEPOSIT_REFUND',
     targetId: row!.id,
     after: {
       inquiryId: input.inquiryId,
+      subOrderId,
       cancellationId: input.cancellationId,
       amountToman: input.amountToman.toString(),
     },
   });
   return row!.id;
+}
+
+/**
+ * Where this money came from, in the words and the address of that place.
+ *
+ * The record is shared between the animal deposit and the shop order, so the
+ * one thing that must not be shared is the sentence the recipient reads: being
+ * told a deposit came back when it was an order would be worse than saying
+ * nothing.
+ */
+function refundSubject(refund: RefundRow): { titleFa: string; bodyFa: string; resume: ResumeContext } {
+  if (refund.subOrderId !== null) {
+    return {
+      titleFa: 'مبلغ بخشی از سفارش شما بازگردانده شد',
+      bodyFa:
+        'مبلغ ' +
+        refund.amountToman.toLocaleString('fa-IR') +
+        ' تومان بابت زیرسفارشی که انجام نشد، به همان روش پرداخت بازگردانده شد.',
+      resume: resumeContext({
+        entity: { type: 'COMMERCE_SUBORDER', id: refund.subOrderId },
+        step: 'REFUNDED',
+        originRoute: '/account/orders',
+      }),
+    };
+  }
+  return {
+    titleFa: 'بیعانه شما برگشت خورد',
+    bodyFa:
+      'مبلغ ' +
+      refund.amountToman.toLocaleString('fa-IR') +
+      ' تومان به همان روشی که پرداخت شده بود بازگردانده شد.',
+    resume: resumeContext({
+      entity: { type: 'LISTING_INQUIRY', id: refund.inquiryId! },
+      step: 'DEPOSIT_REFUNDED',
+      originRoute: '/account/purchases/' + refund.inquiryId,
+    }),
+  };
 }
 
 export interface RefundExecution {
@@ -254,19 +302,13 @@ async function finish(
     });
 
     if (input.status === 'PAID') {
+      const subject = refundSubject(refund);
       await createNotification(tx, {
         recipientAccountId: refund.recipientAccountId,
         kind: 'ANIMAL_DEPOSIT_REFUNDED',
-        titleFa: 'بیعانه شما برگشت خورد',
-        bodyFa:
-          'مبلغ ' +
-          refund.amountToman.toLocaleString('fa-IR') +
-          ' تومان به همان روشی که پرداخت شده بود بازگردانده شد.',
-        resume: resumeContext({
-          entity: { type: 'LISTING_INQUIRY', id: refund.inquiryId },
-          step: 'DEPOSIT_REFUNDED',
-          originRoute: '/account/purchases/' + refund.inquiryId,
-        }),
+        titleFa: subject.titleFa,
+        bodyFa: subject.bodyFa,
+        resume: subject.resume,
       });
     }
 
@@ -330,16 +372,13 @@ export async function recordManualRefund(
       after: { status: 'PAID', bankReference, amountToman: refund.amountToman.toString() },
       reason: noteFa,
     });
+    const subject = refundSubject(refund);
     await createNotification(tx, {
       recipientAccountId: refund.recipientAccountId,
       kind: 'ANIMAL_DEPOSIT_REFUNDED',
-      titleFa: 'بیعانه شما بازگردانده شد',
-      bodyFa: 'استرداد این بیعانه بیرون از درگاه انجام و با شماره پیگیری ثبت شد.',
-      resume: resumeContext({
-        entity: { type: 'LISTING_INQUIRY', id: refund.inquiryId },
-        step: 'DEPOSIT_REFUNDED',
-        originRoute: '/account/purchases/' + refund.inquiryId,
-      }),
+      titleFa: subject.titleFa,
+      bodyFa: 'این استرداد بیرون از درگاه انجام و با شماره پیگیری ثبت شد.',
+      resume: subject.resume,
     });
     return updated;
   });
@@ -362,7 +401,7 @@ export async function refundOfDeal(database: DbClient, inquiryId: string): Promi
 
 export interface RefundQueueEntry {
   readonly id: string;
-  readonly inquiryId: string;
+  readonly inquiryId: string | null;
   readonly animalNameFa: string;
   readonly recipientMobile: string;
   readonly amountToman: bigint;

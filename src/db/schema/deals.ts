@@ -46,6 +46,7 @@ import {
 import { accounts, species, storedFiles } from './core.ts';
 import { listingInquiries } from './inquiry.ts';
 import { animalListings } from './marketplace.ts';
+import { commerceSubOrders } from './orders.ts';
 
 const now = sql`now()`;
 
@@ -162,14 +163,20 @@ export const dealCancellations = pgTable(
  * Separate from the cancellation that decided it, because deciding and paying
  * fail independently: a decision stands whatever the provider does, and a
  * refund that failed at the bank has to be visible as owed and retryable.
+ *
+ * It started as the animal deposit's refund and now carries the shop's too
+ * (PROMPT-010). The retrying, the attempt rows, the ceiling on automatic tries
+ * and the manual record with a bank reference are the same problem in both
+ * places, so they are the same machinery; only what the money was for differs,
+ * and exactly one of the two references below says which.
  */
 export const depositRefunds = pgTable(
   'deposit_refund',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    inquiryId: uuid('inquiry_id')
-      .notNull()
-      .references(() => listingInquiries.id, { onDelete: 'restrict' }),
+    inquiryId: uuid('inquiry_id').references(() => listingInquiries.id, { onDelete: 'restrict' }),
+    /** The shop sub-order this refund belongs to, when that is what it is. */
+    subOrderId: uuid('suborder_id').references(() => commerceSubOrders.id, { onDelete: 'restrict' }),
     cancellationId: uuid('cancellation_id').references(() => dealCancellations.id, { onDelete: 'restrict' }),
     /** The verified payment this money is coming back out of. */
     paymentBatchId: uuid('payment_batch_id').notNull(),
@@ -189,9 +196,16 @@ export const depositRefunds = pgTable(
   },
   (t) => [
     // One refund per deal. A partial refund is one record for the part owed.
-    uniqueIndex('deposit_refund_one_key').on(t.inquiryId),
+    uniqueIndex('deposit_refund_one_key').on(t.inquiryId).where(sql`${t.inquiryId} is not null`),
+    // And one per shop sub-order, for the same reason.
+    uniqueIndex('deposit_refund_suborder_key').on(t.subOrderId).where(sql`${t.subOrderId} is not null`),
     index('deposit_refund_queue_idx').on(t.status, t.createdAt),
     check('deposit_refund_amount_positive', sql`${t.amountToman} > 0`),
+    // A refund is for one thing. Neither both nor neither.
+    check(
+      'deposit_refund_one_subject',
+      sql`(${t.inquiryId} is not null)::int + (${t.subOrderId} is not null)::int = 1`,
+    ),
     check(
       'deposit_refund_paid_needs_ref',
       sql`${t.status} <> 'PAID' or (${t.providerRefundRef} is not null and ${t.completedAt} is not null)`,

@@ -327,6 +327,8 @@ export function bulkPriceProblems(
 
 export interface OfferComparison {
   readonly offerId: string;
+  /** The line a basket actually holds: a price belongs to a variant, not an offer. */
+  readonly skuId: string;
   readonly sellerId: string;
   readonly sellerNameFa: string;
   readonly priceToman: bigint;
