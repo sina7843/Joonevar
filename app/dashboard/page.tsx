@@ -413,6 +413,14 @@ export default async function DashboardPage() {
               >
                 آگهی‌های فروش
               </Link>
+              {/* The mating finder's subscription and capacity (Phase 4, PROMPT-002). */}
+              <Link
+                href="/account/mating-finder"
+                className="text-label-md text-text-brand underline underline-offset-4"
+                data-testid="dashboard-finder-link"
+              >
+                جفت‌یابی
+              </Link>
               {myAnimals.length > 0 ? (
                 <Link href="/animals" className="text-label-md text-text-brand underline underline-offset-4">
                   همه ({myAnimals.length})

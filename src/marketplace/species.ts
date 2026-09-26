@@ -18,7 +18,8 @@ import { marketplaceSpecies } from '../db/schema/marketplace.ts';
 import { recordAudit } from '../audit/service.ts';
 import { conflict, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
-import { assertMarketplaceCapability, isMarket, MARKET_FA, type MarketName } from './model.ts';
+import { assertMarketplaceCapability, isMarket, MARKET_FA, MARKETS, type MarketName } from './model.ts';
+import { assertFinderCapability } from '../finder/model.ts';
 
 export interface MarketSpeciesRow {
   readonly id: string;
@@ -41,6 +42,8 @@ export interface MarketSpeciesRow {
 export const LAUNCH_ENABLED: Record<MarketName, (speciesCode: string) => boolean> = {
   ANIMAL_SALE: (code) => code === 'DOG',
   MERCHANDISE: () => true,
+  // Phase 4: the finder is built for every species and launched for the dog only (DEC-0218).
+  MATING: (code) => code === 'DOG',
 };
 
 /**
@@ -50,7 +53,7 @@ export const LAUNCH_ENABLED: Record<MarketName, (speciesCode: string) => boolean
 export async function ensureMarketSpecies(database: DbClient): Promise<number> {
   const codes = await database.select({ code: species.code }).from(species).orderBy(asc(species.sortOrder));
   let inserted = 0;
-  for (const market of ['ANIMAL_SALE', 'MERCHANDISE'] as const) {
+  for (const market of MARKETS) {
     for (const row of codes) {
       const result = await database
         .insert(marketplaceSpecies)
@@ -58,7 +61,7 @@ export async function ensureMarketSpecies(database: DbClient): Promise<number> {
           market,
           speciesCode: row.code,
           enabled: LAUNCH_ENABLED[market](row.code),
-          reasonFa: 'وضعیت اولیه عرضه طبق تصمیم محصول فاز ۳',
+          reasonFa: market === 'MATING' ? 'وضعیت اولیه عرضه طبق تصمیم محصول فاز ۴' : 'وضعیت اولیه عرضه طبق تصمیم محصول فاز ۳',
         })
         .onConflictDoNothing({ target: [marketplaceSpecies.market, marketplaceSpecies.speciesCode] })
         .returning({ id: marketplaceSpecies.id });
@@ -132,8 +135,10 @@ export async function setSpeciesEnabled(
   actor: Actor,
   input: SetSpeciesInput,
 ): Promise<MarketSpeciesRow> {
-  assertMarketplaceCapability(actor, 'MARKET_SPECIES_WRITE');
   if (!isMarket(input.market)) throw validation('بازار انتخاب‌شده معتبر نیست.');
+  // Opening the finder for a species is the superadmin's, not the marketplace admin's.
+  if (input.market === 'MATING') assertFinderCapability(actor, 'FINDER_CONFIG_WRITE');
+  else assertMarketplaceCapability(actor, 'MARKET_SPECIES_WRITE');
   const market = input.market;
   const reasonFa = input.reasonFa.trim();
   if (reasonFa === '') throw validation('دلیل این تغییر را بنویسید؛ در تاریخچه ثبت می‌شود.');

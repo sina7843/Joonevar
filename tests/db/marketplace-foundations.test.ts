@@ -81,9 +81,11 @@ test('the launch opens the dog for animal sale and every species for the shop', 
 test('a species the taxonomy gains later arrives closed for animal sale', async () => {
   await testDb.db.insert(species).values({ code: 'FERRET', nameFa: 'راسو', nameEn: 'Ferret', sortOrder: 9 });
   const inserted = await ensureMarketSpecies(testDb.db);
-  assert.equal(inserted, 2, 'one row per market for the new species');
+  // Three markets since Phase 4 added the mating finder's species gate (DEC-0218).
+  assert.equal(inserted, 3, 'one row per market for the new species');
   assert.equal(await speciesEnabled(testDb.db, 'ANIMAL_SALE', 'FERRET'), false);
   assert.equal(await speciesEnabled(testDb.db, 'MERCHANDISE', 'FERRET'), true);
+  assert.equal(await speciesEnabled(testDb.db, 'MATING', 'FERRET'), false, 'the finder opens a new species only by decision');
 
   // Running it again adds nothing: the seed is additive, not a reset.
   assert.equal(await ensureMarketSpecies(testDb.db), 0);

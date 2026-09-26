@@ -20,6 +20,7 @@ import {
 import { clubRuleVersions } from '../db/schema/communities.ts';
 import { listingInquiries } from '../db/schema/inquiry.ts';
 import { commerceOrders } from '../db/schema/orders.ts';
+import { finderPlanVersions } from '../db/schema/finder.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { snapshotSetting } from '../settings/service.ts';
@@ -52,7 +53,9 @@ export type PaymentService =
   // A seller's plan period in the merchandise shop (Phase 3, PROMPT-008).
   | 'COMMERCE_SELLER_PLAN'
   // One basket, across however many shops it holds (Phase 3, PROMPT-010).
-  | 'COMMERCE_ORDER';
+  | 'COMMERCE_ORDER'
+  // A mating-finder subscription period (Phase 4, PROMPT-002).
+  | 'MATING_FINDER_SUBSCRIPTION';
 
 /**
  * What to charge for, and where the server should read the price.
@@ -101,17 +104,30 @@ export type BatchItemInput =
        * field change nothing: the browser never carries the amount.
        */
       readonly orderId: string;
+    }
+  | {
+      readonly targetType: string;
+      readonly targetId: string;
+      /**
+       * The published finder plan version whose price is charged (Phase 4,
+       * PROMPT-002). A plan version is immutable, like a club's rule version, so
+       * the figure is read from the one row that states it; an archived version
+       * or an unset price opens no payment.
+       */
+      readonly finderPlanVersionId: string;
     };
 
 const fromSetting = (item: BatchItemInput): item is Extract<BatchItemInput, { settingKey: string }> => 'settingKey' in item;
 const fromClubRule = (item: BatchItemInput): item is Extract<BatchItemInput, { clubRuleVersionId: string }> =>
   'clubRuleVersionId' in item;
 const fromOrder = (item: BatchItemInput): item is Extract<BatchItemInput, { orderId: string }> => 'orderId' in item;
+const fromFinderPlan = (item: BatchItemInput): item is Extract<BatchItemInput, { finderPlanVersionId: string }> =>
+  'finderPlanVersionId' in item;
 
 interface PricedItem {
   readonly item: BatchItemInput;
   readonly amountToman: bigint;
-  readonly priceSource: 'SETTING' | 'CLUB_RULE_VERSION' | 'INQUIRY' | 'COMMERCE_ORDER';
+  readonly priceSource: 'SETTING' | 'CLUB_RULE_VERSION' | 'INQUIRY' | 'COMMERCE_ORDER' | 'FINDER_PLAN';
   readonly settingKey: string | null;
   readonly settingVersion: number | null;
   readonly priceSourceId: string | null;
@@ -212,6 +228,29 @@ async function orderTotal(
   };
 }
 
+/** The finder plan's own price, read from its immutable published version and nowhere else. */
+async function finderPlanPrice(
+  database: Database,
+  item: Extract<BatchItemInput, { finderPlanVersionId: string }>,
+): Promise<PricedItem> {
+  const [plan] = await database
+    .select({ id: finderPlanVersions.id, status: finderPlanVersions.status, priceToman: finderPlanVersions.priceToman })
+    .from(finderPlanVersions)
+    .where(eq(finderPlanVersions.id, item.finderPlanVersionId))
+    .limit(1);
+  if (!plan) throw notFound('این طرح اشتراک پیدا نشد.');
+  if (plan.status !== 'PUBLISHED') throw conflict('این طرح در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.');
+  if (plan.priceToman === null || plan.priceToman <= 0n) throw notConfigured('قیمت طرح اشتراک جفت‌یابی');
+  return {
+    item,
+    amountToman: plan.priceToman,
+    priceSource: 'FINDER_PLAN',
+    settingKey: null,
+    settingVersion: null,
+    priceSourceId: plan.id,
+  };
+}
+
 export interface BatchRecord {
   readonly id: string;
   readonly accountId: string;
@@ -245,6 +284,7 @@ export async function createBatch(
     input.items.map(async (item): Promise<PricedItem> => {
       if (fromClubRule(item)) return clubRulePrice(database, item);
       if (fromOrder(item)) return orderTotal(database, item);
+      if (fromFinderPlan(item)) return finderPlanPrice(database, item);
       if (!fromSetting(item)) return inquiryDeposit(database, item);
       const snapshot = await snapshotSetting(database, item.settingKey);
       return {

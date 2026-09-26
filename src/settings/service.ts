@@ -94,6 +94,19 @@ export async function readText(database: DbClient, key: string): Promise<string>
 }
 
 /**
+ * A BOOL kill switch. Unset, missing or anything but `true` reads as closed, so
+ * no flow ever opens because nobody entered a value.
+ */
+export async function readFlag(database: DbClient, key: string): Promise<boolean> {
+  const [row] = await database
+    .select({ value: productSettings.value })
+    .from(productSettings)
+    .where(eq(productSettings.key, key))
+    .limit(1);
+  return row?.value === true;
+}
+
+/**
  * Snapshot for a record that must keep the value it was created with —
  * referral expiry, a payment item amount, a fee shown on a receipt.
  */

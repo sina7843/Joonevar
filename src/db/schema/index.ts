@@ -30,3 +30,4 @@ export * from './fulfilment.ts';
 export * from './trust.ts';
 export * from './promotions.ts';
 export * from './security.ts';
+export * from './finder.ts';

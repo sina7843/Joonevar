@@ -24,6 +24,7 @@ import { seedTaxonomies, type TaxonomySeedResult } from './taxonomy.ts';
 import { ensureMarketSpecies } from '../../marketplace/species.ts';
 import { ensurePromotionPackages } from '../../marketplace/promotions.ts';
 import { ensureCategories } from '../../commerce/catalog.ts';
+import { ensureFinderRules } from '../../finder/rules.ts';
 
 export interface SeedReport {
   readonly settingsInserted: readonly string[];
@@ -133,6 +134,14 @@ export async function seedBaseline(database: DbClient): Promise<SeedReport> {
    * quietly absent.
    */
   await ensureCategories(database);
+
+  /*
+   * The mating finder's confirmed baseline rule (Phase 4, PROMPT-002): male 14
+   * days, female 6 months, warning only, for the launch species. Written once;
+   * a (species, sex) that already has any rule is left to the superadmin. No
+   * plan and no price is seeded — those exist only when a superadmin publishes them.
+   */
+  await ensureFinderRules(database);
 
   // The approved-issuer registry (D14) starts empty on purpose: no issuer name
   // is invented here. An empty registry does not remove the review path, it

@@ -282,6 +282,8 @@ export const ADMIN_NAV: readonly NavItem[] = [
   { href: '/admin/centres', label: 'مراکز دامپزشکی', icon: 'mapPin' },
   { href: '/admin/communities', label: 'انجمن و کلاب', icon: 'user' },
   { href: '/admin/packages', label: 'بسته‌های تبلیغاتی', icon: 'certificate' },
+  // Phase 4 mating finder: plans, rules, species and switches (DEC-0218).
+  { href: '/admin/mating-finder', label: 'جفت‌یابی', icon: 'dog' },
   { href: '/admin/breeds', label: 'نژادها', icon: 'dog' },
   { href: '/admin/roles', label: 'نقش‌های محتوا', icon: 'shieldCheck' },
   { href: '/admin/notifications', label: 'اعلان‌ها و پیامک', icon: 'bell' },

@@ -24,6 +24,7 @@ import { activatePromotionFromPayment } from '../marketplace/promotions.ts';
 import { reserveFromDeposit } from '../marketplace/inquiries.ts';
 import { activatePlanFromPayment } from '../commerce/plans.ts';
 import { orderPaidEffects } from '../commerce/orders.ts';
+import { activateFinderSubscriptionFromPayment } from '../finder/subscriptions.ts';
 
 export const paidEffects: PaidEffects = {
   async onPaid(tx: DbClient, batch: BatchRecord) {
@@ -107,6 +108,11 @@ export const paidEffects: PaidEffects = {
       // therefore can never sell the same units twice (PROMPT-010).
       case 'COMMERCE_ORDER':
         await orderPaidEffects().onPaid(tx, batch);
+        return;
+      // A finder subscription period begins only here, inside the verifying
+      // transaction; a renewal starts where the live chain ends (Phase 4, PROMPT-002).
+      case 'MATING_FINDER_SUBSCRIPTION':
+        await activateFinderSubscriptionFromPayment(tx, batch);
         return;
       default:
         return;

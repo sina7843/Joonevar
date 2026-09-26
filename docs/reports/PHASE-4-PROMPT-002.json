@@ -1,0 +1,180 @@
+{
+  "promptId": "PROMPT-002",
+  "phase": "4",
+  "status": "COMPLETE",
+  "head_before": "3c6d6a89c4c1445a5e059904e4020c2eb2389e85",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-4.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "The mating finder's foundations exist and are enforced on the server. Migration 0053 is purely additive: seven new enums, three ADD VALUEs (the MATING species gate, the MATING_FINDER settings group, the MATING_FINDER_SUBSCRIPTION payment service) and three versioned tables. A plan version (owner or kennel, one/three/six/twelve months, title, price, active-animal capacity, optional sale window, suspension policy that never refunds) is written once; publishing names the version the operator saw, archives it in the same transaction and a unique partial index keeps one published version per slot, so a stale panel and two simultaneous publishes each end with one winner. The price lives on the version itself and createBatch reads it through a fifth price source, FINDER_PLAN, shaped like the club rule version; an unset price shows the plan but refuses checkout with a Persian operator reason, and zero is rejected. Nothing is seeded: no plan, no price, no capacity. Buying and renewing reuse createBatch/startAttempt/verifyAttempt unchanged; the checkout copies the entire plan version onto the period, so a later price or capacity edit moves nothing already bought; activation runs inside the verifying transaction under the account row lock and starts where the live chain ends, so a renewal never overlaps, a replayed callback does nothing, an amount mismatch activates nothing, and two payments verified at the same moment queue one after the other — all proven against a real database. A checkout replaced by a newer one is SUPERSEDED rather than cancelled, so if its old batch is paid anyway the money still buys the period it priced. Expiry is read from ends_at with no scheduler; an expired subscription falls back to the managed free-owner capacity, never to 'no limit', the Phase 3 seller-plan defect deliberately not repeated. Breed-and-sex rules are versioned the same way (species default or breed-specific, min/max age, cooldown in days or months, kinship degree, WARN or BLOCK) and the seed writes only the confirmed baseline once: dog male 14 days, female 6 months, warning only; ages and kinship thresholds stay unset. Nine kill switches, the request expiry (7 days), contract OTP bounds, media bounds and the free-owner capacity are managed settings in the MATING_FINDER group, writable by the superadmin alone, every switch starting closed. The access matrix is a server answer: a subscribed owner's profile is public, a free owner's is visible only to subscribers while the free-pool switch is open, the owner always sees their own, and a pair needs both KYC approvals and at least one live subscription. Seven Finder capabilities sit on the existing operational contexts; configuration is the superadmin's alone, no other context holds more than three, and none reads a chat or a contract body. The superadmin page /admin/mating-finder publishes and withdraws plans, publishes rules, opens species and shows the switches; /account/mating-finder shows standing, capacity, plans the account may buy (a kennel plan needs an approved kennel), history and which registered animals carry an official microchip. The upgrade rehearsal now has a real Phase 3 boundary and a separate Phase 4 step, 54/54. The full product run found one intended change to a Phase 3 expectation (three markets per species now) and four transient 'Connection terminated unexpectedly' failures in suites this prompt does not touch; the expectation was updated and all five suites re-ran green.",
+  "changedFiles": [
+    "src/db/migrations/0053_finder-foundations.sql",
+    "src/db/migrations/meta/0053_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/finder.ts",
+    "src/db/schema/enums.ts",
+    "src/db/schema/billing.ts",
+    "src/db/schema/index.ts",
+    "src/db/seed/index.ts",
+    "src/finder/model.ts",
+    "src/finder/plans.ts",
+    "src/finder/rules.ts",
+    "src/finder/subscriptions.ts",
+    "src/finder/flags.ts",
+    "src/finder/actions.ts",
+    "src/finder/forms.tsx",
+    "src/billing/payments.ts",
+    "src/billing/effects.ts",
+    "src/billing/receipts.ts",
+    "src/settings/keys.ts",
+    "src/settings/service.ts",
+    "src/authz/policy.ts",
+    "src/identity/kyc.ts",
+    "src/marketplace/model.ts",
+    "src/marketplace/species.ts",
+    "src/notifications/templates.ts",
+    "src/domain/resume-context.ts",
+    "src/ui/shell.tsx",
+    "app/dashboard/page.tsx",
+    "app/admin/mating-finder/page.tsx",
+    "app/account/mating-finder/page.tsx",
+    "app/account/mating-finder/return/page.tsx",
+    "tools/upgrade-check.mjs",
+    "tests/domain/finder-foundations.test.ts",
+    "tests/db/finder-foundations.test.ts",
+    "tests/db/marketplace-foundations.test.ts",
+    "tests/browser/finder-foundations.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-002/admin-finder-desktop.png",
+    "docs/reports/screenshots/phase-4/prompt-002/account-finder-mobile.png",
+    "docs/ops/operator-guide-phase-4.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-4-PROMPT-002.json"
+  ],
+  "migrations": [
+    "0053_finder-foundations"
+  ],
+  "decisions": [
+    "DEC-0218"
+  ],
+  "tests": {
+    "newFinderDomain": {
+      "command": "node --test tests/domain/finder-foundations.test.ts",
+      "total": 9,
+      "pass": 9,
+      "fail": 0
+    },
+    "newFinderDatabase": {
+      "command": "node --test tests/db/finder-foundations.test.ts",
+      "total": 11,
+      "pass": 11,
+      "fail": 0,
+      "covers": "seed and species gate, invalid/overlapping/stale/concurrent plan versions, withdraw guard, closed switch and unpriced checkout, kennel-only plan, FINDER_PLAN price source, verification-only activation, callback replay, amount mismatch, snapshot survives plan edit, renewal stacking, superseded batch paid concurrently with its replacement (no overlap, no lost money), expiry fallback to free capacity, three concurrent activations at capacity 1, access matrix and pair rule, breed-rule precedence and stale guard, superadmin-only species and settings, snapshot not rewritten"
+    },
+    "newFinderBrowser": {
+      "command": "node tools/browser-tests.mjs tests/browser/finder-foundations.test.ts",
+      "total": 3,
+      "pass": 3,
+      "fail": 0
+    },
+    "productFull": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 1048,
+      "pass": 1043,
+      "fail": 5,
+      "skip": 0,
+      "durationSeconds": 1210,
+      "note": "1028 pre-existing + 20 new. Failures: tests/db/marketplace-foundations.test.ts expected two market rows per new species and now gets three, an intended consequence of the MATING market (expectation updated, plus an assertion that the finder does not open a new species). The other four (identity, kennel, market-discovery, market-inquiry) failed with 'Connection terminated unexpectedly' during seed or migration of their own test database, in suites this prompt does not touch; Postgres stayed healthy and nothing in the repository terminates connections outside a suite's own database."
+    },
+    "productTargetedRerun": {
+      "command": "node --test --test-concurrency=2 tests/db/identity.test.ts tests/db/kennel.test.ts tests/db/market-discovery.test.ts tests/db/market-inquiry.test.ts tests/db/marketplace-foundations.test.ts",
+      "total": 64,
+      "pass": 64,
+      "fail": 0,
+      "durationSeconds": 474,
+      "note": "Every suite that failed in the full run, on the final tree including the updated expectation. Only the failing suites were re-run, per the standing preference to run only affected suites."
+    },
+    "domainConfigUi": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 457,
+      "pass": 457,
+      "fail": 0
+    },
+    "browserFull": {
+      "command": "node tools/browser-tests.mjs",
+      "total": 268,
+      "pass": 268,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 720,
+      "note": "265 pre-existing + 3 new, after a clean rm -rf .next && npm run build. Regenerated pre-existing screenshots were restored to HEAD."
+    },
+    "upgradeRehearsal": {
+      "command": "npm run db:upgrade-check",
+      "total": 54,
+      "pass": 54,
+      "fail": 0,
+      "note": "51 before; the Phase 3 step is now bounded at 0052 and a Phase 4 step checks the three finder tables arrive empty."
+    },
+    "tools": {
+      "command": "npm run test:tools",
+      "total": 20,
+      "pass": 20,
+      "fail": 0
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "rm -rf .next && npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 63 s; First Load JS shared 102 kB; /admin/mating-finder, /account/mating-finder and its return page compile as dynamic routes."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\" ; then the five failing suites re-run",
+      "result": "PASS",
+      "evidence": "Full run 1043/1048 with five failures, all accounted for: one intended Phase 3 expectation (two to three markets per species) updated, four transient connection terminations in untouched suites. The five suites re-ran 64/64 on the final tree. The 20 new finder tests pass (9 domain, 11 database)."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "268/268 in 720 s on an isolated database and a clean production build, including the three finder suites: superadmin publishes and a stale tab is refused, an owner is told the purchase is closed, sees the unpriced plan refused in words, buys through the development gateway with server verification and sees the period, capacity and history at 360 px RTL with no horizontal scroll; a marketplace admin is stopped at /admin/mating-finder by the server."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No real price, capacity, age range or kinship threshold exists: all are PRODUCT_DECISION_OPEN or operational data and stay unset until a superadmin publishes them; with nothing published, owners see no plan for sale.",
+    "The capacity race test counts a synthetic audit row under the account lock, because the mating_profile table arrives in PROMPT-003; PROMPT-003 must repeat it against real profile activation.",
+    "The account page lists registered animals of an open species with an official-microchip badge; it activates no profile and says so. Profile eligibility (KYC, fertility declaration, life status, photos) is PROMPT-003.",
+    "Two payment attempts on one pending batch can still both be paid at the gateway (platform behaviour of startAttempt, DEC-0217 section 12); the finder effect activates only once, but the second charge would need a manual refund. Not fixed here because it changes every paid service.",
+    "Suspension policy is recorded on each plan and snapshotted on each period, but suspension itself is PROMPT-007.",
+    "The subscription-activated notification is in-app only and sits behind finder.flag.notifications, which starts closed.",
+    "No real gateway: the browser run used the development gateway page and the database run a test gateway; neither is provider evidence.",
+    "Four full-run failures were transient connection terminations in untouched suites and were re-run individually rather than by repeating the 20-minute full product suite."
+  ],
+  "readiness": {
+    "code": "PHASE_4_FOUNDATIONS_BUILT",
+    "visual": "VERIFIED_BY_SCREENSHOT_360_AND_1440",
+    "integrations": "NOT_CONFIGURED",
+    "legal": "NOT_APPROVED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0053_finder-foundations.sql",
+    "src/finder/",
+    "tests/domain/finder-foundations.test.ts",
+    "tests/db/finder-foundations.test.ts",
+    "tests/browser/finder-foundations.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-002/",
+    "docs/ops/operator-guide-phase-4.md",
+    "DECISIONS.md#dec-0218"
+  ]
+}

@@ -24,6 +24,8 @@ export const SETTING_GROUPS = [
   'COMMERCE',
   'SETTLEMENT',
   'MARKETPLACE_OPERATIONS',
+  // Phase 4 (DEC-0218).
+  'MATING_FINDER',
 ] as const;
 export type SettingGroupName = (typeof SETTING_GROUPS)[number];
 
@@ -99,6 +101,16 @@ const ACCESS: Record<SettingGroupName, GroupAccess> = {
       'SUPPORT_AGENT',
     ],
     write: ['SUPERADMIN', 'MARKETPLACE_ADMIN'],
+  },
+  /*
+   * Phase 4 mating finder (DEC-0218). Plans, capacities, bounds and kill
+   * switches are the superadmin's (PRODUCT_DECISIONS §12). The operators who
+   * moderate, support or report on the finder read them, because they have to
+   * know the rule they are answering about.
+   */
+  MATING_FINDER: {
+    read: ['SUPERADMIN', 'MARKETPLACE_ADMIN', 'LISTING_MODERATOR', 'SUPPORT_AGENT', 'DISPUTE_REVIEWER', 'FINANCE_OPERATOR'],
+    write: ['SUPERADMIN'],
   },
 };
 

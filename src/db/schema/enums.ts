@@ -95,10 +95,17 @@ export const settingGroup = pgEnum('setting_group', [
   'COMMERCE',
   'SETTLEMENT',
   'MARKETPLACE_OPERATIONS',
+  /* Phase 4 mating finder (DEC-0218): plans, rules, bounds and kill switches, written by the superadmin only. */
+  'MATING_FINDER',
 ]);
 
 /** The two Phase 3 markets. They share nothing but the species list (DEC-0203). */
-export const marketplaceMarket = pgEnum('marketplace_market', ['ANIMAL_SALE', 'MERCHANDISE']);
+export const marketplaceMarket = pgEnum('marketplace_market', [
+  'ANIMAL_SALE',
+  'MERCHANDISE',
+  /* Phase 4: which species the mating finder is open for (DOG only at launch, DEC-0218). */
+  'MATING',
+]);
 
 export const settingScopeType = pgEnum('setting_scope_type', ['GLOBAL']);
 
@@ -699,3 +706,39 @@ export const rateLimitAction = pgEnum('rate_limit_action', [
   'REVIEW_SUBMIT',
   'SEARCH_QUERY',
 ]);
+
+// ── Phase 4 mating finder (DEC-0218) ─────────────────────────────────────────
+
+/** Two independent plan families: an ordinary owner and a kennel (PRODUCT_DECISIONS §2). */
+export const finderPlanAudience = pgEnum('finder_plan_audience', ['OWNER', 'KENNEL']);
+
+/** A plan version is immutable once written; publishing a new one archives the old. */
+export const finderPlanStatus = pgEnum('finder_plan_status', ['PUBLISHED', 'ARCHIVED']);
+
+/**
+ * What a Finder suspension does to a paid period. Neither value refunds anything
+ * (PRODUCT_DECISIONS §12); the superadmin states which one a plan carries.
+ */
+export const finderSuspensionPolicy = pgEnum('finder_suspension_policy', [
+  'PERIOD_CONTINUES_NO_REFUND',
+  'PERIOD_PAUSED_NO_REFUND',
+]);
+
+export const finderPeriodKind = pgEnum('finder_period_kind', ['INITIAL', 'RENEWAL']);
+
+/**
+ * A subscription period. EXPIRED is read from `ends_at`, never stored.
+ * SUPERSEDED is an unpaid period replaced by a newer checkout; if its old batch is
+ * paid anyway the money still buys exactly the period it priced.
+ */
+export const finderSubscriptionStatus = pgEnum('finder_subscription_status', [
+  'PENDING_PAYMENT',
+  'ACTIVE',
+  'SUPERSEDED',
+  'CANCELLED',
+]);
+
+export const finderRuleStatus = pgEnum('finder_rule_status', ['PUBLISHED', 'ARCHIVED']);
+
+/** Warning is the baseline everywhere; BLOCK exists only through a published breed rule. */
+export const finderRuleMode = pgEnum('finder_rule_mode', ['WARN', 'BLOCK']);

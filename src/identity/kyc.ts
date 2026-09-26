@@ -292,6 +292,11 @@ export async function canRegisterAnimal(database: DbClient, accountId: string): 
   return record?.status === 'APPROVED';
 }
 
+/** Whether an account's identity has been approved. The one question every eligibility check asks. */
+export async function isKycApproved(database: DbClient, accountId: string): Promise<boolean> {
+  return (await findCase(database, accountId))?.status === 'APPROVED';
+}
+
 /** The document is readable through the private-file route only; this is just the reference. */
 export async function kycDocumentRef(database: DbClient, caseId: string) {
   const [row] = await database

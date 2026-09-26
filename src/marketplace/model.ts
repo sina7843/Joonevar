@@ -11,12 +11,15 @@ import type { Actor, ActorContextName } from '../authz/actor.ts';
 
 // ── Markets ────────────────────────────────────────────────────────────────
 
-export const MARKETS = ['ANIMAL_SALE', 'MERCHANDISE'] as const;
+// MATING is the Phase 4 finder's species gate: the same table and audit, but only
+// the superadmin opens or closes it (PRODUCT_DECISIONS §12, DEC-0218).
+export const MARKETS = ['ANIMAL_SALE', 'MERCHANDISE', 'MATING'] as const;
 export type MarketName = (typeof MARKETS)[number];
 
 export const MARKET_FA: Record<MarketName, string> = {
   ANIMAL_SALE: 'بازار فروش حیوان',
   MERCHANDISE: 'فروشگاه کالا',
+  MATING: 'جفت‌یابی',
 };
 
 export const isMarket = (value: unknown): value is MarketName =>

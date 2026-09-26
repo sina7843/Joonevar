@@ -39,6 +39,7 @@ export const PAYMENT_SERVICE_FA: Record<PaymentService, string> = {
   ANIMAL_SALE_DEPOSIT: 'بیعانه خرید حیوان',
   COMMERCE_SELLER_PLAN: 'پلن فروشندگی کالا',
   COMMERCE_ORDER: 'سفارش فروشگاه کالا',
+  MATING_FINDER_SUBSCRIPTION: 'اشتراک جفت‌یابی',
 };
 
 export const PAYMENT_STATUS_FA: Record<string, string> = {

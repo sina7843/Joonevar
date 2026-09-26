@@ -44,6 +44,8 @@ export const paymentService = pgEnum('payment_service', [
   'COMMERCE_SELLER_PLAN',
   /** One basket across however many shops it holds (Phase 3, PROMPT-010). */
   'COMMERCE_ORDER',
+  // A mating-finder subscription period (Phase 4, PROMPT-002). The mating agreement itself is never paid here.
+  'MATING_FINDER_SUBSCRIPTION',
 ]);
 
 /**

@@ -52,6 +52,9 @@ const LAST_PHASE_2 = '0032';
 /** The last migration of Phase 2.5. Everything after it is Phase 3. */
 const LAST_PHASE_2_5 = '0040';
 
+/** The last migration of Phase 3. Everything after it is Phase 4 (PHASE-4 PROMPT-002). */
+const LAST_PHASE_3 = '0052';
+
 const keep = process.argv.includes('--keep');
 const name = 'hamzist_upgrade_' + randomBytes(4).toString('hex');
 
@@ -262,9 +265,18 @@ try {
 
   // ── 6. The Phase 3 migrations, on top of all of it ───────────────────────
   const phase3 = await withClient(target, (client) =>
-    applyMigrations(client, (file) => file.slice(0, 4) > LAST_PHASE_2_5),
+    applyMigrations(client, (file) => file.slice(0, 4) > LAST_PHASE_2_5 && file.slice(0, 4) <= LAST_PHASE_3),
   );
   console.log('applied ' + phase3.length + ' Phase 3 migrations: ' + phase3.join(', '));
+
+  // ── 6b. The Phase 4 migrations, bounded the same way ──────────────────────
+  // The Phase 3 step above used to apply everything after 0040, so the first
+  // Phase 4 migration would have been absorbed into it and no boundary would
+  // have been rehearsed. PROMPT-008 adds representative Phase 3 rows here.
+  const phase4 = await withClient(target, (client) =>
+    applyMigrations(client, (file) => file.slice(0, 4) > LAST_PHASE_3),
+  );
+  console.log('applied ' + phase4.length + ' Phase 4 migrations: ' + phase4.join(', '));
 
   // ── 7. Nothing the earlier generations wrote may have moved ──────────────
   await withClient(target, async (client) => {
@@ -346,10 +358,14 @@ try {
       'discount_rule',
       'loyalty_entry',
       'rate_limit_hit',
+      // Phase 4: the upgrade publishes no plan, subscribes nobody and seeds no rule by migration.
+      'finder_plan_version',
+      'finder_subscription_period',
+      'finder_breed_rule',
     ]) {
       const counted = await client.query('select count(*)::int as value from ' + table);
       check(
-        'the Phase 3 table ' + table + ' exists and starts empty',
+        'the ' + (table.startsWith('finder_') ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
         counted.rows[0]?.value === 0,
         'rows=' + counted.rows[0]?.value,
       );
