@@ -1,4 +1,5 @@
-# Continuous integration — Phase 2.5 §10, §12 (PROMPT-016).
+# Continuous integration — Phase 2.5 §10, §12 (PROMPT-016),
+# extended for Phase 3 in PROMPT-014.
 #
 # The gates a change has to pass before anybody trusts it, in the order that
 # fails fastest: types, then the tests that need no database, then the build,
@@ -11,6 +12,11 @@
 #     database is a throwaway service container with a password written in the
 #     open on purpose, because it lives for the length of one job and is
 #     reachable from nowhere else.
+#   - **A green run is not a release.** Everything here runs against a
+#     throwaway database and local adapters. It proves the code is consistent
+#     with itself; it is not evidence that a real gateway, a real SMS route or a
+#     real bank account works, and `docs/ops/release-readiness-phase-3.md` lists what
+#     is still unset.
 #   - **A local demo provider never becomes a production fallback.** The
 #     environment below is `development` with `INTEGRATION_MODE=local`, which is
 #     exactly what `assertNotProduction` requires; the adapters refuse to be
@@ -61,6 +67,11 @@ jobs:
       # route/SEO map. They are the cheapest real signal, so they run first.
       - name: Domain, configuration and UI tests
         run: node --test --test-concurrency=4 "tests/domain/*.test.ts" "tests/config/*.test.ts" "tests/ui/*.test.ts"
+
+      # The Runner is what records a prompt as complete, so its own tests are a
+      # gate: a Runner that stops checking is worse than no Runner.
+      - name: Packaging and Runner tests
+        run: npm run test:tools
 
       - name: Build
         env:
@@ -121,6 +132,13 @@ jobs:
       # the migrations apply from nothing dozens of times over.
       - name: Database tests
         run: node --test --test-concurrency=2 "tests/db/*.test.ts"
+
+      # Every run above proves the migrations apply to an empty database. This
+      # proves what an operator actually does on delivery day: upgrade a
+      # database that already holds records. (The backup and restore round trip
+      # is covered by tests/db/backup-restore.test.ts, in the step above.)
+      - name: Upgrade rehearsal on representative data
+        run: npm run db:upgrade-check
 
   browser:
     name: browser suites

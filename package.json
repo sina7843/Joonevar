@@ -19,7 +19,9 @@
     "test:browser": "node tools/browser-tests.mjs",
     "db:backup": "node tools/backup.mjs --out backups",
     "db:restore": "node tools/restore.mjs",
-    "dev:tidy": "node tools/dev-tidy.mjs"
+    "dev:tidy": "node tools/dev-tidy.mjs",
+    "test:tools": "node --test \"tools/tests/*.test.mjs\"",
+    "db:upgrade-check": "node tools/upgrade-check.mjs"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

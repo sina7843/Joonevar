@@ -1,5 +1,5 @@
 /**
- * Upgrade rehearsal — Phase 2.5 §12 (PROMPT-016).
+ * Upgrade rehearsal — Phase 2.5 §12 (PROMPT-016), extended in PHASE-3 PROMPT-014.
  *
  * Every test run proves the migrations apply to an empty database. That is the
  * easy half. The half that matters on delivery day is the other one: a database
@@ -17,6 +17,18 @@
  *      expiry, the published community became ACTIVE without claiming a
  *      verifier, existing co-managers became ADMIN, and every older payment item
  *      says its price came from a setting.
+ *
+ * Phase 3 then repeats the exercise on the same database rather than a fresh
+ * one, because that is the upgrade an operator actually performs: a Phase 1
+ * database that became a Phase 2.5 database now becomes a Phase 3 one. It
+ * writes the records of that generation — an owner, a dog, its microchip, a
+ * kennel, a membership period, a payment and a club membership, and the
+ * notification rows all of that produced — applies 0041 to 0052 on top, and
+ * checks that every one of them came through unchanged, that the new tables
+ * arrived empty, and that a previous release still runs: the inserts the old
+ * code makes are made again, against the new schema, naming only the columns
+ * that existed before 0041. That last check is what DEC-0179 promises, and
+ * until now nothing rehearsed it against real data.
  *
  * It is a script rather than a test because it is a rehearsal an operator runs
  * before an upgrade, with its own throwaway database and its own report.
@@ -36,6 +48,9 @@ const ADMIN_URL =
 
 /** The last migration of Phase 2. Everything after it is Phase 2.5. */
 const LAST_PHASE_2 = '0032';
+
+/** The last migration of Phase 2.5. Everything after it is Phase 3. */
+const LAST_PHASE_2_5 = '0040';
 
 const keep = process.argv.includes('--keep');
 const name = 'hamzist_upgrade_' + randomBytes(4).toString('hex');
@@ -157,7 +172,12 @@ try {
   console.log('representative rows written');
 
   // ── 3. The Phase 2.5 migrations, on top of real data ─────────────────────
-  const after = await withClient(target, (client) => applyMigrations(client, (file) => file.slice(0, 4) > LAST_PHASE_2));
+  // Bounded at both ends. Without the upper bound this stage quietly swallowed
+  // every later phase as soon as one existed, and a rehearsal that applies
+  // everything at once rehearses no upgrade boundary at all.
+  const after = await withClient(target, (client) =>
+    applyMigrations(client, (file) => file.slice(0, 4) > LAST_PHASE_2 && file.slice(0, 4) <= LAST_PHASE_2_5),
+  );
   console.log('applied ' + after.length + ' Phase 2.5 migrations: ' + after.join(', '));
 
   // ── 4. What the phase promised about those rows ──────────────────────────
@@ -206,6 +226,204 @@ try {
     // Re-running the whole set changes nothing: drizzle records what it applied.
     const rerun = await applyMigrations(client, () => false);
     check('a second run applies nothing', rerun.length === 0);
+  });
+
+  // ── 5. The records a Phase 2.5 database actually holds ───────────────────
+  const legacy = await withClient(target, async (client) => {
+    await client.query(
+      `insert into microchip (animal_id, number, bound_via, read_method, bound_by_account_id)
+       values ($1, '985112345678901', 'IMPLANT', 'BLUETOOTH_READER', $2)`,
+      [ids.animalId, ids.accountId],
+    );
+    const kennel = await client.query(
+      "insert into kennel (owner_account_id, status) values ($1, 'APPROVED') returning id",
+      [ids.accountId],
+    );
+    const period = await client.query(
+      `insert into membership_period (account_id, kind, status, tariff_setting_key, tariff_setting_version, amount_toman, period_days, starts_at, ends_at)
+       values ($1, 'INITIAL', 'ACTIVE', 'fee.membership_toman', 1, '150000', 365, now(), now() + interval '365 days')
+       returning id`,
+      [ids.accountId],
+    );
+    await client.query('insert into club_membership (community_id, account_id, status) values ($1, $2, $3)', [
+      ids.clubId,
+      ids.accountId,
+      'ACTIVE',
+    ]);
+    const notification = await client.query(
+      `insert into notification (recipient_account_id, kind, entity_type, entity_id, step, origin_route, title_fa, body_fa)
+       values ($1, 'CLUB_MEMBERSHIP_APPROVED', 'COMMUNITY', $2, 'CLUB_MEMBERSHIP', '/clubs', 'عضویت تأیید شد', 'متن اعلان')
+       returning id`,
+      [ids.accountId, ids.clubId],
+    );
+    return { kennelId: kennel.rows[0].id, periodId: period.rows[0].id, notificationId: notification.rows[0].id };
+  });
+  console.log('Phase 2.5 generation rows written');
+
+  // ── 6. The Phase 3 migrations, on top of all of it ───────────────────────
+  const phase3 = await withClient(target, (client) =>
+    applyMigrations(client, (file) => file.slice(0, 4) > LAST_PHASE_2_5),
+  );
+  console.log('applied ' + phase3.length + ' Phase 3 migrations: ' + phase3.join(', '));
+
+  // ── 7. Nothing the earlier generations wrote may have moved ──────────────
+  await withClient(target, async (client) => {
+    const chip = await client.query('select number, bound_via from microchip where animal_id = $1', [ids.animalId]);
+    check(
+      'a microchip keeps its number and how it was bound',
+      chip.rows[0]?.number === '985112345678901' && chip.rows[0]?.bound_via === 'IMPLANT',
+      'number=' + chip.rows[0]?.number,
+    );
+
+    const kennel = await client.query('select status from kennel where id = $1', [legacy.kennelId]);
+    check('an approved kennel stays approved', kennel.rows[0]?.status === 'APPROVED', 'status=' + kennel.rows[0]?.status);
+
+    const period = await client.query(
+      'select status, amount_toman, tariff_setting_key from membership_period where id = $1',
+      [legacy.periodId],
+    );
+    check(
+      'a membership period keeps its status and the tariff it was priced from',
+      period.rows[0]?.status === 'ACTIVE' && period.rows[0]?.tariff_setting_key === 'fee.membership_toman',
+      'status=' + period.rows[0]?.status,
+    );
+    check(
+      'and its amount to the toman',
+      String(period.rows[0]?.amount_toman) === '150000',
+      'amount=' + period.rows[0]?.amount_toman,
+    );
+
+    const membership = await client.query(
+      'select lifetime, current_period_ends_at from membership where account_id = $1',
+      [ids.accountId],
+    );
+    check(
+      'the lifetime membership is still lifetime after a second upgrade',
+      membership.rows[0]?.lifetime === true && membership.rows[0]?.current_period_ends_at === null,
+      'lifetime=' + membership.rows[0]?.lifetime,
+    );
+
+    const clubMembership = await client.query('select status from club_membership where community_id = $1', [ids.clubId]);
+    check('a club membership stays active', clubMembership.rows[0]?.status === 'ACTIVE', 'status=' + clubMembership.rows[0]?.status);
+
+    const notification = await client.query('select kind, title_fa from notification where id = $1', [legacy.notificationId]);
+    check(
+      'a notification row keeps its kind and its Persian text',
+      notification.rows[0]?.kind === 'CLUB_MEMBERSHIP_APPROVED' && notification.rows[0]?.title_fa === 'عضویت تأیید شد',
+      'kind=' + notification.rows[0]?.kind,
+    );
+
+    const item = await client.query('select price_source, setting_key from payment_item where batch_id = $1', [ids.batchId]);
+    check(
+      'the older payment item still says its price came from a setting',
+      item.rows[0]?.price_source === 'SETTING' && item.rows[0]?.setting_key === 'fee.membership_toman',
+    );
+
+    const animal = await client.query('select status, name from animal where id = $1', [ids.animalId]);
+    check(
+      'the animal is the same animal',
+      animal.rows[0]?.status === 'REGISTERED' && animal.rows[0]?.name === 'سگ ارتقا',
+      'status=' + animal.rows[0]?.status,
+    );
+
+    // The Phase 3 tables arrived, and arrived empty: an upgrade adds capacity,
+    // never rows nobody created.
+    for (const table of [
+      'animal_listing',
+      'listing_inquiry',
+      'listing_offer',
+      'deal_handover',
+      'animal_ownership_transfer',
+      'commerce_seller',
+      'commerce_product',
+      'commerce_order',
+      'commerce_suborder',
+      'seller_shipping_method',
+      'order_return',
+      'seller_ledger_entry',
+      'settlement_batch',
+      'review',
+      'discount_rule',
+      'loyalty_entry',
+      'rate_limit_hit',
+    ]) {
+      const counted = await client.query('select count(*)::int as value from ' + table);
+      check(
+        'the Phase 3 table ' + table + ' exists and starts empty',
+        counted.rows[0]?.value === 0,
+        'rows=' + counted.rows[0]?.value,
+      );
+    }
+
+    // Nobody was made a seller, and nobody's animal was put up for sale.
+    const invented = await client.query(
+      'select (select count(*) from animal_listing where seller_account_id = $1)::int as listings,' +
+        ' (select count(*) from commerce_seller where owner_account_id = $1)::int as sellers',
+      [ids.accountId],
+    );
+    check(
+      'the upgrade listed no animal and made no seller',
+      invented.rows[0]?.listings === 0 && invented.rows[0]?.sellers === 0,
+      JSON.stringify(invented.rows[0]),
+    );
+  });
+
+  // ── 8. What DEC-0179 actually promises: the previous release still runs ──
+  //
+  // Every migration in this phase is additive, which is only worth anything if
+  // a deployment that has not restarted yet keeps working. So the inserts the
+  // previous release makes are made again here, naming only the columns that
+  // existed before 0041, against the schema that exists after 0052.
+  await withClient(target, async (client) => {
+    const previousRelease = async (title, sql, params) => {
+      try {
+        await client.query(sql, params);
+        check(title, true);
+      } catch (error) {
+        check(title, false, error.message);
+      }
+    };
+
+    const second = await client.query(
+      `insert into animal (owner_account_id, status, species, name, sex)
+       values ($1, 'REGISTERED', 'DOG', 'سگ نسل قبل', 'FEMALE') returning id`,
+      [ids.accountId],
+    );
+    check('the previous release can still register an animal', second.rows.length === 1);
+    await previousRelease(
+      'the previous release can still write a notification',
+      `insert into notification (recipient_account_id, kind, entity_type, entity_id, step, origin_route, title_fa, body_fa)
+       values ($1, 'MEMBERSHIP_ACTIVATED', 'ACCOUNT', $2, 'MEMBERSHIP', '/membership', 'عنوان', 'متن')`,
+      [ids.accountId, ids.accountId],
+    );
+    await previousRelease(
+      'the previous release can still open a payment batch',
+      `insert into payment_batch (account_id, service, status, resume_context)
+       values ($1, 'MEMBERSHIP', 'AWAITING_PAYMENT', '{"entity":{"type":"ACCOUNT","id":"x"},"step":"MEMBERSHIP_PAYMENT","originRoute":"/membership"}'::jsonb)`,
+      [ids.accountId],
+    );
+    await previousRelease(
+      'the previous release can still bind a microchip',
+      `insert into microchip (animal_id, number, bound_via, read_method, bound_by_account_id)
+       values ($1, '985119999999999', 'EXISTING_UNREGISTERED', 'MANUAL', $2)`,
+      [second.rows[0].id, ids.accountId],
+    );
+    await previousRelease(
+      'the previous release can still record a membership period',
+      `insert into membership_period (account_id, kind, status, tariff_setting_key, tariff_setting_version, amount_toman, period_days)
+       values ($1, 'RENEWAL', 'PENDING_PAYMENT', 'fee.membership_toman', 1, '150000', 365)`,
+      [ids.accountId],
+    );
+
+    // Every file on disk was recorded exactly once, so the upgrade is complete
+    // and nothing was applied twice on the way through three generations.
+    const files = (await fs.readdir(MIGRATIONS)).filter((file) => file.endsWith('.sql'));
+    const recorded = await client.query('select count(*)::int as value from drizzle.__drizzle_migrations');
+    check(
+      'every migration on disk was applied exactly once',
+      recorded.rows[0]?.value === files.length,
+      'recorded=' + recorded.rows[0]?.value + ' files=' + files.length,
+    );
   });
 } finally {
   if (keep) {

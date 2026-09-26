@@ -1,0 +1,116 @@
+{
+  "promptId": "PROMPT-014",
+  "phase": "3",
+  "status": "COMPLETE",
+  "head_before": "1097dd1",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-3.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "A rehearsal that applies every migration at once rehearses nothing, and that is what the upgrade check had quietly become: its Phase 2.5 stage was bounded only at the bottom, so from the moment Phase 3 existed it swallowed 0041 to 0052 along with the rest and still reported green. It now walks the path a real installation walks — migrations to the end of Phase 2, the records of that generation, Phase 2.5, the records of *that* generation (an owner, a dog, its microchip, a kennel, a membership period, a payment, a club membership and the notification rows all of it produced), then Phase 3 on top of all of it. Every earlier record came through untouched, all seventeen Phase 3 tables arrived and arrived empty, and the upgrade made nobody a seller and listed nobody's animal. It also measures, for the first time, what DEC-0179 actually promises: after 0052, the inserts the previous release makes are made again with the column list that existed before 0041, because additive is a claim about a deployment that has not restarted yet, not a claim about the absence of the word DROP in a file. I wrote a second script to rehearse backup and restore and then deleted it: tests/db/backup-restore.test.ts already exercised the same functions against real linked data and already refused a damaged snapshot, and two implementations of one promise drift — which is exactly the mistake the redaction work made one prompt ago. The two things that suite did lack were folded into it instead: a Phase 3 record coming back, and the migration bookkeeping coming back so the next upgrade adds what is missing rather than replaying everything. The accessibility, RTL and performance suites were green and had never named a single Phase 3 route, so the whole marketplace was unmeasured. It is measured now: the skip link is the first tab stop, every tab stop has a box and a word, one main landmark and one first-level heading per page, no heading level is skipped, zero visible controls lack an accessible name, nothing hangs off the side of a 360px screen, and the pages answer in under 110ms at 76KB and 40KB. The timing thresholds are deliberately loose — this is evidence that nothing is pathological, not a benchmark, and a tight number on a busy CI machine teaches everybody to ignore the check. The full product run then failed one test for the second time in two prompts, and calling it a flake twice would have been a decision rather than an observation: the outbox could send the same SMS twice. The claim transaction took the row with `for update skip locked`, spent an attempt and committed — but the row does not leave PENDING until the provider answers, which happens after that commit, so the lock protected a window that ended before the send began. Under load a second worker walked straight into it. The claim now takes a lease as well, and re-checks the due window inside the lock, because the candidate list every worker holds was read before any claim committed. A worker that dies mid-send now leaves the row to be retried when the lease expires, which is what the retry path already existed for. The delivery documents say what a green build is not: an operator guide whose every route and setting key was checked against the code, an acceptance matrix of twenty rows, and a readiness list that separates NOT_CONFIGURED from broken — gateway, SMS route, bank account, tariffs, agreements, legal approval, carrier integration and real content are all unset, and no amount of green replaces any of them.",
+  "changedFiles": [
+    "tools/upgrade-check.mjs",
+    "src/notifications/outbox.ts",
+    "tests/db/backup-restore.test.ts",
+    "tests/browser/phase-3-readiness.test.ts",
+    ".github/workflows/ci.yml",
+    "package.json",
+    "docs/ops/operator-guide-phase-3.md",
+    "docs/ops/release-readiness-phase-3.md",
+    "docs/ops/recovery-and-rollback.md",
+    "docs/qa/phase-3-acceptance.md",
+    "DECISIONS.md",
+    "IMPLEMENTATION_STATUS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "docs/reports/PHASE-3-PROMPT-014.json"
+  ],
+  "migrations": [],
+  "decisions": [
+    "DEC-0216"
+  ],
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree."
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 on the final tree; Compiled successfully; First Load JS shared by all 102 kB."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "exit 0 — tests 1028, pass 1028, fail 0, skipped 0, duration_ms 1424942.57 on the final tree. An earlier run on the same tree failed tests/db/notification-outbox.test.ts (2 sends where 1 was expected); that was a real outbox race, fixed in src/notifications/outbox.ts, and this run is after the fix."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "exit 0 — tests 265, pass 265, fail 0, skipped 0, duration_ms 625009.42 on the final tree, including the eight new PROMPT-014 readiness tests. Measured server responses: /animals-market 84KB in 80-91ms, /shop 52KB in 69-82ms, the account pages 11-34KB in 61-72ms."
+    },
+    {
+      "id": "upgrade-rehearsal",
+      "command": "npm run db:upgrade-check",
+      "result": "PASS",
+      "evidence": "exit 0 — 51/51 checks on the final tree: 33 migrations to the end of Phase 2, Phase 2 generation records, 8 Phase 2.5 migrations, Phase 2.5 generation records, then 12 Phase 3 migrations (0041-0052); every earlier record intact, all 17 Phase 3 tables present and empty, and all five previous-release inserts accepted against the post-0052 schema."
+    },
+    {
+      "id": "tools-tests",
+      "command": "npm run test:tools",
+      "result": "PASS",
+      "evidence": "exit 0 — tests 19, pass 19, fail 0 on the final tree."
+    }
+  ],
+  "blockers": [],
+  "defectsFoundByTests": [
+    "The outbox could send the same SMS twice. The claim transaction locked the row with `for update skip locked`, spent an attempt and committed, but the row stays PENDING until the provider answers — which happens after that commit — so the lock closed a window that ended before the send started, and a second worker arriving in the gap claimed and sent the same row. It had failed once in the previous prompt's full run and was recorded as a load flake; failing a second time made that label a decision rather than an observation. The claim now also takes a lease on `next_attempt_at` and re-checks the due window inside the lock, since every worker's candidate list was read before any claim committed. Three consecutive runs of the suite pass. A worker that dies mid-send now leaves the row for the retry the lease expiry allows, instead of leaving it immediately re-sendable.",
+    "The upgrade rehearsal had stopped rehearsing an upgrade. Its Phase 2.5 stage filtered on `file > '0032'` with no upper bound, so as soon as Phase 3 migrations existed it applied all of them in that stage and checked Phase 2.5's promises against a database that was already on Phase 3 — and stayed green throughout. The stage is now bounded at both ends, and a Phase 3 stage follows it.",
+    "Three fixture errors in the new rehearsal, each a real shape the script had guessed at: an ACTIVE membership_period needs both ends of its window (a check constraint), payment_batch_status has no PENDING value, and a microchip is unique per animal. All three were the rehearsal being wrong about the schema, not the schema being wrong."
+  ],
+  "incidents": [
+    "I wrote tools/restore-check.mjs, verified it at 15/15, and then deleted it: tests/db/backup-restore.test.ts already covered the same round trip with the same functions against real linked data, including the refusal of a snapshot that does not match its manifest. Keeping both would have left two implementations of one promise to drift apart. The two assertions the existing suite genuinely lacked — a Phase 3 record surviving the round trip, and the migration bookkeeping being restored — were added to it instead.",
+    "One test in the new readiness suite asserted that the shop page shows Persian digits. It failed because the fixture has no products, so the page has no numbers: the assertion needed data it was never given, and its second half (`isolated >= 0`) could not fail at all. It was removed rather than weakened, and the surviving RTL test checks the page is written in Persian, which is true without a catalogue."
+  ],
+  "limitations": [
+    "A green local or CI build is not provider approval. No real gateway, SMS route or bank account is called anywhere in this repository, and the local adapters refuse to be constructed in production, so a green run can never be evidence that a real provider works.",
+    "It is not legal approval either. The seller agreement, the return policy text, the terms of use and the trade licence are decisions people make, not test output. The medicine category is deliberately closed pending one of them.",
+    "No tariff, fee or ceiling has a value. Every one is a managed setting with no default, and an unset one stops the flow and says so rather than being read as zero — but that means the product cannot transact until an operator enters them.",
+    "Carrier integration does not exist. Tracking is recorded by hand and delivery comes from accepted evidence or the buyer's confirmation; no shipping API is called.",
+    "There is no malware scanning and no penetration test, unchanged from PROMPT-013 and stated again in the readiness document rather than left behind in an earlier report.",
+    "The upgrade rehearsal proves the migrations apply to representative records, not to a production-sized database. It says nothing about how long 0041 to 0052 take on millions of rows.",
+    "The performance evidence is a single machine, one run, on a locally built production bundle with an empty catalogue. It shows nothing pathological; it is not a load test and a populated marketplace would need its own measurement.",
+    "The accessibility evidence is a keyboard and structure smoke test, not an audit. No screen reader was actually driven and no automated accessibility tool was run against these pages.",
+    "Nothing runs on a timer anywhere in this phase, the outbox lease included: an expired lease is noticed when a worker next runs, so a queue nobody opens is a queue nobody retries."
+  ],
+  "readiness": {
+    "code": "PHASE_3_DELIVERED",
+    "ci": "EXTENDED_FOR_PHASE_3",
+    "upgradeRehearsal": "VERIFIED_ON_REPRESENTATIVE_DATA",
+    "backupRestore": "VERIFIED_BY_ROUND_TRIP",
+    "accessibility": "SMOKE_TESTED",
+    "performance": "MEASURED_LOCALLY",
+    "operatorDocumentation": "WRITTEN",
+    "integrations": "NOT_CONFIGURED",
+    "tariffsAndAgreements": "NOT_CONFIGURED",
+    "legalApproval": "NOT_OBTAINED",
+    "carrierIntegration": "NOT_INTEGRATED",
+    "malwareScanning": "NOT_IMPLEMENTED",
+    "penetrationTest": "NOT_PERFORMED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tools/upgrade-check.mjs",
+    "src/notifications/outbox.ts",
+    "tests/db/backup-restore.test.ts",
+    "tests/browser/phase-3-readiness.test.ts",
+    ".github/workflows/ci.yml",
+    "docs/ops/operator-guide-phase-3.md",
+    "docs/ops/release-readiness-phase-3.md",
+    "docs/ops/recovery-and-rollback.md",
+    "docs/qa/phase-3-acceptance.md",
+    "DECISIONS.md#DEC-0216"
+  ]
+}

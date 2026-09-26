@@ -20,6 +20,7 @@ import { seedBaseline } from '../../src/db/seed/index.ts';
 import { storedFiles } from '../../src/db/schema/core.ts';
 import { samples } from '../../src/db/schema/clinical.ts';
 import { registrationSheets } from '../../src/db/schema/documents.ts';
+import { commerceSellers } from '../../src/db/schema/commerce.ts';
 import { putPrivateFile, readPrivateFile } from '../../src/files/storage.ts';
 import { runBackup } from '../../tools/backup.mjs';
 import { runRestore } from '../../tools/restore.mjs';
@@ -43,6 +44,11 @@ test('a snapshot restores the database and the private files together', async ()
       purpose: 'KYC_NATIONAL_ID',
       bytes: JPEG,
     });
+    const [seller] = await ctx.testDb.db
+      .insert(commerceSellers)
+      .values({ ownerAccountId: ctx.first.accountId, kind: 'PET_SHOP', displayNameFa: 'فروشگاه پشتیبان' })
+      .returning();
+    assert.ok(seller);
     const [sheetBefore] = await ctx.testDb.db
       .select()
       .from(registrationSheets)
@@ -103,6 +109,22 @@ test('a snapshot restores the database and the private files together', async ()
       const read = await readPrivateFile(ctx.testDb.db, ctx.root, ctx.first.actor, file.id);
       assert.equal(read.bytes.length, JPEG.length);
       assert.deepEqual([...read.bytes], [...JPEG]);
+
+      // A Phase 3 record comes back too: the marketplace tables are part of the
+      // same snapshot, not a second system somebody has to remember.
+      const [sellerAfter] = await ctx.testDb.db
+        .select()
+        .from(commerceSellers)
+        .where(eq(commerceSellers.id, seller.id));
+      assert.equal(sellerAfter!.displayNameFa, 'فروشگاه پشتیبان');
+      assert.equal(sellerAfter!.status, 'DRAFT');
+
+      // And the restored database knows which migrations it already has, so the
+      // next upgrade adds what is missing instead of replaying everything.
+      const recorded = await ctx.testDb.db
+        .execute<{ value: string }>(sql`select count(*)::text as value from drizzle.__drizzle_migrations`)
+        .then((result) => result.rows[0]!.value);
+      assert.ok(Number(recorded) > 0, 'the migration bookkeeping came back with the rows');
     } finally {
       await fs.rm(backupRoot, { recursive: true, force: true });
     }

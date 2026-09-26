@@ -171,13 +171,35 @@ export async function runOutbox(
       const [row] = await tx
         .select()
         .from(notificationDeliveries)
-        .where(and(eq(notificationDeliveries.id, candidate.id), eq(notificationDeliveries.status, 'PENDING')))
+        // The candidate list was read before any claim committed, so every
+        // worker is holding the same ids. The due window is re-checked here,
+        // inside the lock, because that is the only place it is still true
+        // that nobody else has taken this row.
+        .where(
+          and(
+            eq(notificationDeliveries.id, candidate.id),
+            eq(notificationDeliveries.status, 'PENDING'),
+            lte(notificationDeliveries.nextAttemptAt, now),
+          ),
+        )
         .limit(1)
         .for('update', { skipLocked: true });
       if (!row) return null;
+      // The claim also takes a lease. `skip locked` only holds anybody off
+      // while this transaction is open, and the row does not leave PENDING
+      // until the provider has answered — which happens after the commit. So
+      // without pushing the row out of the due window here, a second worker
+      // that arrives in that gap claims the same row and sends the message
+      // twice. A worker that dies mid-send leaves the row to be retried when
+      // the lease runs out, which is what the retry path was already for.
       const [updated] = await tx
         .update(notificationDeliveries)
-        .set({ attempts: row.attempts + 1, lastAttemptAt: now, updatedAt: now })
+        .set({
+          attempts: row.attempts + 1,
+          lastAttemptAt: now,
+          nextAttemptAt: new Date(now.getTime() + policy.firstRetrySeconds * 1000),
+          updatedAt: now,
+        })
         .where(eq(notificationDeliveries.id, row.id))
         .returning();
       const [notification] = await tx

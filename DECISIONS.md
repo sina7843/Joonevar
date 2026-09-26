@@ -2628,3 +2628,28 @@
   - عملیات — سه صفحه تازه (`/market/analytics`، `/market/risk`، `/market/support`)، ده کلید تنظیم تازه، و کاتالوگ اعلان گسترش‌یافته با ۱۲ پیامک تازه و ۱۶ رویداد صریحاً in-app.
   - مستندات — `docs/security/phase-3-threat-review.md`.
 - **Evidence:** `src/db/migrations/0052_operations-security.sql` · `src/db/schema/security.ts` · `src/security/rate-limit.ts`، `redaction.ts`، `risk.ts`، `retention.ts` · `src/analytics/metrics.ts`، `service.ts` · `src/audit/service.ts` · `src/notifications/templates.ts` · `src/settings/keys.ts` · `app/market/analytics/`، `app/market/risk/`، `app/market/support/` · `docs/security/phase-3-threat-review.md` · `tests/domain/operations-security.test.ts` · `tests/db/operations-security.test.ts` · `tests/browser/market-operations-phase3.test.ts` · `docs/reports/PHASE-3-PROMPT-013.json`
+
+## DEC-0216 — تمرین ارتقا مرز فاز می‌خواهد؛ افزودنی‌بودن با اجرای نسخه قبلی سنجیده می‌شود؛ صفحات یک فاز تازه باید در سنجه‌های دسترس‌پذیری و عملکرد نام برده شوند؛ و یک build سبز تأیید ارائه‌دهنده یا تأیید حقوقی نیست
+
+- **Context:** PHASE-3 PROMPT-014. آخرین Prompt فاز: CI، تمرین ارتقا و بازیابی، سنجه‌های دسترس‌پذیری/RTL/عملکرد، راهنمای اپراتور و فهرست آمادگی.
+- **Decision:**
+  - **`upgrade-check` حالا یک زنجیره است نه یک پرش.** روی یک پایگاه‌داده، مهاجرت‌های تا فاز ۲ اعمال می‌شود، رکوردهای آن نسل نوشته می‌شود، فاز ۲.۵ می‌آید، رکوردهای **آن** نسل نوشته می‌شود — مالک، سگ، میکروچیپ، کنل، دوره عضویت، پرداخت، کلاب و اعلان — و بعد فاز ۳ روی همه آن اعمال می‌شود. این همان مسیری است که یک نصب واقعی می‌رود؛ یک پایگاه‌داده تازه هرگز این مسیر را نمی‌رود.
+  - **یافته واقعی حین همین کار:** فیلتر مرحله فاز ۲.۵ کران بالا نداشت (`file > '0032'`)، پس از آمدن فاز ۳ همه مهاجرت‌ها را یکجا اعمال می‌کرد. یعنی آن تمرین از لحظه‌ای که فاز ۳ شروع شد دیگر هیچ مرز ارتقایی را تمرین نمی‌کرد و سبز هم می‌ماند. کران بالا اضافه شد.
+  - **DEC-0179 حالا در برابر داده سنجیده می‌شود، نه در برابر متن فایل.** تا امروز افزودنی‌بودن یعنی «هیچ `DROP` در مهاجرت‌ها نیست». حالا پس از اعمال `0052`، همان insertهایی که نسخه قبلی برنامه می‌زند — با فهرست ستون‌های پیش از `0041` — دوباره زده می‌شوند. اگر یکی رد شود، استقرار بدون restart می‌شکند و ارتقا نباید انجام شود.
+  - **اسکریپت رهرسال بازیابی نوشتم و بعد حذفش کردم.** `tests/db/backup-restore.test.ts` از قبل همان توابع را با داده واقعی و همان رد manifest آزمایش می‌کرد. دو پیاده‌سازی موازی بالاخره از هم فاصله می‌گیرند — همان اشتباهی که در PROMPT-013 با redaction رخ داد. به‌جایش دو چیزی که آن suite کم داشت به خودش اضافه شد: بازگشت یک رکورد فاز ۳ و بازگشت دفترداری مهاجرت‌ها.
+  - **صفحات فاز ۳ در هیچ سنجه‌ای نام برده نشده بودند.** نه در دسترس‌پذیری، نه RTL، نه عملکرد — صف‌ها همه مسیرهای فازهای پیشین را می‌سنجیدند و سبز بودند. `tests/browser/phase-3-readiness.test.ts` همان روش را روی مسیرهای این فاز اجرا می‌کند: پیوند پرش، ترتیب Tab، landmark، سطح سرتیتر، کنترل بی‌نام، چیدمان ۳۶۰px و زمان پاسخ.
+  - **آستانه‌های عملکرد عمداً گشادند.** این شاهدِ «هیچ‌چیز بیمارگونه نیست» است نه benchmark؛ عدد تنگ روی CI شلوغ می‌شکند و همه یاد می‌گیرند نادیده‌اش بگیرند.
+  - **فهرست آمادگی، «تنظیم‌نشده» را از «شکسته» جدا می‌کند** و ارائه‌دهنده، تعرفه، توافق‌نامه، تأیید حقوقی، یکپارچگی حمل‌ونقل و داده واقعی را جدا فهرست می‌کند. یک build سبز محلی یا CI هیچ‌کدام از این‌ها نیست.
+- **Alternatives:**
+  - رهرسال ارتقا روی پایگاه‌داده تازه — رد: همان چیزی را می‌سنجد که هر اجرای تست می‌سنجد.
+  - نگه‌داشتن `tools/restore-check.mjs` در کنار suite موجود — رد: دو پیاده‌سازی از یک قول.
+  - مهاجرت `down` برای بازگشت — رد: مهاجرت‌ها `DROP` ندارند، پس بازگشت درست بازگرداندن snapshot است نه اجرای معکوس.
+  - آستانه تنگ عملکرد — رد: روی CI شلوغ می‌شکند و به نادیده‌گرفتن یاد می‌دهد.
+  - ادعای READY_FOR_PRODUCTION با گیت‌های سبز — رد: سبزی کد درباره ارائه‌دهنده واقعی و تأیید حقوقی چیزی نمی‌گوید.
+- **Impact:**
+  - ابزار — `tools/upgrade-check.mjs` زنجیره سه‌نسلی با ۵۱ بررسی؛ `tests/db/backup-restore.test.ts` رکورد فاز ۳ و دفترداری مهاجرت.
+  - CI — `npm run test:tools` و `npm run db:upgrade-check` به‌عنوان گیت اضافه شدند.
+  - تست — `tests/browser/phase-3-readiness.test.ts` با ۸ تست دسترس‌پذیری/RTL/عملکرد روی مسیرهای فاز ۳.
+  - مستندات — `docs/ops/operator-guide-phase-3.md`، `docs/ops/release-readiness-phase-3.md`، `docs/qa/phase-3-acceptance.md`، و به‌روزرسانی `docs/ops/recovery-and-rollback.md`.
+- **Evidence:** `tools/upgrade-check.mjs` · `tests/db/backup-restore.test.ts` · `tests/browser/phase-3-readiness.test.ts` · `.github/workflows/ci.yml` · `package.json` · `docs/ops/operator-guide-phase-3.md` · `docs/ops/release-readiness-phase-3.md` · `docs/ops/recovery-and-rollback.md` · `docs/qa/phase-3-acceptance.md` · `docs/reports/PHASE-3-PROMPT-014.json`
+
