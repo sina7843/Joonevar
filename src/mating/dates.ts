@@ -12,6 +12,7 @@ import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
 import { matingDateDeclarations, matingPermits } from '../db/schema/mating.ts';
 import { profiles } from '../db/schema/identity.ts';
+import { refreshLastMating } from '../finder/last-mating.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation, versionStale } from '../domain/errors.ts';
@@ -270,6 +271,9 @@ export async function confirmDate(
         after: { permitId, matedOn: row.matedOn, version: row.version },
       });
     }
+    // The derived last mating of both animals moves in this same transaction,
+    // and only here: nothing else writes it (Phase 4, PROMPT-003, R5).
+    await refreshLastMating(tx, [permit.sireAnimalId, permit.damAnimalId]);
     await notifyCounterparty(
       tx,
       permit,

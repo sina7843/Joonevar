@@ -144,6 +144,10 @@ export const filePurpose = pgEnum('file_purpose', [
   'PRODUCT_IMAGE',
   /** What a buyer or a shop showed about a return (PROMPT-011). */
   'RETURN_EVIDENCE',
+  /* Phase 4 mating profile (PROMPT-003): the original photo and video stay private; only the metadata-stripped rendition is ever served publicly. */
+  'MATING_PROFILE_IMAGE',
+  'MATING_PROFILE_RENDITION',
+  'MATING_PROFILE_VIDEO',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -182,6 +186,9 @@ export const reportTargetKind = pgEnum('report_target_kind', [
   /** What buyers write in public, from PROMPT-012. */
   'REVIEW',
   'QUESTION',
+  /** Phase 4 (PROMPT-003): a mating profile, or one of its pictures. */
+  'MATING_PROFILE',
+  'MATING_PROFILE_MEDIA',
 ]);
 
 /**
@@ -742,3 +749,38 @@ export const finderRuleStatus = pgEnum('finder_rule_status', ['PUBLISHED', 'ARCH
 
 /** Warning is the baseline everywhere; BLOCK exists only through a published breed rule. */
 export const finderRuleMode = pgEnum('finder_rule_mode', ['WARN', 'BLOCK']);
+
+/** What an owner states about an animal's fertility. A declaration, never a veterinary finding (PRODUCT_DECISIONS §3). */
+export const fertilityStatus = pgEnum('fertility_status', ['NOT_STERILIZED', 'STERILIZED']);
+
+/**
+ * Owner-recorded lifecycle facts. DECEASED is final; MISSING lasts until FOUND,
+ * ARCHIVED until RESTORED. Nothing is deleted when one is recorded.
+ */
+export const animalLifeEventKind = pgEnum('animal_life_event_kind', ['DECEASED', 'MISSING', 'FOUND', 'ARCHIVED', 'RESTORED']);
+
+/** INACTIVE is off the finder; the five others are the availability states of PRODUCT_DECISIONS §5 / PHASE_4_SPEC §5. */
+export const matingProfileState = pgEnum('mating_profile_state', [
+  'INACTIVE',
+  'READY',
+  'TEMPORARILY_UNAVAILABLE',
+  'INVITE_ONLY',
+  'COORDINATING',
+  'MATCH_SELECTED',
+]);
+
+/** Why a profile left the finder; the owner reopts in after every one of them. */
+export const matingProfileDeactivation = pgEnum('mating_profile_deactivation', [
+  'OWNER',
+  'TRANSFER',
+  'LIFE_EVENT',
+  'IDENTITY_CHANGE',
+  'MODERATION',
+]);
+
+export const matingMediaKind = pgEnum('mating_media_kind', ['IMAGE', 'VIDEO']);
+export const matingMediaRole = pgEnum('mating_media_role', ['FULL_BODY', 'FACE', 'OTHER']);
+export const matingMediaStatus = pgEnum('mating_media_status', ['ACTIVE', 'REMOVED', 'HIDDEN']);
+
+/** Where a derived last mating came from: the official permit's dates, or the contract-backed personal path (PROMPT-006). */
+export const lastMatingSource = pgEnum('last_mating_source', ['OFFICIAL', 'FINDER_PERSONAL']);

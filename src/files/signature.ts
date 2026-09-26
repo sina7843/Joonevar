@@ -72,6 +72,15 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   /** A product picture: images only, served the same way every public image is. */
   PRODUCT_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   RETURN_EVIDENCE: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 5 * MB },
+  /*
+   * Phase 4 mating profile. The original stays private; the rendition is the
+   * same picture with its metadata (EXIF, GPS, text chunks) removed, and only
+   * the rendition is ever served publicly. The clip has the listing clip's
+   * ceiling and the same reasons for it.
+   */
+  MATING_PROFILE_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  MATING_PROFILE_RENDITION: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
+  MATING_PROFILE_VIDEO: { accept: ['video/mp4'], maxBytes: 20 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

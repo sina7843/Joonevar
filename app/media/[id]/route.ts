@@ -5,6 +5,8 @@ import { publicContentImage } from '../../../src/content/service.ts';
 import { publicRecordImage } from '../../../src/media/public-image.ts';
 import { publicListingMedia } from '../../../src/marketplace/listings.ts';
 import { publicProductImage } from '../../../src/commerce/catalog.ts';
+import { publicFinderMedia } from '../../../src/finder/profiles.ts';
+import { currentActor } from '../../../src/authz/request-actor.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +32,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     // published or reserved; pausing it takes the pictures down (PROMPT-003).
     (await publicListingMedia(db(), storage, id)) ??
     // Product pictures, served only while their product is published (PROMPT-009).
-    (await publicProductImage(db(), storage, id));
+    (await publicProductImage(db(), storage, id)) ??
+    // Mating-profile pictures: only the metadata-free rendition, and only while
+    // the profile is visible to this viewer, so it needs to know who is asking
+    // (Phase 4, PROMPT-003).
+    (await publicFinderMedia(db(), storage, id, (await currentActor(db()))?.accountId ?? null));
   if (image === null) return new NextResponse('Not found', { status: 404 });
 
   /*

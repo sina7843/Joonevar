@@ -379,6 +379,13 @@
       "when": 1790431563466,
       "tag": "0053_finder-foundations",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1790435025506,
+      "tag": "0054_finder-profiles",
+      "breakpoints": true
     }
   ]
 }

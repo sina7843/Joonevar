@@ -1,0 +1,113 @@
+{
+  "promptId": "PROMPT-003",
+  "phase": "4",
+  "status": "COMPLETE",
+  "head_before": "424ce883bb110caa55a31252b5bae3fbc734aef1",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-4.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "Mating profiles exist end to end. Migration 0054 is additive: eight enums, five ADD VALUEs, five tables (mating_profile, mating_profile_media, animal_fertility_declaration, animal_life_event, animal_last_mating) and two nullable report columns with text-cast CHECKs; its backfill reads only CONFIRMED official dates. Activation is opt-in and runs under the owner's account lock: every PRODUCT_DECISIONS §3 condition is re-read from its source in that transaction (current ownership, owner KYC, REGISTERED, species open for MATING, life status, a row in the official microchip table and never the declared number, breed/sex/birth date, the newest owner fertility declaration, a full-body and a face picture) and the owner's active profiles are counted under the same lock, so two activations racing for one slot end with one refusal, and an unset free capacity activates nothing. Pedigree only raises completeness. Five availability states with explicit owner transitions; COORDINATING and MATCH_SELECTED are left to the request flow; a paused profile keeps its slot but is not public. Visibility is decided per viewer in the query on every request (listed state, activating owner still owner, registered, alive, species open, subscription matrix) and every 'no' is the same 404; the public page is noindex and outside the sitemap. Pictures are never served as uploaded: a pure-JS stripper removes JPEG APP1-APP15/COM and PNG text/eXIf/tIME blocks, the clean copy is its own stored file, and only it leaves through /media for a viewer who may see the profile; the original and the one short clip stay private. Fertility statements and life events (deceased, missing, found, archived, restored) are append-only, death is final, and a sterilized statement or an inactive life status takes the profile off the finder in the same transaction; finding or restoring does not put it back. One entry point, deactivateProfileOf, is called by the marketplace handover in the ownership transfer transaction, by recordOfficialIdentity when certified breed/sex/birth differ from the declaration, by life events and by the sterilized statement; a new owner takes over the same profile id with the previous owner's media removed. The derived last mating is one query used by both refreshLastMating (called inside the official confirmDate transaction for both animals, serialised per animal by an advisory lock) and rebuildLastMating; PROPOSED, CONFLICTED, SUPERSEDED and legacy personal records never count, there is no setter, and a rebuild reproduces the incremental rows. Cards show exact Persian date with elapsed days or «سابقه جفت‌گیری تأییدشده ثبت نشده», cooldown from the versioned breed rule (warning unless BLOCK), the age rule (requests closed with a reason when unset or out of range), counts of confirmed matings, births and registered offspring and never a partner or a microchip number. Profiles and pictures are reportable through the existing moderation_report.",
+  "changedFiles": [
+    "src/db/migrations/0054_finder-profiles.sql",
+    "src/db/migrations/meta/0054_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/enums.ts",
+    "src/db/schema/finder.ts",
+    "src/db/schema/moderation.ts",
+    "src/finder/profile-model.ts",
+    "src/finder/profiles.ts",
+    "src/finder/last-mating.ts",
+    "src/finder/profile-actions.ts",
+    "src/finder/profile-forms.tsx",
+    "src/finder/profile-card.tsx",
+    "src/media/strip-metadata.ts",
+    "src/animals/life-events.ts",
+    "src/mating/dates.ts",
+    "src/marketplace/handover.ts",
+    "src/clinical/identity.ts",
+    "src/files/signature.ts",
+    "src/authz/policy.ts",
+    "src/authz/routes.ts",
+    "src/notifications/templates.ts",
+    "app/media/[id]/route.ts",
+    "app/account/mating-finder/page.tsx",
+    "app/account/mating-finder/profiles/page.tsx",
+    "app/account/mating-finder/profiles/[animalId]/page.tsx",
+    "app/(public)/mating-finder/[id]/page.tsx",
+    "tools/upgrade-check.mjs",
+    "tests/domain/finder-profile.test.ts",
+    "tests/db/finder-profile.test.ts",
+    "tests/browser/finder-profile.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-003/public-profile-mobile.png",
+    "docs/ops/operator-guide-phase-4.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-4-PROMPT-003.json"
+  ],
+  "migrations": ["0054_finder-profiles"],
+  "decisions": ["DEC-0219"],
+  "tests": {
+    "newDomain": { "command": "node --test tests/domain/finder-profile.test.ts", "total": 9, "pass": 9, "fail": 0 },
+    "newDatabase": {
+      "command": "node --test tests/db/finder-profile.test.ts",
+      "total": 3,
+      "pass": 3,
+      "fail": 0,
+      "covers": "eligibility from real sources, IDOR as NOT_FOUND, unset capacity, full capacity, concurrent activation (one winner), owner transitions and stale version, last face picture of an active profile, sterilized and life-event deactivation, found does not reactivate, death is final; per-viewer visibility across free/subscribed owners and the free-pool switch, rendition served without metadata, original and clip never served, report once/not own/not hidden, paused hides, transfer deactivates and the new owner takes over without the old media; last mating unmoved by proposal and conflict, moved for both animals on confirmation, rebuild equals incremental, no setter exported"
+    },
+    "newBrowser": { "command": "node tools/browser-tests.mjs tests/browser/finder-profile.test.ts", "total": 2, "pass": 2, "fail": 0 },
+    "productFull": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 1060,
+      "pass": 1059,
+      "fail": 1,
+      "durationSeconds": 1278,
+      "note": "The one failure was in this prompt's own new test: it asserted the card JSON contains no '985', which a random UUID can contain. Fixed to assert against the animal's real chip number; tests/db/finder-profile.test.ts re-ran 3/3. Every pre-existing suite passed in the full run."
+    },
+    "browserFull": {
+      "command": "rm -rf .next && npm run build && node tools/browser-tests.mjs",
+      "total": 270,
+      "pass": 270,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 649,
+      "note": "The first build in the gate script aborted with a V8 out-of-memory while another test process was running on the same machine; the build and full browser suite were re-run alone and passed. Regenerated pre-existing screenshots were restored to HEAD."
+    },
+    "upgradeRehearsal": { "command": "npm run db:upgrade-check", "total": 59, "pass": 59, "fail": 0 },
+    "tools": { "command": "npm run test:tools", "total": 20, "pass": 20, "fail": 0 }
+  },
+  "checks": [
+    { "id": "typecheck", "command": "npx tsc --noEmit", "result": "PASS", "evidence": "exit 0 on the final tree." },
+    { "id": "build", "command": "rm -rf .next && npm run build", "result": "PASS", "evidence": "exit 0 in 57 s on the re-run; First Load JS shared 102 kB. The earlier attempt aborted with an out-of-memory under concurrent load and is recorded, not hidden." },
+    { "id": "product-tests", "command": "node --test --test-concurrency=4 <domain/config/db/ui> ; node --test tests/db/finder-profile.test.ts", "result": "PASS", "evidence": "Full run 1059/1060; the single failure was a flawed assertion in this prompt's new test, fixed and the suite re-ran 3/3. All pre-existing suites green, including those touched by the hooks (dates, permit, animal-handover, microchip, moderation, files)." },
+    { "id": "browser-tests", "command": "node tools/browser-tests.mjs", "result": "PASS", "evidence": "270/270 on a clean build: an owner makes an animal eligible and activates it at 360 px RTL with no horizontal scroll and no chip number on the public page; a visitor gets 404 for a free owner's profile and picture; the served rendition has no GPS and the original returns 404." }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No live code path changes breed, sex or birth date after activation today (the chip needs a certified identity first and no identity-correction process exists); the IDENTITY_CHANGE hook in recordOfficialIdentity is therefore wired but not reachable by an active profile.",
+    "Transfer deactivation is tested by performing the same two writes the handover makes; the full marketplace handover suite still passes with the hook in place but does not itself assert on a profile.",
+    "The profile video is stored and shown only to its owner: MP4 metadata is not stripped, so public exposure waits for PROMPT-007 moderation. The upload form is bounded by the 12 MB server-action body limit, below the 20 MB purpose ceiling, as for listing videos.",
+    "Requests do not exist yet, so 'suspend affected requests and notify counterparties' is the deactivateProfileOf entry point PROMPT-005 extends; owner notifications for deactivation sit behind finder.flag.notifications, which starts closed.",
+    "The upgrade rehearsal proves the new tables arrive empty on data without confirmed dates; proving the backfill ignores legacy one-sided dates on representative data is PROMPT-008.",
+    "Profiles above the free capacity after a subscription expires stay active (visible only to subscribers per the matrix); which to keep is PRODUCT_DECISION_OPEN (DEC-0217 §13).",
+    "Reported profiles and pictures are recorded; the queue and decisions are PROMPT-007.",
+    "prompts/ and prompts-2/ appear deleted in the working tree; this was not done by this prompt, was left untouched and is not part of this commit."
+  ],
+  "readiness": {
+    "code": "PHASE_4_PROFILES_BUILT",
+    "visual": "VERIFIED_BY_SCREENSHOT_360",
+    "integrations": "NOT_CONFIGURED",
+    "legal": "NOT_APPROVED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/db/migrations/0054_finder-profiles.sql",
+    "src/finder/profiles.ts",
+    "src/finder/last-mating.ts",
+    "src/media/strip-metadata.ts",
+    "tests/db/finder-profile.test.ts",
+    "tests/browser/finder-profile.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-003/",
+    "DECISIONS.md#dec-0219"
+  ]
+}

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
@@ -162,11 +163,15 @@ export default async function MatingFinderAccountPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">حیوانات شما برای جفت‌یابی</h2>
+          <div className="flex flex-wrap items-center justify-between gap-sm">
+            <h2 className="text-label-lg">حیوانات شما برای جفت‌یابی</h2>
+            <Link href="/account/mating-finder/profiles" className="text-label-md text-text-brand underline underline-offset-4" data-testid="finder-profiles-link">
+              مدیریت پروفایل‌ها
+            </Link>
+          </div>
           <p className="mt-xs text-caption text-text-secondary">
             حیوانات ثبت‌شده شما از گونه‌ای که جفت‌یابی برایش باز است. میکروچیپ رسمی یکی از شرط‌های ورود است؛ احراز هویت،
-            اظهار عقیم‌نبودن، وضعیت زنده‌بودن و تصاویر پایه هنگام فعال‌سازی پروفایل بررسی می‌شوند و فعال‌سازی پروفایل در گام
-            بعدی جفت‌یابی باز می‌شود.
+            اظهار عقیم‌نبودن، وضعیت زنده‌بودن و تصاویر پایه هنگام فعال‌سازی پروفایل بررسی می‌شوند.
           </p>
           {animals.length === 0 ? (
             <div className="mt-md">

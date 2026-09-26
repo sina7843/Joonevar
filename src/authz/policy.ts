@@ -165,7 +165,10 @@ export type FilePurposeName =
   | 'SELLER_DOCUMENT'
   | 'SELLER_LOGO'
   | 'PRODUCT_IMAGE'
-  | 'RETURN_EVIDENCE';
+  | 'RETURN_EVIDENCE'
+  | 'MATING_PROFILE_IMAGE'
+  | 'MATING_PROFILE_RENDITION'
+  | 'MATING_PROFILE_VIDEO';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -239,6 +242,11 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   // A photograph of somebody's returned goods is theirs, the shop's and the
   // arbiter's — nobody else's, however senior (PROMPT-011).
   RETURN_EVIDENCE: ['DISPUTE_REVIEWER', 'SUPPORT_AGENT', 'SUPERADMIN'],
+  // A finder profile's original photo or clip: the owner, and the profile
+  // moderator who has to judge a report about it (Phase 4, PROMPT-003).
+  MATING_PROFILE_IMAGE: ['LISTING_MODERATOR', 'SUPERADMIN'],
+  MATING_PROFILE_RENDITION: ['LISTING_MODERATOR', 'SUPERADMIN'],
+  MATING_PROFILE_VIDEO: ['LISTING_MODERATOR', 'SUPERADMIN'],
 };
 
 export function canReadFile(

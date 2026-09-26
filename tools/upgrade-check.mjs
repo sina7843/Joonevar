@@ -362,10 +362,17 @@ try {
       'finder_plan_version',
       'finder_subscription_period',
       'finder_breed_rule',
+      // PROMPT-003: no animal is put on the finder, no fertility or life event is invented, and with
+      // no confirmed date in this data set the derived last mating starts empty too.
+      'mating_profile',
+      'mating_profile_media',
+      'animal_fertility_declaration',
+      'animal_life_event',
+      'animal_last_mating',
     ]) {
       const counted = await client.query('select count(*)::int as value from ' + table);
       check(
-        'the ' + (table.startsWith('finder_') ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
+        'the ' + (/^(finder_|mating_profile|animal_(fertility|life|last))/.test(table) ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
         counted.rows[0]?.value === 0,
         'rows=' + counted.rows[0]?.value,
       );

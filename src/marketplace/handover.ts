@@ -31,6 +31,7 @@ import { animalListingDeliveries, animalListings } from '../db/schema/marketplac
 import { listingInquiries } from '../db/schema/inquiry.ts';
 import { dealDisputes } from '../db/schema/deals.ts';
 import { animalOwnershipTransfers, dealHandovers } from '../db/schema/handover.ts';
+import { deactivateProfileOf } from '../finder/profiles.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { violates } from '../db/constraint.ts';
@@ -693,6 +694,10 @@ async function completeHandover(
       .where(and(eq(animals.id, animal.id), eq(animals.version, animal.version)))
       .returning({ id: animals.id });
     if (moved.length === 0) throw conflict('پرونده این حیوان در این فاصله تغییر کرده است؛ دوباره تلاش کنید.');
+
+    // The seller's mating profile leaves the finder at once; the buyer opts in
+    // again as the new owner (Phase 4, PROMPT-003, PRODUCT_DECISIONS §11).
+    await deactivateProfileOf(tx, animal.id, 'TRANSFER', actor, 'انتقال مالکیت از بازار', now);
 
     const [listing] = await tx
       .select({ id: animalListings.id, status: animalListings.status, version: animalListings.version })

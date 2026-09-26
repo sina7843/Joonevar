@@ -55,6 +55,10 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // The public animal marketplace (Phase 3, PROMPT-004). Reading an advert
   // needs no account; reporting one does, and that lives under /report.
   { prefix: '/animals-market', access: 'PUBLIC' },
+  // A mating profile's public page (Phase 4, PROMPT-003). The route is public;
+  // whether a given profile is shown to a given viewer is decided in the query
+  // by the subscription matrix, and a profile not for this viewer is a 404.
+  { prefix: '/mating-finder', access: 'PUBLIC' },
   // The public shop of goods (Phase 3, PROMPT-009). Reading is public; selling
   // and buying both happen behind guarded routes.
   { prefix: '/shop', access: 'PUBLIC' },

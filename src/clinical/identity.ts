@@ -17,6 +17,7 @@ import { and, eq } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
 import { referenceBreeds } from '../db/schema/core.ts';
+import { deactivateProfileOf } from '../finder/profiles.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, notFound, validation } from '../domain/errors.ts';
@@ -115,6 +116,13 @@ export async function recordOfficialIdentity(
       .where(and(eq(animals.id, animal.id), eq(animals.version, animal.version)))
       .returning();
     if (!updated) throw conflict('پرونده هم‌زمان تغییر کرده است.');
+
+    // A certified identity that differs from what the owner declared changes
+    // what a mating profile was shown as; the profile leaves the finder until
+    // the owner reviews it (Phase 4, PROMPT-003).
+    if (animal.breedId !== updated.breedId || animal.sex !== updated.sex || animal.birthDate !== updated.birthDate) {
+      await deactivateProfileOf(tx, animal.id, 'IDENTITY_CHANGE', actor, 'هویت رسمی با اظهار قبلی فرق داشت');
+    }
 
     await recordAudit(tx, actor, {
       action: 'ANIMAL_IDENTITY_VERIFIED',

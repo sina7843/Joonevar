@@ -14,9 +14,17 @@
  * MATING_FINDER group, because `product_setting` already gives them versioning,
  * audit and a panel.
  */
-import { bigint, check, index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { bigint, check, date, index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import {
+  animalLifeEventKind,
+  fertilityStatus,
+  lastMatingSource,
+  matingMediaKind,
+  matingMediaRole,
+  matingMediaStatus,
+  matingProfileDeactivation,
+  matingProfileState,
   finderPeriodKind,
   finderPlanAudience,
   finderPlanStatus,
@@ -25,9 +33,9 @@ import {
   finderSubscriptionStatus,
   finderSuspensionPolicy,
 } from './enums.ts';
-import { accounts, referenceBreeds, species } from './core.ts';
+import { accounts, referenceBreeds, species, storedFiles } from './core.ts';
 import { paymentBatches } from './billing.ts';
-import { animalSex } from './animals.ts';
+import { animals, animalSex } from './animals.ts';
 
 const now = sql`now()`;
 
@@ -183,3 +191,144 @@ export const finderBreedRules = pgTable(
       .where(sql`${t.status} = 'PUBLISHED'`),
   ],
 );
+
+// ── PROMPT-003: animal lifecycle facts the finder needs ──────────────────────
+
+/**
+ * The owner's statement about fertility, append-only. The newest row is the
+ * current statement; every earlier one stays. It is shown and audited as the
+ * owner's declaration and never as a veterinary finding (PRODUCT_DECISIONS §3).
+ */
+export const animalFertilityDeclarations = pgTable(
+  'animal_fertility_declaration',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    animalId: uuid('animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    status: fertilityStatus('status').notNull(),
+    declaredByAccountId: uuid('declared_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    noteFa: text('note_fa'),
+    declaredAt: timestamp('declared_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [index('animal_fertility_animal_idx').on(t.animalId, t.declaredAt)],
+);
+
+/**
+ * Death, going missing, being found, archiving and restoring, recorded by the
+ * owner and never deleted. The animal record itself is not rewritten; its
+ * current life status is read from the newest event.
+ */
+export const animalLifeEvents = pgTable(
+  'animal_life_event',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    animalId: uuid('animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    kind: animalLifeEventKind('kind').notNull(),
+    occurredOn: date('occurred_on').notNull(),
+    reasonFa: text('reason_fa').notNull(),
+    recordedByAccountId: uuid('recorded_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [index('animal_life_event_animal_idx').on(t.animalId, t.createdAt)],
+);
+
+// ── PROMPT-003: the mating profile ───────────────────────────────────────────
+
+/**
+ * One profile per animal, created on the owner's first activation and never
+ * deleted. `owner_account_id` is the owner who activated it: when it no longer
+ * equals the animal's owner the profile is off the finder whatever its state
+ * says, and a transfer also sets it INACTIVE in the same transaction.
+ *
+ * There is deliberately no last-mating column here: that is the derived
+ * `animal_last_mating` projection, and nothing but a confirmation writes it.
+ */
+export const matingProfiles = pgTable(
+  'mating_profile',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    animalId: uuid('animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    ownerAccountId: uuid('owner_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    state: matingProfileState('state').notNull().default('INACTIVE'),
+    deactivationReason: matingProfileDeactivation('deactivation_reason'),
+    deactivationNoteFa: text('deactivation_note_fa'),
+    preferencesFa: text('preferences_fa'),
+    primaryMediaId: uuid('primary_media_id'),
+    activatedAt: timestamp('activated_at', { withTimezone: true }),
+    deactivatedAt: timestamp('deactivated_at', { withTimezone: true }),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('mating_profile_animal_key').on(t.animalId),
+    index('mating_profile_owner_idx').on(t.ownerAccountId, t.state),
+    index('mating_profile_state_idx').on(t.state),
+  ],
+);
+
+/**
+ * Pictures and the one short clip of a profile. The original file is private;
+ * a picture is public only through its rendition, which is the same image with
+ * its metadata removed. The clip is not publicly served yet (its container
+ * metadata is not stripped), so only the owner sees it.
+ */
+export const matingProfileMedia = pgTable(
+  'mating_profile_media',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    profileId: uuid('profile_id')
+      .notNull()
+      .references(() => matingProfiles.id, { onDelete: 'restrict' }),
+    kind: matingMediaKind('kind').notNull(),
+    role: matingMediaRole('role').notNull(),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => storedFiles.id, { onDelete: 'restrict' }),
+    renditionFileId: uuid('rendition_file_id').references(() => storedFiles.id, { onDelete: 'restrict' }),
+    altFa: text('alt_fa').notNull(),
+    status: matingMediaStatus('status').notNull().default('ACTIVE'),
+    statusReasonFa: text('status_reason_fa'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    index('mating_profile_media_profile_idx').on(t.profileId, t.status),
+    uniqueIndex('mating_profile_media_rendition_key').on(t.renditionFileId),
+    // One short clip per profile (PRODUCT_DECISIONS §6).
+    uniqueIndex('mating_profile_one_video_key')
+      .on(t.profileId)
+      .where(sql`${t.kind} = 'VIDEO' and ${t.status} = 'ACTIVE'`),
+    check('mating_profile_media_rendition_check', sql`${t.kind} = 'VIDEO' or ${t.renditionFileId} is not null`),
+  ],
+);
+
+/**
+ * The derived last mating of one animal (R5). Written only by the transaction
+ * that confirms a date on either path, or by `rebuildLastMating`; there is no
+ * endpoint that sets it. `confirmed_count` counts mutually confirmed dates. An
+ * animal with no confirmed date has no row.
+ */
+export const animalLastMatings = pgTable('animal_last_mating', {
+  animalId: uuid('animal_id')
+    .primaryKey()
+    .references(() => animals.id, { onDelete: 'restrict' }),
+  lastMatedOn: date('last_mated_on').notNull(),
+  source: lastMatingSource('source').notNull(),
+  sourceId: uuid('source_id').notNull(),
+  confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
+  confirmedCount: integer('confirmed_count').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+});

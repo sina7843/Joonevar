@@ -15,6 +15,7 @@ import { communities } from './communities.ts';
 import { animalListingMedia, animalListings } from './marketplace.ts';
 import { inquiryMessages } from './inquiry.ts';
 import { questions, reviews } from './trust.ts';
+import { matingProfileMedia, matingProfiles } from './finder.ts';
 import {
   moderationAppealStatus,
   moderationDecision,
@@ -52,6 +53,11 @@ export const moderationReports = pgTable(
      * time anybody reads the report.
      */
     reviewId: uuid('review_id').references(() => reviews.id, { onDelete: 'restrict' }),
+    /** Phase 4 (PROMPT-003): a mating profile, or one of its pictures. */
+    matingProfileId: uuid('mating_profile_id').references(() => matingProfiles.id, { onDelete: 'restrict' }),
+    matingProfileMediaId: uuid('mating_profile_media_id').references(() => matingProfileMedia.id, {
+      onDelete: 'restrict',
+    }),
     questionId: uuid('question_id').references(() => questions.id, { onDelete: 'restrict' }),
     /** The listing revision the reporter was reading, so a later edit is visible against it. */
     listingRevision: integer('listing_revision'),
@@ -127,6 +133,20 @@ export const moderationReports = pgTable(
     check(
       'moderation_report_message_check',
       sql`(${t.targetKind}::text = 'INQUIRY_MESSAGE') = (${t.inquiryMessageId} is not null)`,
+    ),
+    uniqueIndex('moderation_report_one_open_mating_profile_key')
+      .on(t.reporterAccountId, t.matingProfileId)
+      .where(sql`${t.status} = 'OPEN'`),
+    uniqueIndex('moderation_report_one_open_mating_media_key')
+      .on(t.reporterAccountId, t.matingProfileMediaId)
+      .where(sql`${t.status} = 'OPEN'`),
+    check(
+      'moderation_report_mating_profile_check',
+      sql`(${t.targetKind}::text = 'MATING_PROFILE') = (${t.matingProfileId} is not null)`,
+    ),
+    check(
+      'moderation_report_mating_media_check',
+      sql`(${t.targetKind}::text = 'MATING_PROFILE_MEDIA') = (${t.matingProfileMediaId} is not null)`,
     ),
   ],
 );

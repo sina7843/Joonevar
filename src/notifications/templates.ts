@@ -202,6 +202,7 @@ export const IN_APP_ONLY_KINDS: readonly string[] = [
   'COMMERCE_LOYALTY_ADJUSTED',
   // Phase 4: the person has just paid and is looking at the result (PRODUCT_DECISIONS §12 lists no SMS for it).
   'FINDER_SUBSCRIPTION_ACTIVATED',
+  'MATING_PROFILE_DEACTIVATED',
 ];
 
 const BY_KIND: ReadonlyMap<string, NotificationTemplate> = new Map(
