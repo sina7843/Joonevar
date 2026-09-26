@@ -369,6 +369,10 @@ try {
       'animal_fertility_declaration',
       'animal_life_event',
       'animal_last_mating',
+      // PROMPT-004: nobody is given a favourite, a saved search or a notice by an upgrade.
+      'finder_favorite',
+      'finder_saved_search',
+      'finder_match_notice',
     ]) {
       const counted = await client.query('select count(*)::int as value from ' + table);
       check(

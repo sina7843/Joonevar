@@ -138,6 +138,8 @@ export const animals = pgTable(
     uniqueIndex('animal_pet_id_key').on(t.petId),
     index('animal_sire_idx').on(t.sireAnimalId),
     index('animal_dam_idx').on(t.damAnimalId),
+    // Finder discovery narrows by these three first (Phase 4, PROMPT-004).
+    index('animal_finder_idx').on(t.species, t.breedId, t.sex),
   ],
 );
 

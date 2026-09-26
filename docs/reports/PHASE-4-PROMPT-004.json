@@ -1,0 +1,94 @@
+{
+  "promptId": "PROMPT-004",
+  "phase": "4",
+  "status": "COMPLETE",
+  "head_before": "5dee6afae7e2c3571d1cd4e2dfce99d1bb26c71e",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-4.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "Public discovery at /mating-finder works end to end, and every rule it applies is enforced on the server. One SQL query decides the set a viewer may see, using the same conditions as publicProfile (listed state, activating owner still the owner, REGISTERED, species open for MATING, newest life event not DECEASED/MISSING/ARCHIVED) plus the subscription matrix, so a hidden profile never leaves the database. A test over five viewers, with the free-pool switch both open and closed, proves the search lists exactly what the single-profile page would show. Column filters (merged-breed-resolved breed, sex, province, city, pedigree, age as birth-date bounds, availability) run in SQL. Filters that need a versioned rule or arithmetic (cooldown, completeness, owner vs kennel, last confirmed mating, rounded distance) run in the application over that set, which is capped at 2000 rows with a ponytail note. Ordering is keyset: the cursor carries the sort key and id, so a profile activated while someone pages causes no duplicate and no skip; this is tested both pure and on the database. Match mode takes one of the viewer's own REGISTERED animals and forces its resolved breed and the opposite sex on the server, whatever the query string says. It excludes the viewer's own animal and returns nothing for someone else's animal. evaluateCompatibility is pure and deterministic, and subscription is not one of its inputs. It returns a 0-100 score with positives, warnings, unknowns, blockers, the rule versions it used and the fixed statement that it guarantees neither fertility, pregnancy, health nor offspring quality. Blockers are: self-pair, different species or breed, same sex, age outside the range or a range nobody set, kinship under a BLOCK rule within its threshold, and cooldown under a BLOCK rule. Kinship and cooldown otherwise only warn, and blocked pairs score 0 and sort last. Kinship is a cycle-safe upward BFS over sire/dam up to six generations, loaded one query per generation. It covers self, parent/child and full siblings (1), half siblings, grandparent and uncle (2), and cousins (3); missing parents give UNKNOWN, never safe. Distances are rounded up to 5 km, and coordinates, address and chip number appear in no output, which a test checks over the whole result JSON. Hostile query values are dropped by a closed vocabulary. Favourites require visibility and show a gone profile without detail. Saved searches store parsed filters, capped at 20. When a profile becomes public (on activation, or on returning from paused), each notifying saved search runs as its own owner, restricted to that profile, and gets at most one notice per profile through a unique key; owners are never told about their own animals, and a match search does not announce a blocked pair. The whole discovery flow sits behind finder.flag.discovery.",
+  "changedFiles": [
+    "src/db/migrations/0055_finder-discovery.sql",
+    "src/db/migrations/meta/0055_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/finder.ts",
+    "src/db/schema/animals.ts",
+    "src/finder/discovery.ts",
+    "src/finder/discovery-model.ts",
+    "src/finder/discovery-actions.ts",
+    "src/finder/discovery-forms.tsx",
+    "src/finder/compatibility.ts",
+    "src/finder/kinship.ts",
+    "src/finder/profiles.ts",
+    "src/notifications/templates.ts",
+    "app/(public)/mating-finder/page.tsx",
+    "app/account/mating-finder/favorites/page.tsx",
+    "app/account/mating-finder/saved-searches/page.tsx",
+    "app/account/mating-finder/profiles/page.tsx",
+    "tools/upgrade-check.mjs",
+    "tests/domain/finder-discovery.test.ts",
+    "tests/db/finder-discovery.test.ts",
+    "tests/browser/finder-discovery.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-004/match-mode-mobile.png",
+    "docs/ops/operator-guide-phase-4.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-4-PROMPT-004.json"
+  ],
+  "migrations": ["0055_finder-discovery"],
+  "decisions": ["DEC-0220"],
+  "tests": {
+    "newDomain": { "command": "node --test tests/domain/finder-discovery.test.ts", "total": 11, "pass": 11, "fail": 0 },
+    "newDatabase": {
+      "command": "node --test tests/db/finder-discovery.test.ts",
+      "total": 9,
+      "pass": 9,
+      "fail": 0,
+      "timing": "browse + match search over 322 profiles: 109 ms on this machine (bounded evidence, not a load test)"
+    },
+    "newBrowser": { "command": "node tools/browser-tests.mjs tests/browser/finder-discovery.test.ts", "total": 2, "pass": 2, "fail": 0 },
+    "productFull": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 1080,
+      "pass": 1079,
+      "fail": 1,
+      "durationSeconds": 1293,
+      "note": "The one failure is tests/config/release.test.ts reading prompts/prompt-manifest.json. The prompts/ and prompts-2/ folders are deleted in the working tree by a change that is not part of this prompt and is not committed. The same test file run in a clean git worktree of HEAD passed 6/6; none of the files it reads are touched by this prompt."
+    },
+    "releaseConfigCleanTree": { "command": "git worktree add --detach <tmp> HEAD ; node --test tests/config/release.test.ts", "total": 6, "pass": 6, "fail": 0 },
+    "browserFull": { "command": "rm -rf .next && npm run build && node tools/browser-tests.mjs", "total": 272, "pass": 272, "fail": 0, "skip": 0, "durationSeconds": 659 },
+    "upgradeRehearsal": { "command": "npm run db:upgrade-check", "total": 62, "pass": 62, "fail": 0 },
+    "tools": { "command": "npm run test:tools", "total": 20, "pass": 20, "fail": 0 }
+  },
+  "checks": [
+    { "id": "typecheck", "command": "npx tsc --noEmit", "result": "PASS", "evidence": "exit 0 on the final tree, before and after the gate run." },
+    { "id": "build", "command": "rm -rf .next && npm run build", "result": "PASS", "evidence": "exit 0 in 57 s; First Load JS shared 102 kB; /mating-finder and the favourites and saved-search pages compile as dynamic routes." },
+    { "id": "product-tests", "command": "node --test --test-concurrency=4 <domain/config/db/ui> ; node --test tests/config/release.test.ts in a clean worktree of HEAD", "result": "PASS", "evidence": "1079/1080 on the working tree. The single failure was traced to the uncommitted deletion of prompts/ (not this prompt's change), and the test passes 6/6 on a clean tree. All 20 new discovery tests pass, and all pre-existing suites pass, including profiles and foundations with the new notice hook." },
+    { "id": "browser-tests", "command": "node tools/browser-tests.mjs", "result": "PASS", "evidence": "272/272 on a clean build. The closed switch states itself. Every filter control has an accessible label. Match mode via the GET form shows explanations and the no-guarantee sentence at 360 px with no horizontal scroll. Favourites and saved searches round-trip. A visitor sees subscribed profiles and gets the written empty state. A hostile query string returns a normal 200 page." }
+  ],
+  "blockers": [],
+  "limitations": [
+    "There is no user-to-user block yet (it arrives with PROMPT-007), so 'exclude blocked users' is not implemented; profiles removed by moderation are INACTIVE and excluded.",
+    "The candidate set is capped at 2000 rows and scored in memory. Measured at 109 ms for 322 profiles; this is bounded evidence, not a load certification.",
+    "Distance works only where both sides entered coordinates (residence geo or approved kennel); the map provider is still NOT_CONFIGURED, so today most owners have none and distance is listed as unknown.",
+    "Owner 'preferences' used by the evaluator are the searcher's own filters (maximum distance, pedigree required); the free-text preferences on a profile are shown but not interpreted.",
+    "Saved-search notices are in-app only and behind finder.flag.notifications (closed by default); SMS templates are reviewed in PROMPT-007. A subscription starting does not by itself re-run notices for the owner's already-active profiles.",
+    "prompts/ and prompts-2/ remain deleted in the working tree; this was not done by this prompt and is not in this commit."
+  ],
+  "readiness": {
+    "code": "PHASE_4_DISCOVERY_BUILT",
+    "visual": "VERIFIED_BY_SCREENSHOT_360",
+    "integrations": "NOT_CONFIGURED",
+    "legal": "NOT_APPROVED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/finder/discovery.ts",
+    "src/finder/compatibility.ts",
+    "src/finder/kinship.ts",
+    "tests/db/finder-discovery.test.ts",
+    "tests/browser/finder-discovery.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-004/",
+    "DECISIONS.md#dec-0220"
+  ]
+}

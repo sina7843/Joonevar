@@ -38,6 +38,18 @@ export default async function FinderProfilesPage() {
             <Link href="/account/mating-finder" className="text-text-brand underline underline-offset-4">
               اشتراک و ظرفیت
             </Link>
+            {' · '}
+            <Link href="/mating-finder" className="text-text-brand underline underline-offset-4" data-testid="finder-search-link">
+              جست‌وجوی جفت
+            </Link>
+            {' · '}
+            <Link href="/account/mating-finder/favorites" className="text-text-brand underline underline-offset-4">
+              علاقه‌مندی‌ها
+            </Link>
+            {' · '}
+            <Link href="/account/mating-finder/saved-searches" className="text-text-brand underline underline-offset-4">
+              جست‌وجوهای ذخیره‌شده
+            </Link>
           </p>
         </Card>
         {entries.length === 0 ? (

@@ -50,6 +50,7 @@ import { activeRule } from './rules.ts';
 import { lastMatingsOf } from './last-mating.ts';
 import { finderFlagEnabled } from './flags.ts';
 import { FINDER_SETTING_KEYS } from './model.ts';
+import { noticeMatches } from './discovery.ts';
 import {
   ageFa,
   ageInMonths,
@@ -443,6 +444,8 @@ export async function activateProfile(database: Database, actor: Actor, input: {
       targetVersion: row.version,
       after: { animalId: animal.id, state: 'READY', capacityLimit: capacity.limit, capacitySource: capacity.source },
     });
+    // Saved searches this profile now matches get their one notice each (PROMPT-004).
+    await noticeMatches(tx, row.id, now);
     return row;
   });
 }
@@ -490,6 +493,7 @@ export async function changeProfileState(
       before: { state: from },
       after: { state: to },
     });
+    if (publiclyListed(to) && !publiclyListed(from)) await noticeMatches(tx, profile.id, now);
     return updated!;
   });
 }

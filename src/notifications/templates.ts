@@ -203,6 +203,8 @@ export const IN_APP_ONLY_KINDS: readonly string[] = [
   // Phase 4: the person has just paid and is looking at the result (PRODUCT_DECISIONS §12 lists no SMS for it).
   'FINDER_SUBSCRIPTION_ACTIVATED',
   'MATING_PROFILE_DEACTIVATED',
+  // Until PROMPT-007 reviews the SMS catalogue for the finder.
+  'FINDER_SAVED_SEARCH_MATCH',
 ];
 
 const BY_KIND: ReadonlyMap<string, NotificationTemplate> = new Map(

@@ -14,7 +14,7 @@
  * MATING_FINDER group, because `product_setting` already gives them versioning,
  * audit and a panel.
  */
-import { bigint, check, date, index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { bigint, boolean, check, date, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import {
   animalLifeEventKind,
@@ -332,3 +332,61 @@ export const animalLastMatings = pgTable('animal_last_mating', {
   confirmedCount: integer('confirmed_count').notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
 });
+
+// ── PROMPT-004: favourites, saved searches, match notices ─────────────────────
+
+/** A profile the viewer keeps. Seeing it later still passes the visibility check. */
+export const finderFavorites = pgTable(
+  'finder_favorite',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    profileId: uuid('profile_id')
+      .notNull()
+      .references(() => matingProfiles.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('finder_favorite_key').on(t.accountId, t.profileId)],
+);
+
+/**
+ * A stored search. `filters` is the validated filter object the search page
+ * uses, never raw query text; `for_animal_id` makes it a match search for one
+ * of the owner's animals.
+ */
+export const finderSavedSearches = pgTable(
+  'finder_saved_search',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    nameFa: text('name_fa').notNull(),
+    filters: jsonb('filters').notNull(),
+    forAnimalId: uuid('for_animal_id').references(() => animals.id, { onDelete: 'restrict' }),
+    notify: boolean('notify').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [index('finder_saved_search_account_idx').on(t.accountId), index('finder_saved_search_notify_idx').on(t.notify)],
+);
+
+/**
+ * One notice per (saved search, profile), whatever makes the profile visible
+ * again: the unique key is the deduplication (PROMPT-004).
+ */
+export const finderMatchNotices = pgTable(
+  'finder_match_notice',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    savedSearchId: uuid('saved_search_id')
+      .notNull()
+      .references(() => finderSavedSearches.id, { onDelete: 'cascade' }),
+    profileId: uuid('profile_id')
+      .notNull()
+      .references(() => matingProfiles.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('finder_match_notice_key').on(t.savedSearchId, t.profileId)],
+);
