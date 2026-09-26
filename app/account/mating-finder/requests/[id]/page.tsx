@@ -12,6 +12,7 @@ import { formatCivilDateFa } from '../../../../../src/domain/calendar.ts';
 import { requestDetail } from '../../../../../src/finder/requests.ts';
 import { messagesOf } from '../../../../../src/finder/conversation.ts';
 import { contractView } from '../../../../../src/finder/contracts.ts';
+import { downstreamView } from '../../../../../src/finder/downstream.ts';
 import {
   CHAT_STATUSES,
   commandProblem,
@@ -19,6 +20,9 @@ import {
   FINANCIAL_FA,
   NO_PAYMENT_THROUGH_HAMZIST_FA,
   NOT_A_LEGAL_SIGNATURE_FA,
+  OFFICIAL_CONSEQUENCES_FA,
+  PATH_IS_FINAL_FA,
+  PERSONAL_CONSEQUENCES_FA,
   PLACE_FA,
   REQUEST_STATUS_FA,
   ROUTE_FA,
@@ -29,6 +33,7 @@ import {
   CommandForm,
   ConfirmContractForm,
   EditContractForm,
+  HandoffForm,
   MessageForm,
   ProposeTermsForm,
   ReportMessageForm,
@@ -54,7 +59,11 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
   }
   const { request, party, events, contact } = detail;
   const status = request.status as RequestStatus;
-  const [chat, contract] = await Promise.all([messagesOf(db(), guard.actor, id), contractView(db(), guard.actor, id)]);
+  const [chat, contract, downstream] = await Promise.all([
+    messagesOf(db(), guard.actor, id),
+    contractView(db(), guard.actor, id),
+    downstreamView(db(), guard.actor, id),
+  ]);
   const can = (c: Parameters<typeof commandProblem>[0]) => commandProblem(c, status, party) === null;
   const snap = request.snapshot as { sender: { nameFa: string | null }; receiver: { nameFa: string }; evaluation: { score: number; warnings: string[]; unknowns: string[] } };
   const defaults = {
@@ -184,6 +193,73 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             ) : (
               <p className="mt-sm text-body-sm">{'لغو ' + (contract.contract.cancelKind === 'BILATERAL' ? 'دوطرفه' : 'یک‌طرفه') + ': ' + (contract.contract.cancelReasonFa ?? '')}</p>
             )}
+          </Card>
+        ) : null}
+
+        {downstream ? (
+          <Card>
+            <div data-testid="finder-downstream">
+              <h2 className="text-label-lg">مسیر پس از قرارداد: {ROUTE_FA[downstream.route]}</h2>
+              {downstream.link === null ? (
+                <>
+                  <ul className="mt-sm list-inside list-disc space-y-xs text-body-sm" data-testid="finder-consequences">
+                    {(downstream.route === 'OFFICIAL' ? OFFICIAL_CONSEQUENCES_FA : PERSONAL_CONSEQUENCES_FA).map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-sm text-caption text-text-secondary">{PATH_IS_FINAL_FA}</p>
+                  {downstream.contract.status !== 'CONFIRMED' || status !== 'CONTRACT_CONFIRMED' ? null : downstream.problems.length > 0 ? (
+                    <Alert tone="warning" title="فعلاً نمی‌توان ادامه داد">
+                      <span data-testid="finder-handoff-problems">{downstream.problems.join(' ')}</span>
+                    </Alert>
+                  ) : (
+                    <div className="mt-md">
+                      <HandoffForm
+                        requestId={id}
+                        contractId={downstream.contract.id}
+                        label={downstream.route === 'OFFICIAL' ? 'بازکردن پرونده مجوز رسمی' : 'بازکردن پرونده جفت‌گیری شخصی'}
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="mt-sm space-y-xs text-body-sm">
+                  {downstream.permit ? (
+                    <p data-testid="finder-downstream-status">
+                      {'پرونده مجوز رسمی' + (downstream.permit.permitNo ? ' ' + downstream.permit.permitNo : '') + ': ' + downstream.permit.statusFa + ' · '}
+                      <Link href={'/mating/permits/' + downstream.permit.id} className="text-text-brand underline underline-offset-4" data-testid="finder-downstream-open">
+                        رفتن به پرونده مجوز
+                      </Link>
+                    </p>
+                  ) : null}
+                  {downstream.permit?.status === 'ISSUED' ? (
+                    <p className="flex flex-wrap gap-md">
+                      <Link href={'/mating/permits/' + downstream.permit.id + '/dates'} className="text-text-brand underline underline-offset-4">تاریخ جفت‌گیری</Link>
+                      <Link href={'/mating/permits/' + downstream.permit.id + '/pregnancy'} className="text-text-brand underline underline-offset-4">آبستنی</Link>
+                      <Link href={'/mating/permits/' + downstream.permit.id + '/birth'} className="text-text-brand underline underline-offset-4">تولد و تقسیم</Link>
+                    </p>
+                  ) : downstream.permit ? (
+                    <p className="text-caption text-text-secondary">تاریخ جفت‌گیری، آبستنی و تولد پس از صدور مجوز در همان پرونده باز می‌شود.</p>
+                  ) : null}
+                  {downstream.personal ? (
+                    <p data-testid="finder-downstream-status">
+                      {'پرونده جفت‌گیری شخصی: ' + (downstream.personal.status === 'ACTIVE' ? 'فعال' : 'لغوشده') + ' · '}
+                      <Link href={'/account/mating-finder/personal/' + downstream.personal.id} className="text-text-brand underline underline-offset-4" data-testid="finder-downstream-open">
+                        تاریخ جفت‌گیری و سابقه
+                      </Link>
+                    </p>
+                  ) : null}
+                  {downstream.link.detachedAt ? (
+                    <p className="text-caption text-text-secondary">{'با لغو قرارداد، این مسیر از قرارداد جدا شد: ' + (downstream.link.detachedReasonFa ?? '')}</p>
+                  ) : null}
+                </div>
+              )}
+              <ul className="mt-md space-y-xs text-caption text-text-secondary" data-testid="finder-cooldown">
+                {downstream.cooldown.map((c) => (
+                  <li key={c.animalId}>{(c.sex === 'MALE' ? 'نر' : 'ماده') + ' «' + c.nameFa + '»: ' + c.cooldown.fa}</li>
+                ))}
+              </ul>
+            </div>
           </Card>
         ) : null}
 

@@ -3,7 +3,16 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { confirmDate, declareDate, declareDifferentDate } from '../../src/mating/dates.ts';
+import {
+  confirmDate,
+  confirmDateOn,
+  declareDate,
+  declareDateOn,
+  declareDifferentDate,
+  declareDifferentDateOn,
+  personalMatingForParty,
+  personalSubject,
+} from '../../src/mating/dates.ts';
 import { AppError } from '../../src/domain/errors.ts';
 
 export interface DateFormState {
@@ -14,10 +23,24 @@ export interface DateFormState {
 
 const text = (form: FormData, key: string): string => String(form.get(key) ?? '');
 
-async function requireActor(permitId: string) {
-  const guard = await guardRoute('/mating/permits/' + permitId + '/dates');
+/**
+ * The same forms serve the official permit and the Finder's contract-backed
+ * personal mating (PHASE-4 PROMPT-006); `kind` picks the subject, and the
+ * subject's own party check runs on the server either way.
+ */
+const isPersonal = (form: FormData) => text(form, 'kind') === 'PERSONAL';
+const pageOf = (form: FormData, id: string) =>
+  isPersonal(form) ? '/account/mating-finder/personal/' + id : '/mating/permits/' + id + '/dates';
+
+async function requireActor(form: FormData, id: string) {
+  const guard = await guardRoute(pageOf(form, id));
   if (!guard.ok) throw guard.denied;
   return guard.actor;
+}
+
+async function personal(form: FormData, id: string) {
+  const actor = await requireActor(form, id);
+  return { actor, subject: personalSubject(await personalMatingForParty(db(), actor, id, { requireActive: true })) };
 }
 
 function failure(error: unknown): DateFormState {
@@ -33,13 +56,19 @@ export async function declareDateAction(
   const permitId = text(form, 'permitId');
   const replaces = text(form, 'replacesVersion').trim();
   try {
-    const actor = await requireActor(permitId);
-    const row = await declareDate(db(), actor, permitId, {
+    const input = {
       matedOn: text(form, 'matedOn'),
       noteFa: text(form, 'note'),
       replacesVersion: replaces === '' ? null : Number(replaces),
-    });
-    revalidatePath('/mating/permits/' + permitId + '/dates');
+    };
+    let row;
+    if (isPersonal(form)) {
+      const { actor, subject } = await personal(form, permitId);
+      row = await declareDateOn(db(), actor, subject, input);
+    } else {
+      row = await declareDate(db(), await requireActor(form, permitId), permitId, input);
+    }
+    revalidatePath(pageOf(form, permitId));
     return {
       ok: true,
       tone: 'success',
@@ -61,12 +90,18 @@ export async function confirmDateAction(
 ): Promise<DateFormState> {
   const permitId = text(form, 'permitId');
   try {
-    const actor = await requireActor(permitId);
-    const row = await confirmDate(db(), actor, permitId, {
+    const input = {
       declarationId: text(form, 'declarationId'),
       expectedVersion: Number(text(form, 'version')),
-    });
-    revalidatePath('/mating/permits/' + permitId + '/dates');
+    };
+    let row;
+    if (isPersonal(form)) {
+      const { actor, subject } = await personal(form, permitId);
+      row = await confirmDateOn(db(), actor, subject, input);
+    } else {
+      row = await confirmDate(db(), await requireActor(form, permitId), permitId, input);
+    }
+    revalidatePath(pageOf(form, permitId));
     return { ok: true, tone: 'success', message: 'نسخه ' + row.version + ' به‌صورت دوطرفه تأیید شد.' };
   } catch (error) {
     return failure(error);
@@ -80,14 +115,21 @@ export async function differentDateAction(
 ): Promise<DateFormState> {
   const permitId = text(form, 'permitId');
   try {
-    const actor = await requireActor(permitId);
-    const { proposed } = await declareDifferentDate(db(), actor, permitId, {
+    const input = {
       declarationId: text(form, 'declarationId'),
       expectedVersion: Number(text(form, 'version')),
       matedOn: text(form, 'matedOn'),
       noteFa: text(form, 'note'),
-    });
-    revalidatePath('/mating/permits/' + permitId + '/dates');
+    };
+    let result;
+    if (isPersonal(form)) {
+      const { actor, subject } = await personal(form, permitId);
+      result = await declareDifferentDateOn(db(), actor, subject, input);
+    } else {
+      result = await declareDifferentDate(db(), await requireActor(form, permitId), permitId, input);
+    }
+    const { proposed } = result;
+    revalidatePath(pageOf(form, permitId));
     return {
       ok: true,
       tone: 'info',

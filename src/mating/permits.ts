@@ -120,7 +120,9 @@ export interface StartPermitInput {
  * case; there is no token a third party could replay.
  */
 export async function startPermit(
-  database: Database,
+  // A transaction is accepted so the Finder handoff (PHASE-4 PROMPT-006) can
+  // open the permit under its own lock; inside it, this becomes a savepoint.
+  database: DbClient,
   actor: Actor,
   input: StartPermitInput,
 ): Promise<PermitRecord> {

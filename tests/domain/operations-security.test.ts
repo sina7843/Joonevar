@@ -142,6 +142,15 @@ test('a number typed into free text does not survive either', () => {
   assert.equal(redactText('سفارش شماره ۳ آماده است'), 'سفارش شماره ۳ آماده است');
 });
 
+test('a record id survives redaction even when it holds ten digits in a row', () => {
+  // A real id from a failed gate run (PHASE-4 PROMPT-006, DEC-0222).
+  const id = 'c6b4c8c8-9b3d-4439-9583-7d0944963847';
+  assert.equal(redactText(id), id);
+  assert.deepEqual(redact({ vetResultId: id, path: '/mating/permits/' + id }), { vetResultId: id, path: '/mating/permits/' + id });
+  // The number next to it is still removed.
+  assert.equal(redactText(id + ' 0499370899'), id + ' [redacted]');
+});
+
 test('masking keeps enough to recognise a record and no more', () => {
   assert.equal(maskTail('09123456789'), '*******6789');
   assert.equal(maskTail('12', 4), '**');

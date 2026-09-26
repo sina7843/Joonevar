@@ -7,10 +7,11 @@
  * from the sources for any set of animals — both run the same query, so the
  * incremental and the rebuilt answer cannot drift apart.
  *
- * Sources today: the official permit's `mating_date_declaration` rows with
- * status CONFIRMED. The contract-backed personal path joins in PROMPT-006.
- * Never a source: PROPOSED, CONFLICTED, SUPERSEDED, and any legacy personal
- * declaration or note.
+ * Sources: `mating_date_declaration` rows with status CONFIRMED, whether they
+ * belong to an official permit (OFFICIAL) or to a contract-backed personal
+ * mating (FINDER_PERSONAL, PROMPT-006). Never a source: PROPOSED, CONFLICTED,
+ * SUPERSEDED, and any legacy personal declaration or note — those live in other
+ * tables and this query does not read them.
  */
 import { inArray, sql } from 'drizzle-orm';
 import type { DbClient } from '../db/client.ts';
@@ -31,17 +32,24 @@ async function computeFromSources(tx: DbClient, animalIds: readonly string[] | n
     animal_id: string;
     mated_on: string;
     id: string;
+    source: 'OFFICIAL' | 'FINDER_PERSONAL';
     confirmed_at: Date | null;
     confirmed_count: number;
   }>(sql`
     select distinct on (x.animal_id)
-      x.animal_id, x.mated_on, x.id, x.confirmed_at, (count(*) over (partition by x.animal_id))::int as confirmed_count
+      x.animal_id, x.mated_on, x.id, x.source, x.confirmed_at, (count(*) over (partition by x.animal_id))::int as confirmed_count
     from (
-      select d.id, d.mated_on, d.confirmed_at, p.sire_animal_id as animal_id
-        from mating_date_declaration d join mating_permit p on p.id = d.permit_id where d.status = 'CONFIRMED'
+      select d.id, d.mated_on, d.confirmed_at, 'OFFICIAL' as source, a.animal_id
+        from mating_date_declaration d
+        join mating_permit p on p.id = d.permit_id
+        cross join lateral (values (p.sire_animal_id), (p.dam_animal_id)) a(animal_id)
+        where d.status = 'CONFIRMED'
       union all
-      select d.id, d.mated_on, d.confirmed_at, p.dam_animal_id as animal_id
-        from mating_date_declaration d join mating_permit p on p.id = d.permit_id where d.status = 'CONFIRMED'
+      select d.id, d.mated_on, d.confirmed_at, 'FINDER_PERSONAL' as source, a.animal_id
+        from mating_date_declaration d
+        join finder_personal_mating m on m.id = d.personal_mating_id
+        cross join lateral (values (m.sire_animal_id), (m.dam_animal_id)) a(animal_id)
+        where d.status = 'CONFIRMED'
     ) x
     where ${filter}
     order by x.animal_id, x.mated_on desc, x.confirmed_at desc nulls last, x.id desc
@@ -55,7 +63,7 @@ type SourceRow = Awaited<ReturnType<typeof computeFromSources>>[number];
 const toValues = (row: SourceRow) => ({
   animalId: row.animal_id,
   lastMatedOn: String(row.mated_on).slice(0, 10),
-  source: 'OFFICIAL' as const,
+  source: row.source,
   sourceId: row.id,
   confirmedAt: row.confirmed_at === null ? null : new Date(row.confirmed_at),
   confirmedCount: Number(row.confirmed_count),

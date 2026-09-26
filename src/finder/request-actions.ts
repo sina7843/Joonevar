@@ -12,6 +12,7 @@ import { acceptTerms, cancelRequest, createRequest, markNotCompleted, proposeTer
 import { blockConversation, postMessage, reportMessage } from './conversation.ts';
 import { cancelContract, confirmContract, editContract, ensureContractPdf, publishTemplate, requestContractCode, startContract } from './contracts.ts';
 import { REQUIRED_CLAUSE_FA, REQUIRED_CLAUSE_KEYS, type TemplateClause } from './request-model.ts';
+import { handoffContract } from './downstream.ts';
 
 export interface RequestFormState {
   readonly ok?: boolean;
@@ -219,4 +220,14 @@ export async function publishTemplateAction(_p: RequestFormState, form: FormData
     if (error instanceof AppError) return { ok: false, message: error.message };
     throw error;
   }
+}
+
+/** PROMPT-006: continue a confirmed contract on its own route; the consequences are acknowledged first. */
+export async function handoffAction(_p: RequestFormState, form: FormData): Promise<RequestFormState> {
+  const requestId = field(form, 'requestId');
+  return run(requestId, async () => {
+    if (field(form, 'acknowledged') !== 'yes') return { ok: false, message: 'پیامدهای این مسیر را خوانده و تأیید کنید.' };
+    const link = await handoffContract(db(), await party(), { contractId: field(form, 'contractId') });
+    return link.route === 'OFFICIAL' ? 'پرونده مجوز رسمی باز شد.' : 'پرونده جفت‌گیری شخصی باز شد.';
+  });
 }

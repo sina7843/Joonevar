@@ -42,6 +42,7 @@ import type { SmsSender } from '../adapters/registry.ts';
 import type { Actor } from '../authz/actor.ts';
 import fs from 'node:fs/promises';
 import { assertFinderFlag } from './flags.ts';
+import { detachDownstream } from './downstream.ts';
 import { assertFinderCapability, FINDER_SETTING_KEYS } from './model.ts';
 import { counterpartOf, enterCoordination, loadForParty, lockAnimals, moveRequest, notifyFinder, releaseCoordination, type RequestRow } from './requests.ts';
 import {
@@ -425,6 +426,8 @@ export async function cancelContract(
       await moveRequest(tx, request, 'CANCELLED', actor, reasonFa, {}, now);
     }
     await releaseCoordination(tx, request.id, now);
+    // PROMPT-006: the downstream link is detached, never rewritten.
+    await detachDownstream(tx, actor, contract.id, reasonFa, now);
     await recordAudit(tx, actor, { action: 'FINDER_CONTRACT_CANCELLED', targetType: 'FINDER_CONTRACT', targetId: contract.id, after: { kind, wasConfirmed: contract.status === 'CONFIRMED' }, reason: reasonFa });
     await notifyFinder(tx, counterpartOf(request, actor.accountId), 'FINDER_CONTRACT_CANCELLED', kind === 'BILATERAL' ? 'قرارداد با توافق دو طرف لغو شد' : 'قرارداد یک‌طرفه لغو شد', reasonFa, request.id);
     return row!;

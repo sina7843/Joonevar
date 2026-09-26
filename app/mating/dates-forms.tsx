@@ -27,12 +27,17 @@ function Result({ state }: { state: DateFormState }) {
  * The same form serves a first declaration and a correction; a correction only
  * adds the version it replaces, and never edits it in place.
  */
+/** `permitId` is the subject id; `kind` PERSONAL points it at a Finder personal mating (PHASE-4 PROMPT-006). */
+export type DateSubjectKind = 'PERMIT' | 'PERSONAL';
+
 export function DeclareDateForm({
   permitId,
   replacesVersion = null,
+  kind = 'PERMIT',
 }: {
   permitId: string;
   replacesVersion?: number | null;
+  kind?: DateSubjectKind;
 }) {
   const [state, submit, pending] = useActionState(declareDateAction, EMPTY);
   const suffix = replacesVersion === null ? '' : '-correction';
@@ -47,6 +52,7 @@ export function DeclareDateForm({
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid={'declare-date-form' + suffix}>
         <input type="hidden" name="permitId" value={permitId} />
+        <input type="hidden" name="kind" value={kind} />
         {replacesVersion === null ? null : (
           <input type="hidden" name="replacesVersion" value={replacesVersion} />
         )}
@@ -78,11 +84,13 @@ export function RespondToDateForm({
   declarationId,
   version,
   matedOn,
+  kind = 'PERMIT',
 }: {
   permitId: string;
   declarationId: string;
   version: number;
   matedOn: string;
+  kind?: DateSubjectKind;
 }) {
   const [confirmState, confirm, confirming] = useActionState(confirmDateAction, EMPTY);
   const [conflictState, conflictSubmit, conflicting] = useActionState(differentDateAction, EMPTY);
@@ -97,6 +105,7 @@ export function RespondToDateForm({
 
       <form action={confirm} className="mt-lg space-y-lg" data-testid="confirm-date-form">
         <input type="hidden" name="permitId" value={permitId} />
+        <input type="hidden" name="kind" value={kind} />
         <input type="hidden" name="declarationId" value={declarationId} />
         <input type="hidden" name="version" value={version} />
         <Result state={confirmState} />
@@ -120,6 +129,7 @@ export function RespondToDateForm({
       {different ? (
         <form action={conflictSubmit} className="mt-lg space-y-lg" data-testid="different-date-form">
           <input type="hidden" name="permitId" value={permitId} />
+          <input type="hidden" name="kind" value={kind} />
           <input type="hidden" name="declarationId" value={declarationId} />
           <input type="hidden" name="version" value={version} />
           <Result state={conflictState} />

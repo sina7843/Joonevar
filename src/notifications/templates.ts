@@ -217,6 +217,7 @@ export const IN_APP_ONLY_KINDS: readonly string[] = [
   'FINDER_CONTRACT_CONFIRMED',
   'FINDER_CONTRACT_CANCEL_ASKED',
   'FINDER_CONTRACT_CANCELLED',
+  'FINDER_DOWNSTREAM_LINKED',
 ];
 
 const BY_KIND: ReadonlyMap<string, NotificationTemplate> = new Map(

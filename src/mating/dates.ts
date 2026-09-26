@@ -6,13 +6,19 @@
  * version rather than an edit of the last one: history is never overwritten. A
  * date becomes the official basis only once the other side has confirmed that
  * exact version.
+ *
+ * PHASE-4 PROMPT-006: the same protocol also serves the contract-backed personal
+ * mating of the Finder. A row belongs to exactly one subject (a permit or a
+ * personal mating, enforced by a CHECK), so the two paths share the rules but
+ * never each other's rows or effects.
  */
-import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, or, sql, type SQL } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
-import { matingDateDeclarations, matingPermits } from '../db/schema/mating.ts';
+import { finderPersonalMatings, matingDateDeclarations, matingPermits } from '../db/schema/mating.ts';
 import { profiles } from '../db/schema/identity.ts';
 import { refreshLastMating } from '../finder/last-mating.ts';
+import { completeLinkedRequest } from '../finder/downstream-link.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
 import { conflict, forbidden, notFound, validation, versionStale } from '../domain/errors.ts';
@@ -60,6 +66,77 @@ async function requireIssuedPermit(
   return permit;
 }
 
+/**
+ * What a date belongs to. The two parties, the two animals and where the
+ * counterparty is sent are all the protocol needs; which path it is stays in
+ * `kind` and in the row's own column.
+ */
+export interface DateSubject {
+  readonly kind: 'PERMIT' | 'PERSONAL';
+  readonly id: string;
+  readonly parties: readonly [string, string];
+  readonly sireAnimalId: string;
+  readonly damAnimalId: string;
+  readonly route: string;
+}
+
+export const permitSubject = (permit: PermitRecord): DateSubject => ({
+  kind: 'PERMIT',
+  id: permit.id,
+  parties: [permit.initiatorAccountId, permit.counterpartyAccountId ?? permit.initiatorAccountId],
+  sireAnimalId: permit.sireAnimalId,
+  damAnimalId: permit.damAnimalId,
+  route: '/mating/permits/' + permit.id + '/dates',
+});
+
+export type PersonalMatingRecord = typeof finderPersonalMatings.$inferSelect;
+
+export const personalSubject = (mating: PersonalMatingRecord): DateSubject => ({
+  kind: 'PERSONAL',
+  id: mating.id,
+  parties: [mating.sireAccountId, mating.damAccountId],
+  sireAnimalId: mating.sireAnimalId,
+  damAnimalId: mating.damAnimalId,
+  route: '/account/mating-finder/personal/' + mating.id,
+});
+
+/** A party of an ACTIVE personal mating; anyone else gets the same not-found. */
+export async function personalMatingForParty(
+  database: DbClient,
+  actor: Actor,
+  id: string,
+  opts: { requireActive?: boolean } = {},
+): Promise<PersonalMatingRecord> {
+  const [row] = await database.select().from(finderPersonalMatings).where(eq(finderPersonalMatings.id, id)).limit(1);
+  if (!row || (row.sireAccountId !== actor.accountId && row.damAccountId !== actor.accountId)) {
+    throw notFound('پرونده جفت‌گیری شخصی پیدا نشد.');
+  }
+  if (opts.requireActive && row.status !== 'ACTIVE') throw conflict('این پرونده لغو شده است؛ تاریخ تازه‌ای روی آن ثبت نمی‌شود.');
+  return row;
+}
+
+const ofSubject = (subject: DateSubject): SQL =>
+  subject.kind === 'PERMIT'
+    ? eq(matingDateDeclarations.permitId, subject.id)
+    : eq(matingDateDeclarations.personalMatingId, subject.id);
+
+const subjectColumns = (subject: DateSubject) =>
+  subject.kind === 'PERMIT' ? { permitId: subject.id } : { personalMatingId: subject.id };
+
+export async function datesOfSubject(database: DbClient, subject: DateSubject): Promise<readonly DateRecord[]> {
+  return database.select().from(matingDateDeclarations).where(ofSubject(subject)).orderBy(desc(matingDateDeclarations.version));
+}
+
+export async function pendingDateOf(database: DbClient, subject: DateSubject): Promise<DateRecord | null> {
+  const [row] = await database
+    .select()
+    .from(matingDateDeclarations)
+    .where(and(ofSubject(subject), eq(matingDateDeclarations.status, 'PROPOSED')))
+    .orderBy(desc(matingDateDeclarations.version))
+    .limit(1);
+  return row ?? null;
+}
+
 export async function datesOfPermit(database: DbClient, permitId: string): Promise<readonly DateRecord[]> {
   return database
     .select()
@@ -81,36 +158,44 @@ export async function pendingDate(database: DbClient, permitId: string): Promise
   return row ?? null;
 }
 
-async function nextVersion(tx: DbClient, permitId: string): Promise<number> {
+/**
+ * The next version of one subject. A per-subject advisory lock (re-entrant within
+ * the transaction) serialises two declarations or corrections racing on it, so
+ * neither reuses a version number and only one of two corrections of the same
+ * version succeeds.
+ */
+const lockSubject = (tx: DbClient, subject: DateSubject) =>
+  tx.execute(sql`select pg_advisory_xact_lock(hashtext('mating_date:' || ${subject.id}))`);
+
+async function nextVersion(tx: DbClient, subject: DateSubject): Promise<number> {
+  await lockSubject(tx, subject);
   const [row] = await tx
     .select({ max: sql<number | null>`max(${matingDateDeclarations.version})` })
     .from(matingDateDeclarations)
-    .where(eq(matingDateDeclarations.permitId, permitId));
+    .where(ofSubject(subject));
   return (row?.max ?? 0) + 1;
 }
 
-const otherParty = (permit: PermitRecord, actor: Actor): string =>
-  permit.initiatorAccountId === actor.accountId
-    ? (permit.counterpartyAccountId ?? permit.initiatorAccountId)
-    : permit.initiatorAccountId;
+const otherParty = (subject: DateSubject, actor: Actor): string =>
+  subject.parties[0] === actor.accountId ? subject.parties[1] : subject.parties[0];
 
 async function notifyCounterparty(
   tx: DbClient,
-  permit: PermitRecord,
+  subject: DateSubject,
   actor: Actor,
   kind: string,
   titleFa: string,
   bodyFa: string,
 ): Promise<void> {
   await createNotification(tx, {
-    recipientAccountId: otherParty(permit, actor),
+    recipientAccountId: otherParty(subject, actor),
     kind,
     titleFa,
     bodyFa,
     resume: {
-      entity: { type: 'MATING_DATE_DECLARATION', id: permit.id },
+      entity: { type: 'MATING_DATE_DECLARATION', id: subject.id },
       step: 'DATE_CONFIRMATION',
-      originRoute: '/mating/permits/' + permit.id + '/dates',
+      originRoute: subject.route,
     },
   });
 }
@@ -139,39 +224,48 @@ export async function declareDate(
   input: DeclareDateInput,
 ): Promise<DateRecord> {
   const permit = await requireIssuedPermit(database, actor, permitId);
+  return declareDateOn(database, actor, permitSubject(permit), input);
+}
+
+/** The protocol itself, for either subject; the caller has already checked the party. */
+export async function declareDateOn(
+  database: Database,
+  actor: Actor,
+  subject: DateSubject,
+  input: DeclareDateInput,
+): Promise<DateRecord> {
+  const permitId = subject.id;
   const matedOn = assertDeclarableDate(input.matedOn);
   // §17.2: the warning never blocks, so what is worth recording is that it was
   // shown and the person went ahead.
-  const advisory = await cooldownAdvisoryForAnimals(database, [permit.sireAnimalId, permit.damAnimalId]);
+  const advisory = await cooldownAdvisoryForAnimals(database, [subject.sireAnimalId, subject.damAnimalId]);
 
   return database.transaction(async (tx) => {
+    await lockSubject(tx, subject);
     let replaces: number | null = null;
     if (input.replacesVersion !== null && input.replacesVersion !== undefined) {
       const [previous] = await tx
         .select()
         .from(matingDateDeclarations)
-        .where(
-          and(
-            eq(matingDateDeclarations.permitId, permitId),
-            eq(matingDateDeclarations.version, input.replacesVersion),
-          ),
-        )
+        .where(and(ofSubject(subject), eq(matingDateDeclarations.version, input.replacesVersion)))
         .limit(1);
       if (!previous) throw notFound('نسخه‌ای که اصلاح می‌کنید پیدا نشد.');
       if (previous.status !== 'PROPOSED') throw conflict('این نسخه دیگر در انتظار تأیید نیست.');
       // The old row stays readable; only its pending approval is retired.
-      await tx
+      const [retired] = await tx
         .update(matingDateDeclarations)
         .set({ status: 'SUPERSEDED' })
-        .where(and(eq(matingDateDeclarations.id, previous.id), eq(matingDateDeclarations.status, 'PROPOSED')));
+        .where(and(eq(matingDateDeclarations.id, previous.id), eq(matingDateDeclarations.status, 'PROPOSED')))
+        .returning({ id: matingDateDeclarations.id });
+      if (!retired) throw conflict('این نسخه هم‌زمان تغییر کرده است؛ نسخه جدید را ببینید.');
       replaces = previous.version;
     }
 
-    const version = await nextVersion(tx, permitId);
+    const version = await nextVersion(tx, subject);
     const [row] = await tx
       .insert(matingDateDeclarations)
       .values({
-        permitId,
+        ...subjectColumns(subject),
         version,
         matedOn,
         declaredByAccountId: actor.accountId,
@@ -187,7 +281,7 @@ export async function declareDate(
       targetType: 'MATING_DATE_DECLARATION',
       targetId: row.id,
       targetVersion: row.version,
-      after: { permitId, matedOn, version, replacesVersion: replaces },
+      after: { subject: subject.kind, subjectId: permitId, matedOn, version, replacesVersion: replaces },
     });
     await recordCooldownContinuation(tx, actor, advisory, {
       type: 'MATING_DATE_DECLARATION',
@@ -196,7 +290,7 @@ export async function declareDate(
     });
     await notifyCounterparty(
       tx,
-      permit,
+      subject,
       actor,
       replaces === null ? 'MATING_DATE_DECLARED' : 'MATING_DATE_CORRECTED',
       replaces === null ? 'اعلام تاریخ جفت‌گیری' : 'اصلاح تاریخ جفت‌گیری',
@@ -219,16 +313,20 @@ export async function confirmDate(
   input: { declarationId: string; expectedVersion: number },
 ): Promise<DateRecord> {
   const permit = await requireIssuedPermit(database, actor, permitId);
+  return confirmDateOn(database, actor, permitSubject(permit), input);
+}
 
+export async function confirmDateOn(
+  database: Database,
+  actor: Actor,
+  subject: DateSubject,
+  input: { declarationId: string; expectedVersion: number },
+): Promise<DateRecord> {
+  const permitId = subject.id;
   const [declaration] = await database
     .select()
     .from(matingDateDeclarations)
-    .where(
-      and(
-        eq(matingDateDeclarations.id, input.declarationId),
-        eq(matingDateDeclarations.permitId, permitId),
-      ),
-    )
+    .where(and(eq(matingDateDeclarations.id, input.declarationId), ofSubject(subject)))
     .limit(1);
   if (!declaration) throw notFound('این اعلام تاریخ پیدا نشد.');
   if (declaration.version !== input.expectedVersion) {
@@ -260,23 +358,25 @@ export async function confirmDate(
       targetType: 'MATING_DATE_DECLARATION',
       targetId: row.id,
       targetVersion: row.version,
-      after: { permitId, matedOn: row.matedOn, version: row.version },
+      after: { subject: subject.kind, subjectId: permitId, matedOn: row.matedOn, version: row.version },
     });
     // The confirmed date belongs to both animals' files (§10, §17.1).
-    for (const animalId of [permit.sireAnimalId, permit.damAnimalId]) {
+    for (const animalId of [subject.sireAnimalId, subject.damAnimalId]) {
       await recordAudit(tx, actor, {
         action: 'ANIMAL_MATING_DATE_CONFIRMED',
         targetType: 'ANIMAL',
         targetId: animalId,
-        after: { permitId, matedOn: row.matedOn, version: row.version },
+        after: { subject: subject.kind, subjectId: permitId, matedOn: row.matedOn, version: row.version },
       });
     }
     // The derived last mating of both animals moves in this same transaction,
     // and only here: nothing else writes it (Phase 4, PROMPT-003, R5).
-    await refreshLastMating(tx, [permit.sireAnimalId, permit.damAnimalId]);
+    await refreshLastMating(tx, [subject.sireAnimalId, subject.damAnimalId]);
+    // A Finder request that led here is now MATING_COMPLETED (PROMPT-006).
+    await completeLinkedRequest(tx, actor, subject.kind, subject.id);
     await notifyCounterparty(
       tx,
-      permit,
+      subject,
       actor,
       'MATING_DATE_CONFIRMED',
       'تاریخ جفت‌گیری تأیید شد',
@@ -299,17 +399,21 @@ export async function declareDifferentDate(
   input: { declarationId: string; expectedVersion: number; matedOn: string; noteFa?: string | null },
 ): Promise<{ conflicted: DateRecord; proposed: DateRecord }> {
   const permit = await requireIssuedPermit(database, actor, permitId);
+  return declareDifferentDateOn(database, actor, permitSubject(permit), input);
+}
+
+export async function declareDifferentDateOn(
+  database: Database,
+  actor: Actor,
+  subject: DateSubject,
+  input: { declarationId: string; expectedVersion: number; matedOn: string; noteFa?: string | null },
+): Promise<{ conflicted: DateRecord; proposed: DateRecord }> {
   const matedOn = assertDeclarableDate(input.matedOn);
 
   const [declaration] = await database
     .select()
     .from(matingDateDeclarations)
-    .where(
-      and(
-        eq(matingDateDeclarations.id, input.declarationId),
-        eq(matingDateDeclarations.permitId, permitId),
-      ),
-    )
+    .where(and(eq(matingDateDeclarations.id, input.declarationId), ofSubject(subject)))
     .limit(1);
   if (!declaration) throw notFound('این اعلام تاریخ پیدا نشد.');
   if (declaration.version !== input.expectedVersion) {
@@ -337,11 +441,11 @@ export async function declareDifferentDate(
       .returning();
     if (!conflicted) throw conflict('این نسخه هم‌زمان تغییر کرده است.');
 
-    const version = await nextVersion(tx, permitId);
+    const version = await nextVersion(tx, subject);
     const [proposed] = await tx
       .insert(matingDateDeclarations)
       .values({
-        permitId,
+        ...subjectColumns(subject),
         version,
         matedOn,
         declaredByAccountId: actor.accountId,
@@ -362,7 +466,7 @@ export async function declareDifferentDate(
     });
     await notifyCounterparty(
       tx,
-      permit,
+      subject,
       actor,
       'MATING_DATE_CONFLICT',
       'مغایرت تاریخ جفت‌گیری',

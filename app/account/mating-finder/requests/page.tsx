@@ -7,6 +7,7 @@ import { EmptyState } from '../../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { myRequests } from '../../../../src/finder/requests.ts';
+import { personalMatingsOf } from '../../../../src/finder/downstream.ts';
 import { REQUEST_STATUS_FA, type RequestStatus } from '../../../../src/finder/request-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 
@@ -16,7 +17,7 @@ export const dynamic = 'force-dynamic';
 export default async function FinderRequestsPage() {
   const guard = await guardRoute('/account/mating-finder/requests');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const rows = await myRequests(db(), guard.actor);
+  const [rows, personal] = await Promise.all([myRequests(db(), guard.actor), personalMatingsOf(db(), guard.actor)]);
   const section = (title: string, list: typeof rows, testId: string) => (
     <Card>
       <h2 className="text-label-lg">{title}</h2>
@@ -62,6 +63,21 @@ export default async function FinderRequestsPage() {
             {section('ارسالی', rows.filter((r) => r.senderAccountId === guard.actor.accountId), 'finder-requests-out')}
           </>
         )}
+        {personal.length > 0 ? (
+          <Card>
+            <h2 className="text-label-lg">پرونده‌های جفت‌گیری شخصی</h2>
+            <p className="mt-xs text-caption text-text-secondary">پرونده‌های رسمی در بخش مجوزهای جفت‌گیری فهرست شده‌اند.</p>
+            <ul className="mt-md space-y-sm" data-testid="finder-personal-list">
+              {personal.map((m) => (
+                <li key={m.id}>
+                  <Link href={'/account/mating-finder/personal/' + m.id} className="text-label-md text-text-brand underline underline-offset-4">
+                    {'پرونده شخصی · ' + (m.status === 'ACTIVE' ? 'فعال' : 'لغوشده') + ' · ' + formatInstantFa(m.createdAt)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null}
       </div>
     </PublicShell>
   );

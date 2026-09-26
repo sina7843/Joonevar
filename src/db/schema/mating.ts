@@ -1,8 +1,10 @@
 import { sql } from 'drizzle-orm';
-import { index, integer, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { check, index, integer, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { accounts } from './core.ts';
 import { animals } from './animals.ts';
 import { paymentBatches } from './billing.ts';
+import { finderPersonalMatingStatus, matingRoute } from './enums.ts';
+import { finderContracts, matingRequests } from './finder.ts';
 
 const now = sql`now()`;
 
@@ -130,10 +132,10 @@ export const matingDateDeclarations = pgTable(
   'mating_date_declaration',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    permitId: uuid('permit_id')
-      .notNull()
-      .references(() => matingPermits.id, { onDelete: 'cascade' }),
-    /** Sequential per permit, so a stale approval can never confirm a new one. */
+    /** Exactly one of permit_id / personal_mating_id: the protocol is shared, the paths are not (PHASE-4 PROMPT-006). */
+    permitId: uuid('permit_id').references(() => matingPermits.id, { onDelete: 'cascade' }),
+    personalMatingId: uuid('personal_mating_id').references(() => finderPersonalMatings.id, { onDelete: 'restrict' }),
+    /** Sequential per permit or personal mating, so a stale approval can never confirm a new one. */
     version: integer('version').notNull(),
     matedOn: text('mated_on').notNull(),
     status: matingDateStatus('status').notNull().default('PROPOSED'),
@@ -153,6 +155,86 @@ export const matingDateDeclarations = pgTable(
   },
   (t) => [
     uniqueIndex('mating_date_version_key').on(t.permitId, t.version),
+    uniqueIndex('mating_date_personal_version_key').on(t.personalMatingId, t.version).where(sql`${t.personalMatingId} is not null`),
     index('mating_date_permit_idx').on(t.permitId, t.status),
+    check('mating_date_one_subject_check', sql`num_nonnulls(${t.permitId}, ${t.personalMatingId}) = 1`),
+  ],
+);
+
+// ── PHASE-4 PROMPT-006: what a confirmed Finder contract leads to ────────────
+
+/**
+ * The contract-backed personal mating — a record of its own, distinct from the
+ * official permit and from the one-sided legacy personal declaration (§20). It
+ * has no permit number, no association review, no official allocation and no
+ * Puppy Card entitlement, and nothing converts it into any of those.
+ */
+export const finderPersonalMatings = pgTable(
+  'finder_personal_mating',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    contractId: uuid('contract_id')
+      .notNull()
+      .references(() => finderContracts.id, { onDelete: 'restrict' }),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => matingRequests.id, { onDelete: 'restrict' }),
+    sireAnimalId: uuid('sire_animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    damAnimalId: uuid('dam_animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    sireAccountId: uuid('sire_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    damAccountId: uuid('dam_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    status: finderPersonalMatingStatus('status').notNull().default('ACTIVE'),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+    cancelReasonFa: text('cancel_reason_fa'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('finder_personal_mating_contract_key').on(t.contractId),
+    check('finder_personal_mating_two_animals_check', sql`${t.sireAnimalId} <> ${t.damAnimalId}`),
+    index('finder_personal_mating_sire_idx').on(t.sireAnimalId),
+    index('finder_personal_mating_dam_idx').on(t.damAnimalId),
+  ],
+);
+
+/**
+ * The one downstream path of one confirmed contract. One row per contract ever:
+ * the route and its target are written once and never updated. Cancelling the
+ * contract only stamps `detached_at`; a different path needs a new request and
+ * a newly confirmed contract.
+ */
+export const finderDownstreamLinks = pgTable(
+  'finder_downstream_link',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    contractId: uuid('contract_id')
+      .notNull()
+      .references(() => finderContracts.id, { onDelete: 'restrict' }),
+    contractNumber: integer('contract_number').notNull(),
+    route: matingRoute('route').notNull(),
+    permitId: uuid('permit_id').references(() => matingPermits.id, { onDelete: 'restrict' }),
+    personalMatingId: uuid('personal_mating_id').references(() => finderPersonalMatings.id, { onDelete: 'restrict' }),
+    linkedByAccountId: uuid('linked_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    linkedAt: timestamp('linked_at', { withTimezone: true }).notNull().default(now),
+    detachedAt: timestamp('detached_at', { withTimezone: true }),
+    detachedReasonFa: text('detached_reason_fa'),
+  },
+  (t) => [
+    uniqueIndex('finder_downstream_contract_key').on(t.contractId),
+    // One permit serves at most one live contract.
+    uniqueIndex('finder_downstream_permit_key').on(t.permitId).where(sql`${t.permitId} is not null and ${t.detachedAt} is null`),
+    check(
+      'finder_downstream_route_check',
+      sql`(${t.route}::text = 'OFFICIAL' and ${t.permitId} is not null and ${t.personalMatingId} is null) or (${t.route}::text = 'PERSONAL' and ${t.personalMatingId} is not null and ${t.permitId} is null)`,
+    ),
   ],
 );

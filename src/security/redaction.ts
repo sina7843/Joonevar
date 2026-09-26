@@ -123,8 +123,24 @@ export function maskTail(value: string, keep = 4): string {
   return '*'.repeat(Math.min(trimmed.length - keep, 12)) + trimmed.slice(-keep);
 }
 
-/** Free text may still carry a number somebody typed into it. */
+const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+const HELD = /\u0000(\d+)\u0000/g;
+
+/**
+ * Free text may still carry a number somebody typed into it.
+ *
+ * Record ids are set aside first: a UUID's last group can hold ten digits in a
+ * row after a hex letter (`…7d0944963847`), which the national-id rule would
+ * otherwise cut out of an audit row at random (found by PHASE-4 PROMPT-006's
+ * gate run, DEC-0222). Every other pattern still applies to everything else.
+ */
 export function redactText(value: string): string {
+  const held: string[] = [];
+  const withoutIds = value.replace(UUID, (id) => '\u0000' + (held.push(id) - 1) + '\u0000');
+  return redactNumbers(withoutIds).replace(HELD, (_, index: string) => held[Number(index)] ?? '');
+}
+
+function redactNumbers(value: string): string {
   return value
     // Iranian mobile numbers, in either digit set — including the leading
     // zero and the country code written in Persian digits, which is how they

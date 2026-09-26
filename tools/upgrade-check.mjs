@@ -384,6 +384,8 @@ try {
       'finder_contract_version',
       'finder_contract_otp',
       'finder_contract_approval',
+      'finder_personal_mating',
+      'finder_downstream_link',
     ]) {
       const counted = await client.query('select count(*)::int as value from ' + table);
       check(

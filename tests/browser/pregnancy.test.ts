@@ -17,6 +17,7 @@ import { certifyIdentity,
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
+import { addDays, todayCivil } from '../../src/domain/calendar.ts';
 // Shared with the membership suites: a membership is applied for and approved before it is paid for.
 import { approveMembershipApplication } from './support.ts';
 
@@ -46,7 +47,8 @@ const nextChip = () => '9' + RUN.padStart(6, '0') + String(7_000_000 + (chipCoun
 
 const newSyntheticMobile = () => '0999' + String(randomInt(1_000_000, 9_999_999));
 
-const day = (offset: number) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+// The product's day is the Tehran civil day (DEC-0222), so offsets start from it, not from UTC.
+const day = (offset: number) => addDays(todayCivil(), offset);
 
 function syntheticNationalId(): string {
   const base = String(900_000_000 + randomInt(0, 99_000_000)).slice(0, 9);

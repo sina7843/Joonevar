@@ -13,6 +13,7 @@ import {
   consentAction,
   createRequestAction,
   editContractAction,
+  handoffAction,
   markNotCompletedAction,
   postMessageAction,
   proposeTermsAction,
@@ -334,6 +335,22 @@ export function PublishTemplateForm({ expectedCurrentVersion, required }: { expe
         </Button>
         <Result state={state} testId="finder-template-result" />
       </div>
+    </form>
+  );
+}
+
+/** PROMPT-006: the consequence screen's one action; the route comes from the confirmed contract, not from this form. */
+export function HandoffForm({ requestId, contractId, label }: { requestId: string; contractId: string; label: string }) {
+  const [state, submit, pending] = useActionState(handoffAction, EMPTY);
+  return (
+    <form onSubmit={submitWith(submit)} className="space-y-md" data-testid="finder-handoff-form">
+      <input type="hidden" name="requestId" value={requestId} />
+      <input type="hidden" name="contractId" value={contractId} />
+      <Check name="acknowledged" value="yes" label="پیامدهای این مسیر را خواندم و می‌پذیرم." defaultChecked={false} testId="finder-handoff-ack" />
+      <Button type="submit" disabled={pending} data-testid="finder-handoff">
+        {label}
+      </Button>
+      <Result state={state} testId="finder-handoff-result" />
     </form>
   );
 }

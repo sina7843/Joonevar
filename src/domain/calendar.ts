@@ -111,6 +111,14 @@ export function formatCivilDateFa(date: CivilDate): string {
   return FA_DATE.format(new Date(Date.UTC(year, month - 1, day)));
 }
 
+const TEHRAN_DAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tehran', year: 'numeric', month: '2-digit', day: '2-digit' });
+
+/**
+ * "Today" is the civil day in Iran, where the product's users are (PHASE-4
+ * PROMPT-006, DEC-0222). Deriving it in UTC made 00:00–03:30 Tehran time still
+ * "yesterday", so a mating declared right after midnight was refused as a future
+ * date. The result is still a plain `YYYY-MM-DD`; only its source moved.
+ */
 export function todayCivil(now: Date = new Date()): CivilDate {
-  return formatCivilDate(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate());
+  return TEHRAN_DAY.format(now);
 }

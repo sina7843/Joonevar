@@ -19,6 +19,7 @@ import { certifyIdentity,
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import { sql } from 'drizzle-orm';
 import { createDatabase } from '../../src/db/client.ts';
+import { addDays, todayCivil } from '../../src/domain/calendar.ts';
 // Shared with the membership suites: a membership is applied for and approved before it is paid for.
 import { approveMembershipApplication } from './support.ts';
 
@@ -628,10 +629,8 @@ test('both sides declare, correct, disagree and confirm a date on the real scree
   await expectText(owner, 'تا ثبت چنین تاریخی، هیچ تاریخ فرضی ساخته نمی‌شود');
   await owner.screenshot({ path: path.join(DATE_SHOTS, 'dates-empty.png'), fullPage: true });
 
-  const day = (offset: number) => {
-    const d = new Date(Date.now() + offset * 86_400_000);
-    return d.toISOString().slice(0, 10);
-  };
+  // The product's day is the Tehran civil day (DEC-0222), so offsets start from it, not from UTC.
+  const day = (offset: number) => addDays(todayCivil(), offset);
 
   // A future date is refused on the screen, with its reason.
   await owner.getByTestId('mated-on').fill(day(1));

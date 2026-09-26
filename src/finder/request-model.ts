@@ -259,3 +259,54 @@ export function codeMatches(otpId: string, code: string, storedHash: string): bo
 
 /** Only the last four digits of a chip ever leave the record, even inside a contract. */
 export const chipTail = (number: string | null): string | null => (number ? '…' + number.slice(-4) : null);
+
+// ── PROMPT-006: what a confirmed contract leads to ───────────────────────────
+
+/** The facts re-read at handoff time for one side; nothing is taken from the contract snapshot. */
+export interface HandoffSide {
+  readonly expectedOwnerId: string;
+  readonly ownerId: string;
+  readonly status: string;
+  readonly lifeStatus: string;
+  readonly sex: string | null;
+  readonly species: string;
+  readonly resolvedBreedId: string | null;
+  readonly hasChip: boolean;
+  readonly hasPedigree: boolean;
+}
+
+/**
+ * Every reason the handoff cannot happen now. The contract is a snapshot; the
+ * animals may have changed hands, died or lost a chip since, so each rule is
+ * checked again against the current records. Pedigree matters only on the
+ * official path, as it does for any permit.
+ */
+export function handoffProblems(route: Route, sire: HandoffSide, dam: HandoffSide): string[] {
+  const out: string[] = [];
+  for (const [label, side] of [['نر', sire], ['ماده', dam]] as const) {
+    if (side.ownerId !== side.expectedOwnerId) out.push('مالک حیوان ' + label + ' پس از قرارداد تغییر کرده است.');
+    if (side.status !== 'REGISTERED' || side.lifeStatus !== 'ACTIVE') out.push('حیوان ' + label + ' دیگر پرونده فعال ندارد.');
+    if (!side.hasChip) out.push('حیوان ' + label + ' میکروچیپ ثبت‌شده ندارد.');
+    if (route === 'OFFICIAL' && !side.hasPedigree) out.push('مسیر رسمی به شجره‌نامه صادرشده برای حیوان ' + label + ' نیاز دارد.');
+  }
+  if (sire.sex !== 'MALE' || dam.sex !== 'FEMALE') out.push('جفت‌گیری بین یک نر و یک ماده ثبت می‌شود.');
+  if (sire.species !== dam.species || sire.resolvedBreedId === null || sire.resolvedBreedId !== dam.resolvedBreedId) {
+    out.push('دو حیوان باید از یک نژاد باشند.');
+  }
+  return out;
+}
+
+export const OFFICIAL_CONSEQUENCES_FA: readonly string[] = [
+  'قرارداد همزیست مجوز صادر نمی‌کند و جای مجوز را نمی‌گیرد؛ همان پرونده مجوز رسمی باز می‌شود.',
+  'طرف مقابل باید پرونده مجوز را جداگانه تأیید کند، توافق تقسیم ثبت شود، هزینه مجوز پرداخت شود و انجمن آن را بررسی کند.',
+  'پس از صدور مجوز، تاریخ جفت‌گیری، اعلام آبستنی، ثبت تولد، تقسیم توله‌ها و کارت توله در همان پرونده انجام می‌شود.',
+];
+
+export const PERSONAL_CONSEQUENCES_FA: readonly string[] = [
+  'پرونده شخصی شماره مجوز، بررسی انجمن، تقسیم رسمی توله یا کارت توله ندارد و به هیچ‌کدام تبدیل نمی‌شود.',
+  'تاریخ جفت‌گیری که هر دو طرف تأیید کنند، در آخرین جفت‌گیری هر دو حیوان ثبت می‌شود.',
+  'اعلام آبستنی، تولد و تقسیم رسمی فقط در مسیر مجوز رسمی وجود دارد.',
+];
+
+export const PATH_IS_FINAL_FA =
+  'مسیر انتخاب‌شده و پرونده‌ای که به آن وصل می‌شود بعداً عوض نمی‌شود؛ برای مسیر دیگر باید این قرارداد لغو شود و درخواست و قرارداد تازه‌ای تأیید شود.';

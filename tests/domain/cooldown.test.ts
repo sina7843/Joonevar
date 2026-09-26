@@ -82,13 +82,15 @@ test('no confirmed history produces no window and no invented base date', () => 
   assert.equal(cooldownWindow('FEMALE', null, '2026-09-02', POLICY), null);
 });
 
-test('dates are civil days: the same instant in any zone is the same day here', () => {
-  // A civil date carries no time and no zone, so "today" is derived once, in
-  // UTC, and an evening in Tehran cannot shift a boundary by a day.
-  const instant = new Date('2026-03-14T22:30:00.000Z');
+test('dates are civil days: "today" is the Tehran civil day, whatever the server zone', () => {
+  // A civil date carries no time and no zone. "Today" is derived once, as the
+  // day in Tehran (UTC+03:30), so just after midnight there is already the new
+  // day (DEC-0222) and no server clock setting can move it.
+  const instant = new Date('2026-03-14T19:30:00.000Z'); // 23:00 Tehran, 14 March
   assert.equal(todayCivil(instant), '2026-03-14');
-  assert.equal(todayCivil(new Date('2026-03-14T00:00:00.000Z')), '2026-03-14');
-  assert.equal(todayCivil(new Date('2026-03-14T23:59:59.999Z')), '2026-03-14');
+  assert.equal(todayCivil(new Date('2026-03-14T20:29:59.999Z')), '2026-03-14');
+  assert.equal(todayCivil(new Date('2026-03-14T20:30:00.000Z')), '2026-03-15', '00:00 Tehran is the next day');
+  assert.equal(todayCivil(new Date('2026-03-14T22:30:00.000Z')), '2026-03-15');
 
   // The comparison is a plain string comparison of `YYYY-MM-DD`, so no local
   // clock reading can move an animal in or out of its window.

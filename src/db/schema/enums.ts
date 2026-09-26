@@ -826,3 +826,6 @@ export const matingFinancialCategory = pgEnum('mating_financial_category', [
 export const finderContractStatus = pgEnum('finder_contract_status', ['DRAFTING', 'CONFIRMED', 'CANCELLED']);
 export const finderTemplateStatus = pgEnum('finder_template_status', ['PUBLISHED', 'ARCHIVED']);
 export const finderCancelKind = pgEnum('finder_cancel_kind', ['BILATERAL', 'UNILATERAL']);
+
+/** PHASE-4 PROMPT-006: the contract-backed personal mating; cancellation keeps its history. */
+export const finderPersonalMatingStatus = pgEnum('finder_personal_mating_status', ['ACTIVE', 'CANCELLED']);
