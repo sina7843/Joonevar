@@ -1,0 +1,140 @@
+{
+  "promptId": "PROMPT-001",
+  "phase": "4",
+  "status": "COMPLETE",
+  "head_before": "13fd64f95c84e6321b4ba41d93a4c5117cadd608",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-4.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "Phase 4 opens on the repository's real HEAD, which is exactly the package's reviewed baseline: 13fd64f9, delta zero, and the package's own validator reports the eight prompts, order and dependencies aligned. The complete current suite was re-run on that HEAD in one continuous timed script rather than quoted from the Phase 3 report: typecheck exit 0 in 25 s; 1028 domain/config/database/UI tests in a single run at concurrency 4 (1250 s, 0 fail, 0 skip) - the database suites no longer had to be split in two; upgrade rehearsal 51/51; clean production build exit 0 with 102 kB shared JS; 265 browser tests (640 s, 0 fail, 0 skip); 20 tool tests. Every count matches the final Phase 3 report except the twentieth tool test, which this prompt added, so no deterministic baseline or report drift existed to fix. The only code change is the Runner: phase 4 is registered on the same arrangement as phase 3 (untracked package read in place, PROJECT_STATUS-PHASE-4.md, .runner/phase-4/, PHASE-4- report prefix, four mandatory gates) and a test drives phase 4 prepare through complete. Every Phase 1-3 promise Phase 4 depends on was traced to its service, its server-side authorization and its tests, not inferred from a table name, and the findings changed the plan in concrete ways: the animal record has no death, missing or sterilization state at all; lineage has only cycle detection and no kinship walk; OTP has only LOGIN and MOBILE_CHANGE purposes with a hard-coded login SMS text; the only chat is the listing-bound inquiry thread; there is no user-to-user block, no account suspension service and no scheduler; settings have only GLOBAL scope; public media has no renditions; PDFs are rendered live and never stored; and pregnancy, birth, litter, allocation and Puppy Card tables all carry permitId NOT NULL, so they belong to the official path only. docs/architecture/phase-4-mating-finder.md defines MATING_FINDER as its own bounded context with ten aggregates and their in-transaction invariants, the subscription/visibility access matrix enforced in queries with NOT_FOUND for invisible profiles, profile eligibility sourced from the microchip row rather than the declared number, a deterministic explainable compatibility evaluator that reports unknown lineage as unknown rather than safe, the derived last-mating projection written only by the bilateral date-confirmation transaction or a rebuild and never by an endpoint, single-winner coordination via a unique partial index rather than check-then-insert, explicit integrations with IDENTITY, ANIMAL, BILLING, MESSAGING, NOTIFICATIONS, OFFICIAL_MATING, the untouched legacy personal declaration, BREEDING, MODERATION and MEDIA, nine kill switches that start closed, invariants I1-I14, additive upgrade rules (no profile published, no account subscribed, no legacy one-sided date confirmed), migrations 0053-0058, the route, UI and test plans and the R1-R14/A01-A12 mapping. Seven existing defects Phase 4 will cross were found and assigned to the prompt that crosses them rather than silently fixed here, the most important being that one-live-permit-per-pair is check-then-insert with no unique index. Seven product questions the source leaves open (prices, capacities, per-breed age ranges, kinship thresholds, legal clause text, which profiles stay visible after expiry, retention) are recorded as PRODUCT_DECISION_OPEN with a closed-until-configured default. No Phase 4 product behaviour, migration or page was built.",
+  "changedFiles": [
+    "docs/architecture/phase-4-mating-finder.md",
+    "docs/qa/phase-4-baseline.md",
+    "PROJECT_STATUS-PHASE-4.md",
+    "tools/runner.mjs",
+    "tools/tests/runner.test.mjs",
+    "docs/reports/README.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    ".gitignore",
+    "docs/reports/PHASE-4-PROMPT-001.json"
+  ],
+  "migrations": [],
+  "decisions": [
+    "DEC-0217"
+  ],
+  "tests": {
+    "productFull": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 1028,
+      "pass": 1028,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 1250,
+      "head": "13fd64f95c84e6321b4ba41d93a4c5117cadd608"
+    },
+    "browserFull": {
+      "command": "node tools/browser-tests.mjs",
+      "total": 265,
+      "pass": 265,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 640,
+      "head": "13fd64f95c84e6321b4ba41d93a4c5117cadd608",
+      "note": "Run after a clean rm -rf .next && npm run build of the same HEAD. The run rewrites the committed screenshots under docs/reports/screenshots as a side effect; those regenerated files were restored to HEAD because they are not this prompt's change."
+    },
+    "upgradeRehearsal": {
+      "command": "npm run db:upgrade-check",
+      "total": 51,
+      "pass": 51,
+      "fail": 0,
+      "durationSeconds": 16
+    },
+    "tools": {
+      "command": "npm run test:tools",
+      "total": 20,
+      "pass": 20,
+      "fail": 0,
+      "skip": 0,
+      "durationSeconds": 13,
+      "note": "19 pre-existing tests plus the phase 4 Runner test added here; this run was on the working tree containing the Runner change."
+    }
+  },
+  "checks": [
+    {
+      "id": "typecheck",
+      "command": "npx tsc --noEmit",
+      "result": "PASS",
+      "evidence": "exit 0 in 25 s on 13fd64f9. The only code change afterwards is tools/runner.mjs and its test, plain .mjs outside the TypeScript program, covered by the tools tests."
+    },
+    {
+      "id": "build",
+      "command": "rm -rf .next && npm run build",
+      "result": "PASS",
+      "evidence": "exit 0 in 66 s from a clean .next; First Load JS shared by all 102 kB."
+    },
+    {
+      "id": "product-tests",
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "result": "PASS",
+      "evidence": "1028 tests, 1028 pass, 0 fail, 0 skip, 0 cancelled, 1250 s, one run on 13fd64f9."
+    },
+    {
+      "id": "browser-tests",
+      "command": "node tools/browser-tests.mjs",
+      "result": "PASS",
+      "evidence": "265 tests, 265 pass, 0 fail, 0 skip, 640 s against an isolated database and a production server built from a clean build of 13fd64f9."
+    },
+    {
+      "id": "full-current-suite",
+      "command": "npx tsc --noEmit ; node --test <domain/config/db/ui> ; npm run test:tools ; npm run db:upgrade-check ; rm -rf .next && npm run build ; node tools/browser-tests.mjs ; node tools/validate-core.mjs",
+      "result": "PASS",
+      "evidence": "All in one continuous timed script, HEAD recorded at the start of each step (13fd64f9 every time): 1028 + 265 product tests, 51 upgrade checks, 20 tool tests, validate-core valid (20 prompts, 29 sections, 19 decisions, 33 acceptance rows). Details in docs/qa/phase-4-baseline.md section 2."
+    },
+    {
+      "id": "baseline-truthfulness",
+      "command": "git rev-parse HEAD ; git status --short ; package VERSION.txt and prompt-manifest reviewedHead ; node Hamzist-Phase-4-Mating-Finder-Prompt-Package/tools/validate-package.mjs ; comparison with docs/reports/PHASE-3-PROMPT-014.json ; git remote -v",
+      "result": "PASS",
+      "evidence": "HEAD 13fd64f95c84e6321b4ba41d93a4c5117cadd608 equals the package's reviewed baseline, so the delta review found nothing to reconcile; the package validator reports VALID. Every number comes from today's run; the counts reproduce the final Phase 3 report (1028, 265, 51) and the only difference, the twentieth tool test, is this prompt's own addition, so no deterministic baseline or report drift existed. One stale statement was caught while writing the baseline: the Phase 3 documents say the repository has no remote, but origin now exists, so the new baseline records the CI result as unverified rather than repeating either 'never ran' or 'green'."
+    },
+    {
+      "id": "architecture-boundary-review",
+      "command": "docs/architecture/phase-4-mating-finder.md",
+      "result": "PASS",
+      "evidence": "MATING_FINDER defined with ten aggregates and their transactional invariants; explicit integrations with IDENTITY, ANIMAL, BILLING, MESSAGING, NOTIFICATIONS, OFFICIAL_MATING, PERSONAL_MATING (legacy, untouched), BREEDING, MODERATION, SETTINGS/AUTHZ/AUDIT, MEDIA and DOCUMENTS, each naming the real module and its allowed extension point; subscription access and profile visibility matrix enforced in queries; compatibility evaluation; request/contract single-winner concurrency by unique partial index and optimistic versions; derived last-mating projection with no set endpoint; hard boundaries: the contract is not a permit and issues none, the personal path gets no official effect, no mating payment/escrow/refund table exists, contract payment happens outside Hamzist. Every Phase 1-3 promise was traced to service, authorization and tests (section 1), not inferred from table names, and the key findings were re-checked directly in the schema (permitId NOT NULL on breeding and date tables, animal_status values, otp_purpose values, the non-unique permit pair index, GLOBAL-only setting scope)."
+    },
+    {
+      "id": "migration-plan-review",
+      "command": "docs/architecture/phase-4-mating-finder.md sections 11 and 14 ; tools/upgrade-check.mjs phase filters",
+      "result": "PASS",
+      "evidence": "Migrations 0053-0058 assigned to prompts 002-007, all additive (CREATE TABLE/INDEX, ALTER TYPE ADD VALUE; no DROP, no ALTER COLUMN on existing tables). Upgrade guarantees stated and testable: no mating_profile row, no subscription period, no plan price seeded, all kill switches unset and therefore closed, and the last-mating backfill reads only existing CONFIRMED official dates, never PROPOSED/CONFLICTED/SUPERSEDED rows or legacy personal_declaration/personal_note. The one-live-permit-per-pair unique index planned for 0057 is specified to refuse loudly on violating legacy data rather than alter it. Found that tools/upgrade-check.mjs applies every migration after 0040 in its phase 3 step, so it would absorb phase 4 migrations without a boundary; PROMPT-002 adds LAST_PHASE_3 = 0052 with the first phase 4 migration."
+    }
+  ],
+  "blockers": [],
+  "limitations": [
+    "No Phase 4 product behaviour exists yet: this prompt produced a baseline, an architecture boundary and a plan, plus the Runner registration. Seven prompts remain.",
+    "Table, column and migration names in the plan are proposals for the prompts that build them, not committed schema.",
+    "Seven existing defects were found and deliberately not fixed here because fixing them changes product behaviour: no unique index behind one-live-permit-per-pair, a second payment attempt allowed on a pending batch, seller plan capacity becoming unlimited after expiry, an out-of-transaction check in respondToAllocation, a raw database error on concurrent mating-date versions, a login-only OTP SMS text, and no KYC revocation. Each is assigned in the architecture document section 12; the seller-plan and allocation ones sit outside Phase 4 scope and stay recorded limitations.",
+    "Seven product questions are PRODUCT_DECISION_OPEN (plan prices, capacities, per-breed age ranges, kinship thresholds, legal clause text, which profiles remain visible after subscription expiry, retention); the dependent paths will stay closed until an operator configures them.",
+    "CI result is unverified: .github/workflows/ci.yml exists and the repository now has an origin remote, but nothing is pushed from this session and there is no evidence of a remote CI run.",
+    "No external integration is verified: payment gateway, SMS, cloud private storage and map key remain NOT_CONFIGURED.",
+    "The tools test run (20/20) was made on the working tree that already contained the Runner change; the 19 pre-existing tool tests passed in that same run."
+  ],
+  "readiness": {
+    "code": "PHASE_4_NOT_STARTED",
+    "baseline": "VERIFIED_ON_REAL_HEAD",
+    "visual": "NOT_APPLICABLE",
+    "integrations": "NOT_CONFIGURED",
+    "legal": "NOT_APPROVED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "docs/architecture/phase-4-mating-finder.md",
+    "docs/qa/phase-4-baseline.md",
+    "PROJECT_STATUS-PHASE-4.md",
+    "tools/runner.mjs",
+    "tools/tests/runner.test.mjs",
+    "DECISIONS.md#dec-0217",
+    "REQUIREMENTS_TRACEABILITY.md"
+  ]
+}

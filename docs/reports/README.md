@@ -1,6 +1,6 @@
 # Committed completion evidence
 
-Each active step writes `docs/reports/PROMPT-NNN.json`. Later phases keep the same structure under a phase-specific name, because they share this directory: phase 2 writes `docs/reports/phase-2/PROMPT-NNN.json`, phase 2.5 writes `docs/reports/PHASE-2.5-PROMPT-NNN.json` (DEC-0187) and phase 3 writes `docs/reports/PHASE-3-PROMPT-NNN.json` (DEC-0203). The Runner reads the name its `--phase` expects and no other. No placeholder COMPLETE reports are shipped. Use this structure, replacing every example with actual evidence:
+Each active step writes `docs/reports/PROMPT-NNN.json`. Later phases keep the same structure under a phase-specific name, because they share this directory: phase 2 writes `docs/reports/phase-2/PROMPT-NNN.json`, phase 2.5 writes `docs/reports/PHASE-2.5-PROMPT-NNN.json` (DEC-0187), phase 3 writes `docs/reports/PHASE-3-PROMPT-NNN.json` (DEC-0203) and phase 4 writes `docs/reports/PHASE-4-PROMPT-NNN.json` (DEC-0217). The Runner reads the name its `--phase` expects and no other. No placeholder COMPLETE reports are shipped. Use this structure, replacing every example with actual evidence:
 
 ```json
 {

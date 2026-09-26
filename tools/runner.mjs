@@ -17,6 +17,8 @@ const PHASES={
  // Phase 3 follows the same arrangement as 2.5: the package stays untracked and is read in place,
  // and its reports are named PHASE-3-PROMPT-NNN.json (DEC-0203).
  '3':{prompts:'Hamzist-Phase-3-Prompt-Package/prompts',status:'PROJECT_STATUS-PHASE-3.md',state:'.runner/phase-3',reports:'docs/reports',reportPrefix:'PHASE-3-',checks:['typecheck','build','product-tests','browser-tests']},
+ // Phase 4 (mating finder) keeps the same arrangement: untracked package read in place, PHASE-4- reports (DEC-0217).
+ '4':{prompts:'Hamzist-Phase-4-Mating-Finder-Prompt-Package/prompts',status:'PROJECT_STATUS-PHASE-4.md',state:'.runner/phase-4',reports:'docs/reports',reportPrefix:'PHASE-4-',checks:['typecheck','build','product-tests','browser-tests']},
 };
 const phase=PHASES[phaseName];
 if(!phase){console.error('ERROR: Unknown phase: '+phaseName);process.exit(1);}

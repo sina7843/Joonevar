@@ -2653,3 +2653,28 @@
   - مستندات — `docs/ops/operator-guide-phase-3.md`، `docs/ops/release-readiness-phase-3.md`، `docs/qa/phase-3-acceptance.md`، و به‌روزرسانی `docs/ops/recovery-and-rollback.md`.
 - **Evidence:** `tools/upgrade-check.mjs` · `tests/db/backup-restore.test.ts` · `tests/browser/phase-3-readiness.test.ts` · `.github/workflows/ci.yml` · `package.json` · `docs/ops/operator-guide-phase-3.md` · `docs/ops/release-readiness-phase-3.md` · `docs/ops/recovery-and-rollback.md` · `docs/qa/phase-3-acceptance.md` · `docs/reports/PHASE-3-PROMPT-014.json`
 
+## DEC-0217 — فاز ۴ در Runner باز شد؛ MATING_FINDER یک context تازه است که مجوز رسمی و توافق شخصی legacy را صدا می‌زند ولی جایشان را نمی‌گیرد؛ آخرین جفت‌گیری projection است؛ baseline بدون delta
+
+- **تاریخ:** ۲۰۲۶-۰۹-۲۶ · **PROMPT:** PHASE-4 PROMPT-001 · **نوع:** TECHNICAL_CHOICE / ARCHITECTURE
+- **Context:** بسته فاز ۴ (جفت‌یابی) روی HEAD `13fd64f9` نوشته شده است. PROMPT-001 می‌خواهد HEAD واقعی و delta بررسی شود، مجموعه کامل با شمارش دقیق اجرا شود، قول‌های فاز ۱ تا ۳ که فاز ۴ به آن‌ها تکیه می‌کند با ردیابی سرویس/مجوز/تست (نه نام جدول) تأیید شوند، و context `MATING_FINDER` با aggregateها، ثابت‌ها، یکپارچه‌سازی‌ها و برنامه migration/API/UI/تست تعریف شود.
+- **Decision:**
+  - **Runner ورودی `'4'` گرفت، با همان ترتیب فاز ۲.۵ و ۳:** بسته untracked سر جایش (`Hamzist-Phase-4-Mating-Finder-Prompt-Package/prompts`)، وضعیت در `PROJECT_STATUS-PHASE-4.md`، state در `.runner/phase-4/`، گزارش با پیشوند `PHASE-4-`؛ همان چهار دروازه اجباری. ادعای «فاز ناشناخته» تست Runner به فاز ۵ منتقل شد و یک تست تازه مسیر prepare→complete فاز ۴ را می‌سنجد. خط `.gitignore` کاربر که بسته را untracked می‌کند، مثل فاز ۳، با همین کار commit می‌شود.
+  - **MATING_FINDER یک context جداست** با ده aggregate (plan، دوره اشتراک، rule نژاد، پروفایل، projection آخرین جفت‌گیری، درخواست، گفت‌وگو، قرارداد، handoff، جفت‌گیری شخصی قراردادمحور). مجوز رسمی از راه توابع موجود `src/mating/permits.ts` صدا زده می‌شود و هیچ‌کدام از شروطش دور زده نمی‌شود؛ `personal_declaration` legacy دست‌نخورده و هرگز ارتقایافته به «دوطرفه تأییدشده» نیست.
+  - **آخرین جفت‌گیری projection است نه فیلد.** جدول `animal_last_mating` فقط از تراکنش تأیید دوطرفه تاریخ (رسمی یا شخصی قراردادمحور) یا `rebuildLastMating` نوشته می‌شود و هیچ endpoint نوشتن ندارد. منبع رسمی همان ردیف‌های `CONFIRMED` جدول `mating_date_declaration` است که امروز `latestConfirmedDateOfAnimal` می‌خواند.
+  - **تک‌برنده با constraint، نه با check-then-insert.** ورود به هماهنگی قرارداد برای هر حیوان یک ردیف در جدولی با unique partial index روی `animal_id` می‌نویسد؛ همان الگوی `listing_inquiry_one_accepted_key` فاز ۳ با `violates()` موجود.
+  - **چت thread آگهی بازاستفاده نمی‌شود، سیاست‌هایش می‌شوند.** جدول‌های `listing_inquiry`/`inquiry_message` به آگهی و وضعیت معامله FK دارند؛ جدول گفت‌وگوی Finder جداست ولی `applyContactPolicy`، `redactText`، `putPrivateFile` و `assertWithinLimit` همان‌ها هستند.
+  - **OTP قرارداد purpose تازه و محدود است.** قاعده §۲۰ فاز ۱ («OTP جدید برای امضای توافق ساخته نشود») درباره سرویس اعلام توافق شخصی است و دست‌نخورده می‌ماند؛ PD §۹ فاز ۴ صریحاً تأیید OTP دوطرفه قرارداد جفت‌یابی را می‌خواهد. purpose `FINDER_CONTRACT` هیچ گردش فاز ۱ را gate نمی‌کند و سازوکار «امضای قانونی» نامیده نمی‌شود.
+  - **هر عدد محصولی که منبع نداده «بسته تا تنظیم» است:** قیمت plan، ظرفیت‌ها، بازه سنی نژاد، آستانه خویشاوندی، متن حقوقی، سیاست نگهداری، و انتخاب پروفایل‌های باقی‌مانده پس از انقضا — هفت مورد `PRODUCT_DECISION_OPEN` در بخش ۱۳ سند معماری. فقط پیش‌فرض‌های تأییدشده PD (نر ۱۴ روز، ماده ۶ ماه، `WARN`، انقضای ۷ روز درخواست، عرضه فقط سگ) مقدار می‌گیرند.
+  - **drift قطعی baseline پیدا نشد؛** هفت نقص موجود که فاز ۴ به آن‌ها برخورد می‌کند (از جمله «یک permit باز برای هر جفت» بدون unique index و تلاش دوم پرداخت برای batch در انتظار) drift گزارش نیستند و رفعشان رفتار را عوض می‌کند؛ هرکدام به Prompt عبورکننده سپرده شد.
+- **Alternatives:**
+  - ساختن اشتراک Finder روی `seller_plan`/`seller_subscription` — رد: تمدید در دوره فعال ناممکن است و ظرفیت پس از انقضا null = نامحدود می‌شود؛ شکل دوره‌ای عضویت/پروانه (قیمت منجمد، یک PENDING، پشته‌کردن تمدید) پایه می‌شود و نسخه‌بندی plan جدول خودش را می‌گیرد.
+  - scope نژادی در settings — رد: `setting_scope_type` فقط `GLOBAL` است و افزودن scope به هسته تنظیمات همه گروه‌ها را لمس می‌کند؛ rule نسخه‌دار نژاد جدول خودش را می‌گیرد، مثل `animal_commission_rule`.
+  - نوشتن تاریخ شخصی در `mating_date_declaration` با `permitId` null — رد: ستون `NOT NULL` و همه توابعش permit صادرشده می‌خواهند؛ nullable کردنش ثابت‌های مسیر رسمی را سست می‌کند. پروتکل یکی است، جدول دو تا.
+  - وصل‌کردن زنجیره آبستنی/زایمان به مسیر شخصی — رد: PD §۱۰ و R10 اثر رسمی برای مسیر شخصی را منع می‌کنند و `tests/db/allocation.test.ts` همین را می‌سنجد.
+  - event bus برای خبرداشتن از انتقال/فوت — رد: وجود ندارد و برای یک مصرف‌کننده لازم نیست؛ بازسنجی در تراکنش نویسنده و تابع reconciliation کافی است.
+- **Impact:**
+  - ابزار — `tools/runner.mjs` و `tools/tests/runner.test.mjs` (فاز ۴)؛ `PROJECT_STATUS-PHASE-4.md`.
+  - مستندات — `docs/architecture/phase-4-mating-finder.md`، `docs/qa/phase-4-baseline.md`، بخش فاز ۴ در `REQUIREMENTS_TRACEABILITY.md`، `docs/reports/README.md`.
+  - هیچ migration، سرویس یا صفحه محصولی ساخته نشد.
+- **Evidence:** `docs/architecture/phase-4-mating-finder.md` · `docs/qa/phase-4-baseline.md` · `docs/reports/PHASE-4-PROMPT-001.json`
+
