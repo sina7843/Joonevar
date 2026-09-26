@@ -15,4 +15,4 @@ Managed by `node tools/runner.mjs --phase 3 …` (DEC-0203). The package is read
 - [x] PROMPT-011 — 011-shipping-returns-ledger-settlement <!-- work-commit:7488d8bb0995e25bb855903b703ac78bb91e5bf3 -->
 - [x] PROMPT-012 — 012-commerce-trust-promotions-growth <!-- work-commit:0908687c0aa8329b1bf6ec2580079d9c1bed8c6e -->
 - [x] PROMPT-013 — 013-operations-notifications-analytics-security <!-- work-commit:f909915dbd5a03ff53b740c1840c0d77fb9ab074 -->
-- [ ] PROMPT-014 — 014-ci-release-readiness-handoff
+- [x] PROMPT-014 — 014-ci-release-readiness-handoff <!-- work-commit:b035d35b4671b0b47e507f883c7ab693c697ef1c -->
