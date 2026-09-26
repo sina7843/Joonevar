@@ -393,6 +393,13 @@
       "when": 1790439405784,
       "tag": "0055_finder-discovery",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1790455878547,
+      "tag": "0056_finder-requests-contracts",
+      "breakpoints": true
     }
   ]
 }

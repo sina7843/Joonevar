@@ -22,6 +22,9 @@ import {
   type FinderDuration,
 } from '../../../src/finder/model.ts';
 import { FinderSpeciesForm, PublishPlanForm, PublishRuleForm, WithdrawPlanForm } from '../../../src/finder/forms.tsx';
+import { PublishTemplateForm } from '../../../src/finder/request-forms.tsx';
+import { currentTemplate } from '../../../src/finder/contracts.ts';
+import { NOT_A_LEGAL_SIGNATURE_FA, REQUIRED_CLAUSE_FA, REQUIRED_CLAUSE_KEYS, type TemplateClause } from '../../../src/finder/request-model.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,13 +45,14 @@ export default async function AdminMatingFinderPage() {
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const now = new Date();
 
-  const [flags, slots, history, rules, species, breeds] = await Promise.all([
+  const [flags, slots, history, rules, species, breeds, template] = await Promise.all([
     finderFlagStates(db()),
     planSlots(db(), now),
     planHistory(db()),
     ruleHistory(db()),
     marketSpecies(db(), 'MATING'),
     breedOptions(db()),
+    currentTemplate(db()),
   ]);
   const published = rules.filter((rule) => rule.status === 'PUBLISHED');
   const dogBreeds = breeds.filter((breed) => breed.speciesCode === FINDER_LAUNCH_SPECIES).map((b) => ({ value: b.id, label: b.nameFa }));
@@ -173,6 +177,36 @@ export default async function AdminMatingFinderPage() {
               ))}
             </ul>
           )}
+        </Card>
+
+        <Card>
+          <h2 className="text-label-lg">قالب قرارداد جفت‌گیری</h2>
+          <p className="mt-xs text-caption text-text-secondary">
+            {'متن حقوقی بندها با شماست و هیچ متنی از پیش ثبت نشده است. تا انتشار قالب، تنظیم قرارداد بسته است. ' + NOT_A_LEGAL_SIGNATURE_FA}
+          </p>
+          {template ? (
+            <div className="mt-md" data-testid="finder-template-current">
+              <p className="text-label-md">{template.titleFa + ' — نسخه ' + fa(template.version)}</p>
+              <ul className="mt-xs list-inside list-disc text-caption">
+                {(template.clauses as TemplateClause[]).map((c) => (
+                  <li key={c.key}>{c.titleFa + (c.required ? ' (اجباری)' : ' (اختیاری)')}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="mt-md text-body-sm" data-testid="finder-template-none">
+              قالبی منتشر نشده است.
+            </p>
+          )}
+          <details className="mt-md">
+            <summary className="cursor-pointer text-label-md text-text-brand" data-testid="finder-template-toggle">
+              {template ? 'انتشار نسخه تازه قالب' : 'انتشار قالب'}
+            </summary>
+            <PublishTemplateForm
+              expectedCurrentVersion={template?.version ?? 0}
+              required={REQUIRED_CLAUSE_KEYS.map((key) => ({ value: key, label: REQUIRED_CLAUSE_FA[key] }))}
+            />
+          </details>
         </Card>
 
         <Card>

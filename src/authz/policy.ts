@@ -168,7 +168,9 @@ export type FilePurposeName =
   | 'RETURN_EVIDENCE'
   | 'MATING_PROFILE_IMAGE'
   | 'MATING_PROFILE_RENDITION'
-  | 'MATING_PROFILE_VIDEO';
+  | 'MATING_PROFILE_VIDEO'
+  | 'FINDER_MESSAGE_ATTACHMENT'
+  | 'FINDER_CONTRACT_PDF';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -247,6 +249,11 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   MATING_PROFILE_IMAGE: ['LISTING_MODERATOR', 'SUPERADMIN'],
   MATING_PROFILE_RENDITION: ['LISTING_MODERATOR', 'SUPERADMIN'],
   MATING_PROFILE_VIDEO: ['LISTING_MODERATOR', 'SUPERADMIN'],
+  // A conversation attachment and a contract belong to the two parties. They are
+  // served only through the finder routes that check the party; no operator
+  // role reads them through the generic file route (R8, R12).
+  FINDER_MESSAGE_ATTACHMENT: [],
+  FINDER_CONTRACT_PDF: [],
 };
 
 export function canReadFile(

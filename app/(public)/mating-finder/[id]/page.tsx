@@ -7,6 +7,12 @@ import { site, viewer } from '../../../../src/public/request.ts';
 import { publicProfile } from '../../../../src/finder/profiles.ts';
 import { MatingProfileCardView } from '../../../../src/finder/profile-card.tsx';
 import { ReportProfileForm } from '../../../../src/finder/profile-forms.tsx';
+import { CreateRequestForm } from '../../../../src/finder/request-forms.tsx';
+import { and, eq, ne } from 'drizzle-orm';
+import { animals } from '../../../../src/db/schema/animals.ts';
+import { matingProfiles } from '../../../../src/db/schema/finder.ts';
+import { readInt } from '../../../../src/settings/service.ts';
+import { FINDER_SETTING_KEYS } from '../../../../src/finder/model.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +36,17 @@ export default async function PublicMatingProfilePage({ params }: { params: Prom
   const actor = await viewer();
   const card = await publicProfile(db(), actor?.accountId ?? null, id);
   if (card === null) notFound();
+  // The viewer's own animals that are on the finder and could send a request from here.
+  const mine = actor
+    ? await db()
+        .select({ id: animals.id, name: animals.name })
+        .from(matingProfiles)
+        .innerJoin(animals, eq(animals.id, matingProfiles.animalId))
+        .where(and(eq(matingProfiles.ownerAccountId, actor.accountId), eq(animals.ownerAccountId, actor.accountId), ne(matingProfiles.state, 'INACTIVE')))
+    : [];
+  const ownProfile = mine.some((m) => m.id === card.animalId);
+  const maxDays = await readInt(db(), FINDER_SETTING_KEYS.requestExpiryDays).catch(() => 7);
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="mx-auto max-w-4xl space-y-lg px-lg py-lg">
@@ -43,6 +60,31 @@ export default async function PublicMatingProfilePage({ params }: { params: Prom
           امتیاز یا اطلاعات این صفحه تضمین سلامت، باروری یا کیفیت توله نیست. ارسال درخواست پس از احراز هویت هر دو مالک ممکن
           می‌شود.
         </p>
+        {!actor ? (
+          <p className="mt-sm text-body-sm">
+            برای ارسال درخواست،{' '}
+            <Link href={'/login?next=' + encodeURIComponent('/mating-finder/' + card.profileId)} className="text-text-brand underline underline-offset-4">
+              وارد شوید
+            </Link>
+            .
+          </p>
+        ) : ownProfile ? null : card.state !== 'READY' ? (
+          <p className="mt-sm text-body-sm" data-testid="finder-request-closed">این پروفایل در حال حاضر درخواست تازه نمی‌پذیرد.</p>
+        ) : mine.length === 0 ? (
+          <p className="mt-sm text-body-sm">
+            برای ارسال درخواست، حیوان شما باید پروفایل فعال جفت‌یابی داشته باشد.{' '}
+            <Link href="/account/mating-finder/profiles" className="text-text-brand underline underline-offset-4">
+              مدیریت پروفایل‌ها
+            </Link>
+          </p>
+        ) : (
+          <CreateRequestForm
+            profileId={card.profileId}
+            myAnimals={mine.map((m) => ({ value: m.id, label: m.name ?? 'بدون نام' }))}
+            maxDays={maxDays}
+            defaults={{ route: 'PERSONAL', windowFrom: today, windowTo: today, cityFa: card.cityFa ?? '', placeCategory: 'NEUTRAL', financialCategory: 'NO_PAYMENT', specialConditionsFa: '' }}
+          />
+        )}
       </section>
       <section className="rounded-lg border border-border-subtle p-lg">
         <h2 className="text-label-lg">گزارش این پروفایل</h2>

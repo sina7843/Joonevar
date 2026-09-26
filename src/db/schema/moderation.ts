@@ -15,7 +15,7 @@ import { communities } from './communities.ts';
 import { animalListingMedia, animalListings } from './marketplace.ts';
 import { inquiryMessages } from './inquiry.ts';
 import { questions, reviews } from './trust.ts';
-import { matingProfileMedia, matingProfiles } from './finder.ts';
+import { finderMessages, matingProfileMedia, matingProfiles } from './finder.ts';
 import {
   moderationAppealStatus,
   moderationDecision,
@@ -58,6 +58,8 @@ export const moderationReports = pgTable(
     matingProfileMediaId: uuid('mating_profile_media_id').references(() => matingProfileMedia.id, {
       onDelete: 'restrict',
     }),
+    /** Phase 4 (PROMPT-005): one message of a finder conversation, reported by a party to it. */
+    finderMessageId: uuid('finder_message_id').references(() => finderMessages.id, { onDelete: 'restrict' }),
     questionId: uuid('question_id').references(() => questions.id, { onDelete: 'restrict' }),
     /** The listing revision the reporter was reading, so a later edit is visible against it. */
     listingRevision: integer('listing_revision'),
@@ -147,6 +149,13 @@ export const moderationReports = pgTable(
     check(
       'moderation_report_mating_media_check',
       sql`(${t.targetKind}::text = 'MATING_PROFILE_MEDIA') = (${t.matingProfileMediaId} is not null)`,
+    ),
+    uniqueIndex('moderation_report_one_open_finder_message_key')
+      .on(t.reporterAccountId, t.finderMessageId)
+      .where(sql`${t.status} = 'OPEN'`),
+    check(
+      'moderation_report_finder_message_check',
+      sql`(${t.targetKind}::text = 'FINDER_MESSAGE') = (${t.finderMessageId} is not null)`,
     ),
   ],
 );

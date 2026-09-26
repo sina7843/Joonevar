@@ -25,6 +25,9 @@ export const RATE_LIMIT_ACTIONS = [
   'DISCOUNT_CODE_TRY',
   'REVIEW_SUBMIT',
   'SEARCH_QUERY',
+  // Phase 4 (PROMPT-005).
+  'FINDER_REQUEST_CREATE',
+  'FINDER_MESSAGE_POST',
 ] as const;
 export type RateLimitAction = (typeof RATE_LIMIT_ACTIONS)[number];
 
@@ -39,6 +42,8 @@ export const RATE_LIMIT_KEYS: Record<RateLimitAction, { ceiling: string; window:
   DISCOUNT_CODE_TRY: { ceiling: 'market.limit.code_try_per_hour', window: 'market.limit.window_minutes' },
   REVIEW_SUBMIT: { ceiling: 'market.limit.review_per_hour', window: 'market.limit.window_minutes' },
   SEARCH_QUERY: { ceiling: 'market.limit.search_per_hour', window: 'market.limit.window_minutes' },
+  FINDER_REQUEST_CREATE: { ceiling: 'finder.limit.request_per_window', window: 'finder.limit.window_minutes' },
+  FINDER_MESSAGE_POST: { ceiling: 'finder.limit.message_per_window', window: 'finder.limit.window_minutes' },
 };
 
 export const RATE_LIMIT_FA: Record<RateLimitAction, string> = {
@@ -48,6 +53,8 @@ export const RATE_LIMIT_FA: Record<RateLimitAction, string> = {
   DISCOUNT_CODE_TRY: 'امتحان کد تخفیف',
   REVIEW_SUBMIT: 'ثبت نظر',
   SEARCH_QUERY: 'جست‌وجو',
+  FINDER_REQUEST_CREATE: 'درخواست جفت‌گیری',
+  FINDER_MESSAGE_POST: 'پیام جفت‌یابی',
 };
 
 /** The default window when nobody has configured one: an hour. */

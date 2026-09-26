@@ -50,6 +50,10 @@ export default async function FinderProfilesPage() {
             <Link href="/account/mating-finder/saved-searches" className="text-text-brand underline underline-offset-4">
               جست‌وجوهای ذخیره‌شده
             </Link>
+            {' · '}
+            <Link href="/account/mating-finder/requests" className="text-text-brand underline underline-offset-4" data-testid="finder-requests-link">
+              درخواست‌ها
+            </Link>
           </p>
         </Card>
         {entries.length === 0 ? (

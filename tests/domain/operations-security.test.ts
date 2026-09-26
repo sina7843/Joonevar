@@ -8,6 +8,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { SETTING_BY_KEY } from '../../src/settings/keys.ts';
 import {
   averageToman,
   cellFa,
@@ -165,10 +166,13 @@ test('a window is a bucket, and a subject is never stored as given', () => {
 });
 
 test('every limited action names the settings that govern it', () => {
+  // Phase 4 added the finder's own limits (finder.limit.*), so the rule is that
+  // each key is a real managed INT setting, not that it has one prefix.
   for (const action of RATE_LIMIT_ACTIONS) {
     const keys = RATE_LIMIT_KEYS[action];
-    assert.ok(keys.ceiling.startsWith('market.limit.'), action + ' has a managed ceiling');
-    assert.ok(keys.window.startsWith('market.limit.'), action + ' has a managed window');
+    assert.equal(SETTING_BY_KEY.get(keys.ceiling)?.kind, 'INT', action + ' has a managed ceiling');
+    assert.equal(SETTING_BY_KEY.get(keys.window)?.kind, 'INT', action + ' has a managed window');
+    assert.ok(/^(market|finder)\.limit\./.test(keys.ceiling), action + ' ceiling lives with the other limits');
   }
 });
 

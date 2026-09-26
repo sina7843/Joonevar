@@ -51,6 +51,7 @@ import { lastMatingsOf } from './last-mating.ts';
 import { finderFlagEnabled } from './flags.ts';
 import { FINDER_SETTING_KEYS } from './model.ts';
 import { noticeMatches } from './discovery.ts';
+import { closeRequestsForAnimal } from './requests.ts';
 import {
   ageFa,
   ageInMonths,
@@ -196,6 +197,9 @@ export async function deactivateProfileOf(
     after: { state: 'INACTIVE', reason },
     reason: noteFa,
   });
+  // Open requests of this animal close with the reason and the other side is told;
+  // a confirmed contract and every history row stay (PROMPT-005, PRODUCT_DECISIONS §11).
+  await closeRequestsForAnimal(tx, animalId, DEACTIVATION_FA[reason] ?? 'پروفایل از جفت‌یابی خارج شد.', now);
   if (reason !== 'OWNER' && (await finderFlagEnabled(tx, 'finder.flag.notifications'))) {
     await createNotification(tx, {
       recipientAccountId: profile.ownerAccountId,

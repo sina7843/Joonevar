@@ -81,6 +81,10 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   MATING_PROFILE_IMAGE: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   MATING_PROFILE_RENDITION: { accept: ['image/jpeg', 'image/png'], maxBytes: 5 * MB },
   MATING_PROFILE_VIDEO: { accept: ['video/mp4'], maxBytes: 20 * MB },
+  /** A picture or a document one owner sends the other in a finder conversation. */
+  FINDER_MESSAGE_ATTACHMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
+  /** The rendered contract; written by the server only. */
+  FINDER_CONTRACT_PDF: { accept: ['application/pdf'], maxBytes: 10 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

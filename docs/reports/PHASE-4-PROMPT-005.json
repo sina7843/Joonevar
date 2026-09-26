@@ -1,0 +1,111 @@
+{
+  "promptId": "PROMPT-005",
+  "phase": "4",
+  "status": "COMPLETE",
+  "head_before": "f06f9c760f44af8b62172fbc6fc4c836ae483c4a",
+  "work_commit": "The work commit carrying this report; its hash is recorded by the Runner in PROJECT_STATUS-PHASE-4.md because a report cannot contain its own hash.",
+  "commit": "See work_commit.",
+  "summary": "This prompt implements the complete pre-mating interaction, from request through a mutually confirmed contract.\n\nRequests\n- A request snapshots both animals and owners, the breed, the compatibility outcome together with the rule versions it used, the expiry setting with its version, and the official/personal route.\n- Negotiable terms live in columns and carry a terms_version: the date window, city, place category, message, financial category and special conditions.\n- Sending requires both owners to have approved KYC and at least one side to hold an active subscription.\n- The receiver's profile must be READY and visible to the sender, and the compatibility evaluator must report no blocker.\n- An official request needs a pedigree on both animals.\n- Expiry defaults to 7 managed days; the sender may choose a shorter duration, never a longer one.\n\nStatuses and commands\n- Ten statuses are driven by one command table. Every command carries an optimistic version, and every move writes a mating_request_event row with its reason plus an audit row.\n- Terminal statuses accept no command.\n- Expiry is enforced on every read and command, and expireDueRequests provides a sweep.\n\nSingle winner\n- Entering CONTRACT_DRAFTING writes one mating_coordination row per animal, and a partial unique index on animal_id where active decides the winner.\n- Before taking the request row lock, each transaction takes per-animal pg_advisory_xact_lock in sorted order. This removed a real deadlock that the concurrency test found.\n- Competing requests are paused, not closed, and the profiles become COORDINATING.\n- A valid cancellation releases the coordination, resumes competitors that are no longer blocked, and returns the profiles to READY.\n\nConversation\n- A dedicated conversation opens only after preliminary acceptance.\n- It reuses the existing contact policy (phone and address masked until the contract is confirmed and both sides consent), private file storage, rate limiting, moderation_report (new target FINDER_MESSAGE) and audit.\n- Each side can block the other side's messages.\n- No operational role can read the chat or the contract.\n\nContracts\n- Contracts are built from a versioned template that must contain the seven required clauses as required.\n- No clause text is seeded; contract drafting stays closed until a super-admin publishes a template.\n- Every edit creates a new version with a sha256 hash of its canonical JSON, and earlier approvals no longer count toward the new version.\n- Each party confirms the version it sees with its own one-time code, bound to (account, version, content hash). The code is stored salted and hashed and compared in constant time, with bounded attempts, expiry and a resend interval. Stale versions, stale hashes and replayed codes are refused.\n- The confirmation records account, time, IP and user agent. It is named 'تأیید دوطرفه با کد یک‌بارمصرف' and is explicitly not a guaranteed legal signature.\n- The confirmed version is rendered once to a private, immutable PDF that only the two parties can download, with every download audited.\n- Cancellation is bilateral (a request waits for the other side) or unilateral with a reason; versions, approvals and the PDF are preserved.\n\nOther\n- Deactivating a profile closes that animal's open requests and draft contracts, with a reason and a notice to the other side.\n- No payment table or amount column exists anywhere on this path. A test proves the payment_batch count does not change across the whole flow.",
+  "changedFiles": [
+    "src/db/migrations/0056_finder-requests-contracts.sql",
+    "src/db/migrations/meta/0056_snapshot.json",
+    "src/db/migrations/meta/_journal.json",
+    "src/db/schema/enums.ts",
+    "src/db/schema/finder.ts",
+    "src/db/schema/moderation.ts",
+    "src/authz/policy.ts",
+    "src/files/signature.ts",
+    "src/security/rate-limit.ts",
+    "src/settings/keys.ts",
+    "src/domain/resume-context.ts",
+    "src/finder/request-model.ts",
+    "src/finder/requests.ts",
+    "src/finder/contracts.ts",
+    "src/finder/conversation.ts",
+    "src/finder/request-actions.ts",
+    "src/finder/request-forms.tsx",
+    "src/finder/profiles.ts",
+    "src/notifications/templates.ts",
+    "app/account/mating-finder/requests/page.tsx",
+    "app/account/mating-finder/requests/[id]/page.tsx",
+    "app/api/finder/contracts/[id]/pdf/route.ts",
+    "app/api/finder/messages/[id]/file/route.ts",
+    "app/(public)/mating-finder/[id]/page.tsx",
+    "app/account/mating-finder/profiles/page.tsx",
+    "app/admin/mating-finder/page.tsx",
+    "tools/upgrade-check.mjs",
+    "tests/domain/finder-requests.test.ts",
+    "tests/db/finder-requests.test.ts",
+    "tests/browser/finder-requests.test.ts",
+    "tests/domain/operations-security.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-005/contract-confirmed-mobile.png",
+    "docs/ops/operator-guide-phase-4.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-4-PROMPT-005.json"
+  ],
+  "migrations": ["0056_finder-requests-contracts"],
+  "decisions": ["DEC-0221"],
+  "tests": {
+    "newDomain": { "command": "node --test tests/domain/finder-requests.test.ts", "total": 8, "pass": 8, "fail": 0 },
+    "newDatabase": {
+      "command": "node --test tests/db/finder-requests.test.ts",
+      "total": 8,
+      "pass": 8,
+      "fail": 0,
+      "note": "Covers KYC/subscription access, expiry, duplicate and stale commands, the two-winner race, privacy/IDOR, concurrent edits and confirmations, OTP replay, PDF access, and the unchanged payment_batch count. The race test passed 3 runs in a row after the advisory-lock fix."
+    },
+    "newBrowser": { "command": "node tools/browser-tests.mjs tests/browser/finder-requests.test.ts", "total": 1, "pass": 1, "fail": 0 },
+    "productFull": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "total": 1096,
+      "pass": 1090,
+      "fail": 6,
+      "durationSeconds": 1362,
+      "note": "Six failures, three causes. (1) tests/domain/operations-security.test.ts asserted that every rate-limit key starts with market.limit.; it now requires each key to be a managed INT setting under market.limit. or finder.limit. (2) Four DB tests in operations-security, payments, pedigree and permit hit 16 s 'Connection terminated' timeouts under memory pressure. (3) tests/config/release.test.ts reads prompts/, which is deleted in the working tree by a change that is not part of this prompt."
+    },
+    "productRerunAffected": {
+      "command": "node --test --test-concurrency=1 tests/db/operations-security.test.ts tests/db/payments.test.ts tests/db/pedigree.test.ts tests/db/permit.test.ts tests/db/registration-sheet.test.ts tests/domain/operations-security.test.ts",
+      "total": 69,
+      "pass": 69,
+      "fail": 0
+    },
+    "releaseConfigCleanTree": { "command": "git worktree add --detach <tmp> HEAD ; node --test tests/config/release.test.ts", "result": "run after the work commit; see the final report to the user" },
+    "browserFull": { "command": "rm -rf .next && npm run build && node tools/browser-tests.mjs", "total": 273, "pass": 273, "fail": 0, "skip": 0, "durationSeconds": 652 },
+    "upgradeRehearsal": { "command": "npm run db:upgrade-check", "total": 72, "pass": 72, "fail": 0 },
+    "tools": { "command": "npm run test:tools", "total": 20, "pass": 20, "fail": 0 }
+  },
+  "checks": [
+    { "id": "typecheck", "command": "npx tsc --noEmit", "result": "PASS", "evidence": "Exit 0 on the final tree, including after the operations-security test change." },
+    { "id": "build", "command": "rm -rf .next && npm run build", "result": "PASS", "evidence": "Exit 0 on the final tree. The first three attempts aborted with V8 'Zone Allocation failed / VirtualAlloc failed' because the machine's commit charge was about 30 of 32 GB, held by unrelated applications. One of those attempts used a temporary, uncommitted cpus:1 config that did not help and was reverted. The next plain build succeeded once memory was available. /account/mating-finder/requests, /[id] and the two /api/finder routes compile as dynamic routes; First Load JS shared is 102 kB." },
+    { "id": "product-tests", "command": "full product run, then a re-run of the affected suites", "result": "PASS", "evidence": "1090/1096 in the full run. The six failures are explained in tests.productFull. After the test fix, the re-run of the five DB suites plus the domain suite passed 69/69, and all 16 new request/contract tests pass. The release.test failure comes from the uncommitted prompts/ deletion; it is verified on a clean worktree of the work commit." },
+    { "id": "browser-tests", "command": "node tools/browser-tests.mjs", "result": "PASS", "evidence": "273/273 on a clean build. Covers a request from the public profile, acceptance, and a phone number masked in chat. The contract is started with the not-a-legal-signature naming. Each side confirms with its own code taken from the development SMS outbox, and the contract reaches 'confirmed'. Contact stays hidden without consent, with no horizontal scroll at 360 px. The PDF downloads as application/pdf for a party and is refused to a stranger." }
+  ],
+  "blockers": [],
+  "limitations": [
+    "There is no user-level block across the whole Finder yet (PROMPT-007). Blocking is per conversation, and moderation-inactivated profiles are excluded.",
+    "Finder notifications are in-app only and behind finder.flag.notifications, which is closed by default. The contract code SMS goes through the configured SMS sender; with INTEGRATION_MODE=local that is the development outbox, and it has not been verified against a live provider.",
+    "PDF rendering uses the existing Playwright/Chromium renderer. If rendering fails after confirmation, the confirmation stands and the PDF is rendered on the first download.",
+    "There is no scheduler. Expiry is enforced when a request is read or acted on, and expireDueRequests is a sweep to be wired to a job later.",
+    "No contract clause text is seeded. Contracts cannot be drafted until a super-admin publishes a template with legally reviewed text. The two-sided OTP confirmation is not a legal signature.",
+    "Binding the request route and date window to the official permit and the actual mating date belongs to PROMPT-006.",
+    "prompts/ and prompts-2/ remain deleted in the working tree. This prompt did not delete them, and the deletion is not in this commit."
+  ],
+  "readiness": {
+    "code": "PHASE_4_REQUESTS_CONTRACTS_BUILT",
+    "visual": "VERIFIED_BY_SCREENSHOT_360",
+    "integrations": "NOT_CONFIGURED",
+    "legal": "NOT_APPROVED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "src/finder/requests.ts",
+    "src/finder/contracts.ts",
+    "src/finder/conversation.ts",
+    "tests/db/finder-requests.test.ts",
+    "tests/browser/finder-requests.test.ts",
+    "docs/reports/screenshots/phase-4/prompt-005/",
+    "DECISIONS.md#dec-0221"
+  ]
+}

@@ -17,6 +17,13 @@
 import { bigint, boolean, check, date, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import {
+  finderCancelKind,
+  finderContractStatus,
+  finderTemplateStatus,
+  matingFinancialCategory,
+  matingPlaceCategory,
+  matingRequestStatus,
+  matingRoute,
   animalLifeEventKind,
   fertilityStatus,
   lastMatingSource,
@@ -389,4 +396,293 @@ export const finderMatchNotices = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
   },
   (t) => [uniqueIndex('finder_match_notice_key').on(t.savedSearchId, t.profileId)],
+);
+
+// ── PROMPT-005: requests ─────────────────────────────────────────────────────
+
+/**
+ * One request from one owner's animal to another owner's profile. Everything
+ * decided at sending time is snapshotted in `snapshot` (both animals and owners,
+ * the resolved breed, the rule versions and the compatibility outcome), so a
+ * later edit to either animal or rule rewrites nothing already agreed on. The
+ * negotiable terms live in columns and move with `terms_version`.
+ */
+export const matingRequests = pgTable(
+  'mating_request',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    senderAccountId: uuid('sender_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    receiverAccountId: uuid('receiver_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    senderAnimalId: uuid('sender_animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    receiverAnimalId: uuid('receiver_animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    receiverProfileId: uuid('receiver_profile_id')
+      .notNull()
+      .references(() => matingProfiles.id, { onDelete: 'restrict' }),
+    status: matingRequestStatus('status').notNull().default('WAITING_REVIEW'),
+    route: matingRoute('route').notNull(),
+    windowFrom: date('window_from').notNull(),
+    windowTo: date('window_to').notNull(),
+    cityFa: text('city_fa').notNull(),
+    placeCategory: matingPlaceCategory('place_category').notNull(),
+    messageFa: text('message_fa'),
+    financialCategory: matingFinancialCategory('financial_category').notNull(),
+    specialConditionsFa: text('special_conditions_fa'),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    snapshot: jsonb('snapshot').notNull(),
+    termsVersion: integer('terms_version').notNull().default(1),
+    /** Set while one side's changed terms wait for the other side (NEGOTIATING). */
+    termsProposedByAccountId: uuid('terms_proposed_by_account_id').references(() => accounts.id, {
+      onDelete: 'set null',
+    }),
+    /** A competitor holds coordination for one of the two animals; this request waits. */
+    pausedAt: timestamp('paused_at', { withTimezone: true }),
+    senderContactConsent: boolean('sender_contact_consent').notNull().default(false),
+    receiverContactConsent: boolean('receiver_contact_consent').notNull().default(false),
+    closedReasonFa: text('closed_reason_fa'),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    check('mating_request_window_check', sql`${t.windowFrom} <= ${t.windowTo}`),
+    check('mating_request_two_animals_check', sql`${t.senderAnimalId} <> ${t.receiverAnimalId}`),
+    // Asking twice about the same pair while one request is alive is the same asking.
+    uniqueIndex('mating_request_one_live_pair_key')
+      .on(t.senderAnimalId, t.receiverAnimalId)
+      .where(
+        sql`${t.status} in ('WAITING_REVIEW','PRELIMINARILY_ACCEPTED','NEGOTIATING','CONTRACT_DRAFTING','CONTRACT_CONFIRMED')`,
+      ),
+    index('mating_request_receiver_idx').on(t.receiverAccountId, t.status),
+    index('mating_request_sender_idx').on(t.senderAccountId, t.status),
+    index('mating_request_expiry_idx').on(t.status, t.expiresAt),
+  ],
+);
+
+/** Every status change with its actor and reason; nothing here is rewritten. */
+export const matingRequestEvents = pgTable(
+  'mating_request_event',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => matingRequests.id, { onDelete: 'restrict' }),
+    fromStatus: matingRequestStatus('from_status'),
+    toStatus: matingRequestStatus('to_status').notNull(),
+    actorAccountId: uuid('actor_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+    reasonFa: text('reason_fa'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [index('mating_request_event_request_idx').on(t.requestId, t.createdAt)],
+);
+
+/**
+ * The single-winner lock (R7). Entering contract coordination writes one active
+ * row per animal; the partial unique index lets only one request hold an animal
+ * at a time, whatever the timing. Releasing sets `active` false and keeps the row.
+ */
+export const matingCoordinations = pgTable(
+  'mating_coordination',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    animalId: uuid('animal_id')
+      .notNull()
+      .references(() => animals.id, { onDelete: 'restrict' }),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => matingRequests.id, { onDelete: 'restrict' }),
+    active: boolean('active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    releasedAt: timestamp('released_at', { withTimezone: true }),
+  },
+  (t) => [
+    uniqueIndex('mating_coordination_one_active_key').on(t.animalId).where(sql`${t.active}`),
+    uniqueIndex('mating_coordination_request_animal_key').on(t.requestId, t.animalId),
+  ],
+);
+
+// ── PROMPT-005: conversation ─────────────────────────────────────────────────
+
+/** Opened at preliminary acceptance, one per request; only its two parties read it. */
+export const finderConversations = pgTable(
+  'finder_conversation',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => matingRequests.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('finder_conversation_request_key').on(t.requestId)],
+);
+
+export const finderMessages = pgTable(
+  'finder_message',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    conversationId: uuid('conversation_id')
+      .notNull()
+      .references(() => finderConversations.id, { onDelete: 'restrict' }),
+    senderAccountId: uuid('sender_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    /** Stored as shown: contact details masked until both sides agreed to reveal them. */
+    bodyFa: text('body_fa'),
+    redacted: boolean('redacted').notNull().default(false),
+    fileId: uuid('file_id').references(() => storedFiles.id, { onDelete: 'restrict' }),
+    hiddenAt: timestamp('hidden_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    check('finder_message_content_check', sql`${t.bodyFa} is not null or ${t.fileId} is not null`),
+    index('finder_message_conversation_idx').on(t.conversationId, t.createdAt),
+  ],
+);
+
+/** One side stopped hearing from the other in this conversation. */
+export const finderConversationBlocks = pgTable(
+  'finder_conversation_block',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    conversationId: uuid('conversation_id')
+      .notNull()
+      .references(() => finderConversations.id, { onDelete: 'restrict' }),
+    blockerAccountId: uuid('blocker_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('finder_conversation_block_key').on(t.conversationId, t.blockerAccountId)],
+);
+
+// ── PROMPT-005: contract ─────────────────────────────────────────────────────
+
+/**
+ * A contract template version. `clauses` is the ordered list of
+ * { key, required, titleFa, bodyFa }. Required clauses cannot be removed from a
+ * contract; the text is the superadmin's, and none is seeded (DEC-0217 §13).
+ */
+export const finderContractTemplates = pgTable(
+  'finder_contract_template',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    version: integer('version').notNull(),
+    status: finderTemplateStatus('status').notNull().default('PUBLISHED'),
+    titleFa: text('title_fa').notNull(),
+    clauses: jsonb('clauses').notNull(),
+    reasonFa: text('reason_fa').notNull(),
+    publishedByAccountId: uuid('published_by_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+    publishedAt: timestamp('published_at', { withTimezone: true }).notNull().default(now),
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+  },
+  (t) => [
+    uniqueIndex('finder_template_version_key').on(t.version),
+    uniqueIndex('finder_template_one_published_key').on(t.status).where(sql`${t.status} = 'PUBLISHED'`),
+  ],
+);
+
+export const finderContracts = pgTable(
+  'finder_contract',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => matingRequests.id, { onDelete: 'restrict' }),
+    templateId: uuid('template_id')
+      .notNull()
+      .references(() => finderContractTemplates.id, { onDelete: 'restrict' }),
+    status: finderContractStatus('status').notNull().default('DRAFTING'),
+    currentNumber: integer('current_number').notNull().default(1),
+    confirmedNumber: integer('confirmed_number'),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
+    pdfFileId: uuid('pdf_file_id').references(() => storedFiles.id, { onDelete: 'restrict' }),
+    cancelRequestedByAccountId: uuid('cancel_requested_by_account_id').references(() => accounts.id, {
+      onDelete: 'set null',
+    }),
+    cancelRequestedAt: timestamp('cancel_requested_at', { withTimezone: true }),
+    cancelKind: finderCancelKind('cancel_kind'),
+    cancelledByAccountId: uuid('cancelled_by_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+    cancelReasonFa: text('cancel_reason_fa'),
+    version: integer('version').notNull().default(1),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('finder_contract_request_key').on(t.requestId)],
+);
+
+/** Every edit is a new numbered version with its own content hash; nothing is edited in place. */
+export const finderContractVersions = pgTable(
+  'finder_contract_version',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    contractId: uuid('contract_id')
+      .notNull()
+      .references(() => finderContracts.id, { onDelete: 'restrict' }),
+    number: integer('number').notNull(),
+    content: jsonb('content').notNull(),
+    contentHash: text('content_hash').notNull(),
+    createdByAccountId: uuid('created_by_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('finder_contract_version_key').on(t.contractId, t.number)],
+);
+
+/**
+ * A one-time code bound to one account, one contract version and its hash. The
+ * code is stored only as a salted hash; consuming it is a conditional update,
+ * so it works once.
+ */
+export const finderContractOtps = pgTable(
+  'finder_contract_otp',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    contractVersionId: uuid('contract_version_id')
+      .notNull()
+      .references(() => finderContractVersions.id, { onDelete: 'restrict' }),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    contentHash: text('content_hash').notNull(),
+    codeHash: text('code_hash').notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    attempts: integer('attempts').notNull().default(0),
+    maxAttempts: integer('max_attempts').notNull(),
+    lastSentAt: timestamp('last_sent_at', { withTimezone: true }).notNull(),
+    consumedAt: timestamp('consumed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [index('finder_contract_otp_version_idx').on(t.contractVersionId, t.accountId)],
+);
+
+/** One approval per account per version, tied to the hash that was shown and the code that proved it. */
+export const finderContractApprovals = pgTable(
+  'finder_contract_approval',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    contractVersionId: uuid('contract_version_id')
+      .notNull()
+      .references(() => finderContractVersions.id, { onDelete: 'restrict' }),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    contentHash: text('content_hash').notNull(),
+    otpId: uuid('otp_id')
+      .notNull()
+      .references(() => finderContractOtps.id, { onDelete: 'restrict' }),
+    ip: text('ip'),
+    userAgent: text('user_agent'),
+    approvedAt: timestamp('approved_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('finder_contract_approval_key').on(t.contractVersionId, t.accountId),
+    uniqueIndex('finder_contract_approval_otp_key').on(t.otpId),
+  ],
 );

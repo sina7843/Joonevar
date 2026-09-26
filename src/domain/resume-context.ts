@@ -53,7 +53,8 @@ export type EntityType =
   | 'COMMERCE_REVIEW'
   | 'COMMERCE_QUESTION'
   // Phase 4 mating finder.
-  | 'FINDER_SUBSCRIPTION';
+  | 'FINDER_SUBSCRIPTION'
+  | 'MATING_REQUEST';
 
 export interface EntityRef {
   readonly type: EntityType;

@@ -148,6 +148,9 @@ export const filePurpose = pgEnum('file_purpose', [
   'MATING_PROFILE_IMAGE',
   'MATING_PROFILE_RENDITION',
   'MATING_PROFILE_VIDEO',
+  /* Phase 4 PROMPT-005: a picture or document sent inside a finder conversation, and the confirmed contract PDF. */
+  'FINDER_MESSAGE_ATTACHMENT',
+  'FINDER_CONTRACT_PDF',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -189,6 +192,8 @@ export const reportTargetKind = pgEnum('report_target_kind', [
   /** Phase 4 (PROMPT-003): a mating profile, or one of its pictures. */
   'MATING_PROFILE',
   'MATING_PROFILE_MEDIA',
+  /** Phase 4 (PROMPT-005): one message of a finder conversation. */
+  'FINDER_MESSAGE',
 ]);
 
 /**
@@ -712,6 +717,9 @@ export const rateLimitAction = pgEnum('rate_limit_action', [
   'DISCOUNT_CODE_TRY',
   'REVIEW_SUBMIT',
   'SEARCH_QUERY',
+  // Phase 4 (PROMPT-005).
+  'FINDER_REQUEST_CREATE',
+  'FINDER_MESSAGE_POST',
 ]);
 
 // ── Phase 4 mating finder (DEC-0218) ─────────────────────────────────────────
@@ -784,3 +792,37 @@ export const matingMediaStatus = pgEnum('mating_media_status', ['ACTIVE', 'REMOV
 
 /** Where a derived last mating came from: the official permit's dates, or the contract-backed personal path (PROMPT-006). */
 export const lastMatingSource = pgEnum('last_mating_source', ['OFFICIAL', 'FINDER_PERSONAL']);
+
+// ── Phase 4 PROMPT-005: requests, conversations, contracts ────────────────────
+
+export const matingRequestStatus = pgEnum('mating_request_status', [
+  'WAITING_REVIEW',
+  'PRELIMINARILY_ACCEPTED',
+  'REJECTED',
+  'NEGOTIATING',
+  'CANCELLED',
+  'EXPIRED',
+  'CONTRACT_DRAFTING',
+  'CONTRACT_CONFIRMED',
+  'MATING_COMPLETED',
+  'MATING_NOT_COMPLETED',
+]);
+
+/** Which downstream path the two owners intend; the permit and the personal record stay separate (PROMPT-006). */
+export const matingRoute = pgEnum('mating_route', ['OFFICIAL', 'PERSONAL']);
+
+/** A place category, never an address: where the mating is meant to happen. */
+export const matingPlaceCategory = pgEnum('mating_place_category', ['SIRE_OWNER', 'DAM_OWNER', 'NEUTRAL']);
+
+/** How the two owners settle between themselves; Hamzist collects none of it (PRODUCT_DECISIONS §9). */
+export const matingFinancialCategory = pgEnum('mating_financial_category', [
+  'FIXED_AMOUNT',
+  'OFFSPRING_SHARE',
+  'MIXED',
+  'NO_PAYMENT',
+  'PRIVATE_DETAILS',
+]);
+
+export const finderContractStatus = pgEnum('finder_contract_status', ['DRAFTING', 'CONFIRMED', 'CANCELLED']);
+export const finderTemplateStatus = pgEnum('finder_template_status', ['PUBLISHED', 'ARCHIVED']);
+export const finderCancelKind = pgEnum('finder_cancel_kind', ['BILATERAL', 'UNILATERAL']);

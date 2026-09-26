@@ -373,10 +373,21 @@ try {
       'finder_favorite',
       'finder_saved_search',
       'finder_match_notice',
+      // PROMPT-005: no request, conversation, contract, code or approval is created by an upgrade.
+      'mating_request',
+      'mating_request_event',
+      'mating_coordination',
+      'finder_conversation',
+      'finder_message',
+      'finder_contract_template',
+      'finder_contract',
+      'finder_contract_version',
+      'finder_contract_otp',
+      'finder_contract_approval',
     ]) {
       const counted = await client.query('select count(*)::int as value from ' + table);
       check(
-        'the ' + (/^(finder_|mating_profile|animal_(fertility|life|last))/.test(table) ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
+        'the ' + (/^(finder_|mating_(profile|request|coordination)|animal_(fertility|life|last))/.test(table) ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
         counted.rows[0]?.value === 0,
         'rows=' + counted.rows[0]?.value,
       );
