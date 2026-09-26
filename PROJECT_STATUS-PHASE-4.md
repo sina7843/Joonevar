@@ -4,7 +4,7 @@ Managed by `node tools/runner.mjs --phase 4 …` (DEC-0217). The package is read
 
 - [x] PROMPT-001 — 001-head-baseline-mating-finder-architecture <!-- work-commit:d8732dbf196e4da84acf73e034b70c2049c62150 -->
 - [x] PROMPT-002 — 002-foundations-settings-subscriptions <!-- work-commit:8d30d0dbe3bc7648d04c141db7f7af55efa57ad3 -->
-- [ ] PROMPT-003 — 003-profile-eligibility-visibility-last-mating
+- [x] PROMPT-003 — 003-profile-eligibility-visibility-last-mating <!-- work-commit:12c4129cd6293ff5383e0b2df04602e1730e26d7 -->
 - [ ] PROMPT-004 — 004-discovery-search-compatibility
 - [ ] PROMPT-005 — 005-requests-chat-contracts
 - [ ] PROMPT-006 — 006-paths-events-cooldown-breeding
