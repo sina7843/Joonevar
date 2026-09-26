@@ -6,7 +6,7 @@ Managed by `node tools/runner.mjs --phase 4 …` (DEC-0217). The package is read
 - [x] PROMPT-002 — 002-foundations-settings-subscriptions <!-- work-commit:8d30d0dbe3bc7648d04c141db7f7af55efa57ad3 -->
 - [x] PROMPT-003 — 003-profile-eligibility-visibility-last-mating <!-- work-commit:12c4129cd6293ff5383e0b2df04602e1730e26d7 -->
 - [x] PROMPT-004 — 004-discovery-search-compatibility <!-- work-commit:32901ff788a4880ca241dca19d2d8d3e2895a35a -->
-- [ ] PROMPT-005 — 005-requests-chat-contracts
+- [x] PROMPT-005 — 005-requests-chat-contracts <!-- work-commit:201e3ff038f6dd3c092ba462e868db97e6834cdf -->
 - [ ] PROMPT-006 — 006-paths-events-cooldown-breeding
 - [ ] PROMPT-007 — 007-operations-moderation-notifications-security
 - [ ] PROMPT-008 — 008-ci-release-readiness-handoff
