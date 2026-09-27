@@ -8,5 +8,5 @@ Managed by `node tools/runner.mjs --phase 4 …` (DEC-0217). The package is read
 - [x] PROMPT-004 — 004-discovery-search-compatibility <!-- work-commit:32901ff788a4880ca241dca19d2d8d3e2895a35a -->
 - [x] PROMPT-005 — 005-requests-chat-contracts <!-- work-commit:201e3ff038f6dd3c092ba462e868db97e6834cdf -->
 - [x] PROMPT-006 — 006-paths-events-cooldown-breeding <!-- work-commit:1ed0fee41f1054c2c64bf7d6c9495e19e2e54f82 -->
-- [ ] PROMPT-007 — 007-operations-moderation-notifications-security
+- [x] PROMPT-007 — 007-operations-moderation-notifications-security <!-- work-commit:6ee5b9115924a2f771f24ca23918ee182140bce7 -->
 - [ ] PROMPT-008 — 008-ci-release-readiness-handoff
