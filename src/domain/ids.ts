@@ -33,6 +33,11 @@ export const asSampleTrackingCode = (v: string) => v as SampleTrackingCode;
 
 export const newUuid = (): string => randomUUID();
 
+const UUID_SHAPE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Whether a value from a URL or a form can be a record id at all; anything else is simply "not found". */
+export const isUuid = (value: string): boolean => UUID_SHAPE.test(value);
+
 /**
  * Human-readable code alphabet. Excludes 0/O/1/I/L so a code read aloud at a
  * clinic desk or typed from a paper slip cannot collide — manual entry is an

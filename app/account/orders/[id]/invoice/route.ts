@@ -1,6 +1,7 @@
 import { db } from '../../../../../src/db/client.ts';
 import { guardRoute } from '../../../../../src/authz/guard.ts';
-import { toErrorBody } from '../../../../../src/domain/errors.ts';
+import { notFound, toErrorBody } from '../../../../../src/domain/errors.ts';
+import { isUuid } from '../../../../../src/domain/ids.ts';
 import { invoicePdf } from '../../../../../src/commerce/invoice.ts';
 
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,10 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+  if (!isUuid(id)) {
+    const { status, body } = toErrorBody(notFound('سفارش پیدا نشد.'));
+    return Response.json(body, { status });
+  }
   const guard = await guardRoute('/account/orders');
   if (!guard.ok) {
     const { status, body } = toErrorBody(guard.denied);

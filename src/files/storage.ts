@@ -6,6 +6,7 @@
  * so a crafted filename cannot escape the root, and every read goes through an
  * authorization check rather than an unguessable URL.
  */
+import { isUuid } from '../domain/ids.ts';
 import { createHash, randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -107,6 +108,7 @@ export async function putPrivateFile(
 }
 
 export async function findFile(tx: DbClient, fileId: string): Promise<StoredFileRecord> {
+  if (!isUuid(fileId)) throw notFound('File not found');
   const [row] = await tx
     .select()
     .from(storedFiles)

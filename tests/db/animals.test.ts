@@ -659,3 +659,11 @@ test('the association queue shows submitted cases and hides the rest', async () 
     assert.equal(queue.items[0]?.issuerName, 'SYNTHETIC — صف');
   });
 });
+
+test('an id that is not a UUID is simply not found, never a database error', async () => {
+  await withCtx(async (ctx) => {
+    for (const id of ['request', 'new', "1' or '1'='1", '']) {
+      await assert.rejects(requireOwnedAnimal(ctx.testDb.db, ctx.owner.actor, id), (e: unknown) => (e as { code?: string }).code === 'NOT_FOUND', id);
+    }
+  });
+});

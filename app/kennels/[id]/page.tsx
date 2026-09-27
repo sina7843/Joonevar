@@ -1,3 +1,5 @@
+import { notFound as pageNotFound } from 'next/navigation';
+import { isUuid } from '../../../src/domain/ids.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../src/ui/access-denied.tsx';
 import { AppError } from '../../../src/domain/errors.ts';
@@ -31,6 +33,8 @@ export const dynamic = 'force-dynamic';
  */
 export default async function KennelPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  // A segment that cannot be an id is a missing page, not a server error.
+  if (!isUuid(id)) pageNotFound();
   const guard = await guardRoute('/kennels/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 

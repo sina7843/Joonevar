@@ -1,3 +1,5 @@
+import { notFound as pageNotFound } from 'next/navigation';
+import { isUuid } from '../../../../src/domain/ids.ts';
 import Link from 'next/link';
 import { eq } from 'drizzle-orm';
 import { guardRoute } from '../../../../src/authz/guard.ts';
@@ -38,6 +40,8 @@ export default async function LocationPage({
   searchParams: Promise<{ context?: string; sel?: string }>;
 }) {
   const { id } = await params;
+  // A segment that cannot be an id is a missing page, not a server error.
+  if (!isUuid(id)) pageNotFound();
   const guard = await guardRoute('/vets/location/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 

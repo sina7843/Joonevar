@@ -1,3 +1,5 @@
+import { notFound as pageNotFound } from 'next/navigation';
+import { isUuid } from '../../../../src/domain/ids.ts';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
@@ -35,6 +37,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const guard = await guardRoute('/account/orders');
   if (!guard.ok) throw guard.denied;
   const { id } = await params;
+  // A segment that cannot be an id is a missing page, not a server error.
+  if (!isUuid(id)) pageNotFound();
 
   let view;
   try {

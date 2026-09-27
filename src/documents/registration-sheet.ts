@@ -233,7 +233,7 @@ export async function createSheetRequest(
     resume: {
       entity: { type: 'ANIMAL', id: unique[0]! },
       step: 'REGISTRATION_SHEET_PAYMENT',
-      originRoute: '/registration/batch',
+      originRoute: '/registration',
     },
   });
 

@@ -1,3 +1,5 @@
+import { notFound as pageNotFound } from 'next/navigation';
+import { isUuid } from '../../../../src/domain/ids.ts';
 import { eq } from 'drizzle-orm';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
@@ -22,6 +24,8 @@ export const dynamic = 'force-dynamic';
  */
 export default async function AssocKennelPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  // A segment that cannot be an id is a missing page, not a server error.
+  if (!isUuid(id)) pageNotFound();
   const guard = await guardRoute('/assoc/kennels/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 

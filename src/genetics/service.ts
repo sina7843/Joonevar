@@ -6,6 +6,7 @@
  * Parentage Result. Everything else — ownership, microchip, permits — is
  * outside its authority and no function here gives it one.
  */
+import { requireOwnedAnimal } from '../animals/service.ts';
 import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
@@ -788,7 +789,7 @@ export async function ownerResult(
   actor: Actor,
   animalId: string,
 ): Promise<ResultRecord | null> {
-  const [animal] = await database.select().from(animals).where(eq(animals.id, animalId)).limit(1);
-  if (!animal || animal.ownerAccountId !== actor.accountId) throw notFound('پرونده حیوان پیدا نشد.');
+  // The one owner check every animal read goes through (it also answers "not found" for a non-id).
+  await requireOwnedAnimal(database, actor, animalId);
   return resultOfAnimal(database, animalId);
 }

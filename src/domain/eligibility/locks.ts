@@ -27,19 +27,19 @@ export const LOCK_MEMBERSHIP_REQUIRED: LockDetail = {
 export const LOCK_REGISTRATION_SHEET_REQUIRED: LockDetail = {
   reason: 'برای دریافت شجره‌نامه ابتدا برگه ثبتی این حیوان باید صادر شود',
   nextPrerequisite: 'برگه ثبتی پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری صادر می‌شود.',
-  cta: { label: 'دریافت برگه ثبتی', href: '/registration/batch' },
+  cta: { label: 'دریافت برگه ثبتی', href: '/registration/new' },
 };
 
 export const LOCK_KENNEL_NEEDS_SHEET: LockDetail = {
   reason: 'برای شروع ثبت کنل، حداقل یک حیوان دارای برگه ثبتی لازم است',
   nextPrerequisite: 'ابتدا برگه ثبتی یکی از حیوان‌های خود را دریافت کنید.',
-  cta: { label: 'دریافت برگه ثبتی', href: '/registration/batch' },
+  cta: { label: 'دریافت برگه ثبتی', href: '/registration/new' },
 };
 
 export const LOCK_PERMIT_NEEDS_PEDIGREE: LockDetail = {
   reason: 'برای مجوز جفت‌گیری، حیوان شجره‌دار لازم است',
   nextPrerequisite: 'ابتدا شجره‌نامه حیوان خود را دریافت کنید.',
-  cta: { label: 'دریافت شجره‌نامه', href: '/pedigree/request' },
+  cta: { label: 'دریافت شجره‌نامه', href: '/pedigree' },
 };
 
 export const LOCK_PUPPY_CARD_NEEDS_PERMIT: LockDetail = {

@@ -1,3 +1,5 @@
+import { notFound as pageNotFound } from 'next/navigation';
+import { isUuid } from '../../../../src/domain/ids.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
@@ -22,6 +24,8 @@ export const dynamic = 'force-dynamic';
  */
 export default async function AssocKycCasePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  // A segment that cannot be an id is a missing page, not a server error.
+  if (!isUuid(id)) pageNotFound();
   const guard = await guardRoute('/assoc/kyc/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 

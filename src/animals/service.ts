@@ -65,7 +65,12 @@ const trimmedOrNull = (value: string | null | undefined): string | null => {
   return trimmed === '' ? null : trimmed;
 };
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function findAnimal(database: DbClient, animalId: string): Promise<AnimalRecord | null> {
+  // A path segment that is not an id is simply not an animal: answer "not found"
+  // instead of letting the database reject it as a server error.
+  if (!UUID.test(animalId)) return null;
   const [row] = await database.select().from(animals).where(eq(animals.id, animalId)).limit(1);
   return row ?? null;
 }
