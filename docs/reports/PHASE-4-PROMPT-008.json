@@ -1,0 +1,101 @@
+{
+  "promptId": "PROMPT-008",
+  "phase": "4",
+  "status": "COMPLETE",
+  "head_before": "34ae19ca5d011b6c28770008b30a13f747025d67",
+  "tested_commit": "528cda95f834cb3eb915f96f06b78c05dfa8d0af",
+  "work_commit": "The commit carrying this report. It changes only this report on top of tested_commit, so the code that was tested is byte-for-byte the code delivered. Its hash is recorded by the Runner in PROJECT_STATUS-PHASE-4.md because a report cannot contain its own hash.",
+  "commit": "See work_commit and tested_commit.",
+  "summary": "Phase 4 handoff.\n\nCI and one exact commit\n- CI already runs every suite through globs; this prompt adds only a Phase 4 note and a browser timeout of 45 minutes.\n- All automatable gates ran on one exact commit (tested_commit) in a clean git worktree with no local changes.\n- The user's uncommitted deletion of prompts/ in the main working tree does not touch that run.\n\nUpgrade rehearsal on representative Phase 3 data\n- Before the Phase 4 migrations, the rehearsal writes: KYC owners; a chipped and pedigreed pair with a puppy's lineage; a kennel; an issued permit with confirmed (out of order), conflicted and pending dates; a pregnancy and a litter; a one-sided personal declaration with a later note; an animal listing; and a paid shop order.\n- After the upgrade it proves: no animal was put on the finder, no account was subscribed, no date changed version, day or state, and the derived last mating is exactly the newest confirmed date for both animals, with count 2. All other records came through, and the previous release still writes against the new schema.\n\nEnd-to-end scenarios\n- Every requested scenario is mapped to the test that proves it in docs/qa/phase-4-acceptance.md.\n- The only scenario without a database-level proof, an expired request in contract coordination, was added in tests/db/finder-acceptance.test.ts.\n\nBounded evidence (tests/browser/finder-evidence.test.ts)\n- Ten owner-facing finder pages at 360 px: no horizontal scroll, RTL, one main landmark, a skip link as the first tab stop, no unnamed control.\n- Operator pages: landmarked and fully named.\n- The compatibility disclosure appears wherever a score does.\n- The contract PDF is A4, with embedded fonts, 2 pages, 42 KB.\n- Discovery over 120 synthetic profiles answers in 114-150 ms.\n- The measurement found a real defect: the signed-in shells had no skip link, so the first tab stop on every signed-in page was the dashboard link. It is fixed in both shared shells.\n\nSource invariants (tests/config/phase-4-invariants.test.ts)\n- The last mating has one writer and no setter.\n- The only finder payment is the subscription; contracts carry no amount or escrow.\n- Confidential feedback is read on one operator page.\n- Finder private files have no generic reviewer.\n\nDocumentation\n- The Persian operator guide covers plans, prices and capacity, breed rules, moderation, suspension, outbox recovery, contract templates, legal-text activation, migration and rollback, and kill switches.\n- docs/ops/release-readiness-phase-4.md separates code readiness from everything still unset.\n\nNothing was pushed, deployed, charged or sent to a real user.",
+  "changedFiles": [
+    ".github/workflows/ci.yml",
+    "tools/upgrade-check.mjs",
+    "src/ui/shell.tsx",
+    "tests/browser/finder-evidence.test.ts",
+    "tests/config/phase-4-invariants.test.ts",
+    "tests/db/finder-acceptance.test.ts",
+    "docs/ops/operator-guide-phase-4.md",
+    "docs/ops/release-readiness-phase-4.md",
+    "docs/qa/phase-4-acceptance.md",
+    "DECISIONS.md",
+    "REQUIREMENTS_TRACEABILITY.md",
+    "IMPLEMENTATION_STATUS.md",
+    "docs/reports/PHASE-4-PROMPT-008.json"
+  ],
+  "migrations": [],
+  "decisions": ["DEC-0224"],
+  "environment": "Windows 11, Node 24, Postgres 16 in Docker; clean git worktree of tested_commit at D:/CLaude/hz-final-wt with node_modules linked and the ignored .env.local copied; no other local change (git status --porcelain was empty at the start of every gate).",
+  "tests": {
+    "typecheck": { "command": "npx tsc --noEmit", "result": "exit 0", "durationSeconds": 26 },
+    "productFull": {
+      "command": "node --test --test-concurrency=4 \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
+      "reported": { "tests": 1111, "pass": 1107, "fail": 4, "skipped": 0 },
+      "durationSeconds": 1436,
+      "note": "The 4 failures were whole test files whose worker process was killed by 'FATAL ERROR: Committing semi space failed. Allocation failed - JavaScript heap out of memory': tests/db/commerce-fulfilment, commerce-seller, communities and content-taxonomy. The machine's memory was exhausted by other applications, as in earlier prompts. No assertion failed. The node test runner counts a crashed file as one failing test, so their 38 tests are not in the 1111."
+    },
+    "productRerunOfKilledFiles": {
+      "command": "node --test --test-concurrency=1 tests/db/commerce-fulfilment.test.ts tests/db/commerce-seller.test.ts tests/db/communities.test.ts tests/db/content-taxonomy.test.ts",
+      "commit": "528cda95f834cb3eb915f96f06b78c05dfa8d0af",
+      "tests": 38,
+      "pass": 38,
+      "fail": 0,
+      "skipped": 0,
+      "durationSeconds": 135
+    },
+    "productEffective": {
+      "tests": 1145,
+      "pass": 1145,
+      "fail": 0,
+      "skipped": 0,
+      "note": "1107 from the full run plus 38 from the four files re-run on the same commit. release.test passes here because the worktree is clean."
+    },
+    "tools": { "command": "npm run test:tools", "tests": 20, "pass": 20, "fail": 0, "skipped": 0 },
+    "upgradeRehearsal": { "command": "npm run db:upgrade-check", "checks": 87, "pass": 87, "fail": 0 },
+    "build": { "command": "rm -rf .next && npm run build", "result": "exit 0 on the first try", "durationSeconds": 53, "firstLoadJsSharedKb": 103 },
+    "browserFull": { "command": "node tools/browser-tests.mjs", "tests": 280, "pass": 280, "fail": 0, "skipped": 0, "durationSeconds": 664 },
+    "newSuites": {
+      "tests/config/phase-4-invariants.test.ts": 4,
+      "tests/db/finder-acceptance.test.ts": 1,
+      "tests/browser/finder-evidence.test.ts": 5
+    }
+  },
+  "evidenceMeasurements": {
+    "contractPdf": "2 pages, 42 KB, A4, embedded fonts",
+    "finderResponses": "/mating-finder 116 ms 128 KB · public profile 89 ms 41 KB · match mode 140-150 ms 183 KB · owner pages 66-107 ms · operator pages 68-111 ms · /admin/mating-finder 102 ms 196 KB",
+    "population": "120 synthetic profiles; bounded evidence only, not a load test",
+    "a11y": "10 owner pages at 360 px: overflow 0, dir=rtl, 1 main, skip link first, 0 unnamed controls; 5 operator pages: 1 main, 0 unnamed controls"
+  },
+  "checks": [
+    { "id": "typecheck", "command": "npx tsc --noEmit", "result": "PASS", "evidence": "Exit 0 on tested_commit in the clean worktree." },
+    { "id": "build", "command": "rm -rf .next && npm run build", "result": "PASS", "evidence": "Exit 0 on tested_commit (first try, 53 s); First Load JS shared is 103 kB." },
+    { "id": "product-tests", "command": "full product run on tested_commit, then a re-run of the files the out-of-memory crash killed", "result": "PASS", "evidence": "The full run had 1107 passing and 4 file-level failures, all caused by the worker running out of memory, not by an assertion. Those four files re-run on the same commit: 38/38. Effective total 1145/1145, 0 skipped, including release.test on the clean tree." },
+    { "id": "browser-tests", "command": "node tools/browser-tests.mjs", "result": "PASS", "evidence": "280/280, 0 skipped, on tested_commit's production build in its own isolated database. This includes the new Phase 4 evidence suite and every earlier phase's browser suites." },
+    { "id": "upgrade-rehearsal", "command": "npm run db:upgrade-check", "result": "PASS", "evidence": "87/87 on tested_commit, including the Phase 3 breeding, marketplace and shop data set and its post-upgrade checks." },
+    { "id": "tools", "command": "npm run test:tools", "result": "PASS", "evidence": "20/20 on tested_commit." }
+  ],
+  "blockers": [],
+  "limitations": [
+    "The accessibility, RTL, PDF and performance results are bounded automated evidence. There was no screen-reader user audit, no legal review and no load test.",
+    "In the upgrade rehearsal the two pedigree rows are written with foreign-key triggers suspended for that one statement; the real issuance chain is covered by its own suites.",
+    "Not configured, and deliberately not invented (docs/ops/release-readiness-phase-4.md §6): subscription plan prices, the free capacity and optional limits; a real payment gateway and SMS provider (SMS is off); the map provider; the contract clause text and legal approval of the OTP confirmation; the retention policy for chat, attachments, evidence and feedback; and the scheduling of the reconciliation job and outbox worker, and production monitoring.",
+    "The product suite needed one re-run of four files because other applications exhausted the machine's memory. A CI runner does not share that pressure.",
+    "prompts/ and prompts-2/ remain deleted in the user's working tree. This was not done by this prompt and is not in any commit; the gates ran on a clean worktree."
+  ],
+  "readiness": {
+    "code": "PHASE_4_CODE_COMPLETE",
+    "visual": "VERIFIED_BY_SCREENSHOT_360",
+    "integrations": "NOT_CONFIGURED",
+    "legal": "NOT_APPROVED",
+    "production": "NOT_READY"
+  },
+  "evidence": [
+    "tools/upgrade-check.mjs",
+    "tests/browser/finder-evidence.test.ts",
+    "tests/config/phase-4-invariants.test.ts",
+    "tests/db/finder-acceptance.test.ts",
+    "docs/qa/phase-4-acceptance.md",
+    "docs/ops/release-readiness-phase-4.md",
+    "docs/ops/operator-guide-phase-4.md",
+    "DECISIONS.md#dec-0224"
+  ]
+}
