@@ -33,6 +33,15 @@
  * It is a script rather than a test because it is a rehearsal an operator runs
  * before an upgrade, with its own throwaway database and its own report.
  *
+ * Phase 4 (PROMPT-008) adds the breeding generation before its own
+ * migrations: owners with KYC, a pedigreed and chipped pair with a puppy's
+ * lineage, a kennel, an issued permit whose dates are confirmed, conflicted and
+ * pending, a pregnancy and a litter, a one-sided personal declaration, an animal
+ * listing and a shop order. After the upgrade it checks that no animal was put
+ * on the finder, nobody was subscribed, and the derived last mating is exactly
+ * the newest mutually confirmed date — never a pending, conflicted or
+ * one-sided one.
+ *
  * Usage: node tools/upgrade-check.mjs [--keep]
  */
 import { randomBytes } from 'node:crypto';
@@ -56,6 +65,9 @@ const LAST_PHASE_2_5 = '0040';
 const LAST_PHASE_3 = '0052';
 
 const keep = process.argv.includes('--keep');
+
+/** Rows step 6a writes into Phase 3 tables on purpose; every other table checked must stay empty. */
+const WRITTEN_BEFORE_PHASE_4 = { animal_listing: 1, commerce_seller: 1, commerce_order: 1, commerce_suborder: 1 };
 const name = 'hamzist_upgrade_' + randomBytes(4).toString('hex');
 
 function urlFor(database) {
@@ -269,6 +281,99 @@ try {
   );
   console.log('applied ' + phase3.length + ' Phase 3 migrations: ' + phase3.join(', '));
 
+  // ── 6a. What a Phase 3 database holds about breeding (PHASE-4 PROMPT-008) ──
+  //
+  // Two KYC-approved owners, a pedigreed pair of dogs with official chips and a
+  // puppy whose lineage names them, a kennel, an issued permit whose dates are
+  // every state a date can be in — two confirmed (the older one confirmed last),
+  // a conflicted pair and one still pending — a pregnancy, a litter with two
+  // puppies, a one-sided personal declaration whose note names a later date,
+  // an animal listing and a shop order. The pedigree rows are written with
+  // foreign-key triggers suspended for that one statement: the chain that issues
+  // a real pedigree (visit, sample, parentage result, payment) has its own
+  // suites, and what this rehearsal needs is only that the row exists.
+  const breeding = await withClient(target, async (client) => {
+    const one = async (text, values = []) => (await client.query(text, values)).rows[0];
+    const ownerA = ids.accountId;
+    const ownerB = (await one("insert into account (mobile, status) values ('09990990002', 'ACTIVE') returning id")).id;
+    await client.query(
+      `insert into profile (account_id, first_name, last_name, national_id, birth_date) values ($1, 'نمونه', 'مالک دوم', '0084575948', '1988-02-02')`,
+      [ownerB],
+    );
+    for (const owner of [ownerA, ownerB]) await client.query("insert into kyc_case (account_id, status) values ($1, 'APPROVED')", [owner]);
+    const breed = (await one("select id from reference_breed where species_code = 'DOG' order by sort_order limit 1"))?.id ?? null;
+    const animal = async (owner, name, sex, sire = null, dam = null) =>
+      (await one(
+        `insert into animal (owner_account_id, status, species, name, sex, breed_id, birth_date, sire_animal_id, dam_animal_id)
+         values ($1, 'REGISTERED', 'DOG', $2, $3, $4, '2022-01-01', $5, $6) returning id`,
+        [owner, name, sex, breed, sire, dam],
+      )).id;
+    const sire = await animal(ownerA, 'پدر ارتقا', 'MALE');
+    const dam = await animal(ownerB, 'مادر ارتقا', 'FEMALE');
+    const pup = await animal(ownerA, 'توله ارتقا', 'MALE', sire, dam);
+    for (const [id, owner, number] of [[sire, ownerA, '985112345678911'], [dam, ownerB, '985112345678912']]) {
+      await client.query(
+        "insert into microchip (animal_id, number, bound_via, read_method, bound_by_account_id) values ($1, $2, 'IMPLANT', 'BLUETOOTH_READER', $3)",
+        [id, number, owner],
+      );
+    }
+    await client.query("set session_replication_role = replica");
+    for (const [id, owner, code] of [[sire, ownerA, 'HZ-UPG-0001'], [dam, ownerB, 'HZ-UPG-0002']]) {
+      await client.query(
+        `insert into pedigree (animal_id, owner_account_id, item_id, batch_id, pedigree_code, issued_from_result_id, issued_from_result_version, generation_at_issue)
+         values ($1, $2, gen_random_uuid(), gen_random_uuid(), $3, gen_random_uuid(), 1, 1)`,
+        [id, owner, code],
+      );
+    }
+    await client.query("set session_replication_role = origin");
+    await client.query("insert into kennel (owner_account_id, status) values ($1, 'APPROVED')", [ownerB]);
+    const permit = (await one(
+      `insert into mating_permit (initiator_account_id, counterparty_account_id, sire_animal_id, dam_animal_id, status, permit_no, issued_at, counterparty_confirmed_at)
+       values ($1, $2, $3, $4, 'ISSUED', 'MP-UPGRADE1', now(), now()) returning id`,
+      [ownerA, ownerB, sire, dam],
+    )).id;
+    const date = async (version, matedOn, status, declaredBy, confirmedBy, extra = {}) =>
+      (await one(
+        `insert into mating_date_declaration (permit_id, version, mated_on, status, declared_by_account_id, confirmed_by_account_id, confirmed_at, conflicts_with_id)
+         values ($1, $2, $3, $4, $5, $6, $7, $8) returning id`,
+        [permit, version, matedOn, status, declaredBy, confirmedBy, confirmedBy ? new Date(Date.UTC(2025, 5, version)) : null, extra.conflictsWith ?? null],
+      )).id;
+    await date(1, '2025-03-10', 'CONFIRMED', ownerA, ownerB);
+    const conflicted = await date(2, '2025-04-01', 'CONFLICTED', ownerA, null);
+    await date(3, '2025-04-02', 'PROPOSED', ownerB, null, { conflictsWith: conflicted });
+    // An older date confirmed after the newer one: the newest mating still wins.
+    await date(4, '2025-02-01', 'CONFIRMED', ownerB, ownerA);
+    await client.query("insert into pregnancy_declaration (permit_id, version, pregnant, expected_count, declared_by_account_id) values ($1, 1, true, 2, $2)", [permit, ownerB]);
+    const litter = (await one("insert into litter (permit_id, born_on) values ($1, '2025-05-10') returning id", [permit])).id;
+    await client.query("insert into birth_event (permit_id, version, born_on, live_count, dead_count, declared_by_account_id) values ($1, 1, '2025-05-10', 2, 0, $2)", [permit, ownerB]);
+    for (const code of ['PUP-UPG00001', 'PUP-UPG00002']) {
+      await client.query('insert into puppy (litter_id, permit_id, temp_code, created_by_version) values ($1, $2, $3, 1)', [litter, permit, code]);
+    }
+    // A one-sided personal declaration: its note names a date after every official one.
+    const declaration = (await one(
+      `insert into personal_declaration (initiator_account_id, initiator_animal_id, counterparty_animal_id, counterparty_account_id, invited_mobile)
+       values ($1, $2, $3, $4, '09990990002') returning id`,
+      [ownerA, sire, dam, ownerB],
+    )).id;
+    await client.query("insert into personal_note (declaration_id, kind, note_date, recorded_by_account_id) values ($1, 'MATING_DATE', '2025-06-01', $2)", [declaration, ownerA]);
+    // The marketplace and the shop, as the second owner.
+    const listing = (await one("insert into animal_listing (animal_id, seller_account_id, seller_kind, status) values ($1, $2, 'OWNER', 'PUBLISHED') returning id", [dam, ownerB])).id;
+    const seller = (await one("insert into commerce_seller (owner_account_id, kind) values ($1, 'PET_SHOP') returning id", [ownerB])).id;
+    const order = (await one(
+      `insert into commerce_order (buyer_account_id, reference, items_total_toman, discount_total_toman, shipping_total_toman, grand_total_toman, recipient_name_fa, recipient_phone, address_fa, holds_expire_at, status)
+       values ($1, 'ORD-UPGRADE1', 100000, 0, 20000, 120000, 'نمونه', '09990990001', 'نشانی نمونه', now() + interval '1 hour', 'PAID') returning id`,
+      [ownerA],
+    )).id;
+    await client.query(
+      `insert into commerce_suborder (order_id, seller_id, reference, items_total_toman, discount_toman, shipping_toman, buyer_total_toman, commission_percent_bp, commission_toman, payout_toman)
+       values ($1, $2, 'SUB-UPGRADE1', 100000, 0, 20000, 120000, 1000, 10000, 110000)`,
+      [order, seller],
+    );
+    const before = (await client.query('select id, version, mated_on, status from mating_date_declaration where permit_id = $1 order by version', [permit])).rows;
+    return { ownerA, ownerB, sire, dam, pup, permit, litter, declaration, listing, seller, order, dates: before };
+  });
+  console.log('Phase 3 breeding, marketplace and shop rows written');
+
   // ── 6b. The Phase 4 migrations, bounded the same way ──────────────────────
   // The Phase 3 step above used to apply everything after 0040, so the first
   // Phase 4 migration would have been absorbed into it and no boundary would
@@ -368,7 +473,6 @@ try {
       'mating_profile_media',
       'animal_fertility_declaration',
       'animal_life_event',
-      'animal_last_mating',
       // PROMPT-004: nobody is given a favourite, a saved search or a notice by an upgrade.
       'finder_favorite',
       'finder_saved_search',
@@ -393,12 +497,62 @@ try {
       'moderation_report_evidence',
     ]) {
       const counted = await client.query('select count(*)::int as value from ' + table);
+      // PROMPT-008 wrote one row into each of these before the Phase 4 upgrade; they must hold exactly that.
+      const written = WRITTEN_BEFORE_PHASE_4[table] ?? 0;
       check(
-        'the ' + (/^(finder_|mating_(profile|request|coordination)|animal_(fertility|life|last)|account_sanction|moderation_report_evidence)/.test(table) ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
-        counted.rows[0]?.value === 0,
+        'the ' + (/^(finder_|mating_(profile|request|coordination)|animal_(fertility|life|last)|account_sanction|moderation_report_evidence)/.test(table) ? 'Phase 4' : 'Phase 3') +
+          ' table ' + table + (written === 0 ? ' exists and starts empty' : ' holds exactly the ' + written + ' row written, none invented'),
+        counted.rows[0]?.value === written,
         'rows=' + counted.rows[0]?.value,
       );
     }
+
+    // PROMPT-008: the breeding records of a Phase 3 database, after the Phase 4 upgrade.
+    const dates = (await client.query('select id, version, mated_on, status, permit_id, personal_mating_id from mating_date_declaration where permit_id = $1 order by version', [breeding.permit])).rows;
+    check(
+      'every official date keeps its version, day and state — nothing pending or conflicted was confirmed',
+      JSON.stringify(dates.map((d) => [d.id, d.version, d.mated_on, d.status])) === JSON.stringify(breeding.dates.map((d) => [d.id, d.version, d.mated_on, d.status])),
+      JSON.stringify(dates.map((d) => d.status)),
+    );
+    check('every existing date still belongs to its permit and to no personal record', dates.every((d) => d.permit_id === breeding.permit && d.personal_mating_id === null));
+    const last = (await client.query('select animal_id, last_mated_on::text as on, source, confirmed_count from animal_last_mating order by animal_id')).rows;
+    const expected = [breeding.sire, breeding.dam].sort();
+    check(
+      'the derived last mating exists for exactly the two animals of confirmed dates',
+      JSON.stringify(last.map((r) => r.animal_id)) === JSON.stringify(expected),
+      'animals=' + last.length,
+    );
+    check(
+      'it is the newest confirmed date, from the official source, counting both confirmations',
+      last.every((r) => r.on === '2025-03-10' && r.source === 'OFFICIAL' && Number(r.confirmed_count) === 2),
+      JSON.stringify(last.map((r) => [r.on, r.source, r.confirmed_count])),
+    );
+    check('neither the pending, the conflicted nor the one-sided later date became a last mating', !last.some((r) => ['2025-04-01', '2025-04-02', '2025-06-01'].includes(r.on)));
+    const note = await client.query('select note_date from personal_note where declaration_id = $1', [breeding.declaration]);
+    check('the one-sided personal declaration and its note are untouched', String(note.rows[0]?.note_date) === '2025-06-01');
+    const permitRow = await client.query('select status, permit_no from mating_permit where id = $1', [breeding.permit]);
+    check('the issued permit keeps its state and number', permitRow.rows[0]?.status === 'ISSUED' && permitRow.rows[0]?.permit_no === 'MP-UPGRADE1');
+    const kept = await client.query(
+      `select (select count(*) from pregnancy_declaration where permit_id = $1)::int as pregnancy,
+              (select count(*) from puppy where litter_id = $2)::int as puppies,
+              (select count(*) from pedigree where animal_id in ($3, $4))::int as pedigrees,
+              (select count(*) from microchip where animal_id in ($3, $4))::int as chips,
+              (select count(*) from animal where id = $5 and sire_animal_id = $3 and dam_animal_id = $4)::int as lineage,
+              (select count(*) from kyc_case where account_id in ($6, $7) and status = 'APPROVED')::int as kyc,
+              (select count(*) from animal_listing where id = $8 and status = 'PUBLISHED')::int as listing,
+              (select count(*) from commerce_order where id = $9 and status = 'PAID')::int as orders`,
+      [breeding.permit, breeding.litter, breeding.sire, breeding.dam, breeding.pup, breeding.ownerA, breeding.ownerB, breeding.listing, breeding.order],
+    );
+    const k = kept.rows[0];
+    check(
+      'pregnancy, litter, pedigrees, chips, lineage, KYC, the listing and the paid order all came through',
+      k.pregnancy === 1 && k.puppies === 2 && k.pedigrees === 2 && k.chips === 2 && k.lineage === 1 && k.kyc === 2 && k.listing === 1 && k.orders === 1,
+      JSON.stringify(k),
+    );
+    check(
+      'no animal was put on the finder and no account was subscribed, not even the pedigreed, chipped, KYC-approved ones',
+      (await client.query('select (select count(*) from mating_profile)::int + (select count(*) from finder_subscription_period)::int as n')).rows[0].n === 0,
+    );
 
     // Nobody was made a seller, and nobody's animal was put up for sale.
     const invented = await client.query(

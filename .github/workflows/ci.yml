@@ -1,5 +1,13 @@
 # Continuous integration — Phase 2.5 §10, §12 (PROMPT-016),
-# extended for Phase 3 in PROMPT-014.
+# extended for Phase 3 in PROMPT-014 and for Phase 4 (mating finder) in
+# PHASE-4 PROMPT-008.
+#
+# Every suite is picked up by the globs below, so the Phase 4 suites
+# (tests/*/finder-*.test.ts, tests/config/phase-4-invariants.test.ts and the
+# browser evidence suite) run without a list to keep in step. The upgrade
+# rehearsal writes a representative Phase 3 breeding data set before the
+# Phase 4 migrations and checks that nothing was published, subscribed or
+# confirmed by the upgrade.
 #
 # The gates a change has to pass before anybody trusts it, in the order that
 # fails fastest: types, then the tests that need no database, then the build,
@@ -15,8 +23,8 @@
 #   - **A green run is not a release.** Everything here runs against a
 #     throwaway database and local adapters. It proves the code is consistent
 #     with itself; it is not evidence that a real gateway, a real SMS route or a
-#     real bank account works, and `docs/ops/release-readiness-phase-3.md` lists what
-#     is still unset.
+#     real bank account works, and `docs/ops/release-readiness-phase-4.md` (with
+#     the earlier phases' documents) lists what is still unset.
 #   - **A local demo provider never becomes a production fallback.** The
 #     environment below is `development` with `INTEGRATION_MODE=local`, which is
 #     exactly what `assertNotProduction` requires; the adapters refuse to be
@@ -143,7 +151,8 @@ jobs:
   browser:
     name: browser suites
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # About eleven minutes locally for the whole set after Phase 4; the margin is for a slower runner.
+    timeout-minutes: 45
     needs: [static]
     services:
       postgres:

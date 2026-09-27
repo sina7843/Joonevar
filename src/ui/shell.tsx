@@ -99,6 +99,13 @@ export async function PublicShell({
 
   return (
     <div className="min-h-dvh bg-bg-canvas">
+      {/* The keyboard's way past the header, as on the public site (PHASE-4 PROMPT-008 found it missing here). */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-sm focus:right-sm focus:z-30 focus:rounded-md focus:bg-bg-surface focus:px-md focus:py-sm"
+      >
+        رفتن به محتوای اصلی
+      </a>
       <header className="sticky top-0 z-20 border-b border-border-subtle bg-bg-surface">
         <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-3xl items-center justify-between gap-sm px-lg">
           <div className="flex min-w-0 items-center gap-sm">
@@ -151,7 +158,7 @@ export async function PublicShell({
             <RoleSwitcher contexts={contexts} active={actor.context} returnTo={pathname} />
           </div>
         ) : null}
-        <main>{children}</main>
+        <main id="main" tabIndex={-1}>{children}</main>
       </div>
 
       <nav
@@ -206,6 +213,13 @@ export async function OpsShell({
 }) {
   return (
     <div className="min-h-dvh bg-bg-subtle">
+      {/* The keyboard's way past the header, as on the public site (PHASE-4 PROMPT-008 found it missing here). */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-sm focus:right-sm focus:z-30 focus:rounded-md focus:bg-bg-surface focus:px-md focus:py-sm"
+      >
+        رفتن به محتوای اصلی
+      </a>
       <header className="border-b border-border-subtle bg-bg-surface">
         <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-6xl items-center justify-between gap-sm px-lg">
           <div className="flex min-w-0 items-center gap-sm">
@@ -245,7 +259,7 @@ export async function OpsShell({
             })}
           </ul>
         </nav>
-        <main className="min-w-0 flex-1">{children}</main>
+        <main id="main" tabIndex={-1} className="min-w-0 flex-1">{children}</main>
       </div>
     </div>
   );
