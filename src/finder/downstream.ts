@@ -29,6 +29,8 @@ import type { Actor } from '../authz/actor.ts';
 import { startPermit, PERMIT_STATUS_FA } from '../mating/permits.ts';
 import { counterpartOf, loadForParty, lockAnimals, notifyFinder } from './requests.ts';
 import { lifeStatusOf } from './profiles.ts';
+import { assertFinderFlag } from './flags.ts';
+import { assertFinderAccess } from './sanctions.ts';
 import { activeRule } from './rules.ts';
 import { lastMatingsOf } from './last-mating.ts';
 import { cooldownState, type CooldownState } from './profile-model.ts';
@@ -104,6 +106,7 @@ export async function handoffContract(db: Database, actor: Actor, input: { contr
 
     const existing = await linkOfContract(tx, contract.id);
     if (existing) return existing;
+    await assertFinderAccess(tx, actor.accountId, now);
     if (contract.status !== 'CONFIRMED' || contract.confirmedNumber === null) {
       throw conflict('فقط قرارداد تأییدشده دوطرفه به مسیر بعدی می‌رود.');
     }
@@ -114,6 +117,8 @@ export async function handoffContract(db: Database, actor: Actor, input: { contr
     // must not open a second permit alongside this one.
     await lockAnimals(tx, [content.animals.sire.animalId, content.animals.dam.animalId]);
     const { route, sire, dam, problems } = await currentHandoffProblems(tx, content);
+    // Each route has its own switch; closing one stops new handoffs, never an existing link.
+    await assertFinderFlag(tx, route === 'OFFICIAL' ? 'finder.flag.official_handoff' : 'finder.flag.personal_handoff');
     if (problems.length > 0) throw validation(problems.join(' '));
 
     let permitId: string | null = null;

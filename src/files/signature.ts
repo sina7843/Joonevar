@@ -85,6 +85,8 @@ export const PURPOSE_RULES: Record<FilePurposeName, PurposeRule> = {
   FINDER_MESSAGE_ATTACHMENT: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
   /** The rendered contract; written by the server only. */
   FINDER_CONTRACT_PDF: { accept: ['application/pdf'], maxBytes: 10 * MB },
+  /** What a reporter attaches to a finder report (PROMPT-007). */
+  FINDER_REPORT_EVIDENCE: { accept: ['image/jpeg', 'image/png', 'application/pdf'], maxBytes: 10 * MB },
 };
 
 export function detectMime(bytes: Uint8Array): DetectedMime | null {

@@ -50,7 +50,7 @@ async function count(ctx: MatingCtx, table: string): Promise<number> {
 
 async function finderSetup(ctx: MatingCtx) {
   const db = ctx.testDb.db;
-  for (const key of ['finder.flag.discovery', 'finder.flag.free_pool_visibility', 'finder.flag.requests', 'finder.flag.chat', 'finder.flag.contracts']) {
+  for (const key of ['finder.flag.discovery', 'finder.flag.free_pool_visibility', 'finder.flag.requests', 'finder.flag.chat', 'finder.flag.contracts', 'finder.flag.official_handoff', 'finder.flag.personal_handoff']) {
     const current = await snapshotSetting(db, key);
     await updateSetting(db, ctx.admin.actor, { key, value: true, reason: 'SYNTHETIC', expectedVersion: current.version });
   }

@@ -54,6 +54,14 @@ export default async function FinderProfilesPage() {
             <Link href="/account/mating-finder/requests" className="text-text-brand underline underline-offset-4" data-testid="finder-requests-link">
               درخواست‌ها
             </Link>
+            {' · '}
+            <Link href="/account/mating-finder/blocks" className="text-text-brand underline underline-offset-4">
+              مسدودشده‌ها
+            </Link>
+            {' · '}
+            <Link href="/account/mating-finder/appeals" className="text-text-brand underline underline-offset-4">
+              تصمیم‌ها و اعتراض
+            </Link>
           </p>
         </Card>
         {entries.length === 0 ? (

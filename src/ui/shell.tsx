@@ -7,6 +7,7 @@ import { RoleSwitcher, CONTEXT_LABEL_FA } from './role-switcher.tsx';
 import { switchableContexts, type Actor, type ActorContextName } from '../authz/actor.ts';
 import { canReadSettingGroup } from '../authz/policy.ts';
 import { hasMarketplaceCapability } from '../marketplace/model.ts';
+import { hasFinderCapability } from '../finder/model.ts';
 import { db } from '../db/client.ts';
 import { findProfile } from '../identity/account.ts';
 import { signOutAction } from '../identity/sign-out-action.ts';
@@ -356,6 +357,11 @@ export function marketNav(actor: Actor): readonly NavItem[] {
   if (hasMarketplaceCapability(actor, 'ANIMAL_LISTING_MODERATE')) {
     items.push({ href: '/market/trust', label: 'نظرها و پرسش‌ها', icon: 'warning' });
   }
+  // Phase 4 PROMPT-007: the finder's operations, each behind its own capability.
+  if (hasFinderCapability(actor, 'FINDER_ANALYTICS_VIEW')) items.push({ href: '/market/finder', label: 'عملیات جفت‌یابی', icon: 'dog' });
+  if (hasFinderCapability(actor, 'FINDER_REPORT_MODERATE')) items.push({ href: '/market/finder/reports', label: 'گزارش‌های جفت‌یابی', icon: 'warning' });
+  if (hasFinderCapability(actor, 'FINDER_FEEDBACK_VIEW')) items.push({ href: '/market/finder/feedback', label: 'بازخورد محرمانه', icon: 'clipboardText' });
+  if (hasFinderCapability(actor, 'FINDER_ACCESS_SUSPEND')) items.push({ href: '/market/finder/sanctions', label: 'تعلیق و محدودیت', icon: 'shieldCheck' });
   if (hasMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE')) {
     items.push({ href: '/market/promotions', label: 'کمپین و تخفیف', icon: 'listChecks' });
   }

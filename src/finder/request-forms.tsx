@@ -18,7 +18,6 @@ import {
   postMessageAction,
   proposeTermsAction,
   publishTemplateAction,
-  reportMessageAction,
   requestCodeAction,
   respondAction,
   startContractAction,
@@ -188,20 +187,6 @@ export function MessageForm({ requestId }: { requestId: string }) {
         </Button>
         <Result state={state} testId="finder-message-result" />
       </div>
-    </form>
-  );
-}
-
-export function ReportMessageForm({ messageId }: { messageId: string }) {
-  const [state, submit, pending] = useActionState(reportMessageAction, EMPTY);
-  return (
-    <form onSubmit={submitWith(submit)} className="flex flex-wrap items-center gap-xs">
-      <input type="hidden" name="messageId" value={messageId} />
-      <input type="hidden" name="reason" value="OFFENSIVE" />
-      <Button type="submit" tone="ghost" disabled={pending} data-testid={'finder-report-message-' + messageId}>
-        گزارش
-      </Button>
-      <Result state={state} testId={'finder-report-message-result-' + messageId} />
     </form>
   );
 }

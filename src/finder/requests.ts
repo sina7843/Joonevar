@@ -18,7 +18,7 @@
  */
 import { and, desc, eq, inArray, isNull, ne, or, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
-import { accounts } from '../db/schema/core.ts';
+import { accounts, notifications } from '../db/schema/core.ts';
 import { residences } from '../db/schema/identity.ts';
 import { animals } from '../db/schema/animals.ts';
 import { finderContracts, finderConversations, matingCoordinations, matingProfiles, matingRequestEvents, matingRequests } from '../db/schema/finder.ts';
@@ -33,6 +33,7 @@ import { conflict, notFound, validation } from '../domain/errors.ts';
 import { todayCivil } from '../domain/calendar.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertFinderFlag, finderFlagEnabled } from './flags.ts';
+import { assertFinderAccess, blockedBetween } from './sanctions.ts';
 import { pairFormationProblem } from './subscriptions.ts';
 import { publicProfile } from './profiles.ts';
 import { searchProfiles } from './discovery.ts';
@@ -73,8 +74,23 @@ export async function loadForParty(tx: DbClient, actor: Actor, requestId: string
   return { request, party };
 }
 
+/**
+ * Kinds that coalesce (PROMPT-007): while the recipient has not read the last
+ * notice of this kind for this request, another one adds nothing — one SMS per
+ * burst of messages, not one per message.
+ */
+const COALESCED_KINDS = ['FINDER_MESSAGE_POSTED'];
+
 export async function notifyFinder(tx: DbClient, recipient: string, kind: string, titleFa: string, bodyFa: string, requestId: string): Promise<void> {
   if (!(await finderFlagEnabled(tx, 'finder.flag.notifications'))) return;
+  if (COALESCED_KINDS.includes(kind)) {
+    const [unread] = await tx
+      .select({ id: notifications.id })
+      .from(notifications)
+      .where(and(eq(notifications.recipientAccountId, recipient), eq(notifications.kind, kind), eq(notifications.entityId, requestId), isNull(notifications.readAt)))
+      .limit(1);
+    if (unread) return;
+  }
   await createNotification(tx, {
     recipientAccountId: recipient,
     kind,
@@ -240,6 +256,7 @@ const text = (value: string | null, max: number, label: string): string | null =
 
 export async function createRequest(db: Database, actor: Actor, input: CreateRequestInput, now: Date = new Date()): Promise<RequestRow> {
   await assertFinderFlag(db, 'finder.flag.requests');
+  await assertFinderAccess(db, actor.accountId, now);
   const problem = termsProblem(input, todayCivil(now));
   if (problem) throw validation(problem);
   const messageFa = text(input.messageFa, 1000, 'توضیح');
@@ -335,6 +352,9 @@ async function hasPedigree(db: DbClient, animalId: string): Promise<boolean> {
  * The common path of every owner command: lock, expire if due, check the
  * version, the party and the transition, then move.
  */
+const FORWARD_COMMANDS: readonly RequestCommand[] = ['ACCEPT', 'PROPOSE_TERMS', 'ACCEPT_TERMS', 'START_CONTRACT'];
+export const BLOCKED_FA = 'امکان ادامه این گفت‌وگو و درخواست وجود ندارد.';
+
 async function command(
   db: Database,
   actor: Actor,
@@ -350,6 +370,12 @@ async function command(
     if (request.version !== input.expectedVersion) throw conflict(STALE);
     const problem = commandProblem(name, request.status as RequestStatus, loaded.party);
     if (problem) throw conflict(problem);
+    // PROMPT-007: moving a request forward needs finder access and no block between
+    // the two; stepping back (reject, cancel, not completed) never does.
+    if (FORWARD_COMMANDS.includes(name)) {
+      await assertFinderAccess(tx, actor.accountId, now);
+      if (await blockedBetween(tx, request.senderAccountId, request.receiverAccountId)) throw conflict(BLOCKED_FA);
+    }
     return work(tx, request, loaded.party);
   });
 }

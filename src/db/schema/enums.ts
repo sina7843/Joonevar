@@ -151,6 +151,8 @@ export const filePurpose = pgEnum('file_purpose', [
   /* Phase 4 PROMPT-005: a picture or document sent inside a finder conversation, and the confirmed contract PDF. */
   'FINDER_MESSAGE_ATTACHMENT',
   'FINDER_CONTRACT_PDF',
+  /* Phase 4 PROMPT-007: private evidence attached to a finder report; moderators only. */
+  'FINDER_REPORT_EVIDENCE',
 ]);
 
 export const notificationChannel = pgEnum('notification_channel', ['IN_APP', 'SMS']);
@@ -194,6 +196,9 @@ export const reportTargetKind = pgEnum('report_target_kind', [
   'MATING_PROFILE_MEDIA',
   /** Phase 4 (PROMPT-005): one message of a finder conversation. */
   'FINDER_MESSAGE',
+  /** Phase 4 (PROMPT-007): a person met through the finder, or one mating request. */
+  'FINDER_ACCOUNT',
+  'FINDER_REQUEST',
 ]);
 
 /**
@@ -784,6 +789,9 @@ export const matingProfileDeactivation = pgEnum('mating_profile_deactivation', [
   'LIFE_EVENT',
   'IDENTITY_CHANGE',
   'MODERATION',
+  /* PROMPT-007: over the fallback capacity after a subscription ended, or the owner's finder access was suspended. */
+  'SUBSCRIPTION_ENDED',
+  'SUSPENSION',
 ]);
 
 export const matingMediaKind = pgEnum('mating_media_kind', ['IMAGE', 'VIDEO']);
@@ -829,3 +837,20 @@ export const finderCancelKind = pgEnum('finder_cancel_kind', ['BILATERAL', 'UNIL
 
 /** PHASE-4 PROMPT-006: the contract-backed personal mating; cancellation keeps its history. */
 export const finderPersonalMatingStatus = pgEnum('finder_personal_mating_status', ['ACTIVE', 'CANCELLED']);
+
+// ── Phase 4 PROMPT-007: operations ────────────────────────────────────────────
+
+/** The finder's own report categories (PHASE_4_SPEC §12). */
+export const finderReportCategory = pgEnum('finder_report_category', [
+  'FALSE_ANIMAL_DATA',
+  'INVALID_CHIP_CLAIM',
+  'HARASSMENT',
+  'CONTRACT_BREACH',
+  'UNAUTHORIZED_BROKERAGE',
+  'CROSS_BREED_REQUEST',
+  'ANIMAL_ABUSE',
+  'OTHER_POLICY',
+]);
+
+/** What a sanction covers: the finder only, or the whole account (sign-in refused). */
+export const sanctionScope = pgEnum('sanction_scope', ['FINDER_ACCESS', 'ACCOUNT']);

@@ -82,6 +82,8 @@ export const DEACTIVATION_FA: Record<string, string> = {
   LIFE_EVENT: 'رویداد فوت، مفقودی یا بایگانی ثبت شد',
   IDENTITY_CHANGE: 'اطلاعات هویتی حساس تغییر کرد؛ پیش از فعال‌سازی دوباره بررسی کنید',
   MODERATION: 'توسط مدیریت از جفت‌یابی خارج شد',
+  SUBSCRIPTION_ENDED: 'اشتراک پایان یافت و این پروفایل بیش از ظرفیت رایگان بود',
+  SUSPENSION: 'دسترسی جفت‌یابی این حساب تعلیق شد',
 };
 
 export const isProfileState = (value: unknown): value is ProfileState =>

@@ -23,7 +23,9 @@ import { reportInputProblems } from '../moderation/model.ts';
 import { conflict, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertFinderFlag } from './flags.ts';
-import { contactsRevealed, counterpartOf, loadForParty, notifyFinder } from './requests.ts';
+import { assertFinderAccess, blockedBetween } from './sanctions.ts';
+import type { FinderReportCategory } from './reports-model.ts';
+import { BLOCKED_FA, contactsRevealed, counterpartOf, loadForParty, notifyFinder } from './requests.ts';
 import { CHAT_STATUSES, type RequestStatus } from './request-model.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -61,6 +63,9 @@ export async function postMessage(
     if (!conversation) throw conflict('گفت‌وگو هنوز باز نشده است.');
     const other = counterpartOf(request, actor.accountId);
     if (await blocked(tx, conversation.id, other)) throw conflict('طرف مقابل دریافت پیام در این گفت‌وگو را بسته است.');
+    // PROMPT-007: a finder-wide block and a suspension stop new messages too.
+    await assertFinderAccess(tx, actor.accountId, now);
+    if (await blockedBetween(tx, actor.accountId, other)) throw conflict(BLOCKED_FA);
     const policy = applyContactPolicy(body, contactsRevealed(request));
     const file = input.file
       ? await putPrivateFile(tx, storageRoot, actor, { ownerAccountId: actor.accountId, purpose: 'FINDER_MESSAGE_ATTACHMENT', bytes: input.file.bytes, originalName: input.file.originalName })
@@ -104,7 +109,12 @@ export async function blockConversation(db: Database, actor: Actor, input: { req
 }
 
 /** A party reports the other's message; it reaches the queue (PROMPT-007) without anyone else reading the rest. */
-export async function reportMessage(db: Database, actor: Actor, input: { messageId: string; reason: string; details: string | null }): Promise<{ id: string }> {
+export async function reportMessage(
+  db: Database,
+  actor: Actor,
+  input: { messageId: string; reason: string; details: string | null; finderCategory?: FinderReportCategory | null },
+  within?: (tx: DbClient, reportId: string) => Promise<void>,
+): Promise<{ id: string }> {
   const problems = reportInputProblems({ reason: input.reason, details: input.details });
   if (problems.length > 0) throw validation(problems[0]!);
   if (!UUID.test(input.messageId)) throw notFound('این پیام پیدا نشد.');
@@ -123,7 +133,7 @@ export async function reportMessage(db: Database, actor: Actor, input: { message
     try {
       const [created] = await tx
         .insert(moderationReports)
-        .values({ targetKind: 'FINDER_MESSAGE' as never, reporterAccountId: actor.accountId, reason: input.reason as never, details: input.details?.trim() || null, finderMessageId: row.message.id })
+        .values({ targetKind: 'FINDER_MESSAGE' as never, reporterAccountId: actor.accountId, reason: input.reason as never, details: input.details?.trim() || null, finderMessageId: row.message.id, finderCategory: input.finderCategory ?? null })
         .returning({ id: moderationReports.id });
       id = created!.id;
     } catch (error) {
@@ -133,6 +143,7 @@ export async function reportMessage(db: Database, actor: Actor, input: { message
       throw error;
     }
     await recordAudit(tx, actor, { action: 'FINDER_MESSAGE_REPORTED', targetType: 'FINDER_MESSAGE', targetId: row.message.id, after: { reportId: id } });
+    if (within) await within(tx, id);
     return { id };
   });
 }

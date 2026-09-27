@@ -9,7 +9,7 @@ import { guardRoute } from '../authz/guard.ts';
 import { currentSmsSender } from '../adapters/current.ts';
 import { AppError } from '../domain/errors.ts';
 import { acceptTerms, cancelRequest, createRequest, markNotCompleted, proposeTerms, REQUESTS_ROUTE, respondToRequest, setContactConsent } from './requests.ts';
-import { blockConversation, postMessage, reportMessage } from './conversation.ts';
+import { blockConversation, postMessage } from './conversation.ts';
 import { cancelContract, confirmContract, editContract, ensureContractPdf, publishTemplate, requestContractCode, startContract } from './contracts.ts';
 import { REQUIRED_CLAUSE_FA, REQUIRED_CLAUSE_KEYS, type TemplateClause } from './request-model.ts';
 import { handoffContract } from './downstream.ts';
@@ -133,13 +133,6 @@ export async function blockAction(_p: RequestFormState, form: FormData): Promise
   return run(requestId, async () => {
     await blockConversation(db(), await party(), { requestId });
     return 'پیام‌های طرف مقابل در این گفت‌وگو بسته شد.';
-  });
-}
-
-export async function reportMessageAction(_p: RequestFormState, form: FormData): Promise<RequestFormState> {
-  return run('', async () => {
-    await reportMessage(db(), await party(), { messageId: field(form, 'messageId'), reason: field(form, 'reason'), details: field(form, 'details') || null });
-    return 'گزارش ثبت شد.';
   });
 }
 

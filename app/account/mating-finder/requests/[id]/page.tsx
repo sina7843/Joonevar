@@ -13,6 +13,8 @@ import { requestDetail } from '../../../../../src/finder/requests.ts';
 import { messagesOf } from '../../../../../src/finder/conversation.ts';
 import { contractView } from '../../../../../src/finder/contracts.ts';
 import { downstreamView } from '../../../../../src/finder/downstream.ts';
+import { myFeedback } from '../../../../../src/finder/operations.ts';
+import { BlockPersonForm, FeedbackForm, FinderReportForm } from '../../../../../src/finder/ops-forms.tsx';
 import {
   CHAT_STATUSES,
   commandProblem,
@@ -36,7 +38,6 @@ import {
   HandoffForm,
   MessageForm,
   ProposeTermsForm,
-  ReportMessageForm,
 } from '../../../../../src/finder/request-forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -59,10 +60,11 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
   }
   const { request, party, events, contact } = detail;
   const status = request.status as RequestStatus;
-  const [chat, contract, downstream] = await Promise.all([
+  const [chat, contract, downstream, feedback] = await Promise.all([
     messagesOf(db(), guard.actor, id),
     contractView(db(), guard.actor, id),
     downstreamView(db(), guard.actor, id),
+    myFeedback(db(), guard.actor, id),
   ]);
   const can = (c: Parameters<typeof commandProblem>[0]) => commandProblem(c, status, party) === null;
   const snap = request.snapshot as { sender: { nameFa: string | null }; receiver: { nameFa: string }; evaluation: { score: number; warnings: string[]; unknowns: string[] } };
@@ -296,7 +298,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
                     </a>
                   ) : null}
                   <p className="text-caption text-text-secondary">{formatInstantFa(m.createdAt)}</p>
-                  {m.senderAccountId !== guard.actor.accountId && !m.hiddenAt ? <ReportMessageForm messageId={m.id} /> : null}
+                  {m.senderAccountId !== guard.actor.accountId && !m.hiddenAt ? <FinderReportForm target="MESSAGE" id={m.id} testId={'finder-report-message-' + m.id} /> : null}
                 </li>
               ))}
             </ul>
@@ -310,6 +312,39 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             )}
           </Card>
         ) : null}
+
+        {['MATING_COMPLETED', 'MATING_NOT_COMPLETED'].includes(status) ? (
+          <Card>
+            <h2 className="text-label-lg">بازخورد محرمانه</h2>
+            <p className="mt-xs text-caption text-text-secondary">
+              فقط مدیریت همزیست این بازخورد را می‌بیند؛ به طرف مقابل نشان داده نمی‌شود و امتیاز عمومی نمی‌سازد.
+            </p>
+            {feedback ? (
+              <p className="mt-sm text-body-sm" data-testid="finder-feedback-done">بازخورد شما ثبت شده است.</p>
+            ) : (
+              <FeedbackForm requestId={id} />
+            )}
+          </Card>
+        ) : null}
+
+        <Card>
+          <h2 className="text-label-lg">گزارش و مسدودکردن</h2>
+          <p className="mt-xs text-caption text-text-secondary">
+            گزارش را مدیریت بررسی می‌کند و مدرک شما خصوصی می‌ماند. با مسدودکردن، درخواست‌های باز میان شما بسته می‌شود و
+            دیگر پروفایل‌ها و پیام‌های یکدیگر را نمی‌بینید؛ به طرف مقابل گفته نمی‌شود چه کسی مسدود کرده است.
+          </p>
+          <details className="mt-sm">
+            <summary className="cursor-pointer text-label-md">گزارش این درخواست</summary>
+            <FinderReportForm target="REQUEST" id={id} testId="finder-report-request" />
+          </details>
+          <details className="mt-sm">
+            <summary className="cursor-pointer text-label-md">گزارش کاربر مقابل</summary>
+            <FinderReportForm target="ACCOUNT" id={id} testId="finder-report-account" />
+          </details>
+          <div className="mt-md">
+            <BlockPersonForm requestId={id} />
+          </div>
+        </Card>
 
         <Card>
           <h2 className="text-label-lg">تاریخچه</h2>

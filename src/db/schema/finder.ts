@@ -686,3 +686,67 @@ export const finderContractApprovals = pgTable(
     uniqueIndex('finder_contract_approval_otp_key').on(t.otpId),
   ],
 );
+
+// ── PROMPT-007: blocks, confidential feedback, reminders ─────────────────────
+
+/**
+ * One person blocking another across the whole finder. Lifting keeps the row;
+ * a new block after that is a new row.
+ */
+export const finderUserBlocks = pgTable(
+  'finder_user_block',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    blockerAccountId: uuid('blocker_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    blockedAccountId: uuid('blocked_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+    liftedAt: timestamp('lifted_at', { withTimezone: true }),
+  },
+  (t) => [
+    uniqueIndex('finder_user_block_active_key').on(t.blockerAccountId, t.blockedAccountId).where(sql`${t.liftedAt} is null`),
+    index('finder_user_block_blocked_idx').on(t.blockedAccountId),
+    check('finder_user_block_self_check', sql`${t.blockerAccountId} <> ${t.blockedAccountId}`),
+  ],
+);
+
+/**
+ * Confidential feedback after a mating event. Read only by authorised
+ * operations; never shown to the other party and never a public rating.
+ */
+export const finderFeedback = pgTable(
+  'finder_feedback',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => matingRequests.id, { onDelete: 'restrict' }),
+    authorAccountId: uuid('author_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    score: integer('score').notNull(),
+    bodyFa: text('body_fa'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [
+    uniqueIndex('finder_feedback_author_key').on(t.requestId, t.authorAccountId),
+    check('finder_feedback_score_check', sql`${t.score} between 1 and 5`),
+  ],
+);
+
+/** One reminder of one kind per request, ever: the sweep may run as often as it likes. */
+export const finderReminders = pgTable(
+  'finder_reminder',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    requestId: uuid('request_id')
+      .notNull()
+      .references(() => matingRequests.id, { onDelete: 'restrict' }),
+    kind: text('kind').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
+  },
+  (t) => [uniqueIndex('finder_reminder_key').on(t.requestId, t.kind)],
+);

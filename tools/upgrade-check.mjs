@@ -386,10 +386,15 @@ try {
       'finder_contract_approval',
       'finder_personal_mating',
       'finder_downstream_link',
+      'finder_user_block',
+      'finder_feedback',
+      'finder_reminder',
+      'account_sanction',
+      'moderation_report_evidence',
     ]) {
       const counted = await client.query('select count(*)::int as value from ' + table);
       check(
-        'the ' + (/^(finder_|mating_(profile|request|coordination)|animal_(fertility|life|last))/.test(table) ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
+        'the ' + (/^(finder_|mating_(profile|request|coordination)|animal_(fertility|life|last)|account_sanction|moderation_report_evidence)/.test(table) ? 'Phase 4' : 'Phase 3') + ' table ' + table + ' exists and starts empty',
         counted.rows[0]?.value === 0,
         'rows=' + counted.rows[0]?.value,
       );

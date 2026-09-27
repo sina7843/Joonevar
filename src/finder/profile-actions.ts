@@ -14,7 +14,6 @@ import {
   PROFILES_ROUTE,
   removeProfileMedia,
   setPrimaryMedia,
-  submitProfileReport,
   updatePreferences,
 } from './profiles.ts';
 
@@ -124,19 +123,3 @@ export async function lifeEventAction(_p: ProfileFormState, form: FormData): Pro
   });
 }
 
-export async function reportProfileAction(_p: ProfileFormState, form: FormData): Promise<ProfileFormState> {
-  try {
-    const guard = await guardRoute('/report');
-    if (!guard.ok) throw guard.denied;
-    await submitProfileReport(db(), guard.actor, {
-      profileId: field(form, 'profileId'),
-      mediaId: field(form, 'mediaId') || null,
-      reason: field(form, 'reason'),
-      details: field(form, 'details') || null,
-    });
-    return { ok: true, message: 'گزارش شما ثبت شد و بررسی می‌شود.' };
-  } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
-    throw error;
-  }
-}

@@ -257,6 +257,12 @@ export const FINDER_CAPABILITIES = [
   'FINDER_CONTRACT_SUPPORT',
   /** Aggregate, minimised Finder analytics. */
   'FINDER_ANALYTICS_VIEW',
+  /** PROMPT-007: work the finder report queue and its appeals — the reported item only, never a whole chat. */
+  'FINDER_REPORT_MODERATE',
+  /** PROMPT-007: read confidential post-event feedback. */
+  'FINDER_FEEDBACK_VIEW',
+  /** PROMPT-007: restrict a whole account (sign-in refused). Superadmin only. */
+  'FINDER_ACCOUNT_RESTRICT',
 ] as const;
 export type FinderCapability = (typeof FINDER_CAPABILITIES)[number];
 
@@ -269,9 +275,9 @@ export type FinderCapability = (typeof FINDER_CAPABILITIES)[number];
 const CAPABILITIES: Partial<Record<ActorContextName, readonly FinderCapability[]>> = {
   SUPERADMIN: FINDER_CAPABILITIES,
   MARKETPLACE_ADMIN: ['FINDER_OVERVIEW_VIEW', 'FINDER_ANALYTICS_VIEW'],
-  LISTING_MODERATOR: ['FINDER_OVERVIEW_VIEW', 'FINDER_PROFILE_MODERATE'],
+  LISTING_MODERATOR: ['FINDER_OVERVIEW_VIEW', 'FINDER_PROFILE_MODERATE', 'FINDER_REPORT_MODERATE'],
   SUPPORT_AGENT: ['FINDER_OVERVIEW_VIEW', 'FINDER_SUBSCRIPTION_VIEW', 'FINDER_CONTRACT_SUPPORT'],
-  DISPUTE_REVIEWER: ['FINDER_OVERVIEW_VIEW', 'FINDER_CONTRACT_SUPPORT'],
+  DISPUTE_REVIEWER: ['FINDER_OVERVIEW_VIEW', 'FINDER_CONTRACT_SUPPORT', 'FINDER_FEEDBACK_VIEW'],
   FINANCE_OPERATOR: ['FINDER_OVERVIEW_VIEW', 'FINDER_SUBSCRIPTION_VIEW', 'FINDER_ANALYTICS_VIEW'],
 };
 

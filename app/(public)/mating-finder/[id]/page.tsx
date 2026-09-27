@@ -6,7 +6,7 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site, viewer } from '../../../../src/public/request.ts';
 import { publicProfile } from '../../../../src/finder/profiles.ts';
 import { MatingProfileCardView } from '../../../../src/finder/profile-card.tsx';
-import { ReportProfileForm } from '../../../../src/finder/profile-forms.tsx';
+import { BlockPersonForm, FinderReportForm } from '../../../../src/finder/ops-forms.tsx';
 import { CreateRequestForm } from '../../../../src/finder/request-forms.tsx';
 import { and, eq, ne } from 'drizzle-orm';
 import { animals } from '../../../../src/db/schema/animals.ts';
@@ -89,7 +89,14 @@ export default async function PublicMatingProfilePage({ params }: { params: Prom
       <section className="rounded-lg border border-border-subtle p-lg">
         <h2 className="text-label-lg">گزارش این پروفایل</h2>
         {actor ? (
-          <ReportProfileForm profileId={card.profileId} images={card.images.map((image) => ({ value: image.mediaId, label: 'تصویر: ' + image.altFa }))} />
+          <>
+            <FinderReportForm target="PROFILE" id={card.profileId} images={card.images.map((image) => ({ value: image.mediaId, label: 'تصویر: ' + image.altFa }))} />
+            {!ownProfile ? (
+              <div className="mt-md">
+                <BlockPersonForm profileId={card.profileId} />
+              </div>
+            ) : null}
+          </>
         ) : (
           <p className="mt-xs text-body-sm">
             برای گزارش،{' '}

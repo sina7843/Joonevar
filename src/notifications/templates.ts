@@ -170,6 +170,24 @@ export const NOTIFICATION_TEMPLATES: readonly NotificationTemplate[] = [
     channels: ['SMS'],
     smsFa: 'همزیست: تسویه فروشگاه شما واریز شد. شماره پیگیری در حساب شماست.',
   },
+  // ── Phase 4 mating finder (PROMPT-007): a decision to make, a deadline, or a
+  // date the other side must confirm. No sentence names an animal, a person or a
+  // place; the app has the detail. Messages are coalesced before they get here:
+  // one notice per conversation until the last one is read.
+  { kind: 'FINDER_REQUEST_RECEIVED', channels: ['SMS'], smsFa: 'همزیست: یک درخواست جفت‌گیری تازه دارید. برای بررسی وارد حساب خود شوید.' },
+  { kind: 'FINDER_REQUEST_ANSWERED', channels: ['SMS'], smsFa: 'همزیست: به درخواست جفت‌گیری شما پاسخ داده شد. نتیجه در حساب شماست.' },
+  { kind: 'FINDER_MESSAGE_POSTED', channels: ['SMS'], smsFa: 'همزیست: در گفت‌وگوی جفت‌یابی پیام تازه دارید.' },
+  { kind: 'FINDER_CONTRACT_READY', channels: ['SMS'], smsFa: 'همزیست: قرارداد جفت‌گیری برای بررسی و تأیید شما آماده است.' },
+  { kind: 'FINDER_CONTRACT_CHANGED', channels: ['SMS'], smsFa: 'همزیست: قرارداد جفت‌گیری تغییر کرد و نسخه تازه به تأیید دوباره شما نیاز دارد.' },
+  { kind: 'FINDER_CONTRACT_CONFIRMED', channels: ['SMS'], smsFa: 'همزیست: قرارداد جفت‌گیری به تأیید هر دو طرف رسید.' },
+  { kind: 'FINDER_REQUEST_CANCELLED', channels: ['SMS'], smsFa: 'همزیست: یک درخواست جفت‌گیری شما بسته شد. دلیل آن در حساب شماست.' },
+  { kind: 'FINDER_CONTRACT_CANCELLED', channels: ['SMS'], smsFa: 'همزیست: یک قرارداد جفت‌گیری شما لغو شد. جزئیات در حساب شماست.' },
+  { kind: 'FINDER_REQUEST_EXPIRING', channels: ['SMS'], smsFa: 'همزیست: مهلت یک درخواست جفت‌گیری شما رو به پایان است.' },
+  { kind: 'FINDER_WINDOW_APPROACHING', channels: ['SMS'], smsFa: 'همزیست: بازه جفت‌گیری قرارداد شما نزدیک است. پس از جفت‌گیری تاریخ را ثبت کنید.' },
+  { kind: 'FINDER_SAVED_SEARCH_MATCH', channels: ['SMS'], smsFa: 'همزیست: حیوان تازه‌ای با جست‌وجوی ذخیره‌شده شما منطبق است.' },
+  { kind: 'MATING_DATE_DECLARED', channels: ['SMS'], smsFa: 'همزیست: تاریخ جفت‌گیری برای تأیید شما اعلام شد.' },
+  { kind: 'MATING_DATE_CORRECTED', channels: ['SMS'], smsFa: 'همزیست: تاریخ جفت‌گیری اصلاح شد و نسخه تازه به تأیید شما نیاز دارد.' },
+  { kind: 'MATING_DATE_CONFLICT', channels: ['SMS'], smsFa: 'همزیست: طرف مقابل تاریخ جفت‌گیری دیگری اعلام کرد. هر دو مقدار در حساب شماست.' },
 ];
 
 /**
@@ -203,21 +221,15 @@ export const IN_APP_ONLY_KINDS: readonly string[] = [
   // Phase 4: the person has just paid and is looking at the result (PRODUCT_DECISIONS §12 lists no SMS for it).
   'FINDER_SUBSCRIPTION_ACTIVATED',
   'MATING_PROFILE_DEACTIVATED',
-  // Until PROMPT-007 reviews the SMS catalogue for the finder.
-  'FINDER_SAVED_SEARCH_MATCH',
-  'FINDER_REQUEST_RECEIVED',
-  'FINDER_REQUEST_ANSWERED',
+  // Reviewed in PROMPT-007: the person is already in the conversation, or it is
+  // a step of something they started; the loud finder kinds are templated above.
   'FINDER_REQUEST_TERMS',
-  'FINDER_REQUEST_CANCELLED',
   'FINDER_REQUEST_OUTCOME',
-  'FINDER_MESSAGE_POSTED',
-  'FINDER_CONTRACT_READY',
-  'FINDER_CONTRACT_CHANGED',
   'FINDER_CONTRACT_APPROVED_BY_OTHER',
-  'FINDER_CONTRACT_CONFIRMED',
   'FINDER_CONTRACT_CANCEL_ASKED',
-  'FINDER_CONTRACT_CANCELLED',
   'FINDER_DOWNSTREAM_LINKED',
+  'FINDER_MODERATION_DECISION',
+  'MATING_DATE_CONFIRMED',
 ];
 
 const BY_KIND: ReadonlyMap<string, NotificationTemplate> = new Map(

@@ -25,7 +25,7 @@ import type { AccountId } from '../../src/domain/ids.ts';
 import { BASE_URL, DATABASE_URL, MOBILE, clearSyntheticOtp, expectText, newSyntheticMobile, signIn, syntheticNationalId } from './support.ts';
 
 const SHOTS = path.join('docs', 'reports', 'screenshots', 'phase-4', 'prompt-006');
-const FLAGS = ['finder.flag.discovery', 'finder.flag.free_pool_visibility', 'finder.flag.requests', 'finder.flag.chat', 'finder.flag.contracts'];
+const FLAGS = ['finder.flag.discovery', 'finder.flag.free_pool_visibility', 'finder.flag.requests', 'finder.flag.chat', 'finder.flag.contracts', 'finder.flag.official_handoff', 'finder.flag.personal_handoff'];
 const sink: Array<{ to: string; text: string }> = [];
 const sms = localTestSmsSender(sink, loadEnv({ APP_ENV: 'development', INTEGRATION_MODE: 'local', DATABASE_URL: 'postgres://synthetic/unused' }));
 const as = (id: string): Actor => ({ accountId: id as AccountId, context: 'USER', activeRoles: [] });

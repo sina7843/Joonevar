@@ -170,7 +170,8 @@ export type FilePurposeName =
   | 'MATING_PROFILE_RENDITION'
   | 'MATING_PROFILE_VIDEO'
   | 'FINDER_MESSAGE_ATTACHMENT'
-  | 'FINDER_CONTRACT_PDF';
+  | 'FINDER_CONTRACT_PDF'
+  | 'FINDER_REPORT_EVIDENCE';
 
 const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   KYC_NATIONAL_ID: ['ASSOCIATION_OPERATOR'],
@@ -254,6 +255,9 @@ const FILE_REVIEWERS: Record<FilePurposeName, readonly ActorContextName[]> = {
   // role reads them through the generic file route (R8, R12).
   FINDER_MESSAGE_ATTACHMENT: [],
   FINDER_CONTRACT_PDF: [],
+  // PROMPT-007: served only through the finder evidence route, which checks
+  // FINDER_REPORT_MODERATE and audits every view.
+  FINDER_REPORT_EVIDENCE: [],
 };
 
 export function canReadFile(

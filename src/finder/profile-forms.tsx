@@ -12,7 +12,6 @@ import {
   lifeEventAction,
   preferencesAction,
   removeMediaAction,
-  reportProfileAction,
   setPrimaryAction,
   type ProfileFormState,
 } from './profile-actions.ts';
@@ -196,39 +195,3 @@ export function LifeEventForm({ animalId, options }: { animalId: string; options
   );
 }
 
-export function ReportProfileForm({ profileId, images }: { profileId: string; images: ReadonlyArray<{ value: string; label: string }> }) {
-  const [state, submit, pending] = useActionState(reportProfileAction, EMPTY);
-  return (
-    <form onSubmit={submitWith(submit)} className="mt-sm grid gap-sm sm:grid-cols-2" data-testid="finder-report-form">
-      <input type="hidden" name="profileId" value={profileId} />
-      <SelectField
-        label="موضوع"
-        name="mediaId"
-        placeholder="کل پروفایل"
-        options={images}
-        data-testid="finder-report-target"
-      />
-      <SelectField
-        label="دلیل"
-        name="reason"
-        required
-        options={[
-          { value: 'INCORRECT_INFO', label: 'اطلاعات نادرست' },
-          { value: 'OFFENSIVE', label: 'تصویر یا متن نامناسب' },
-          { value: 'PRIVACY', label: 'افشای اطلاعات خصوصی' },
-          { value: 'OTHER', label: 'دلیل دیگر' },
-        ]}
-        data-testid="finder-report-reason"
-      />
-      <div className="sm:col-span-2">
-        <TextAreaField label="توضیح" name="details" rows={2} maxLength={1000} />
-      </div>
-      <div className="flex flex-wrap items-center gap-md sm:col-span-2">
-        <Button type="submit" tone="ghost" disabled={pending} data-testid="finder-report-submit">
-          ثبت گزارش
-        </Button>
-        <Result state={state} testId="finder-report-result" />
-      </div>
-    </form>
-  );
-}

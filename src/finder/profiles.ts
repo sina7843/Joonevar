@@ -46,6 +46,8 @@ import { conflict, notFound, validation } from '../domain/errors.ts';
 import { todayCivil } from '../domain/calendar.ts';
 import type { Actor } from '../authz/actor.ts';
 import { assertCapacityAvailable, lockAccount, mayViewProfile } from './subscriptions.ts';
+import { assertFinderAccess, blockedBetween } from './sanctions.ts';
+import type { FinderReportCategory } from './reports-model.ts';
 import { activeRule } from './rules.ts';
 import { lastMatingsOf } from './last-mating.ts';
 import { finderFlagEnabled } from './flags.ts';
@@ -165,7 +167,7 @@ export async function eligibilityOf(
 export async function deactivateProfileOf(
   tx: DbClient,
   animalId: string,
-  reason: 'OWNER' | 'TRANSFER' | 'LIFE_EVENT' | 'IDENTITY_CHANGE' | 'MODERATION',
+  reason: 'OWNER' | 'TRANSFER' | 'LIFE_EVENT' | 'IDENTITY_CHANGE' | 'MODERATION' | 'SUBSCRIPTION_ENDED' | 'SUSPENSION',
   actor: Actor | null,
   noteFa: string | null = null,
   now: Date = new Date(),
@@ -413,6 +415,7 @@ export async function setPrimaryMedia(database: Database, actor: Actor, input: {
  */
 export async function activateProfile(database: Database, actor: Actor, input: { animalId: string }, now: Date = new Date()): Promise<ProfileRow> {
   await requireOwnedAnimal(database, actor, input.animalId);
+  await assertFinderAccess(database, actor.accountId, now);
   return database.transaction(async (tx) => {
     await lockAccount(tx, actor.accountId);
     const [animal] = await tx.select().from(animals).where(eq(animals.id, input.animalId)).for('update').limit(1);
@@ -626,6 +629,8 @@ async function visibleTo(database: DbClient, viewerAccountId: string | null, pro
   if (profile.ownerAccountId !== animal.ownerAccountId || animal.status !== 'REGISTERED') return false;
   const [life, open] = await Promise.all([lifeStatusOf(database, animal.id), speciesEnabled(database, 'MATING', animal.species)]);
   if (life !== 'ACTIVE' || !open) return false;
+  // PROMPT-007: a block in either direction answers exactly like a hidden profile.
+  if (viewerAccountId && viewerAccountId !== animal.ownerAccountId && (await blockedBetween(database, viewerAccountId, animal.ownerAccountId))) return false;
   return mayViewProfile(database, viewerAccountId, animal.ownerAccountId, now);
 }
 
@@ -717,7 +722,8 @@ export async function ownerFinderAnimal(database: DbClient, actor: Actor, animal
 export async function submitProfileReport(
   database: Database,
   actor: Actor,
-  input: { profileId: string; mediaId: string | null; reason: string; details: string | null },
+  input: { profileId: string; mediaId: string | null; reason: string; details: string | null; finderCategory?: FinderReportCategory | null },
+  within?: (tx: DbClient, reportId: string) => Promise<void>,
 ): Promise<{ id: string }> {
   const problems = reportInputProblems({ reason: input.reason, details: input.details });
   if (problems.length > 0) throw validation(problems[0]!);
@@ -741,6 +747,7 @@ export async function submitProfileReport(
           details: input.details?.trim() || null,
           matingProfileId: mediaId ? null : card.profileId,
           matingProfileMediaId: mediaId,
+          finderCategory: input.finderCategory ?? null,
         })
         .returning({ id: moderationReports.id });
       id = created!.id;
@@ -757,6 +764,7 @@ export async function submitProfileReport(
       targetId: mediaId ?? card.profileId,
       after: { reportId: id, reason: input.reason },
     });
+    if (within) await within(tx, id);
     return { id };
   });
 }

@@ -43,8 +43,9 @@ import type { Actor } from '../authz/actor.ts';
 import fs from 'node:fs/promises';
 import { assertFinderFlag } from './flags.ts';
 import { detachDownstream } from './downstream.ts';
+import { assertFinderAccess, blockedBetween } from './sanctions.ts';
 import { assertFinderCapability, FINDER_SETTING_KEYS } from './model.ts';
-import { counterpartOf, enterCoordination, loadForParty, lockAnimals, moveRequest, notifyFinder, releaseCoordination, type RequestRow } from './requests.ts';
+import { BLOCKED_FA, counterpartOf, enterCoordination, loadForParty, lockAnimals, moveRequest, notifyFinder, releaseCoordination, type RequestRow } from './requests.ts';
 import {
   applyClauseChoices,
   chipTail,
@@ -182,6 +183,7 @@ async function buildContent(tx: DbClient, request: RequestRow, template: typeof 
  */
 export async function startContract(db: Database, actor: Actor, input: { requestId: string; expectedVersion: number }, now: Date = new Date()) {
   await assertFinderFlag(db, 'finder.flag.contracts');
+  await assertFinderAccess(db, actor.accountId, now);
   const template = await currentTemplate(db);
   if (!template) throw conflict('متن قرارداد هنوز توسط مدیریت منتشر نشده است؛ تنظیم قرارداد فعلاً ممکن نیست.');
   return db.transaction(async (tx) => {
@@ -189,6 +191,7 @@ export async function startContract(db: Database, actor: Actor, input: { request
     await lockAnimals(tx, [peek.request.senderAnimalId, peek.request.receiverAnimalId]);
     const { request, party } = await loadForParty(tx, actor, input.requestId, true);
     if (request.version !== input.expectedVersion) throw conflict('این درخواست در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.');
+    if (await blockedBetween(tx, request.senderAccountId, request.receiverAccountId)) throw conflict(BLOCKED_FA);
     const problem = commandProblem('START_CONTRACT', request.status as RequestStatus, party);
     if (problem) throw conflict(problem);
     if (request.pausedAt) throw conflict('یکی از دو حیوان در تنظیم قرارداد دیگری است.');
@@ -258,6 +261,7 @@ export async function requestContractCode(
     readInt(db, FINDER_SETTING_KEYS.otpMaxAttempts),
     readInt(db, FINDER_SETTING_KEYS.otpResendSeconds),
   ]);
+  await assertFinderAccess(db, actor.accountId, now);
   const sent = await db.transaction(async (tx) => {
     const { contract } = await loadContractForParty(tx, actor, input.contractId, true);
     if (contract.status !== 'DRAFTING') throw conflict('این قرارداد در انتظار تأیید نیست.');
@@ -317,6 +321,7 @@ export async function confirmContract(
   input: { contractId: string; number: number; contentHash: string; otpId: string; code: string; ip: string | null; userAgent: string | null },
   now: Date = new Date(),
 ): Promise<ConfirmOutcome> {
+  await assertFinderAccess(db, actor.accountId, now);
   try {
     return await db.transaction(async (tx) => {
       const { contract, request } = await loadContractForParty(tx, actor, input.contractId, true);

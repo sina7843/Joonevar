@@ -9,14 +9,16 @@
  */
 import { sql } from 'drizzle-orm';
 import { check, index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
-import { accounts } from './core.ts';
+import { accounts, storedFiles } from './core.ts';
 import { contentItems } from './content.ts';
 import { communities } from './communities.ts';
 import { animalListingMedia, animalListings } from './marketplace.ts';
 import { inquiryMessages } from './inquiry.ts';
 import { questions, reviews } from './trust.ts';
-import { finderMessages, matingProfileMedia, matingProfiles } from './finder.ts';
+import { finderMessages, matingProfileMedia, matingProfiles, matingRequests } from './finder.ts';
 import {
+  finderReportCategory,
+  sanctionScope,
   moderationAppealStatus,
   moderationDecision,
   reportReason,
@@ -60,6 +62,14 @@ export const moderationReports = pgTable(
     }),
     /** Phase 4 (PROMPT-005): one message of a finder conversation, reported by a party to it. */
     finderMessageId: uuid('finder_message_id').references(() => finderMessages.id, { onDelete: 'restrict' }),
+    /** Phase 4 (PROMPT-007): a mating request, or a person met through the finder. */
+    finderRequestId: uuid('finder_request_id').references(() => matingRequests.id, { onDelete: 'restrict' }),
+    reportedAccountId: uuid('reported_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    /** The finder category; the generic `reason` keeps its nearest value for older readers. */
+    finderCategory: finderReportCategory('finder_category'),
+    /** Who took the report from the queue; one moderator works a report at a time. */
+    assignedToAccountId: uuid('assigned_to_account_id').references(() => accounts.id, { onDelete: 'set null' }),
+    assignedAt: timestamp('assigned_at', { withTimezone: true }),
     questionId: uuid('question_id').references(() => questions.id, { onDelete: 'restrict' }),
     /** The listing revision the reporter was reading, so a later edit is visible against it. */
     listingRevision: integer('listing_revision'),
@@ -157,6 +167,21 @@ export const moderationReports = pgTable(
       'moderation_report_finder_message_check',
       sql`(${t.targetKind}::text = 'FINDER_MESSAGE') = (${t.finderMessageId} is not null)`,
     ),
+    uniqueIndex('moderation_report_one_open_finder_request_key')
+      .on(t.reporterAccountId, t.finderRequestId)
+      .where(sql`${t.status} = 'OPEN'`),
+    uniqueIndex('moderation_report_one_open_finder_account_key')
+      .on(t.reporterAccountId, t.reportedAccountId)
+      .where(sql`${t.status} = 'OPEN'`),
+    check(
+      'moderation_report_finder_request_check',
+      sql`(${t.targetKind}::text = 'FINDER_REQUEST') = (${t.finderRequestId} is not null)`,
+    ),
+    check(
+      'moderation_report_finder_account_check',
+      sql`(${t.targetKind}::text = 'FINDER_ACCOUNT') = (${t.reportedAccountId} is not null)`,
+    ),
+    index('moderation_report_finder_queue_idx').on(t.finderCategory, t.status),
   ],
 );
 
@@ -217,4 +242,60 @@ export const publisherRestrictions = pgTable(
     liftReason: text('lift_reason'),
   },
   (t) => [index('publisher_restriction_account_idx').on(t.accountId)],
+);
+
+// ── Phase 4 PROMPT-007 ────────────────────────────────────────────────────────
+
+/**
+ * A private file a reporter attached to a report. Served only through the
+ * finder evidence route, to the moderators of that queue, and every view is audited.
+ */
+export const moderationReportEvidence = pgTable(
+  'moderation_report_evidence',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    reportId: uuid('report_id')
+      .notNull()
+      .references(() => moderationReports.id, { onDelete: 'restrict' }),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => storedFiles.id, { onDelete: 'restrict' }),
+    uploadedByAccountId: uuid('uploaded_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  },
+  (t) => [index('moderation_report_evidence_report_idx').on(t.reportId)],
+);
+
+/**
+ * A sanction on an account: its finder access, or the account itself. Lifting
+ * stamps `lifted_at` with a reason; nothing is deleted, and a sanction never
+ * refunds or pauses a subscription beyond the policy that period snapshotted.
+ */
+export const accountSanctions = pgTable(
+  'account_sanction',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    accountId: uuid('account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    scope: sanctionScope('scope').notNull(),
+    reasonFa: text('reason_fa').notNull(),
+    reportId: uuid('report_id').references(() => moderationReports.id, { onDelete: 'restrict' }),
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull().default(sql`now()`),
+    /** Null = until lifted. */
+    endsAt: timestamp('ends_at', { withTimezone: true }),
+    createdByAccountId: uuid('created_by_account_id')
+      .notNull()
+      .references(() => accounts.id, { onDelete: 'restrict' }),
+    liftedAt: timestamp('lifted_at', { withTimezone: true }),
+    liftedByAccountId: uuid('lifted_by_account_id').references(() => accounts.id, { onDelete: 'restrict' }),
+    liftReasonFa: text('lift_reason_fa'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  },
+  (t) => [
+    uniqueIndex('account_sanction_one_open_key').on(t.accountId, t.scope).where(sql`${t.liftedAt} is null`),
+    check('account_sanction_window_check', sql`${t.endsAt} is null or ${t.endsAt} > ${t.startsAt}`),
+  ],
 );

@@ -25,6 +25,7 @@ import { conflict, notFound, validation } from '../domain/errors.ts';
 import { todayCivil } from '../domain/calendar.ts';
 import { distanceKm } from '../domain/referral.ts';
 import type { Actor } from '../authz/actor.ts';
+import { notBlockedSql } from './sanctions.ts';
 import { speciesEnabled } from '../marketplace/species.ts';
 import { hasFinderSubscription } from './subscriptions.ts';
 import { finderFlagEnabled } from './flags.ts';
@@ -86,6 +87,8 @@ async function candidates(db: DbClient, viewer: Viewer, f: SearchFilters, now: D
       or a.owner_account_id = ${viewer.accountId}
       or ${viewer.subscribed && viewer.freePoolOpen}
     )`,
+    // PROMPT-007: a block, in either direction, hides both people from each other.
+    notBlockedSql(viewer.accountId ?? '00000000-0000-0000-0000-000000000000', sql`a.owner_account_id`),
   ];
   if (onlyProfileId) conditions.push(sql`p.id = ${onlyProfileId}`);
   if (f.breedId) conditions.push(sql`coalesce(b.merged_into_breed_id, a.breed_id) = ${f.breedId}`);

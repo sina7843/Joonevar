@@ -18,6 +18,7 @@
  * every revision, report, decision and appeal in place, because a dispute about
  * a sale is answered from exactly those rows.
  */
+import { FINDER_TARGET_KINDS } from '../finder/reports-model.ts';
 import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { accounts } from '../db/schema/core.ts';
@@ -514,6 +515,12 @@ export async function appealableReports(
   return rows;
 }
 
+/**
+ * Appeals on finder reports belong to the finder queue and its own capability
+ * (PHASE-4 PROMPT-007); this queue neither lists nor decides them.
+ */
+const notFinderReport = sql`${moderationReports.targetKind}::text not in (${sql.join(FINDER_TARGET_KINDS.map((k) => sql`${k}`), sql`, `)})`;
+
 export async function appealQueue(database: DbClient, actor: Actor): Promise<readonly AppealView[]> {
   assertMarketplaceCapability(actor, 'ANIMAL_LISTING_MODERATE');
   const rows = await database
@@ -532,7 +539,7 @@ export async function appealQueue(database: DbClient, actor: Actor): Promise<rea
     .innerJoin(moderationReports, eq(moderationReports.id, moderationAppeals.reportId))
     .leftJoin(animalListings, eq(animalListings.id, moderationReports.listingId))
     .leftJoin(animals, eq(animals.id, animalListings.animalId))
-    .where(eq(moderationAppeals.status, 'OPEN'))
+    .where(and(eq(moderationAppeals.status, 'OPEN'), notFinderReport))
     .orderBy(desc(moderationAppeals.createdAt));
   return rows as AppealView[];
 }
@@ -585,7 +592,7 @@ export async function decideAppeal(
     })
     .from(moderationAppeals)
     .innerJoin(moderationReports, eq(moderationReports.id, moderationAppeals.reportId))
-    .where(eq(moderationAppeals.id, input.appealId))
+    .where(and(eq(moderationAppeals.id, input.appealId), notFinderReport))
     .limit(1);
   if (!appeal) throw notFound('این اعتراض پیدا نشد.');
   if (appeal.status !== 'OPEN') throw conflict('این اعتراض قبلاً پاسخ داده شده است.');
