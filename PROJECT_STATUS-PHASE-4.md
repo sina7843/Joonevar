@@ -9,4 +9,4 @@ Managed by `node tools/runner.mjs --phase 4 …` (DEC-0217). The package is read
 - [x] PROMPT-005 — 005-requests-chat-contracts <!-- work-commit:201e3ff038f6dd3c092ba462e868db97e6834cdf -->
 - [x] PROMPT-006 — 006-paths-events-cooldown-breeding <!-- work-commit:1ed0fee41f1054c2c64bf7d6c9495e19e2e54f82 -->
 - [x] PROMPT-007 — 007-operations-moderation-notifications-security <!-- work-commit:6ee5b9115924a2f771f24ca23918ee182140bce7 -->
-- [ ] PROMPT-008 — 008-ci-release-readiness-handoff
+- [x] PROMPT-008 — 008-ci-release-readiness-handoff <!-- work-commit:1fb7f37d5cc3b59980ed739270143e39e7ae078a -->
