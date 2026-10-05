@@ -78,8 +78,10 @@ test('a published record becomes searchable across the public sections', async (
 test('a visitor searches from the header and the page names the rule that ordered the results', async () => {
   await withPage(DESKTOP, null, async (page) => {
     await page.goto(BASE_URL + '/', { waitUntil: 'load' });
-    await page.getByTestId('site-search-input').fill('کلاب جست‌وجو');
-    await Promise.all([page.waitForURL(/\/search\?/), page.getByTestId('site-search-input').press('Enter')]);
+    // DS SiteShell: the header's search icon opens the search page.
+    await Promise.all([page.waitForURL(/\/search/), page.getByTestId('site-search').click()]);
+    await page.getByTestId('search-input').fill('کلاب جست‌وجو');
+    await Promise.all([page.waitForURL(/\/search\?/), page.getByTestId('search-input').press('Enter')]);
 
     await page.getByTestId('search-results').waitFor();
     await expectText(page, CLUB);

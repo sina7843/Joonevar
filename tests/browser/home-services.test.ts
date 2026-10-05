@@ -47,8 +47,10 @@ test('home shows what Hamzist does, how it works and a way into the directories'
     // Every service on the home page has its own page.
     const cards = page.locator('[data-testid^="home-service-"]');
     assert.ok((await cards.count()) >= 6);
-    await page.getByTestId('home-search-input').fill('دامپزشک');
-    await Promise.all([page.waitForURL(/\/search\?/), page.getByTestId('home-search-input').press('Enter')]);
+    // DS v1.0.3: search lives in the header, not in a home section.
+    await Promise.all([page.waitForURL(/\/search/), page.getByTestId('site-search').click()]);
+    await page.getByTestId('search-input').fill('دامپزشک');
+    await Promise.all([page.waitForURL(/\/search\?/), page.getByTestId('search-input').press('Enter')]);
     await page.getByTestId('search-form').waitFor();
     await page.goBack({ waitUntil: 'load' });
 

@@ -123,40 +123,47 @@ test('metadata is absolute and canonical, and nothing is indexed outside product
 test('the header links only built sections, marks the current one and offers sign-in', async () => {
   await withPage(DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/about', { waitUntil: 'load' });
+    // DS GroupedNav (v1.0.3): five groups with panels, then «استعلام اصالت»;
+    // «خانه» is the logo. Panel links are in the DOM even while closed.
     const nav = page.locator('nav[aria-label="ناوبری سایت"] a');
     assert.deepEqual(await nav.evaluateAll((nodes) => nodes.map((n) => n.getAttribute('href'))), [
-      '/',
-      '/veterinarians',
-      '/centers',
-      '/breeds',
       '/articles',
       '/news',
       '/announcements',
+      '/veterinarians',
+      '/centers',
+      '/breeds',
       '/associations',
       '/clubs',
-      // The animal marketplace (Phase 3, PROMPT-004).
+      // The animal marketplace (Phase 3, PROMPT-004) and the goods shop (PROMPT-009).
       '/animals-market',
-      // The goods shop (Phase 3, PROMPT-009).
       '/shop',
       '/services',
       '/guides',
-      '/verify',
       '/about',
       '/contact',
+      '/verify',
     ]);
-    // «درباره همزیست» is the page being read, and it marks itself.
-    assert.equal(await nav.nth(14).getAttribute('aria-current'), 'page');
+    // «درباره همزیست» is the page being read: it marks itself, and its group does too.
+    assert.equal(await nav.nth(12).getAttribute('aria-current'), 'page');
     assert.equal(await nav.nth(0).getAttribute('aria-current'), null);
+    const groups = page.locator('nav[aria-label="ناوبری سایت"] .hz-nav-group > button');
+    assert.equal(await groups.count(), 5);
+    assert.equal(await groups.nth(4).getAttribute('aria-current'), 'true');
+
+    // The panel opens on click and closes on Escape.
+    await groups.nth(0).click();
+    assert.equal(await groups.nth(0).getAttribute('aria-expanded'), 'true');
+    await page.keyboard.press('Escape');
+    assert.equal(await groups.nth(0).getAttribute('aria-expanded'), 'false');
 
     const account = page.getByTestId('site-account-link');
     assert.equal(await account.getAttribute('href'), '/login');
     assert.equal((await account.textContent())?.trim(), 'ورود / ثبت‌نام');
 
-    // Every section a visitor starts from is linked: the nine of §4, the five
-    // Phase 2.5 added (PROMPT-014) and the two Phase 3 markets — the animal
-    // marketplace (PROMPT-004) and the shop (PROMPT-009). The public pages
+    // Every section a visitor starts from is linked once; the public pages
     // reached from inside a section stay out of the header.
-    assert.equal(await nav.count(), 16);
+    assert.equal(await nav.count(), 15);
 
     // The breadcrumb reads right to left: home sits to the right of the page.
     const crumbs = page.locator('[data-testid="breadcrumbs"] li:not(.hz-breadcrumbs__sep)');
@@ -189,6 +196,8 @@ test('the mobile menu opens and closes as a disclosure, on Escape and after navi
     assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('data-testid')), 'site-menu-toggle');
 
     await toggle.click();
+    // «درباره همزیست» sits in the «خدمات» accordion of the drawer.
+    await menu.getByRole('button', { name: 'خدمات' }).click();
     await Promise.all([
       page.waitForURL((url) => url.pathname === '/about'),
       menu.getByRole('link', { name: 'درباره همزیست' }).click(),
