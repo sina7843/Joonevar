@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { statusOf } from './status-dictionary.ts';
 
 export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'error';
 
@@ -12,12 +13,21 @@ export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'error';
 export function StatusBadge({
   tone = 'neutral',
   size = 'md',
+  status,
   children,
 }: {
   tone?: StatusTone;
   size?: 'md' | 'sm';
-  children: ReactNode;
+  /** A status-dictionary key; its label and tone win over `tone` and children. */
+  status?: string;
+  children?: ReactNode;
 }) {
+  if (status !== undefined) {
+    const entry = statusOf(status);
+    // Unknown key (data drift): neutral with the raw key, never a guessed tone.
+    tone = entry?.tone ?? 'neutral';
+    children = entry?.labelFa ?? <bdi dir="ltr">{status}</bdi>;
+  }
   return (
     <span className={['hz-badge', 'hz-badge--' + tone, size === 'sm' ? 'hz-badge--sm' : ''].join(' ').trim()}>
       <span className="hz-badge__dot" aria-hidden="true" />

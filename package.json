@@ -16,13 +16,14 @@
     "db:seed": "node src/db/seed/run.ts",
     "db:demo": "node src/db/seed/demo.ts",
     "test": "node --test \"tests/domain/*.test.ts\" \"tests/config/*.test.ts\" \"tests/db/*.test.ts\" \"tests/ui/*.test.ts\"",
-    "check": "npm run typecheck && npm run test",
+    "check": "npm run typecheck && npm run check:ds && npm run test",
     "test:browser": "node tools/browser-tests.mjs",
     "db:backup": "node tools/backup.mjs --out backups",
     "db:restore": "node tools/restore.mjs",
     "dev:tidy": "node tools/dev-tidy.mjs",
     "test:tools": "node --test \"tools/tests/*.test.mjs\"",
-    "db:upgrade-check": "node tools/upgrade-check.mjs"
+    "db:upgrade-check": "node tools/upgrade-check.mjs",
+    "check:ds": "node tools/check-ds-styles.mjs"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
