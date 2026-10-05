@@ -9,7 +9,7 @@ import { buildMetadata } from '../../../../../src/seo/metadata.ts';
 import { site } from '../../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../../../../src/ui/section-header.tsx';
 import { ButtonLink } from '../../../../../src/ui/button.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -61,24 +61,27 @@ export default async function CityPage({ params }: Params) {
         origin={origin}
       />
 
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{page.city.nameFa}</h1>
-        <p className="text-body-md text-text-secondary">{'استان ' + page.province.nameFa}</p>
-        <div className="flex flex-wrap gap-xs" data-testid="city-counts">
-          {page.counts.vets > 0 ? <StatusBadge tone="info">{fa(page.counts.vets) + ' دامپزشک'}</StatusBadge> : null}
-          {page.counts.centres > 0 ? <StatusBadge tone="info">{fa(page.counts.centres) + ' مرکز'}</StatusBadge> : null}
-          {page.counts.communities > 0 ? (
-            <StatusBadge tone="info">{fa(page.counts.communities) + ' انجمن و کلاب'}</StatusBadge>
-          ) : null}
-          {page.indexable ? null : <StatusBadge tone="neutral">هنوز رکوردی منتشر نشده است</StatusBadge>}
-        </div>
-      </header>
+      <PageHeader
+        title={page.city.nameFa}
+        meta={[
+          'استان ' + page.province.nameFa,
+          <span key="counts" data-testid="city-counts">
+            {page.indexable
+              ? [
+                  page.counts.vets > 0 ? fa(page.counts.vets) + ' دامپزشک' : null,
+                  page.counts.centres > 0 ? fa(page.counts.centres) + ' مرکز' : null,
+                  page.counts.communities > 0 ? fa(page.counts.communities) + ' انجمن و کلاب' : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')
+              : 'هنوز رکوردی منتشر نشده است'}
+          </span>,
+        ]}
+      />
 
       {page.indexable ? (
-        <section aria-labelledby="city-links-title" className="space-y-sm">
-          <h2 id="city-links-title" className="text-h3">
-            فهرست‌ها با فیلتر این شهر
-          </h2>
+        <section aria-labelledby="city-links-title" className="hz-card space-y-md">
+          <SectionHeader id="city-links-title" title="فهرست‌ها با فیلتر این شهر" size="sm" />
           <div className="flex flex-wrap gap-sm">
             <ButtonLink tone="secondary" href={'/veterinarians' + query} data-testid="city-vets-link">
               دامپزشکان این شهر
@@ -95,7 +98,8 @@ export default async function CityPage({ params }: Params) {
         />
       )}
 
-      <p className="text-caption text-text-secondary" data-testid="city-privacy-note">
+      <p className="hz-caption" data-testid="city-privacy-note">
+
         این صفحه فقط محل اعلام‌شده رکوردهای منتشرشده را نشان می‌دهد؛ نشانی دقیق و موقعیت غیرعمومی منتشر نمی‌شود.
       </p>
     </div>

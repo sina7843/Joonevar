@@ -8,6 +8,8 @@ import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Button } from '../../../../src/ui/button.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { SearchField } from '../../../../src/ui/search-field.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,38 +37,38 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
       : await verifyDocument(db(), { code, clientKey: clientKeyOf((await headers()).get('x-forwarded-for')) });
 
   return (
-    <div className="mx-auto max-w-3xl space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
-
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="text-body-md text-text-secondary">
-          کد روی سند را بنویسید یا نشانی QR را اینجا بگذارید. استعلام فقط وجود و وضعیت سند را نشان می‌دهد؛ اطلاعات مالک
-          هرگز نمایش داده نمی‌شود.
-        </p>
-      </header>
-
-      <form method="get" action="/verify" role="search" className="space-y-sm" data-testid="verify-form">
-        <label htmlFor="verify-code-input" className="block text-label-md">
-          کد سند
-        </label>
-        <input
-          id="verify-code-input"
-          name="code"
-          type="search"
-          defaultValue={code}
-          dir="ltr"
-          placeholder="RS-XXXXXXXX"
-          className="min-h-[var(--size-control-md)] w-full rounded-md border border-border-control bg-bg-surface px-md font-mono text-body-sm text-text-primary focus:border-border-brand"
-          data-testid="verify-code-input"
+    <div className="mx-auto max-w-[var(--container-reading)] space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={origin} />
+        <PageHeader
+          title={TITLE}
+          meta={[
+            'کد روی سند را بنویسید یا نشانی QR را اینجا بگذارید. استعلام فقط وجود و وضعیت سند را نشان می‌دهد؛ اطلاعات مالک هرگز نمایش داده نمی‌شود.',
+          ]}
         />
-        <Button type="submit" data-testid="verify-submit">
+      </div>
+
+      <form method="get" action="/verify" role="search" className="hz-card flex flex-col gap-sm sm:flex-row" data-testid="verify-form">
+        <div className="min-w-0 flex-1">
+          <SearchField
+            id="verify-code-input"
+            name="code"
+            label="کد سند"
+            defaultValue={code}
+            dir="ltr"
+            placeholder="RS-XXXXXXXX"
+            size="lg"
+            data-testid="verify-code-input"
+          />
+        </div>
+        <Button type="submit" size="lg" data-testid="verify-submit">
           استعلام
         </Button>
       </form>
 
       {answer === null ? (
         <EmptyState
+          icon="shieldCheck"
           title="هنوز کدی وارد نشده است"
           description="کد برگه ثبتی با RS، شجره‌نامه با PD، کارت توله با PC و شناسه حیوان با PET آغاز می‌شود."
         />

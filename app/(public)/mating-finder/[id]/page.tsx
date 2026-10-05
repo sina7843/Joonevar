@@ -13,6 +13,9 @@ import { animals } from '../../../../src/db/schema/animals.ts';
 import { matingProfiles } from '../../../../src/db/schema/finder.ts';
 import { readInt } from '../../../../src/settings/service.ts';
 import { FINDER_SETTING_KEYS } from '../../../../src/finder/model.ts';
+import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { ButtonLink } from '../../../../src/ui/button.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,65 +51,86 @@ export default async function PublicMatingProfilePage({ params }: { params: Prom
   const maxDays = await readInt(db(), FINDER_SETTING_KEYS.requestExpiryDays).catch(() => 7);
   const today = new Date().toISOString().slice(0, 10);
 
+  const loginHref = '/login?next=' + encodeURIComponent('/mating-finder/' + card.profileId);
+
   return (
-    <div className="mx-auto max-w-4xl space-y-lg px-lg py-lg">
-      <h1 className="text-h2" data-testid="finder-public-title">
-        {'پروفایل جفت‌یابی ' + card.nameFa}
-      </h1>
-      <MatingProfileCardView card={card} detail />
-      <section className="rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست و گفت‌وگو</span></h2></div>
-        <p className="mt-xs text-body-sm text-text-secondary">
-          امتیاز یا اطلاعات این صفحه تضمین سلامت، باروری یا کیفیت توله نیست. ارسال درخواست پس از احراز هویت هر دو مالک ممکن
-          می‌شود.
-        </p>
-        {!actor ? (
-          <p className="mt-sm text-body-sm">
-            برای ارسال درخواست،{' '}
-            <Link href={'/login?next=' + encodeURIComponent('/mating-finder/' + card.profileId)} className="text-text-brand underline underline-offset-4">
-              وارد شوید
-            </Link>
-            .
-          </p>
-        ) : ownProfile ? null : card.state !== 'READY' ? (
-          <p className="mt-sm text-body-sm" data-testid="finder-request-closed">این پروفایل در حال حاضر درخواست تازه نمی‌پذیرد.</p>
-        ) : mine.length === 0 ? (
-          <p className="mt-sm text-body-sm">
-            برای ارسال درخواست، حیوان شما باید پروفایل فعال جفت‌یابی داشته باشد.{' '}
-            <Link href="/account/mating-finder/profiles" className="text-text-brand underline underline-offset-4">
-              مدیریت پروفایل‌ها
-            </Link>
-          </p>
-        ) : (
-          <CreateRequestForm
-            profileId={card.profileId}
-            myAnimals={mine.map((m) => ({ value: m.id, label: m.name ?? 'بدون نام' }))}
-            maxDays={maxDays}
-            defaults={{ route: 'PERSONAL', windowFrom: today, windowTo: today, cityFa: card.cityFa ?? '', placeCategory: 'NEUTRAL', financialCategory: 'NO_PAYMENT', specialConditionsFa: '' }}
-          />
-        )}
-      </section>
-      <section className="rounded-xl border border-border-default p-lg">
-        <h2 className="hz-card__title">گزارش این پروفایل</h2>
-        {actor ? (
-          <>
-            <FinderReportForm target="PROFILE" id={card.profileId} images={card.images.map((image) => ({ value: image.mediaId, label: 'تصویر: ' + image.altFa }))} />
-            {!ownProfile ? (
-              <div className="mt-md">
-                <BlockPersonForm profileId={card.profileId} />
+    <div className="space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs
+          items={[
+            { name: 'خانه', path: '/' },
+            { name: 'جفت‌یابی', path: '/mating-finder' },
+            { name: card.nameFa, path: '/mating-finder/' + card.profileId },
+          ]}
+          origin={site().origin}
+        />
+        <PageHeader
+          title={<span data-testid="finder-public-title">{'پروفایل جفت‌یابی ' + card.nameFa}</span>}
+          meta={[[card.breedFa, card.cityFa].filter(Boolean).join('، ') || 'جفت‌یابی']}
+        />
+      </div>
+
+      <div className="grid gap-xl lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+        <div className="min-w-0 space-y-xl">
+          <MatingProfileCardView card={card} detail />
+          <section className="hz-card" aria-labelledby="finder-report-title">
+            <SectionHeader id="finder-report-title" title="گزارش این پروفایل" size="sm" />
+            {actor ? (
+              <>
+                <FinderReportForm target="PROFILE" id={card.profileId} images={card.images.map((image) => ({ value: image.mediaId, label: 'تصویر: ' + image.altFa }))} />
+                {!ownProfile ? (
+                  <div className="mt-md border-t border-border-subtle pt-md">
+                    <BlockPersonForm profileId={card.profileId} />
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <p className="hz-body-sm">
+                برای گزارش،{' '}
+                <Link href={loginHref} className="hz-link">
+                  وارد شوید
+                </Link>
+                .
+              </p>
+            )}
+          </section>
+        </div>
+
+        <aside aria-labelledby="finder-request-title" className="min-w-0 lg:sticky lg:top-[calc(var(--header-site)+24px)]">
+          <section className="hz-card space-y-md">
+            <SectionHeader id="finder-request-title" title="درخواست و گفت‌وگو" size="sm" />
+            <p className="hz-body-sm text-text-secondary">
+              امتیاز یا اطلاعات این صفحه تضمین سلامت، باروری یا کیفیت توله نیست. ارسال درخواست پس از احراز هویت هر دو مالک ممکن
+              می‌شود.
+            </p>
+            {!actor ? (
+              <ButtonLink href={loginHref} block iconStart="signIn">
+                ورود برای ارسال درخواست
+              </ButtonLink>
+            ) : ownProfile ? (
+              <p className="hz-body-sm">این پروفایل حیوان خود شماست.</p>
+            ) : card.state !== 'READY' ? (
+              <p className="hz-mating__note" data-testid="finder-request-closed">
+                این پروفایل در حال حاضر درخواست تازه نمی‌پذیرد.
+              </p>
+            ) : mine.length === 0 ? (
+              <div className="space-y-sm">
+                <p className="hz-mating__note">برای ارسال درخواست، حیوان شما باید پروفایل فعال جفت‌یابی داشته باشد.</p>
+                <ButtonLink tone="secondary" href="/account/mating-finder/profiles">
+                  مدیریت پروفایل‌ها
+                </ButtonLink>
               </div>
-            ) : null}
-          </>
-        ) : (
-          <p className="mt-xs text-body-sm">
-            برای گزارش،{' '}
-            <Link href={'/login?next=' + encodeURIComponent('/mating-finder/' + card.profileId)} className="text-text-brand underline underline-offset-4">
-              وارد شوید
-            </Link>
-            .
-          </p>
-        )}
-      </section>
+            ) : (
+              <CreateRequestForm
+                profileId={card.profileId}
+                myAnimals={mine.map((m) => ({ value: m.id, label: m.name ?? 'بدون نام' }))}
+                maxDays={maxDays}
+                defaults={{ route: 'PERSONAL', windowFrom: today, windowTo: today, cityFa: card.cityFa ?? '', placeCategory: 'NEUTRAL', financialCategory: 'NO_PAYMENT', specialConditionsFa: '' }}
+              />
+            )}
+          </section>
+        </aside>
+      </div>
     </div>
   );
 }

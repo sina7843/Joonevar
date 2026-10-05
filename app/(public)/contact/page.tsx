@@ -7,6 +7,8 @@ import { site } from '../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { RichText } from '../../../src/content/rich-text.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,53 +55,51 @@ export default async function ContactPage() {
   const anyContact = [email, phone, address, hours].some((item) => item !== null);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
-
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="text-body-md text-text-secondary">{DESCRIPTION}</p>
-      </header>
+    <div className="mx-auto max-w-[var(--container-reading)] space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={origin} />
+        <PageHeader title={TITLE} meta={[DESCRIPTION]} />
+      </div>
 
       <section aria-labelledby="contact-details-title" className="space-y-md">
-        <h2 id="contact-details-title" className="text-h4">
-          راه‌های ارتباطی
-        </h2>
+        <SectionHeader id="contact-details-title" title="راه‌های ارتباطی" size="sm" />
         {anyContact ? (
-          <dl className="space-y-md rounded-xl border border-border-default bg-bg-surface p-lg text-body-sm" data-testid="contact-details">
-            {phone ? (
-              <div>
-                <dt className="text-caption text-text-secondary">شماره تماس</dt>
-                <dd dir="ltr" className="text-body-md">
-                  {phone}
-                </dd>
-              </div>
-            ) : null}
-            {email ? (
-              <div>
-                <dt className="text-caption text-text-secondary">ایمیل</dt>
-                <dd dir="ltr" className="text-body-md">
-                  {email}
-                </dd>
-              </div>
-            ) : null}
-            {address ? (
-              <div>
-                <dt className="text-caption text-text-secondary">نشانی</dt>
-                <dd className="text-body-md">
-                  <RichText source={address} />
-                </dd>
-              </div>
-            ) : null}
-            {hours ? (
-              <div>
-                <dt className="text-caption text-text-secondary">ساعت پاسخ‌گویی</dt>
-                <dd className="text-body-md">
-                  <RichText source={hours} />
-                </dd>
-              </div>
-            ) : null}
-          </dl>
+          <div className="hz-card" data-testid="contact-details">
+            <dl className="hz-kv">
+              {phone ? (
+                <div className="hz-kv__row">
+                  <dt className="hz-kv__key">شماره تماس</dt>
+                  <dd className="hz-kv__value">
+                    <bdi dir="ltr">{phone}</bdi>
+                  </dd>
+                </div>
+              ) : null}
+              {email ? (
+                <div className="hz-kv__row">
+                  <dt className="hz-kv__key">ایمیل</dt>
+                  <dd className="hz-kv__value">
+                    <bdi dir="ltr">{email}</bdi>
+                  </dd>
+                </div>
+              ) : null}
+              {address ? (
+                <div className="hz-kv__row">
+                  <dt className="hz-kv__key">نشانی</dt>
+                  <dd className="hz-kv__value">
+                    <RichText source={address} />
+                  </dd>
+                </div>
+              ) : null}
+              {hours ? (
+                <div className="hz-kv__row">
+                  <dt className="hz-kv__key">ساعت پاسخ‌گویی</dt>
+                  <dd className="hz-kv__value">
+                    <RichText source={hours} />
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </div>
         ) : (
           <Alert tone="info" title="راه تماس عمومی هنوز ثبت نشده است">
             <span data-testid="contact-not-configured">
@@ -110,26 +110,27 @@ export default async function ContactPage() {
       </section>
 
       <section aria-labelledby="contact-routes-title" className="space-y-md">
-        <h2 id="contact-routes-title" className="text-h4">
-          پیگیری از داخل سامانه
-        </h2>
-        <ul className="space-y-sm" data-testid="contact-routes">
+        <SectionHeader id="contact-routes-title" title="پیگیری از داخل سامانه" size="sm" />
+        <ul className="hz-cardlist" data-testid="contact-routes">
           {ROUTES.map((route) => (
-            <li key={route.href} className="rounded-xl border border-border-default bg-bg-surface p-lg">
-              <Link href={route.href} className="text-label-lg text-text-brand">
-                {route.label}
+            <li key={route.href}>
+              <Link href={route.href} className="hz-cardlist__item hz-card--interactive text-text-primary no-underline">
+                <span className="hz-cardlist__row">
+                  <span className="min-w-0">
+                    <span className="hz-cardlist__title block">{route.label}</span>
+                    <span className="hz-cardlist__meta block">{route.note}</span>
+                  </span>
+                  <Icon name="caretRight" size="sm" mirror className="shrink-0 text-text-brand" />
+                </span>
               </Link>
-              <p className="mt-2xs text-body-sm text-text-secondary">{route.note}</p>
             </li>
           ))}
         </ul>
       </section>
 
-      <section aria-labelledby="contact-report-title" className="space-y-sm">
-        <h2 id="contact-report-title" className="text-h4">
-          گزارش محتوا یا کلاب
-        </h2>
-        <p className="text-body-sm text-text-secondary">
+      <section aria-labelledby="contact-report-title" className="hz-card hz-card--subtle space-y-sm">
+        <SectionHeader id="contact-report-title" title="گزارش محتوا یا کلاب" size="sm" />
+        <p className="hz-body-sm text-text-secondary">
           هر مطلب و هر کلاب عمومی دکمه گزارش خودش را دارد؛ گزارش شما با دلیل بررسی می‌شود و نام گزارش‌دهنده به طرف مقابل گفته نمی‌شود.
         </p>
       </section>

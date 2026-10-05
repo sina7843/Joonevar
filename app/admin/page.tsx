@@ -1,19 +1,19 @@
 import { guardRoute } from '../../src/authz/guard.ts';
 import { AccessDenied } from '../../src/ui/access-denied.tsx';
 import { OpsShell, ADMIN_NAV } from '../../src/ui/shell.tsx';
-import { Card } from '../../src/ui/card.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
-import Link from 'next/link';
+import { CountTiles, StatTiles } from '../../src/ui/desk.tsx';
+import { SectionHeader } from '../../src/ui/section-header.tsx';
 import { db } from '../../src/db/client.ts';
 import { healthReport } from '../../src/health/service.ts';
 import { queueBoard } from '../../src/admin/queues.ts';
 import { EmptyState } from '../../src/ui/states.tsx';
-import { StatusBadge } from '../../src/ui/status.tsx';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Superadmin environment (§21.4, D11). It opens on the real state of managed
+ * Superadmin environment (§21.4, D11) — DS P09 home: managed-data tiles, then
+ * the review queues this role may read. It opens on the real state of managed
  * data, because the first operational job is entering the values that are still
  * missing rather than admiring a summary.
  */
@@ -22,59 +22,60 @@ export default async function AdminPage() {
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
   const [report, queues] = await Promise.all([healthReport(db()), queueBoard(db(), guard.actor)]);
+  const unset = report.settings.notConfigured.length;
 
   return (
-    <OpsShell actor={guard.actor} title="سوپرادمین" pathname="/admin" nav={ADMIN_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت داده مدیریتی</span></h2></div>
-          <p className="mt-md text-body-sm">
-            {report.settings.total} کلید تنظیم · {report.settings.notConfigured.length} مورد «تعیین‌نشده»
-          </p>
-          <p className="mt-sm text-caption text-text-secondary">
-            مقدار نامعلوم با عدد پیش‌فرض جایگزین نمی‌شود؛ تا ورود داده واقعی، مسیر پرداخت آن قلم باز نمی‌شود.
-          </p>
-          <div className="mt-lg">
-            <ButtonLink href="/admin/settings" block>
-              مدیریت تنظیمات
-            </ButtonLink>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>صف‌های بررسی</span></h2></div>
-          <p className="mt-xs text-caption text-text-secondary">
-            فقط صف‌هایی که این نقش اجازه خواندنشان را دارد نمایش داده می‌شوند؛ صف بسته‌شده صفر نشان داده نمی‌شود.
-          </p>
-          {queues.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="صفی در دسترس این نقش نیست" description="هر صف با مجوز خودش باز می‌شود." />
-            </div>
-          ) : (
-            <ul className="mt-lg space-y-sm" data-testid="queue-board">
-              {queues.map((queue) => (
-                <li key={queue.key}>
-                  <Link
-                    href={queue.href}
-                    className="flex items-center justify-between gap-md rounded-lg border border-border-default p-md hover:border-border-control"
-                    data-testid={'queue-' + queue.key}
-                  >
-                    <span className="text-label-md">{queue.labelFa}</span>
-                    <StatusBadge tone={queue.waiting > 0 ? 'warning' : 'neutral'}>
-                      {queue.waiting > 0 ? queue.waiting.toLocaleString('fa-IR') + ' در انتظار' : 'خالی'}
-                    </StatusBadge>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="mt-lg">
-            <ButtonLink tone="secondary" href="/admin/merge" block>
-              ادغام رکورد تکراری
-            </ButtonLink>
-          </div>
-        </Card>
+    <OpsShell actor={guard.actor} title="مرور" pathname="/admin" nav={ADMIN_NAV}>
+      <div className="flex flex-wrap items-center justify-between gap-sm">
+        <p className="hz-page-header__meta">
+          <span className="hz-page-header__meta-item">
+            {report.settings.total.toLocaleString('fa-IR') + ' کلید تنظیم · ' + unset.toLocaleString('fa-IR') + ' مورد «تعیین‌نشده»'}
+          </span>
+        </p>
+        <div className="flex flex-wrap gap-sm">
+          <ButtonLink tone="secondary" size="sm" href="/admin/settings">
+            مدیریت تنظیمات
+          </ButtonLink>
+          <ButtonLink tone="secondary" size="sm" href="/admin/merge">
+            ادغام رکورد تکراری
+          </ButtonLink>
+        </div>
       </div>
+
+      <section className="space-y-md" aria-labelledby="admin-data-title">
+        <SectionHeader title="وضعیت داده مدیریتی" size="sm" id="admin-data-title" />
+        <StatTiles
+          tiles={[
+            { label: 'کلیدهای تنظیم', value: report.settings.total, sub: 'هر تغییر نسخه‌دار و با دلیل', href: '/admin/settings' },
+            {
+              label: 'مقادیر تعیین‌نشده',
+              value: unset,
+              sub: unset === 0 ? 'همه مقادیر ثبت شده‌اند' : undefined,
+              alert: unset > 0 ? 'تا ثبت مقدار، مسیر پرداخت آن قلم بسته است' : undefined,
+              href: '/admin/settings?unset=1',
+            },
+          ]}
+        />
+        <p className="text-caption text-text-secondary">
+          مقدار نامعلوم با عدد پیش‌فرض جایگزین نمی‌شود؛ تا ورود داده واقعی، مسیر پرداخت آن قلم باز نمی‌شود.
+        </p>
+      </section>
+
+      <section className="space-y-md" aria-labelledby="admin-queues-title">
+        <SectionHeader title="صف‌های بررسی" size="sm" id="admin-queues-title" />
+        <p className="text-caption text-text-secondary">
+          فقط صف‌هایی که این نقش اجازه خواندنشان را دارد نمایش داده می‌شوند؛ صف بسته‌شده صفر نشان داده نمی‌شود.
+        </p>
+        {queues.length === 0 ? (
+          <EmptyState title="صفی در دسترس این نقش نیست" description="هر صف با مجوز خودش باز می‌شود." />
+        ) : (
+          <CountTiles
+            testId="queue-board"
+            linkTestId="queue-"
+            queues={queues.map((queue) => ({ key: queue.key, titleFa: queue.labelFa, href: queue.href, waiting: queue.waiting }))}
+          />
+        )}
+      </section>
     </OpsShell>
   );
 }

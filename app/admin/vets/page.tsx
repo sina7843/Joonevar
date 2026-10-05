@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { ADMIN_NAV, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
@@ -31,90 +30,87 @@ export default async function AdminVetsPage() {
   );
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/vets" nav={ADMIN_NAV}>
-      <div className="space-y-lg">
-        <Alert tone="info" title="این صفحه فرم درخواست معتمدشدن نیست">
-          گردش درخواست و تأیید نقش دامپزشک طبق D01 در فاز بعدی است. اینجا فقط داده دامپزشکان از قبل تأییدشده و
-          مراکز آن‌ها ثبت می‌شود.
-        </Alert>
+    <OpsShell actor={guard.actor} title="دامپزشکان معتمد" pathname="/admin/vets" nav={ADMIN_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{vets.length.toLocaleString('fa-IR') + ' دامپزشک ثبت‌شده'}</span>
+      </p>
+      <Alert tone="info" title="این صفحه فرم درخواست معتمدشدن نیست">
+        گردش درخواست و تأیید نقش دامپزشک طبق D01 در فاز بعدی است. اینجا فقط داده دامپزشکان از قبل تأییدشده و
+        مراکز آن‌ها ثبت می‌شود.
+      </Alert>
 
+      <div className="grid items-start gap-lg lg:grid-cols-2">
         <VetProfileForm />
-
-        {vets.length === 0 ? (
-          <EmptyState
-            title="هنوز دامپزشکی ثبت نشده است"
-            description="تا ورود داده واقعی دامپزشکان تأییدشده، Finder نتیجه‌ای ندارد و هیچ داده نمونه‌ای جایگزین آن نمی‌شود."
-          />
-        ) : (
-          <>
-            <AddLocationForm
-              vets={vets.map((v) => ({ accountId: v.accountId, nameFa: v.displayNameFa }))}
-            />
-
-            <ul className="space-y-lg" data-testid="vet-registry">
-              {locations.map(({ vet, rows }) => (
-                <li key={vet.id}>
-                  <Card>
-                    <h2 className="hz-card__title">{vet.displayNameFa}</h2>
-                    <p className="mt-2xs text-caption text-text-secondary">
-                      کد نظام دامپزشکی {vet.councilCode}
-                    </p>
-                    <p className="mt-xs text-body-sm">
-                      <Link
-                        href={'/admin/vets/' + vet.accountId}
-                        className="text-text-brand underline underline-offset-4"
-                        data-testid={'directory-edit-' + vet.accountId}
-                      >
-                        {'پروفایل عمومی · ' + VET_PUBLIC_STATUS_FA[vet.publicStatus]}
-                      </Link>
-                    </p>
-
-                    {rows.length === 0 ? (
-                      <p className="mt-lg text-body-sm text-text-secondary">مرکزی برای این دامپزشک ثبت نشده است.</p>
-                    ) : (
-                      <ul className="mt-lg space-y-lg">
-                        {rows.map((location) => {
-                          const microchip = eligibilityOf(location, 'MICROCHIP');
-                          return (
-                            <li key={location.id} className="rounded-xl border border-border-default p-lg">
-                              <div className="flex items-start justify-between gap-md">
-                                <div className="min-w-0">
-                                  <h3 className="text-label-md">{location.nameFa}</h3>
-                                  <p className="mt-2xs text-caption text-text-secondary">
-                                    {[location.cityFa, location.neighborhoodFa].filter(Boolean).join(' · ')}
-                                  </p>
-                                </div>
-                                <StatusBadge tone={microchip.eligible ? 'success' : 'neutral'}>
-                                  {microchip.eligible ? 'در Finder میکروچیپ' : 'خارج از Finder میکروچیپ'}
-                                </StatusBadge>
-                              </div>
-                              {microchip.eligible ? null : (
-                                <p className="mt-sm text-caption text-text-secondary">{microchip.reasonFa}</p>
-                              )}
-                              <EditLocationForm
-                                location={{
-                                  id: location.id,
-                                  nameFa: location.nameFa,
-                                  version: location.version,
-                                  licenceStatus: location.licenceStatus,
-                                  canImplantMicrochip: location.canImplantMicrochip,
-                                  canDrawBloodSample: location.canDrawBloodSample,
-                                  canPregnancyCheck: location.canPregnancyCheck,
-                                  isActive: location.isActive,
-                                }}
-                              />
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </Card>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+        {vets.length > 0 ? <AddLocationForm vets={vets.map((v) => ({ accountId: v.accountId, nameFa: v.displayNameFa }))} /> : null}
       </div>
+
+      {vets.length === 0 ? (
+        <EmptyState
+          title="هنوز دامپزشکی ثبت نشده است"
+          description="تا ورود داده واقعی دامپزشکان تأییدشده، Finder نتیجه‌ای ندارد و هیچ داده نمونه‌ای جایگزین آن نمی‌شود."
+        />
+      ) : (
+        <ul className="space-y-lg" data-testid="vet-registry" aria-label="دامپزشکان ثبت‌شده">
+          {locations.map(({ vet, rows }) => (
+            <li key={vet.id} className="hz-card space-y-md">
+              <div className="flex flex-wrap items-start justify-between gap-sm">
+                <div className="min-w-0">
+                  <h2 className="hz-card__title">{vet.displayNameFa}</h2>
+                  <p className="text-caption text-text-secondary">
+                    {'کد نظام دامپزشکی '}
+                    <bdi dir="ltr">{vet.councilCode}</bdi>
+                  </p>
+                </div>
+                <Link
+                  href={'/admin/vets/' + vet.accountId}
+                  className="hz-link hz-link--standalone"
+                  data-testid={'directory-edit-' + vet.accountId}
+                >
+                  {'پروفایل عمومی · ' + VET_PUBLIC_STATUS_FA[vet.publicStatus]}
+                </Link>
+              </div>
+
+              {rows.length === 0 ? (
+                <p className="text-body-sm text-text-secondary">مرکزی برای این دامپزشک ثبت نشده است.</p>
+              ) : (
+                <ul className="divide-y divide-border-subtle border-t border-border-subtle">
+                  {rows.map((location) => {
+                    const microchip = eligibilityOf(location, 'MICROCHIP');
+                    return (
+                      <li key={location.id} className="py-md last:pb-0">
+                        <div className="flex flex-wrap items-start justify-between gap-sm">
+                          <div className="min-w-0">
+                            <h3 className="text-label-lg">{location.nameFa}</h3>
+                            <p className="text-caption text-text-secondary">
+                              {[location.cityFa, location.neighborhoodFa].filter(Boolean).join(' · ')}
+                            </p>
+                          </div>
+                          <StatusBadge tone={microchip.eligible ? 'success' : 'neutral'} size="sm">
+                            {microchip.eligible ? 'در Finder میکروچیپ' : 'خارج از Finder میکروچیپ'}
+                          </StatusBadge>
+                        </div>
+                        {microchip.eligible ? null : <p className="mt-xs text-caption text-text-secondary">{microchip.reasonFa}</p>}
+                        <EditLocationForm
+                          location={{
+                            id: location.id,
+                            nameFa: location.nameFa,
+                            version: location.version,
+                            licenceStatus: location.licenceStatus,
+                            canImplantMicrochip: location.canImplantMicrochip,
+                            canDrawBloodSample: location.canDrawBloodSample,
+                            canPregnancyCheck: location.canPregnancyCheck,
+                            isActive: location.isActive,
+                          }}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </OpsShell>
   );
 }

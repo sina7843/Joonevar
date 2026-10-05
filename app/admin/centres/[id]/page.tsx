@@ -20,11 +20,11 @@ export default async function AdminCentrePage({ params }: { params: Promise<{ id
   const locations = await linkableLocations(db(), guard.actor);
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/centres" nav={ADMIN_NAV}>
+    <OpsShell actor={guard.actor} title="مراکز دامپزشکی" pathname="/admin/centres" nav={ADMIN_NAV}>
+      <Link href="/admin/centres" className="hz-link hz-link--standalone hz-hide-md">
+        بازگشت به مراکز
+      </Link>
       <div className="space-y-lg">
-        <Link href="/admin/centres" className="text-label-md text-text-brand underline underline-offset-4">
-          بازگشت به مراکز
-        </Link>
         <CentreEditor data={data} surface="admin" unlinkedLocations={locations} />
       </div>
     </OpsShell>

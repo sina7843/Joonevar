@@ -3,8 +3,9 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { STATUS_FA } from '../../../src/breeds/model.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ADMIN_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
+import { Panel } from '../../../src/ui/desk.tsx';
+import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { breedRegistry } from '../../../src/operations/service.ts';
@@ -13,7 +14,9 @@ import { AddBreedForm, BreedStateForm } from './forms.tsx';
 export const dynamic = 'force-dynamic';
 
 /**
- * The breed register — §21.4 (reference lists).
+ * The breed register — §21.4 (reference lists) — DS P11: an item without a
+ * lifecycle, so a plain DataTable (restacked as cards below 768) under the add
+ * form.
  *
  * Adding a breed is managed data rather than a deployment. Retiring one keeps
  * every animal already recorded with it exactly as it is; it only stops being
@@ -24,63 +27,80 @@ export default async function AdminBreedsPage() {
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
   const rows = await breedRegistry(db(), guard.actor);
+  const active = rows.filter((row) => row.isActive).length;
 
   return (
-    <OpsShell actor={guard.actor} title="سوپرادمین" pathname="/admin/breeds" nav={ADMIN_NAV}>
-      <div className="space-y-lg">
-        <Alert tone="info" title="کنارگذاشتن یک نژاد، پرونده‌های ثبت‌شده را تغییر نمی‌دهد">
-          <span data-testid="breeds-note">
-            نژاد کنارگذاشته‌شده فقط در انتخاب‌های جدید دیده نمی‌شود؛ حیوان‌هایی که با آن ثبت شده‌اند دست‌نخورده
-            می‌مانند و هر تغییر با Actor، زمان و مقدار قبلی ثبت می‌شود.
-          </span>
-        </Alert>
+    <OpsShell actor={guard.actor} title="نژادها" pathname="/admin/breeds" nav={ADMIN_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{rows.length.toLocaleString('fa-IR') + ' نژاد در فهرست مرجع'}</span>
+        <span className="hz-page-header__meta-item">{active.toLocaleString('fa-IR') + ' فعال در انتخاب‌های فرم'}</span>
+      </p>
+      <Alert tone="info" title="کنارگذاشتن یک نژاد، پرونده‌های ثبت‌شده را تغییر نمی‌دهد">
+        <span data-testid="breeds-note">
+          نژاد کنارگذاشته‌شده فقط در انتخاب‌های جدید دیده نمی‌شود؛ حیوان‌هایی که با آن ثبت شده‌اند دست‌نخورده
+          می‌مانند و هر تغییر با Actor، زمان و مقدار قبلی ثبت می‌شود.
+        </span>
+      </Alert>
 
-        <AddBreedForm />
+      <AddBreedForm />
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فهرست مرجع نژادها</span></h2></div>
-          <ul className="mt-lg space-y-md" data-testid="breed-list">
-            {rows.map((row) => (
-              <li
-                key={row.id}
-                className="rounded-xl border border-border-default p-lg"
-                data-testid={'breed-' + row.nameEn}
-              >
-                <div className="flex items-start justify-between gap-md">
-                  <div className="min-w-0">
-                    <p className="text-label-md">{row.nameFa}</p>
-                    <p className="mt-2xs text-caption text-text-secondary">
-                      <bdi>{row.nameEn}</bdi>
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap justify-end gap-xs">
-                    <StatusBadge tone={row.isActive ? 'success' : 'neutral'}>
-                      <span data-testid={'breed-state-' + row.nameEn}>
-                        {row.isActive ? 'فعال' : 'کنارگذاشته‌شده'}
+      <Panel title="فهرست مرجع نژادها" count={rows.length.toLocaleString('fa-IR')}>
+        {rows.length === 0 ? (
+          <EmptyState title="هنوز نژادی ثبت نشده است" description="نخستین نژاد را با فرم بالا به فهرست مرجع اضافه کنید." />
+        ) : (
+          <div className="hz-table-wrap">
+            <table className="hz-table hz-table--dense hz-table--stack">
+              <caption className="hz-visually-hidden">فهرست مرجع نژادها</caption>
+              <thead>
+                <tr>
+                  <th scope="col">نژاد</th>
+                  <th scope="col">انتخاب در فرم‌ها</th>
+                  <th scope="col">صفحه عمومی</th>
+                  <th scope="col">کنش</th>
+                </tr>
+              </thead>
+              <tbody data-testid="breed-list">
+                {rows.map((row) => (
+                  <tr key={row.id} data-testid={'breed-' + row.nameEn}>
+                    <td className="hz-table__lead">
+                      <div className="hz-case">
+                        <Link href={'/admin/breeds/' + row.id} className="hz-case__name" data-testid={'edit-breed-' + row.nameEn}>
+                          {row.nameFa}
+                          <span className="hz-visually-hidden"> — ویرایش پرونده نژاد</span>
+                        </Link>
+                        <bdi className="hz-case__sub" dir="ltr">
+                          {row.nameEn}
+                        </bdi>
+                      </div>
+                    </td>
+                    <td data-label="انتخاب در فرم‌ها">
+                      <StatusBadge tone={row.isActive ? 'success' : 'neutral'} size="sm">
+                        <span data-testid={'breed-state-' + row.nameEn}>{row.isActive ? 'فعال' : 'کنارگذاشته‌شده'}</span>
+                      </StatusBadge>
+                    </td>
+                    <td data-label="صفحه عمومی">
+                      {/* Two independent axes: offered in forms, and whether a public page exists (DEC-0155). */}
+                      <span className="flex flex-wrap gap-xs">
+                        <StatusBadge tone={row.profileStatus === 'PUBLISHED' ? 'info' : 'neutral'} size="sm">
+                          <span data-testid={'breed-profile-' + row.nameEn}>{'صفحه: ' + STATUS_FA[row.profileStatus]}</span>
+                        </StatusBadge>
+                        {row.mergedIntoBreedId ? (
+                          <StatusBadge tone="warning" size="sm">
+                            تکراری
+                          </StatusBadge>
+                        ) : null}
                       </span>
-                    </StatusBadge>
-                    {/* Two independent axes: offered in forms, and whether a public page exists (DEC-0155). */}
-                    <StatusBadge tone={row.profileStatus === 'PUBLISHED' ? 'info' : 'neutral'}>
-                      <span data-testid={'breed-profile-' + row.nameEn}>{'صفحه: ' + STATUS_FA[row.profileStatus]}</span>
-                    </StatusBadge>
-                    {row.mergedIntoBreedId ? <StatusBadge tone="warning">تکراری</StatusBadge> : null}
-                  </div>
-                </div>
-                <div className="mt-md flex flex-wrap items-center justify-between gap-sm">
-                  <Link
-                    href={'/admin/breeds/' + row.id}
-                    className="text-label-md text-text-brand underline underline-offset-4"
-                    data-testid={'edit-breed-' + row.nameEn}
-                  >
-                    ویرایش پرونده نژاد
-                  </Link>
-                </div>
-                <BreedStateForm breedId={row.id} active={row.isActive} suffix={row.nameEn} />
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
+                    </td>
+                    <td data-label="کنش">
+                      <BreedStateForm breedId={row.id} active={row.isActive} suffix={row.nameEn} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
     </OpsShell>
   );
 }

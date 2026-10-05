@@ -23,11 +23,11 @@ export default async function AdminVetDirectoryPage({ params }: { params: Promis
   if (data === null) notFound();
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/vets" nav={ADMIN_NAV}>
+    <OpsShell actor={guard.actor} title="دامپزشکان معتمد" pathname="/admin/vets" nav={ADMIN_NAV}>
+      <Link href="/admin/vets" className="hz-link hz-link--standalone hz-hide-md">
+        بازگشت به دامپزشکان
+      </Link>
       <div className="space-y-lg">
-        <Link href="/admin/vets" className="text-label-md text-text-brand underline underline-offset-4">
-          بازگشت به دامپزشکان
-        </Link>
         <VetDirectoryEditor data={data} surface="admin" />
       </div>
     </OpsShell>

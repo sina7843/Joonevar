@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import { Breadcrumbs } from '../../../src/ui/breadcrumbs.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
+import { CtaBand } from '../public-ui.tsx';
 import { buildMetadata } from '../../../src/seo/metadata.ts';
 import { site } from '../../../src/public/request.ts';
 
@@ -32,41 +35,41 @@ const PRIVACY = [
   'هر پرونده فقط به صاحبش و به کسانی نشان داده می‌شود که کار همان پرونده به آن‌ها سپرده شده است.',
 ];
 
+/** One fact list in a white card (P03 read shape, 720 measure). */
+function FactCard({ id, title, icon, lines }: { id: string; title: string; icon: 'shieldCheck' | 'lockSimple'; lines: readonly string[] }) {
+  return (
+    <section aria-labelledby={id} className="hz-card space-y-md">
+      <SectionHeader id={id} title={title} size="sm" />
+      <ul className="space-y-sm">
+        {lines.map((line) => (
+          <li key={line} className="flex items-start gap-sm text-body-md">
+            <Icon name={icon} size="sm" className="mt-2xs shrink-0 text-text-brand" />
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export default function AboutPage() {
   const { origin } = site();
   return (
-    <article className="mx-auto max-w-3xl space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
-
-      <header className="space-y-md">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="text-body-md text-text-secondary">
-          همزیست سامانه‌ای فارسی برای ثبت و پیگیری هویت، نسب، اسناد و چرخه تولیدمثل سگ‌هاست. مالک، پرورش‌دهنده،
-          دامپزشک معتمد، انجمن و مرکز ژنتیک هر کدام در محیط خودشان همان پرونده مشترک را پیش می‌برند.
-        </p>
-      </header>
-
-      <section aria-labelledby="official-title" className="rounded-xl border border-border-default bg-bg-surface p-lg">
-        <h2 id="official-title" className="text-h3">
-          چه چیزی رسمی ثبت می‌شود
-        </h2>
-        <ul className="mt-md list-disc space-y-sm ps-xl text-body-md">
-          {OFFICIAL.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section aria-labelledby="privacy-title" className="rounded-xl border border-border-default bg-bg-surface p-lg">
-        <h2 id="privacy-title" className="text-h3">
-          از اطلاعات شما چگونه محافظت می‌شود
-        </h2>
-        <ul className="mt-md list-disc space-y-sm ps-xl text-body-md">
-          {PRIVACY.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
-      </section>
-    </article>
+    <div className="space-y-s48 lg:space-y-s64">
+      <article className="mx-auto max-w-[var(--container-reading)] space-y-xl">
+        <div className="space-y-md">
+          <Breadcrumbs items={CRUMBS} origin={origin} />
+          <PageHeader
+            title={TITLE}
+            meta={[
+              'همزیست سامانه‌ای فارسی برای ثبت و پیگیری هویت، نسب، اسناد و چرخه تولیدمثل سگ‌هاست. مالک، پرورش‌دهنده، دامپزشک معتمد، انجمن و مرکز ژنتیک هر کدام در محیط خودشان همان پرونده مشترک را پیش می‌برند.',
+            ]}
+          />
+        </div>
+        <FactCard id="official-title" title="چه چیزی رسمی ثبت می‌شود" icon="shieldCheck" lines={OFFICIAL} />
+        <FactCard id="privacy-title" title="از اطلاعات شما چگونه محافظت می‌شود" icon="lockSimple" lines={PRIVACY} />
+      </article>
+      <CtaBand id="about-cta-title" />
+    </div>
   );
 }

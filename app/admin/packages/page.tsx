@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { ADMIN_NAV, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { Panel } from '../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -21,6 +21,9 @@ const fa = (value: number): string => value.toLocaleString('fa-IR');
  * Features, slot capacity and availability are set here; the price of each plan
  * is a managed setting, edited in /admin/settings with its own reason and
  * version, so one figure is never charged from two places.
+ *
+ * DS P11: one config card per plan (key, price, capacity, edit form), then the
+ * purchases as a list.
  */
 export default async function AdminPackagesPage() {
   const guard = await guardRoute('/admin/packages');
@@ -30,42 +33,52 @@ export default async function AdminPackagesPage() {
   const [plans, subscriptions] = await Promise.all([listPlans(db(), now), allPackages(db(), guard.actor)]);
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/packages" nav={ADMIN_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">بسته‌های تبلیغاتی</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            پروفایل پایه رایگان است. قیمت هر بسته از{' '}
-            <Link href="/admin/settings" className="text-text-brand underline underline-offset-4" data-testid="packages-settings-link">
-              تنظیمات محصول
-            </Link>{' '}
-            خوانده می‌شود و تا ثبت‌نشدن مبلغ، آن بسته فروخته نمی‌شود. بسته تبلیغاتی هیچ تأیید حرفه‌ای یا معتمدبودنی نمی‌سازد.
-          </p>
-        </Card>
+    <OpsShell actor={guard.actor} title="بسته‌های تبلیغاتی" pathname="/admin/packages" nav={ADMIN_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">
+          پروفایل پایه رایگان است. قیمت هر بسته از{' '}
+          <Link href="/admin/settings" className="hz-link" data-testid="packages-settings-link">
+            تنظیمات محصول
+          </Link>{' '}
+          خوانده می‌شود و تا ثبت‌نشدن مبلغ، آن بسته فروخته نمی‌شود. بسته تبلیغاتی هیچ تأیید حرفه‌ای یا معتمدبودنی نمی‌سازد.
+        </span>
+      </p>
 
+      <div className="grid items-start gap-lg lg:grid-cols-2">
         {plans.map((entry) => (
-          <Card key={entry.plan.id}>
-            <div className="flex flex-wrap items-start justify-between gap-md">
-              <div className="min-w-0">
-                <h2 className="hz-card__title">{entry.tierFa + ' ' + entry.periodFa}</h2>
-                <p className="mt-2xs text-caption text-text-secondary">
-                  <bdi className="hz-ltr font-mono">{entry.plan.priceSettingKey}</bdi>
-                </p>
+          <section key={entry.plan.id} className="hz-card space-y-md" aria-labelledby={'plan-title-' + entry.plan.id}>
+            <div className="flex flex-wrap items-start justify-between gap-sm">
+              <div className="hz-setting__label">
+                <h2 className="hz-card__title" id={'plan-title-' + entry.plan.id}>
+                  {entry.tierFa + ' ' + entry.periodFa}
+                </h2>
+                <bdi className="hz-setting__key" dir="ltr">
+                  {entry.plan.priceSettingKey}
+                </bdi>
               </div>
-              <div className="flex flex-wrap gap-xs">
-                <StatusBadge tone={entry.plan.isActive === 1 ? 'success' : 'neutral'}>
-                  {entry.plan.isActive === 1 ? 'ارائه می‌شود' : 'ارائه نمی‌شود'}
-                </StatusBadge>
-                <span data-testid={'plan-price-badge-' + entry.plan.id}>
-                  <StatusBadge tone={entry.price.configured ? 'info' : 'warning'}>
-                    {entry.priceFa ?? 'قیمت ثبت‌نشده'}
-                  </StatusBadge>
-                </span>
-                <StatusBadge tone={entry.full ? 'warning' : 'neutral'}>
-                  {'فعال: ' + fa(entry.activeCount) + (entry.plan.slotCapacity === null ? '' : ' از ' + fa(entry.plan.slotCapacity))}
-                </StatusBadge>
-              </div>
+              <StatusBadge tone={entry.plan.isActive === 1 ? 'success' : 'neutral'} size="sm">
+                {entry.plan.isActive === 1 ? 'ارائه می‌شود' : 'ارائه نمی‌شود'}
+              </StatusBadge>
             </div>
+            <dl className="hz-kv">
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">قیمت</dt>
+                <dd
+                  className={entry.price.configured ? 'hz-kv__value' : 'hz-kv__value hz-setting__value--unset'}
+                  data-testid={'plan-price-badge-' + entry.plan.id}
+                >
+                  {entry.priceFa ?? 'قیمت ثبت‌نشده'}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">ظرفیت فعال</dt>
+                <dd className="hz-kv__value">
+                  <StatusBadge tone={entry.full ? 'warning' : 'neutral'} size="sm">
+                    {'فعال: ' + fa(entry.activeCount) + (entry.plan.slotCapacity === null ? '' : ' از ' + fa(entry.plan.slotCapacity))}
+                  </StatusBadge>
+                </dd>
+              </div>
+            </dl>
             {entry.price.configured ? null : <UnpricedNotice testId={'plan-unpriced-' + entry.plan.id} />}
             <PlanForm
               plan={{
@@ -76,62 +89,58 @@ export default async function AdminPackagesPage() {
                 isActive: entry.plan.isActive === 1,
               }}
             />
-          </Card>
+          </section>
         ))}
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>خریدهای ثبت‌شده</span></h2></div>
-          {subscriptions.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="هنوز بسته‌ای خریداری نشده است" description="هر خرید پس از تأیید پرداخت اینجا می‌آید." />
-            </div>
-          ) : (
-            <ul className="mt-lg space-y-sm" data-testid="package-subscriptions">
-              {subscriptions.map((row) => {
-                const state = adState(row, now);
-                return (
-                  <li key={row.id} className="rounded-lg border border-border-default p-md" data-testid={'subscription-' + row.id}>
-                    <div className="flex flex-wrap items-start justify-between gap-sm">
-                      <div className="min-w-0">
-                        <p className="text-label-md">{row.target?.nameFa ?? 'پرونده حذف‌شده'}</p>
-                        <p className="mt-2xs text-caption text-text-secondary">
-                          {[
-                            row.target?.kindFa,
-                            AD_TIER_FA[row.plan.tier as AdTier] + ' ' + AD_PERIOD_FA[row.plan.period as AdPeriod],
-                            row.startsAt ? 'از ' + formatInstantFa(row.startsAt) : null,
-                            row.endsAt ? 'تا ' + formatInstantFa(row.endsAt) : null,
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </p>
-                        {row.cancelReasonFa ? (
-                          <p className="mt-2xs text-caption text-text-secondary">{'دلیل لغو: ' + row.cancelReasonFa}</p>
-                        ) : null}
-                      </div>
-                      <StatusBadge
-                        tone={
-                          state === 'ACTIVE'
-                            ? 'success'
-                            : state === 'PENDING_PAYMENT'
-                              ? 'info'
-                              : state === 'PAYMENT_FAILED'
-                                ? 'error'
-                                : 'neutral'
-                        }
-                      >
-                        {AD_STATE_FA[state]}
-                      </StatusBadge>
-                    </div>
-                    {state === 'ACTIVE' || state === 'PENDING_PAYMENT' ? (
-                      <CancelPackageForm surface="admin" subscription={{ id: row.id, version: row.version }} />
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Card>
       </div>
+
+      <Panel title="خریدهای ثبت‌شده" count={fa(subscriptions.length)}>
+        {subscriptions.length === 0 ? (
+          <EmptyState title="هنوز بسته‌ای خریداری نشده است" description="هر خرید پس از تأیید پرداخت اینجا می‌آید." />
+        ) : (
+          <ul className="divide-y divide-border-subtle" data-testid="package-subscriptions">
+            {subscriptions.map((row) => {
+              const state = adState(row, now);
+              return (
+                <li key={row.id} className="py-md first:pt-0 last:pb-0" data-testid={'subscription-' + row.id}>
+                  <div className="flex flex-wrap items-start justify-between gap-sm">
+                    <div className="hz-case min-w-0">
+                      <span className="hz-case__name">{row.target?.nameFa ?? 'پرونده حذف‌شده'}</span>
+                      <span className="hz-case__sub">
+                        {[
+                          row.target?.kindFa,
+                          AD_TIER_FA[row.plan.tier as AdTier] + ' ' + AD_PERIOD_FA[row.plan.period as AdPeriod],
+                          row.startsAt ? 'از ' + formatInstantFa(row.startsAt) : null,
+                          row.endsAt ? 'تا ' + formatInstantFa(row.endsAt) : null,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </span>
+                      {row.cancelReasonFa ? <span className="hz-case__sub">{'دلیل لغو: ' + row.cancelReasonFa}</span> : null}
+                    </div>
+                    <StatusBadge
+                      size="sm"
+                      tone={
+                        state === 'ACTIVE'
+                          ? 'success'
+                          : state === 'PENDING_PAYMENT'
+                            ? 'info'
+                            : state === 'PAYMENT_FAILED'
+                              ? 'error'
+                              : 'neutral'
+                      }
+                    >
+                      {AD_STATE_FA[state]}
+                    </StatusBadge>
+                  </div>
+                  {state === 'ACTIVE' || state === 'PENDING_PAYMENT' ? (
+                    <CancelPackageForm surface="admin" subscription={{ id: row.id, version: row.version }} />
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Panel>
     </OpsShell>
   );
 }

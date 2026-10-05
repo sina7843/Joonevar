@@ -15,6 +15,10 @@ import { flagEnabled } from '../../../../src/marketplace/flags.ts';
 import { checkoutAction, setCartLineAction } from './actions.ts';
 import { BasketDiscountForm } from '../../../../src/commerce/trust-forms.tsx';
 import { applyBasketDiscountAction } from './actions.ts';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { EmptyState } from '../../../../src/ui/states.tsx';
+import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,224 +87,250 @@ export default async function CartPage({
     { name: 'سبد خرید', path: '/shop/cart' },
   ];
 
+  const itemCount = cart.groups.reduce((sum, group) => sum + group.lines.reduce((n, line) => n + line.quantity, 0), 0);
+
   return (
-    <div className="space-y-lg">
-      <Breadcrumbs items={crumbs} origin={site().origin} />
-      <h1 className="text-h2">سبد خرید</h1>
+    <div className="space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs items={crumbs} origin={site().origin} />
+        <PageHeader
+          title="سبد خرید"
+          meta={cart.empty ? [] : [fa(itemCount) + ' کالا', fa(cart.groups.length) + ' فروشگاه']}
+        />
+      </div>
 
       {cart.empty ? (
-        <div className="space-y-sm">
-          <p className="text-body-sm text-text-secondary" data-testid="cart-empty">
-            سبد خرید شما خالی است.
-          </p>
-          <Link href="/shop" className="text-text-brand text-caption" data-testid="cart-back-to-shop">
-            رفتن به فروشگاه
-          </Link>
+        <div data-testid="cart-empty">
+        <EmptyState
+          icon="shoppingCart"
+          title="سبد خرید شما خالی است."
+          description="کالاهای فروشگاه‌ها را از صفحه هر محصول به سبد اضافه کنید."
+          action={
+            <ButtonLink tone="secondary" href="/shop" data-testid="cart-back-to-shop">
+              رفتن به فروشگاه
+            </ButtonLink>
+          }
+        />
         </div>
       ) : (
-        <>
-          {cart.changes.length > 0 ? (
-            <Alert tone="warning" title="از آخرین باری که این سبد را دیده‌اید، چیزهایی تغییر کرده است">
-              <ul className="space-y-2xs" data-testid="cart-changes">
-                {cart.changes.map((change, index) => (
-                  <li key={index} className="text-body-sm" data-testid={'cart-change-' + change.kind}>
-                    <strong>{CHANGE_TITLE_FA[change.kind]}</strong> — {change.labelFa}: {change.detailFa}
-                  </li>
-                ))}
-              </ul>
-            </Alert>
-          ) : null}
-
-          {!checkoutOpen ? (
-            <Alert tone="info" title="پرداخت سبد فروشگاه در حال حاضر باز نیست">
-              <span data-testid="cart-checkout-closed">
-                سبد شما نگه داشته می‌شود؛ تا باز شدن این مسیر، ثبت سفارش تازه ممکن نیست.
-              </span>
-            </Alert>
-          ) : null}
-
-          <div className="space-y-lg" data-testid="cart-groups">
-            {cart.groups.map((group) => (
-              <section
-                key={group.sellerId}
-                className="space-y-md rounded-xl border border-border-default p-lg"
-                data-testid={'cart-group-' + group.sellerId}
-              >
-                <header className="flex flex-wrap items-center justify-between gap-sm">
-                  <h2 className="hz-card__title">{group.sellerNameFa}</h2>
-                  {group.sellerTrading ? null : (
-                    <StatusBadge tone="neutral">فروش غیرفعال</StatusBadge>
-                  )}
-                </header>
-
-                <ul className="space-y-md">
-                  {group.lines.map((line) => (
-                    <li
-                      key={line.skuId}
-                      className="flex flex-wrap items-start gap-md border-t border-border-subtle pt-md first:border-t-0 first:pt-0"
-                      data-testid={'cart-line-' + line.skuId}
-                    >
-                      {line.imageFileId ? (
-                        <div className="w-24">
-                          <RecordImage fileId={line.imageFileId} altFa={line.productNameFa} variant="thumb" />
-                        </div>
-                      ) : null}
-                      <div className="flex-1 space-y-2xs">
-                        <Link
-                          href={'/shop/' + line.productSlug}
-                          className="text-body-sm text-text-brand"
-                          data-testid={'cart-product-' + line.skuId}
-                        >
-                          {line.productNameFa}
-                        </Link>
-                        <p className="text-caption text-text-secondary">
-                          {[line.brandFa, line.variantLabelFa].filter(Boolean).join(' · ')}
-                        </p>
-                        <p className="text-body-sm" data-testid={'cart-price-' + line.skuId}>
-                          {fa(line.unitPriceToman)} تومان × {fa(line.quantity)} ={' '}
-                          <strong>{fa(line.lineTotalToman)} تومان</strong>
-                        </p>
-                        {line.reasonFa ? (
-                          <p className="text-caption text-text-danger" data-testid={'cart-line-problem-' + line.skuId}>
-                            {line.reasonFa}
-                          </p>
-                        ) : null}
-                      </div>
-                      <div className="space-y-sm">
-                        <CartLineForm
-                          action={setCartLineAction}
-                          skuId={line.skuId}
-                          quantity={line.quantity}
-                          max={line.available}
-                        />
-                        <RemoveLineForm action={setCartLineAction} skuId={line.skuId} />
-                      </div>
+        <div className="grid gap-xl lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+          <div className="min-w-0 space-y-lg">
+            {cart.changes.length > 0 ? (
+              <Alert tone="warning" title="از آخرین باری که این سبد را دیده‌اید، چیزهایی تغییر کرده است">
+                <ul className="space-y-2xs" data-testid="cart-changes">
+                  {cart.changes.map((change, index) => (
+                    <li key={index} className="hz-body-sm" data-testid={'cart-change-' + change.kind}>
+                      <strong>{CHANGE_TITLE_FA[change.kind]}</strong> — {change.labelFa}: {change.detailFa}
                     </li>
                   ))}
                 </ul>
-
-                <fieldset className="space-y-2xs" data-testid={'cart-methods-' + group.sellerId}>
-                  <legend className="text-label-sm">روش ارسال</legend>
-                  {group.methodOffers.length === 0 ? (
-                    <p className="text-caption text-text-danger" data-testid={'cart-no-method-' + group.sellerId}>
-                      این فروشگاه هنوز هیچ روش ارسالی اعلام نکرده است.
-                    </p>
-                  ) : (
-                    <ul className="space-y-2xs">
-                      {group.methodOffers.map((offer) => (
-                        <li key={offer.methodId} className="text-body-sm">
-                          {offer.problem === null ? (
-                            <Link
-                              href={withMethod(group.sellerId, offer.methodId)}
-                              className={
-                                offer.methodId === group.chosenMethodId ? 'text-text-brand' : 'text-text-secondary'
-                              }
-                              data-testid={'cart-method-' + offer.methodId}
-                            >
-                              {offer.methodId === group.chosenMethodId ? '● ' : '○ '}
-                              {offer.labelFa} —{' '}
-                              {offer.waived ? 'رایگان' : fa(offer.toman!) + ' تومان'} — آماده‌سازی{' '}
-                              {fa(offer.preparationDays)} روز
-                            </Link>
-                          ) : (
-                            <span className="text-caption text-text-secondary" data-testid={'cart-method-blocked-' + offer.methodId}>
-                              {offer.labelFa} — {offer.problemFa}
-                            </span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </fieldset>
-
-                <dl className="grid gap-2xs text-body-sm" data-testid={'cart-money-' + group.sellerId}>
-                  <div className="flex justify-between">
-                    <dt>جمع کالاها</dt>
-                    <dd>{fa(group.itemsTotalToman)} تومان</dd>
-                  </div>
-                  <div className="flex justify-between">
-                    <dt>هزینه ارسال</dt>
-                    <dd data-testid={'cart-shipping-' + group.sellerId}>
-                      {group.shippingToman === null
-                        ? 'اعلام نشده'
-                        : group.shippingToman === 0n
-                          ? 'رایگان'
-                          : fa(group.shippingToman) + ' تومان'}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between text-label-sm">
-                    <dt>جمع این فروشگاه</dt>
-                    <dd>{fa(group.buyerTotalToman)} تومان</dd>
-                  </div>
-                </dl>
-              </section>
-            ))}
-          </div>
-
-          <section className="space-y-md rounded-xl border border-border-default p-lg">
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تحویل و پرداخت</span></h2></div>
-            <dl className="grid gap-2xs text-body-sm">
-              <div className="flex justify-between">
-                <dt>جمع کالاها</dt>
-                <dd>{fa(cart.itemsTotalToman)} تومان</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>جمع هزینه ارسال</dt>
-                <dd>{fa(cart.shippingTotalToman)} تومان</dd>
-              </div>
-            </dl>
-            <BasketDiscountForm
-              action={applyBasketDiscountAction}
-              code={code}
-              points={cart.loyaltyPoints}
-              availablePoints={cart.loyaltyAvailable}
-              pointValueFa={null}
-            />
-            {cart.discountTotalToman > 0n ? (
-              <p className="text-body-sm" data-testid="cart-discount">
-                تخفیف: {fa(cart.discountTotalToman)} تومان
-              </p>
+              </Alert>
             ) : null}
-            {cart.loyaltyToman > 0n ? (
-              <p className="text-body-sm" data-testid="cart-loyalty">
-                امتیاز خرج‌شده: {fa(cart.loyaltyPoints)} امتیاز — {fa(cart.loyaltyToman)} تومان
-              </p>
-            ) : null}
-            {cart.refusedDiscounts.length > 0 ? (
-              <ul className="space-y-2xs text-caption text-text-danger" data-testid="cart-refused-discounts">
-                {cart.refusedDiscounts.map((refusal, index) => (
-                  <li key={index}>
-                    {refusal.labelFa} — {refusal.reasonFa}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-            <p className="text-caption text-text-secondary" data-testid="cart-split-note">
-              این سبد از {fa(cart.groups.length)} فروشگاه است. پرداخت یک‌بار انجام می‌شود و هر فروشگاه سفارش خودش
-              را جداگانه آماده و ارسال می‌کند.
-            </p>
-            {cart.blocked ? (
-              <Alert tone="error" title="تا رفع موارد بالا، ثبت سفارش ممکن نیست">
-                <span data-testid="cart-blocked">
-                  قلم‌هایی که قابل خرید نیستند را از سبد بردارید یا تعدادشان را کم کنید.
+
+            {!checkoutOpen ? (
+              <Alert tone="info" title="پرداخت سبد فروشگاه در حال حاضر باز نیست">
+                <span data-testid="cart-checkout-closed">
+                  سبد شما نگه داشته می‌شود؛ تا باز شدن این مسیر، ثبت سفارش تازه ممکن نیست.
                 </span>
               </Alert>
             ) : null}
-            <CheckoutForm
-              action={checkoutAction}
-              totalToman={cart.grandTotalToman}
-              defaults={{ ...defaults, provinceFa: provinceFa ?? defaults.provinceFa }}
-              blocked={cart.blocked || !checkoutOpen}
-              code={code}
-              redeemPoints={cart.loyaltyPoints}
-              chosenMethods={Object.fromEntries(
-                cart.groups
-                  .filter((group) => group.chosenMethodId !== null)
-                  .map((group) => [group.sellerId, group.chosenMethodId!]),
-              )}
-            />
-          </section>
-        </>
+
+            <div className="space-y-lg" data-testid="cart-groups">
+              {cart.groups.map((group) => (
+                <section
+                  key={group.sellerId}
+                  className="hz-card space-y-md"
+                  aria-labelledby={'cart-group-title-' + group.sellerId}
+                  data-testid={'cart-group-' + group.sellerId}
+                >
+                  <header className="flex flex-wrap items-center justify-between gap-sm">
+                    <SectionHeader id={'cart-group-title-' + group.sellerId} title={group.sellerNameFa} size="sm" />
+                    {group.sellerTrading ? null : <StatusBadge tone="neutral">فروش غیرفعال</StatusBadge>}
+                  </header>
+
+                  <ul className="hz-cart-list">
+                    {group.lines.map((line) => (
+                      <li
+                        key={line.skuId}
+                        className={line.reasonFa ? 'hz-cart-row hz-cart-row--stacked hz-cart-row--unavailable' : 'hz-cart-row hz-cart-row--stacked'}
+                        data-testid={'cart-line-' + line.skuId}
+                      >
+                        <RecordImage fileId={line.imageFileId} altFa={line.productNameFa} variant="thumb-lg" />
+                        <div className="hz-cart-row__body">
+                          <Link href={'/shop/' + line.productSlug} className="hz-cart-row__name" data-testid={'cart-product-' + line.skuId}>
+                            {line.productNameFa}
+                          </Link>
+                          {line.brandFa || line.variantLabelFa ? (
+                            <span className="hz-cart-row__variant">{[line.brandFa, line.variantLabelFa].filter(Boolean).join(' · ')}</span>
+                          ) : null}
+                          <span className="hz-cart-row__unit">{'قیمت واحد ' + fa(line.unitPriceToman) + ' تومان'}</span>
+                          {line.reasonFa ? (
+                            <p className="hz-inline-msg hz-inline-msg--error" data-testid={'cart-line-problem-' + line.skuId}>
+                              <Icon name="warningCircle" size="xs" />
+                              <span className="hz-inline-msg__text">{line.reasonFa}</span>
+                            </p>
+                          ) : null}
+                        </div>
+                        <div className="hz-cart-row__fix flex flex-wrap items-end gap-sm">
+                          <CartLineForm action={setCartLineAction} skuId={line.skuId} quantity={line.quantity} max={line.available} />
+                          <RemoveLineForm action={setCartLineAction} skuId={line.skuId} />
+                        </div>
+                        <div className="hz-cart-row__total" data-testid={'cart-price-' + line.skuId}>
+                          <span className="hz-cart-row__amount">
+                            {fa(line.lineTotalToman)} <small>تومان</small>
+                          </span>
+                          <span className="hz-cart-row__math">
+                            {fa(line.quantity)} × {fa(line.unitPriceToman)}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <fieldset className="space-y-sm border-t border-border-subtle pt-md" data-testid={'cart-methods-' + group.sellerId}>
+                    <legend className="hz-field__label float-start mb-sm w-full">روش ارسال</legend>
+                    {group.methodOffers.length === 0 ? (
+                      <p className="hz-inline-msg hz-inline-msg--error" data-testid={'cart-no-method-' + group.sellerId}>
+                        <Icon name="warningCircle" size="xs" />
+                        <span className="hz-inline-msg__text">این فروشگاه هنوز هیچ روش ارسالی اعلام نکرده است.</span>
+                      </p>
+                    ) : (
+                      <ul className="grid gap-sm md:grid-cols-2">
+                        {group.methodOffers.map((offer) => {
+                          const chosen = offer.methodId === group.chosenMethodId;
+                          return (
+                            <li key={offer.methodId}>
+                              {offer.problem === null ? (
+                                <Link
+                                  href={withMethod(group.sellerId, offer.methodId)}
+                                  aria-current={chosen ? 'true' : undefined}
+                                  className={
+                                    'hz-option h-full text-text-primary no-underline' + (chosen ? ' border-border-brand bg-bg-brand-subtle' : '')
+                                  }
+                                  data-testid={'cart-method-' + offer.methodId}
+                                >
+                                  <Icon name={chosen ? 'checkCircle' : 'truck'} size="sm" className={chosen ? 'text-text-brand' : 'text-text-secondary'} />
+                                  <span className="min-w-0">
+                                    <span className="block text-label-md">{offer.labelFa}</span>
+                                    <span className="hz-caption block">
+                                      {(offer.waived ? 'رایگان' : fa(offer.toman!) + ' تومان') + ' · آماده‌سازی ' + fa(offer.preparationDays) + ' روز'}
+                                    </span>
+                                  </span>
+                                </Link>
+                              ) : (
+                                <span className="hz-option h-full cursor-default bg-bg-subtle" data-testid={'cart-method-blocked-' + offer.methodId}>
+                                  <Icon name="prohibit" size="sm" className="text-text-secondary" />
+                                  <span className="min-w-0">
+                                    <span className="block text-label-md text-text-secondary">{offer.labelFa}</span>
+                                    <span className="hz-caption block">{offer.problemFa}</span>
+                                  </span>
+                                </span>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </fieldset>
+
+                  <dl className="hz-summary__list border-t border-border-subtle pt-md" data-testid={'cart-money-' + group.sellerId}>
+                    <div className="hz-summary__row">
+                      <dt>جمع کالاها</dt>
+                      <dd>{fa(group.itemsTotalToman)} تومان</dd>
+                    </div>
+                    <div className="hz-summary__row">
+                      <dt>هزینه ارسال</dt>
+                      <dd data-testid={'cart-shipping-' + group.sellerId}>
+                        {group.shippingToman === null ? (
+                          <span className="hz-unset">اعلام نشده</span>
+                        ) : group.shippingToman === 0n ? (
+                          <span className="hz-summary__free">رایگان</span>
+                        ) : (
+                          fa(group.shippingToman) + ' تومان'
+                        )}
+                      </dd>
+                    </div>
+                    <div className="hz-summary__row">
+                      <dt className="font-bold text-text-primary">جمع این فروشگاه</dt>
+                      <dd>{fa(group.buyerTotalToman)} تومان</dd>
+                    </div>
+                  </dl>
+                </section>
+              ))}
+            </div>
+          </div>
+
+          <aside aria-labelledby="cart-summary-title" className="min-w-0 lg:sticky lg:top-[calc(var(--header-site)+24px)]">
+            <section className="hz-card hz-summary">
+              <h2 className="hz-summary__title" id="cart-summary-title">
+                تحویل و پرداخت
+              </h2>
+              <dl className="hz-summary__list">
+                <div className="hz-summary__row">
+                  <dt>{'جمع کالاها (' + fa(itemCount) + ' عدد)'}</dt>
+                  <dd>{fa(cart.itemsTotalToman)} تومان</dd>
+                </div>
+                <div className="hz-summary__row">
+                  <dt>جمع هزینه ارسال</dt>
+                  <dd>{fa(cart.shippingTotalToman)} تومان</dd>
+                </div>
+                {cart.discountTotalToman > 0n ? (
+                  <div className="hz-summary__row" data-testid="cart-discount">
+                    <dt>تخفیف</dt>
+                    <dd>{'−' + fa(cart.discountTotalToman) + ' تومان'}</dd>
+                  </div>
+                ) : null}
+                {cart.loyaltyToman > 0n ? (
+                  <div className="hz-summary__row" data-testid="cart-loyalty">
+                    <dt>امتیاز خرج‌شده</dt>
+                    <dd>{fa(cart.loyaltyPoints) + ' امتیاز — ' + fa(cart.loyaltyToman) + ' تومان'}</dd>
+                  </div>
+                ) : null}
+              </dl>
+              <BasketDiscountForm
+                action={applyBasketDiscountAction}
+                code={code}
+                points={cart.loyaltyPoints}
+                availablePoints={cart.loyaltyAvailable}
+                pointValueFa={null}
+              />
+              {cart.refusedDiscounts.length > 0 ? (
+                <ul className="space-y-2xs" data-testid="cart-refused-discounts">
+                  {cart.refusedDiscounts.map((refusal, index) => (
+                    <li key={index} className="hz-inline-msg hz-inline-msg--error">
+                      <Icon name="warningCircle" size="xs" />
+                      <span className="hz-inline-msg__text">
+                        {refusal.labelFa} — {refusal.reasonFa}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <p className="hz-summary__note" data-testid="cart-split-note">
+                این سبد از {fa(cart.groups.length)} فروشگاه است. پرداخت یک‌بار انجام می‌شود و هر فروشگاه سفارش خودش را
+                جداگانه آماده و ارسال می‌کند.
+              </p>
+              {cart.blocked ? (
+                <Alert tone="error" title="تا رفع موارد بالا، ثبت سفارش ممکن نیست">
+                  <span data-testid="cart-blocked">قلم‌هایی که قابل خرید نیستند را از سبد بردارید یا تعدادشان را کم کنید.</span>
+                </Alert>
+              ) : null}
+              <CheckoutForm
+                action={checkoutAction}
+                totalToman={cart.grandTotalToman}
+                defaults={{ ...defaults, provinceFa: provinceFa ?? defaults.provinceFa }}
+                blocked={cart.blocked || !checkoutOpen}
+                code={code}
+                redeemPoints={cart.loyaltyPoints}
+                chosenMethods={Object.fromEntries(
+                  cart.groups
+                    .filter((group) => group.chosenMethodId !== null)
+                    .map((group) => [group.sellerId, group.chosenMethodId!]),
+                )}
+              />
+            </section>
+          </aside>
+        </div>
       )}
     </div>
   );

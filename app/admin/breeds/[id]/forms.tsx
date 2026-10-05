@@ -192,9 +192,11 @@ export function BreedProfileForm({
           data-testid="profile-standard-url"
         />
 
-        <Button type="submit" block disabled={pending} data-testid="save-breed-profile">
-          {pending ? 'در حال ذخیره…' : 'ذخیره پرونده نژاد'}
-        </Button>
+        <div className="hz-action-row">
+          <Button type="submit" loading={pending} loadingLabel="در حال ذخیره…" disabled={pending} data-testid="save-breed-profile">
+            ذخیره پرونده نژاد
+          </Button>
+        </div>
       </form>
     </Card>
   );
@@ -229,7 +231,7 @@ export function BreedStatusForm({
           data-testid="breed-status-to"
         />
         <TextAreaField label="دلیل" name="reason" rows={2} required data-testid="breed-status-reason" />
-        <Button type="submit" disabled={pending} data-testid="change-breed-status">
+        <Button type="submit" tone="secondary" disabled={pending} data-testid="change-breed-status">
           {pending ? 'در حال ثبت…' : 'ثبت وضعیت'}
         </Button>
       </form>
@@ -262,7 +264,7 @@ export function MedicalClaimForm({ breedId }: { breedId: string }) {
           <TextField label="پیوند منبع" name="sourceUrl" type="url" ltr data-testid="claim-source-url" />
           <TextField label="تاریخ بازبینی" name="reviewedOn" type="date" ltr required data-testid="claim-reviewed-on" />
         </div>
-        <Button type="submit" disabled={pending} data-testid="add-claim">
+        <Button type="submit" tone="secondary" disabled={pending} data-testid="add-claim">
           {pending ? 'در حال ثبت…' : 'ثبت مطلب'}
         </Button>
       </form>

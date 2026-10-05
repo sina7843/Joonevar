@@ -2,13 +2,12 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { ADMIN_NAV, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
-import { Alert } from '../../../src/ui/alert.tsx';
+import { Panel, ViewChips } from '../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { mergeCandidates, mergedRecords } from '../../../src/admin/merge.ts';
-import { MERGE_KIND_FA, MERGE_KIND_PATH, isMergeKind, type MergeKind } from '../../../src/admin/merge-model.ts';
-import { MergeForm, MergeKindTabs } from '../../../src/admin/forms.tsx';
+import { MERGE_KINDS, MERGE_KIND_FA, MERGE_KIND_PATH, isMergeKind, type MergeKind } from '../../../src/admin/merge-model.ts';
+import { MergeForm } from '../../../src/admin/forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,56 +30,56 @@ export default async function AdminMergePage({ searchParams }: { searchParams: P
   ]);
 
   return (
-    <OpsShell actor={guard.actor} title="سوپرادمین" pathname="/admin/merge" nav={ADMIN_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">ادغام رکورد تکراری</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            رکورد تکراری حذف نمی‌شود: ردیف، تاریخچه و نشانی عمومی‌اش می‌ماند و همان نشانی به رکورد اصلی اشاره می‌کند.
-            رکوردی که خودش تکراری ثبت شده دوباره ادغام نمی‌شود تا زنجیره‌ای از هدایت ساخته نشود.
-          </p>
-          <div className="mt-lg">
-            <MergeKindTabs current={kind} />
-          </div>
-        </Card>
+    <OpsShell actor={guard.actor} title="ادغام رکورد تکراری" pathname="/admin/merge" nav={ADMIN_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">
+          رکورد تکراری حذف نمی‌شود: ردیف، تاریخچه و نشانی عمومی‌اش می‌ماند و همان نشانی به رکورد اصلی اشاره می‌کند.
+          رکوردی که خودش تکراری ثبت شده دوباره ادغام نمی‌شود تا زنجیره‌ای از هدایت ساخته نشود.
+        </span>
+      </p>
+      <div data-testid="merge-kinds">
+        <ViewChips
+          label="نوع رکورد"
+          chips={MERGE_KINDS.map((value) => ({
+            key: value,
+            href: '/admin/merge?kind=' + value,
+            label: MERGE_KIND_FA[value],
+            current: value === kind,
+            testId: 'merge-kind-' + value,
+          }))}
+        />
+      </div>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'ثبت تکراری — ' + MERGE_KIND_FA[kind]}</span></h2></div>
+      <div className="hz-desk">
+        <Panel title={'ثبت تکراری — ' + MERGE_KIND_FA[kind]}>
           {options.length < 2 ? (
-            <div className="mt-lg">
-              <EmptyState
-                title="برای ادغام دست‌کم دو رکورد لازم است"
-                description="در این دایرکتوری هنوز دو رکورد ادغام‌نشده وجود ندارد."
-              />
-            </div>
+            <EmptyState
+              title="برای ادغام دست‌کم دو رکورد لازم است"
+              description="در این دایرکتوری هنوز دو رکورد ادغام‌نشده وجود ندارد."
+            />
           ) : (
             <MergeForm kind={kind} options={options} />
           )}
-        </Card>
+        </Panel>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>رکوردهای ادغام‌شده</span></h2></div>
+        <Panel title="رکوردهای ادغام‌شده" count={merged.length.toLocaleString('fa-IR')}>
           {merged.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="هنوز رکوردی تکراری ثبت نشده است" description="هر ادغام با دلیلش در تاریخچه می‌ماند." />
-            </div>
+            <EmptyState title="هنوز رکوردی تکراری ثبت نشده است" description="هر ادغام با دلیلش در تاریخچه می‌ماند." />
           ) : (
-            <ul className="mt-lg space-y-sm" data-testid="merged-records">
+            <ul className="divide-y divide-border-subtle" data-testid="merged-records">
               {merged.map((row) => (
-                <li
-                  key={row.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
-                  data-testid={'merged-' + row.id}
-                >
+                <li key={row.id} className="flex flex-wrap items-center justify-between gap-sm py-sm" data-testid={'merged-' + row.id}>
                   <span className="text-body-sm">
-                    {row.nameFa}
-                    {row.primary ? ' → ' + row.primary.nameFa : ''}
+                    <span className="text-text-secondary">{row.nameFa}</span>
+                    {row.primary ? (
+                      <>
+                        {' ← '}
+                        <b className="text-label-md">{row.primary.nameFa}</b>
+                      </>
+                    ) : null}
                   </span>
                   {row.primary?.slug ? (
-                    <Link
-                      href={MERGE_KIND_PATH[kind] + row.primary.slug}
-                      className="text-label-md text-text-brand underline underline-offset-4"
-                    >
+                    <Link href={MERGE_KIND_PATH[kind] + row.primary.slug} className="hz-link hz-link--standalone">
                       رکورد اصلی
                     </Link>
                   ) : null}
@@ -88,13 +87,14 @@ export default async function AdminMergePage({ searchParams }: { searchParams: P
               ))}
             </ul>
           )}
-          <div className="mt-lg">
-            <Alert tone="info" title="بازبینی">
-              هر ادغام در <Link href="/admin/audit" className="text-text-brand underline underline-offset-4">تاریخچه</Link> با
-              مقدار قبلی، دلیل و زمانش ثبت شده است.
-            </Alert>
-          </div>
-        </Card>
+          <p className="text-caption text-text-secondary">
+            هر ادغام در{' '}
+            <Link href="/admin/audit" className="hz-link">
+              تاریخچه
+            </Link>{' '}
+            با مقدار قبلی، دلیل و زمانش ثبت شده است.
+          </p>
+        </Panel>
       </div>
     </OpsShell>
   );

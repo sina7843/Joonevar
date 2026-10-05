@@ -9,8 +9,9 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,23 +56,26 @@ export default async function ProvincePage({ params }: Params) {
         origin={origin}
       />
 
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{'استان ' + page.province.nameFa}</h1>
-        <div className="flex flex-wrap gap-xs" data-testid="province-counts">
-          {page.counts.vets > 0 ? <StatusBadge tone="info">{fa(page.counts.vets) + ' دامپزشک'}</StatusBadge> : null}
-          {page.counts.centres > 0 ? <StatusBadge tone="info">{fa(page.counts.centres) + ' مرکز'}</StatusBadge> : null}
-          {page.counts.communities > 0 ? (
-            <StatusBadge tone="info">{fa(page.counts.communities) + ' انجمن و کلاب'}</StatusBadge>
-          ) : null}
-          {page.indexable ? null : <StatusBadge tone="neutral">هنوز رکوردی منتشر نشده است</StatusBadge>}
-        </div>
-      </header>
+      <PageHeader
+        title={'استان ' + page.province.nameFa}
+        meta={[
+          <span key="counts" data-testid="province-counts">
+            {page.indexable
+              ? [
+                  page.counts.vets > 0 ? fa(page.counts.vets) + ' دامپزشک' : null,
+                  page.counts.centres > 0 ? fa(page.counts.centres) + ' مرکز' : null,
+                  page.counts.communities > 0 ? fa(page.counts.communities) + ' انجمن و کلاب' : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')
+              : 'هنوز رکوردی منتشر نشده است'}
+          </span>,
+        ]}
+      />
 
       {page.indexable ? (
-        <section aria-labelledby="province-links-title" className="space-y-sm">
-          <h2 id="province-links-title" className="text-h3">
-            فهرست‌ها با فیلتر این استان
-          </h2>
+        <section aria-labelledby="province-links-title" className="hz-card space-y-md">
+          <SectionHeader id="province-links-title" title="فهرست‌ها با فیلتر این استان" size="sm" />
           <div className="flex flex-wrap gap-sm">
             <ButtonLink tone="secondary" href={'/veterinarians?province=' + page.province.code} data-testid="province-vets-link">
               دامپزشکان این استان
@@ -92,25 +96,26 @@ export default async function ProvincePage({ params }: Params) {
       )}
 
       <section aria-labelledby="province-cities-title">
-        <h2 id="province-cities-title" className="text-h3">
-          شهرها
-        </h2>
+        <SectionHeader id="province-cities-title" title="شهرها" count={fa(page.cities.length)} />
         {page.cities.length === 0 ? (
           <div className="mt-md">
             <EmptyState title="شهری برای این استان ثبت نشده است" description="شهرها را مدیریت همزیست اضافه می‌کند." />
           </div>
         ) : (
-          <ul className="mt-md grid gap-sm sm:grid-cols-2 lg:grid-cols-3" data-testid="city-list">
+          <ul className="hz-cardlist md:grid md:grid-cols-2 lg:grid-cols-3" data-testid="city-list">
             {page.cities.map((entry) => (
               <li key={entry.city.id}>
                 <Link
                   href={entry.path}
-                  className="flex items-center justify-between gap-sm rounded-lg border border-border-default bg-bg-surface px-md py-sm transition-colors hover:border-border-control"
+                  className="hz-cardlist__item hz-card--interactive h-full text-text-primary no-underline"
                   data-testid={'city-' + entry.city.slug}
                 >
-                  <span className="text-label-md">{entry.city.nameFa}</span>
-                  <span className="text-caption text-text-secondary">
-                    {entry.total === 0 ? 'بدون رکورد' : fa(entry.total) + ' رکورد'}
+                  <span className="hz-cardlist__row">
+                    <span className="hz-cardlist__title inline-flex items-center gap-xs">
+                      <Icon name="mapPin" size="xs" className="text-text-brand" />
+                      {entry.city.nameFa}
+                    </span>
+                    <span className="hz-cardlist__meta">{entry.total === 0 ? 'بدون رکورد' : fa(entry.total) + ' رکورد'}</span>
                   </span>
                 </Link>
               </li>
@@ -118,7 +123,8 @@ export default async function ProvincePage({ params }: Params) {
           </ul>
         )}
         {citiesWithRecords.length === 0 && page.cities.length > 0 ? (
-          <p className="mt-sm text-caption text-text-secondary">هنوز هیچ‌کدام از این شهرها رکورد منتشرشده‌ای ندارند.</p>
+          <p className="hz-caption mt-sm">هنوز
+ هیچ‌کدام از این شهرها رکورد منتشرشده‌ای ندارند.</p>
         ) : null}
       </section>
     </div>

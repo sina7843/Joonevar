@@ -6,7 +6,7 @@ import { servicePath } from '../../../../src/services/catalogue.ts';
 import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -30,31 +30,33 @@ export default async function ServicesPage() {
 
   return (
     <div className="space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={origin} />
+        <PageHeader
+          title={TITLE}
+          meta={[
+            'هر خدمت را با پیش‌نیازها، مراحل، مدارک و هزینه ثبت‌شده‌اش بخوانید. همزیست نوبت نمی‌دهد و زمان انجام هیچ خدمتی را تضمین نمی‌کند.',
+          ]}
+        />
+      </div>
 
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="max-w-2xl text-body-md text-text-secondary">
-          هر خدمت را با پیش‌نیازها، مراحل، مدارک و هزینه ثبت‌شده‌اش بخوانید. همزیست نوبت نمی‌دهد و زمان انجام هیچ خدمتی را
-          تضمین نمی‌کند.
-        </p>
-      </header>
-
-      <ul className="grid gap-md sm:grid-cols-2" data-testid="service-list">
-        {views.map(({ service, fee, feeFa }) => (
+      <ul className="grid gap-s20 md:grid-cols-2 lg:grid-cols-3" data-testid="service-list">
+        {views.map(({ service }) => (
           <li key={service.slug}>
             <Link
               href={servicePath(service.slug)}
-              className="flex h-full items-start gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
+              className="hz-card hz-card--interactive hz-service-card h-full"
               data-testid={'service-card-' + service.slug}
             >
-              <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">
-                <Icon name="clipboardText" size="md" />
-              </span>
-              <span className="min-w-0 space-y-xs">
-                <span className="block text-label-lg text-text-primary">{service.titleFa}</span>
-                <span className="block text-body-sm text-text-secondary">{service.summaryFa}</span>
-              </span>
+              {/* No tariff on the public list (DEC-0186): the fee appears where the payment happens. */}
+              <div className="hz-service">
+                <h2 className="hz-service__title">
+                  <Icon name="clipboardText" size="sm" className="text-text-brand" />
+                  {service.titleFa}
+                  <Icon name="arrowRight" size="sm" mirror />
+                </h2>
+                <p className="hz-service__desc">{service.summaryFa}</p>
+              </div>
             </Link>
           </li>
         ))}

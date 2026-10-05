@@ -40,36 +40,39 @@ function Capabilities({
 }) {
   return (
     <fieldset className="space-y-sm">
-      <legend className="text-label-md">امکانات اجباری موجود در این مرکز</legend>
-      <label className="flex items-center gap-sm text-body-sm">
+      <legend className="hz-field__label">امکانات اجباری موجود در این مرکز</legend>
+      <label className="hz-check">
         <input
           type="checkbox"
           name="canImplantMicrochip"
           defaultChecked={implant}
-          className="size-[var(--size-selection-md)]"
           data-testid={'cap-implant' + suffix}
         />
-        کاشت میکروچیپ
+        <span className="hz-check__text">
+          <span className="hz-check__label">کاشت میکروچیپ</span>
+        </span>
       </label>
-      <label className="flex items-center gap-sm text-body-sm">
+      <label className="hz-check">
         <input
           type="checkbox"
           name="canDrawBloodSample"
           defaultChecked={blood}
-          className="size-[var(--size-selection-md)]"
           data-testid={'cap-blood' + suffix}
         />
-        نمونه‌گیری خون
+        <span className="hz-check__text">
+          <span className="hz-check__label">نمونه‌گیری خون</span>
+        </span>
       </label>
-      <label className="flex items-center gap-sm text-body-sm">
+      <label className="hz-check">
         <input
           type="checkbox"
           name="canPregnancyCheck"
           defaultChecked={pregnancy}
-          className="size-[var(--size-selection-md)]"
           data-testid={'cap-pregnancy' + suffix}
         />
-        بررسی بارداری
+        <span className="hz-check__text">
+          <span className="hz-check__label">بررسی بارداری</span>
+        </span>
       </label>
     </fieldset>
   );
@@ -96,7 +99,7 @@ export function VetProfileForm() {
           data-testid="vet-council-code"
         />
         <TextField label="تلفن تماس" name="phone" ltr data-testid="vet-phone" />
-        <Button type="submit" block disabled={pending} data-testid="save-vet">
+        <Button type="submit" disabled={pending} data-testid="save-vet">
           ثبت دامپزشک
         </Button>
       </form>
@@ -147,7 +150,7 @@ export function AddLocationForm({ vets }: { vets: ReadonlyArray<{ accountId: str
           data-testid="location-licence-status"
         />
         <Capabilities />
-        <Button type="submit" block disabled={pending} data-testid="add-location">
+        <Button type="submit" tone="secondary" disabled={pending} data-testid="add-location">
           افزودن مرکز
         </Button>
       </form>
@@ -171,7 +174,7 @@ export function EditLocationForm({
 }) {
   const [state, submit, pending] = useActionState(updateLocationAction, EMPTY);
   return (
-    <form action={submit} className="mt-lg space-y-lg" data-testid={'edit-location-' + location.id}>
+    <form action={submit} className="mt-md space-y-md" data-testid={'edit-location-' + location.id}>
       <input type="hidden" name="locationId" value={location.id} />
       <input type="hidden" name="version" value={location.version} />
       <input type="hidden" name="nameFa" value={location.nameFa} />
@@ -190,17 +193,18 @@ export function EditLocationForm({
         pregnancy={location.canPregnancyCheck}
         suffix={'-' + location.id}
       />
-      <label className="flex items-center gap-sm text-body-sm">
+      <label className="hz-check">
         <input
           type="checkbox"
           name="isActive"
           defaultChecked={location.isActive}
-          className="size-[var(--size-selection-md)]"
           data-testid={'active-' + location.id}
         />
-        این مرکز فعال است
+        <span className="hz-check__text">
+          <span className="hz-check__label">این مرکز فعال است</span>
+        </span>
       </label>
-      <Button tone="secondary" type="submit" block disabled={pending} data-testid={'save-location-' + location.id}>
+      <Button tone="secondary" size="sm" type="submit" disabled={pending} data-testid={'save-location-' + location.id}>
         ذخیره تغییرات
       </Button>
     </form>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { ADMIN_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Panel } from '../../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -12,58 +12,83 @@ import { CentreCreateForm } from '../../../../src/centres/forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
-/** Centres in the superadmin environment — Requirements-Phase-2 §9, §21 (PROMPT-008). */
+/**
+ * Centres in the superadmin environment — Requirements-Phase-2 §9, §21 (PROMPT-008).
+ * DS P11: the create form, then the register as a DataTable (cards below 768).
+ */
 export default async function AdminCentresPage() {
   const guard = await guardRoute('/admin/centres');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const [centres, reference] = await Promise.all([manageableCentres(db(), guard.actor), centreReferenceData(db())]);
 
+  const published = centres.filter((row) => row.centre.publicStatus === 'PUBLISHED').length;
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/centres" nav={ADMIN_NAV}>
-      <div className="space-y-lg">
-        <CentreCreateForm surface="admin" types={reference.types} provinces={reference.provinces} cities={reference.cities} />
+    <OpsShell actor={guard.actor} title="مراکز دامپزشکی" pathname="/admin/centres" nav={ADMIN_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{centres.length.toLocaleString('fa-IR') + ' مرکز ثبت‌شده'}</span>
+        <span className="hz-page-header__meta-item">{published.toLocaleString('fa-IR') + ' منتشرشده'}</span>
+      </p>
+      <CentreCreateForm surface="admin" types={reference.types} provinces={reference.provinces} cities={reference.cities} />
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مراکز ثبت‌شده</span></h2></div>
-          {centres.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="هنوز مرکزی ثبت نشده است" description="با فرم بالا اولین مرکز را ثبت کنید." />
-            </div>
-          ) : (
-            <ul className="mt-lg space-y-sm" data-testid="centre-list">
-              {centres.map((row) => (
-                <li key={row.centre.id}>
-                  <Link
-                    href={'/admin/centres/' + row.centre.id}
-                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
-                    data-testid={'centre-row-' + row.centre.id}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-sm">
-                      <div className="min-w-0">
-                        <p className="text-label-lg">{row.centre.displayNameFa}</p>
-                        <p className="mt-2xs text-caption text-text-secondary">
+      <Panel title="مراکز ثبت‌شده" count={centres.length.toLocaleString('fa-IR')}>
+        {centres.length === 0 ? (
+          <EmptyState title="هنوز مرکزی ثبت نشده است" description="با فرم بالا اولین مرکز را ثبت کنید." />
+        ) : (
+          <div className="hz-table-wrap">
+            <table className="hz-table hz-table--dense hz-table--stack">
+              <caption className="hz-visually-hidden">مراکز ثبت‌شده</caption>
+              <thead>
+                <tr>
+                  <th scope="col">مرکز</th>
+                  <th scope="col">وضعیت صفحه</th>
+                  <th scope="col">مجوز</th>
+                  <th scope="col">مالک</th>
+                </tr>
+              </thead>
+              <tbody data-testid="centre-list">
+                {centres.map((row) => (
+                  <tr key={row.centre.id}>
+                    <td className="hz-table__lead">
+                      <div className="hz-case">
+                        <Link href={'/admin/centres/' + row.centre.id} className="hz-case__name" data-testid={'centre-row-' + row.centre.id}>
+                          {row.centre.displayNameFa}
+                        </Link>
+                        <span className="hz-case__sub">
                           {[row.typeNameFa, row.cityNameFa, row.branchCount > 0 ? row.branchCount.toLocaleString('fa-IR') + ' شعبه' : 'بدون شعبه']
                             .filter(Boolean)
                             .join(' · ')}
-                        </p>
+                        </span>
                       </div>
-                      <div className="flex flex-wrap gap-xs">
-                        <StatusBadge tone={row.centre.publicStatus === 'PUBLISHED' ? 'success' : row.centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-                          {CENTRE_STATUS_FA[row.centre.publicStatus as CentreStatus]}
+                    </td>
+                    <td data-label="وضعیت صفحه">
+                      <StatusBadge
+                        size="sm"
+                        tone={row.centre.publicStatus === 'PUBLISHED' ? 'success' : row.centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}
+                      >
+                        {CENTRE_STATUS_FA[row.centre.publicStatus as CentreStatus]}
+                      </StatusBadge>
+                    </td>
+                    <td data-label="مجوز">
+                      <StatusBadge size="sm" tone={row.centre.licenceStatus === 'VALID' ? 'info' : 'neutral'}>
+                        {'مجوز: ' + LICENCE_STATUS_FA[row.centre.licenceStatus as LicenceStatusName]}
+                      </StatusBadge>
+                    </td>
+                    <td data-label="مالک">
+                      {row.centre.ownerAccountId ? (
+                        <span className="text-body-sm text-text-secondary">دارای مالک</span>
+                      ) : (
+                        <StatusBadge size="sm" tone="warning">
+                          بدون مالک
                         </StatusBadge>
-                        <StatusBadge tone={row.centre.licenceStatus === 'VALID' ? 'info' : 'neutral'}>
-                          {'مجوز: ' + LICENCE_STATUS_FA[row.centre.licenceStatus as LicenceStatusName]}
-                        </StatusBadge>
-                        {row.centre.ownerAccountId ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
     </OpsShell>
   );
 }

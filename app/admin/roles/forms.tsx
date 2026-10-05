@@ -65,7 +65,7 @@ export function MarketplaceRoleForm() {
       <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فعال‌سازی یا تعلیق نقش بازار</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         شش نقش عملیاتی بازار و فروشگاه مستقل‌اند و از هیچ نقش دیگری به ارث نمی‌رسند. هر نقش فقط محیط
-        <bdi className="hz-ltr font-mono"> /market </bdi>
+        <bdi dir="ltr"> /market </bdi>
         را باز می‌کند؛ اختیار هر کار جداگانه سنجیده می‌شود.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="marketplace-role-form">
@@ -102,7 +102,7 @@ export function MarketplaceRoleForm() {
           />
         </div>
         <TextAreaField label="دلیل" name="reason" rows={2} required data-testid="market-role-reason" />
-        <Button type="submit" disabled={pending} data-testid="save-marketplace-role">
+        <Button type="submit" tone="secondary" disabled={pending} data-testid="save-marketplace-role">
           {pending ? 'در حال ثبت…' : 'ثبت'}
         </Button>
       </form>

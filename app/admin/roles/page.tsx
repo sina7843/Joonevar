@@ -1,7 +1,7 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ADMIN_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { Panel } from '../../../src/ui/desk.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -11,7 +11,10 @@ import { ContentRoleForm, MarketplaceRoleForm } from './forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
-/** Content roles — P2-D11 (PROMPT-004). Granted and suspended here, with a reason, never by any other role. */
+/**
+ * Content roles — P2-D11 (PROMPT-004). Granted and suspended here, with a reason, never by any other role.
+ * DS P11 entity config: per role family, the change form beside its holders table.
+ */
 export default async function AdminRolesPage() {
   const guard = await guardRoute('/admin/roles');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
@@ -21,80 +24,106 @@ export default async function AdminRolesPage() {
   ]);
 
   return (
-    <OpsShell actor={guard.actor} title="سوپرادمین" pathname="/admin/roles" nav={ADMIN_NAV}>
-      <div className="space-y-lg">
+    <OpsShell actor={guard.actor} title="نقش‌های محتوا" pathname="/admin/roles" nav={ADMIN_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{holders.length.toLocaleString('fa-IR') + ' نقش محتوا'}</span>
+        <span className="hz-page-header__meta-item">{marketHolders.length.toLocaleString('fa-IR') + ' نقش بازار'}</span>
+        <span className="hz-page-header__meta-item">هر تغییر با دلیل در تاریخچه می‌ماند</span>
+      </p>
+      <div className="grid items-start gap-lg lg:grid-cols-2">
         <ContentRoleForm />
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نویسندگان و ادمین‌های محتوا</span></h2></div>
+        <Panel title="نویسندگان و ادمین‌های محتوا" count={holders.length.toLocaleString('fa-IR')}>
           {holders.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="هنوز نقشی داده نشده است" description="با فرم بالا نقش نویسنده یا ادمین محتوا را فعال کنید." />
-            </div>
+            <EmptyState title="هنوز نقشی داده نشده است" description="با فرم کنار این فهرست نقش نویسنده یا ادمین محتوا را فعال کنید." />
           ) : (
-            <ul className="mt-lg space-y-sm" data-testid="content-role-holders">
-              {holders.map((holder) => (
-                <li
-                  key={holder.accountId + holder.role}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
-                  data-testid={'role-holder-' + holder.mobile + '-' + holder.role}
-                >
-                  <div className="min-w-0">
-                    <p className="text-label-md">
-                      {holder.firstName ? holder.firstName + ' ' + (holder.lastName ?? '') : 'بدون پروفایل'}
-                    </p>
-                    <p className="text-caption text-text-secondary">
-                      <bdi dir="ltr">{holder.mobile}</bdi>
-                    </p>
-                  </div>
-                  <div className="flex gap-xs">
-                    <StatusBadge tone="info">{CONTENT_ROLE_FA[holder.role as ContentRoleName]}</StatusBadge>
-                    <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'}>
-                      {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
-                    </StatusBadge>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="hz-table-wrap">
+              <table className="hz-table hz-table--dense hz-table--stack">
+                <caption className="hz-visually-hidden">نویسندگان و ادمین‌های محتوا</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">دارنده نقش</th>
+                    <th scope="col">نقش</th>
+                    <th scope="col">وضعیت</th>
+                  </tr>
+                </thead>
+                <tbody data-testid="content-role-holders">
+                  {holders.map((holder) => (
+                    <tr key={holder.accountId + holder.role} data-testid={'role-holder-' + holder.mobile + '-' + holder.role}>
+                      <td className="hz-table__lead">
+                        <div className="hz-case">
+                          <span className="hz-case__name">
+                            {holder.firstName ? holder.firstName + ' ' + (holder.lastName ?? '') : 'بدون پروفایل'}
+                          </span>
+                          <bdi className="hz-case__sub" dir="ltr">
+                            {holder.mobile}
+                          </bdi>
+                        </div>
+                      </td>
+                      <td data-label="نقش">
+                        <StatusBadge tone="info" size="sm">
+                          {CONTENT_ROLE_FA[holder.role as ContentRoleName]}
+                        </StatusBadge>
+                      </td>
+                      <td data-label="وضعیت">
+                        <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'} size="sm">
+                          {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
+                        </StatusBadge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </Card>
+        </Panel>
+      </div>
 
+      <div className="grid items-start gap-lg lg:grid-cols-2">
         <MarketplaceRoleForm />
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نقش‌های عملیاتی بازار و فروشگاه</span></h2></div>
+        <Panel title="نقش‌های عملیاتی بازار و فروشگاه" count={marketHolders.length.toLocaleString('fa-IR')}>
           {marketHolders.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState
-                title="هنوز نقشی داده نشده است"
-                description="با فرم بالا یکی از شش نقش عملیاتی بازار را فعال کنید."
-              />
-            </div>
+            <EmptyState title="هنوز نقشی داده نشده است" description="با فرم کنار این فهرست یکی از شش نقش عملیاتی بازار را فعال کنید." />
           ) : (
-            <ul className="mt-lg space-y-sm" data-testid="marketplace-role-holders">
-              {marketHolders.map((holder) => (
-                <li
-                  key={holder.accountId + holder.role}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
-                  data-testid={'market-role-holder-' + holder.mobile + '-' + holder.role}
-                >
-                  <div className="min-w-0">
-                    <p className="text-label-md">
-                      {holder.firstName ? holder.firstName + ' ' + (holder.lastName ?? '') : 'بدون پروفایل'}
-                    </p>
-                    <p className="text-caption text-text-secondary">
-                      <bdi dir="ltr">{holder.mobile}</bdi>
-                    </p>
-                  </div>
-                  <div className="flex gap-xs">
-                    <StatusBadge tone="info">{MARKETPLACE_ROLE_FA[holder.role as MarketplaceRoleName]}</StatusBadge>
-                    <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'}>
-                      {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
-                    </StatusBadge>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="hz-table-wrap">
+              <table className="hz-table hz-table--dense hz-table--stack">
+                <caption className="hz-visually-hidden">نقش‌های عملیاتی بازار و فروشگاه</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">دارنده نقش</th>
+                    <th scope="col">نقش</th>
+                    <th scope="col">وضعیت</th>
+                  </tr>
+                </thead>
+                <tbody data-testid="marketplace-role-holders">
+                  {marketHolders.map((holder) => (
+                    <tr key={holder.accountId + holder.role} data-testid={'market-role-holder-' + holder.mobile + '-' + holder.role}>
+                      <td className="hz-table__lead">
+                        <div className="hz-case">
+                          <span className="hz-case__name">
+                            {holder.firstName ? holder.firstName + ' ' + (holder.lastName ?? '') : 'بدون پروفایل'}
+                          </span>
+                          <bdi className="hz-case__sub" dir="ltr">
+                            {holder.mobile}
+                          </bdi>
+                        </div>
+                      </td>
+                      <td data-label="نقش">
+                        <StatusBadge tone="info" size="sm">
+                          {MARKETPLACE_ROLE_FA[holder.role as MarketplaceRoleName]}
+                        </StatusBadge>
+                      </td>
+                      <td data-label="وضعیت">
+                        <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'} size="sm">
+                          {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
+                        </StatusBadge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </Card>
+        </Panel>
       </div>
     </OpsShell>
   );

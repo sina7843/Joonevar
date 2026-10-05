@@ -10,6 +10,12 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { ButtonLink } from '../../../src/ui/button.tsx';
 import { JsonLdScript } from '../../../src/seo/json-ld.tsx';
 import { faqLd } from '../../../src/seo/structured-data.ts';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { RecordImage } from '../../../src/ui/record-image.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
+import { CtaBand } from '../public-ui.tsx';
+
+const DATE_FA = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { dateStyle: 'long', timeZone: 'Asia/Tehran' });
 
 export const dynamic = 'force-dynamic';
 
@@ -64,38 +70,35 @@ export default async function GuidesPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
+    <div className="space-y-s48 lg:space-y-s64">
       <JsonLdScript data={faqLd({ path: '/guides', questions: FAQ }, origin)} />
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={origin} />
+        <PageHeader title={TITLE} meta={[DESCRIPTION]} />
+      </div>
 
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="max-w-2xl text-body-md text-text-secondary">{DESCRIPTION}</p>
-      </header>
-
-      <section aria-labelledby="guides-services-title" className="space-y-md">
-        <h2 id="guides-services-title" className="text-h4">
-          راهنمای خدمات
-        </h2>
-        <ul className="grid gap-md sm:grid-cols-2" data-testid="guides-services">
+      <section aria-labelledby="guides-services-title">
+        <SectionHeader id="guides-services-title" title="راهنمای خدمات" link={{ href: '/services', label: 'همه خدمات' }} />
+        <ul className="grid gap-s20 md:grid-cols-2 lg:grid-cols-3" data-testid="guides-services">
           {services.map(({ service }) => (
             <li key={service.slug}>
-              <Link
-                href={'/services/' + service.slug}
-                className="block h-full rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
-              >
-                <span className="block text-label-lg text-text-primary">{service.titleFa}</span>
-                <span className="mt-2xs block text-body-sm text-text-secondary">{service.summaryFa}</span>
+              <Link href={'/services/' + service.slug} className="hz-card hz-card--interactive hz-service-card h-full">
+                <div className="hz-service">
+                  <h3 className="hz-service__title">
+                    <Icon name="clipboardText" size="sm" className="text-text-brand" />
+                    {service.titleFa}
+                    <Icon name="arrowRight" size="sm" mirror />
+                  </h3>
+                  <p className="hz-service__desc">{service.summaryFa}</p>
+                </div>
               </Link>
             </li>
           ))}
         </ul>
       </section>
 
-      <section aria-labelledby="guides-tutorials-title" className="space-y-md">
-        <h2 id="guides-tutorials-title" className="text-h4">
-          آموزش‌های منتشرشده
-        </h2>
+      <section aria-labelledby="guides-tutorials-title">
+        <SectionHeader id="guides-tutorials-title" title="آموزش‌های منتشرشده" link={{ href: '/articles', label: 'همه آموزش‌ها' }} />
         {tutorials.items.length === 0 ? (
           <EmptyState
             title="هنوز آموزشی برای کار با سامانه منتشر نشده است"
@@ -107,15 +110,21 @@ export default async function GuidesPage() {
             }
           />
         ) : (
-          <ul className="grid gap-md sm:grid-cols-2" data-testid="guides-tutorials">
+          <ul className="grid gap-s20 md:grid-cols-2 lg:grid-cols-3" data-testid="guides-tutorials">
             {tutorials.items.map((item) => (
               <li key={item.slug}>
-                <Link
-                  href={'/articles/' + item.slug}
-                  className="block h-full rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
-                >
-                  <span className="block text-label-lg text-text-primary">{item.titleFa}</span>
-                  <span className="mt-2xs block text-body-sm text-text-secondary">{item.summaryFa}</span>
+                <Link href={'/articles/' + item.slug} className="hz-article hz-card--interactive h-full" title={item.titleFa}>
+                  <RecordImage variant="3x2" fileId={item.imageFileId} altFa={item.imageAltFa} />
+                  <div className="hz-article__body">
+                    <span className="hz-tag">{item.categoryNameFa ?? 'آموزش'}</span>
+                    <h3 className="hz-article__title">{item.titleFa}</h3>
+                    <p className="hz-article__summary">{item.summaryFa}</p>
+                    <div className="hz-meta">
+                      <time className="hz-meta__item" dateTime={item.publishAt.toISOString()}>
+                        {DATE_FA.format(item.publishAt)}
+                      </time>
+                    </div>
+                  </div>
                 </Link>
               </li>
             ))}
@@ -123,19 +132,19 @@ export default async function GuidesPage() {
         )}
       </section>
 
-      <section aria-labelledby="guides-faq-title" className="space-y-md">
-        <h2 id="guides-faq-title" className="text-h4">
-          پرسش‌های پرتکرار
-        </h2>
-        <dl className="space-y-md" data-testid="guides-faq">
+      <section aria-labelledby="guides-faq-title" className="max-w-[var(--container-reading)]">
+        <SectionHeader id="guides-faq-title" title="پرسش‌های پرتکرار" />
+        <dl className="hz-card divide-y divide-border-subtle" data-testid="guides-faq">
           {FAQ.map((entry) => (
-            <div key={entry.question} className="rounded-xl border border-border-default bg-bg-surface p-lg">
+            <div key={entry.question} className="space-y-xs py-md first:pt-0 last:pb-0">
               <dt className="text-label-lg">{entry.question}</dt>
-              <dd className="mt-xs text-body-sm text-text-secondary">{entry.answer}</dd>
+              <dd className="hz-body-sm text-text-secondary">{entry.answer}</dd>
             </div>
           ))}
         </dl>
       </section>
+
+      <CtaBand id="guides-cta-title" />
     </div>
   );
 }

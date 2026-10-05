@@ -7,6 +7,8 @@ import { VerificationResult } from '../../../../src/verification/result.tsx';
 import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,27 +36,24 @@ export default async function VerifyByCodePage({ params }: { params: Promise<{ c
   });
 
   return (
-    <div className="mx-auto max-w-3xl space-y-xl">
-      <Breadcrumbs
-        items={[
-          { name: 'خانه', path: '/' },
-          { name: TITLE, path: '/verify' },
-        ]}
-        origin={origin}
-      />
-
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="text-body-md text-text-secondary">نتیجه استعلام کدی که با QR باز شده است.</p>
-      </header>
+    <div className="mx-auto max-w-[var(--container-reading)] space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs
+          items={[
+            { name: 'خانه', path: '/' },
+            { name: TITLE, path: '/verify' },
+          ]}
+          origin={origin}
+        />
+        <PageHeader title={TITLE} meta={['نتیجه استعلام کدی که با QR باز شده است.']} />
+      </div>
 
       <VerificationResult answer={answer} />
 
-      <p className="text-body-sm">
-        <Link href="/verify" className="text-text-brand underline underline-offset-4" data-testid="verify-another">
-          استعلام کد دیگر
-        </Link>
-      </p>
+      <Link href="/verify" className="hz-link hz-link--standalone" data-testid="verify-another">
+        استعلام کد دیگر
+        <Icon name="arrowRight" size="xs" mirror />
+      </Link>
     </div>
   );
 }

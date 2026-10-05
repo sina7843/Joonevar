@@ -5,6 +5,9 @@ import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { statusOf } from '../../../../src/ui/status-dictionary.ts';
+import { Icon } from '../../../../src/ui/icon.tsx';
 import { MEMBERSHIP_STATUS_FA } from '../../../../src/billing/membership-model.ts';
 import { CLUB_LIFECYCLE_FA } from '../../../../src/clubs/model.ts';
 
@@ -82,42 +85,46 @@ const CLUB_MEANING: Record<(typeof CLUB_ORDER)[number], string> = {
  */
 export default function AssociationStatusPage() {
   const { origin } = site();
+  // Tones come from the shared dictionary (one tone per key for every viewer).
+  const tone = (key: string) => statusOf(key)?.tone ?? 'neutral';
 
   return (
-    <div className="mx-auto max-w-3xl space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
+    <div className="mx-auto max-w-[var(--container-reading)] space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={origin} />
+        <PageHeader title={TITLE} meta={[DESCRIPTION]} />
+      </div>
 
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="text-body-md text-text-secondary">{DESCRIPTION}</p>
-      </header>
-
-      <section aria-labelledby="status-membership-title" className="space-y-md">
-        <h2 id="status-membership-title" className="text-h4">
-          وضعیت‌های عضویت انجمن
-        </h2>
-        <dl className="space-y-sm" data-testid="status-membership">
+      <section aria-labelledby="status-membership-title" className="hz-card space-y-md">
+        <SectionHeader id="status-membership-title" title="وضعیت‌های عضویت انجمن" size="sm" />
+        <dl className="divide-y divide-border-subtle" data-testid="status-membership">
           {MEMBERSHIP.map((entry) => (
-            <div key={entry.status} className="rounded-xl border border-border-default bg-bg-surface p-lg">
-              <dt className="text-label-lg">{MEMBERSHIP_STATUS_FA[entry.status]}</dt>
-              <dd className="mt-xs text-body-sm text-text-secondary">{entry.meaning}</dd>
+            <div key={entry.status} className="space-y-xs py-md first:pt-0 last:pb-0">
+              <dt>
+                <StatusBadge tone={tone(entry.status)}>{MEMBERSHIP_STATUS_FA[entry.status]}</StatusBadge>
+              </dt>
+              <dd className="hz-body-sm text-text-secondary">{entry.meaning}</dd>
             </div>
           ))}
         </dl>
-        <Link href="/association/membership" className="inline-block text-body-sm text-text-brand">
+        <Link href="/association/membership" className="hz-link hz-link--standalone hz-body-sm">
           شرایط و مسیر عضویت
+          <Icon name="arrowRight" size="xs" mirror />
         </Link>
       </section>
 
-      <section aria-labelledby="status-trusted-title" className="space-y-md">
-        <h2 id="status-trusted-title" className="text-h4">
-          مراحل دامپزشک معتمد
-        </h2>
-        <ol className="space-y-sm" data-testid="status-trusted">
+      <section aria-labelledby="status-trusted-title" className="hz-card space-y-md">
+        <SectionHeader id="status-trusted-title" title="مراحل دامپزشک معتمد" size="sm" />
+        <ol className="space-y-lg" data-testid="status-trusted">
           {TRUSTED_STEPS.map((step, index) => (
-            <li key={step.title} className="rounded-xl border border-border-default bg-bg-surface p-lg">
-              <p className="text-label-lg">{(index + 1).toLocaleString('fa-IR') + '. ' + step.title}</p>
-              <p className="mt-xs text-body-sm text-text-secondary">{step.body}</p>
+            <li key={step.title} className="flex gap-md">
+              <span className="hz-avatar shrink-0" aria-hidden="true">
+                {(index + 1).toLocaleString('fa-IR')}
+              </span>
+              <span className="min-w-0">
+                <span className="block text-label-lg">{step.title}</span>
+                <span className="hz-body-sm mt-xs block text-text-secondary">{step.body}</span>
+              </span>
             </li>
           ))}
         </ol>
@@ -126,24 +133,21 @@ export default function AssociationStatusPage() {
         </ButtonLink>
       </section>
 
-      <section aria-labelledby="status-club-title" className="space-y-md">
-        <h2 id="status-club-title" className="text-h4">
-          چرخه یک کلاب
-        </h2>
-        <dl className="space-y-sm" data-testid="status-club">
+      <section aria-labelledby="status-club-title" className="hz-card space-y-md">
+        <SectionHeader id="status-club-title" title="چرخه یک کلاب" size="sm" />
+        <dl className="divide-y divide-border-subtle" data-testid="status-club">
           {CLUB_ORDER.map((state) => (
-            <div key={state} className="rounded-xl border border-border-default bg-bg-surface p-lg">
-              <dt className="flex flex-wrap items-center gap-sm text-label-lg">
-                <StatusBadge tone={state === 'ACTIVE' ? 'success' : state === 'SUSPENDED' || state === 'REJECTED' ? 'error' : 'neutral'}>
-                  {CLUB_LIFECYCLE_FA[state]}
-                </StatusBadge>
+            <div key={state} className="space-y-xs py-md first:pt-0 last:pb-0">
+              <dt>
+                <StatusBadge tone={tone(state)}>{CLUB_LIFECYCLE_FA[state]}</StatusBadge>
               </dt>
-              <dd className="mt-xs text-body-sm text-text-secondary">{CLUB_MEANING[state]}</dd>
+              <dd className="hz-body-sm text-text-secondary">{CLUB_MEANING[state]}</dd>
             </div>
           ))}
         </dl>
-        <Link href="/clubs" className="inline-block text-body-sm text-text-brand">
+        <Link href="/clubs" className="hz-link hz-link--standalone hz-body-sm">
           فهرست کلاب‌ها
+          <Icon name="arrowRight" size="xs" mirror />
         </Link>
       </section>
     </div>

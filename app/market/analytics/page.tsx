@@ -1,7 +1,7 @@
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { Card } from '../../../src/ui/card.tsx';
+import { Panel, StatTiles } from '../../../src/ui/desk.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { analyticsFor } from '../../../src/analytics/service.ts';
 import { cellFa, type RedactedBreakdown } from '../../../src/analytics/metrics.ts';
@@ -21,22 +21,25 @@ function Breakdown({
   testId: string;
 }) {
   return (
-    <div>
-      <h3 className="text-label-sm">{titleFa}</h3>
+    <div className="min-w-0">
+      <h3 className="text-label-md">{titleFa}</h3>
       {rows.length === 0 ? (
         <p className="mt-2xs text-caption text-text-secondary">—</p>
       ) : (
-        <ul className="mt-2xs space-y-2xs text-body-sm" data-testid={testId}>
+        <dl className="hz-kv mt-2xs" data-testid={testId}>
           {rows.map((row) => (
-            <li key={row.labelFa}>
-              {row.labelFa}: {cellFa(row)}
-            </li>
+            <div key={row.labelFa} className="hz-kv__row">
+              <dt className="hz-kv__key">{row.labelFa}</dt>
+              <dd className="hz-kv__value">{cellFa(row)}</dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       )}
     </div>
   );
 }
+
+const toman = (value: number | bigint): string => fa(value);
 
 /**
  * What the marketplace did — PROMPT-013.
@@ -45,6 +48,9 @@ function Breakdown({
  * person reads as «کمتر از حد نمایش» rather than as a number, because a
  * province with one sale in it is not a statistic — it is a fact about
  * somebody, and this screen's capability is not the one that may see it.
+ *
+ * DS P09 home shape for volume reports: StatTile rows per area under a small
+ * SectionHeader, breakdowns as KeyValue lists.
  */
 export default async function AnalyticsPage({
   searchParams,
@@ -58,126 +64,106 @@ export default async function AnalyticsPage({
 
   return (
     <OpsShell actor={guard.actor} title="گزارش‌ها" nav={marketNav(guard.actor)} pathname="/market/analytics">
-      <div className="space-y-lg p-lg">
-        <Alert tone="info" title="این صفحه فقط جمع و شمار نشان می‌دهد">
-          <span data-testid="analytics-privacy-note">
-            تفکیکی که کمتر از {fa(view.minimumCohort)} رکورد داشته باشد با «کمتر از حد نمایش» نشان داده می‌شود؛
-            نام، شماره و نشانی در این صفحه نمی‌آید.
-          </span>
-        </Alert>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{'بازه: ' + fa(days) + ' روز گذشته'}</span>
+        <span className="hz-page-header__meta-item">فقط جمع و شمار</span>
+      </p>
+      <Alert tone="info" title="این صفحه فقط جمع و شمار نشان می‌دهد">
+        <span data-testid="analytics-privacy-note">
+          تفکیکی که کمتر از {fa(view.minimumCohort)} رکورد داشته باشد با «کمتر از حد نمایش» نشان داده می‌شود؛
+          نام، شماره و نشانی در این صفحه نمی‌آید.
+        </span>
+      </Alert>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فروشگاه کالا</span></h2></div>
-          <dl className="mt-md grid gap-sm md:grid-cols-4" data-testid="analytics-shop">
-            <div>
-              <dt className="text-caption text-text-secondary">ارزش سفارش‌ها</dt>
-              <dd className="text-label-lg" data-testid="analytics-gmv">
-                {fa(view.shop.gmv.totalToman)} تومان
-              </dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">تعداد سفارش</dt>
-              <dd className="text-label-lg" data-testid="analytics-orders">
-                {fa(view.shop.gmv.count)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">میانگین سفارش</dt>
-              <dd className="text-label-lg">{fa(view.shop.gmv.averageToman)} تومان</dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">کارمزد همزیست</dt>
-              <dd className="text-label-lg" data-testid="analytics-commission">
-                {fa(view.shop.commissionToman)} تومان
-              </dd>
-            </div>
-          </dl>
-          <p className="mt-md text-body-sm" data-testid="analytics-returns">
-            مرجوعی: {fa(view.shop.returns.count)} — بازپرداخت {fa(view.shop.returns.refundedToman)} تومان — نرخ{' '}
-            {pct(view.shop.returns.rate)} از تحویل‌شده‌ها
-          </p>
-          <div className="mt-md">
-            <Breakdown titleFa="وضعیت زیرسفارش‌ها" rows={view.shop.subOrders} testId="analytics-suborders" />
-          </div>
-        </Card>
+      <Panel title="فروشگاه کالا" aside="مبلغ‌ها به تومان">
+        <div data-testid="analytics-shop">
+          <StatTiles
+            tiles={[
+              { label: 'ارزش سفارش‌ها', value: toman(view.shop.gmv.totalToman), unit: 'تومان', valueTestId: 'analytics-gmv' },
+              { label: 'تعداد سفارش', value: fa(view.shop.gmv.count), valueTestId: 'analytics-orders' },
+              { label: 'میانگین سفارش', value: toman(view.shop.gmv.averageToman), unit: 'تومان' },
+              { label: 'کارمزد همزیست', value: toman(view.shop.commissionToman), unit: 'تومان', valueTestId: 'analytics-commission' },
+            ]}
+          />
+        </div>
+        <p className="text-body-sm" data-testid="analytics-returns">
+          مرجوعی: {fa(view.shop.returns.count)} — بازپرداخت {fa(view.shop.returns.refundedToman)} تومان — نرخ{' '}
+          {pct(view.shop.returns.rate)} از تحویل‌شده‌ها
+        </p>
+        <Breakdown titleFa="وضعیت زیرسفارش‌ها" rows={view.shop.subOrders} testId="analytics-suborders" />
+      </Panel>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بازار حیوان</span></h2></div>
-          <dl className="mt-md grid gap-sm md:grid-cols-3" data-testid="analytics-animals">
-            <div>
-              <dt className="text-caption text-text-secondary">ارزش معامله‌های کامل‌شده</dt>
-              <dd className="text-label-lg" data-testid="analytics-deals">
-                {fa(view.animals.deals.totalToman)} تومان
-              </dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">بیعانه‌های دریافتی</dt>
-              <dd className="text-label-lg">{fa(view.animals.depositsToman)} تومان</dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">بازپرداخت‌ها</dt>
-              <dd className="text-label-lg">{fa(view.animals.refundsToman)} تومان</dd>
-            </div>
-          </dl>
+      <Panel title="بازار حیوان" aside="مبلغ‌ها به تومان">
+        <div data-testid="analytics-animals">
+          <StatTiles
+            tiles={[
+              { label: 'ارزش معامله‌های کامل‌شده', value: toman(view.animals.deals.totalToman), unit: 'تومان', valueTestId: 'analytics-deals' },
+              { label: 'بیعانه‌های دریافتی', value: toman(view.animals.depositsToman), unit: 'تومان' },
+              { label: 'بازپرداخت‌ها', value: toman(view.animals.refundsToman), unit: 'تومان' },
+            ]}
+          />
+        </div>
 
-          <h3 className="mt-lg text-label-sm">قیف معامله</h3>
-          <ul className="mt-2xs space-y-2xs text-body-sm" data-testid="analytics-funnel">
+        <div>
+          <h3 className="text-label-md">قیف معامله</h3>
+          <dl className="hz-kv mt-2xs" data-testid="analytics-funnel">
             {view.animals.funnel.map((step) => (
-              <li key={step.labelFa}>
-                {step.labelFa}: {fa(step.count)}
-                {step.ofPrevious !== null ? ' — ' + pct(step.ofPrevious) + ' از مرحله قبل' : ''}
-                {step.ofTop !== null ? ' — ' + pct(step.ofTop) + ' از آغاز' : ''}
-              </li>
+              <div key={step.labelFa} className="hz-kv__row">
+                <dt className="hz-kv__key">{step.labelFa}</dt>
+                <dd className="hz-kv__value">
+                  {fa(step.count)}
+                  {step.ofPrevious !== null ? ' — ' + pct(step.ofPrevious) + ' از مرحله قبل' : ''}
+                  {step.ofTop !== null ? ' — ' + pct(step.ofTop) + ' از آغاز' : ''}
+                </dd>
+              </div>
             ))}
-          </ul>
+          </dl>
+        </div>
 
-          <div className="mt-lg grid gap-lg md:grid-cols-3">
-            <Breakdown titleFa="به تفکیک گونه" rows={view.animals.bySpecies} testId="analytics-species" />
-            <Breakdown titleFa="به تفکیک نژاد" rows={view.animals.byBreed} testId="analytics-breed" />
-            <Breakdown titleFa="به تفکیک استان" rows={view.animals.byProvince} testId="analytics-province" />
-          </div>
-        </Card>
+        <div className="grid gap-lg md:grid-cols-3">
+          <Breakdown titleFa="به تفکیک گونه" rows={view.animals.bySpecies} testId="analytics-species" />
+          <Breakdown titleFa="به تفکیک نژاد" rows={view.animals.byBreed} testId="analytics-breed" />
+          <Breakdown titleFa="به تفکیک استان" rows={view.animals.byProvince} testId="analytics-province" />
+        </div>
+      </Panel>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گزارش‌ها و moderation</span></h2></div>
-          <div className="mt-md">
-            <Breakdown titleFa="نتیجه گزارش‌ها" rows={view.moderation} testId="analytics-reports" />
-          </div>
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مالی فروشندگان</span></h2></div>
-          <dl className="mt-md grid gap-sm md:grid-cols-4" data-testid="analytics-balances">
-            <div>
-              <dt className="text-caption text-text-secondary">در جریان</dt>
-              <dd className="text-label-lg">{fa(view.sellers.balances.pendingToman)} تومان</dd>
+      <div className="grid items-start gap-lg lg:grid-cols-2">
+        <Panel title="مالی فروشندگان" aside="مبلغ‌ها به تومان">
+          <dl className="hz-kv" data-testid="analytics-balances">
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">در جریان</dt>
+              <dd className="hz-kv__value">{fa(view.sellers.balances.pendingToman)} تومان</dd>
             </div>
-            <div>
-              <dt className="text-caption text-text-secondary">نگه‌داشته</dt>
-              <dd className="text-label-lg">{fa(view.sellers.balances.heldToman)} تومان</dd>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">نگه‌داشته</dt>
+              <dd className="hz-kv__value">{fa(view.sellers.balances.heldToman)} تومان</dd>
             </div>
-            <div>
-              <dt className="text-caption text-text-secondary">قابل تسویه</dt>
-              <dd className="text-label-lg">{fa(view.sellers.balances.availableToman)} تومان</dd>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">قابل تسویه</dt>
+              <dd className="hz-kv__value">{fa(view.sellers.balances.availableToman)} تومان</dd>
             </div>
-            <div>
-              <dt className="text-caption text-text-secondary">بدهی</dt>
-              <dd className="text-label-lg">{fa(view.sellers.balances.debtToman)} تومان</dd>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">بدهی</dt>
+              <dd className="hz-kv__value">{fa(view.sellers.balances.debtToman)} تومان</dd>
             </div>
           </dl>
-          <p className="mt-md text-body-sm" data-testid="analytics-settlements">
+          <p className="text-body-sm" data-testid="analytics-settlements">
             تسویه‌های واریزشده: {fa(view.sellers.settlements.count)} — جمع {fa(view.sellers.settlements.paidToman)}{' '}
             تومان
           </p>
-        </Card>
+        </Panel>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تبلیغ</span></h2></div>
-          <p className="mt-sm text-body-sm" data-testid="analytics-advertising">
-            بسته‌های خریداری‌شده: {fa(view.advertising.promotions)} — فعال در این لحظه:{' '}
-            {fa(view.advertising.activeNow)}
-          </p>
-        </Card>
+        <div className="space-y-lg">
+          <Panel title="گزارش‌ها و moderation">
+            <Breakdown titleFa="نتیجه گزارش‌ها" rows={view.moderation} testId="analytics-reports" />
+          </Panel>
+          <Panel title="تبلیغ">
+            <p className="text-body-sm" data-testid="analytics-advertising">
+              بسته‌های خریداری‌شده: {fa(view.advertising.promotions)} — فعال در این لحظه:{' '}
+              {fa(view.advertising.activeNow)}
+            </p>
+          </Panel>
+        </div>
       </div>
     </OpsShell>
   );

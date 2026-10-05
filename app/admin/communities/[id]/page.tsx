@@ -22,11 +22,11 @@ export default async function AdminCommunityPage({ params }: { params: Promise<{
   const posts = data.posting === null ? await communityPosts(db(), guard.actor, id) : [];
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/communities" nav={ADMIN_NAV}>
+    <OpsShell actor={guard.actor} title="انجمن و کلاب" pathname="/admin/communities" nav={ADMIN_NAV}>
+      <Link href="/admin/communities" className="hz-link hz-link--standalone hz-hide-md">
+        بازگشت به انجمن‌ها و کلاب‌ها
+      </Link>
       <div className="space-y-lg">
-        <Link href="/admin/communities" className="text-label-md text-text-brand underline underline-offset-4">
-          بازگشت به انجمن‌ها و کلاب‌ها
-        </Link>
         <CommunityEditor data={data} surface="admin" posts={posts} />
       </div>
     </OpsShell>

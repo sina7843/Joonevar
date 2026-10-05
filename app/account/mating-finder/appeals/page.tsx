@@ -1,7 +1,8 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -20,36 +21,58 @@ export default async function FinderAppealsPage() {
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const rows = await myFinderDecisions(db(), guard.actor);
   return (
-    <PublicShell actor={guard.actor} title="تصمیم‌های مدیریت و اعتراض" pathname="/account/mating-finder">
+    <PublicShell
+      actor={guard.actor}
+      title="تصمیم‌های مدیریت و اعتراض"
+      pathname="/account/mating-finder"
+      header={
+        <PageHeader
+          title="تصمیم‌های مدیریت و اعتراض"
+          back={{ href: '/account/mating-finder' }}
+          meta={['هر تصمیم دلیل دارد و می‌توانید یک بار به آن اعتراض کنید. اعتراض را کسی جز تصمیم‌گیرنده اول بررسی می‌کند.']}
+        />
+      }
+    >
       <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">تصمیم‌های مدیریت درباره جفت‌یابی</h2>
-          <p className="mt-xs text-caption text-text-secondary">
-            هر تصمیم دلیل دارد و می‌توانید یک بار به آن اعتراض کنید. اعتراض را کسی جز تصمیم‌گیرنده اول بررسی می‌کند.
-          </p>
-        </Card>
         {rows.length === 0 ? (
           <EmptyState title="تصمیمی درباره شما ثبت نشده است" description="اگر گزارشی درباره پروفایل یا پیام شما به اقدام برسد، اینجا دیده می‌شود." />
         ) : (
-          rows.map(({ report, appeal }) => (
-            <Card key={report.id}>
-              <div data-testid={'finder-decision-' + report.id}>
-                <p className="text-label-md">{TARGET_FA[report.targetKind] ?? report.targetKind}</p>
-                <p className="mt-xs text-body-sm">{report.decisionReason}</p>
-                <p className="mt-xs text-caption text-text-secondary">{report.decidedAt ? formatInstantFa(report.decidedAt) : ''}</p>
-                {appeal ? (
-                  <div className="mt-sm">
+          <ul className="hz-cardlist">
+            {rows.map(({ report, appeal }) => (
+              <li key={report.id} className="hz-cardlist__item" data-testid={'finder-decision-' + report.id}>
+                <div className="hz-cardlist__row">
+                  <span className="hz-cardlist__title">{TARGET_FA[report.targetKind] ?? report.targetKind}</span>
+                  {appeal ? (
                     <StatusBadge tone={appeal.status === 'OVERTURNED' ? 'success' : appeal.status === 'OPEN' ? 'info' : 'neutral'}>
                       <span data-testid="finder-appeal-status">{APPEAL_FA[appeal.status]}</span>
                     </StatusBadge>
-                    {appeal.decisionReasonFa ? <p className="mt-xs text-body-sm">{appeal.decisionReasonFa}</p> : null}
-                  </div>
+                  ) : null}
+                </div>
+                <p className="hz-body-sm">
+                  <span className="text-text-secondary">دلیل تصمیم: </span>
+                  {report.decisionReason}
+                </p>
+                {report.decidedAt ? (
+                  <span className="hz-cardlist__meta inline-flex items-center gap-xs">
+                    <Icon name="calendarBlank" size="xs" />
+                    {formatInstantFa(report.decidedAt)}
+                  </span>
+                ) : null}
+                {appeal ? (
+                  appeal.decisionReasonFa ? (
+                    <p className="hz-body-sm border-t border-border-subtle pt-sm">
+                      <span className="text-text-secondary">پاسخ اعتراض: </span>
+                      {appeal.decisionReasonFa}
+                    </p>
+                  ) : null
                 ) : (
-                  <AppealForm reportId={report.id} />
+                  <div className="border-t border-border-subtle pt-sm">
+                    <AppealForm reportId={report.id} />
+                  </div>
                 )}
-              </div>
-            </Card>
-          ))
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </PublicShell>
