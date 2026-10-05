@@ -1,7 +1,7 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { Panel } from '../../../src/ui/desk.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -40,74 +40,78 @@ export default async function SellerPlansPage() {
 
   return (
     <OpsShell actor={guard.actor} title="پلن‌های فروشندگی" nav={marketNav(guard.actor)} pathname="/market/plans">
-      <div className="space-y-lg">
-        <Alert tone="info" title="انتشار پلن، تعرفه نمی‌سازد">
-          <span data-testid="plan-page-note">
-            تعرفه هر پلن در کلید تنظیمات خودش ثبت می‌شود و خالی بودن آن یعنی «تعیین‌نشده»، نه رایگان. دوره
-            فروشگاه فقط با پرداخت تأییدشده روی سرور آغاز می‌شود و تغییر نسخه پلن، دوره‌های فروخته‌شده را
-            تغییر نمی‌دهد.
-          </span>
-        </Alert>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{live.length.toLocaleString('fa-IR') + ' پلن قابل خرید'}</span>
+        <span className="hz-page-header__meta-item">هر انتشار نسخه تازه می‌سازد</span>
+      </p>
+      <Alert tone="info" title="انتشار پلن، تعرفه نمی‌سازد">
+        <span data-testid="plan-page-note">
+          تعرفه هر پلن در کلید تنظیمات خودش ثبت می‌شود و خالی بودن آن یعنی «تعیین‌نشده»، نه رایگان. دوره
+          فروشگاه فقط با پرداخت تأییدشده روی سرور آغاز می‌شود و تغییر نسخه پلن، دوره‌های فروخته‌شده را
+          تغییر نمی‌دهد.
+        </span>
+      </Alert>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پلن‌های قابل خرید</span></h2></div>
-          {live.length === 0 ? (
-            <p className="mt-sm text-caption text-text-secondary" data-testid="live-plans-empty">
-              هنوز پلنی منتشر نشده است.
-            </p>
-          ) : (
-            <ul className="mt-lg space-y-sm" data-testid="live-plans">
-              {live.map((plan) => (
-                <li key={plan.id} className="flex flex-wrap items-center gap-sm text-body-sm">
-                  <StatusBadge tone="success">{plan.code}</StatusBadge>
-                  <span>{plan.labelFa}</span>
-                  <span className="text-caption text-text-secondary">نسخه {plan.version.toLocaleString('fa-IR')}</span>
-                  <span className="text-caption text-text-secondary">
-                    {plan.durationDays.toLocaleString('fa-IR')} روز
+      <Panel title="پلن‌های قابل خرید" count={live.length.toLocaleString('fa-IR')} aside="مبلغ‌ها به تومان">
+        {live.length === 0 ? (
+          <p className="text-caption text-text-secondary" data-testid="live-plans-empty">
+            هنوز پلنی منتشر نشده است.
+          </p>
+        ) : (
+          <ul data-testid="live-plans">
+            {live.map((plan) => (
+              <li key={plan.id} className="hz-setting">
+                <div className="hz-setting__label">
+                  <span className="hz-setting__name">{plan.labelFa}</span>
+                  <bdi className="hz-setting__key" dir="ltr">
+                    {plan.code}
+                  </bdi>
+                  <span className="hz-setting__hint">
+                    {'نسخه ' + plan.version.toLocaleString('fa-IR') + ' · ' + plan.durationDays.toLocaleString('fa-IR') + ' روز · سقف محصول: ' +
+                      (plan.productLimit === null ? 'بدون سقف' : plan.productLimit.toLocaleString('fa-IR')) + ' · کارمزد ' + percentFa(plan.commissionPercentBp)}
                   </span>
-                  <span className="text-caption text-text-secondary">
-                    سقف محصول: {plan.productLimit === null ? 'بدون سقف' : plan.productLimit.toLocaleString('fa-IR')}
+                </div>
+                <div className="hz-setting__end">
+                  <span className={plan.priceToman === null ? 'hz-setting__value hz-setting__value--unset' : 'hz-setting__value'}>
+                    {plan.priceToman === null ? 'تعیین‌نشده' : plan.priceToman.toLocaleString('fa-IR') + ' تومان'}
                   </span>
-                  <span className="text-caption text-text-secondary">کارمزد {percentFa(plan.commissionPercentBp)}</span>
-                  <span className="text-caption text-text-secondary">
-                    تعرفه: {plan.priceToman === null ? 'تعیین‌نشده' : plan.priceToman.toLocaleString('fa-IR') + ' تومان'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتشار نسخه تازه</span></h2></div>
-          <div className="mt-lg">
-            <SellerPlanForm />
-          </div>
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌ها</span></h2></div>
+      <div className="hz-desk">
+        <Panel title="تاریخچه نسخه‌ها" count={history.length.toLocaleString('fa-IR')}>
           {history.length === 0 ? (
-            <div className="mt-lg" data-testid="plan-history-empty">
+            <div data-testid="plan-history-empty">
               <EmptyState title="هنوز نسخه‌ای منتشر نشده است" description="هر نسخه‌ای که منتشر شود اینجا می‌ماند." />
             </div>
           ) : (
-            <ul className="mt-lg space-y-sm" data-testid="plan-history">
+            <ul data-testid="plan-history">
               {history.map((plan) => (
-                <li key={plan.id} className="flex flex-wrap items-center gap-sm text-body-sm">
-                  <StatusBadge tone={plan.status === 'PUBLISHED' ? 'success' : 'neutral'}>
-                    {plan.status === 'PUBLISHED' ? 'منتشرشده' : plan.status === 'ARCHIVED' ? 'بایگانی' : 'پیش‌نویس'}
-                  </StatusBadge>
-                  <span>{plan.labelFa}</span>
-                  <span className="text-caption text-text-secondary">
-                    {plan.code} — نسخه {plan.version.toLocaleString('fa-IR')}
-                  </span>
-                  <span className="text-caption text-text-secondary">{when(plan.publishedAt)}</span>
+                <li key={plan.id} className="hz-setting">
+                  <div className="hz-setting__label">
+                    <span className="hz-setting__name">{plan.labelFa}</span>
+                    <span className="hz-setting__hint">
+                      <bdi dir="ltr">{plan.code}</bdi>
+                      {' — نسخه ' + plan.version.toLocaleString('fa-IR') + ' · ' + when(plan.publishedAt)}
+                    </span>
+                  </div>
+                  <div className="hz-setting__end">
+                    <StatusBadge tone={plan.status === 'PUBLISHED' ? 'success' : 'neutral'} size="sm">
+                      {plan.status === 'PUBLISHED' ? 'منتشرشده' : plan.status === 'ARCHIVED' ? 'بایگانی' : 'پیش‌نویس'}
+                    </StatusBadge>
+                  </div>
                 </li>
               ))}
             </ul>
           )}
-        </Card>
+        </Panel>
+        <Panel title="انتشار نسخه تازه">
+          <SellerPlanForm />
+        </Panel>
       </div>
     </OpsShell>
   );

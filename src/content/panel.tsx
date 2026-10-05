@@ -3,7 +3,11 @@ import { notFound } from 'next/navigation';
 import { db } from '../db/client.ts';
 import type { Actor } from '../authz/actor.ts';
 import { OpsShell, AUTHOR_NAV, CONTENT_NAV } from '../ui/shell.tsx';
-import { Card } from '../ui/card.tsx';
+import { Icon } from '../ui/icon.tsx';
+import { DeskHead, Panel } from '../ui/desk.tsx';
+import { Pagination } from '../ui/pagination.tsx';
+import { SelectField } from '../ui/field.tsx';
+import { Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { EmptyState } from '../ui/states.tsx';
@@ -32,7 +36,9 @@ import {
 } from './model.ts';
 import { ContentFieldsForm, ContentImageForm, ContentStatusForm, CreateContentForm, RestoreRevisionButton } from './editor.tsx';
 
-const TITLE: Record<ContentPanel, string> = { author: 'محیط نویسنده', content: 'ادمین محتوا' };
+/** Shell titles follow the nav labels, so the h1 names the page (one h1, rendered by the shell). */
+const TITLE: Record<ContentPanel, string> = { author: 'نوشته‌های من', content: 'همه محتوا' };
+const NEW_TITLE: Record<ContentPanel, string> = { author: 'نوشته تازه', content: 'محتوای تازه' };
 const NAV = { author: AUTHOR_NAV, content: CONTENT_NAV } as const;
 
 const STATE_TONE: Record<PublicState, StatusTone> = {
@@ -73,99 +79,119 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
 
   return (
     <OpsShell actor={actor} title={TITLE[panel]} pathname={base} nav={NAV[panel]}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="flex flex-wrap items-center justify-between gap-md">
-            <div>
-              <h1 className="text-h3">{panel === 'author' ? 'نوشته‌های من' : 'همه محتوا'}</h1>
-              <p className="text-body-sm text-text-secondary">
-                {panel === 'author'
-                  ? 'آموزش و خبری که نوشته‌اید، با وضعیت انتشار هرکدام.'
-                  : 'همه آموزش‌ها، خبرها و اطلاعیه‌ها، از هر نویسنده.'}
-              </p>
-            </div>
-            <ButtonLink href={base + '/new'} data-testid="new-content-link">
-              نوشته تازه
-            </ButtonLink>
+      <div className="flex flex-wrap items-center justify-between gap-sm">
+        <p className="hz-page-header__meta">
+          <span className="hz-page-header__meta-item">
+            {panel === 'author'
+              ? 'آموزش و خبری که نوشته‌اید، با وضعیت انتشار هرکدام.'
+              : 'همه آموزش‌ها، خبرها و اطلاعیه‌ها، از هر نویسنده.'}
+          </span>
+        </p>
+        <ButtonLink href={base + '/new'} tone="secondary" size="sm" iconStart="plus" data-testid="new-content-link">
+          نوشته تازه
+        </ButtonLink>
+      </div>
+
+      <form method="get" action={base} className="hz-card hz-card--compact flex flex-wrap items-end gap-md" data-testid="panel-filter" role="search">
+        <div className="min-w-0 flex-1 basis-48">
+          <SelectField
+            label="وضعیت"
+            name="status"
+            defaultValue={status ?? ''}
+            placeholder="همه"
+            options={CONTENT_STATUSES.map((value) => ({ value, label: STATUS_FA[value] }))}
+          />
+        </div>
+        {panel === 'content' ? (
+          <div className="min-w-0 flex-1 basis-48">
+            <SelectField
+              label="نوع"
+              name="kind"
+              defaultValue={kind ?? ''}
+              placeholder="همه"
+              options={CONTENT_KINDS.filter((value) => value !== 'CLUB_POST').map((value) => ({ value, label: KIND_FA[value] }))}
+            />
           </div>
-          <form method="get" action={base} className="mt-lg flex flex-wrap items-end gap-md" data-testid="panel-filter">
-            <label className="space-y-xs text-label-md">
-              <span className="block">وضعیت</span>
-              <select name="status" defaultValue={status ?? ''} className="min-h-[var(--size-control-md)] rounded-md border border-border-control bg-bg-surface px-md text-body-sm">
-                <option value="">همه</option>
-                {CONTENT_STATUSES.map((value) => (
-                  <option key={value} value={value}>
-                    {STATUS_FA[value]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {panel === 'content' ? (
-              <label className="space-y-xs text-label-md">
-                <span className="block">نوع</span>
-                <select name="kind" defaultValue={kind ?? ''} className="min-h-[var(--size-control-md)] rounded-md border border-border-control bg-bg-surface px-md text-body-sm">
-                  <option value="">همه</option>
-                  {CONTENT_KINDS.filter((value) => value !== 'CLUB_POST').map((value) => (
-                    <option key={value} value={value}>
-                      {KIND_FA[value]}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
+        ) : null}
+        <div className="hz-action-row">
+          <Button type="submit" tone="secondary">
+            فیلتر
+          </Button>
+          {status || kind ? (
             <ButtonLink tone="ghost" href={base}>
               همه
             </ButtonLink>
-            <button type="submit" className="min-h-[var(--size-control-md)] rounded-md border border-border-brand px-lg text-label-md text-text-brand">
-              فیلتر
-            </button>
-          </form>
-        </Card>
+          ) : null}
+        </div>
+      </form>
 
-        {result.items.length === 0 ? (
-          <EmptyState
-            title={status || kind ? 'محتوایی با این فیلتر نیست' : 'هنوز محتوایی نیست'}
-            description={status || kind ? 'فیلتر را بردارید.' : 'با «نوشته تازه» اولین پیش‌نویس را بسازید.'}
-          />
-        ) : (
-          <ul className="space-y-sm" data-testid="panel-content-list">
-            {result.items.map((item) => (
-              <li key={item.id}>
-                <Link
-                  href={editorPathFor(panel, item.id)}
-                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
-                  data-testid={'panel-item-' + item.id}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-sm">
-                    <div className="min-w-0">
-                      <p className="text-caption text-text-secondary">{KIND_FA[item.kind]}</p>
-                      <p className="text-label-lg text-text-primary">{item.titleFa}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-xs">
-                      <StatusBadge tone={STATUS_TONE[item.status]}>{STATUS_FA[item.status]}</StatusBadge>
-                      <StatusBadge tone={STATE_TONE[item.publicState]}>
+      {result.items.length === 0 ? (
+        <EmptyState
+          title={status || kind ? 'محتوایی با این فیلتر نیست' : 'هنوز محتوایی نیست'}
+          description={status || kind ? 'فیلتر را بردارید.' : 'با «نوشته تازه» اولین پیش‌نویس را بسازید.'}
+          action={
+            status || kind ? (
+              <ButtonLink tone="secondary" size="sm" href={base}>
+                پاک کردن فیلترها
+              </ButtonLink>
+            ) : undefined
+          }
+        />
+      ) : (
+        <div data-testid="panel-content-list">
+          <div className="hz-table-wrap">
+            <table className="hz-table hz-table--dense hz-table--stack">
+              <caption className="hz-visually-hidden">{TITLE[panel]}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">عنوان</th>
+                  <th scope="col">نوع</th>
+                  <th scope="col">وضعیت</th>
+                  <th scope="col">نمایش عمومی</th>
+                  <th scope="col">
+                    <span className="hz-visually-hidden">باز کردن</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {result.items.map((item) => (
+                  <tr key={item.id}>
+                    <td className="hz-table__lead">
+                      <div className="hz-case">
+                        <Link className="hz-case__name" href={editorPathFor(panel, item.id)} data-testid={'panel-item-' + item.id}>
+                          {item.titleFa}
+                        </Link>
+                        <span className="hz-case__sub">
+                          {'آخرین تغییر: ' + formatInstantFa(item.updatedAt) + ' · نسخه ' + fa(item.revisionNumber)}
+                          {item.publicState === 'SCHEDULED' && item.publishAt ? ' · انتشار: ' + formatInstantFa(item.publishAt) : ''}
+                        </span>
+                      </div>
+                    </td>
+                    <td data-label="نوع">{KIND_FA[item.kind]}</td>
+                    <td data-label="وضعیت">
+                      <StatusBadge tone={STATUS_TONE[item.status]} size="sm">
+                        {STATUS_FA[item.status]}
+                      </StatusBadge>
+                    </td>
+                    <td data-label="نمایش عمومی">
+                      <StatusBadge tone={STATE_TONE[item.publicState]} size="sm">
                         <span data-testid={'panel-item-state-' + item.id}>{PUBLIC_STATE_FA[item.publicState]}</span>
                       </StatusBadge>
-                    </div>
-                  </div>
-                  <p className="mt-sm text-caption text-text-secondary">
-                    {'آخرین تغییر: ' + formatInstantFa(item.updatedAt) + ' · نسخه ' + fa(item.revisionNumber)}
-                    {item.publicState === 'SCHEDULED' && item.publishAt ? ' · انتشار: ' + formatInstantFa(item.publishAt) : ''}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+                    </td>
+                    <td className="hz-table__open">
+                      <Link className="hz-icon-btn hz-icon-btn--sm" href={editorPathFor(panel, item.id)} aria-hidden="true" tabIndex={-1}>
+                        <Icon name="caretRight" size="sm" mirror />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
-        {result.totalPages > 1 ? (
-          <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
-            {result.page > 1 ? <ButtonLink tone="secondary" href={hrefFor(result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
-            <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-            {result.page < result.totalPages ? <ButtonLink tone="secondary" href={hrefFor(result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
-          </nav>
-        ) : null}
-      </div>
+      <Pagination page={result.page} pageSize={result.pageSize} total={result.total} totalPages={result.totalPages} hrefFor={hrefFor} />
     </OpsShell>
   );
 }
@@ -173,7 +199,7 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
 export function NewContentView({ actor, panel }: { actor: Actor; panel: ContentPanel }) {
   const role = actor.context === 'CONTENT_ADMIN' ? 'CONTENT_ADMIN' : 'AUTHOR';
   return (
-    <OpsShell actor={actor} title={TITLE[panel]} pathname={PANEL_BASE[panel] + '/new'} nav={NAV[panel]}>
+    <OpsShell actor={actor} title={NEW_TITLE[panel]} pathname={PANEL_BASE[panel] + '/new'} nav={NAV[panel]}>
       <CreateContentForm panel={panel} kinds={creatableKinds(role).map((value) => ({ value, label: KIND_FA[value] }))} />
     </OpsShell>
   );
@@ -206,104 +232,102 @@ export async function ContentEditorView({ actor, panel, contentId }: { actor: Ac
   };
 
   return (
-    <OpsShell actor={actor} title={TITLE[panel]} pathname={PANEL_BASE[panel]} nav={NAV[panel]}>
-      <div className="space-y-lg">
-        <Link href={PANEL_BASE[panel]} className="text-label-md text-text-brand underline underline-offset-4">
-          بازگشت به فهرست
-        </Link>
+    <OpsShell actor={actor} title={row.titleFa} pathname={PANEL_BASE[panel]} nav={NAV[panel]}>
+      <Link href={PANEL_BASE[panel]} className="hz-link hz-link--standalone hz-hide-md">
+        بازگشت به فهرست
+      </Link>
 
-        <Card>
-          <div className="flex flex-wrap items-start justify-between gap-md">
-            <div className="min-w-0">
-              <p className="text-caption text-text-secondary">{KIND_FA[row.kind]}</p>
-              <h1 className="text-h3">{row.titleFa}</h1>
-            </div>
-            <div className="flex flex-wrap gap-xs">
-              <StatusBadge tone={STATUS_TONE[row.status]}>
-                <span data-testid="content-status">{STATUS_FA[row.status]}</span>
-              </StatusBadge>
-              <StatusBadge tone={STATE_TONE[data.publicState]}>
-                <span data-testid="content-public-state">{PUBLIC_STATE_FA[data.publicState]}</span>
-              </StatusBadge>
-            </div>
-          </div>
-          <p className="mt-md text-caption text-text-secondary">
-            {'نسخه ' + fa(row.revisionNumber) + ' · امضای عمومی: ' + data.byline}
-            {row.publishAt ? ' · زمان انتشار: ' + formatInstantFa(row.publishAt) : ''}
+      <DeskHead
+        title={KIND_FA[row.kind]}
+        status={{ tone: STATUS_TONE[row.status], label: STATUS_FA[row.status], testId: 'content-status' }}
+        meta={[
+          'نسخه ' + fa(row.revisionNumber),
+          'امضای عمومی: ' + data.byline,
+          row.publishAt ? 'زمان انتشار: ' + formatInstantFa(row.publishAt) : null,
+          <StatusBadge key="public" tone={STATE_TONE[data.publicState]} size="sm">
+            <span data-testid="content-public-state">{PUBLIC_STATE_FA[data.publicState]}</span>
+          </StatusBadge>,
+        ]}
+      >
+        {publicPath && (data.publicState === 'VISIBLE' || data.publicState === 'ARCHIVED') ? (
+          <p>
+            <Link href={publicPath + '/' + row.slug} className="hz-link hz-link--standalone" data-testid="content-public-link">
+              مشاهده در سایت
+            </Link>
           </p>
-          {publicPath && (data.publicState === 'VISIBLE' || data.publicState === 'ARCHIVED') ? (
-            <p className="mt-sm">
-              <Link href={publicPath + '/' + row.slug} className="text-label-md text-text-brand underline underline-offset-4" data-testid="content-public-link">
-                مشاهده در سایت
-              </Link>
-            </p>
-          ) : null}
-        </Card>
-
-        {row.moderationNote && (row.status === 'HIDDEN' || row.status === 'DELETED') ? (
-          <Alert tone="warning" title={row.status === 'HIDDEN' ? 'ادمین محتوا این محتوا را پنهان کرده است' : 'این محتوا حذف شده است'}>
-            <span data-testid="content-moderation-note">{row.moderationNote}</span>
-          </Alert>
         ) : null}
+      </DeskHead>
 
-        {row.correctionNote ? (
-          <Alert tone="info" title="ادمین محتوا اصلاح این نوشته را خواسته است">
-            <span data-testid="content-correction-note">{row.correctionNote}</span>
-            <span className="mt-xs block text-caption">با ذخیره نسخه اصلاح‌شده، درخواست بسته می‌شود.</span>
-          </Alert>
-        ) : null}
+      {row.moderationNote && (row.status === 'HIDDEN' || row.status === 'DELETED') ? (
+        <Alert tone="warning" title={row.status === 'HIDDEN' ? 'ادمین محتوا این محتوا را پنهان کرده است' : 'این محتوا حذف شده است'}>
+          <span data-testid="content-moderation-note">{row.moderationNote}</span>
+        </Alert>
+      ) : null}
 
-        {data.restriction ? (
-          <Alert tone="warning" title={panel === 'author' ? 'انتشار برای حساب شما محدود است' : 'این نویسنده محدودیت انتشار دارد'}>
-            <span data-testid="content-restriction">{restrictionMessage(data.restriction)}</span>
-          </Alert>
-        ) : null}
+      {row.correctionNote ? (
+        <Alert tone="info" title="ادمین محتوا اصلاح این نوشته را خواسته است">
+          <span data-testid="content-correction-note">{row.correctionNote}</span>
+          <span className="mt-xs block text-caption">با ذخیره نسخه اصلاح‌شده، درخواست بسته می‌شود.</span>
+        </Alert>
+      ) : null}
 
-        <ContentFieldsForm
-          panel={panel}
-          item={item}
-          canEdit={data.canEdit}
-          categories={data.categories.map((category) => ({
-            value: category.id,
-            label: category.nameFa + (category.isActive ? '' : ' (کنارگذاشته)'),
-          }))}
-          breeds={data.breeds.map((breed) => ({ value: breed.id, label: breed.nameFa + ' — ' + breed.nameEn }))}
-          species={data.species.map((row) => ({ value: row.code, label: row.nameFa }))}
-        />
+      {data.restriction ? (
+        <Alert tone="warning" title={panel === 'author' ? 'انتشار برای حساب شما محدود است' : 'این نویسنده محدودیت انتشار دارد'}>
+          <span data-testid="content-restriction">{restrictionMessage(data.restriction)}</span>
+        </Alert>
+      ) : null}
 
-        {data.canEdit ? <ContentImageForm panel={panel} item={item} /> : null}
-
-        {data.moves.length > 0 ? (
-          <ContentStatusForm
+      <div className="hz-desk">
+        <div className="min-w-0 space-y-lg">
+          <ContentFieldsForm
             panel={panel}
             item={item}
-            moves={data.moves.map((to) => ({
-              value: to,
-              label: MOVE_FA[to],
-              needsReason: reasonRequired(role, row.status, to, isOwner),
+            canEdit={data.canEdit}
+            categories={data.categories.map((category) => ({
+              value: category.id,
+              label: category.nameFa + (category.isActive ? '' : ' (کنارگذاشته)'),
             }))}
+            breeds={data.breeds.map((breed) => ({ value: breed.id, label: breed.nameFa + ' — ' + breed.nameEn }))}
+            species={data.species.map((row) => ({ value: row.code, label: row.nameFa }))}
           />
-        ) : null}
+          {data.canEdit ? <ContentImageForm panel={panel} item={item} /> : null}
+        </div>
 
-        <Card>
-          <h2 className="hz-card__title">نسخه‌ها</h2>
-          <ul className="mt-lg space-y-sm" data-testid="content-revisions">
-            {data.revisions.map((revision) => (
-              <li key={revision.number} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md">
-                <div>
-                  <p className="text-label-md">{'نسخه ' + fa(revision.number)}</p>
-                  <p className="text-caption text-text-secondary">
-                    {formatInstantFa(revision.createdAt)}
-                    {revision.note ? ' · ' + revision.note : ''}
-                  </p>
-                </div>
-                {data.canEdit && revision.number !== row.revisionNumber ? (
-                  <RestoreRevisionButton panel={panel} item={item} revisionNumber={revision.number} />
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <div className="min-w-0 space-y-lg">
+          {data.moves.length > 0 ? (
+            <ContentStatusForm
+              panel={panel}
+              item={item}
+              moves={data.moves.map((to) => ({
+                value: to,
+                label: MOVE_FA[to],
+                needsReason: reasonRequired(role, row.status, to, isOwner),
+              }))}
+            />
+          ) : null}
+
+          <Panel title="نسخه‌ها" count={fa(data.revisions.length)}>
+            <ul className="divide-y divide-border-subtle" data-testid="content-revisions">
+              {data.revisions.map((revision) => (
+                <li key={revision.number} className="flex flex-wrap items-center justify-between gap-sm py-sm first:pt-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className="text-label-md">
+                      {'نسخه ' + fa(revision.number)}
+                      {revision.number === row.revisionNumber ? <span className="text-caption font-normal text-text-secondary"> · فعلی</span> : null}
+                    </p>
+                    <p className="text-caption text-text-secondary">
+                      {formatInstantFa(revision.createdAt)}
+                      {revision.note ? ' · ' + revision.note : ''}
+                    </p>
+                  </div>
+                  {data.canEdit && revision.number !== row.revisionNumber ? (
+                    <RestoreRevisionButton panel={panel} item={item} revisionNumber={revision.number} />
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        </div>
       </div>
     </OpsShell>
   );

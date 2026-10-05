@@ -4,6 +4,8 @@ import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
+import { EmptyState } from '../../../src/ui/states.tsx';
+import { QueueMeta } from '../../../src/ui/desk.tsx';
 import { operatorOrders, expireUnacceptedSubOrders } from '../../../src/commerce/orders.ts';
 import { ORDER_STATUS_FA, type OrderStatus } from '../../../src/commerce/order-model.ts';
 
@@ -17,6 +19,8 @@ const fa = (value: number | bigint): string => value.toLocaleString('fa-IR');
  * Reading is all this does. Moving a sub-order happens on the record itself,
  * where the reason has to be written down, and the money rails — refunds and
  * settlement — are their own screens with their own capability.
+ *
+ * DS P09 table (cards below 768); money end-aligned in تومان.
  */
 export default async function MarketOrdersPage() {
   const guard = await guardRoute('/market/orders');
@@ -30,8 +34,7 @@ export default async function MarketOrdersPage() {
 
   return (
     <OpsShell actor={guard.actor} title="سفارش‌های فروشگاه کالا" nav={marketNav(guard.actor)} pathname="/market/orders">
-      <div className="space-y-lg p-lg">
-      <h2 className="text-h2">سفارش‌های فروشگاه کالا</h2>
+      <QueueMeta total={rows.length} noun="سفارش" />
 
       {expired > 0 ? (
         <Alert tone="info" title="زیرسفارش‌های بی‌پاسخ لغو شدند">
@@ -42,40 +45,54 @@ export default async function MarketOrdersPage() {
       ) : null}
 
       {rows.length === 0 ? (
-        <p className="text-body-sm text-text-secondary" data-testid="market-orders-empty">
-          هنوز سفارشی ثبت نشده است.
-        </p>
+        <div data-testid="market-orders-empty">
+          <EmptyState title="هنوز سفارشی ثبت نشده است" description="هر سفارشی که پس از پرداخت ثبت شود، اینجا می‌آید." />
+        </div>
       ) : (
-        <ul className="space-y-sm" data-testid="market-orders">
-          {rows.map((row) => (
-            <li
-              key={row.order.id}
-              className="flex flex-wrap items-center justify-between gap-sm rounded-xl border border-border-default p-lg"
-              data-testid={'market-order-' + row.order.id}
-            >
-              <div className="space-y-2xs">
-                <Link
-                  href={'/account/orders/' + row.order.id}
-                  className="text-text-brand text-body-sm"
-                  data-testid={'market-order-link-' + row.order.id}
-                >
-                  {row.order.reference}
-                </Link>
-                <p className="text-caption text-text-secondary">
-                  {row.order.createdAt.toLocaleDateString('fa-IR')} — {fa(row.order.grandTotalToman)} تومان —{' '}
-                  {fa(Number(row.subOrders))} فروشگاه
-                </p>
-              </div>
-              <StatusBadge tone={row.order.status === 'PAID' ? 'success' : 'neutral'}>
-                <span data-testid={'market-order-status-' + row.order.id}>
-                  {ORDER_STATUS_FA[row.order.status as OrderStatus]}
-                </span>
-              </StatusBadge>
-            </li>
-          ))}
-        </ul>
+        <div className="hz-table-wrap">
+          <table className="hz-table hz-table--dense hz-table--stack">
+            <caption className="hz-visually-hidden">سفارش‌های فروشگاه کالا</caption>
+            <thead>
+              <tr>
+                <th scope="col">کد سفارش</th>
+                <th scope="col">تاریخ</th>
+                <th scope="col">فروشگاه‌ها</th>
+                <th scope="col" className="text-end">
+                  مبلغ
+                </th>
+                <th scope="col">وضعیت</th>
+              </tr>
+            </thead>
+            <tbody data-testid="market-orders">
+              {rows.map((row) => (
+                <tr key={row.order.id} data-testid={'market-order-' + row.order.id}>
+                  <td className="hz-table__lead">
+                    <Link
+                      href={'/account/orders/' + row.order.id}
+                      className="hz-case__name"
+                      data-testid={'market-order-link-' + row.order.id}
+                    >
+                      <bdi dir="ltr">{row.order.reference}</bdi>
+                    </Link>
+                  </td>
+                  <td data-label="تاریخ">{row.order.createdAt.toLocaleDateString('fa-IR')}</td>
+                  <td data-label="فروشگاه‌ها">{fa(Number(row.subOrders))}</td>
+                  <td data-label="مبلغ" className="hz-num text-end">
+                    {fa(row.order.grandTotalToman)} تومان
+                  </td>
+                  <td data-label="وضعیت">
+                    <StatusBadge tone={row.order.status === 'PAID' ? 'success' : 'neutral'} size="sm">
+                      <span data-testid={'market-order-status-' + row.order.id}>
+                        {ORDER_STATUS_FA[row.order.status as OrderStatus]}
+                      </span>
+                    </StatusBadge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
-      </div>
     </OpsShell>
   );
 }

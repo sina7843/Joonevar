@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { Card } from '../../../src/ui/card.tsx';
+import { Panel, StatTiles } from '../../../src/ui/desk.tsx';
+import { TextField } from '../../../src/ui/field.tsx';
+import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { AppError } from '../../../src/domain/errors.ts';
 import { supportSummary } from '../../../src/security/risk.ts';
@@ -41,96 +43,76 @@ export default async function SupportPage({
 
   return (
     <OpsShell actor={guard.actor} title="پشتیبانی" nav={marketNav(guard.actor)} pathname="/market/support">
-      <div className="space-y-lg p-lg">
-        <Alert tone="info" title="این صفحه شمارش نشان می‌دهد، نه محتوا">
-          <span data-testid="support-note">
-            برای خواندن خود پرونده — گفت‌وگو، مدرک یا سند — باید به همان صفحه بروید؛ اختیار آن جداست.
-          </span>
+      <Alert tone="info" title="این صفحه شمارش نشان می‌دهد، نه محتوا">
+        <span data-testid="support-note">
+          برای خواندن خود پرونده — گفت‌وگو، مدرک یا سند — باید به همان صفحه بروید؛ اختیار آن جداست.
+        </span>
+      </Alert>
+
+      <Panel title="یافتن حساب">
+        <form className="flex flex-wrap items-end gap-sm" data-testid="support-search" role="search">
+          <div className="min-w-0 flex-1 basis-64">
+            <TextField label="شناسه حساب" name="account" defaultValue={accountId} ltr data-testid="support-account-input" />
+          </div>
+          <Button type="submit" data-testid="support-account-submit">
+            نمایش
+          </Button>
+        </form>
+        <p className="text-caption text-text-secondary" data-testid="support-search-note">
+          جست‌وجو با شماره تماس در دسترس نیست: فهرست‌کردن حساب‌ها از روی شماره، همان چیزی است که یک نشتی به آن
+          تبدیل می‌شود. شناسه را از همان پرونده‌ای بردارید که در دست دارید.
+        </p>
+      </Panel>
+
+      {problemFa !== null ? (
+        <Alert tone="error" title="این حساب نمایش داده نشد">
+          <span data-testid="support-problem">{problemFa}</span>
         </Alert>
+      ) : null}
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>یافتن حساب</span></h2></div>
-          <form className="mt-md flex flex-wrap items-end gap-sm" data-testid="support-search">
-            <label className="flex flex-col gap-2xs text-caption">
-              شناسه حساب
-              <input
-                type="text"
-                name="account"
-                defaultValue={accountId}
-                dir="ltr"
-                className="rounded-lg border border-border-default px-md py-sm text-body-sm"
-                data-testid="support-account-input"
-              />
-            </label>
-            <button
-              type="submit"
-              className="rounded-lg border border-border-default px-lg py-sm text-body-sm"
-              data-testid="support-account-submit"
-            >
-              نمایش
-            </button>
-          </form>
-          <p className="mt-sm text-caption text-text-secondary" data-testid="support-search-note">
-            جست‌وجو با شماره تماس در دسترس نیست: فهرست‌کردن حساب‌ها از روی شماره، همان چیزی است که یک نشتی به آن
-            تبدیل می‌شود. شناسه را از همان پرونده‌ای بردارید که در دست دارید.
-          </p>
-        </Card>
+      {summary !== null ? (
+        <Panel
+          title={
+            <span data-testid="support-account">
+              {'حساب '}
+              <bdi dir="ltr">{summary.maskedMobile}</bdi>
+            </span>
+          }
+          aside={
+            <Link href="/market/refunds" className="hz-link" data-testid="support-to-refunds">
+              صف بازپرداخت‌ها
+            </Link>
+          }
+        >
+          <div data-testid="support-counts">
+            <StatTiles
+              tiles={[
+                { label: 'درخواست خرید باز', value: fa(summary.openInquiries), valueTestId: 'support-inquiries' },
+                { label: 'گزارش باز', value: fa(summary.openReports), valueTestId: 'support-reports' },
+                { label: 'بازپرداخت در انتظار', value: fa(summary.refundsOwed), valueTestId: 'support-refunds' },
+              ]}
+            />
+          </div>
 
-        {problemFa !== null ? (
-          <Alert tone="error" title="این حساب نمایش داده نشد">
-            <span data-testid="support-problem">{problemFa}</span>
-          </Alert>
-        ) : null}
-
-        {summary !== null ? (
-          <Card>
-            <h2 className="text-label-lg" data-testid="support-account">
-              حساب {summary.maskedMobile}
-            </h2>
-            <dl className="mt-md grid gap-sm md:grid-cols-3" data-testid="support-counts">
-              <div>
-                <dt className="text-caption text-text-secondary">درخواست خرید باز</dt>
-                <dd className="text-label-lg" data-testid="support-inquiries">
-                  {fa(summary.openInquiries)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-caption text-text-secondary">گزارش باز</dt>
-                <dd className="text-label-lg" data-testid="support-reports">
-                  {fa(summary.openReports)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-caption text-text-secondary">بازپرداخت در انتظار</dt>
-                <dd className="text-label-lg" data-testid="support-refunds">
-                  {fa(summary.refundsOwed)}
-                </dd>
-              </div>
+          {summary.signals.length > 0 ? (
+            <dl className="hz-kv" data-testid="support-signals">
+              {summary.signals.map((signal) => (
+                <div key={signal.kind} className="hz-kv__row">
+                  <dt className="hz-kv__key">
+                    {signal.labelFa}
+                    <span className="block text-caption font-normal text-text-secondary">{signal.noteFa}</span>
+                  </dt>
+                  <dd className="hz-kv__value hz-num">{fa(signal.count)}</dd>
+                </div>
+              ))}
             </dl>
-
-            {summary.signals.length > 0 ? (
-              <ul className="mt-lg space-y-sm" data-testid="support-signals">
-                {summary.signals.map((signal) => (
-                  <li key={signal.kind} className="text-body-sm">
-                    <strong>{signal.labelFa}</strong>: {fa(signal.count)} —{' '}
-                    <span className="text-caption text-text-secondary">{signal.noteFa}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-lg text-caption text-text-secondary" data-testid="support-no-signals">
-                نشانه پرخطری برای این حساب ثبت نشده است.
-              </p>
-            )}
-
-            <p className="mt-lg text-caption">
-              <Link href="/market/refunds" className="text-text-brand" data-testid="support-to-refunds">
-                صف بازپرداخت‌ها
-              </Link>
+          ) : (
+            <p className="text-caption text-text-secondary" data-testid="support-no-signals">
+              نشانه پرخطری برای این حساب ثبت نشده است.
             </p>
-          </Card>
-        ) : null}
-      </div>
+          )}
+        </Panel>
+      ) : null}
     </OpsShell>
   );
 }

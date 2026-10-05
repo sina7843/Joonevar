@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { EmptyState } from '../../../src/ui/states.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { riskQueue } from '../../../src/security/risk.ts';
 
@@ -32,50 +32,49 @@ export default async function RiskPage({
 
   return (
     <OpsShell actor={guard.actor} title="نشانه‌های پرخطر" nav={marketNav(guard.actor)} pathname="/market/risk">
-      <div className="space-y-lg p-lg">
-        <Alert tone="info" title="این نشانه‌ها دلیل نگاه‌کردن‌اند، نه حکم">
-          <span data-testid="risk-note">
-            هیچ‌کدام از این عددها به‌تنهایی تصمیم نیست و این صفحه وضعیت هیچ حسابی را تغییر نمی‌دهد. برای اقدام،
-            به همان پرونده بروید و تصمیم را با دلیلش ثبت کنید.
-          </span>
-        </Alert>
+      <QueueMeta total={rows.length} noun={'حساب با نشانه در ' + fa(days) + ' روز گذشته'} />
+      <Alert tone="info" title="این نشانه‌ها دلیل نگاه‌کردن‌اند، نه حکم">
+        <span data-testid="risk-note">
+          هیچ‌کدام از این عددها به‌تنهایی تصمیم نیست و این صفحه وضعیت هیچ حسابی را تغییر نمی‌دهد. برای اقدام،
+          به همان پرونده بروید و تصمیم را با دلیلش ثبت کنید.
+        </span>
+      </Alert>
 
-        {rows.length === 0 ? (
-          <p className="text-body-sm text-text-secondary" data-testid="risk-empty">
-            در این بازه نشانه‌ای ثبت نشده است.
-          </p>
-        ) : (
-          <ul className="space-y-lg" data-testid="risk-queue">
-            {rows.map((row) => (
-              <li key={row.accountId}>
-                <Card>
-                  <div className="flex flex-wrap items-center justify-between gap-sm">
-                    <h2 className="text-label-lg" data-testid={'risk-account-' + row.accountId}>
-                      حساب {row.maskedMobile}
-                    </h2>
-                    <Link
-                      href={'/market/support?account=' + row.accountId}
-                      className="text-caption text-text-brand"
-                      data-testid={'risk-support-' + row.accountId}
-                    >
-                      باز کردن در پشتیبانی
-                    </Link>
+      {rows.length === 0 ? (
+        <div data-testid="risk-empty">
+          <EmptyState title="در این بازه نشانه‌ای ثبت نشده است." description="هر شماری که از آستانه‌اش بگذرد، اینجا با توضیحش می‌آید." />
+        </div>
+      ) : (
+        <CaseList label="حساب‌های دارای نشانه" testId="risk-queue">
+          {rows.map((row) => (
+            <CaseItem
+              key={row.accountId}
+              type="نشانه پرخطر"
+              name={
+                <span data-testid={'risk-account-' + row.accountId}>
+                  {'حساب '}
+                  <bdi dir="ltr">{row.maskedMobile}</bdi>
+                </span>
+              }
+              href={'/market/support?account=' + row.accountId}
+              linkLabel="باز کردن در پشتیبانی"
+              linkTestId={'risk-support-' + row.accountId}
+            >
+              <dl className="hz-kv" data-testid={'risk-signals-' + row.accountId}>
+                {row.signals.map((signal) => (
+                  <div key={signal.kind} className="hz-kv__row">
+                    <dt className="hz-kv__key">
+                      {signal.labelFa}
+                      <span className="block text-caption font-normal text-text-secondary">{signal.noteFa}</span>
+                    </dt>
+                    <dd className="hz-kv__value hz-num">{fa(signal.count)}</dd>
                   </div>
-                  <ul className="mt-md space-y-sm" data-testid={'risk-signals-' + row.accountId}>
-                    {row.signals.map((signal) => (
-                      <li key={signal.kind} className="text-body-sm">
-                        <strong>{signal.labelFa}</strong>: {fa(signal.count)}
-                        <br />
-                        <span className="text-caption text-text-secondary">{signal.noteFa}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                ))}
+              </dl>
+            </CaseItem>
+          ))}
+        </CaseList>
+      )}
     </OpsShell>
   );
 }

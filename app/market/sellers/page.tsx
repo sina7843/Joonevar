@@ -1,10 +1,10 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, DocFrame, QueueMeta } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { AppError } from '../../../src/domain/errors.ts';
@@ -51,89 +51,98 @@ export default async function SellerReviewPage() {
 
   return (
     <OpsShell actor={guard.actor} title="پرونده‌های فروشنده کالا" nav={marketNav(guard.actor)} pathname="/market/sellers">
-      <div className="space-y-lg">
-        <Alert tone="info" title="مدارک کسب‌وکار خصوصی‌اند و هر بازکردنشان ثبت می‌شود">
-          <span data-testid="seller-review-note">
-            {IBAN_NOTE_FA} تأیید پرونده به‌تنهایی فروشگاه را فعال نمی‌کند؛ فعال‌شدن نتیجه آغاز دوره پلن
-            است و دوره پلن فقط با پرداخت تأییدشده روی سرور آغاز می‌شود.
-          </span>
-        </Alert>
+      <QueueMeta
+        total={queue.length}
+        noun="پرونده در صف"
+        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.submittedAt) ?? 0)) : null}
+      />
+      <Alert tone="info" title="مدارک کسب‌وکار خصوصی‌اند و هر بازکردنشان ثبت می‌شود">
+        <span data-testid="seller-review-note">
+          {IBAN_NOTE_FA} تأیید پرونده به‌تنهایی فروشگاه را فعال نمی‌کند؛ فعال‌شدن نتیجه آغاز دوره پلن
+          است و دوره پلن فقط با پرداخت تأییدشده روی سرور آغاز می‌شود.
+        </span>
+      </Alert>
 
-        {queue.length === 0 ? (
-          <div data-testid="seller-queue-empty">
-            <EmptyState
-              title="پرونده‌ای در انتظار بررسی نیست"
-              description="هر پرونده فروشندگی که ارسال شود، اینجا برای بررسی می‌آید."
-            />
-          </div>
-        ) : (
-          <ul className="space-y-lg" data-testid="seller-queue">
-            {queue.map((entry, index) => {
-              const detail = details[index]!;
-              const status = entry.status as SellerStatus;
-              return (
-                <li key={entry.id} data-testid={'seller-row-' + entry.id}>
-                  <Card>
-                    <div className="flex flex-wrap items-center gap-sm">
-                      <StatusBadge tone={status === 'APPROVED' ? 'success' : 'neutral'}>
-                        <span data-testid={'seller-status-' + entry.id}>{SELLER_STATUS_FA[status]}</span>
-                      </StatusBadge>
-                      <span className="text-label-lg">{entry.displayNameFa}</span>
-                      <span className="text-caption text-text-secondary">
-                        {SELLER_KIND_FA[entry.kind as SellerKind]}
-                      </span>
-                      <span className="text-caption text-text-secondary">{entry.legalNameFa ?? '—'}</span>
-                      <span className="text-caption text-text-secondary">ارسال: {when(entry.submittedAt)}</span>
-                    </div>
+      {queue.length === 0 ? (
+        <div data-testid="seller-queue-empty">
+          <EmptyState
+            title="پرونده‌ای در انتظار بررسی نیست"
+            description="هر پرونده فروشندگی که ارسال شود، اینجا برای بررسی می‌آید."
+          />
+        </div>
+      ) : (
+        <CaseList label="پرونده‌های فروشنده" testId="seller-queue">
+          {queue.map((entry, index) => {
+            const detail = details[index]!;
+            const status = entry.status as SellerStatus;
+            return (
+              <CaseItem
+                key={entry.id}
+                testId={'seller-row-' + entry.id}
+                type={SELLER_KIND_FA[entry.kind as SellerKind]}
+                name={entry.displayNameFa}
+                sub={(entry.legalNameFa ?? '—') + ' · ارسال: ' + when(entry.submittedAt)}
+                ageDays={ageInDays(entry.submittedAt)}
+                status={{ tone: status === 'APPROVED' ? 'success' : 'info', label: SELLER_STATUS_FA[status], testId: 'seller-status-' + entry.id }}
+                owner="SYSTEM"
+                ownerLabel="بررسی فروشندگان"
+                ownerIsUs
+              >
+                <div className="space-y-md">
+                  <KeyValueList
+                    twoCol
+                    rows={[
+                      {
+                        key: 'شناسه ملی',
+                        value: detail.seller.nationalIdentifier ? (
+                          <bdi className="hz-id" dir="ltr">
+                            {detail.seller.nationalIdentifier}
+                          </bdi>
+                        ) : null,
+                      },
+                      {
+                        key: 'حساب تسویه',
+                        testId: 'seller-iban-' + entry.id,
+                        value: (
+                          <>
+                            <bdi className="hz-id" dir="ltr">
+                              {detail.maskedIban ?? '—'}
+                            </bdi>
+                            {entry.ibanVerifiedAt ? ' — تأییدشده' : ' — تأیید نشده'}
+                          </>
+                        ),
+                      },
+                      { key: 'مجوز اعلام‌شده', value: detail.seller.licenceKindFa ?? 'اعلام نشده' },
+                      { key: 'نشانی', value: detail.placeFa },
+                    ]}
+                  />
 
-                    <dl className="mt-lg grid gap-sm text-body-sm md:grid-cols-2">
-                      <div>
-                        <dt className="text-caption text-text-secondary">شناسه ملی</dt>
-                        <dd>
-                          <bdi className="hz-ltr font-mono">{detail.seller.nationalIdentifier ?? '—'}</bdi>
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-caption text-text-secondary">حساب تسویه</dt>
-                        <dd data-testid={'seller-iban-' + entry.id}>
-                          <bdi className="hz-ltr font-mono">{detail.maskedIban ?? '—'}</bdi>
-                          {entry.ibanVerifiedAt ? ' — تأییدشده' : ' — تأیید نشده'}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-caption text-text-secondary">مجوز اعلام‌شده</dt>
-                        <dd>{detail.seller.licenceKindFa ?? 'اعلام نشده'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-caption text-text-secondary">نشانی</dt>
-                        <dd>{detail.placeFa ?? '—'}</dd>
-                      </div>
-                    </dl>
-
+                  <div className="space-y-sm">
                     {detail.documents.length > 0 ? (
-                      <ul className="mt-lg space-y-2xs text-caption" data-testid={'seller-docs-' + entry.id}>
+                      <div className="grid gap-md sm:grid-cols-2 lg:grid-cols-3" data-testid={'seller-docs-' + entry.id}>
                         {detail.documents.map((document) => (
-                          <li key={document.id}>
-                            <Link href={'/api/files/' + document.fileId} className="text-text-brand">
-                              {document.kind}
-                            </Link>
-                            {document.noteFa ? ' — ' + document.noteFa : ''}
-                          </li>
+                          <DocFrame
+                            key={document.id}
+                            href={'/api/files/' + document.fileId}
+                            label={document.kind}
+                            linkLabel={'مشاهده ' + document.kind}
+                            meta={document.noteFa ?? undefined}
+                          />
                         ))}
-                      </ul>
+                      </div>
                     ) : (
-                      <p className="mt-lg text-caption text-text-secondary">مدرکی بارگذاری نشده است.</p>
+                      <p className="text-caption text-text-secondary">مدرکی بارگذاری نشده است.</p>
                     )}
+                  </div>
 
-                    <VerifyIbanForm sellerId={entry.id} />
-                    <SellerDecisionForm sellerId={entry.id} version={entry.version} />
-                  </Card>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+                  <VerifyIbanForm sellerId={entry.id} />
+                  <SellerDecisionForm sellerId={entry.id} version={entry.version} />
+                </div>
+              </CaseItem>
+            );
+          })}
+        </CaseList>
+      )}
     </OpsShell>
   );
 }

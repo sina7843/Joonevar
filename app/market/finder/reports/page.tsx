@@ -1,9 +1,9 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { CaseItem, CaseList, Panel, QueueMeta, ViewChips } from '../../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { AppError } from '../../../../src/domain/errors.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
@@ -18,6 +18,9 @@ export const dynamic = 'force-dynamic';
  * The finder report queue and its appeals — PHASE-4 PROMPT-007. A moderator
  * sees the reported item alone and the evidence the reporter attached; opening
  * a piece of evidence is recorded.
+ *
+ * DS P09 queue with the take / decide steps inside each case card (no `[id]`
+ * route), and the appeals as a second panel.
  */
 export default async function FinderReportsPage({ searchParams }: { searchParams: Promise<{ closed?: string }> }) {
   const guard = await guardRoute('/market/finder/reports');
@@ -35,31 +38,44 @@ export default async function FinderReportsPage({ searchParams }: { searchParams
   const canUnlist = hasFinderCapability(actor, 'FINDER_PROFILE_MODERATE');
   return (
     <OpsShell actor={actor} title="گزارش‌های جفت‌یابی" nav={marketNav(actor)} pathname="/market/finder/reports">
-      <div className="space-y-lg">
-        <Card>
-          <p className="text-body-sm">
-            <a href="/market/finder/reports" className="text-text-brand underline underline-offset-4">گزارش‌های باز</a>
-            {' · '}
-            <a href="/market/finder/reports?closed=1" className="text-text-brand underline underline-offset-4">تصمیم‌گرفته</a>
-          </p>
-        </Card>
-        {queue.length === 0 ? (
-          <EmptyState title="گزارشی نیست" description="گزارش‌های تازه اینجا می‌آیند." />
-        ) : (
-          queue.map((r) => (
-            <Card key={r.id}>
-              <div data-testid={'finder-report-' + r.id}>
-                <div className="flex flex-wrap items-center justify-between gap-sm">
-                  <p className="text-label-md">{r.categoryFa + ' — ' + r.targetFa}</p>
-                  <StatusBadge tone={r.status === 'OPEN' ? 'warning' : 'neutral'}>{r.status}</StatusBadge>
-                </div>
-                <p className="mt-xs text-body-sm" data-testid={'finder-report-subject-' + r.id}>{r.subjectFa}</p>
-                {r.details ? <p className="mt-xs whitespace-pre-line text-body-sm text-text-secondary">{r.details}</p> : null}
-                <p className="mt-xs text-caption text-text-secondary">{formatInstantFa(r.createdAt)}</p>
+      <QueueMeta
+        total={queue.length}
+        noun={closed ? 'گزارش تصمیم‌گرفته' : 'گزارش باز'}
+        oldestDays={!closed && queue.length > 0 ? Math.max(...queue.map((r) => ageInDays(r.createdAt) ?? 0)) : null}
+      />
+      <ViewChips
+        label="نمای گزارش‌ها"
+        chips={[
+          { key: 'open', href: '/market/finder/reports', label: 'گزارش‌های باز', current: !closed },
+          { key: 'closed', href: '/market/finder/reports?closed=1', label: 'تصمیم‌گرفته', current: closed },
+        ]}
+      />
+      {queue.length === 0 ? (
+        <EmptyState title="گزارشی نیست" description="گزارش‌های تازه اینجا می‌آیند." />
+      ) : (
+        <CaseList label="گزارش‌های جفت‌یابی">
+          {queue.map((r) => (
+            <CaseItem
+              key={r.id}
+              testId={'finder-report-' + r.id}
+              type={r.targetFa}
+              name={r.categoryFa}
+              sub={formatInstantFa(r.createdAt)}
+              ageDays={r.status === 'OPEN' ? ageInDays(r.createdAt) : undefined}
+              status={r.status === 'OPEN' ? { tone: 'warning', label: 'در انتظار بررسی' } : { tone: 'neutral', label: 'تصمیم‌گرفته' }}
+              owner={r.status === 'OPEN' ? 'SYSTEM' : null}
+              ownerLabel={r.assigned && !r.assignedToMe ? 'همکار دیگر' : 'ناظر جفت‌یابی'}
+              ownerIsUs={r.status === 'OPEN' && (!r.assigned || r.assignedToMe)}
+            >
+              <div className="space-y-sm">
+                <p className="text-body-sm" data-testid={'finder-report-subject-' + r.id}>
+                  {r.subjectFa}
+                </p>
+                {r.details ? <p className="whitespace-pre-line text-body-sm text-text-secondary">{r.details}</p> : null}
                 {r.evidence.length > 0 ? (
-                  <p className="mt-xs flex flex-wrap gap-sm text-caption">
+                  <p className="flex flex-wrap gap-sm text-caption">
                     {r.evidence.map((e, i) => (
-                      <a key={e} href={'/api/finder/reports/evidence/' + e} className="text-text-brand underline underline-offset-4" data-testid="finder-evidence-link">
+                      <a key={e} href={'/api/finder/reports/evidence/' + e} className="hz-link" data-testid="finder-evidence-link">
                         {'مدرک ' + (i + 1).toLocaleString('fa-IR')}
                       </a>
                     ))}
@@ -72,41 +88,38 @@ export default async function FinderReportsPage({ searchParams }: { searchParams
                       <TakeReportForm reportId={r.id} release />
                     </>
                   ) : r.assigned ? (
-                    <p className="mt-sm text-caption">در دست بررسی همکار دیگر.</p>
+                    <p className="text-caption text-text-secondary">در دست بررسی همکار دیگر.</p>
                   ) : (
-                    <div className="mt-sm">
-                      <TakeReportForm reportId={r.id} release={false} />
-                    </div>
+                    <TakeReportForm reportId={r.id} release={false} />
                   )
                 ) : (
-                  <p className="mt-sm text-body-sm">{r.decisionReason}</p>
+                  <p className="text-body-sm">{r.decisionReason}</p>
                 )}
               </div>
-            </Card>
-          ))
+            </CaseItem>
+          ))}
+        </CaseList>
+      )}
+      <Panel title="اعتراض‌های باز" count={appeals.length.toLocaleString('fa-IR')}>
+        {appeals.length === 0 ? (
+          <p className="text-body-sm text-text-secondary">اعتراض بازی نیست.</p>
+        ) : (
+          <ul className="divide-y divide-border-subtle">
+            {appeals.map(({ appeal, report }) => (
+              <li key={appeal.id} className="space-y-xs py-md first:pt-0 last:pb-0" data-testid={'finder-appeal-' + appeal.id}>
+                <h3 className="text-label-lg">{TARGET_FA[report.targetKind] ?? report.targetKind}</h3>
+                <p className="text-body-sm">{'تصمیم: ' + (report.decisionReason ?? '')}</p>
+                <p className="text-body-sm">{'اعتراض: ' + appeal.statementFa}</p>
+                {report.decidedByAccountId === actor.accountId ? (
+                  <p className="text-caption text-text-secondary">تصمیم اول با شما بوده است؛ همکار دیگری باید این اعتراض را بررسی کند.</p>
+                ) : (
+                  <DecideAppealForm appealId={appeal.id} />
+                )}
+              </li>
+            ))}
+          </ul>
         )}
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعتراض‌های باز</span></h2></div>
-          {appeals.length === 0 ? (
-            <p className="mt-xs text-body-sm text-text-secondary">اعتراض بازی نیست.</p>
-          ) : (
-            <ul className="mt-sm space-y-md">
-              {appeals.map(({ appeal, report }) => (
-                <li key={appeal.id} className="rounded-lg border border-border-default p-md" data-testid={'finder-appeal-' + appeal.id}>
-                  <p className="text-label-md">{TARGET_FA[report.targetKind] ?? report.targetKind}</p>
-                  <p className="mt-xs text-body-sm">{'تصمیم: ' + (report.decisionReason ?? '')}</p>
-                  <p className="mt-xs text-body-sm">{'اعتراض: ' + appeal.statementFa}</p>
-                  {report.decidedByAccountId === actor.accountId ? (
-                    <p className="mt-xs text-caption">تصمیم اول با شما بوده است؛ همکار دیگری باید این اعتراض را بررسی کند.</p>
-                  ) : (
-                    <DecideAppealForm appealId={appeal.id} />
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </div>
+      </Panel>
     </OpsShell>
   );
 }

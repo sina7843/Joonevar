@@ -82,7 +82,7 @@ export function CentreEditor({
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-md">
           <div>
-            <h1 className="text-h3">{centre.displayNameFa}</h1>
+            <h2 className="hz-h3">{centre.displayNameFa}</h2>
             <p className="mt-2xs text-caption text-text-secondary">{facts.typeNameFa}</p>
           </div>
           <span data-testid="centre-public-status">
@@ -93,7 +93,7 @@ export function CentreEditor({
         </div>
         {centre.publicStatus === 'PUBLISHED' && centre.publicSlug ? (
           <p className="mt-sm text-body-sm">
-            <Link href={'/centers/' + centre.publicSlug} className="text-text-brand underline underline-offset-4" data-testid="centre-public-link">
+            <Link href={'/centers/' + centre.publicSlug} className="hz-link hz-link--standalone" data-testid="centre-public-link">
               مشاهده صفحه عمومی
             </Link>
           </p>
@@ -163,9 +163,9 @@ export function CentreEditor({
             <EmptyState title="شعبه‌ای ثبت نشده است" description="برای انتشار مرکز، دست‌کم یک شعبه عمومی با شهر لازم است." />
           </div>
         ) : (
-          <ul className="mt-lg space-y-lg">
+          <ul className="mt-lg divide-y divide-border-subtle">
             {facts.branches.map((branch) => (
-              <li key={branch.id} className="rounded-xl border border-border-default p-lg" data-testid={'centre-branch-' + branch.id}>
+              <li key={branch.id} className="py-lg first:pt-0 last:pb-0" data-testid={'centre-branch-' + branch.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
                     <h3 className="text-label-md">{branch.nameFa}</h3>
@@ -240,9 +240,9 @@ export function CentreEditor({
             <EmptyState title="عضوی ثبت نشده است" description="با نشانی عمومی یا کد نظام دامپزشک دعوت بفرستید." />
           </div>
         ) : (
-          <ul className="mt-lg space-y-sm" data-testid="centre-members">
+          <ul className="mt-lg divide-y divide-border-subtle" data-testid="centre-members">
             {facts.members.map((member) => (
-              <li key={member.id} className="rounded-lg border border-border-default p-md" data-testid={'centre-member-' + member.id}>
+              <li key={member.id} className="py-md first:pt-0 last:pb-0" data-testid={'centre-member-' + member.id}>
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <div className="min-w-0">
                     <p className="text-label-md">{member.nameFa}</p>

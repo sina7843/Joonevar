@@ -1,7 +1,7 @@
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { productCategories } from '../../../src/db/schema/catalog.ts';
@@ -43,86 +43,103 @@ export default async function MarketReturnsPage() {
 
   return (
     <OpsShell actor={guard.actor} title="مرجوعی و سیاست آن" nav={marketNav(guard.actor)} pathname="/market/returns">
-      <div className="space-y-lg p-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>سیاست مرجوعی در جریان</span></h2></div>
-          {policy === null ? (
-            <Alert tone="warning" title="هنوز هیچ نسخه‌ای منتشر نشده است">
-              <span data-testid="policy-missing">
-                تا انتشار یک نسخه، هیچ مرجوعی‌ای ثبت نمی‌شود؛ مهلت مرجوعی چیزی نیست که حدس زده شود.
-              </span>
-            </Alert>
-          ) : (
-            <div className="mt-sm space-y-sm">
-              <p className="text-body-sm" data-testid="policy-live">
-                نسخه {policy.version} — مهلت عمومی {fa(policy.windowDays)} روز
-              </p>
-              <p className="text-caption text-text-secondary" data-testid="policy-body-text">
-                {policy.bodyFa}
-              </p>
-              {exceptions.length > 0 ? (
-                <ul className="space-y-2xs text-body-sm" data-testid="policy-exceptions">
-                  {exceptions.map((exception) => (
-                    <li key={exception.categoryId} data-testid={'policy-exception-' + exception.categoryId}>
-                      {exception.categoryNameFa} — {RETURN_RULE_FA[exception.rule as ReturnRule]} —{' '}
-                      {exception.reasonFa}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          )}
-          <div className="mt-lg">
-            <ReturnPolicyForm action={publishReturnPolicyAction} categories={categories} />
-          </div>
-        </Card>
+      <QueueMeta total={disputes.length} noun="مرجوعی مورد اختلاف" />
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرجوعی‌های مورد اختلاف</span></h2></div>
-          <p className="mt-2xs text-caption text-text-secondary" data-testid="disputed-hold-note">
-            تا تعیین تکلیف، مبلغ این زیرسفارش‌ها نگه داشته می‌شود و در هیچ دسته تسویه‌ای نمی‌آید.
+      <Panel title="مرجوعی‌های مورد اختلاف" count={fa(disputes.length)}>
+        <p className="text-caption text-text-secondary" data-testid="disputed-hold-note">
+          تا تعیین تکلیف، مبلغ این زیرسفارش‌ها نگه داشته می‌شود و در هیچ دسته تسویه‌ای نمی‌آید.
+        </p>
+        {disputes.length === 0 ? (
+          <p className="text-body-sm text-text-secondary" data-testid="disputed-empty">
+            مرجوعی مورد اختلافی وجود ندارد.
           </p>
-          {disputes.length === 0 ? (
-            <p className="mt-sm text-body-sm text-text-secondary" data-testid="disputed-empty">
-              مرجوعی مورد اختلافی وجود ندارد.
-            </p>
-          ) : (
-            <ul className="mt-md space-y-lg" data-testid="disputed-returns">
-              {disputes.map((view) => (
-                <li key={view.row.id} className="space-y-sm rounded-lg border border-border-default p-lg">
-                  <div className="flex flex-wrap items-center justify-between gap-sm">
-                    <span className="text-label-sm" data-testid={'disputed-ref-' + view.row.id}>
-                      {view.row.reference} — {view.sellerNameFa} — زیرسفارش {view.subOrderReference}
-                    </span>
-                    <StatusBadge tone="warning">
-                      <span data-testid={'disputed-status-' + view.row.id}>
-                        {RETURN_STATUS_FA[view.row.status as ReturnStatus]}
-                      </span>
-                    </StatusBadge>
-                  </div>
+        ) : (
+          <CaseList label="مرجوعی‌های مورد اختلاف" testId="disputed-returns">
+            {disputes.map((view) => (
+              <CaseItem
+                key={view.row.id}
+                type="مرجوعی"
+                name={
+                  <span data-testid={'disputed-ref-' + view.row.id}>
+                    <bdi dir="ltr">{view.row.reference}</bdi>
+                    {' — ' + view.sellerNameFa}
+                  </span>
+                }
+                sub={
+                  <>
+                    {'زیرسفارش '}
+                    <bdi dir="ltr">{view.subOrderReference}</bdi>
+                  </>
+                }
+                status={{
+                  tone: 'warning',
+                  label: RETURN_STATUS_FA[view.row.status as ReturnStatus],
+                  testId: 'disputed-status-' + view.row.id,
+                }}
+                owner="SYSTEM"
+                ownerLabel="پشتیبانی بازار"
+                ownerIsUs
+              >
+                <div className="space-y-sm">
                   <p className="text-body-sm" data-testid={'disputed-reason-' + view.row.id}>
                     {view.row.reasonFa}
                     {view.row.decisionNoteFa ? ' — ' + view.row.decisionNoteFa : ''}
                   </p>
-                  <ul className="space-y-2xs text-caption" data-testid={'disputed-items-' + view.row.id}>
+                  <dl className="hz-kv" data-testid={'disputed-items-' + view.row.id}>
                     {view.items.map((item) => (
-                      <li key={item.id}>
-                        {item.productNameFa} × {fa(item.quantity)} — {fa(item.lineRefundToman)} تومان
-                      </li>
+                      <div key={item.id} className="hz-kv__row">
+                        <dt className="hz-kv__key">{item.productNameFa + ' × ' + fa(item.quantity)}</dt>
+                        <dd className="hz-kv__value hz-num">{fa(item.lineRefundToman)} تومان</dd>
+                      </div>
                     ))}
-                  </ul>
+                  </dl>
                   <ReturnMoveForm
                     action={moveReturnAsOperatorAction}
                     returnId={view.row.id}
                     moves={view.moves}
                     testPrefix="ops-return"
                   />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </div>
+                </div>
+              </CaseItem>
+            ))}
+          </CaseList>
+        )}
+      </Panel>
+
+      <Panel title="سیاست مرجوعی در جریان">
+        {policy === null ? (
+          <Alert tone="warning" title="هنوز هیچ نسخه‌ای منتشر نشده است">
+            <span data-testid="policy-missing">
+              تا انتشار یک نسخه، هیچ مرجوعی‌ای ثبت نمی‌شود؛ مهلت مرجوعی چیزی نیست که حدس زده شود.
+            </span>
+          </Alert>
+        ) : (
+          <div className="space-y-sm">
+            <p className="text-body-sm" data-testid="policy-live">
+              نسخه {policy.version} — مهلت عمومی {fa(policy.windowDays)} روز
+            </p>
+            <p className="text-caption text-text-secondary" data-testid="policy-body-text">
+              {policy.bodyFa}
+            </p>
+            {exceptions.length > 0 ? (
+              <ul data-testid="policy-exceptions">
+                {exceptions.map((exception) => (
+                  <li key={exception.categoryId} className="hz-setting" data-testid={'policy-exception-' + exception.categoryId}>
+                    <div className="hz-setting__label">
+                      <span className="hz-setting__name">{exception.categoryNameFa}</span>
+                      <span className="hz-setting__hint">{exception.reasonFa}</span>
+                    </div>
+                    <div className="hz-setting__end">
+                      <span className="hz-setting__value">{RETURN_RULE_FA[exception.rule as ReturnRule]}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        )}
+        <ReturnPolicyForm action={publishReturnPolicyAction} categories={categories} />
+      </Panel>
     </OpsShell>
   );
 }

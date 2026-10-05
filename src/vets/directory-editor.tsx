@@ -58,7 +58,7 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-md">
           <div>
-            <h1 className="text-h3">{profile.displayNameFa}</h1>
+            <h2 className="hz-h3">{profile.displayNameFa}</h2>
             <p className="mt-2xs text-caption text-text-secondary">پروفایل عمومی دایرکتوری</p>
           </div>
           <span data-testid="directory-public-status">
@@ -69,7 +69,7 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
         </div>
         {profile.publicStatus === 'PUBLISHED' && profile.publicSlug ? (
           <p className="mt-sm text-body-sm">
-            <Link href={'/veterinarians/' + profile.publicSlug} className="text-text-brand underline underline-offset-4" data-testid="directory-public-link">
+            <Link href={'/veterinarians/' + profile.publicSlug} className="hz-link hz-link--standalone" data-testid="directory-public-link">
               مشاهده صفحه عمومی
             </Link>
           </p>
@@ -132,9 +132,9 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
             />
           </div>
         ) : (
-          <ul className="mt-lg space-y-lg">
+          <ul className="mt-lg divide-y divide-border-subtle">
             {facts.locations.map((location) => (
-              <li key={location.id} className="rounded-xl border border-border-default p-lg" data-testid={'directory-location-' + location.id}>
+              <li key={location.id} className="py-lg first:pt-0 last:pb-0" data-testid={'directory-location-' + location.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
                     <h3 className="text-label-md">{location.nameFa}</h3>

@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { AppError } from '../../../src/domain/errors.ts';
@@ -30,6 +30,8 @@ const when = (value: Date) =>
  * facts, and whether the handover happened. The limit is printed on the page
  * the reviewer works from, because a reviewer who quietly decides the remaining
  * price would be making a promise the product cannot keep.
+ *
+ * DS P09 + in-card P10 desk (no `[id]` route): facts, claim, note, decision.
  */
 export default async function DisputeQueuePage() {
   const guard = await guardRoute('/market/disputes');
@@ -45,59 +47,54 @@ export default async function DisputeQueuePage() {
 
   return (
     <OpsShell actor={guard.actor} title="پرونده‌های اختلاف" nav={marketNav(guard.actor)} pathname="/market/disputes">
-      <div className="space-y-lg">
-        <Alert tone="info" title="دامنه داوری">
-          <span data-testid="dispute-scope-note">{OUT_OF_SCOPE_FA}</span>
-        </Alert>
+      <QueueMeta
+        total={queue.length}
+        noun="پرونده باز"
+        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null}
+      />
+      <Alert tone="info" title="دامنه داوری">
+        <span data-testid="dispute-scope-note">{OUT_OF_SCOPE_FA}</span>
+      </Alert>
 
-        {queue.length === 0 ? (
-          <div data-testid="dispute-queue-empty">
-            <EmptyState
-              title="پرونده بازی نیست"
-              description="هر اختلافی که طرفین یک معامله باز کنند، اینجا برای بررسی می‌آید."
-            />
-          </div>
-        ) : (
-          <ul className="space-y-lg" data-testid="dispute-queue">
-            {queue.map((entry) => (
-              <li key={entry.id}>
-                <Card>
-                  <div className="flex flex-wrap items-center gap-sm">
-                    <StatusBadge tone="neutral">
-                      <span data-testid={'dispute-status-' + entry.id}>
-                        {DISPUTE_STATUS_FA[entry.status] ?? entry.status}
-                      </span>
-                    </StatusBadge>
-                    <span className="text-label-lg">{entry.animalNameFa}</span>
-                    <span className="text-caption text-text-secondary">
-                      {DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope}
-                    </span>
-                    <span className="text-caption text-text-secondary">
-                      بیعانه: {moneyFa(entry.depositAmountToman)} تومان
-                    </span>
-                    <span className="text-caption text-text-secondary">
-                      طرح‌کننده: {entry.openedByParty === 'BUYER' ? 'خریدار' : 'فروشنده'}
-                    </span>
-                    <span className="text-caption text-text-secondary">{when(entry.createdAt)}</span>
-                    <Link href={'/account/purchases/' + entry.inquiryId} className="text-text-brand">
-                      گفت‌وگوی معامله
-                    </Link>
-                  </div>
-                  <p className="mt-sm text-body-sm" data-testid={'dispute-claim-' + entry.id}>
-                    {entry.claimFa}
-                  </p>
-                  <ReviewerNoteForm disputeId={entry.id} />
-                  <DisputeDecisionForm
-                    disputeId={entry.id}
-                    version={entry.version}
-                    depositFa={moneyFa(entry.depositAmountToman)}
-                  />
-                </Card>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {queue.length === 0 ? (
+        <div data-testid="dispute-queue-empty">
+          <EmptyState
+            title="پرونده بازی نیست"
+            description="هر اختلافی که طرفین یک معامله باز کنند، اینجا برای بررسی می‌آید."
+          />
+        </div>
+      ) : (
+        <CaseList label="پرونده‌های اختلاف" testId="dispute-queue">
+          {queue.map((entry) => (
+            <CaseItem
+              key={entry.id}
+              type={DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope}
+              name={entry.animalNameFa}
+              sub={
+                <>
+                  {'بیعانه: ' + moneyFa(entry.depositAmountToman) + ' تومان · طرح‌کننده: ' + (entry.openedByParty === 'BUYER' ? 'خریدار' : 'فروشنده') + ' · ' + when(entry.createdAt) + ' · '}
+                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
+                    گفت‌وگوی معامله
+                  </Link>
+                </>
+              }
+              ageDays={ageInDays(entry.createdAt)}
+              status={{ tone: 'info', label: DISPUTE_STATUS_FA[entry.status] ?? entry.status, testId: 'dispute-status-' + entry.id }}
+              owner="SYSTEM"
+              ownerLabel="داور بازار"
+              ownerIsUs
+            >
+              <div className="space-y-md">
+                <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'dispute-claim-' + entry.id}>
+                  {entry.claimFa}
+                </blockquote>
+                <ReviewerNoteForm disputeId={entry.id} />
+                <DisputeDecisionForm disputeId={entry.id} version={entry.version} depositFa={moneyFa(entry.depositAmountToman)} />
+              </div>
+            </CaseItem>
+          ))}
+        </CaseList>
+      )}
     </OpsShell>
   );
 }

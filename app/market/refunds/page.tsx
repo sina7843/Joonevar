@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { AppError } from '../../../src/domain/errors.ts';
@@ -39,61 +39,66 @@ export default async function RefundQueuePage() {
 
   return (
     <OpsShell actor={guard.actor} title="استرداد بیعانه" nav={marketNav(guard.actor)} pathname="/market/refunds">
-      <div className="space-y-lg">
-        <Alert tone="info" title="هیچ مبلغی با زدن دکمه «پرداخت‌شده» نمی‌شود">
-          <span data-testid="refund-policy-note">
-            استرداد فقط وقتی پرداخت‌شده ثبت می‌شود که درگاه شماره پیگیری بدهد یا اپراتور شماره پیگیری بانکی
-            را وارد کند. تلاش ناموفق با متن خطا نگه داشته می‌شود و پس از{' '}
-            {MAX_AUTOMATIC_REFUND_ATTEMPTS.toLocaleString('fa-IR')} تلاش، پیگیری دستی لازم است.
-          </span>
-        </Alert>
+      <QueueMeta
+        total={queue.length}
+        noun="استرداد در انتظار"
+        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null}
+      />
+      <Alert tone="info" title="هیچ مبلغی با زدن دکمه «پرداخت‌شده» نمی‌شود">
+        <span data-testid="refund-policy-note">
+          استرداد فقط وقتی پرداخت‌شده ثبت می‌شود که درگاه شماره پیگیری بدهد یا اپراتور شماره پیگیری بانکی
+          را وارد کند. تلاش ناموفق با متن خطا نگه داشته می‌شود و پس از{' '}
+          {MAX_AUTOMATIC_REFUND_ATTEMPTS.toLocaleString('fa-IR')} تلاش، پیگیری دستی لازم است.
+        </span>
+      </Alert>
 
-        {queue.length === 0 ? (
-          <div data-testid="refund-queue-empty">
-            <EmptyState
-              title="استرداد در انتظاری نیست"
-              description="هر لغو یا رأیی که بیعانه را برگرداند، اینجا به‌عنوان کار باقی‌مانده می‌آید."
-            />
-          </div>
-        ) : (
-          <ul className="space-y-lg" data-testid="refund-queue">
-            {queue.map((entry) => (
-              <li key={entry.id}>
-                <Card>
-                  <div className="flex flex-wrap items-center gap-sm">
-                    <StatusBadge tone={entry.status === 'FAILED' ? 'error' : 'neutral'}>
-                      <span data-testid={'refund-status-' + entry.id}>
-                        {REFUND_STATUS_FA[entry.status] ?? entry.status}
-                      </span>
-                    </StatusBadge>
-                    <span className="text-label-lg">{moneyFa(entry.amountToman)} تومان</span>
-                    <span className="text-caption text-text-secondary">{entry.animalNameFa}</span>
-                    <span className="text-caption text-text-secondary">
-                      گیرنده: <bdi className="hz-ltr font-mono">{entry.recipientMobile}</bdi>
-                    </span>
-                    <span className="text-caption text-text-secondary">
-                      تلاش‌ها: {entry.attempts.toLocaleString('fa-IR')}
-                    </span>
-                    <span className="text-caption text-text-secondary">{when(entry.createdAt)}</span>
-                    <Link href={'/account/purchases/' + entry.inquiryId} className="text-text-brand">
-                      معامله
-                    </Link>
-                  </div>
-                  {entry.lastErrorFa ? (
-                    <p className="mt-sm text-caption text-text-secondary" data-testid={'refund-error-' + entry.id}>
-                      آخرین خطا: {entry.lastErrorFa}
-                    </p>
-                  ) : null}
-                  <div className="mt-lg space-y-lg">
-                    <RetryRefundForm refundId={entry.id} retryable={entry.retryable} />
-                    <ManualRefundForm refundId={entry.id} />
-                  </div>
-                </Card>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {queue.length === 0 ? (
+        <div data-testid="refund-queue-empty">
+          <EmptyState
+            title="استرداد در انتظاری نیست"
+            description="هر لغو یا رأیی که بیعانه را برگرداند، اینجا به‌عنوان کار باقی‌مانده می‌آید."
+          />
+        </div>
+      ) : (
+        <CaseList label="استردادهای در انتظار" testId="refund-queue">
+          {queue.map((entry) => (
+            <CaseItem
+              key={entry.id}
+              type="استرداد بیعانه"
+              name={<span className="hz-num">{moneyFa(entry.amountToman) + ' تومان'}</span>}
+              sub={
+                <>
+                  {entry.animalNameFa + ' · گیرنده: '}
+                  <bdi dir="ltr">{entry.recipientMobile}</bdi>
+                  {' · تلاش‌ها: ' + entry.attempts.toLocaleString('fa-IR') + ' · ' + when(entry.createdAt) + ' · '}
+                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
+                    معامله
+                  </Link>
+                </>
+              }
+              ageDays={ageInDays(entry.createdAt)}
+              status={{
+                tone: entry.status === 'FAILED' ? 'error' : 'neutral',
+                label: REFUND_STATUS_FA[entry.status] ?? entry.status,
+                testId: 'refund-status-' + entry.id,
+              }}
+              owner="SYSTEM"
+              ownerLabel="مالی بازار"
+              ownerIsUs
+            >
+              <div className="space-y-md">
+                {entry.lastErrorFa ? (
+                  <p className="text-caption text-text-secondary" data-testid={'refund-error-' + entry.id}>
+                    آخرین خطا: {entry.lastErrorFa}
+                  </p>
+                ) : null}
+                <RetryRefundForm refundId={entry.id} retryable={entry.retryable} />
+                <ManualRefundForm refundId={entry.id} />
+              </div>
+            </CaseItem>
+          ))}
+        </CaseList>
+      )}
     </OpsShell>
   );
 }

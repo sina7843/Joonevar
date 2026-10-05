@@ -1,7 +1,7 @@
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { reviewQueue } from '../../../src/commerce/reviews.ts';
@@ -31,73 +31,76 @@ export default async function MarketTrustPage() {
 
   return (
     <OpsShell actor={guard.actor} title="نظرها و پرسش‌ها" nav={marketNav(guard.actor)} pathname="/market/trust">
-      <div className="space-y-lg p-lg">
-        <Alert tone="info" title="امتیاز فروشگاه فقط از نظرها ساخته می‌شود">
-          <span data-testid="reputation-note">
-            هیچ بسته تبلیغی و هیچ پلنی در محاسبه امتیاز دخالت ندارد؛ تبلیغ جایگاه می‌خرد، نه اعتبار.
-          </span>
-        </Alert>
+      <QueueMeta total={questions.length} noun="پرسش در انتظار بررسی" />
+      <Alert tone="info" title="امتیاز فروشگاه فقط از نظرها ساخته می‌شود">
+        <span data-testid="reputation-note">
+          هیچ بسته تبلیغی و هیچ پلنی در محاسبه امتیاز دخالت ندارد؛ تبلیغ جایگاه می‌خرد، نه اعتبار.
+        </span>
+      </Alert>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرسش‌های در انتظار بررسی</span></h2></div>
-          {questions.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="question-queue-empty">
-              پرسشی در انتظار بررسی نیست.
-            </p>
-          ) : (
-            <ul className="mt-md space-y-lg" data-testid="question-queue">
-              {questions.map((entry) => (
-                <li
-                  key={entry.question.id}
-                  className="space-y-sm rounded-lg border border-border-default p-lg"
-                  data-testid={'question-' + entry.question.id}
-                >
-                  <p className="text-body-sm">
-                    {entry.productNameFa ?? entry.sellerNameFa ?? '—'} — {entry.question.bodyFa}
-                  </p>
+      <Panel title="پرسش‌های در انتظار بررسی" count={fa(questions.length)}>
+        {questions.length === 0 ? (
+          <p className="text-caption text-text-secondary" data-testid="question-queue-empty">
+            پرسشی در انتظار بررسی نیست.
+          </p>
+        ) : (
+          <CaseList label="پرسش‌های در انتظار بررسی" testId="question-queue">
+            {questions.map((entry) => (
+              <CaseItem
+                key={entry.question.id}
+                testId={'question-' + entry.question.id}
+                type="پرسش"
+                name={entry.productNameFa ?? entry.sellerNameFa ?? '—'}
+                status={{ tone: 'info', label: 'در انتظار بررسی' }}
+                owner="SYSTEM"
+                ownerLabel="ناظر آگهی"
+                ownerIsUs
+              >
+                <div className="space-y-sm">
+                  <blockquote className="hz-card hz-card--subtle text-body-sm">{entry.question.bodyFa}</blockquote>
                   <DecideQuestionForm action={decideQuestionAction} questionId={entry.question.id} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+                </div>
+              </CaseItem>
+            ))}
+          </CaseList>
+        )}
+      </Panel>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نظرها</span></h2></div>
-          {reviews.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="review-queue-empty">
-              نظری ثبت نشده است.
-            </p>
-          ) : (
-            <ul className="mt-md space-y-lg" data-testid="review-queue">
-              {reviews.map((view) => (
-                <li
-                  key={view.row.id}
-                  className="space-y-sm rounded-lg border border-border-default p-lg"
-                  data-testid={'review-' + view.row.id}
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-sm">
-                    <span className="text-body-sm">
-                      {view.sellerNameFa ?? 'معامله حیوان'} — {view.dimensionsFa[0]}: {fa(view.row.scoreOne)} —{' '}
-                      {view.dimensionsFa[1]}: {fa(view.row.scoreTwo)} — {view.dimensionsFa[2]}:{' '}
-                      {fa(view.row.scoreThree)}
+      <Panel title="نظرها" count={fa(reviews.length)}>
+        {reviews.length === 0 ? (
+          <p className="text-caption text-text-secondary" data-testid="review-queue-empty">
+            نظری ثبت نشده است.
+          </p>
+        ) : (
+          <ul className="divide-y divide-border-subtle" data-testid="review-queue">
+            {reviews.map((view) => (
+              <li key={view.row.id} className="space-y-sm py-md first:pt-0 last:pb-0" data-testid={'review-' + view.row.id}>
+                <div className="flex flex-wrap items-start justify-between gap-sm">
+                  <div className="hz-case min-w-0">
+                    <span className="hz-case__name">{view.sellerNameFa ?? 'معامله حیوان'}</span>
+                    <span className="hz-case__sub">
+                      {view.dimensionsFa[0]}: {fa(view.row.scoreOne)} · {view.dimensionsFa[1]}: {fa(view.row.scoreTwo)} ·{' '}
+                      {view.dimensionsFa[2]}: {fa(view.row.scoreThree)}
                     </span>
-                    <StatusBadge tone={view.row.status === 'PUBLISHED' ? 'success' : 'neutral'}>
-                      <span data-testid={'review-status-' + view.row.id}>{view.row.status}</span>
-                    </StatusBadge>
                   </div>
-                  {view.row.bodyFa ? (
-                    <p className="text-body-sm" data-testid={'review-body-' + view.row.id}>
-                      {view.row.bodyFa}
-                    </p>
-                  ) : null}
-                  <ModerateReviewForm action={moderateReviewAction} reviewId={view.row.id} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      </div>
+                  {/* The machine status stays as written: operators and checks read the same word. */}
+                  <StatusBadge tone={view.row.status === 'PUBLISHED' ? 'success' : 'neutral'} size="sm">
+                    <bdi dir="ltr" data-testid={'review-status-' + view.row.id}>
+                      {view.row.status}
+                    </bdi>
+                  </StatusBadge>
+                </div>
+                {view.row.bodyFa ? (
+                  <p className="text-body-sm" data-testid={'review-body-' + view.row.id}>
+                    {view.row.bodyFa}
+                  </p>
+                ) : null}
+                <ModerateReviewForm action={moderateReviewAction} reviewId={view.row.id} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
     </OpsShell>
   );
 }

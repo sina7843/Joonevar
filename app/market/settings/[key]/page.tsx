@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Panel } from '../../../../src/ui/desk.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { AppError } from '../../../../src/domain/errors.ts';
 import { settingHistory } from '../../../../src/marketplace/operations.ts';
@@ -49,54 +49,80 @@ export default async function MarketSettingHistoryPage({
           description="این مقدار از زمان نصب دست نخورده است؛ اولین تغییر همین‌جا با نام، زمان و دلیل ثبت می‌شود."
         />
       ) : (
-        <ul className="space-y-md" data-testid="setting-history">
-          {history.items.map((row) => (
-            <li key={row.id} className="rounded-lg border border-border-default p-md" data-testid={'history-' + row.id}>
-              <div className="flex flex-wrap items-center justify-between gap-sm">
-                <p className="text-caption text-text-secondary">{formatted(row.occurredAt)}</p>
-                <StatusBadge tone="neutral">{row.actorContext ?? 'سیستم'}</StatusBadge>
-              </div>
-              <p className="mt-sm text-body-sm">
-                <bdi className="hz-ltr font-mono" data-testid={'history-before-' + row.id}>
-                  {row.beforeValue}
-                </bdi>
-                <span className="mx-sm text-text-disabled">←</span>
-                <bdi className="hz-ltr font-mono" data-testid={'history-after-' + row.id}>
-                  {row.afterValue}
-                </bdi>
-              </p>
-              {row.reason ? <p className="mt-sm text-caption text-text-secondary">دلیل: {row.reason}</p> : null}
-            </li>
-          ))}
-        </ul>
+        <div className="hz-table-wrap">
+          <table className="hz-table hz-table--stack" data-testid="setting-history">
+            <caption className="hz-visually-hidden">تاریخچه تغییرات، تازه‌ترین در بالا</caption>
+            <thead>
+              <tr>
+                <th scope="col">زمان</th>
+                <th scope="col">انجام‌دهنده</th>
+                <th scope="col">قبل ← بعد</th>
+                <th scope="col">دلیل</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.items.map((row) => (
+                <tr key={row.id} className="hz-audit-row" data-testid={'history-' + row.id}>
+                  <td className="hz-table__lead">
+                    <span className="hz-audit-when">{formatted(row.occurredAt)}</span>
+                  </td>
+                  <td data-label="انجام‌دهنده">
+                    <span className={row.actorContext ? 'hz-audit-who' : 'hz-audit-who hz-audit-who--system'}>
+                      <span className="hz-audit-who__name">
+                        <bdi dir="auto">{row.actorContext ?? 'سیستم'}</bdi>
+                      </span>
+                    </span>
+                  </td>
+                  <td data-label="قبل ← بعد" className="max-w-md">
+                    <div className="hz-audit-change">
+                      <span className="hz-visually-hidden">از</span>
+                      <bdi className="hz-audit-change__before [overflow-wrap:anywhere]" dir="ltr" data-testid={'history-before-' + row.id}>
+                        {row.beforeValue}
+                      </bdi>
+                      <Icon name="arrowRight" size="xs" mirror className="hz-audit-change__arrow" />
+                      <span className="hz-visually-hidden">به</span>
+                      <bdi className="hz-audit-change__after [overflow-wrap:anywhere]" dir="ltr" data-testid={'history-after-' + row.id}>
+                        {row.afterValue}
+                      </bdi>
+                    </div>
+                  </td>
+                  <td data-label="دلیل" className="min-w-48">
+                    {row.reason ? (
+                      <p className="hz-audit-reason">دلیل: {row.reason}</p>
+                    ) : (
+                      <p className="hz-audit-reason hz-audit-reason--none">— بدون دلیل ثبت‌شده</p>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       );
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
     return (
       <OpsShell actor={actor} title="تاریخچه مقدار" pathname="/market/settings" nav={marketNav(actor)}>
-        <Card>
-          <Alert tone="error" title={error.message} />
-        </Card>
+        <Alert tone="error" title={error.message} />
       </OpsShell>
     );
   }
 
   return (
     <OpsShell actor={actor} title="تاریخچه مقدار" pathname="/market/settings" nav={marketNav(actor)}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{definition?.labelFa ?? key}</span></h2></div>
-          <p className="mt-2xs text-caption text-text-secondary">
-            <bdi className="hz-ltr font-mono">{key}</bdi>
-          </p>
-          <p className="mt-md text-caption">
-            <Link href="/market/settings" className="text-text-brand" data-testid="back-to-settings">
-              بازگشت به تنظیمات بازار
-            </Link>
-          </p>
-        </Card>
-        <Card>{body}</Card>
-      </div>
+      <Link href="/market/settings" className="hz-link hz-link--standalone" data-testid="back-to-settings">
+        بازگشت به تنظیمات بازار
+      </Link>
+      <Panel
+        title={definition?.labelFa ?? key}
+        aside={
+          <bdi className="hz-setting__key" dir="ltr">
+            {key}
+          </bdi>
+        }
+      >
+        {body}
+      </Panel>
     </OpsShell>
   );
 }

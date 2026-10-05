@@ -1,7 +1,7 @@
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { Card } from '../../../src/ui/card.tsx';
+import { Panel } from '../../../src/ui/desk.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { productCategories } from '../../../src/db/schema/catalog.ts';
@@ -34,9 +34,69 @@ export default async function MarketPromotionsPage() {
 
   return (
     <OpsShell actor={guard.actor} title="کمپین و تخفیف" nav={marketNav(guard.actor)} pathname="/market/promotions">
-      <div className="space-y-lg p-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>سیاست هم‌زمانی تخفیف‌ها</span></h2></div>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{fa(rules.length) + ' کمپین و کد'}</span>
+        <span className="hz-page-header__meta-item">
+          {stacking.row === null ? 'سیاست هم‌زمانی: منتشر نشده' : 'سیاست هم‌زمانی: نسخه ' + stacking.row.version}
+        </span>
+      </p>
+
+      <Panel title="کمپین‌ها و کدهای همزیست" count={fa(rules.length)}>
+        {rules.length === 0 ? (
+          <p className="text-caption text-text-secondary" data-testid="platform-rules-empty">
+            هنوز کمپینی تعریف نشده است.
+          </p>
+        ) : (
+          <ul data-testid="platform-rules">
+            {rules.map((rule) => (
+              <li key={rule.id} className="hz-setting" data-testid={'platform-rule-' + rule.id}>
+                <div className="hz-setting__label">
+                  <span className="hz-setting__name">{rule.labelFa}</span>
+                  <span className="hz-setting__hint">
+                    {DISCOUNT_KIND_FA[rule.kind as DiscountKind]}
+                    {rule.code ? (
+                      <>
+                        {' — کد '}
+                        <bdi dir="ltr">{rule.code}</bdi>
+                      </>
+                    ) : null}
+                    {rule.percentBp !== null ? ' — ' + fa(rule.percentBp / 100) + '٪' : ''}
+                    {rule.totalUses !== null ? ' — سقف ' + fa(rule.totalUses) : ''}
+                  </span>
+                </div>
+                <div className="hz-setting__end">
+                  {/* The machine status stays as written: operators and checks read the same word. */}
+                  <StatusBadge tone={rule.status === 'ACTIVE' ? 'success' : 'neutral'} size="sm">
+                    <bdi dir="ltr" data-testid={'platform-rule-status-' + rule.id}>
+                      {rule.status}
+                    </bdi>
+                  </StatusBadge>
+                  {rule.status === 'DRAFT' || rule.status === 'PAUSED' ? (
+                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="ACTIVE" labelFa="فعال کردن" />
+                  ) : null}
+                  {rule.status === 'ACTIVE' ? (
+                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="PAUSED" labelFa="توقف" />
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Panel>
+
+      <div className="grid items-start gap-lg lg:grid-cols-2">
+        <Panel title="کمپین تازه">
+          <p className="text-caption text-text-secondary" data-testid="platform-discount-note">
+            هزینه این تخفیف‌ها از سهم همزیست کم می‌شود، نه از سهم فروشنده.
+          </p>
+          <DiscountForm
+            action={createDiscountAction}
+            kinds={['PLATFORM_CODE', 'CATEGORY_CAMPAIGN', 'FREE_SHIPPING']}
+            categories={categories}
+          />
+        </Panel>
+
+        <Panel title="سیاست هم‌زمانی تخفیف‌ها">
           {stacking.row === null ? (
             <Alert tone="warning" title="هنوز نسخه‌ای منتشر نشده است">
               <span data-testid="stacking-none">
@@ -44,65 +104,12 @@ export default async function MarketPromotionsPage() {
               </span>
             </Alert>
           ) : (
-            <p className="mt-sm text-body-sm" data-testid="stacking-live">
+            <p className="text-body-sm" data-testid="stacking-live">
               نسخه {stacking.row.version} — {fa(stacking.policy.combinable.length)} جفت قابل جمع
             </p>
           )}
-          <div className="mt-lg">
-            <StackingForm action={publishStackingAction} />
-          </div>
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کمپین‌ها و کدهای همزیست</span></h2></div>
-          {rules.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="platform-rules-empty">
-              هنوز کمپینی تعریف نشده است.
-            </p>
-          ) : (
-            <ul className="mt-md space-y-sm" data-testid="platform-rules">
-              {rules.map((rule) => (
-                <li
-                  key={rule.id}
-                  className="flex flex-wrap items-center justify-between gap-sm text-body-sm"
-                  data-testid={'platform-rule-' + rule.id}
-                >
-                  <span>
-                    {rule.labelFa} — {DISCOUNT_KIND_FA[rule.kind as DiscountKind]}
-                    {rule.code ? ' — کد ' + rule.code : ''}
-                    {rule.percentBp !== null ? ' — ' + fa(rule.percentBp / 100) + '٪' : ''}
-                    {rule.totalUses !== null ? ' — سقف ' + fa(rule.totalUses) : ''}
-                  </span>
-                  <span className="flex items-center gap-sm">
-                    <StatusBadge tone={rule.status === 'ACTIVE' ? 'success' : 'neutral'}>
-                      <span data-testid={'platform-rule-status-' + rule.id}>{rule.status}</span>
-                    </StatusBadge>
-                    {rule.status === 'DRAFT' || rule.status === 'PAUSED' ? (
-                      <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="ACTIVE" labelFa="فعال کردن" />
-                    ) : null}
-                    {rule.status === 'ACTIVE' ? (
-                      <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="PAUSED" labelFa="توقف" />
-                    ) : null}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کمپین تازه</span></h2></div>
-          <p className="mt-2xs text-caption text-text-secondary" data-testid="platform-discount-note">
-            هزینه این تخفیف‌ها از سهم همزیست کم می‌شود، نه از سهم فروشنده.
-          </p>
-          <div className="mt-lg">
-            <DiscountForm
-              action={createDiscountAction}
-              kinds={['PLATFORM_CODE', 'CATEGORY_CAMPAIGN', 'FREE_SHIPPING']}
-              categories={categories}
-            />
-          </div>
-        </Card>
+          <StackingForm action={publishStackingAction} />
+        </Panel>
       </div>
     </OpsShell>
   );

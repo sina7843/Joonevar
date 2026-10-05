@@ -48,8 +48,11 @@ export function CaseQueue({
   showType = false,
   showOwner = true,
   extraLabel,
+  nameLabel = 'متقاضی',
 }: {
   label: string;
+  /** Header of the name column (متقاضی، حیوان، عنوان…). */
+  nameLabel?: string;
   rows: readonly QueueRow[];
   showCode?: boolean;
   showType?: boolean;
@@ -66,7 +69,7 @@ export function CaseQueue({
           <tr>
             {showAge ? <th scope="col">سن پرونده</th> : null}
             {showCode ? <th scope="col">کد پرونده</th> : null}
-            <th scope="col">متقاضی</th>
+            <th scope="col">{nameLabel}</th>
             {showType ? <th scope="col">نوع</th> : null}
             {showStatus ? <th scope="col">وضعیت</th> : null}
             {showOwner ? <th scope="col">اقدام بعدی با</th> : null}

@@ -107,7 +107,7 @@ export function CommunityEditor({
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-md">
           <div>
-            <h1 className="text-h3">{community.displayNameFa}</h1>
+            <h2 className="hz-h3">{community.displayNameFa}</h2>
             <p className="mt-2xs text-caption text-text-secondary">
               {COMMUNITY_KIND_FA[kind] + ' · حوزه ' + COMMUNITY_SCOPE_FA[community.scope as CommunityScope]}
             </p>
@@ -120,7 +120,7 @@ export function CommunityEditor({
         </div>
         {community.publicStatus === 'PUBLISHED' && community.publicSlug ? (
           <p className="mt-sm text-body-sm">
-            <Link href={'/associations/' + community.publicSlug} className="text-text-brand underline underline-offset-4" data-testid="community-public-link">
+            <Link href={'/associations/' + community.publicSlug} className="hz-link hz-link--standalone" data-testid="community-public-link">
               مشاهده صفحه عمومی
             </Link>
           </p>
@@ -192,9 +192,9 @@ export function CommunityEditor({
             <EmptyState title="مدیری ثبت نشده است" description="با شماره موبایل حساب، دعوت بفرستید." />
           </div>
         ) : (
-          <ul className="mt-lg space-y-sm" data-testid="community-managers">
+          <ul className="mt-lg divide-y divide-border-subtle" data-testid="community-managers">
             {facts.managers.map((manager) => (
-              <li key={manager.id} className="rounded-lg border border-border-default p-md" data-testid={'community-manager-' + manager.id}>
+              <li key={manager.id} className="py-md first:pt-0 last:pb-0" data-testid={'community-manager-' + manager.id}>
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <div className="min-w-0">
                     <p className="text-label-md">{manager.nameFa ?? 'بدون پروفایل هویتی'}</p>
@@ -224,9 +224,9 @@ export function CommunityEditor({
             <EmptyState title="رویدادی ثبت نشده است" description="با فرم پایین، اولین رویداد را اضافه کنید." />
           </div>
         ) : (
-          <ul className="mt-lg space-y-lg">
+          <ul className="mt-lg divide-y divide-border-subtle">
             {facts.events.map((event) => (
-              <li key={event.id} className="rounded-xl border border-border-default p-lg" data-testid={'community-event-' + event.id}>
+              <li key={event.id} className="py-lg first:pt-0 last:pb-0" data-testid={'community-event-' + event.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
                     <h3 className="text-label-md">{event.titleFa}</h3>
@@ -288,9 +288,9 @@ export function CommunityEditor({
                   <EmptyState title="نوشته‌ای ثبت نشده است" description="با فرم پایین، اولین پیش‌نویس را بسازید." />
                 </div>
               ) : (
-                <ul className="mt-lg space-y-lg" data-testid="community-posts">
+                <ul className="mt-lg divide-y divide-border-subtle" data-testid="community-posts">
                   {posts.map((post) => (
-                    <li key={post.id} className="rounded-xl border border-border-default p-lg" data-testid={'community-post-' + post.id}>
+                    <li key={post.id} className="py-lg first:pt-0 last:pb-0" data-testid={'community-post-' + post.id}>
                       <div className="flex flex-wrap items-start justify-between gap-sm">
                         <h3 className="text-label-md">{post.titleFa}</h3>
                         <StatusBadge

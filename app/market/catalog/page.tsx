@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { AppError } from '../../../src/domain/errors.ts';
@@ -23,6 +24,9 @@ const when = (value: Date) =>
  * Seller-proposed products waiting to be published, merged into a shared base,
  * or sent back with a reason. The blocked categories are printed here too, so
  * the reviewer reads the same sentence a seller would if they tried.
+ *
+ * DS P09: there is no `[id]` route, so each case card carries its own desk
+ * (publish / send back, merge) under the facts.
  */
 export default async function CatalogReviewPage() {
   const guard = await guardRoute('/market/catalog');
@@ -46,97 +50,98 @@ export default async function CatalogReviewPage() {
 
   return (
     <OpsShell actor={guard.actor} title="بررسی کاتالوگ کالا" nav={marketNav(guard.actor)} pathname="/market/catalog">
-      <div className="space-y-lg">
-        {blocked.length > 0 ? (
-          <Alert tone="info" title="دسته‌های بدون فروش عمومی در این فاز">
-            <span data-testid="catalog-blocked-note">
-              {blocked.map((category) => category.nameFa).join('، ')} — {blocked[0]!.policyNoteFa}
-            </span>
-          </Alert>
-        ) : null}
+      <QueueMeta
+        total={queue.length}
+        noun="کالا در صف بررسی"
+        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null}
+      />
+      {blocked.length > 0 ? (
+        <Alert tone="info" title="دسته‌های بدون فروش عمومی در این فاز">
+          <span data-testid="catalog-blocked-note">
+            {blocked.map((category) => category.nameFa).join('، ')} — {blocked[0]!.policyNoteFa}
+          </span>
+        </Alert>
+      ) : null}
 
-        {queue.length === 0 ? (
-          <div data-testid="catalog-queue-empty">
-            <EmptyState
-              title="کالایی در انتظار بررسی نیست"
-              description="هر کالایی که فروشنده‌ای برای بررسی بفرستد، اینجا می‌آید."
-            />
-          </div>
-        ) : (
-          <ul className="space-y-lg" data-testid="catalog-queue">
-            {queue.map((entry, index) => {
-              const detail = details[index]!;
-              return (
-                <li key={entry.id}>
-                  <Card>
-                    <div className="flex flex-wrap items-center gap-sm">
-                      <StatusBadge tone="neutral">
-                        <span data-testid={'catalog-status-' + entry.id}>
-                          {PRODUCT_STATUS_FA[entry.status as ProductStatus] ?? entry.status}
-                        </span>
-                      </StatusBadge>
-                      <span className="text-label-lg">{entry.nameFa}</span>
-                      <span className="text-caption text-text-secondary">{entry.brandFa ?? 'بدون برند'}</span>
-                      <span className="text-caption text-text-secondary">{entry.categoryNameFa}</span>
-                      <span className="text-caption text-text-secondary">{entry.sellerNameFa ?? 'کاتالوگ مشترک'}</span>
-                      <span className="text-caption text-text-secondary">{when(entry.createdAt)}</span>
-                    </div>
-
-                    <dl className="mt-lg grid gap-sm text-body-sm md:grid-cols-2">
-                      <div>
-                        <dt className="text-caption text-text-secondary">بارکد</dt>
-                        <dd>
-                          <bdi className="hz-ltr font-mono">{entry.barcode ?? '—'}</bdi>
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-caption text-text-secondary">تنوع‌ها</dt>
-                        <dd data-testid={'catalog-variants-' + entry.id}>
-                          {detail.variants.length === 0
-                            ? 'تک‌نوع'
-                            : detail.variants.map((variant) => variant.labelFa).join('، ')}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-caption text-text-secondary">مناسب برای</dt>
-                        <dd>{detail.speciesCodes.join('، ') || '—'}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-caption text-text-secondary">تصویرها</dt>
-                        <dd>
-                          {detail.media.length === 0
-                            ? 'ندارد'
-                            : detail.media.map((image) => (
-                                <Link
-                                  key={image.id}
-                                  href={'/api/files/' + image.fileId}
-                                  className="ms-sm text-text-brand"
-                                >
+      {queue.length === 0 ? (
+        <div data-testid="catalog-queue-empty">
+          <EmptyState
+            title="کالایی در انتظار بررسی نیست"
+            description="هر کالایی که فروشنده‌ای برای بررسی بفرستد، اینجا می‌آید."
+          />
+        </div>
+      ) : (
+        <CaseList label="کالاهای در انتظار بررسی" testId="catalog-queue">
+          {queue.map((entry, index) => {
+            const detail = details[index]!;
+            return (
+              <CaseItem
+                key={entry.id}
+                type="کالای پیشنهادی"
+                name={entry.nameFa}
+                sub={[entry.brandFa ?? 'بدون برند', entry.categoryNameFa, entry.sellerNameFa ?? 'کاتالوگ مشترک', when(entry.createdAt)].join(' · ')}
+                ageDays={ageInDays(entry.createdAt)}
+                status={{
+                  tone: 'info',
+                  label: PRODUCT_STATUS_FA[entry.status as ProductStatus] ?? entry.status,
+                  testId: 'catalog-status-' + entry.id,
+                }}
+                owner="SYSTEM"
+                ownerLabel="بررسی کاتالوگ"
+                ownerIsUs
+              >
+                <div className="space-y-md">
+                  <KeyValueList
+                    twoCol
+                    rows={[
+                      {
+                        key: 'بارکد',
+                        value: entry.barcode ? (
+                          <bdi className="hz-id" dir="ltr">
+                            {entry.barcode}
+                          </bdi>
+                        ) : null,
+                      },
+                      {
+                        key: 'تنوع‌ها',
+                        value: detail.variants.length === 0 ? 'تک‌نوع' : detail.variants.map((variant) => variant.labelFa).join('، '),
+                        testId: 'catalog-variants-' + entry.id,
+                      },
+                      { key: 'مناسب برای', value: detail.speciesCodes.join('، ') || null },
+                      {
+                        key: 'تصویرها',
+                        value:
+                          detail.media.length === 0 ? (
+                            'ندارد'
+                          ) : (
+                            <span className="flex flex-wrap gap-sm">
+                              {detail.media.map((image) => (
+                                <Link key={image.id} href={'/api/files/' + image.fileId} className="hz-link">
                                   {image.altFa}
                                 </Link>
                               ))}
-                        </dd>
-                      </div>
-                    </dl>
-
-                    <ProductDecisionForm productId={entry.id} version={entry.version} />
-                    <ProductMergeForm
-                      productId={entry.id}
-                      version={entry.version}
-                      targets={targets
-                        .filter((target) => target.id !== entry.id)
-                        .map((target) => ({
-                          value: target.id,
-                          label: target.nameFa + (target.barcode ? ' — ' + target.barcode : ''),
-                        }))}
-                    />
-                  </Card>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
+                            </span>
+                          ),
+                      },
+                    ]}
+                  />
+                  <ProductDecisionForm productId={entry.id} version={entry.version} />
+                  <ProductMergeForm
+                    productId={entry.id}
+                    version={entry.version}
+                    targets={targets
+                      .filter((target) => target.id !== entry.id)
+                      .map((target) => ({
+                        value: target.id,
+                        label: target.nameFa + (target.barcode ? ' — ' + target.barcode : ''),
+                      }))}
+                  />
+                </div>
+              </CaseItem>
+            );
+          })}
+        </CaseList>
+      )}
     </OpsShell>
   );
 }
