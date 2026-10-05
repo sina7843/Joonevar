@@ -40,12 +40,12 @@ export default async function AdminAuditPage({
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">فیلتر بر اساس نوع پرونده</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فیلتر بر اساس نوع پرونده</span></h2></div>
           <ul className="mt-md flex flex-wrap gap-sm" data-testid="audit-filters">
             <li>
               <a
                 href="/admin/audit"
-                className="rounded-md border border-border-subtle px-md py-2xs text-caption"
+                className="rounded-lg border border-border-default px-md py-2xs text-caption"
                 data-testid="audit-filter-all"
               >
                 همه
@@ -55,7 +55,7 @@ export default async function AdminAuditPage({
               <li key={value}>
                 <a
                   href={'/admin/audit?target=' + encodeURIComponent(value)}
-                  className="rounded-md border border-border-subtle px-md py-2xs text-caption"
+                  className="rounded-lg border border-border-default px-md py-2xs text-caption"
                   data-testid={'audit-filter-' + value}
                 >
                   {value}

@@ -20,7 +20,7 @@ export default async function FinderRequestsPage() {
   const [rows, personal] = await Promise.all([myRequests(db(), guard.actor), personalMatingsOf(db(), guard.actor)]);
   const section = (title: string, list: typeof rows, testId: string) => (
     <Card>
-      <h2 className="text-label-lg">{title}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{title}</span></h2></div>
       {list.length === 0 ? (
         <p className="mt-sm text-body-sm text-text-secondary">موردی نیست.</p>
       ) : (
@@ -28,7 +28,7 @@ export default async function FinderRequestsPage() {
           {list.map((r) => {
             const snap = r.snapshot as { sender: { nameFa: string | null }; receiver: { nameFa: string } };
             return (
-              <li key={r.id} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm">
+              <li key={r.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm">
                 <Link href={'/account/mating-finder/requests/' + r.id} className="text-label-md text-text-brand underline underline-offset-4" data-testid={'finder-request-link-' + r.id}>
                   {(snap.sender.nameFa ?? 'بدون نام') + ' ← ' + snap.receiver.nameFa}
                 </Link>
@@ -50,7 +50,7 @@ export default async function FinderRequestsPage() {
     <PublicShell actor={guard.actor} title="درخواست‌های جفت‌گیری" pathname="/account/mating-finder">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">درخواست‌های جفت‌گیری</h1>
+          <h2 className="text-h3">درخواست‌های جفت‌گیری</h2>
           <p className="mt-xs text-caption text-text-secondary">
             درخواست‌های ورودی نامحدودند، ولی هر حیوان در هر زمان فقط با یک درخواست وارد تنظیم قرارداد می‌شود.
           </p>
@@ -65,7 +65,7 @@ export default async function FinderRequestsPage() {
         )}
         {personal.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">پرونده‌های جفت‌گیری شخصی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده‌های جفت‌گیری شخصی</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">پرونده‌های رسمی در بخش مجوزهای جفت‌گیری فهرست شده‌اند.</p>
             <ul className="mt-md space-y-sm" data-testid="finder-personal-list">
               {personal.map((m) => (

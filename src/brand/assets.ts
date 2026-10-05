@@ -1,17 +1,11 @@
 /**
- * Brand assets and reversal rules — Hamzist Design System handoff
- * (Figma 2GMJPgnnenGnr1zBN2yH5h), sections 04 Colorways, 05 App Icon & Favicon,
- * 06 Clear Space & Minimum Size and 08 Mono & Reversal Rules.
+ * Brand assets and reversal rules — Hamzist Design System v1.0.3, *Brand*
+ * (docs/design-system/design-system/brand.md, DEC-0225).
  *
- * Every file listed here is an official export used exactly as delivered: never
- * redrawn, recoloured, stretched or rescaled into another size. That last part
- * is why the favicon sizes are three separate files rather than one image the
- * browser scales: section 08 states that below 24px the mark ships as the
- * simplified single-ink glyph, because the interior detail muds together at
- * favicon sizes. A 16px favicon is therefore different artwork from a 48px one.
- *
- * The rules are stated here as data, next to the assets they govern, so a test
- * can check them instead of a document asserting them in prose.
+ * Every file listed here is the system's delivered file, copied byte for byte
+ * under its stable name: never redrawn, recoloured, stretched or rescaled. The
+ * favicon sizes are three separate files because below 24px the mark is
+ * different artwork. The rules are data so a test can check them.
  */
 
 export interface BrandAsset {
@@ -19,50 +13,75 @@ export interface BrandAsset {
   readonly path: string;
   readonly width: number;
   readonly height: number;
-  /** The Design System node this file was exported from, so it can be re-checked. */
-  readonly figmaNode: string;
+  /** Where this file sits in the design system package, so it can be re-checked. */
+  readonly source: string;
 }
 
-/** Section 05: one artwork per size, not one image scaled three ways. */
+const DS = 'docs/design-system/design-system/assets/brand/';
+
+/** Brand › Files: one artwork per favicon size, not one image scaled three ways. */
 export const FAVICONS: readonly BrandAsset[] = [
-  { path: '/brand/favicon-16.png', width: 16, height: 16, figmaNode: '24:353' },
-  { path: '/brand/favicon-32.png', width: 32, height: 32, figmaNode: '24:359' },
-  { path: '/brand/favicon-48.png', width: 48, height: 48, figmaNode: '24:365' },
+  { path: '/brand/favicon/favicon-16.png', width: 16, height: 16, source: DS + 'favicon/favicon-16.png' },
+  { path: '/brand/favicon/favicon-32.png', width: 32, height: 32, source: DS + 'favicon/favicon-32.png' },
+  { path: '/brand/favicon/favicon-48.png', width: 48, height: 48, source: DS + 'favicon/favicon-48.png' },
 ];
 
-/** Section 05: iOS app icon, light appearance. */
+/** App icon option A (approved 11 Mehr 1405): the iOS touch icon. */
 export const APPLE_ICON: BrandAsset = {
-  path: '/brand/app-icon-ios.png',
-  width: 1024,
-  height: 1024,
-  figmaNode: '24:297',
+  path: '/brand/app-icon/apple-touch-icon-180.png',
+  width: 180,
+  height: 180,
+  source: DS + 'app-icon/A/apple-touch-icon-180.png',
 };
 
-/** Section 05: the square social avatar, used as the share image. */
-export const SOCIAL_ICON: BrandAsset = {
-  path: '/brand/app-icon-social.png',
+/** App icon option A at install sizes (web manifest). */
+export const PWA_ICONS: readonly BrandAsset[] = [
+  { path: '/brand/app-icon/pwa-192.png', width: 192, height: 192, source: DS + 'app-icon/A/pwa-192.png' },
+  { path: '/brand/app-icon/pwa-512.png', width: 512, height: 512, source: DS + 'app-icon/A/pwa-512.png' },
+];
+export const PWA_MASKABLE: BrandAsset = {
+  path: '/brand/app-icon/pwa-maskable-512.png',
   width: 512,
   height: 512,
-  figmaNode: '24:321',
+  source: DS + 'app-icon/A/pwa-maskable-512.png',
 };
 
-/** Section 02: the Persian horizontal lockup, the header mark. */
+/** The share image (OpenGraph), 1200×630. */
+export const SOCIAL_ICON: BrandAsset = {
+  path: '/brand/social/og-1200x630.png',
+  width: 1200,
+  height: 630,
+  source: DS + 'social/og-1200x630.png',
+};
+
+/** The Persian horizontal lockup, the header mark. */
 export const LOCKUP_FA: BrandAsset = {
-  path: '/brand/logo-fa-horizontal.png',
-  width: 334,
-  height: 72,
-  figmaNode: '14:2',
+  path: '/brand/logo/lockup-horizontal-fa-light.svg',
+  width: 415.92,
+  height: 92,
+  source: DS + 'logo/lockup-horizontal-fa-light.svg',
 };
 
-/** Section 01: the master symbol. */
+/** The master symbol. */
 export const SYMBOL: BrandAsset = {
-  path: '/brand/logo-symbol.png',
+  path: '/brand/logo/symbol.svg',
   width: 144,
   height: 162,
-  figmaNode: '4:21',
+  source: DS + 'logo/symbol.svg',
 };
 
-export const BRAND_ASSETS: readonly BrandAsset[] = [...FAVICONS, APPLE_ICON, SOCIAL_ICON, LOCKUP_FA, SYMBOL];
+export const BRAND_ASSETS: readonly BrandAsset[] = [
+  ...FAVICONS,
+  APPLE_ICON,
+  ...PWA_ICONS,
+  PWA_MASKABLE,
+  SOCIAL_ICON,
+  LOCKUP_FA,
+  SYMBOL,
+];
+
+/** Manifest colours (Brand › app-icon): both follow the cream chrome. */
+export const THEME_COLOR = '#FFFCF8';
 
 export type BrandTone = 'FULL_COLOR' | 'MONO_INK' | 'MONO_LIGHT';
 export type BrandSurface = 'LIGHT' | 'DARK';

@@ -1,60 +1,97 @@
 @import 'tailwindcss';
 
 /*
- * Design tokens — read from the approved prototype file
- * SPDPe6xmPR4fDGXIT5fvni via get_variable_defs on nodes 109:360 (F03),
- * 156:397 (F04), 349:8324 (F15) and 178:914 (VET-009).
+ * Hamzist Design System v1.0.3 (docs/design-system, DEC-0225).
  *
- * Names below are the published variable names, unchanged, so a value can be
- * traced back to its source. Nothing here is invented; the two entries that do
- * not exist upstream are marked CODE-ONLY and listed in the design mapping.
+ * `tokens.css` and `bundle.css` are the system's own files, copied unchanged
+ * apart from the font URLs. Components render its `.hz-*` classes. The bundle
+ * sits in Tailwind's `components` layer, so a page's utilities (spacing, grid,
+ * placement) still win over it when they are deliberately added.
+ */
+@import '../src/ui/design-system/tokens.css';
+@import '../src/ui/design-system/bundle.css' layer(components);
+
+/*
+ * Tailwind names. Every value is a semantic variable of the system — never a
+ * hex here, so this file cannot drift from tokens.css. The older names (the
+ * prototype's `bg-canvas`, `action-primary-default`, …) stay as aliases until
+ * the migration is complete (HANDOFF step 8).
  */
 @theme {
-  /* ── Brand and surfaces ────────────────────────────────────────────── */
-  --color-bg-canvas: #fffcf8;
-  --color-bg-surface: #ffffff;
-  --color-bg-subtle: #faf7f2;
-  --color-bg-brand-subtle: #fff6ed;
-  --color-bg-disabled: #f0eae2;
+  --color-*: initial;
 
-  --color-text-primary: #171a17;
-  --color-text-secondary: #685f57;
-  --color-text-brand: #a83d0b;
-  --color-text-disabled: #b9aea2;
+  /* Grounds */
+  --color-bg-page: var(--bg-page);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-chrome: var(--bg-chrome);
+  --color-bg-feature: var(--bg-feature);
+  --color-bg-band: var(--bg-band);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-bg-brand-subtle: var(--bg-brand-subtle);
+  --color-bg-disabled: var(--bg-disabled);
+  --color-bg-media-empty: var(--bg-media-empty);
+  --color-bg-canvas: var(--bg-chrome); /* alias: the page itself is bg-page */
 
-  --color-border-subtle: #f0eae2;
-  --color-border-brand: #e46a1d;
-  --color-border-disabled: #f0eae2;
+  /* Text */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-brand: var(--text-brand);
+  --color-text-disabled: var(--text-disabled);
+  --color-text-on-action: var(--text-on-action);
+  --color-text-danger: var(--status-error-text); /* alias used by older screens */
 
-  --color-action-primary-default: #c94f12;
-  --color-action-primary-on: #ffffff;
-  --color-action-primary-disabled: #f0eae2;
-  --color-action-secondary-default: #ffffff;
-  --color-action-secondary-on: #171a17;
-  --color-action-secondary-disabled: #faf7f2;
+  /* Lines */
+  --color-border-default: var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-control: var(--border-control);
+  --color-border-brand: var(--border-brand);
+  --color-border-disabled: var(--border-disabled);
+  --color-focus-ring: var(--focus-ring);
+  --color-accent-bar: var(--accent-bar);
 
-  /* ── Status ────────────────────────────────────────────────────────── */
-  --color-status-neutral-bg: #faf7f2;
-  --color-status-neutral-text: #4f4842;
-  --color-status-neutral-border: #ded5ca;
-  --color-status-info-bg: #eff8ff;
-  --color-status-info-text: #175cd3;
-  --color-status-info-border: #2e90fa;
-  --color-status-success-bg: #ecfdf3;
-  --color-status-success-text: #166b48;
-  --color-status-success-border: #22a06b;
-  --color-status-warning-bg: #fffaeb;
-  --color-status-warning-text: #b54708;
-  --color-status-warning-border: #f79009;
-  --color-status-error-bg: #fef3f2;
-  --color-status-error-text: #b42318;
-  --color-status-error-border: #f04438;
+  /* Actions */
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-secondary: var(--action-secondary);
+  --color-action-secondary-hover: var(--action-secondary-hover);
+  --color-action-destructive: var(--action-destructive);
+  --color-action-primary-default: var(--action-primary);
+  --color-action-primary-on: var(--text-on-action);
+  --color-action-primary-disabled: var(--bg-disabled);
+  --color-action-secondary-default: var(--action-secondary);
+  --color-action-secondary-on: var(--text-primary);
+  --color-action-secondary-disabled: var(--bg-subtle);
 
-  /* ── Logo (Design System file 2GMJPgnnenGnr1zBN2yH5h) ───────────────── */
-  --color-logo-mark: #e46a1d;
-  --color-logo-cutout: #fff1d6;
+  /* Icons and logo */
+  --color-icon-default: var(--icon-default);
+  --color-icon-strong: var(--icon-strong);
+  --color-logo-mark: var(--logo-mark);
+  --color-logo-cutout: var(--logo-cutout);
+  --color-logo-ink: var(--logo-ink);
 
-  /* ── Spacing ───────────────────────────────────────────────────────── */
+  /* Status */
+  --color-status-neutral-bg: var(--status-neutral-bg);
+  --color-status-neutral-text: var(--status-neutral-text);
+  --color-status-neutral-border: var(--status-neutral-border);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-text: var(--status-info-text);
+  --color-status-info-border: var(--status-info-border);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-text: var(--status-success-text);
+  --color-status-success-border: var(--status-success-border);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-text: var(--status-warning-text);
+  --color-status-warning-border: var(--status-warning-border);
+  --color-status-error-bg: var(--status-error-bg);
+  --color-status-error-text: var(--status-error-text);
+  --color-status-error-border: var(--status-error-border);
+
+  /*
+   * Spacing. The existing six names are kept (never renamed). The system's
+   * larger steps get `s`-prefixed numeric names: plain `2xl…` would collide
+   * with the container scale (`max-w-3xl` would become 40px) and plain numbers
+   * would replace Tailwind's `size-20`/`mt-1` multiplier.
+   */
   --spacing-0: 0px;
   --spacing-2xs: 2px;
   --spacing-xs: 4px;
@@ -62,28 +99,32 @@
   --spacing-md: 12px;
   --spacing-lg: 16px;
   --spacing-xl: 24px;
+  --spacing-s20: 20px;
+  --spacing-s32: 32px;
+  --spacing-s40: 40px;
+  --spacing-s48: 48px;
+  --spacing-s64: 64px;
+  --spacing-s80: 80px;
+  --spacing-s96: 96px;
 
-  /* ── Radii ─────────────────────────────────────────────────────────── */
+  /* Radius — controls 12, cards 20, CTA box 28, pills full. */
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --radius-full: 999px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
 
-  /* ── Sizes ─────────────────────────────────────────────────────────── */
-  /*
-   * Content widths — CODE-ONLY.
-   *
-   * Not `max-w-md`: the spacing scale uses the same names as Tailwind's
-   * container scale, and spacing wins, so `max-w-md` resolves to 12px — a page
-   * twelve pixels wide. These names cannot collide, and they are referenced as
-   * `max-w-(--size-content-md)` so a width utility really means a width.
-   */
+  /* Elevation exists only for floating layers: `shadow-(--shadow-overlay-sm)`. */
+
+  /* Sizes */
   --size-content-sm: 24rem;
   --size-content-md: 28rem;
   --size-content-lg: 32rem;
-
+  --size-container-site: 1280px;
+  --size-container-app: 1200px;
+  --size-container-reading: 720px;
   --size-stroke-default: 1px;
   --size-icon-xs: 16px;
   --size-icon-sm: 20px;
@@ -91,57 +132,93 @@
   --size-icon-lg: 32px;
   --size-control-sm: 36px;
   --size-control-md: 44px;
+  --size-control-lg: 48px;
   --size-touch-min: 44px;
   --size-badge-sm: 24px;
   --size-selection-md: 22px;
   --size-header-mobile: 64px;
   --size-textarea-rows-3: 72px;
 
-  /*
-   * Typography. The published styles name IRANSansX at 12/14/16/20/24/32 with
-   * fixed line heights. The font file itself is not in this package and its
-   * licence is not confirmed here, so the stack falls back to a system Persian
-   * face and any typographic claim stays UNVERIFIED (DEC-0007). Sizes and line
-   * heights are the real published values.
-   */
-  --font-fa: 'IRANSansX', 'Vazirmatn', 'Segoe UI', Tahoma, system-ui, sans-serif;
+  /* Type — IRANSansX only; Tahoma before system UI, as the system specifies. */
+  --font-fa: var(--font-sans);
+  --font-sans: 'IRANSansX', Tahoma, system-ui, sans-serif;
+  --font-mono: 'IRANSansX', Tahoma, system-ui, sans-serif;
 
-  --text-caption: 12px;
-  --text-caption--line-height: 20px;
-  --text-label-sm: 12px;
-  --text-label-sm--line-height: 18px;
-  --text-label-md: 14px;
-  --text-label-md--line-height: 20px;
-  --text-label-lg: 16px;
-  --text-label-lg--line-height: 24px;
+  /*
+   * Scale (Typography). Mobile values here; desktop values below in :root.
+   * The old `h3` (24) is the system's `h2` and the old `h4` (20) its `h3`;
+   * screens were renamed in the same change.
+   */
+  --text-display: 28px;
+  --text-display--line-height: 44px;
+  --text-display--font-weight: 700;
+  --text-h1: 24px;
+  --text-h1--line-height: 38px;
+  --text-h1--font-weight: 700;
+  --text-h2: 20px;
+  --text-h2--line-height: 32px;
+  --text-h2--font-weight: 700;
+  --text-h3: 18px;
+  --text-h3--line-height: 30px;
+  --text-h3--font-weight: 700;
+  --text-h4: 16px;
+  --text-h4--line-height: 26px;
+  --text-h4--font-weight: 700;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 28px;
+  --text-body-md: 15px;
+  --text-body-md--line-height: 26px;
   --text-body-sm: 14px;
   --text-body-sm--line-height: 24px;
-  --text-body-md: 16px;
-  --text-body-md--line-height: 28px;
-  --text-h4: 20px;
-  --text-h4--line-height: 32px;
-  --text-h3: 24px;
-  --text-h3--line-height: 36px;
-  --text-h1: 32px;
-  --text-h1--line-height: 48px;
+  --text-label-lg: 15px;
+  --text-label-lg--line-height: 24px;
+  --text-label-lg--font-weight: 700;
+  --text-label-md: 14px;
+  --text-label-md--line-height: 22px;
+  --text-label-md--font-weight: 600;
+  --text-label-sm: 13px;
+  --text-label-sm--line-height: 20px;
+  --text-label-sm--font-weight: 600;
+  --text-caption: 12px;
+  --text-caption--line-height: 20px;
+  --text-overline: 12px;
+  --text-overline--line-height: 20px;
+  --text-overline--font-weight: 700;
+  --text-numeric-lg: 26px;
+  --text-numeric-lg--line-height: 40px;
+  --text-numeric-lg--font-weight: 700;
+  --text-id: 13px;
+  --text-id--line-height: 20px;
+  --text-id--font-weight: 600;
+}
 
-  /*
-   * Display size — CODE-ONLY (DEC-0182).
-   *
-   * The published scale stops at 32px, which is a heading size, not a display
-   * one. The public landing needs a first line that carries the page, so this
-   * value is added here under the same rule the content widths already follow:
-   * not upstream, marked, traceable. It scales with the viewport so the hero
-   * never needs a second breakpoint to stay on two lines.
-   */
-  --text-display: clamp(30px, 5.2vw, 52px);
-  --text-display--line-height: 1.18;
+@media (min-width: 768px) {
+  :root {
+    --text-body-lg: 18px;
+    --text-body-lg--line-height: 32px;
+    --text-body-md: 16px;
+    --text-body-md--line-height: 28px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --text-display: 44px;
+    --text-display--line-height: 64px;
+    --text-h1: 32px;
+    --text-h1--line-height: 48px;
+    --text-h2: 24px;
+    --text-h2--line-height: 38px;
+    --text-h3: 20px;
+    --text-h3--line-height: 32px;
+    --text-numeric-lg: 36px;
+    --text-numeric-lg--line-height: 52px;
+  }
 }
 
 :root {
-  /* CODE-ONLY: no overlay/scrim or focus-ring variable is published upstream. */
-  --hz-scrim: color-mix(in srgb, #171a17 45%, transparent);
-  --hz-focus-ring: #c94f12;
+  --hz-scrim: var(--overlay-scrim);
+  --hz-focus-ring: var(--focus-ring);
 }
 
 html {
@@ -149,29 +226,31 @@ html {
 }
 
 body {
-  font-family: var(--font-fa);
-  background: var(--color-bg-canvas);
-  color: var(--color-text-primary);
-  font-size: var(--text-body-sm);
-  line-height: var(--text-body-sm--line-height);
+  font-family: var(--font-sans);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: var(--text-body-md);
+  line-height: var(--text-body-md--line-height);
+  -webkit-font-smoothing: antialiased;
   /* Long Persian words must wrap rather than push the layout sideways. */
   overflow-wrap: anywhere;
 }
 
-/*
- * Focus must stay visible for keyboard users. Tailwind's reset removes the
- * default outline, so it is restored explicitly on every focusable element.
- */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--hz-focus-ring);
-  outline-offset: 2px;
-  border-radius: var(--radius-xs);
+/* Headings are Bold 700 with Persian-safe line height (Typography). */
+:where(h1, h2, h3, h4, h5, h6) {
+  font-weight: 700;
 }
 
 /*
- * Identifiers and numbers stay left-to-right and readable inside Persian text
- * (§24.3) without altering the stored value.
+ * Focus: 2px focus-ring with a 2px offset on every control. Text fields are the
+ * exception and draw it with their own border (bundle.css `.hz-input`).
  */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Identifiers and numbers stay left-to-right inside Persian text (§24.3). */
 .hz-ltr {
   direction: ltr;
   unicode-bidi: isolate;
@@ -188,53 +267,20 @@ body {
 }
 
 /*
- * Motion — small, and only where it explains something.
- *
- * Two moves, no more: content arrives from slightly below as the page settles,
- * and a card that can be opened lifts a little under the pointer. The arrival is
- * staggered by one step per section so the eye is led down the page in reading
- * order rather than everything appearing at once. The reduced-motion block below
- * turns all of it off, so this stays a courtesy and never a requirement.
+ * Motion (Motion foundation): only the card lift remains. The old arrival
+ * stagger was decoration, which the system does not allow; `.hz-enter` and
+ * `.hz-stagger` are kept as inert names until screens stop using them.
  */
-@keyframes hz-rise {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.hz-enter {
-  animation: hz-rise 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-
-.hz-stagger > * {
-  animation: hz-rise 320ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-.hz-stagger > *:nth-child(1) { animation-delay: 0ms; }
-.hz-stagger > *:nth-child(2) { animation-delay: 40ms; }
-.hz-stagger > *:nth-child(3) { animation-delay: 80ms; }
-.hz-stagger > *:nth-child(4) { animation-delay: 120ms; }
-.hz-stagger > *:nth-child(5) { animation-delay: 160ms; }
-.hz-stagger > *:nth-child(n + 6) { animation-delay: 200ms; }
-
-/* Only what can be opened lifts, so the movement means "this is a door". */
 .hz-lift {
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease;
+    transform var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard);
 }
-.hz-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px -12px rgb(23 26 23 / 0.35);
-  border-color: var(--color-border-brand);
-}
-.hz-lift:active {
-  transform: translateY(0);
+@media (hover: hover) and (pointer: fine) {
+  .hz-lift:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-control);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -245,3 +291,69 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Shell glue (Shells › Sticky and scroll behaviour, OpsShell rail). The bundle
+ * styles a collapsed sidebar through `.hz-sidebar--collapsed`; the 768–1023
+ * rail is the same look applied by width, so it needs no script.
+ */
+@media (min-width: 768px) {
+  .hz-app > .hz-sidebar {
+    position: sticky;
+    inset-block-start: 0;
+    height: 100dvh;
+  }
+}
+.hz-ops-symbol { display: none; }
+@media (min-width: 1024px) {
+  .hz-app--ops.hz-app--rail { grid-template-columns: 72px minmax(0, 1fr); }
+  .hz-sidebar--collapsed .hz-ops-logo { display: none; }
+  .hz-sidebar--collapsed .hz-ops-symbol { display: inline-flex; }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .hz-sidebar--ops { align-items: center; padding-inline: 8px; }
+  .hz-sidebar--ops .hz-ops-logo, .hz-sidebar--ops .hz-sidebar__env,
+  .hz-sidebar--ops .hz-side-item__label, .hz-sidebar--ops .hz-sidebar__group,
+  .hz-sidebar--ops .hz-count { display: none; }
+  .hz-sidebar--ops .hz-ops-symbol { display: inline-flex; }
+  .hz-sidebar--ops .hz-sidebar__head, .hz-sidebar--ops .hz-sidebar__nav,
+  .hz-sidebar--ops .hz-sidebar__items { align-items: center; padding-inline: 0; }
+  .hz-sidebar--ops .hz-sidebar__items[hidden] { display: flex; }
+  .hz-sidebar--ops .hz-sidebar__section { align-items: center; width: 100%; }
+  .hz-sidebar--ops .hz-sidebar__section + .hz-sidebar__section { margin-block-start: 6px; padding-block-start: 6px; border-block-start: 1px solid var(--border-subtle); }
+  .hz-sidebar--ops .hz-side-item { width: 48px; height: 44px; justify-content: center; padding: 0; }
+}
+/* The public tab bar must not cover the last card or the focused control. */
+@media (max-width: 1023.98px) {
+  html:has(.hz-tabbar) { scroll-padding-block-end: calc(var(--tabbar) + 16px); }
+}
+
+/* A landing band runs edge to edge out of the page container (P01 `bg-band`). */
+.hz-bleed { margin-inline: calc(50% - 50vw); }
+
+/* A card inside a grid or flex track never forces it wider than the screen
+   (nowrap badges and identifiers wrap their row instead). */
+.hz-card, .hz-request, .hz-locked, .hz-animal__body { min-width: 0; }
+.hz-animal { flex-wrap: wrap; }
+.hz-animal__body { flex: 1 1 12rem; }
+
+/*
+ * P09 below 768px: the queue table restacks as the system's card list
+ * (`.hz-cardlist__item` look: white, border-default, radius-lg, 14px), so the
+ * same row markup serves every width and a link exists only once.
+ */
+@media (max-width: 767.98px) {
+  .hz-table-wrap:has(.hz-table--stack) { border: 0; background: none; overflow: visible; }
+  .hz-table--stack, .hz-table--stack tbody { display: block; }
+  .hz-table--stack thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .hz-table--stack tr {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; position: relative;
+    margin-block-end: 8px; padding: 14px; padding-inline-end: 48px;
+    background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+  }
+  .hz-table--stack td { display: block; height: auto; padding: 0; border: 0; }
+  .hz-table--stack td.hz-table__lead { order: -1; flex: 1 0 100%; }
+  .hz-table--stack td.hz-table__open { position: absolute; inset-block-start: 10px; inset-inline-end: 6px; }
+  .hz-table--stack .hz-case__sub { max-width: 100%; white-space: normal; }
+}
+.hz-table__open { width: 44px; text-align: end; }

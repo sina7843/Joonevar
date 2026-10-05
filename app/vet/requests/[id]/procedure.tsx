@@ -304,7 +304,7 @@ export function PregnancyPanel({
   const [state, submit, pending] = useActionState(recordPregnancyResultAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">{isCorrection ? 'اصلاح نتیجه بررسی بارداری' : 'ثبت نتیجه بررسی بارداری'}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{isCorrection ? 'اصلاح نتیجه بررسی بارداری' : 'ثبت نتیجه بررسی بارداری'}</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         این نتیجه رکورد مستقل شماست و اعلام مالک را بازنویسی نمی‌کند؛ در صورت اختلاف، هر دو مقدار با برچسب
         خنثی نمایش داده می‌شود.

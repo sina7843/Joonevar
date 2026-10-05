@@ -64,3 +64,118 @@ export function liveSections(): readonly PublicSection[] {
 export function navSections(): readonly PublicSection[] {
   return PUBLIC_SECTIONS.filter((section) => section.live && section.nav);
 }
+
+/**
+ * Header groups — DS *GroupedNav* (v1.0.3): five groups with a caret and a
+ * panel, then «استعلام اصالت» as a plain link; «خانه» is the logo. Each item
+ * names a section by its address, so a section that is not live drops out of
+ * its group instead of linking to a dead end. Descriptions are the system's
+ * approved copy.
+ */
+export interface NavGroupItem {
+  readonly href: string;
+  readonly descFa: string;
+}
+export interface NavGroup {
+  readonly id: string;
+  readonly labelFa: string;
+  readonly parts: ReadonlyArray<{ readonly labelFa: string; readonly items: readonly NavGroupItem[] }>;
+}
+
+export const NAV_GROUPS: readonly NavGroup[] = [
+  {
+    id: 'magazine',
+    labelFa: 'مجله',
+    parts: [
+      {
+        labelFa: 'مطالب',
+        items: [
+          { href: '/articles', descFa: 'راهنمای نگهداری، سلامت و ثبت' },
+          { href: '/news', descFa: 'رویدادها و خبرهای انجمن‌ها و کلاب‌ها' },
+          { href: '/announcements', descFa: 'مهلت‌ها و تغییرهای رسمی سامانه' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'vetguide',
+    labelFa: 'راهنمای دامپزشکی',
+    parts: [
+      {
+        labelFa: 'راهنما',
+        items: [
+          { href: '/veterinarians', descFa: 'دامپزشک معتمد نزدیک خود را پیدا کنید' },
+          { href: '/centers', descFa: 'کلینیک، بیمارستان و آزمایشگاه' },
+          { href: '/breeds', descFa: 'ویژگی‌ها، نگهداری و تاریخچه' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'community',
+    labelFa: 'انجمن‌ها',
+    parts: [
+      {
+        labelFa: 'انجمن و کلاب',
+        items: [
+          { href: '/associations', descFa: 'انجمن‌های رسمی و کلاب‌های نژاد' },
+          { href: '/clubs', descFa: 'عضویت، رویدادها و قوانین هر کلاب' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'market',
+    labelFa: 'بازار',
+    parts: [
+      {
+        labelFa: 'خرید و فروش',
+        items: [
+          { href: '/animals-market', descFa: 'آگهی‌های بررسی‌شده با شناسه ثبت' },
+          { href: '/shop', descFa: 'غذا، لوازم و بهداشت' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'services',
+    labelFa: 'خدمات',
+    parts: [
+      {
+        labelFa: 'خدمات سامانه',
+        items: [
+          { href: '/services', descFa: 'برگه ثبتی، شجره‌نامه، مجوز و تعرفه‌ها' },
+          { href: '/guides', descFa: 'مراحل ثبت حیوان، پیگیری درخواست و دریافت سند، گام به گام' },
+        ],
+      },
+      {
+        labelFa: 'همزیست',
+        items: [
+          { href: '/about', descFa: 'سامانه رسمی ثبت سگ و گربه' },
+          { href: '/contact', descFa: 'پشتیبانی و پاسخ به پرسش‌ها' },
+        ],
+      },
+    ],
+  },
+];
+
+/** The plain link after the groups. */
+export const VERIFY_HREF = '/verify';
+
+/** Footer groups — DS *SiteFooter*: the header grouping plus the off-nav pages. */
+export const FOOTER_GROUPS: ReadonlyArray<{ readonly labelFa: string; readonly hrefs: readonly string[] }> = [
+  { labelFa: 'مجله', hrefs: ['/articles', '/news', '/announcements'] },
+  { labelFa: 'راهنمای دامپزشکی', hrefs: ['/veterinarians', '/centers', '/breeds'] },
+  { labelFa: 'انجمن‌ها', hrefs: ['/associations', '/clubs', '/association/membership', '/association/regulations'] },
+  { labelFa: 'بازار', hrefs: ['/animals-market', '/shop'] },
+  { labelFa: 'خدمات', hrefs: ['/services', '/guides', '/verify', '/parentage-test', '/association/status'] },
+  { labelFa: 'همزیست', hrefs: ['/', '/about', '/contact'] },
+];
+
+/** Resolve a group's addresses to live sections, keeping the group's order. */
+export function liveLinks(hrefs: readonly string[]): ReadonlyArray<{ href: string; label: string }> {
+  return hrefs.flatMap((href) => {
+    const section = PUBLIC_SECTIONS.find((candidate) => candidate.href === href && candidate.live);
+    return section ? [{ href: section.href, label: section.label }] : [];
+  });
+}

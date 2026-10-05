@@ -51,7 +51,7 @@ export default async function PostalRequestPage({ params }: { params: Promise<{ 
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">مشخصات درخواست</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مشخصات درخواست</span></h2></div>
           <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="postal-detail">
             <dt className="text-text-secondary">سند</dt>
             <dd data-testid="postal-document-type">{POSTAL_DOCUMENT_FA[request.documentType]}</dd>

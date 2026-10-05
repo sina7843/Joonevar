@@ -92,7 +92,7 @@ export default async function ShopIndexPage({
       <nav aria-label="دسته‌ها" className="hz-rail flex gap-sm" data-testid="shop-categories">
         <Link
           href={linkFor({ categoryId: null })}
-          className="rounded-full border border-border-subtle px-md py-2xs text-caption"
+          className="rounded-full border border-border-default px-md py-2xs text-caption"
         >
           همه دسته‌ها
         </Link>
@@ -100,14 +100,14 @@ export default async function ShopIndexPage({
           <Link
             key={category.id}
             href={linkFor({ categoryId: category.id })}
-            className="whitespace-nowrap rounded-full border border-border-subtle px-md py-2xs text-caption"
+            className="whitespace-nowrap rounded-full border border-border-default px-md py-2xs text-caption"
           >
             {category.nameFa}
           </Link>
         ))}
         <Link
           href={linkFor({ inStockOnly: !filter.inStockOnly })}
-          className="whitespace-nowrap rounded-full border border-border-subtle px-md py-2xs text-caption"
+          className="whitespace-nowrap rounded-full border border-border-default px-md py-2xs text-caption"
           data-testid="shop-stock-filter"
         >
           {filter.inStockOnly ? 'همه کالاها' : 'فقط کالاهای موجود'}
@@ -121,11 +121,11 @@ export default async function ShopIndexPage({
       ) : (
         <ul className="grid gap-md md:grid-cols-3" data-testid="shop-results">
           {items.map((item) => (
-            <li key={item.id} className="space-y-sm rounded-lg border border-border-subtle p-lg">
+            <li key={item.id} className="space-y-sm rounded-xl border border-border-default p-lg">
               {item.imageFileId ? (
                 <RecordImage fileId={item.imageFileId} altFa={item.imageAltFa ?? item.nameFa} variant="thumb" />
               ) : null}
-              <h2 className="text-label-lg">
+              <h2 className="hz-card__title">
                 <Link href={'/shop/' + item.slug} className="text-text-brand" data-testid={'shop-item-' + item.id}>
                   {item.nameFa}
                 </Link>
@@ -150,7 +150,7 @@ export default async function ShopIndexPage({
             <Link
               key={page}
               href={'/shop' + shopQueryString({ ...filter, page })}
-              className="rounded-md border border-border-subtle px-md py-2xs text-caption"
+              className="rounded-lg border border-border-default px-md py-2xs text-caption"
             >
               {fa(page)}
             </Link>

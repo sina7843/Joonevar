@@ -24,7 +24,7 @@ export default async function AdminCentresPage() {
         <CentreCreateForm surface="admin" types={reference.types} provinces={reference.provinces} cities={reference.cities} />
 
         <Card>
-          <h2 className="text-label-lg">مراکز ثبت‌شده</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مراکز ثبت‌شده</span></h2></div>
           {centres.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="هنوز مرکزی ثبت نشده است" description="با فرم بالا اولین مرکز را ثبت کنید." />
@@ -35,7 +35,7 @@ export default async function AdminCentresPage() {
                 <li key={row.centre.id}>
                   <Link
                     href={'/admin/centres/' + row.centre.id}
-                    className="block rounded-lg border border-border-subtle p-lg hover:border-border-brand"
+                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
                     data-testid={'centre-row-' + row.centre.id}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-sm">

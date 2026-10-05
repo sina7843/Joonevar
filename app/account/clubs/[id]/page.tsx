@@ -126,7 +126,7 @@ export default async function AccountClubPage({ params }: { params: Promise<{ id
           ) : (
             <ul className="mt-md space-y-sm" data-testid="club-members">
               {view.members.map((member) => (
-                <li key={member.membershipId} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle p-md">
+                <li key={member.membershipId} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md">
                   <span className="text-body-sm">{(member.nameFa ?? 'کاربر همزیست') + ' — ' + CLUB_ROLE_FA[member.role]}</span>
                   {view.assignableRoles.includes(member.role) ? (
                     <ClubRoleRemoveForm clubId={club.id} membershipId={member.membershipId} version={member.version} />

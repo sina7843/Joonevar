@@ -6,16 +6,27 @@ import type { LockDetail } from '../domain/errors.ts';
 import { Icon } from './icon.tsx';
 import type { IconName } from './icon-paths.ts';
 
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
+/**
+ * Card — DS *Card* (`.hz-card`): white, 1px `border-default`, radius 20, no
+ * shadow. `feature` (cream) is for SiteShell landing pages only.
+ */
+export type CardVariant = 'default' | 'compact' | 'flush' | 'subtle' | 'feature';
+
+export function Card({
+  children,
+  className = '',
+  variant = 'default',
+  as: Tag = 'section',
+}: {
+  children: ReactNode;
+  className?: string;
+  variant?: CardVariant;
+  as?: 'section' | 'article' | 'div';
+}) {
   return (
-    <section
-      className={[
-        'rounded-lg border border-border-subtle bg-bg-surface p-lg',
-        className,
-      ].join(' ')}
-    >
+    <Tag className={['hz-card', variant === 'default' ? '' : 'hz-card--' + variant, className].join(' ').trim()}>
       {children}
-    </section>
+    </Tag>
   );
 }
 
@@ -23,26 +34,29 @@ export function CardHeader({
   title,
   subtitle,
   badge,
+  action,
 }: {
   title: string;
   subtitle?: ReactNode;
   badge?: { tone: StatusTone; label: string };
+  action?: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-md">
+    <div className="hz-card__header">
       <div className="min-w-0">
-        <h3 className="text-label-lg text-text-primary">{title}</h3>
+        <h3 className="hz-card__title">{title}</h3>
         {subtitle ? <div className="mt-2xs text-caption text-text-secondary">{subtitle}</div> : null}
       </div>
       {badge ? <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge> : null}
+      {action ?? null}
     </div>
   );
 }
 
 /**
- * Animal summary card, following the approved dashboard composition
- * (prototype OWN-001 / Populated, node 116:481): name, species and breed, the
- * identifier when one has been issued, and a status badge.
+ * Animal row — DS *AnimalCard* (`.hz-animal`): thumbnail, name, species and
+ * breed, the identifier once issued, and the state as a badge. The whole row
+ * is the link (§23.2: the Pet ID exists only once a sheet is issued).
  */
 export function AnimalCard({
   name,
@@ -50,51 +64,47 @@ export function AnimalCard({
   petId,
   status,
   href,
+  imageFileId = null,
+  imageAltFa = null,
 }: {
   name: string;
   speciesBreed: string;
   petId: string | null;
   status: { tone: StatusTone; label: string };
   href: string;
+  imageFileId?: string | null;
+  imageAltFa?: string | null;
 }) {
-  /*
-   * Prototype PET card, F03 116:481: an avatar tile, the name, the species and
-   * breed under it, the identifier, and the state as a badge. The whole row is
-   * the link — the prototype has no button inside this card, and a button per
-   * animal turned a list into a column of calls to action.
-   */
   return (
-    <Link
-      href={href}
-      className="hz-lift block rounded-lg border border-border-subtle bg-bg-surface p-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-border-brand"
-    >
-      <div className="flex items-start gap-md">
-        <span
-          aria-hidden="true"
-          className="flex size-[var(--size-control-md)] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand"
-        >
-          <Icon name="dog" size="md" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-sm">
-            <h3 className="truncate text-label-lg">{name}</h3>
-            <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+    <Link href={href} className="hz-animal">
+      <div className="hz-media hz-media--thumb-lg">
+        {imageFileId ? (
+          <img src={'/media/' + imageFileId} alt={imageAltFa ?? ''} loading="lazy" width={64} height={64} />
+        ) : (
+          <div className="hz-media__empty">
+            <img src="/brand/logo/symbol.svg" alt="" />
           </div>
-          <p className="mt-2xs text-caption text-text-secondary">{speciesBreed}</p>
-          <p className="mt-2xs text-caption text-text-secondary">
-            {/* Pet ID exists only once a registration sheet is issued (§23.2). */}
-            {petId ? <Identifier label="شناسه:" value={petId} /> : <span>شناسه: —</span>}
-          </p>
-        </div>
+        )}
       </div>
+      <div className="hz-animal__body">
+        <span className="hz-animal__name">{name}</span>
+        <span className="hz-animal__meta">{speciesBreed}</span>
+        <span className="hz-animal__meta">
+          {petId ? <Identifier label="شناسه:" value={petId} /> : 'شناسه: —'}
+        </span>
+      </div>
+      <div className="hz-animal__end">
+        <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+      </div>
+      <Icon name="caretRight" size="sm" mirror />
     </Link>
   );
 }
 
 /**
- * Active request card. Every active request shows its status, the animal, the
- * owner of the next action, a deadline when one exists, and a continue CTA that
- * returns to the same case and step (§8).
+ * Active request — DS *RequestCard* (`.hz-request`): title, case code, animal,
+ * status, the owner of the next action, a deadline when one exists, and a
+ * «پیگیری» link back to the same case and step (§8).
  */
 export function RequestCard({
   title,
@@ -114,29 +124,34 @@ export function RequestCard({
   resumeHref: string;
 }) {
   return (
-    <Card>
-      <CardHeader title={title} badge={status} subtitle={<Identifier value={requestCode} />} />
-      <p className="mt-md text-body-sm">{animalName}</p>
-      {deadlineFa ? <p className="mt-2xs text-caption text-text-secondary">مهلت مراجعه تا {deadlineFa}</p> : null}
-      <div className="mt-sm">
-        <ActionOwner owner={owner} />
+    <article className="hz-request">
+      <div className="hz-request__head">
+        <div className="min-w-0">
+          <div className="hz-request__title">{title}</div>
+          <div className="hz-request__meta">
+            <bdi className="hz-id" dir="ltr" data-testid="identifier">
+              {requestCode}
+            </bdi>
+            <span>حیوان: {animalName}</span>
+          </div>
+        </div>
+        <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
       </div>
-      <div className="mt-lg">
-        <ButtonLink tone="secondary" href={resumeHref} block>
+      <div className="hz-request__foot">
+        <ActionOwner owner={owner} extra={deadlineFa ? 'مهلت مراجعه تا ' + deadlineFa : undefined} />
+        <ButtonLink tone="secondary" href={resumeHref}>
           پیگیری
+          <Icon name="arrowRight" size="sm" mirror />
         </ButtonLink>
       </div>
-    </Card>
+    </article>
   );
 }
 
 /**
- * A locked service.
- *
- * §5 makes three parts mandatory — the reason, the next prerequisite and a
- * direct CTA — and the prototype's blocked dashboard state (node 116:690)
- * renders exactly that. The component takes a `LockDetail`, so a lock cannot be
- * shown as a bare disabled button with nothing to act on.
+ * A locked service — DS *LockedServiceCard* (`.hz-locked`): what is locked ·
+ * why · what unlocks it (§5). It takes a `LockDetail`, so a lock can never be a
+ * bare disabled button with nothing to act on.
  */
 export function LockedServiceCard({
   serviceLabel,
@@ -148,50 +163,53 @@ export function LockedServiceCard({
   icon?: IconName;
 }) {
   return (
-    <div className="space-y-md">
-      <div className="rounded-lg bg-bg-subtle p-xl text-center">
-        <p className="text-h4 text-text-primary">{lock.reason}</p>
-        <p className="mt-md text-body-sm text-text-secondary">{lock.nextPrerequisite}</p>
-        <div className="mt-lg flex justify-center">
-          <ButtonLink href={lock.cta.href}>{lock.cta.label}</ButtonLink>
-        </div>
-      </div>
-      <div
-        aria-disabled="true"
-        className="flex items-center justify-center gap-sm rounded-lg bg-bg-disabled p-lg text-label-lg text-text-disabled"
-      >
-        {icon ? <Icon name={icon} size="md" /> : null}
+    <article className="hz-locked" aria-disabled="true">
+      <h3 className="hz-locked__title">
+        <Icon name={icon ?? 'lockSimple'} size="sm" />
         {serviceLabel}
-      </div>
-    </div>
+      </h3>
+      <p className="hz-locked__why">
+        <b>{lock.reason}</b> {lock.nextPrerequisite}
+      </p>
+      <ButtonLink tone="secondary" size="sm" href={lock.cta.href} className="hz-locked__unlock">
+        {lock.cta.label}
+      </ButtonLink>
+    </article>
   );
 }
 
-/** An available service entry point. */
+/** An available service entry point — DS *ServiceCard*: the whole card is the link. */
 export function ServiceCard({
   label,
   description,
   href,
   icon,
+  price,
 }: {
   label: string;
   description: string;
   href: string;
-  /** The domain glyph of this service (DS 48:472 domain icons). */
   icon?: IconName;
+  /** Formatted fee from the managed fee table; `null` shows «تعیین‌نشده». */
+  price?: string | null;
 }) {
   return (
-    <Card>
-      <h3 className="flex items-center gap-sm text-label-lg">
-        {icon ? <Icon name={icon} size="md" className="text-text-brand" /> : null}
-        {label}
-      </h3>
-      <p className="mt-2xs text-caption text-text-secondary">{description}</p>
-      <div className="mt-lg">
-        <ButtonLink tone="secondary" href={href} block>
+    <Link href={href} className="hz-card hz-card--interactive hz-service-card">
+      <div className="hz-service">
+        <h3 className="hz-service__title">
+          {icon ? <Icon name={icon} size="sm" className="text-text-brand" /> : null}
           {label}
-        </ButtonLink>
+          <Icon name="arrowRight" size="sm" mirror />
+        </h3>
+        <p className="hz-service__desc">{description}</p>
       </div>
-    </Card>
+      {price !== undefined ? (
+        <div className="hz-card__footer">
+          <span className={price === null ? 'hz-service__price hz-service__price--unset' : 'hz-service__price'}>
+            {price ?? 'تعیین‌نشده'}
+          </span>
+        </div>
+      ) : null}
+    </Link>
   );
 }

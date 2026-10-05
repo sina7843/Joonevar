@@ -55,7 +55,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
     <PublicShell actor={guard.actor} title="برگه ثبتی" pathname={'/documents/' + id}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">برگه ثبتی هم‌زیست</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>برگه ثبتی هم‌زیست</span></h2></div>
           <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="sheet-document">
             <dt className="text-text-secondary">شماره برگه</dt>
             <dd data-testid="sheet-no">

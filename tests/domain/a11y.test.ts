@@ -58,25 +58,30 @@ test('every pair the public pages render meets the level it is judged at', () =>
 });
 
 test('the values checked here are the ones the stylesheet publishes', () => {
-  const css = fs.readFileSync(path.join('app', 'globals.css'), 'utf8');
+  // The design system's tokens.css is the one source (DEC-0225); globals.css only
+  // aliases its variables. Semantic names are resolved through their var() chain.
+  const css = fs.readFileSync(path.join('src', 'ui', 'design-system', 'tokens.css'), 'utf8');
+  const vars = new Map<string, string>();
+  for (const match of css.matchAll(/--([a-z0-9-]+):([^;}]+)/g)) if (!vars.has(match[1]!)) vars.set(match[1]!, match[2]!.trim());
   const published = (name: string): string => {
-    const match = new RegExp('--' + name + ':\\s*(#[0-9a-fA-F]{3,8})').exec(css);
-    assert.ok(match, 'token not found in globals.css: ' + name);
-    return match![1]!.toLowerCase();
+    let value = vars.get(name);
+    for (let hops = 0; value !== undefined && value.startsWith('var(') && hops < 5; hops++) value = vars.get(value.slice(6, -1));
+    assert.ok(value && /^#[0-9a-fA-F]{3,8}$/.test(value), 'token not found in tokens.css: ' + name);
+    return value!.toLowerCase();
   };
 
   // A drift between this file and the stylesheet would make the whole check a
   // fiction, so the two are compared rather than trusted.
-  assert.equal(TOKENS.bgCanvas, published('color-bg-canvas'));
-  assert.equal(TOKENS.bgSurface, published('color-bg-surface'));
-  assert.equal(TOKENS.textPrimary, published('color-text-primary'));
-  assert.equal(TOKENS.textSecondary, published('color-text-secondary'));
-  assert.equal(TOKENS.textBrand, published('color-text-brand'));
-  assert.equal(TOKENS.actionPrimaryDefault, published('color-action-primary-default'));
-  assert.equal(TOKENS.actionPrimaryOn, published('color-action-primary-on'));
-  assert.equal(TOKENS.statusErrorText, published('color-status-error-text'));
-  assert.equal(TOKENS.statusWarningText, published('color-status-warning-text'));
-  assert.equal(TOKENS.focusRing, published('hz-focus-ring'));
+  assert.equal(TOKENS.bgCanvas, published('bg-chrome'));
+  assert.equal(TOKENS.bgSurface, published('bg-surface'));
+  assert.equal(TOKENS.textPrimary, published('text-primary'));
+  assert.equal(TOKENS.textSecondary, published('text-secondary'));
+  assert.equal(TOKENS.textBrand, published('text-brand'));
+  assert.equal(TOKENS.actionPrimaryDefault, published('action-primary'));
+  assert.equal(TOKENS.actionPrimaryOn, published('text-on-action'));
+  assert.equal(TOKENS.statusErrorText, published('status-error-text'));
+  assert.equal(TOKENS.statusWarningText, published('status-warning-text'));
+  assert.equal(TOKENS.focusRing, published('focus-ring'));
 });
 
 test('disabled text is left out rather than held to a rule it is exempt from', () => {

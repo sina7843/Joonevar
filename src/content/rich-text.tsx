@@ -30,7 +30,7 @@ function inline(nodes: readonly InlineNode[]): ReactNode {
 function block(item: Block, index: number): ReactNode {
   if (item.kind === 'heading') {
     return item.level === 2 ? (
-      <h2 key={index} className="text-h4 text-text-primary">
+      <h2 key={index} className="text-h3 text-text-primary">
         {inline(item.children)}
       </h2>
     ) : (

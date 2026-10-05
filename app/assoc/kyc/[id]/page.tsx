@@ -44,7 +44,7 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
     <OpsShell actor={guard.actor} title="بررسی احراز هویت" pathname="/assoc/kyc" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">اطلاعات متقاضی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات متقاضی</span></h2></div>
           <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
             <dt className="text-text-secondary">نام</dt>
             <dd>{profile ? profile.firstName + ' ' + profile.lastName : '—'}</dd>
@@ -58,7 +58,7 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">مدرک هویتی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدرک هویتی</span></h2></div>
           {record.documentFileId ? (
             <p className="mt-md text-body-sm">
               <a
@@ -78,7 +78,7 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
 
         {record.status === 'UNDER_REVIEW' ? (
           <Card>
-            <h2 className="text-label-lg">ثبت نتیجه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
             <div className="mt-lg">
               <ReviewForm caseId={record.id} version={record.version} />
             </div>

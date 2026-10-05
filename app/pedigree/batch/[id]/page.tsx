@@ -79,7 +79,7 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <h2 className="text-label-lg">مرور هزینه صدور</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرور هزینه صدور</span></h2></div>
             <StatusBadge
               tone={batch.status === 'PAID' ? 'success' : batch.status === 'FAILED' ? 'warning' : 'info'}
             >
@@ -110,13 +110,13 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">وضعیت صدور هر حیوان</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت صدور هر حیوان</span></h2></div>
           <ul className="mt-lg space-y-lg" data-testid="pedigree-items">
             {items.map((item) => {
               const name = animalRows.find((a) => a.id === item.animalId)?.name ?? 'بدون نام';
               const document = documents.find((d) => d.animalId === item.animalId);
               return (
-                <li key={item.id} className="rounded-lg border border-border-subtle p-lg">
+                <li key={item.id} className="rounded-xl border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <span className="text-body-sm">{name}</span>
                     <StatusBadge

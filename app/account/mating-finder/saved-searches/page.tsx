@@ -21,7 +21,7 @@ export default async function FinderSavedSearchesPage() {
     <PublicShell actor={guard.actor} title="جست‌وجوهای ذخیره‌شده" pathname="/account/mating-finder">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">جست‌وجوهای ذخیره‌شده</h1>
+          <h2 className="text-h3">جست‌وجوهای ذخیره‌شده</h2>
           <p className="mt-xs text-caption text-text-secondary">
             وقتی حیوان تازه‌ای با یکی از این جست‌وجوها جور شود و برای شما قابل‌دیدن باشد، یک بار خبرتان می‌کنیم.
           </p>
@@ -31,7 +31,7 @@ export default async function FinderSavedSearchesPage() {
         ) : (
           <ul className="space-y-sm" data-testid="finder-saved-searches">
             {searches.map((search) => (
-              <li key={search.id} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm" data-testid={'finder-saved-' + search.id}>
+              <li key={search.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm" data-testid={'finder-saved-' + search.id}>
                 <Link
                   href={'/mating-finder?' + new URLSearchParams(filtersToQuery(search.filters as SearchFilters)).toString()}
                   className="text-label-md text-text-brand underline underline-offset-4"

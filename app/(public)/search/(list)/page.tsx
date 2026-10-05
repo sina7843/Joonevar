@@ -51,7 +51,7 @@ export function generateMetadata(): Metadata {
 }
 
 const CONTROL =
-  'w-full rounded-md border border-border-subtle bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
+  'w-full rounded-lg border border-border-default bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
   'min-h-[var(--size-control-md)] focus:border-border-brand';
 
 function Filter({
@@ -125,7 +125,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">
           دامپزشک، مرکز، انجمن و کلاب، نژاد، آموزش و خبر را با هم جست‌وجو کنید. نتیجه‌های تبلیغاتی با برچسب «تبلیغ» می‌آیند و
           تبلیغ، تأیید حرفه‌ای یا معتمدبودن نمی‌سازد.
@@ -136,7 +136,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         method="get"
         action="/search"
         role="search"
-        className="grid gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
+        className="grid gap-md rounded-xl border border-border-default bg-bg-surface p-lg sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
         data-testid="search-form"
       >
         <div className="space-y-xs sm:col-span-2">
@@ -243,7 +243,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <li key={kind}>
                 <Link
                   href={hrefFor(1).replace('/search', '/search?kind=' + kind).replace('?kind=' + kind + '?', '?kind=' + kind + '&')}
-                  className="inline-flex items-center rounded-md border border-border-subtle px-md py-2xs text-caption text-text-secondary hover:border-border-brand"
+                  className="inline-flex items-center rounded-lg border border-border-default px-md py-2xs text-caption text-text-secondary hover:border-border-control"
                   data-testid={'kind-count-' + kind}
                 >
                   {SEARCH_KIND_FA[kind] + ' (' + fa(answer.totalByKind[kind]) + ')'}
@@ -257,7 +257,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <li key={result.kind + result.slug}>
                 <Link
                   href={result.path}
-                  className="flex items-start gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
+                  className="flex items-start gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
                   data-testid={'result-' + result.kind + '-' + result.slug}
                 >
                   <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">

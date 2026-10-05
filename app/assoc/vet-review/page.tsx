@@ -105,7 +105,7 @@ export default async function AssocVetReviewPage({ searchParams }: { searchParam
                   <Card>
                     <div className="flex flex-wrap items-start justify-between gap-md">
                       <div className="min-w-0">
-                        <h2 className="text-label-lg">{item.displayNameFa ?? '—'}</h2>
+                        <h2 className="hz-card__title">{item.displayNameFa ?? '—'}</h2>
                         <p className="mt-2xs text-caption text-text-secondary">
                           {item.caseTypeFa + ' · '}
                           <span dir="ltr">{item.code ?? '—'}</span>

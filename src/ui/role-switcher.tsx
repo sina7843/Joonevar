@@ -44,24 +44,19 @@ export function RoleSwitcher({
   if (contexts.length < 2) return null;
 
   return (
-    <nav aria-label="تغییر نقش" className="hz-rail flex gap-sm" data-testid="role-switcher">
+    <nav aria-label="تغییر نقش" className="hz-segmented" data-testid="role-switcher">
       {contexts.map((context) => {
         const isActive = context === active;
         return (
-          <form key={context} action="/api/context" method="post" className="shrink-0">
+          <form key={context} action="/api/context" method="post" className="flex">
             <input type="hidden" name="context" value={context} />
             <input type="hidden" name="returnTo" value={returnTo} />
             <button
               type="submit"
               aria-current={isActive ? 'true' : undefined}
               data-context={context}
-              className={[
-                'rounded-full border px-lg py-sm text-label-md whitespace-nowrap',
-                'min-h-[var(--size-control-sm)]',
-                isActive
-                  ? 'border-border-brand bg-bg-surface text-text-brand'
-                  : 'border-border-subtle bg-bg-subtle text-text-secondary',
-              ].join(' ')}
+              aria-pressed={isActive}
+              className="hz-segmented__item"
             >
               {LABEL[context]}
             </button>

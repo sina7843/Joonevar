@@ -81,7 +81,7 @@ export default async function MembershipPage() {
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-h4">عضویت انجمن</h2>
+              <h2 className="text-h3">عضویت انجمن</h2>
               <p className="mt-sm text-body-sm text-text-secondary">
                 {standing.lifetime
                   ? 'عضویت شما پیش از دوره‌ای شدن عضویت فعال شده است و مادام‌العمر می‌ماند؛ تاریخ پایانی برای آن ساخته نمی‌شود.'
@@ -175,7 +175,7 @@ export default async function MembershipPage() {
               </Alert>
             ) : (
               <>
-                <p className="mt-md text-h4" data-testid="membership-fee">
+                <p className="mt-md text-h3" data-testid="membership-fee">
                   {standing.pendingAmountToman ? formatTomanFa({ configured: true, toman: toman(standing.pendingAmountToman) }) : feeLabel}
                 </p>
                 <p className="mt-sm text-caption text-text-secondary">

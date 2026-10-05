@@ -26,7 +26,7 @@ export default async function RewardsPage() {
     <PublicShell actor={guard.actor} title="امتیاز خرید" pathname="/account/rewards">
       <div className="space-y-lg p-lg">
         <Card>
-          <h2 className="text-label-lg">مانده امتیاز</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مانده امتیاز</span></h2></div>
           <p className="mt-sm text-h2" data-testid="loyalty-balance">
             {fa(view.balance)}
           </p>
@@ -44,7 +44,7 @@ export default async function RewardsPage() {
 
         {view.expiringSoon.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">امتیازهایی که به‌زودی منقضی می‌شوند</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>امتیازهایی که به‌زودی منقضی می‌شوند</span></h2></div>
             <ul className="mt-md space-y-2xs text-body-sm" data-testid="loyalty-expiring">
               {view.expiringSoon.map((lot, index) => (
                 <li key={index}>
@@ -56,7 +56,7 @@ export default async function RewardsPage() {
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">دفتر امتیاز</h2>
+          <h2 className="hz-card__title">دفتر امتیاز</h2>
           {view.entries.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="loyalty-empty">
               هنوز امتیازی ثبت نشده است.

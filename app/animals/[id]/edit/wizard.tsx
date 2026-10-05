@@ -370,7 +370,7 @@ export function AnimalWizard({
       {step === 6 ? (
         <div className="space-y-lg">
           <Card>
-            <h2 className="text-label-lg">نوع ثبت حیوان هم‌زیست</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نوع ثبت حیوان هم‌زیست</span></h2></div>
             {/*
               * Choosing the kind of record is the whole of this step, so the
               * choice saves itself. A separate "save" button asked the person to

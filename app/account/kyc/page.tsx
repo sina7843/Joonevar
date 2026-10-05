@@ -51,7 +51,7 @@ export default async function KycPage() {
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div>
-              <h2 className="text-label-lg">وضعیت پرونده</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت پرونده</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 احراز هویت با عضویت انجمن یکی نیست و هیچ‌کدام دیگری را فعال نمی‌کند.
               </p>
@@ -144,7 +144,7 @@ export default async function KycPage() {
         {editable ? (
           <>
             <Card>
-              <h2 className="text-label-lg">مدرک هویتی</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدرک هویتی</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 {hasDocument
                   ? 'تصویر بارگذاری‌شده شما حفظ شده است؛ در صورت نیاز می‌توانید آن را جایگزین کنید.'

@@ -129,7 +129,7 @@ export default async function SellerCatalogPage() {
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">روش‌های ارسال</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>روش‌های ارسال</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="shipping-methods-note">
             {methods.length === 0
               ? 'تا ثبت حداقل یک روش ارسال، کالاهای شما در سبد خرید قابل پرداخت نیستند.'
@@ -169,7 +169,7 @@ export default async function SellerCatalogPage() {
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">کالای تازه</h2>
+          <h2 className="hz-card__title">کالای تازه</h2>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="plan-limit-note">
             {subscription.productLimit === null
               ? 'پلن فعلی شما سقف تعداد کالا ندارد.'
@@ -185,7 +185,7 @@ export default async function SellerCatalogPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">کالاهای من</h2>
+          <h2 className="hz-card__title">کالاهای من</h2>
           {products.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="products-empty">
               هنوز کالایی ثبت نکرده‌اید.
@@ -221,7 +221,7 @@ export default async function SellerCatalogPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">عرضه‌های من</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>عرضه‌های من</span></h2></div>
           <div className="mt-lg">
             <NewOfferForm
               sellerId={store.id}
@@ -255,7 +255,7 @@ export default async function SellerCatalogPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">قیمت و موجودی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>قیمت و موجودی</span></h2></div>
           {lines.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="skus-empty">
               هنوز قیمتی ثبت نشده است.

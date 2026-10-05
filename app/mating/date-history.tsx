@@ -21,7 +21,7 @@ export function DateHistory({
 }) {
   return (
     <Card>
-      <h2 className="text-label-lg">تاریخچه اعلام‌ها</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه اعلام‌ها</span></h2></div>
       {rows.length === 0 ? (
         <div className="mt-lg">
           <EmptyState
@@ -34,7 +34,7 @@ export function DateHistory({
           {rows.map((row) => (
             <li
               key={row.id}
-              className="rounded-lg border border-border-subtle p-lg"
+              className="rounded-xl border border-border-default p-lg"
               data-testid={'date-version-' + row.version}
             >
               <div className="flex items-start justify-between gap-md">

@@ -61,7 +61,7 @@ export default async function ReviewVisitPage({
     <PublicShell actor={actor} title="مرور درخواست مراجعه" pathname="/requests/new/review">
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">{CONTEXT_FA[context]}</h2>
+          <h2 className="hz-card__title">{CONTEXT_FA[context]}</h2>
           <p className="mt-md text-body-sm">
             {vet.displayNameFa} · کد نظام دامپزشکی {vet.councilCode}
           </p>

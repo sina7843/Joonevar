@@ -61,7 +61,7 @@ export default async function AdminMatingFinderPage() {
     <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/mating-finder" nav={ADMIN_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">جفت‌یابی — تنظیمات پایه</h1>
+          <h2 className="text-h3">جفت‌یابی — تنظیمات پایه</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             هر انتشار یک نسخه تازه و تغییرناپذیر می‌سازد و نسخه قبلی را بایگانی می‌کند. اشتراکی که خریده شده، همان نسخه‌ای را
             نگه می‌دارد که خریده است. قیمت، ظرفیت، بازه سنی و آستانه خویشاوندی هیچ مقدار ازپیش‌تعیین‌شده‌ای ندارند.
@@ -69,7 +69,7 @@ export default async function AdminMatingFinderPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">کلیدهای قطع و وصل</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کلیدهای قطع و وصل</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">
             همه بسته شروع می‌شوند و مقدار تنظیم‌نشده بسته خوانده می‌شود. تغییر آن‌ها و مرزهای فنی (انقضای درخواست، کد
             تأیید، رسانه و ظرفیت حساب رایگان) از{' '}
@@ -80,7 +80,7 @@ export default async function AdminMatingFinderPage() {
           </p>
           <ul className="mt-md grid gap-sm sm:grid-cols-2 lg:grid-cols-3" data-testid="finder-flags">
             {flags.map((flag) => (
-              <li key={flag.key} className="flex items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm">
+              <li key={flag.key} className="flex items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm">
                 <span className="text-body-sm">{flag.labelFa}</span>
                 <span data-testid={'finder-flag-' + flag.key}>
                   <StatusBadge tone={flag.enabled ? 'success' : 'neutral'}>{flag.enabled ? 'باز' : 'بسته'}</StatusBadge>
@@ -91,11 +91,11 @@ export default async function AdminMatingFinderPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">گونه‌های باز برای جفت‌یابی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گونه‌های باز برای جفت‌یابی</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">عرضه اولیه فقط برای سگ است. باز کردن گونه دیگر تصمیم محصولی و حقوقی است و دلیلش ثبت می‌شود.</p>
           <ul className="mt-md space-y-md">
             {species.map((row) => (
-              <li key={row.id} className="rounded-lg border border-border-subtle p-md" data-testid={'finder-species-' + row.speciesCode}>
+              <li key={row.id} className="rounded-lg border border-border-default p-md" data-testid={'finder-species-' + row.speciesCode}>
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <span className="text-label-md">{row.nameFa}</span>
                   <StatusBadge tone={row.enabled ? 'success' : 'neutral'}>{row.enabled ? 'باز' : 'بسته'}</StatusBadge>
@@ -107,7 +107,7 @@ export default async function AdminMatingFinderPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">طرح‌های اشتراک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>طرح‌های اشتراک</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">
             دو خانواده مستقل مالک و کنل، هرکدام در چهار مدت. قیمت خالی یعنی طرح دیده می‌شود ولی خریدنی نیست. ظرفیت مورد
             انتظار مالک مشترک ۳ حیوان است، ولی فقط با انتشار صریح شما اعمال می‌شود.
@@ -117,7 +117,7 @@ export default async function AdminMatingFinderPage() {
               const testId = slot.audience + '-' + slot.durationMonths;
               const current = slot.current;
               return (
-                <section key={testId} className="rounded-lg border border-border-subtle p-lg" data-testid={'finder-slot-' + testId}>
+                <section key={testId} className="rounded-xl border border-border-default p-lg" data-testid={'finder-slot-' + testId}>
                   <div className="flex flex-wrap items-start justify-between gap-sm">
                     <h3 className="text-label-md">
                       {'طرح ' + FINDER_AUDIENCE_FA[slot.audience] + ' — ' + FINDER_DURATION_FA[slot.durationMonths as FinderDuration]}
@@ -160,13 +160,13 @@ export default async function AdminMatingFinderPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه نسخه‌های طرح</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌های طرح</span></h2></div>
           {history.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">هنوز طرحی منتشر نشده است.</p>
           ) : (
             <ul className="mt-md space-y-sm" data-testid="finder-plan-history">
               {history.map((row) => (
-                <li key={row.id} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm">
+                <li key={row.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm">
                   <span className="text-body-sm">
                     {FINDER_AUDIENCE_FA[row.audience] + ' ' + FINDER_DURATION_FA[row.durationMonths as FinderDuration] + ' · نسخه ' + fa(row.version) +
                       ' · ' + price(row.priceToman) + ' · ظرفیت ' + fa(row.activeAnimalCapacity) + ' · ' + formatInstantFa(row.publishedAt) + ' · ' + row.reasonFa}
@@ -180,7 +180,7 @@ export default async function AdminMatingFinderPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">قالب قرارداد جفت‌گیری</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>قالب قرارداد جفت‌گیری</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">
             {'متن حقوقی بندها با شماست و هیچ متنی از پیش ثبت نشده است. تا انتشار قالب، تنظیم قرارداد بسته است. ' + NOT_A_LEGAL_SIGNATURE_FA}
           </p>
@@ -210,14 +210,14 @@ export default async function AdminMatingFinderPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">قاعده‌های نژاد و جنس</h2>
+          <h2 className="hz-card__title">قاعده‌های نژاد و جنس</h2>
           <Alert tone="info" title="حالت پایه فقط هشدار است">
             فاصله پایه نر ۱۴ روز و ماده ۶ ماه است و درخواست را نمی‌بندد. بازه سنی و آستانه خویشاوندی تا انتشار شما تنظیم‌نشده
             می‌مانند؛ نژادی که قاعده سنی ندارد، درخواستش بسته می‌ماند و دلیل آن به کاربر گفته می‌شود.
           </Alert>
           <div className="mt-md space-y-lg">
             {published.map((rule) => (
-              <section key={rule.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'finder-rule-' + rule.id}>
+              <section key={rule.id} className="rounded-xl border border-border-default p-lg" data-testid={'finder-rule-' + rule.id}>
                 <h3 className="text-label-md">
                   {rule.speciesCode + ' · ' + (rule.breedNameFa ?? 'پیش‌فرض گونه') + ' · ' + (rule.sex === 'MALE' ? 'نر' : 'ماده') + ' · نسخه ' + fa(rule.version)}
                 </h3>
@@ -251,7 +251,7 @@ export default async function AdminMatingFinderPage() {
                 </details>
               </section>
             ))}
-            <section className="rounded-lg border border-border-subtle p-lg" data-testid="finder-rule-new">
+            <section className="rounded-xl border border-border-default p-lg" data-testid="finder-rule-new">
               <h3 className="text-label-md">قاعده تازه برای یک نژاد</h3>
               <p className="mt-xs text-caption text-text-secondary">قاعده نژاد بر پیش‌فرض گونه مقدم است. اگر آن نژاد و جنس قاعده دارد، نسخه تازه را از همان کارت منتشر کنید.</p>
               <PublishRuleForm

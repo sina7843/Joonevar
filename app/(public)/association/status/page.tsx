@@ -88,17 +88,17 @@ export default function AssociationStatusPage() {
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">{DESCRIPTION}</p>
       </header>
 
       <section aria-labelledby="status-membership-title" className="space-y-md">
-        <h2 id="status-membership-title" className="text-h5">
+        <h2 id="status-membership-title" className="text-h4">
           وضعیت‌های عضویت انجمن
         </h2>
         <dl className="space-y-sm" data-testid="status-membership">
           {MEMBERSHIP.map((entry) => (
-            <div key={entry.status} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <div key={entry.status} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <dt className="text-label-lg">{MEMBERSHIP_STATUS_FA[entry.status]}</dt>
               <dd className="mt-xs text-body-sm text-text-secondary">{entry.meaning}</dd>
             </div>
@@ -110,12 +110,12 @@ export default function AssociationStatusPage() {
       </section>
 
       <section aria-labelledby="status-trusted-title" className="space-y-md">
-        <h2 id="status-trusted-title" className="text-h5">
+        <h2 id="status-trusted-title" className="text-h4">
           مراحل دامپزشک معتمد
         </h2>
         <ol className="space-y-sm" data-testid="status-trusted">
           {TRUSTED_STEPS.map((step, index) => (
-            <li key={step.title} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <li key={step.title} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <p className="text-label-lg">{(index + 1).toLocaleString('fa-IR') + '. ' + step.title}</p>
               <p className="mt-xs text-body-sm text-text-secondary">{step.body}</p>
             </li>
@@ -127,12 +127,12 @@ export default function AssociationStatusPage() {
       </section>
 
       <section aria-labelledby="status-club-title" className="space-y-md">
-        <h2 id="status-club-title" className="text-h5">
+        <h2 id="status-club-title" className="text-h4">
           چرخه یک کلاب
         </h2>
         <dl className="space-y-sm" data-testid="status-club">
           {CLUB_ORDER.map((state) => (
-            <div key={state} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <div key={state} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <dt className="flex flex-wrap items-center gap-sm text-label-lg">
                 <StatusBadge tone={state === 'ACTIVE' ? 'success' : state === 'SUSPENDED' || state === 'REJECTED' ? 'error' : 'neutral'}>
                   {CLUB_LIFECYCLE_FA[state]}

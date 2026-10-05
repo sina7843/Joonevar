@@ -8,7 +8,7 @@
  * ratio each pair has to meet. A token that changes and breaks a pair fails a
  * test instead of quietly shipping.
  *
- * The tokens are the Design System's published values (`app/globals.css`). They
+ * The tokens are the Design System v1.0.3 values (`src/ui/design-system/tokens.css`, DEC-0225). They
  * are copied here as data, not redefined: the test asserts the two stay equal,
  * so this file can never drift into a second source of truth.
  */
@@ -58,7 +58,7 @@ export const TOKENS = {
   bgSurface: '#ffffff',
   bgSubtle: '#faf7f2',
   bgBrandSubtle: '#fff6ed',
-  textPrimary: '#171a17',
+  textPrimary: '#3a3b36',
   textSecondary: '#685f57',
   textBrand: '#a83d0b',
   textDisabled: '#b9aea2',
@@ -66,7 +66,7 @@ export const TOKENS = {
   actionPrimaryDefault: '#c94f12',
   actionPrimaryOn: '#ffffff',
   actionSecondaryDefault: '#ffffff',
-  actionSecondaryOn: '#171a17',
+  actionSecondaryOn: '#3a3b36',
   statusNeutralText: '#4f4842',
   statusNeutralBg: '#faf7f2',
   statusInfoText: '#175cd3',
@@ -77,7 +77,7 @@ export const TOKENS = {
   statusWarningBg: '#fffaeb',
   statusErrorText: '#b42318',
   statusErrorBg: '#fef3f2',
-  focusRing: '#c94f12',
+  focusRing: '#e46a1d',
 } as const;
 
 export interface ContrastPair {

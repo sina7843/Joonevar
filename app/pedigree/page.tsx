@@ -55,7 +55,7 @@ export default async function PedigreePage() {
         </ButtonLink>
 
         <Card>
-          <h2 className="text-label-lg">مرکز ژنتیک مقصد</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرکز ژنتیک مقصد</span></h2></div>
           <p className="mt-md text-caption text-text-secondary">
             یک مرکز ثابت وجود دارد و انتخاب مرکز در محصول نیست؛ این اطلاعات فقط برای واریز مستقیم است.
           </p>
@@ -83,7 +83,7 @@ export default async function PedigreePage() {
 
         {receipts.length === 0 ? null : (
           <Card>
-            <h2 className="text-label-lg">فیش‌های من</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فیش‌های من</span></h2></div>
             <ul className="mt-md space-y-sm text-body-sm" data-testid="receipt-list">
               {receipts.map((receipt) => (
                 <li key={receipt.id} className="flex items-center justify-between gap-md">

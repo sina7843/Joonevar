@@ -52,7 +52,7 @@ export function CreateContentForm({
   const [state, submit, pending] = useActionState(createContentAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">نوشته تازه</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نوشته تازه</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         با عنوان شروع کنید؛ پیش‌نویس ساخته می‌شود و بقیه را در صفحه ویرایش می‌نویسید.
       </p>
@@ -113,7 +113,7 @@ export function ContentFieldsForm({
   const [state, submit, pending] = useActionState(updateContentAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">متن و مشخصات</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>متن و مشخصات</span></h2></div>
       <form onSubmit={submitWithoutReset(submit)} className="mt-lg space-y-lg" data-testid="content-fields-form">
         <input type="hidden" name="panel" value={panel} />
         <input type="hidden" name="contentId" value={item.id} />
@@ -193,12 +193,12 @@ export function ContentImageForm({ panel, item }: { panel: ContentPanel; item: E
   const [state, submit, pending] = useActionState(uploadContentImageAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">تصویر</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصویر</span></h2></div>
       {item.imageFileId ? (
         <img
           src={'/api/files/' + item.imageFileId}
           alt={item.imageAltFa ?? ''}
-          className="mt-md max-h-[240px] rounded-md border border-border-subtle object-contain"
+          className="mt-md max-h-[240px] rounded-lg border border-border-default object-contain"
           data-testid="content-image-preview"
         />
       ) : (
@@ -236,7 +236,7 @@ export function ContentStatusForm({
   const to = chosen?.value ?? '';
   return (
     <Card>
-      <h2 className="text-label-lg">وضعیت</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت</span></h2></div>
       <form
         onSubmit={submitWithoutReset(submit, (data) => {
           // The picker gives a local time with no zone; the browser knows the zone, the server does not.
@@ -313,7 +313,7 @@ export function CreateCategoryForm({ kinds }: { kinds: ReadonlyArray<{ value: st
   const [state, submit, pending] = useActionState(createCategoryAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">دسته تازه</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دسته تازه</span></h2></div>
       <form action={submit} className="mt-lg space-y-lg" data-testid="create-category-form">
         <Result state={state} testId="create-category-result" />
         <div className="grid gap-lg md:grid-cols-3">

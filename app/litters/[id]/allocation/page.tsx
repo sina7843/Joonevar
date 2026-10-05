@@ -62,7 +62,7 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">تخصیص مالکیت توله‌ها</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تخصیص مالکیت توله‌ها</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {view.permit.permitNo ?? '—'} ·{' '}
                 <Link
@@ -94,7 +94,7 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
 
         {view.ruleContext ? (
           <Card>
-            <h2 className="text-label-lg">توافق پیش از تولد (فقط زمینه پیشنهاد)</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توافق پیش از تولد (فقط زمینه پیشنهاد)</span></h2></div>
             <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="rule-context">
               <dt className="text-text-secondary">نوع توافق</dt>
               <dd>{view.ruleContext.typeFa}</dd>
@@ -115,12 +115,12 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
 
         {view.current ? (
           <Card>
-            <h2 className="text-label-lg">{'نسخه ' + view.current.version + ' — مالک پیشنهادی هر توله'}</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'نسخه ' + view.current.version + ' — مالک پیشنهادی هر توله'}</span></h2></div>
             <ul className="mt-lg space-y-md" data-testid="allocation-items">
               {view.puppies.map((puppy) => (
                 <li
                   key={puppy.id}
-                  className="flex items-start justify-between gap-md rounded-lg border border-border-subtle p-lg"
+                  className="flex items-start justify-between gap-md rounded-xl border border-border-default p-lg"
                   data-testid={'allocation-row-' + puppy.tempCode}
                 >
                   <div className="min-w-0">
@@ -212,12 +212,12 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
 
         {view.history.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>
+            <h2 className="hz-card__title">تاریخچه نسخه‌ها</h2>
             <ul className="mt-lg space-y-md" data-testid="allocation-history">
               {view.history.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-lg border border-border-subtle p-lg"
+                  className="rounded-xl border border-border-default p-lg"
                   data-testid={'allocation-version-' + row.version}
                 >
                   <p className="text-label-md">

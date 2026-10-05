@@ -43,7 +43,7 @@ export default async function AssocKennelPage({ params }: { params: Promise<{ id
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">{kennel.nameFa ?? 'کنل بدون نام'}</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{kennel.nameFa ?? 'کنل بدون نام'}</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 {owner[0] ? owner[0].firstName + ' ' + owner[0].lastName : '—'}
               </p>

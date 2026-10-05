@@ -112,16 +112,16 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
       ) : null}
 
       {product.descriptionFa ? (
-        <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-          <h2 className="text-label-lg">درباره این کالا</h2>
+        <section className="space-y-sm rounded-xl border border-border-default p-lg">
+          <h2 className="hz-card__title">درباره این کالا</h2>
           <p className="text-body-sm" data-testid="product-description">
             {product.descriptionFa}
           </p>
         </section>
       ) : null}
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">مشخصات</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مشخصات</span></h2></div>
         {Object.keys(product.specifications).length === 0 ? (
           <p className="text-caption text-text-secondary">مشخصه‌ای ثبت نشده است.</p>
         ) : (
@@ -139,8 +139,8 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
         </p>
       </section>
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">امتیاز خریداران</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>امتیاز خریداران</span></h2></div>
         <p className="text-body-sm" data-testid="product-rating">
           {rating.count === 0
             ? 'هنوز نظری ثبت نشده است.'
@@ -166,8 +166,8 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
         ) : null}
       </section>
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">پرسش و پاسخ</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرسش و پاسخ</span></h2></div>
         {questions.length === 0 ? (
           <p className="text-caption text-text-secondary" data-testid="product-questions-empty">
             هنوز پرسشی درباره این کالا منتشر نشده است.
@@ -185,8 +185,8 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
         {signedIn ? <AskQuestionForm action={askQuestionAction} productId={product.id} /> : null}
       </section>
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">فروشندگان این کالا</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فروشندگان این کالا</span></h2></div>
         <ul className="mt-md space-y-sm" data-testid="product-offers">
           {product.offers.map((offer) => (
             <li

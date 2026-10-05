@@ -51,7 +51,7 @@ export default async function MarketSettingHistoryPage({
       ) : (
         <ul className="space-y-md" data-testid="setting-history">
           {history.items.map((row) => (
-            <li key={row.id} className="rounded-lg border border-border-subtle p-md" data-testid={'history-' + row.id}>
+            <li key={row.id} className="rounded-lg border border-border-default p-md" data-testid={'history-' + row.id}>
               <div className="flex flex-wrap items-center justify-between gap-sm">
                 <p className="text-caption text-text-secondary">{formatted(row.occurredAt)}</p>
                 <StatusBadge tone="neutral">{row.actorContext ?? 'سیستم'}</StatusBadge>
@@ -85,7 +85,7 @@ export default async function MarketSettingHistoryPage({
     <OpsShell actor={actor} title="تاریخچه مقدار" pathname="/market/settings" nav={marketNav(actor)}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">{definition?.labelFa ?? key}</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{definition?.labelFa ?? key}</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary">
             <bdi className="hz-ltr font-mono">{key}</bdi>
           </p>

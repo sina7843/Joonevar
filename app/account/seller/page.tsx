@@ -60,7 +60,7 @@ export default async function SellerPage() {
             </span>
           </Alert>
           <Card>
-            <h2 className="text-label-lg">ثبت فروشگاه تازه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت فروشگاه تازه</span></h2></div>
             <div className="mt-lg">
               <StartSellerForm />
             </div>
@@ -95,7 +95,7 @@ export default async function SellerPage() {
       <div className="space-y-lg p-lg">
         <Card>
           <div className="flex flex-wrap items-start justify-between gap-sm">
-            <h2 className="text-label-lg">{seller.displayNameFa ?? 'فروشگاه بدون نام'}</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{seller.displayNameFa ?? 'فروشگاه بدون نام'}</span></h2></div>
             <StatusBadge tone={status === 'ACTIVE' ? 'success' : status === 'SUSPENDED' ? 'warning' : 'neutral'}>
               <span data-testid="seller-status">{SELLER_STATUS_FA[status]}</span>
             </StatusBadge>
@@ -139,7 +139,7 @@ export default async function SellerPage() {
 
         {detail.blockers.length > 0 && isSellerEditable(status) ? (
           <Card>
-            <h2 className="text-label-lg">برای ارسال پرونده این موارد لازم است</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>برای ارسال پرونده این موارد لازم است</span></h2></div>
             <ul className="mt-lg space-y-2xs text-body-sm" data-testid="seller-blockers">
               {detail.blockers.map((blocker) => (
                 <li key={blocker}>{blocker}</li>
@@ -149,7 +149,7 @@ export default async function SellerPage() {
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">اطلاعات کسب‌وکار</h2>
+          <h2 className="hz-card__title">اطلاعات کسب‌وکار</h2>
           <div className="mt-lg">
             <SellerApplicationForm
               disabled={!editable}
@@ -187,7 +187,7 @@ export default async function SellerPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">قرارداد و مدارک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>قرارداد و مدارک</span></h2></div>
           <div className="mt-lg space-y-lg">
             <AcceptAgreementForm sellerId={seller.id} accepted={seller.agreementVersion} />
             {detail.documents.length > 0 ? (
@@ -211,7 +211,7 @@ export default async function SellerPage() {
 
         {isSellerEditable(status) && roleAllows(role, 'STORE_SUBMIT') ? (
           <Card>
-            <h2 className="text-label-lg">ارسال برای بررسی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ارسال برای بررسی</span></h2></div>
             <div className="mt-lg">
               <SubmitSellerForm sellerId={seller.id} version={seller.version} />
             </div>
@@ -220,7 +220,7 @@ export default async function SellerPage() {
 
         {(status === 'APPROVED' || status === 'ACTIVE' || status === 'SUSPENDED') && roleAllows(role, 'STORE_BILLING') ? (
           <Card>
-            <h2 className="text-label-lg">پلن فروشندگی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پلن فروشندگی</span></h2></div>
             <p className="mt-2xs text-caption text-text-secondary" data-testid="plan-note">
               دوره فروشگاه فقط با پرداخت تأییدشده روی سرور آغاز می‌شود. تا ثبت تعرفه یک پلن، خرید آن باز
               نمی‌شود و «تعیین‌نشده» به معنی رایگان نیست.
@@ -241,7 +241,7 @@ export default async function SellerPage() {
 
         {roleAllows(role, 'STORE_MEMBERS') ? (
           <Card>
-            <h2 className="text-label-lg">همکاران فروشگاه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>همکاران فروشگاه</span></h2></div>
             <p className="mt-2xs text-caption text-text-secondary">
               نقش هر همکار فقط در همین فروشگاه معنی دارد و هیچ دسترسی‌ای به فروشگاه دیگری نمی‌دهد.
             </p>

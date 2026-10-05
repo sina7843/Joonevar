@@ -34,7 +34,7 @@ export default async function AdminMergePage({ searchParams }: { searchParams: P
     <OpsShell actor={guard.actor} title="سوپرادمین" pathname="/admin/merge" nav={ADMIN_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">ادغام رکورد تکراری</h1>
+          <h2 className="text-h3">ادغام رکورد تکراری</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             رکورد تکراری حذف نمی‌شود: ردیف، تاریخچه و نشانی عمومی‌اش می‌ماند و همان نشانی به رکورد اصلی اشاره می‌کند.
             رکوردی که خودش تکراری ثبت شده دوباره ادغام نمی‌شود تا زنجیره‌ای از هدایت ساخته نشود.
@@ -45,7 +45,7 @@ export default async function AdminMergePage({ searchParams }: { searchParams: P
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">{'ثبت تکراری — ' + MERGE_KIND_FA[kind]}</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'ثبت تکراری — ' + MERGE_KIND_FA[kind]}</span></h2></div>
           {options.length < 2 ? (
             <div className="mt-lg">
               <EmptyState
@@ -59,7 +59,7 @@ export default async function AdminMergePage({ searchParams }: { searchParams: P
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">رکوردهای ادغام‌شده</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>رکوردهای ادغام‌شده</span></h2></div>
           {merged.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="هنوز رکوردی تکراری ثبت نشده است" description="هر ادغام با دلیلش در تاریخچه می‌ماند." />
@@ -69,7 +69,7 @@ export default async function AdminMergePage({ searchParams }: { searchParams: P
               {merged.map((row) => (
                 <li
                   key={row.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
                   data-testid={'merged-' + row.id}
                 >
                   <span className="text-body-sm">

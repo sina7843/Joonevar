@@ -26,7 +26,7 @@ export default async function MyOrdersPage() {
   return (
     <PublicShell actor={guard.actor} title="سفارش‌های فروشگاه" pathname="/account/orders">
       <div className="space-y-lg p-lg">
-      <h1 className="text-h2">سفارش‌های فروشگاه</h1>
+      <h2 className="text-h2">سفارش‌های فروشگاه</h2>
       {orders.length === 0 ? (
         <p className="text-body-sm text-text-secondary" data-testid="orders-empty">
           هنوز سفارشی ثبت نکرده‌اید.
@@ -36,7 +36,7 @@ export default async function MyOrdersPage() {
           {orders.map((order) => (
             <li
               key={order.id}
-              className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-lg"
+              className="flex flex-wrap items-center justify-between gap-sm rounded-xl border border-border-default p-lg"
               data-testid={'order-row-' + order.id}
             >
               <div className="space-y-2xs">

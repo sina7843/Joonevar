@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { ICON_PATHS } from './icon-paths.ts';
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -68,71 +69,73 @@ interface OverlayProps {
   footer?: ReactNode;
 }
 
-function Surface({
-  open,
-  onClose,
-  title,
-  children,
-  footer,
-  placement,
-  testId,
-}: OverlayProps & { placement: string; testId: string }) {
+const CloseButton = ({ onClose }: { onClose: () => void }) => (
+  <button type="button" className="hz-icon-btn" aria-label="بستن" onClick={onClose}>
+    <svg className="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true" focusable="false">
+      <path d={ICON_PATHS.x.regular} />
+    </svg>
+  </button>
+);
+
+/**
+ * Modal — DS *Modal*: scrim + a centring layer + `.hz-modal` (head, body,
+ * foot). Enter: fade and scale from 0.98 (bundle), off under reduced motion.
+ */
+export function Modal({ open, onClose, title, children, footer }: OverlayProps) {
   const panelRef = useOverlay(open, onClose);
   if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex" data-testid={testId + '-root'}>
-      <div
-        className="absolute inset-0"
-        style={{ background: 'var(--hz-scrim)' }}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        tabIndex={-1}
-        data-testid={testId}
-        className={['relative z-10 bg-bg-surface p-lg shadow-lg outline-none', placement].join(' ')}
-      >
-        <h2 className="text-h4">{title}</h2>
-        <div className="mt-md text-body-sm">{children}</div>
-        {footer}
+    <div data-testid="modal-root">
+      <div className="hz-scrim" onClick={onClose} aria-hidden="true" />
+      <div className="hz-modal-layer">
+        <div ref={panelRef} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} data-testid="modal" className="hz-modal outline-none">
+          <div className="hz-modal__head">
+            <h2 className="hz-modal__title">{title}</h2>
+            <CloseButton onClose={onClose} />
+          </div>
+          <div className="hz-modal__body">{children}</div>
+          {footer ? <div className="hz-modal__foot">{footer}</div> : null}
+        </div>
       </div>
     </div>
   );
 }
 
-export function Modal(props: OverlayProps) {
+/** Side panel — DS *Drawer*: at the inline end (left in RTL) for details and filters. */
+export function Drawer({ open, onClose, title, children, footer }: OverlayProps) {
+  const panelRef = useOverlay(open, onClose);
+  if (!open) return null;
   return (
-    <Surface
-      {...props}
-      testId="modal"
-      placement="m-auto max-h-[85vh] w-[min(90vw,480px)] overflow-y-auto rounded-lg"
-    />
+    <div data-testid="drawer-root">
+      <div className="hz-scrim" onClick={onClose} aria-hidden="true" />
+      <div ref={panelRef} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} data-testid="drawer" className="hz-drawer hz-drawer--full-mobile outline-none">
+        <div className="hz-drawer__head">
+          <h2 className="hz-drawer__title">{title}</h2>
+          <CloseButton onClose={onClose} />
+        </div>
+        <div className="hz-drawer__body">{children}</div>
+        {footer ? <div className="hz-drawer__foot">{footer}</div> : null}
+      </div>
+    </div>
   );
 }
 
-/** Side panel. In RTL it enters from the right, which is the natural edge. */
-export function Drawer(props: OverlayProps) {
+/** Mobile sheet — DS *BottomSheet*: same semantics as the modal, pinned to the bottom edge. */
+export function BottomSheet({ open, onClose, title, children, footer }: OverlayProps) {
+  const panelRef = useOverlay(open, onClose);
+  if (!open) return null;
   return (
-    <Surface
-      {...props}
-      testId="drawer"
-      placement="ms-auto h-full w-[min(92vw,420px)] overflow-y-auto rounded-s-lg"
-    />
-  );
-}
-
-/** Mobile sheet. Same semantics as the modal, anchored to the bottom edge. */
-export function BottomSheet(props: OverlayProps) {
-  return (
-    <Surface
-      {...props}
-      testId="bottom-sheet"
-      placement="mt-auto w-full max-h-[80vh] overflow-y-auto rounded-t-xl"
-    />
+    <div data-testid="bottom-sheet-root">
+      <div className="hz-scrim" onClick={onClose} aria-hidden="true" />
+      <div ref={panelRef} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} data-testid="bottom-sheet" className="hz-sheet outline-none">
+        <div className="hz-sheet__handle" aria-hidden="true" />
+        <div className="hz-sheet__head">
+          <h2 className="hz-sheet__title">{title}</h2>
+          <CloseButton onClose={onClose} />
+        </div>
+        <div className="hz-sheet__body">{children}</div>
+        {footer ? <div className="hz-sheet__foot">{footer}</div> : null}
+      </div>
+    </div>
   );
 }

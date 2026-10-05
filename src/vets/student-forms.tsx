@@ -35,7 +35,7 @@ export function StudentApplicationForm({
   const [state, submit, pending] = useActionState(correction ? resubmitStudentApplicationAction : submitStudentApplicationAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">{correction ? 'اصلاح پرونده دانشجویی' : 'درخواست احراز دانشجوی دامپزشکی'}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{correction ? 'اصلاح پرونده دانشجویی' : 'درخواست احراز دانشجوی دامپزشکی'}</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         حساب کاربری شما همان حساب عادی می‌ماند. پس از بررسی دستی انجمن، فقط Tag «دانشجوی دامپزشکی» اضافه می‌شود؛ دسترسی دکتر، پروانه یا
         دامپزشک معتمد با این مسیر داده نمی‌شود.

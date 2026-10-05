@@ -52,7 +52,7 @@ export default async function AccountPackagesPage() {
     <PublicShell actor={guard.actor} title="بسته‌های تبلیغاتی" pathname="/account/packages">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">بسته‌های تبلیغاتی</h1>
+          <h2 className="text-h3">بسته‌های تبلیغاتی</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             پروفایل پایه رایگان است و بسته لازم ندارد. بسته تبلیغاتی فقط جای نمایش را با برچسب «تبلیغ» تغییر می‌دهد؛
             تأیید حرفه‌ای، معتمدبودن و کامل‌بودن پرونده را نمی‌سازد و جای آن‌ها را هم نمی‌گیرد.
@@ -75,7 +75,7 @@ export default async function AccountPackagesPage() {
               <Card key={target.type + target.id}>
                 <div className="flex flex-wrap items-start justify-between gap-md">
                   <div className="min-w-0">
-                    <h2 className="text-label-lg">{target.nameFa}</h2>
+                    <h2 className="hz-card__title">{target.nameFa}</h2>
                     <p className="mt-2xs text-caption text-text-secondary">{target.kindFa}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-xs">
@@ -91,7 +91,7 @@ export default async function AccountPackagesPage() {
                 </div>
 
                 {live ? (
-                  <div className="mt-lg rounded-lg border border-border-subtle p-lg" data-testid={'live-package-' + target.id}>
+                  <div className="mt-lg rounded-xl border border-border-default p-lg" data-testid={'live-package-' + target.id}>
                     <p className="text-label-md">
                       {'بسته فعال: ' +
                         AD_TIER_FA[history.find((row) => row.id === live.id)?.tier as AdTier] +
@@ -127,7 +127,7 @@ export default async function AccountPackagesPage() {
                             ? 'ظرفیت این بسته تکمیل است.'
                             : null;
                         return (
-                          <li key={entry.plan.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'plan-card-' + testId}>
+                          <li key={entry.plan.id} className="rounded-xl border border-border-default p-lg" data-testid={'plan-card-' + testId}>
                             <p className="text-label-lg">{entry.tierFa + ' ' + entry.periodFa}</p>
                             <p className="mt-2xs text-label-md" data-testid={'plan-price-' + testId}>
                               {entry.priceFa ?? 'قیمت ثبت‌نشده'}
@@ -164,7 +164,7 @@ export default async function AccountPackagesPage() {
                         return (
                           <li
                             key={row.id}
-                            className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm"
+                            className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm"
                             data-testid={'history-row-' + row.id}
                           >
                             <span className="text-body-sm">

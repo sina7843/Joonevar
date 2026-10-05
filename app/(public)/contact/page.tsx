@@ -57,16 +57,16 @@ export default async function ContactPage() {
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">{DESCRIPTION}</p>
       </header>
 
       <section aria-labelledby="contact-details-title" className="space-y-md">
-        <h2 id="contact-details-title" className="text-h5">
+        <h2 id="contact-details-title" className="text-h4">
           راه‌های ارتباطی
         </h2>
         {anyContact ? (
-          <dl className="space-y-md rounded-lg border border-border-subtle bg-bg-surface p-lg text-body-sm" data-testid="contact-details">
+          <dl className="space-y-md rounded-xl border border-border-default bg-bg-surface p-lg text-body-sm" data-testid="contact-details">
             {phone ? (
               <div>
                 <dt className="text-caption text-text-secondary">شماره تماس</dt>
@@ -110,12 +110,12 @@ export default async function ContactPage() {
       </section>
 
       <section aria-labelledby="contact-routes-title" className="space-y-md">
-        <h2 id="contact-routes-title" className="text-h5">
+        <h2 id="contact-routes-title" className="text-h4">
           پیگیری از داخل سامانه
         </h2>
         <ul className="space-y-sm" data-testid="contact-routes">
           {ROUTES.map((route) => (
-            <li key={route.href} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <li key={route.href} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <Link href={route.href} className="text-label-lg text-text-brand">
                 {route.label}
               </Link>
@@ -126,7 +126,7 @@ export default async function ContactPage() {
       </section>
 
       <section aria-labelledby="contact-report-title" className="space-y-sm">
-        <h2 id="contact-report-title" className="text-h5">
+        <h2 id="contact-report-title" className="text-h4">
           گزارش محتوا یا کلاب
         </h2>
         <p className="text-body-sm text-text-secondary">

@@ -39,7 +39,7 @@ export default async function MarketTrustPage() {
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">پرسش‌های در انتظار بررسی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرسش‌های در انتظار بررسی</span></h2></div>
           {questions.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="question-queue-empty">
               پرسشی در انتظار بررسی نیست.
@@ -49,7 +49,7 @@ export default async function MarketTrustPage() {
               {questions.map((entry) => (
                 <li
                   key={entry.question.id}
-                  className="space-y-sm rounded-md border border-border-subtle p-lg"
+                  className="space-y-sm rounded-lg border border-border-default p-lg"
                   data-testid={'question-' + entry.question.id}
                 >
                   <p className="text-body-sm">
@@ -63,7 +63,7 @@ export default async function MarketTrustPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">نظرها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نظرها</span></h2></div>
           {reviews.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="review-queue-empty">
               نظری ثبت نشده است.
@@ -73,7 +73,7 @@ export default async function MarketTrustPage() {
               {reviews.map((view) => (
                 <li
                   key={view.row.id}
-                  className="space-y-sm rounded-md border border-border-subtle p-lg"
+                  className="space-y-sm rounded-lg border border-border-default p-lg"
                   data-testid={'review-' + view.row.id}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-sm">

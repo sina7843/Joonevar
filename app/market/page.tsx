@@ -55,7 +55,7 @@ export default async function MarketOverviewPage() {
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">نقش و اختیارات شما</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نقش و اختیارات شما</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="market-context">
             {MARKETPLACE_CONTEXT_FA[actor.context] ?? 'سوپرادمین'}
           </p>
@@ -71,13 +71,13 @@ export default async function MarketOverviewPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">کلیدهای قطع و وصل</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کلیدهای قطع و وصل</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary">
             هر کلید یک تنظیم نسخه‌دار است؛ هر بار زدن آن با نام، زمان و دلیل در تاریخچه ثبت می‌شود.
           </p>
           <ul className="mt-lg space-y-md" data-testid="market-flags">
             {flags.map((flag) => (
-              <li key={flag.key} className="rounded-lg border border-border-subtle p-md" data-testid={'flag-' + flag.key}>
+              <li key={flag.key} className="rounded-lg border border-border-default p-md" data-testid={'flag-' + flag.key}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
                     <p className="text-label-md">{flag.labelFa}</p>
@@ -105,10 +105,10 @@ export default async function MarketOverviewPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">گونه‌های فعال هر بازار</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گونه‌های فعال هر بازار</span></h2></div>
           <div className="mt-lg space-y-md" data-testid="market-species-summary">
             {(['ANIMAL_SALE', 'MERCHANDISE'] as const).map((market) => (
-              <div key={market} className="rounded-lg border border-border-subtle p-md">
+              <div key={market} className="rounded-lg border border-border-default p-md">
                 <p className="text-label-md">{MARKET_FA[market]}</p>
                 <ul className="mt-sm flex flex-wrap gap-xs">
                   {byMarket(market).map((row) => (
@@ -126,12 +126,12 @@ export default async function MarketOverviewPage() {
 
         {groups.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">مقادیر مدیریت‌شده</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مقادیر مدیریت‌شده</span></h2></div>
             <ul className="mt-lg space-y-sm" data-testid="market-setting-groups">
               {groups.map((group) => (
                 <li
                   key={group.group}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
                   data-testid={'market-group-' + group.group}
                 >
                   <Link href={'/market/settings?group=' + group.group} className="text-label-md text-text-brand">

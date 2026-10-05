@@ -57,7 +57,7 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">اعلام وجود توافق شخصی</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام وجود توافق شخصی</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary" data-testid="declaration-route-note">
                 این مسیر شخصی است و با «مجوز رسمی جفت‌گیری» یکی نیست؛ شناسه، وضعیت و Route جداگانه دارد.
               </p>
@@ -106,7 +106,7 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
 
         {awaitingMe ? (
           <Card>
-            <h2 className="text-label-lg">پاسخ شما</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پاسخ شما</span></h2></div>
             <p className="mt-md text-caption text-text-secondary">
               فقط «وجود» توافق را تأیید یا رد می‌کنید؛ متن یا مفاد توافق در هم‌زیست ثبت نمی‌شود و کد
               یک‌بارمصرف جدیدی برای امضا ساخته نمی‌شود.
@@ -130,10 +130,10 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
 
         {view.notes.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">یادداشت‌های شخصی (UNVERIFIED)</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>یادداشت‌های شخصی (UNVERIFIED)</span></h2></div>
             <ul className="mt-lg space-y-md" data-testid="personal-notes">
               {view.notes.map((note) => (
-                <li key={note.id} className="rounded-lg border border-border-subtle p-lg">
+                <li key={note.id} className="rounded-xl border border-border-default p-lg">
                   <p className="text-label-md">
                     {NOTE_KIND_FA[note.kind] ?? note.kind}
                     {note.noteDate ? ' · ' + formatCivilDateFa(note.noteDate) : ''}

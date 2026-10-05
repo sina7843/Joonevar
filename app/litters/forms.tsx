@@ -44,7 +44,7 @@ export function ProposeAllocationForm({
   const [state, submit, pending] = useActionState(proposeAllocationAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">{isRevision ? 'ثبت نسخه اصلاح‌شده تخصیص' : 'پیشنهاد تخصیص توله‌ها'}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{isRevision ? 'ثبت نسخه اصلاح‌شده تخصیص' : 'پیشنهاد تخصیص توله‌ها'}</span></h2></div>
       <form action={submit} className="mt-lg space-y-lg" data-testid="propose-allocation-form">
         <input type="hidden" name="litterId" value={litterId} />
         <input type="hidden" name="permitId" value={permitId} />

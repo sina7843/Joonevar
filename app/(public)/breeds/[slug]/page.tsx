@@ -134,7 +134,7 @@ export default async function BreedPageView({ params }: Params) {
 
       <header>
         <RecordImage priority fileId={breed.imageFileId} altFa={breed.imageAltFa} className="mb-lg" />
-        <h1 className="text-h3 md:text-h1">{breed.nameFa}</h1>
+        <h1 className="text-h2 md:text-h1">{breed.nameFa}</h1>
         <p className="mt-xs text-body-md text-text-secondary">
           <bdi>{breed.nameEn}</bdi>
         </p>
@@ -153,14 +153,14 @@ export default async function BreedPageView({ params }: Params) {
 
       {facts.length > 0 ? (
         <section aria-labelledby="breed-facts-title">
-          <h2 id="breed-facts-title" className="text-h4">
+          <h2 id="breed-facts-title" className="text-h3">
             مشخصات
           </h2>
           <dl className="mt-md grid gap-sm sm:grid-cols-2" data-testid="breed-facts">
             {facts.map((fact) => (
               <div
                 key={fact.label}
-                className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm"
+                className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm"
               >
                 <dt className="text-body-sm text-text-secondary">{fact.label}</dt>
                 <dd className="text-label-md text-text-primary">{fact.value}</dd>
@@ -172,7 +172,7 @@ export default async function BreedPageView({ params }: Params) {
 
       {breed.historyFa ? (
         <section aria-labelledby="breed-history-title">
-          <h2 id="breed-history-title" className="text-h4">
+          <h2 id="breed-history-title" className="text-h3">
             تاریخچه
           </h2>
           <Prose text={breed.historyFa} />
@@ -181,7 +181,7 @@ export default async function BreedPageView({ params }: Params) {
 
       {breed.standardFa || breed.standardUrl ? (
         <section aria-labelledby="breed-standard-title">
-          <h2 id="breed-standard-title" className="text-h4">
+          <h2 id="breed-standard-title" className="text-h3">
             استاندارد نژاد
           </h2>
           {breed.standardFa ? <Prose text={breed.standardFa} /> : null}
@@ -195,7 +195,7 @@ export default async function BreedPageView({ params }: Params) {
 
       {claimGroups.length > 0 ? (
         <section aria-labelledby="breed-health-title" data-testid="breed-health">
-          <h2 id="breed-health-title" className="text-h4">
+          <h2 id="breed-health-title" className="text-h3">
             سلامت و ژنتیک
           </h2>
           <p className="mt-xs text-body-sm text-text-secondary">
@@ -209,7 +209,7 @@ export default async function BreedPageView({ params }: Params) {
                 {entry.items.map((claim) => (
                   <li
                     key={claim.id}
-                    className="rounded-lg border border-border-subtle bg-bg-surface p-md"
+                    className="rounded-lg border border-border-default bg-bg-surface p-md"
                     data-testid="breed-claim"
                   >
                     <p className="text-label-md">{claim.titleFa}</p>

@@ -65,9 +65,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       </p>
 
       <header className="space-y-sm">
-        <h1 className="text-h2" data-testid="order-reference">
+        <h2 className="text-h2" data-testid="order-reference">
           سفارش {order.reference}
-        </h1>
+        </h2>
         <StatusBadge tone={order.status === 'PAID' ? 'success' : 'neutral'}>
           <span data-testid="order-status">{ORDER_STATUS_FA[order.status as OrderStatus]}</span>
         </StatusBadge>
@@ -118,8 +118,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </p>
       ) : null}
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">نشانی تحویل</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نشانی تحویل</span></h2></div>
         <p className="text-body-sm" data-testid="order-address">
           {order.recipientNameFa} — {order.recipientPhone}
           <br />
@@ -132,11 +132,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         {parts.map((part) => (
           <section
             key={part.subOrder.id}
-            className="space-y-md rounded-lg border border-border-subtle p-lg"
+            className="space-y-md rounded-xl border border-border-default p-lg"
             data-testid={'order-part-' + part.subOrder.id}
           >
             <header className="flex flex-wrap items-center justify-between gap-sm">
-              <h2 className="text-label-lg">{part.sellerNameFa}</h2>
+              <h2 className="hz-card__title">{part.sellerNameFa}</h2>
               <StatusBadge tone={part.subOrder.status === 'DELIVERED' ? 'success' : 'neutral'}>
                 <span data-testid={'suborder-status-' + part.subOrder.id}>
                   {SUB_ORDER_STATUS_FA[part.subOrder.status as SubOrderStatus]}

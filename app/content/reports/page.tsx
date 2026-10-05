@@ -36,7 +36,7 @@ export default async function ContentReportsPage({ searchParams }: { searchParam
     <OpsShell actor={guard.actor} title="ادمین محتوا" pathname="/content/reports" nav={CONTENT_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">گزارش‌های کاربران</h1>
+          <h2 className="text-h3">گزارش‌های کاربران</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             گزارش‌های باز هر محتوا یک‌جا بررسی می‌شوند. نام گزارش‌دهنده در این صفحه نمی‌آید.
           </p>
@@ -67,7 +67,7 @@ export default async function ContentReportsPage({ searchParams }: { searchParam
                 <li key={entry.contentId}>
                   <Link
                     href={'/content/reports/' + entry.contentId}
-                    className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                    className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                     data-testid={'report-queue-item-' + entry.contentId}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-sm">
@@ -94,7 +94,7 @@ export default async function ContentReportsPage({ searchParams }: { searchParam
         ) : (
           <ul className="space-y-sm" data-testid="report-history">
             {history!.items.map((report) => (
-              <li key={report.id} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+              <li key={report.id} className="rounded-xl border border-border-default bg-bg-surface p-lg">
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <Link href={'/content/reports/' + report.contentId} className="text-label-md text-text-brand underline underline-offset-4">
                     {report.titleFa}

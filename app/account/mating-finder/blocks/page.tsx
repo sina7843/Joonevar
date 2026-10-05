@@ -19,7 +19,7 @@ export default async function FinderBlocksPage() {
     <PublicShell actor={guard.actor} title="کاربران مسدودشده" pathname="/account/mating-finder">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">کاربران مسدودشده در جفت‌یابی</h1>
+          <h2 className="text-h3">کاربران مسدودشده در جفت‌یابی</h2>
           <p className="mt-xs text-caption text-text-secondary">
             شما و کاربر مسدودشده پروفایل‌های یکدیگر را نمی‌بینید، درخواست نمی‌فرستید و پیام نمی‌دهید. برداشتن مسدودی
             درخواست‌های بسته‌شده را باز نمی‌کند.
@@ -31,7 +31,7 @@ export default async function FinderBlocksPage() {
           <Card>
             <ul className="space-y-sm" data-testid="finder-blocks">
               {rows.map((r) => (
-                <li key={r.id} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm">
+                <li key={r.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm">
                   <span className="text-body-sm">{r.labelFa + ' · ' + formatInstantFa(r.createdAt)}</span>
                   <UnblockForm blockId={r.id} />
                 </li>

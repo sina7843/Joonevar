@@ -79,7 +79,7 @@ export function VetProfileForm() {
   const [state, submit, pending] = useActionState(saveVetAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">ثبت دامپزشک معتمد موجود</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت دامپزشک معتمد موجود</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         این فرم درخواست معتمدشدن نیست. فقط داده دامپزشکی که قبلاً تأیید شده و نقشش ثبت است، وارد می‌شود.
       </p>
@@ -108,7 +108,7 @@ export function AddLocationForm({ vets }: { vets: ReadonlyArray<{ accountId: str
   const [state, submit, pending] = useActionState(addLocationAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">افزودن مرکز</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>افزودن مرکز</span></h2></div>
       <form action={submit} className="mt-lg space-y-lg" data-testid="add-location-form">
         <Result state={state} />
         <SelectField

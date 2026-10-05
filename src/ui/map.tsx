@@ -52,7 +52,7 @@ export function PlaceMap({
   }
 
   return (
-    <div className="mt-sm overflow-hidden rounded-lg border border-border-subtle" data-testid={testId}>
+    <div className="mt-sm overflow-hidden rounded-lg border border-border-default" data-testid={testId}>
       <iframe
         src={src}
         title={'نقشه ' + nameFa}

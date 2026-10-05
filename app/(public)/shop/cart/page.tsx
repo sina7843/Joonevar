@@ -123,11 +123,11 @@ export default async function CartPage({
             {cart.groups.map((group) => (
               <section
                 key={group.sellerId}
-                className="space-y-md rounded-lg border border-border-subtle p-lg"
+                className="space-y-md rounded-xl border border-border-default p-lg"
                 data-testid={'cart-group-' + group.sellerId}
               >
                 <header className="flex flex-wrap items-center justify-between gap-sm">
-                  <h2 className="text-label-lg">{group.sellerNameFa}</h2>
+                  <h2 className="hz-card__title">{group.sellerNameFa}</h2>
                   {group.sellerTrading ? null : (
                     <StatusBadge tone="neutral">فروش غیرفعال</StatusBadge>
                   )}
@@ -237,8 +237,8 @@ export default async function CartPage({
             ))}
           </div>
 
-          <section className="space-y-md rounded-lg border border-border-subtle p-lg">
-            <h2 className="text-label-lg">تحویل و پرداخت</h2>
+          <section className="space-y-md rounded-xl border border-border-default p-lg">
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تحویل و پرداخت</span></h2></div>
             <dl className="grid gap-2xs text-body-sm">
               <div className="flex justify-between">
                 <dt>جمع کالاها</dt>

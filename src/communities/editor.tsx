@@ -107,7 +107,7 @@ export function CommunityEditor({
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-md">
           <div>
-            <h1 className="text-h4">{community.displayNameFa}</h1>
+            <h1 className="text-h3">{community.displayNameFa}</h1>
             <p className="mt-2xs text-caption text-text-secondary">
               {COMMUNITY_KIND_FA[kind] + ' · حوزه ' + COMMUNITY_SCOPE_FA[community.scope as CommunityScope]}
             </p>
@@ -185,7 +185,7 @@ export function CommunityEditor({
       ) : null}
 
       <Card>
-        <h2 className="text-label-lg">مدیران</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدیران</span></h2></div>
         <p className="mt-xs text-body-sm text-text-secondary">نام هر مدیر فقط پس از پذیرش دعوت در صفحه عمومی می‌آید.</p>
         {facts.managers.length === 0 ? (
           <div className="mt-lg">
@@ -194,7 +194,7 @@ export function CommunityEditor({
         ) : (
           <ul className="mt-lg space-y-sm" data-testid="community-managers">
             {facts.managers.map((manager) => (
-              <li key={manager.id} className="rounded-lg border border-border-subtle p-md" data-testid={'community-manager-' + manager.id}>
+              <li key={manager.id} className="rounded-lg border border-border-default p-md" data-testid={'community-manager-' + manager.id}>
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <div className="min-w-0">
                     <p className="text-label-md">{manager.nameFa ?? 'بدون پروفایل هویتی'}</p>
@@ -215,7 +215,7 @@ export function CommunityEditor({
       </Card>
 
       <Card>
-        <h2 className="text-label-lg">رویدادها</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>رویدادها</span></h2></div>
         <p className="mt-xs text-body-sm text-text-secondary">
           تاریخ‌ها همان‌اند که ثبت می‌کنید؛ همزیست ثبت‌نام یا جای رویداد را تضمین نمی‌کند. رویداد لغوشده با دلیلش می‌ماند.
         </p>
@@ -226,7 +226,7 @@ export function CommunityEditor({
         ) : (
           <ul className="mt-lg space-y-lg">
             {facts.events.map((event) => (
-              <li key={event.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'community-event-' + event.id}>
+              <li key={event.id} className="rounded-xl border border-border-default p-lg" data-testid={'community-event-' + event.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
                     <h3 className="text-label-md">{event.titleFa}</h3>
@@ -274,7 +274,7 @@ export function CommunityEditor({
 
       {kind === 'CLUB' && canEditContent ? (
         <Card>
-          <h2 className="text-label-lg">نوشته‌های کلاب</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نوشته‌های کلاب</span></h2></div>
           {posting ? (
             <div className="mt-md" data-testid="community-posting-blocked">
               <Alert tone="info" title="انتشار مستقیم فعال نیست">
@@ -290,7 +290,7 @@ export function CommunityEditor({
               ) : (
                 <ul className="mt-lg space-y-lg" data-testid="community-posts">
                   {posts.map((post) => (
-                    <li key={post.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'community-post-' + post.id}>
+                    <li key={post.id} className="rounded-xl border border-border-default p-lg" data-testid={'community-post-' + post.id}>
                       <div className="flex flex-wrap items-start justify-between gap-sm">
                         <h3 className="text-label-md">{post.titleFa}</h3>
                         <StatusBadge

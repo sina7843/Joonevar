@@ -1,97 +1,104 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Logo } from '../ui/logo.tsx';
-import { DesktopNav, MobileMenu, type NavLink } from './site-nav.tsx';
-import { navSections } from './sections.ts';
+import { Icon } from '../ui/icon.tsx';
+import { DesktopNav, FooterColumn, MobileMenu, type NavLink, type ResolvedNavGroup } from './site-nav.tsx';
+import { FOOTER_GROUPS, NAV_GROUPS, VERIFY_HREF, liveLinks } from './sections.ts';
 import { viewer } from './request.ts';
 
 /**
- * Shell of the public site — Requirements-Phase-2 §4 (DEC-0149).
+ * Shell of the public site — Requirements-Phase-2 §4 (DEC-0149), drawn as DS
+ * *SiteShell* v1.0.3: a cream sticky header (logo · five grouped panels +
+ * «استعلام اصالت» · search · «ورود / ثبت‌نام»), the white page in the 1280
+ * container, and a cream footer with six link groups.
  *
- * This is the storefront a visitor sees before signing in. It is not the
- * application shell (`PublicShell` in `src/ui/shell.tsx`, for the signed-in
- * user, breeder and vet contexts) and it grants nothing: the account link only
- * leads to sign-in or to the panel, where the server decides access as before.
- *
- * No contact details, licences or social links are shown: none are known yet,
- * and an invented one would be worse than none.
+ * It grants nothing: the account button only leads to sign-in or to the panel,
+ * where the server decides access as before. No contact details, licences,
+ * support hours or trust badges are shown: none are known yet, and an invented
+ * one would be worse than none (docs/design-system/GAPS.md).
  */
 export async function SiteShell({ children }: { children: ReactNode }) {
   const actor = await viewer();
-  const links: readonly NavLink[] = navSections().map(({ href, label }) => ({ href, label }));
   const account: NavLink =
     actor === null ? { href: '/login', label: 'ورود / ثبت‌نام' } : { href: '/dashboard', label: 'پنل من' };
 
+  const groups: ResolvedNavGroup[] = NAV_GROUPS.map((group) => ({
+    id: group.id,
+    labelFa: group.labelFa,
+    parts: group.parts
+      .map((part) => ({
+        labelFa: part.labelFa,
+        items: part.items.flatMap((item) => {
+          const link = liveLinks([item.href])[0];
+          return link ? [{ href: link.href, label: link.label, descFa: item.descFa }] : [];
+        }),
+      }))
+      .filter((part) => part.items.length > 0),
+  })).filter((group) => group.parts.length > 0);
+  const verify = liveLinks([VERIFY_HREF])[0] ?? null;
+
   return (
-    <div className="flex min-h-dvh flex-col bg-bg-canvas">
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-sm focus:right-sm focus:z-30 focus:rounded-md focus:bg-bg-surface focus:px-md focus:py-sm"
-      >
+    <div className="flex min-h-dvh flex-col bg-bg-page">
+      <a className="hz-skip-link" href="#main">
         رفتن به محتوای اصلی
       </a>
 
-      <header className="sticky top-0 z-20 border-b border-border-subtle bg-bg-surface">
-        <div className="mx-auto flex min-h-[var(--size-header-mobile)] max-w-7xl items-center justify-between gap-md px-lg">
-          <div className="flex min-w-0 items-center gap-lg">
+      <header className="hz-site-header">
+        <div className="hz-container">
+          <div className="hz-site-header__bar">
             <Link href="/" aria-label="همزیست — صفحه اصلی" className="shrink-0">
-              <Logo height={28} />
+              <Logo size="responsive" />
             </Link>
-            <DesktopNav links={links} />
-          </div>
-          <div className="flex shrink-0 items-center gap-xs">
-            {/* Plain GET form: a search is an address a visitor can share (§16). */}
-            <form method="get" action="/search" role="search" className="hidden xl:flex" data-testid="site-search">
-              <label htmlFor="site-search-input" className="sr-only">
-                جست‌وجو در همزیست
-              </label>
-              <input
-                id="site-search-input"
-                name="q"
-                type="search"
-                placeholder="جست‌وجو"
-                className="w-[9rem] rounded-md border border-border-subtle bg-bg-canvas px-md text-body-sm text-text-primary min-h-[var(--size-control-sm)] focus:border-border-brand lg:w-[14rem]"
-                data-testid="site-search-input"
-              />
-            </form>
-            <Link
-              href={account.href}
-              className="inline-flex min-h-[var(--size-control-sm)] items-center rounded-md bg-action-primary-default px-md text-label-md text-action-primary-on hover:opacity-90"
-              data-testid="site-account-link"
-            >
-              {account.label}
-            </Link>
-            <MobileMenu links={links} />
+            <div className="hz-show-lg">
+              <DesktopNav groups={groups} verify={verify} />
+            </div>
+            <div className="hz-site-header__end">
+              <Link href="/search" className="hz-icon-btn" aria-label="جست‌وجو در همزیست" data-testid="site-search">
+                <Icon name="magnifyingGlass" size="md" />
+              </Link>
+              <span className="hz-show-lg">
+                <Link href={account.href} className="hz-btn hz-btn--primary hz-btn--sm" data-testid="site-account-link">
+                  <Icon name="user" size="xs" weight="fill" />
+                  {account.label}
+                </Link>
+              </span>
+              <span className="hz-hide-lg">
+                <MobileMenu groups={groups} verify={verify} account={account} />
+              </span>
+            </div>
           </div>
         </div>
       </header>
 
-      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-lg py-xl">
-        {children}
+      <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
+        <div className="hz-container py-xl lg:pb-s64 lg:pt-s40">{children}</div>
       </main>
 
-      <footer className="border-t border-border-subtle bg-bg-surface" data-testid="site-footer">
-        <div className="mx-auto flex max-w-6xl flex-col gap-lg px-lg py-xl md:flex-row md:items-start md:justify-between">
-          <div className="space-y-sm">
-            <Logo variant="symbol" height={40} />
-            <p className="max-w-(--size-content-md) text-body-sm text-text-secondary">
-              ثبت و پیگیری هویت، نسب و اسناد سگ‌ها در یک سامانه فارسی.
-            </p>
+      <footer className="hz-site-footer" data-testid="site-footer">
+        <div className="hz-container">
+          <div className="hz-site-footer__grid">
+            <div className="hz-site-footer__brand">
+              <Link href="/" aria-label="همزیست — صفحه اصلی">
+                <Logo size="responsive" />
+              </Link>
+              <p className="hz-site-footer__tagline">سامانه رسمی ثبت سگ و گربه، شجره‌نامه و مجوز جفت‌گیری.</p>
+            </div>
+            {FOOTER_GROUPS.map((group, index) => {
+              const links = liveLinks(group.hrefs);
+              return links.length > 0 ? (
+                <FooterColumn key={group.labelFa} id={String(index)} labelFa={group.labelFa} links={links} />
+              ) : null;
+            })}
           </div>
-          <nav aria-label="پیوندهای پایین صفحه">
-            <ul className="flex flex-wrap gap-x-lg gap-y-sm text-label-md">
-              {[...links, account].map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="inline-flex min-h-[var(--size-touch-min)] items-center text-text-secondary hover:text-text-brand"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className="hz-site-footer__bottom">
+            <span>© ۱۴۰۵ همزیست</span>
+            <span className="hz-site-footer__contact">
+              همه حقوق این سامانه محفوظ است.{' '}
+              <Link className="hz-link" href="/contact">
+                تماس با ما
+              </Link>
+            </span>
+          </div>
         </div>
       </footer>
     </div>

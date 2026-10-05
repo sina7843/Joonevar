@@ -23,7 +23,7 @@ export default async function FinderAppealsPage() {
     <PublicShell actor={guard.actor} title="تصمیم‌های مدیریت و اعتراض" pathname="/account/mating-finder">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">تصمیم‌های مدیریت درباره جفت‌یابی</h1>
+          <h2 className="text-h3">تصمیم‌های مدیریت درباره جفت‌یابی</h2>
           <p className="mt-xs text-caption text-text-secondary">
             هر تصمیم دلیل دارد و می‌توانید یک بار به آن اعتراض کنید. اعتراض را کسی جز تصمیم‌گیرنده اول بررسی می‌کند.
           </p>

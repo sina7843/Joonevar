@@ -59,7 +59,7 @@ export function ReturnRequestForm({
       ) : (
         <>
           {returnable.map((item) => (
-            <fieldset key={item.id} className="space-y-2xs rounded-md border border-border-subtle p-md">
+            <fieldset key={item.id} className="space-y-2xs rounded-lg border border-border-default p-md">
               <legend className="text-label-sm">{item.labelFa}</legend>
               <label className="flex items-center gap-sm text-body-sm">
                 <input type="checkbox" name="items" value={item.id} data-testid={'return-line-' + item.id} />
@@ -345,7 +345,7 @@ export function ReturnPolicyForm({
           در فرم مرجوعی به خریدار نشان داده می‌شود.
         </p>
         {categories.map((category) => (
-          <div key={category.id} className="space-y-2xs rounded-md border border-border-subtle p-md">
+          <div key={category.id} className="space-y-2xs rounded-lg border border-border-default p-md">
             <p className="text-label-sm">{category.nameFa}</p>
             <SelectField
               label="قاعده"

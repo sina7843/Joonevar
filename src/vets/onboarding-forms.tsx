@@ -170,7 +170,7 @@ export function ReviewDecisionForm({ applicationId, version, open }: { applicati
   if (!open) {
     return (
       <Card>
-        <h2 className="text-label-lg">تصمیم</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
         <div className="mt-md">
           <Result state={state} testId="review-decision-result" />
         </div>
@@ -180,7 +180,7 @@ export function ReviewDecisionForm({ applicationId, version, open }: { applicati
   }
   return (
     <Card>
-      <h2 className="text-label-lg">تصمیم</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
       <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="review-decision-form">
         <input type="hidden" name="applicationId" value={applicationId} />
         <input type="hidden" name="expectedVersion" value={version} />
@@ -214,7 +214,7 @@ export function UnownedVetForm({ provinces, cities }: { provinces: readonly Opti
   const [state, submit, pending] = useActionState(createUnownedVetProfileAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">انتشار پروفایل بدون مالک</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتشار پروفایل بدون مالک</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         فقط اطلاعات عمومی و قابل استناد. پروفایل بدون مالک تأیید کد نظام ندارد و تا Claim و تأیید دامپزشک، ویرایش محتوایی نمی‌پذیرد.
       </p>

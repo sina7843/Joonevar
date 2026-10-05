@@ -64,7 +64,7 @@ export default async function SellerPromotionsPage({
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">تخفیف‌های این فروشگاه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تخفیف‌های این فروشگاه</span></h2></div>
           {rules.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="seller-rules-empty">
               هنوز تخفیفی تعریف نکرده‌اید.
@@ -113,7 +113,7 @@ export default async function SellerPromotionsPage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تخفیف تازه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تخفیف تازه</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="seller-discount-note">
             هزینه این تخفیف‌ها از سهم خود فروشگاه کم می‌شود.
           </p>

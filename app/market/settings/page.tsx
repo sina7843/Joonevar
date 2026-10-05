@@ -59,12 +59,12 @@ export default async function MarketSettingsPage({
     <OpsShell actor={actor} title="تنظیمات بازار" pathname="/market/settings" nav={marketNav(actor)}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">گروه‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گروه‌ها</span></h2></div>
           <ul className="mt-md flex flex-wrap gap-sm" data-testid="market-setting-tabs">
             <li>
               <Link
                 href="/market/settings"
-                className="rounded-md border border-border-subtle px-md py-2xs text-caption"
+                className="rounded-lg border border-border-default px-md py-2xs text-caption"
                 data-testid="market-tab-all"
               >
                 همه
@@ -100,7 +100,7 @@ export default async function MarketSettingsPage({
         {groups.map((view) => (
           <Card key={view.group}>
             <div className="flex flex-wrap items-center justify-between gap-sm">
-              <h2 className="text-label-lg">{view.labelFa}</h2>
+              <h2 className="hz-card__title">{view.labelFa}</h2>
               <StatusBadge tone={view.unset === 0 ? 'success' : 'warning'}>
                 {'تعیین‌نشده: ' + view.unset.toLocaleString('fa-IR')}
               </StatusBadge>
@@ -109,7 +109,7 @@ export default async function MarketSettingsPage({
               {view.settings.map((setting) => (
                 <li
                   key={setting.key}
-                  className="rounded-lg border border-border-subtle p-md"
+                  className="rounded-lg border border-border-default p-md"
                   data-testid={'market-setting-' + setting.key}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">

@@ -31,19 +31,19 @@ export default async function FinderSanctionsPage() {
           {NO_REFUND_FA}
         </Alert>
         <Card>
-          <h2 className="text-label-lg">ثبت محدودیت</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت محدودیت</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">پروفایل‌های حساب از جفت‌یابی خارج می‌شوند و درخواست‌های باز با دلیل بسته می‌شوند؛ قرارداد تأییدشده و سابقه دست نمی‌خورد.</p>
           <div className="mt-sm">
             <ImposeSanctionForm canRestrictAccount={hasFinderCapability(guard.actor, 'FINDER_ACCOUNT_RESTRICT')} />
           </div>
         </Card>
         <Card>
-          <h2 className="text-label-lg">سابقه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>سابقه</span></h2></div>
           <ul className="mt-sm space-y-sm" data-testid="finder-sanctions">
             {rows.map((s) => {
               const live = !s.liftedAt && (!s.endsAt || s.endsAt > now);
               return (
-                <li key={s.id} className="rounded-md border border-border-subtle p-sm">
+                <li key={s.id} className="rounded-lg border border-border-default p-sm">
                   <p className="text-label-md">{(s.scope === 'ACCOUNT' ? 'محدودیت حساب' : 'تعلیق جفت‌یابی') + (live ? ' — فعال' : ' — پایان‌یافته')}</p>
                   <p className="mt-xs text-body-sm">{s.reasonFa}</p>
                   <p className="mt-xs text-caption text-text-secondary">

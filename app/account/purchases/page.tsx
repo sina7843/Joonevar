@@ -50,7 +50,7 @@ export default async function PurchasesPage() {
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">درخواست‌های من</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌های من</span></h2></div>
           {mine.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="my-inquiries-empty">
               هنوز درخواست خریدی ثبت نکرده‌اید.
@@ -80,7 +80,7 @@ export default async function PurchasesPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">درخواست‌های رسیده به آگهی‌های من</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌های رسیده به آگهی‌های من</span></h2></div>
           {incoming.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="incoming-inquiries-empty">
               درخواستی برای آگهی‌های شما ثبت نشده است.

@@ -55,7 +55,7 @@ export default async function AssocVetStudentsPage({ searchParams }: { searchPar
               <Card>
                 <div className="flex items-start justify-between gap-md">
                   <div className="min-w-0">
-                    <h2 className="text-label-lg">{item.displayNameFa ?? '—'}</h2>
+                    <h2 className="hz-card__title">{item.displayNameFa ?? '—'}</h2>
                     <p className="mt-2xs text-caption text-text-secondary">
                       {(item.universityFa ?? '—') + ' · شماره دانشجویی '}
                       <span dir="ltr">{item.studentNumber ?? '—'}</span>

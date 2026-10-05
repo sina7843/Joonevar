@@ -43,7 +43,7 @@ export default async function ClaimVetProfilePage({ params }: { params: Promise<
     <PublicShell actor={guard.actor} title="Claim پروفایل دامپزشک" pathname="/account/vet-profile">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">{profile.displayNameFa}</h1>
+          <h2 className="text-h3">{profile.displayNameFa}</h2>
           <p className="mt-xs text-body-sm text-text-secondary">{(profile.cityNameFa ? profile.cityNameFa + ' · ' : '') + 'پروفایل بدون مالک'}</p>
           <p className="mt-md text-body-sm">
             با تأیید Claim توسط ادمین انجمن، ویرایش و انتشار این پروفایل به حساب شما سپرده می‌شود و کد نظام آن تأیید می‌شود. تاریخچه ثبت‌شده

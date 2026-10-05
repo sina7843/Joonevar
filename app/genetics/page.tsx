@@ -42,7 +42,7 @@ export default async function GeneticsPage() {
               <Card>
                 <div className="flex items-start justify-between gap-md">
                   <div className="min-w-0">
-                    <h2 className="text-label-lg">{queue.titleFa}</h2>
+                    <h2 className="hz-card__title">{queue.titleFa}</h2>
                     <p className="mt-2xs text-caption text-text-secondary">{queue.noteFa}</p>
                   </div>
                   <StatusBadge tone={queue.waiting > 0 ? 'warning' : 'neutral'}>

@@ -96,7 +96,7 @@ export function SuggestionForm({ provinces, cities }: { provinces: readonly Opti
   const [state, submit, pending] = useActionState(submitSuggestionAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">پیشنهاد ثبت دامپزشک یا مرکز</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیشنهاد ثبت دامپزشک یا مرکز</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         آنچه می‌نویسید مستقیم منتشر نمی‌شود: اپراتور بررسی آن را می‌خواند و در صورت تأیید، رکورد با برچسب «بدون مالک» منتشر می‌شود.
         پیشنهاددادن مالکیت نمی‌آورد.
@@ -164,7 +164,7 @@ export function SuggestionDecisionForm({ suggestionId, version, open }: { sugges
   if (!open) {
     return (
       <Card>
-        <h2 className="text-label-lg">تصمیم</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
         <div className="mt-md">
           <Result state={state} testId="suggestion-decision-result" />
         </div>
@@ -174,7 +174,7 @@ export function SuggestionDecisionForm({ suggestionId, version, open }: { sugges
   }
   return (
     <Card>
-      <h2 className="text-label-lg">تصمیم</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
       <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="suggestion-decision-form">
         <input type="hidden" name="suggestionId" value={suggestionId} />
         <input type="hidden" name="expectedVersion" value={version} />
@@ -281,7 +281,7 @@ export function CentreClaimForm({ claimSlug, centreNameFa }: { claimSlug: string
   const [state, submit, pending] = useActionState(submitCentreClaimAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">{'درخواست مدیریت ' + centreNameFa}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'درخواست مدیریت ' + centreNameFa}</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         با تأیید این درخواست، ویرایش و انتشار این مرکز به حساب شما سپرده می‌شود. تاریخچه ثبت‌شده مرکز همان‌طور می‌ماند.
       </p>
@@ -356,7 +356,7 @@ export function CentreClaimDecisionForm({ claimId, version, open }: { claimId: s
   if (!open) {
     return (
       <Card>
-        <h2 className="text-label-lg">تصمیم</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
         <div className="mt-md">
           <Result state={state} testId="claim-decision-result" />
         </div>
@@ -366,7 +366,7 @@ export function CentreClaimDecisionForm({ claimId, version, open }: { claimId: s
   }
   return (
     <Card>
-      <h2 className="text-label-lg">تصمیم</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
       <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="claim-decision-form">
         <input type="hidden" name="claimId" value={claimId} />
         <input type="hidden" name="expectedVersion" value={version} />

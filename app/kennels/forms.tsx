@@ -61,7 +61,7 @@ export function KennelForm({
   const [state, submit, pending] = useActionState(saveKennelAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">مشخصات کنل</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مشخصات کنل</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         نشانی کنل برای ارسال پرونده لازم است. نشانی محل سکونت شما جدا و اختیاری است و خالی‌بودن آن مانع ثبت
         کنل نیست.
@@ -122,7 +122,7 @@ export function KennelBreeds({
 
   return (
     <Card>
-      <h2 className="text-label-lg">نژادهای پرورشی</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نژادهای پرورشی</span></h2></div>
       <p className="mt-md text-caption text-text-secondary" data-testid="breed-count">
         {selected.length} نژاد انتخاب شده است. حداقل یک نژاد لازم است و کنل تک‌نژادی همین مسیر با یک انتخاب
         است.

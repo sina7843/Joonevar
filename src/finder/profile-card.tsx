@@ -14,12 +14,12 @@ export function MatingProfileCardView({ card, detail = false }: { card: ProfileC
   const sexFa = card.sex === 'MALE' ? 'نر' : card.sex === 'FEMALE' ? 'ماده' : 'نامشخص';
   const place = [card.provinceFa, card.cityFa].filter(Boolean).join('، ') || 'مکان ثبت نشده';
   return (
-    <article className="rounded-lg border border-border-subtle bg-bg-surface p-lg" data-testid={'finder-card-' + card.profileId}>
+    <article className="rounded-xl border border-border-default bg-bg-surface p-lg" data-testid={'finder-card-' + card.profileId}>
       <div className="flex flex-wrap items-start gap-md">
         <RecordImage fileId={card.primary?.fileId ?? null} altFa={card.primary?.altFa ?? null} variant={detail ? 'banner' : 'thumb'} priority={detail} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-sm">
-            <h2 className="text-label-lg">{card.nameFa}</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{card.nameFa}</span></h2></div>
             <span data-testid={'finder-card-state-' + card.profileId}>
               <StatusBadge tone={card.state === 'READY' ? 'success' : card.state === 'INACTIVE' ? 'neutral' : 'info'}>{card.stateFa}</StatusBadge>
             </span>

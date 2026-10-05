@@ -30,7 +30,7 @@ export default async function ContentClubsPage() {
     <OpsShell actor={guard.actor} title="گزارش کلاب‌ها" pathname="/content/clubs" nav={CONTENT_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">گزارش‌های کاربران درباره کلاب‌ها</h1>
+          <h2 className="text-h3">گزارش‌های کاربران درباره کلاب‌ها</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             گزارش‌های باز هر کلاب یک‌جا بررسی می‌شوند. نام گزارش‌دهنده در این صفحه نمی‌آید و به کلاب هم گفته نمی‌شود.
           </p>
@@ -41,7 +41,7 @@ export default async function ContentClubsPage() {
         ) : (
           <ul className="space-y-md" data-testid="club-report-queue">
             {groups.map((group) => (
-              <li key={group.club.id} className="space-y-sm rounded-lg border border-border-subtle bg-bg-surface p-lg">
+              <li key={group.club.id} className="space-y-sm rounded-xl border border-border-default bg-bg-surface p-lg">
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <Link href={'/clubs/' + (group.club.publicSlug ?? '')} className="text-label-lg text-text-brand">
                     {group.club.displayNameFa}

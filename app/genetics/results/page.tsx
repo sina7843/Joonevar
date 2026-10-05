@@ -53,13 +53,13 @@ export default async function GeneticsResultsPage() {
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">نمونه‌های در حال پردازش</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نمونه‌های در حال پردازش</span></h2></div>
           {checks.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">نمونه‌ای در حال پردازش نیست.</p>
           ) : (
             <ul className="mt-lg space-y-lg" data-testid="processing-list">
               {checks.map(({ row, parents }) => (
-                <li key={row.sample.id} className="rounded-lg border border-border-subtle p-lg">
+                <li key={row.sample.id} className="rounded-xl border border-border-default p-lg">
                   <p className="text-body-sm">
                     <Identifier label="کد رهگیری نمونه:" value={row.sample.trackingCode} />
                   </p>
@@ -82,12 +82,12 @@ export default async function GeneticsResultsPage() {
 
         {waiting.length === 0 ? null : (
           <Card>
-            <h2 className="text-label-lg">در انتظار تکمیل نتایج والدین</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>در انتظار تکمیل نتایج والدین</span></h2></div>
             <ul className="mt-lg space-y-lg" data-testid="waiting-list">
               {waiting.map((result) => {
                 const animal = waitingAnimals.find((a) => a.id === result.animalId);
                 return (
-                  <li key={result.id} className="rounded-lg border border-border-subtle p-lg">
+                  <li key={result.id} className="rounded-xl border border-border-default p-lg">
                     <div className="flex items-start justify-between gap-md">
                       <div className="min-w-0">
                         <p className="text-body-sm">{animal?.name ?? 'بدون نام'}</p>

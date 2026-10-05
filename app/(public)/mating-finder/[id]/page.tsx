@@ -50,12 +50,12 @@ export default async function PublicMatingProfilePage({ params }: { params: Prom
 
   return (
     <div className="mx-auto max-w-4xl space-y-lg px-lg py-lg">
-      <h1 className="text-h3" data-testid="finder-public-title">
+      <h1 className="text-h2" data-testid="finder-public-title">
         {'پروفایل جفت‌یابی ' + card.nameFa}
       </h1>
       <MatingProfileCardView card={card} detail />
-      <section className="rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">درخواست و گفت‌وگو</h2>
+      <section className="rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست و گفت‌وگو</span></h2></div>
         <p className="mt-xs text-body-sm text-text-secondary">
           امتیاز یا اطلاعات این صفحه تضمین سلامت، باروری یا کیفیت توله نیست. ارسال درخواست پس از احراز هویت هر دو مالک ممکن
           می‌شود.
@@ -86,8 +86,8 @@ export default async function PublicMatingProfilePage({ params }: { params: Prom
           />
         )}
       </section>
-      <section className="rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">گزارش این پروفایل</h2>
+      <section className="rounded-xl border border-border-default p-lg">
+        <h2 className="hz-card__title">گزارش این پروفایل</h2>
         {actor ? (
           <>
             <FinderReportForm target="PROFILE" id={card.profileId} images={card.images.map((image) => ({ value: image.mediaId, label: 'تصویر: ' + image.altFa }))} />

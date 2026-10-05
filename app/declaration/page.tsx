@@ -37,7 +37,7 @@ export default async function DeclarationsPage() {
       <div className="space-y-lg">
         {eligibility.allowed ? (
           <Card>
-            <h2 className="text-label-lg">اعلام توافق شخصی جفت‌گیری</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام توافق شخصی جفت‌گیری</span></h2></div>
             <p className="mt-md text-caption text-text-secondary" data-testid="scope-note">
               {SCOPE_NOTE_FA}
             </p>

@@ -47,7 +47,7 @@ export function ReportForm({ contentId, backHref }: { contentId: string; backHre
         {REPORT_REASONS.map((reason) => (
           <label
             key={reason}
-            className="flex min-h-[var(--size-touch-min)] cursor-pointer items-center gap-sm rounded-md border border-border-subtle bg-bg-surface px-md text-body-sm has-[:checked]:border-border-brand has-[:checked]:bg-bg-brand-subtle"
+            className="flex min-h-[var(--size-touch-min)] cursor-pointer items-center gap-sm rounded-lg border border-border-default bg-bg-surface px-md text-body-sm has-[:checked]:border-border-brand has-[:checked]:bg-bg-brand-subtle"
           >
             <input type="radio" name="reason" value={reason} required data-testid={'report-reason-' + reason} />
             {REASON_FA[reason]}
@@ -91,7 +91,7 @@ export function DecisionForm({
 
   return (
     <Card>
-      <h2 className="text-label-lg">تصمیم درباره گزارش‌های باز</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم درباره گزارش‌های باز</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         تصمیم برای همه گزارش‌های باز این محتوا ثبت می‌شود و دلیل آن در تاریخچه می‌ماند.
       </p>

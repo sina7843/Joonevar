@@ -23,7 +23,7 @@ export default function NotFound() {
       <Link href="/" aria-label="همزیست — صفحه اصلی">
         <Logo height={32} />
       </Link>
-      <h1 className="text-h3">صفحه‌ای با این نشانی پیدا نشد</h1>
+      <h1 className="text-h2">صفحه‌ای با این نشانی پیدا نشد</h1>
       <p className="text-body-md text-text-secondary">
         ممکن است نشانی اشتباه نوشته شده باشد یا این صفحه هنوز منتشر نشده باشد.
       </p>

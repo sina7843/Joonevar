@@ -47,17 +47,17 @@ export default async function FinderOverviewPage() {
     <OpsShell actor={actor} title="عملیات جفت‌یابی" nav={marketNav(actor)} pathname="/market/finder">
       <div className="grid gap-lg md:grid-cols-2" data-testid="finder-overview">
         <Card>
-          <h2 className="text-label-lg">پیکربندی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیکربندی</span></h2></div>
           <p className="mt-xs text-body-sm">{'طرح منتشرشده: ' + fa(view.config.publishedPlans) + ' · قاعده نژاد: ' + fa(view.config.publishedRules)}</p>
           <p className="mt-xs text-body-sm">{'قالب قرارداد: ' + (view.config.templateVersion === null ? 'منتشر نشده' : 'نسخه ' + fa(view.config.templateVersion))}</p>
         </Card>
         <Card>
-          <h2 className="text-label-lg">ظرفیت</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ظرفیت</span></h2></div>
           <p className="mt-xs text-body-sm">{'پروفایل فعال: ' + fa(view.capacity.activeProfiles) + ' · ظرفیت اشتراک‌های فعال: ' + fa(view.capacity.subscribedCapacity)}</p>
           <Rows rows={view.capacity.byState} testId="finder-overview-states" />
         </Card>
         <Card>
-          <h2 className="text-label-lg">{'قیف درخواست (' + fa(view.sinceDays) + ' روز اخیر)'}</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'قیف درخواست (' + fa(view.sinceDays) + ' روز اخیر)'}</span></h2></div>
           <ul className="mt-xs space-y-2xs text-body-sm" data-testid="finder-overview-funnel">
             {view.funnel.map((f) => (
               <li key={f.labelFa} className="flex justify-between gap-md">
@@ -68,25 +68,25 @@ export default async function FinderOverviewPage() {
           </ul>
         </Card>
         <Card>
-          <h2 className="text-label-lg">قرارداد و مسیر</h2>
+          <h2 className="hz-card__title">قرارداد و مسیر</h2>
           <p className="mt-xs text-body-sm">{'آغازشده: ' + fa(view.contracts.started) + ' · تأییدشده: ' + fa(view.contracts.confirmed) + ' · لغوشده: ' + fa(view.contracts.cancelled)}</p>
           <Rows rows={view.handoff} testId="finder-overview-handoff" />
           <p className="mt-sm text-body-sm">{'تاریخ تأییدشده: ' + fa(view.dates.confirmed) + ' · در انتظار تأیید: ' + fa(view.dates.pending) + ' · مغایرت: ' + fa(view.dates.conflicted)}</p>
         </Card>
         <Card>
-          <h2 className="text-label-lg">گزارش‌ها و محدودیت‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گزارش‌ها و محدودیت‌ها</span></h2></div>
           <p className="mt-xs text-body-sm">{'باز: ' + fa(view.reports.open) + ' · تصمیم‌گرفته: ' + fa(view.reports.decided) + ' · اعتراض باز: ' + fa(view.reports.openAppeals)}</p>
           <Rows rows={view.reports.byCategory} testId="finder-overview-categories" />
           <p className="mt-sm text-body-sm">{'تعلیق جفت‌یابی فعال: ' + fa(view.sanctions.finderAccess) + ' · حساب محدود: ' + fa(view.sanctions.account)}</p>
         </Card>
         <Card>
-          <h2 className="text-label-lg">سلامت اعلان‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>سلامت اعلان‌ها</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">«ارسال‌شده» برای پیامک یعنی ارائه‌دهنده پذیرفته است، نه اینکه به گوشی رسیده باشد؛ در حالت محلی هیچ ارسال واقعی رخ نمی‌دهد.</p>
           <Rows rows={view.notifications} testId="finder-overview-notifications" />
         </Card>
         {hasFinderCapability(actor, 'FINDER_CONFIG_WRITE') ? (
           <Card>
-            <h2 className="text-label-lg">هماهنگ‌سازی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>هماهنگ‌سازی</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">
               انقضای درخواست‌ها، خروج پروفایل پس از انتقال، فوت، مفقودی، بایگانی یا پایان اشتراک، یادآوری‌ها و پاک‌کردن کدهای منقضی. اجرای دوباره بی‌خطر است.
             </p>

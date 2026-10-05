@@ -21,7 +21,7 @@ export default async function AccountCentresPage() {
     <PublicShell actor={guard.actor} title="مراکز من" pathname="/account/centres">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">مراکزی که مدیریت می‌کنید</h1>
+          <h2 className="text-h3">مراکزی که مدیریت می‌کنید</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             مدیریت یک مرکز پس از واگذاری یا تأیید Claim به حساب شما سپرده می‌شود. مجوز مرکز را بررسی همزیست ثبت می‌کند، نه مدیر مرکز.
           </p>
@@ -35,7 +35,7 @@ export default async function AccountCentresPage() {
               <li key={row.centre.id}>
                 <Link
                   href={'/account/centres/' + row.centre.id}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                   data-testid={'my-centre-' + row.centre.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">

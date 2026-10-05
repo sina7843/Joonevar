@@ -25,7 +25,7 @@ export function RelatedColumn({
           <ul className="mt-md space-y-md">
             {group.items.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="hz-lift flex gap-md rounded-lg border border-border-subtle bg-bg-surface p-sm">
+                <Link href={item.href} className="hz-lift flex gap-md rounded-lg border border-border-default bg-bg-surface p-sm">
                   <RecordImage variant="thumb" fileId={item.imageFileId} altFa={item.imageAltFa} />
                   <span className="min-w-0">
                     <span className="block text-label-md text-text-primary">{item.titleFa}</span>

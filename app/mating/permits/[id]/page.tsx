@@ -83,7 +83,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">مجوز رسمی جفت‌گیری</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مجوز رسمی جفت‌گیری</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary" data-testid="permit-route-note">
                 مسیر رسمی هم‌زیست؛ این پرونده با «اعلام توافق شخصی» یکی نیست و شناسه و وضعیت جداگانه دارد.
               </p>
@@ -124,7 +124,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {/* §16 step 6: both parties, both animals and the agreed rule in one review. */}
         <Card>
-          <h2 className="text-label-lg">مرور طرفین و حیوان‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرور طرفین و حیوان‌ها</span></h2></div>
           <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="permit-parties">
             <dt className="text-text-secondary">آغازکننده</dt>
             <dd data-testid="permit-initiator">{view.initiatorName}</dd>
@@ -189,7 +189,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {awaitingMyConfirmation ? (
           <Card>
-            <h2 className="text-label-lg">تأیید مشارکت شما</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تأیید مشارکت شما</span></h2></div>
             <p className="mt-md text-caption text-text-secondary">
               این پرونده برای حیوان شما باز شده است. تأیید یا رد آن فقط از حساب خود شما ثبت می‌شود.
             </p>
@@ -215,7 +215,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {needsPayment ? (
           <Card>
-            <h2 className="text-label-lg">پرداخت هزینه مجوز</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرداخت هزینه مجوز</span></h2></div>
             <p className="mt-md text-body-sm">
               هزینه مجوز جفت‌گیری: <span data-testid="permit-fee">{feeLabel ?? 'تعیین‌نشده'}</span>
             </p>
@@ -240,7 +240,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {canSubmit ? (
           <Card>
-            <h2 className="text-label-lg">ارسال برای بررسی عملیاتی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ارسال برای بررسی عملیاتی</span></h2></div>
             <p className="mt-md text-caption text-text-secondary">
               پرداخت این پرونده روی سرور تأیید شده است. تصمیم نهایی و صدور مجوز با بررسی انجمن/هم‌زیست است.
             </p>
@@ -250,7 +250,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {permit.status === 'ISSUED' ? (
           <Card>
-            <h2 className="text-label-lg">پرونده رسمی جفت‌گیری</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده رسمی جفت‌گیری</span></h2></div>
             <p className="mt-md text-body-sm">
               <Link
                 href={'/mating/permits/' + permit.id + '/dates'}

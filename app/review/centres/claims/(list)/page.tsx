@@ -40,7 +40,7 @@ export default async function ReviewCentreClaimsPage({ searchParams }: { searchP
     <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/centres/claims" nav={REVIEW_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">درخواست‌های مدیریت مرکز</h1>
+          <h2 className="text-h3">درخواست‌های مدیریت مرکز</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             تأیید، ویرایش آینده مرکز را به درخواست‌دهنده می‌سپارد. تاریخچه ثبت‌شده مرکز منتقل نمی‌شود و همان‌جا می‌ماند.
           </p>
@@ -70,7 +70,7 @@ export default async function ReviewCentreClaimsPage({ searchParams }: { searchP
               <li key={item.id}>
                 <Link
                   href={'/review/centres/claims/' + item.id}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                   data-testid={'claim-item-' + item.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">

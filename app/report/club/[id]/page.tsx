@@ -28,11 +28,11 @@ export default async function ReportClubPage({ params }: { params: Promise<{ id:
       <div className="space-y-lg">
         <Card>
           <p className="text-caption text-text-secondary">کلاب</p>
-          <h1 className="text-h4">
+          <h2 className="text-h3">
             <Link href={'/clubs/' + club.publicSlug} className="hover:text-text-brand">
               {club.displayNameFa}
             </Link>
-          </h1>
+          </h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             گزارش شما به ادمین محتوا می‌رسد و با دلیل بررسی می‌شود. هر حساب برای هر کلاب تا بسته‌شدن بررسی، یک گزارش باز دارد.
           </p>

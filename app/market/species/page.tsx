@@ -39,14 +39,14 @@ export default async function MarketSpeciesPage() {
 
         {(['ANIMAL_SALE', 'MERCHANDISE'] as const).map((market) => (
           <Card key={market}>
-            <h2 className="text-label-lg">{MARKET_FA[market]}</h2>
+            <h2 className="hz-card__title">{MARKET_FA[market]}</h2>
             <ul className="mt-lg space-y-md">
               {rows
                 .filter((row) => row.market === market)
                 .map((row) => (
                   <li
                     key={row.id}
-                    className="rounded-lg border border-border-subtle p-md"
+                    className="rounded-lg border border-border-default p-md"
                     data-testid={'species-row-' + market + '-' + row.speciesCode}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-sm">

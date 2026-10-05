@@ -65,7 +65,7 @@ export default async function VetPage() {
                 <Card>
                   <div className="flex items-start justify-between gap-md">
                     <div className="min-w-0">
-                      <h2 className="text-label-lg">{SERVICE_TYPE_FA[row.request.serviceType]}</h2>
+                      <h2 className="hz-card__title">{SERVICE_TYPE_FA[row.request.serviceType]}</h2>
                       <p className="mt-2xs text-caption text-text-secondary">{row.locationNameFa}</p>
                       {row.referral ? (
                         <p className="mt-2xs text-caption text-text-secondary">
@@ -94,7 +94,7 @@ export default async function VetPage() {
 
         {completed.length === 0 ? null : (
           <Card>
-            <h2 className="text-label-lg">پرونده‌های تکمیل‌شده اخیر</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده‌های تکمیل‌شده اخیر</span></h2></div>
             <ul className="mt-md space-y-sm text-body-sm" data-testid="vet-completed">
               {completed.map((row) => (
                 <li key={row.request.id}>

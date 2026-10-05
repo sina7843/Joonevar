@@ -63,7 +63,7 @@ export default async function AssocClubPage({ params }: { params: Promise<{ id: 
 
         {detail.members.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">نقش‌های این کلاب</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نقش‌های این کلاب</span></h2></div>
             <ul className="mt-md space-y-xs text-body-sm" data-testid="club-authority-members">
               {detail.members.map((member) => (
                 <li key={member.membershipId}>{(member.nameFa ?? 'کاربر همزیست') + ' — ' + CLUB_ROLE_FA[member.role]}</li>

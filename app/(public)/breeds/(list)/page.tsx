@@ -42,7 +42,7 @@ export function generateMetadata(): Metadata {
 }
 
 const CONTROL =
-  'w-full rounded-md border border-border-subtle bg-bg-surface px-md text-body-sm text-text-primary ' +
+  'w-full rounded-lg border border-border-default bg-bg-surface px-md text-body-sm text-text-primary ' +
   'min-h-[var(--size-control-md)] focus:border-border-brand';
 
 /** Breed bank list — Requirements-Phase-2 §6 (PROMPT-003). */
@@ -65,7 +65,7 @@ export default async function BreedsPage({ searchParams }: { searchParams: Promi
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">
           مشخصات، گروه FCI، تاریخچه و استاندارد هر نژاد. هر مطلب سلامت منبع و تاریخ بازبینی خودش را دارد.
         </p>
@@ -75,7 +75,7 @@ export default async function BreedsPage({ searchParams }: { searchParams: Promi
         method="get"
         action="/breeds"
         role="search"
-        className="grid gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg md:grid-cols-[1fr_1fr_auto] md:items-end"
+        className="grid gap-md rounded-xl border border-border-default bg-bg-surface p-lg md:grid-cols-[1fr_1fr_auto] md:items-end"
         data-testid="breed-search"
       >
         <div className="space-y-xs">
@@ -141,7 +141,7 @@ export default async function BreedsPage({ searchParams }: { searchParams: Promi
               <li key={breed.slug}>
                 <Link
                   href={'/breeds/' + breed.slug}
-                  className="flex h-full flex-col gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
+                  className="flex h-full flex-col gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
                   data-testid={'breed-card-' + breed.slug}
                 >
                   <RecordImage fileId={breed.imageFileId} altFa={breed.imageAltFa} />

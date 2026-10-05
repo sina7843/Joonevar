@@ -33,7 +33,7 @@ export default async function IssuersPage() {
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">افزودن صادرکننده</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>افزودن صادرکننده</span></h2></div>
           <div className="mt-lg">
             <AddIssuerForm />
           </div>

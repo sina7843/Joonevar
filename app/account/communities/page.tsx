@@ -26,7 +26,7 @@ export default async function AccountCommunitiesPage() {
     <PublicShell actor={guard.actor} title="انجمن و کلاب من" pathname="/account/communities">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">انجمن‌ها و کلاب‌هایی که مدیریت می‌کنید</h1>
+          <h2 className="text-h3">انجمن‌ها و کلاب‌هایی که مدیریت می‌کنید</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             مدیریت یک پرونده پس از واگذاری به حساب شما سپرده می‌شود. شماره ثبت و مجوز را بررسی همزیست ثبت می‌کند، نه مدیر پرونده.
           </p>
@@ -34,7 +34,7 @@ export default async function AccountCommunitiesPage() {
 
         {invitations.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">دعوت‌های مدیریت</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دعوت‌های مدیریت</span></h2></div>
             <div className="mt-lg space-y-md" data-testid="community-invitations">
               {invitations.map((invitation) => (
                 <CommunityInvitationForm
@@ -62,7 +62,7 @@ export default async function AccountCommunitiesPage() {
               <li key={row.community.id}>
                 <Link
                   href={'/account/communities/' + row.community.id}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                   data-testid={'my-community-' + row.community.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">

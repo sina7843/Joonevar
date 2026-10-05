@@ -34,7 +34,7 @@ export default async function FinderFeedbackPage() {
           <Card>
             <ul className="space-y-sm" data-testid="finder-feedback-list">
               {rows.map((r) => (
-                <li key={r.id} className="rounded-md border border-border-subtle p-sm">
+                <li key={r.id} className="rounded-lg border border-border-default p-sm">
                   <p className="text-label-md">{r.score.toLocaleString('fa-IR') + ' از ۵ · ' + REQUEST_STATUS_FA[r.outcome as RequestStatus] + ' · ' + ROUTE_FA[r.route]}</p>
                   {r.bodyFa ? <p className="mt-xs whitespace-pre-line text-body-sm">{r.bodyFa}</p> : null}
                   <p className="mt-xs text-caption text-text-secondary">{formatInstantFa(r.createdAt)}</p>

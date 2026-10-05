@@ -78,6 +78,7 @@ const RULES: ReadonlyArray<{ prefix: string; access: RouteAccess }> = [
   // Content images: the route itself serves only images of visible content (DEC-0160).
   { prefix: '/media', access: 'PUBLIC' },
   { prefix: '/robots.txt', access: 'PUBLIC' },
+  { prefix: '/manifest.webmanifest', access: 'PUBLIC' },
   { prefix: '/sitemap.xml', access: 'PUBLIC' },
   { prefix: '/sitemaps', access: 'PUBLIC' },
 

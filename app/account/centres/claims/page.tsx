@@ -37,7 +37,7 @@ export default async function AccountCentreClaimsPage() {
     <PublicShell actor={guard.actor} title="درخواست‌های مدیریت مرکز" pathname="/account/centres">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">درخواست‌های مدیریت مرکز</h1>
+          <h2 className="text-h3">درخواست‌های مدیریت مرکز</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             درخواست را از صفحه همان مرکز بدون مالک ثبت می‌کنید. تأیید، ویرایش آینده مرکز را به شما می‌سپارد؛ تاریخچه ثبت‌شده تغییر نمی‌کند.
           </p>

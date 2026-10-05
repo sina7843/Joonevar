@@ -80,7 +80,7 @@ export function CommunityCreateForm({ surface }: { surface: CommunitySurface }) 
   const [state, submit, pending] = useActionState(createCommunityAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">ثبت انجمن یا کلاب تازه</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت انجمن یا کلاب تازه</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         رکورد تازه پیش‌نویس است و تا نوشتن معرفی و راه ارتباطی منتشر نمی‌شود. انجمن ساختار رسمی یا صنفی است و کلاب اجتماع تخصصی،
         نژادی، شهری یا ورزشی.
@@ -136,7 +136,7 @@ export function CommunityProfileForm({
   const [state, submit, pending] = useActionState(updateCommunityProfileAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">پرونده</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده</span></h2></div>
       <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="community-profile-form">
         <Hidden surface={surface} communityId={community.id} />
         <input type="hidden" name="expectedVersion" value={community.version} />
@@ -220,7 +220,7 @@ export function CommunityRegistrationForm({ surface, community }: { surface: Com
   const [state, submit, pending] = useActionState(setCommunityRegistrationAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">شماره ثبت و مجوز</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شماره ثبت و مجوز</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">فقط همان چیزی که در مدارک دیده شده است ثبت می‌شود.</p>
       <form onSubmit={submitWith(submit)} className="mt-lg space-y-md" data-testid="community-registration-form">
         <Hidden surface={surface} communityId={community.id} />
@@ -259,7 +259,7 @@ export function CommunityPublisherForm({ community }: { community: EditableCommu
   const grant = !community.canPublishPosts;
   return (
     <Card>
-      <h2 className="text-label-lg">مجوز انتشار مستقیم</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مجوز انتشار مستقیم</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         {community.canPublishPosts
           ? 'این کلاب می‌تواند نوشته‌هایش را خودش منتشر کند. ادمین محتوا همچنان می‌تواند نوشته را پنهان یا حذف نرم کند.'
@@ -283,7 +283,7 @@ export function CommunityOwnerForm({ community }: { community: EditableCommunity
   const [state, submit, pending] = useActionState(assignCommunityOwnerAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">مدیر پرونده</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدیر پرونده</span></h2></div>
       <form onSubmit={submitWith(submit)} className="mt-lg grid gap-md md:grid-cols-[1fr_1fr_auto] md:items-end" data-testid="community-owner-form">
         <Hidden surface="admin" communityId={community.id} />
         <input type="hidden" name="expectedVersion" value={community.version} />
@@ -314,7 +314,7 @@ export function CommunityStatusForm({
   const lockedForOwner = surface === 'owner' && community.hiddenByReview && community.publicStatus === 'HIDDEN';
   return (
     <Card>
-      <h2 className="text-label-lg">انتشار</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتشار</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">{'وضعیت فعلی: ' + VET_PUBLIC_STATUS_FA[community.publicStatus]}</p>
       <Result state={state} testId="community-status-result" />
       {lockedForOwner ? (
@@ -403,7 +403,7 @@ export function CommunityInvitationForm({
 }) {
   const [state, submit, pending] = useActionState(respondToCommunityInvitationAction, EMPTY);
   return (
-    <div className="rounded-lg border border-border-subtle p-lg" data-testid={'community-invitation-' + invitation.id}>
+    <div className="rounded-xl border border-border-default p-lg" data-testid={'community-invitation-' + invitation.id}>
       <p className="text-label-md">{invitation.communityNameFa}</p>
       {invitation.roleFa ? <p className="mt-2xs text-caption text-text-secondary">{'سمت پیشنهادی: ' + invitation.roleFa}</p> : null}
       <p className="mt-xs text-body-sm text-text-secondary">تا وقتی نپذیرید، نام شما در صفحه عمومی نمایش داده نمی‌شود.</p>

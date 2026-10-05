@@ -29,7 +29,7 @@ export default async function DevGatewayPage({
     <main className="mx-auto max-w-(--size-content-md) space-y-lg p-lg">
       <div className="flex flex-col items-center gap-md">
         <Logo height={28} />
-        <h1 className="text-h4">درگاه آزمایشی توسعه</h1>
+        <h1 className="text-h3">درگاه آزمایشی توسعه</h1>
         <p className="text-center text-caption text-status-warning-text">
           این صفحه درگاه واقعی نیست و فقط در محیط توسعه وجود دارد.
         </p>

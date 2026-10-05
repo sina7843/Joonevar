@@ -56,7 +56,7 @@ export default async function ProvincePage({ params }: Params) {
       />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{'استان ' + page.province.nameFa}</h1>
+        <h1 className="text-h2 md:text-h1">{'استان ' + page.province.nameFa}</h1>
         <div className="flex flex-wrap gap-xs" data-testid="province-counts">
           {page.counts.vets > 0 ? <StatusBadge tone="info">{fa(page.counts.vets) + ' دامپزشک'}</StatusBadge> : null}
           {page.counts.centres > 0 ? <StatusBadge tone="info">{fa(page.counts.centres) + ' مرکز'}</StatusBadge> : null}
@@ -69,7 +69,7 @@ export default async function ProvincePage({ params }: Params) {
 
       {page.indexable ? (
         <section aria-labelledby="province-links-title" className="space-y-sm">
-          <h2 id="province-links-title" className="text-h4">
+          <h2 id="province-links-title" className="text-h3">
             فهرست‌ها با فیلتر این استان
           </h2>
           <div className="flex flex-wrap gap-sm">
@@ -92,7 +92,7 @@ export default async function ProvincePage({ params }: Params) {
       )}
 
       <section aria-labelledby="province-cities-title">
-        <h2 id="province-cities-title" className="text-h4">
+        <h2 id="province-cities-title" className="text-h3">
           شهرها
         </h2>
         {page.cities.length === 0 ? (
@@ -105,7 +105,7 @@ export default async function ProvincePage({ params }: Params) {
               <li key={entry.city.id}>
                 <Link
                   href={entry.path}
-                  className="flex items-center justify-between gap-sm rounded-lg border border-border-subtle bg-bg-surface px-md py-sm transition-colors hover:border-border-brand"
+                  className="flex items-center justify-between gap-sm rounded-lg border border-border-default bg-bg-surface px-md py-sm transition-colors hover:border-border-control"
                   data-testid={'city-' + entry.city.slug}
                 >
                   <span className="text-label-md">{entry.city.nameFa}</span>

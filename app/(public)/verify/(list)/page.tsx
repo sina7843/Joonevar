@@ -39,7 +39,7 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">
           کد روی سند را بنویسید یا نشانی QR را اینجا بگذارید. استعلام فقط وجود و وضعیت سند را نشان می‌دهد؛ اطلاعات مالک
           هرگز نمایش داده نمی‌شود.
@@ -57,7 +57,7 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
           defaultValue={code}
           dir="ltr"
           placeholder="RS-XXXXXXXX"
-          className="min-h-[var(--size-control-md)] w-full rounded-md border border-border-subtle bg-bg-surface px-md font-mono text-body-sm text-text-primary focus:border-border-brand"
+          className="min-h-[var(--size-control-md)] w-full rounded-md border border-border-control bg-bg-surface px-md font-mono text-body-sm text-text-primary focus:border-border-brand"
           data-testid="verify-code-input"
         />
         <Button type="submit" data-testid="verify-submit">

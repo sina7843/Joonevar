@@ -81,7 +81,7 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <h2 className="text-label-lg">مرور هزینه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرور هزینه</span></h2></div>
             <StatusBadge tone={batch.status === 'PAID' ? 'success' : batch.status === 'FAILED' ? 'warning' : 'info'}>
               <span data-testid="batch-status">{BATCH_FA[batch.status]}</span>
             </StatusBadge>
@@ -127,7 +127,7 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">وضعیت صدور هر حیوان</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت صدور هر حیوان</span></h2></div>
           <p className="mt-md text-caption text-text-secondary">
             وضعیت هر حیوان مستقل است؛ توقف یکی، صدور بقیه را متوقف نمی‌کند.
           </p>
@@ -142,7 +142,7 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
               const name = animalRows.find((a) => a.id === item.animalId)?.name ?? 'بدون نام';
               const sheet = sheets.find((s) => s.animalId === item.animalId);
               return (
-                <li key={item.id} className="rounded-lg border border-border-subtle p-lg">
+                <li key={item.id} className="rounded-xl border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <span className="text-body-sm">{name}</span>
                     <StatusBadge

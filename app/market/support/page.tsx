@@ -49,7 +49,7 @@ export default async function SupportPage({
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">یافتن حساب</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>یافتن حساب</span></h2></div>
           <form className="mt-md flex flex-wrap items-end gap-sm" data-testid="support-search">
             <label className="flex flex-col gap-2xs text-caption">
               شناسه حساب
@@ -58,13 +58,13 @@ export default async function SupportPage({
                 name="account"
                 defaultValue={accountId}
                 dir="ltr"
-                className="rounded-md border border-border-subtle px-md py-sm text-body-sm"
+                className="rounded-lg border border-border-default px-md py-sm text-body-sm"
                 data-testid="support-account-input"
               />
             </label>
             <button
               type="submit"
-              className="rounded-md border border-border-subtle px-lg py-sm text-body-sm"
+              className="rounded-lg border border-border-default px-lg py-sm text-body-sm"
               data-testid="support-account-submit"
             >
               نمایش

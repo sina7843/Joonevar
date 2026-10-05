@@ -31,11 +31,11 @@ export default async function ReportContentPage({ params }: { params: Promise<{ 
       <div className="space-y-lg">
         <Card>
           <p className="text-caption text-text-secondary">{KIND_FA[item.kind]}</p>
-          <h1 className="text-h4">
+          <h2 className="text-h3">
             <Link href={publicHref} className="hover:text-text-brand">
               {item.titleFa}
             </Link>
-          </h1>
+          </h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             گزارش شما به ادمین محتوا می‌رسد و با دلیل بررسی می‌شود. هر حساب برای هر مطلب تا بسته شدن بررسی، یک گزارش باز
             دارد.

@@ -28,7 +28,7 @@ export default async function PermitsPage() {
       <div className="space-y-lg">
         {eligibility.allowed ? (
           <Card>
-            <h2 className="text-label-lg">مجوز رسمی جفت‌گیری</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مجوز رسمی جفت‌گیری</span></h2></div>
             <p className="mt-md text-caption text-text-secondary">
               مسیر: انتخاب حیوان شجره‌دار خود → کد شجره‌نامه حیوان مقابل → شناسایی و تأیید طرف مقابل → ثبت
               توافق تقسیم → مرور → پرداخت → ارسال → بررسی و صدور مجوز.

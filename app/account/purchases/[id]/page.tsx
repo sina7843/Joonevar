@@ -121,7 +121,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
 
         <Card>
           <div className="flex flex-wrap items-start justify-between gap-sm">
-            <h2 className="text-label-lg">{thread.listingTitleFa}</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{thread.listingTitleFa}</span></h2></div>
             <StatusBadge tone={status === 'CONVERTED' ? 'success' : 'neutral'}>
               <span data-testid="inquiry-status">{INQUIRY_STATUS_FA[status]}</span>
             </StatusBadge>
@@ -173,7 +173,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
 
         {/* The price ladder. Immutable rows: a counteroffer supersedes, never edits. */}
         <Card>
-          <h2 className="text-label-lg">قیمت</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>قیمت</span></h2></div>
           {priceLocked ? (
             <p className="mt-sm text-body-sm" data-testid="price-locked">
               قیمت نهایی قفل شده است و تغییر نمی‌کند: {moneyFa(inquiry.finalPriceToman)} تومان.
@@ -203,7 +203,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
         {/* Acceptance, the deposit, and the two ordinary ways this ends. */}
         {party !== null ? (
           <Card>
-            <h2 className="text-label-lg">وضعیت معامله</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت معامله</span></h2></div>
             {status !== 'OPEN' && status !== 'ACCEPTED' ? (
               <p className="mt-sm text-body-sm" data-testid="deal-state-note">
                 {status === 'CONVERTED'
@@ -256,11 +256,11 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
 
         {/* The transcript. Append-only; a redaction is recorded beside the text. */}
         <Card>
-          <h2 className="text-label-lg">گفت‌وگو</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گفت‌وگو</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary">{CONTACT_BLOCKED_FA}</p>
           <ul className="mt-lg space-y-md" data-testid="thread-messages">
             {thread.messages.map((message) => (
-              <li key={message.id} className="rounded-md border border-border-subtle p-md" data-testid={'message-' + message.id}>
+              <li key={message.id} className="rounded-lg border border-border-default p-md" data-testid={'message-' + message.id}>
                 <p className="text-caption text-text-secondary">
                   {message.mine ? 'شما' : 'طرف مقابل'}
                   <span className="mx-sm text-text-disabled">|</span>
@@ -308,7 +308,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
             disagree about which arrangement is real. */}
         {party !== null && inquiry.status !== 'CONVERTED' && inquiry.status !== 'COMPLETED' ? (
           <Card>
-            <h2 className="text-label-lg">زمان و محل تحویل</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>زمان و محل تحویل</span></h2></div>
             {liveHandover ? (
               <p className="mt-sm text-body-sm" data-testid="live-handover">
                 {DELIVERY_METHOD_FA[liveHandover.method as DeliveryMethod]}
@@ -332,7 +332,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
             buyer holds, and the buyer's own confirmation (PROMPT-007). */}
         {party !== null && (inquiry.status === 'CONVERTED' || inquiry.status === 'COMPLETED') ? (
           <Card>
-            <h2 className="text-label-lg">تحویل حیوان و انتقال مالکیت</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تحویل حیوان و انتقال مالکیت</span></h2></div>
             {handover === null ? (
               <>
                 <p className="mt-sm text-caption text-text-secondary">
@@ -369,7 +369,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
 
                 {handoverStatus === 'COMPLETED' ? (
                   <pre
-                    className="hz-rail mt-lg whitespace-pre-wrap rounded-md border border-border-subtle p-md text-body-sm"
+                    className="hz-rail mt-lg whitespace-pre-wrap rounded-lg border border-border-default p-md text-body-sm"
                     data-testid="handover-statement-final"
                   >
                     {handover.handover.statementFa}
@@ -412,7 +412,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
         {/* After the deposit: cancelling, what it cost, and the money coming back. */}
         {party !== null && (inquiry.status === 'CONVERTED' || cancellation !== null) ? (
           <Card>
-            <h2 className="text-label-lg">لغو معامله و استرداد بیعانه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>لغو معامله و استرداد بیعانه</span></h2></div>
             {cancellation === null ? (
               <>
                 <p className="mt-sm text-caption text-text-secondary">
@@ -475,7 +475,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
         */}
         {party !== null && (inquiry.status === 'CONVERTED' || cancellation !== null || dispute !== null) ? (
           <Card>
-            <h2 className="text-label-lg">داوری</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>داوری</span></h2></div>
             {dispute === null ? (
               <div className="mt-lg">
                 <OpenDisputeForm inquiryId={inquiry.id} />
@@ -509,7 +509,7 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
         {/* Reporting and blocking: both keep the transcript intact. */}
         {party !== null ? (
           <Card>
-            <h2 className="text-label-lg">گزارش و بستن گفت‌وگو</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گزارش و بستن گفت‌وگو</span></h2></div>
             <div className="mt-lg space-y-lg">
               <ReportMessageForm
                 inquiryId={inquiry.id}

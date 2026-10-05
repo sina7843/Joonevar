@@ -18,7 +18,7 @@ export function AddBreedForm() {
   const [state, submit, pending] = useActionState(addBreedAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">افزودن نژاد به فهرست مرجع</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>افزودن نژاد به فهرست مرجع</span></h2></div>
       <form action={submit} className="mt-lg space-y-lg" data-testid="add-breed-form">
         <Result state={state} />
         <TextField label="نام فارسی" name="nameFa" required data-testid="breed-name-fa" />

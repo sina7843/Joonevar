@@ -33,7 +33,7 @@ export default async function AssocKennelsPage() {
                 <Card>
                   <div className="flex items-start justify-between gap-md">
                     <div className="min-w-0">
-                      <h2 className="text-label-lg">{kennel.nameFa ?? 'کنل بدون نام'}</h2>
+                      <h2 className="hz-card__title">{kennel.nameFa ?? 'کنل بدون نام'}</h2>
                       <p className="mt-2xs text-caption text-text-secondary">
                         {[kennel.provinceFa, kennel.cityFa].filter(Boolean).join(' · ')} ·{' '}
                         {kennel.submittedAt

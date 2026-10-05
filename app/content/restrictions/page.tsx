@@ -21,7 +21,7 @@ export default async function ContentRestrictionsPage() {
     <OpsShell actor={guard.actor} title="ادمین محتوا" pathname="/content/restrictions" nav={CONTENT_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">محدودیت ناشر</h1>
+          <h2 className="text-h3">محدودیت ناشر</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             نویسنده محدودشده نمی‌تواند محتوا منتشر کند یا محتوای منتشرشده را تغییر دهد؛ پیش‌نویس‌هایش قابل ویرایش
             می‌مانند. محدودیت از صفحه گزارش یک محتوا ثبت می‌شود.
@@ -34,7 +34,7 @@ export default async function ContentRestrictionsPage() {
             {rows.map((row) => (
               <li
                 key={row.id}
-                className="rounded-lg border border-border-subtle bg-bg-surface p-lg"
+                className="rounded-xl border border-border-default bg-bg-surface p-lg"
                 data-testid={'restriction-' + row.id}
               >
                 <div className="flex flex-wrap items-start justify-between gap-sm">

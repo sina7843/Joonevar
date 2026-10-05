@@ -76,7 +76,7 @@ export default async function AssocMembersPage({
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">درخواست‌های در انتظار بررسی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌های در انتظار بررسی</span></h2></div>
           {waiting.items.length === 0 && corrections.items.length === 0 ? (
             <p className="mt-md text-body-sm text-text-disabled" data-testid="membership-queue-empty">
               درخواست بازی در صف نیست.

@@ -48,7 +48,7 @@ export default async function ReviewCentreClaimPage({ params }: { params: Promis
           <div className="flex flex-wrap items-start justify-between gap-md">
             <div>
               <p className="text-caption text-text-secondary">{data.centreNameFa}</p>
-              <h1 className="text-h4">{claim.claimantNameFa}</h1>
+              <h2 className="text-h3">{claim.claimantNameFa}</h2>
             </div>
             <span data-testid="claim-review-status">
               <StatusBadge tone={claim.status === 'SUBMITTED' ? 'warning' : claim.status === 'APPROVED' ? 'success' : 'neutral'}>
@@ -92,10 +92,10 @@ export default async function ReviewCentreClaimPage({ params }: { params: Promis
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">مدارک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدارک</span></h2></div>
           <ul className="mt-md space-y-sm" data-testid="claim-documents">
             {documents.map((document) => (
-              <li key={document.id} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm">
+              <li key={document.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm">
                 <span className="text-body-sm">{CLAIM_DOCUMENT_KIND_FA[document.kind as ClaimDocumentKind] + ' · ' + document.mime}</span>
                 <a
                   href={'/api/files/' + document.fileId}

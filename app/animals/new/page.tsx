@@ -39,7 +39,7 @@ export default async function NewAnimalPage({
             احراز هویت شما تأیید شده است. برای ثبت حیوان، عضویت انجمن لازم نیست و نشانی سکونت هم اجباری نیست.
           </Alert>
           <Card>
-            <h2 className="text-label-lg">شروع ثبت</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شروع ثبت</span></h2></div>
             <p className="mt-md text-body-sm text-text-secondary">
               فرم شش‌مرحله‌ای است و هر مرحله ذخیره می‌شود؛ اگر نیمه‌کاره خارج شوید، از همان‌جا ادامه می‌دهید.
             </p>

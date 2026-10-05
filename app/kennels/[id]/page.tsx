@@ -66,7 +66,7 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">{kennel.nameFa ?? 'کنل بدون نام'}</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{kennel.nameFa ?? 'کنل بدون نام'}</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary" data-testid="kennel-location">
                 {[kennel.provinceFa, kennel.cityFa].filter(Boolean).join(' · ') || 'نشانی ثبت نشده'}
                 {kennel.addressFa ? ' — ' + kennel.addressFa : ''}
@@ -136,7 +136,7 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
 
         {needsPayment ? (
           <Card>
-            <h2 className="text-label-lg">مرور و پرداخت</h2>
+            <h2 className="hz-card__title">مرور و پرداخت</h2>
             <p className="mt-md text-body-sm">
               هزینه ثبت کنل:{' '}
               <span data-testid="kennel-fee">{feeLabel ?? 'تعیین‌نشده'}</span>
@@ -159,7 +159,7 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
 
         {canSubmit ? (
           <Card>
-            <h2 className="text-label-lg">ارسال برای بررسی انجمن</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ارسال برای بررسی انجمن</span></h2></div>
             <p className="mt-md text-caption text-text-secondary">
               پرداخت این پرونده تأیید شده است. ارسال، پرونده را در صف بررسی انجمن قرار می‌دهد.
             </p>

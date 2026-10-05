@@ -160,7 +160,7 @@ export function ListingContentForm({
         />
       </div>
 
-      <fieldset className="space-y-md rounded-lg border border-border-subtle p-lg">
+      <fieldset className="space-y-md rounded-xl border border-border-default p-lg">
         <legend className="px-xs text-label-md">اظهارات فروشنده</legend>
         <p className="text-caption text-text-secondary">
           همزیست سابقه واکسیناسیون و عقیم‌سازی را نگه نمی‌دارد؛ این موارد اظهار فروشنده‌اند و به همین شکل به
@@ -202,7 +202,7 @@ export function ListingContentForm({
         />
       </fieldset>
 
-      <fieldset className="space-y-sm rounded-lg border border-border-subtle p-lg">
+      <fieldset className="space-y-sm rounded-xl border border-border-default p-lg">
         <legend className="px-xs text-label-md">روش‌های تحویل که ارائه می‌دهید</legend>
         {DELIVERY_METHODS.map((method: DeliveryMethod) => (
           <label key={method} className="flex items-center gap-sm text-body-sm">

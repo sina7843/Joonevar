@@ -28,7 +28,7 @@ export default async function BreederActivatePage() {
     <PublicShell actor={guard.actor} title="فعال‌سازی پرورش‌دهنده" pathname="/breeder/activate">
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">نقش پرورش‌دهنده چگونه فعال می‌شود</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نقش پرورش‌دهنده چگونه فعال می‌شود</span></h2></div>
           <p className="mt-md text-body-sm" data-testid="breeder-activation-rule">
             نقش پرورش‌دهنده با تأیید پرونده کنل فعال می‌شود. مدرک اضافه‌ای جز همان کارت ملی KYC خواسته
             نمی‌شود و پرداخت مستقلی با عنوان «فعال‌سازی نقش» وجود ندارد؛ تنها پرداخت این مسیر، هزینه ثبت کنل

@@ -3,7 +3,8 @@ import { AccessDenied } from '../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../src/ui/shell.tsx';
 import Link from 'next/link';
 import { AnimalCard, Card, LockedServiceCard, RequestCard, ServiceCard } from '../../src/ui/card.tsx';
-import { EmptyState } from '../../src/ui/states.tsx';
+import { SectionHeader, PageHeader } from '../../src/ui/section-header.tsx';
+import { Icon } from '../../src/ui/icon.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { Identifier, StatusBadge } from '../../src/ui/status.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
@@ -47,7 +48,7 @@ const SERVICE_CARDS: ReadonlyArray<{
   {
     service: 'ANIMAL_REGISTRATION',
     label: 'ثبت حیوان هم‌زیست',
-    icon: 'dog',
+    icon: 'pawPrint',
     description: 'پس از تأیید احراز هویت باز می‌شود؛ برای این کار عضویت لازم نیست.',
     href: '/animals/new',
   },
@@ -212,28 +213,48 @@ export default async function DashboardPage() {
     return eligibility.allowed ? [] : [{ entry, lock: eligibility.lock }];
   });
 
-  return (
-    <PublicShell actor={actor} title="داشبورد" pathname="/dashboard">
-      <div className="hz-stagger space-y-xl">
-        {/*
-          * Prototype OWN-001 opens with the person, not with a service: the
-          * greeting is the first thing under the header, and everything below it
-          * is ordered by what is waiting for them.
-          */}
-        <h2 className="text-h3" data-testid="dashboard-greeting">
-          {profile === null ? 'سلام' : 'سلام، ' + profile.firstName + ' ' + profile.lastName}
-        </h2>
+  const greeting = profile === null ? 'سلام' : 'سلام، ' + profile.firstName;
+  const today = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
 
+  /*
+   * K2 (P04 user dashboard): greeting header, the unread alert, payments and
+   * membership as full-width panels, animals and active requests side by side
+   * from 1024px, then the services grid with locked services in place.
+   */
+  return (
+    <PublicShell
+      actor={actor}
+      title="داشبورد"
+      pathname="/dashboard"
+      unreadCount={unread}
+      primaryAction={services.ANIMAL_REGISTRATION.allowed ? { href: '/animals/new', label: 'ثبت حیوان', icon: 'plus' } : undefined}
+      header={
+        <PageHeader
+          title={<span data-testid="dashboard-greeting">{greeting}</span>}
+          meta={[
+            today,
+            myAnimals.length.toLocaleString('fa-IR') + ' حیوان',
+            activeRequests.length.toLocaleString('fa-IR') + ' درخواست فعال',
+          ]}
+        />
+      }
+    >
+      <div className="space-y-xl">
         {unread > 0 ? (
-          <Alert
-            tone="info"
-            title={'شما ' + unread.toLocaleString('fa-IR') + ' اعلان خوانده‌نشده دارید'}
-            action={<ButtonLink href="/notifications">دیدن اعلان‌ها</ButtonLink>}
-          >
-            <span data-testid="dashboard-unread">
-              هر اعلان به همان پرونده‌ای برمی‌گردد که درباره آن است؛ باز کردن آن، اعلان را خوانده‌شده ثبت می‌کند.
-            </span>
-          </Alert>
+          <div className="hz-alert hz-alert--info hz-alert--inline-action" role="status">
+            <Icon name="bell" size="sm" className="hz-alert__icon" />
+            <div className="hz-alert__body">
+              <span className="hz-alert__title">{unread.toLocaleString('fa-IR') + ' اعلان خوانده‌نشده دارید'}</span>
+              <span data-testid="dashboard-unread">
+                هر اعلان به همان پرونده‌ای برمی‌گردد که درباره آن است؛ باز کردن آن، اعلان را خوانده‌شده ثبت می‌کند.
+              </span>
+              <div className="hz-alert__actions">
+                <ButtonLink tone="secondary" size="sm" href="/notifications">
+                  مشاهده اعلان‌ها
+                </ButtonLink>
+              </div>
+            </div>
+          </div>
         ) : null}
 
         {profile === null ? (
@@ -246,297 +267,285 @@ export default async function DashboardPage() {
           </Alert>
         ) : null}
 
-        {/*
-          * Phase 2.5 PROMPT-004: after sign-in, an ordinary account may choose a
-          * veterinary path. Choosing nothing is a complete answer — the account
-          * stays exactly what it is, so this is an offer, never a gate.
-          */}
-        {actor.context === 'USER' && professional.profile === null && professional.cases.length === 0 ? (
-          <Card>
-            <p className="text-label-lg">مسیر حرفه‌ای دامپزشکی</p>
-            <p className="mt-2xs text-caption text-text-secondary">
-              حساب شما یک حساب کاربری عادی است و همان می‌ماند. اگر دانشجو یا دکتر دامپزشک هستید، مسیر خود را انتخاب کنید؛ این انتخاب
-              اختیاری است.
-            </p>
-            <div className="mt-lg flex flex-wrap gap-md" data-testid="dashboard-vet-path">
-              <Link
-                href="/account/vet-profile?path=student"
-                className="text-label-md text-text-brand underline underline-offset-4"
-                data-testid="dashboard-path-student"
-              >
-                دانشجوی دامپزشکی
-              </Link>
-              <Link
-                href="/account/vet-profile?path=doctor"
-                className="text-label-md text-text-brand underline underline-offset-4"
-                data-testid="dashboard-path-doctor"
-              >
-                دکتر دامپزشک
-              </Link>
-            </div>
-          </Card>
-        ) : null}
-
-        {operational.length > 0 ? (
-          <section aria-labelledby="ops-heading" className="space-y-md">
-            <h2 id="ops-heading" className="text-h4">
-              محیط‌های عملیاتی شما
-            </h2>
-            <Card>
-              <p className="text-caption text-text-secondary">
-                این محیط‌ها از حساب کاربری شما جدا هستند و برای کار در آن‌ها عضویت انجمن لازم نیست؛ فقط نقش
-                فعال شما بررسی می‌شود.
-              </p>
-              <div className="mt-lg space-y-md">
-                {operational.map((environment) => (
-                  <div key={environment.href} className="space-y-2xs">
-                    <ButtonLink href={environment.href} block data-testid={'ops-entry-' + environment.role}>
-                      {environment.label}
-                    </ButtonLink>
-                    <p className="text-caption text-text-secondary">{environment.description}</p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </section>
-        ) : null}
-
         {vet !== null && vet.reasonFa !== null ? (
           <Alert tone="warning" title="پذیرش کار جدید متوقف است">
             {vet.reasonFa}
           </Alert>
         ) : null}
 
-        <section aria-labelledby="payments-heading">
-          <h2 id="payments-heading" className="sr-only">
-            پرداخت‌ها و رسیدها
-          </h2>
-          <Card>
-            <div className="flex flex-wrap items-start justify-between gap-md">
-              <div className="min-w-0">
-                <p className="text-label-lg">پرداخت‌ها و رسیدها</p>
-                <p className="mt-2xs text-caption text-text-secondary" data-testid="dashboard-payments-note">
-                  {payments.items.length === 0
-                    ? 'هنوز پرداختی ثبت نشده است. هر پرداخت با مبلغ قفل‌شده و وضعیت تأیید سرور اینجا می‌آید.'
-                    : 'آخرین پرداخت‌های شما، با وضعیتی که سرور تأیید کرده است.'}
-                </p>
-              </div>
-              <ButtonLink tone="secondary" href="/payments">
-                همه پرداخت‌ها
+        {/*
+          * D11: an operator reaches their own environment from here; the
+          * environments are not a public role switch (RoleSwitcher › role list).
+          */}
+        {operational.length > 0 ? (
+          <section aria-labelledby="ops-heading" className="hz-card">
+            <SectionHeader size="sm" id="ops-heading" title="محیط‌های عملیاتی شما" />
+            <p className="hz-caption">
+              این محیط‌ها از حساب کاربری شما جدا هستند و برای کار در آن‌ها عضویت انجمن لازم نیست؛ فقط نقش فعال شما بررسی می‌شود.
+            </p>
+            <ul className="hz-role-list mt-md">
+              {operational.map((environment) => (
+                <li key={environment.href}>
+                  <Link className="hz-role-link" href={environment.href} data-testid={'ops-entry-' + environment.role}>
+                    <span className="hz-role-link__icon">
+                      <Icon name="buildings" size="md" />
+                    </span>
+                    <span className="hz-role-link__text">
+                      <span className="hz-role-link__name">{environment.label}</span>
+                      <span className="hz-role-link__role">{environment.description}</span>
+                    </span>
+                    <span className="hz-role-link__end">
+                      <Icon name="caretRight" size="sm" mirror />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {/*
+          * Phase 2.5 PROMPT-004: after sign-in, an ordinary account may choose a
+          * veterinary path. Choosing nothing is a complete answer, so this is an
+          * offer, never a gate.
+          */}
+        {actor.context === 'USER' && professional.profile === null && professional.cases.length === 0 ? (
+          <section className="hz-card">
+            <SectionHeader size="sm" title="مسیر حرفه‌ای دامپزشکی" />
+            <p className="hz-caption">
+              حساب شما یک حساب کاربری عادی است و همان می‌ماند. اگر دانشجو یا دکتر دامپزشک هستید، مسیر خود را انتخاب کنید؛ این انتخاب
+              اختیاری است.
+            </p>
+            <div className="mt-md flex flex-wrap gap-sm" data-testid="dashboard-vet-path">
+              <ButtonLink tone="secondary" size="sm" href="/account/vet-profile?path=student" data-testid="dashboard-path-student" iconStart="student">
+                دانشجوی دامپزشکی
+              </ButtonLink>
+              <ButtonLink tone="secondary" size="sm" href="/account/vet-profile?path=doctor" data-testid="dashboard-path-doctor" iconStart="stethoscope">
+                دکتر دامپزشک
               </ButtonLink>
             </div>
-            {payments.items.length > 0 ? (
-              <ul className="mt-lg space-y-xs text-body-sm" data-testid="dashboard-payments">
-                {payments.items.map((line) => (
-                  <li key={line.batchId} className="flex flex-wrap items-center justify-between gap-sm">
-                    <Link href={'/payments/' + line.batchId} className="text-text-brand">
-                      {line.serviceFa}
-                    </Link>
-                    <span className="text-text-secondary">{line.totalToman.toLocaleString('fa-IR') + ' تومان · ' + line.statusFa}</span>
+          </section>
+        ) : null}
+
+        <section aria-labelledby="payments-heading" className="hz-card">
+          <SectionHeader
+            size="sm"
+            id="payments-heading"
+            title="پرداخت‌ها و رسیدها"
+            count={payments.items.length > 0 ? payments.items.length.toLocaleString('fa-IR') + ' پرداخت اخیر' : undefined}
+            link={{ href: '/payments', label: 'همه پرداخت‌ها' }}
+          />
+          <p className="hz-caption" data-testid="dashboard-payments-note">
+            {payments.items.length === 0
+              ? 'هنوز پرداختی ثبت نشده است. هر پرداخت با مبلغ قفل‌شده و وضعیت تأیید سرور اینجا می‌آید.'
+              : 'آخرین پرداخت‌های شما، با وضعیتی که سرور تأیید کرده است.'}
+          </p>
+          {payments.items.length > 0 ? (
+            <div className="hz-table-wrap mt-md">
+              <table className="hz-table" data-testid="dashboard-payments">
+                <thead>
+                  <tr>
+                    <th scope="col">خدمت</th>
+                    <th scope="col" className="hz-num">
+                      مبلغ (تومان)
+                    </th>
+                    <th scope="col">وضعیت</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.items.map((line) => (
+                    <tr key={line.batchId}>
+                      <td>
+                        <Link href={'/payments/' + line.batchId} className="hz-link">
+                          {line.serviceFa}
+                        </Link>
+                      </td>
+                      <td className="hz-num">{line.totalToman.toLocaleString('fa-IR')}</td>
+                      <td>{line.statusFa}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+        </section>
+
+        <section aria-labelledby="membership-heading" className="hz-card">
+          <div className="flex items-start justify-between gap-md">
+            <SectionHeader size="sm" id="membership-heading" title="عضویت انجمن" />
+            <StatusBadge
+              tone={
+                membershipActive
+                  ? 'success'
+                  : membership.status === 'APPROVED_AWAITING_PAYMENT' || membership.status === 'PENDING_REVIEW'
+                    ? 'info'
+                    : 'neutral'
+              }
+            >
+              <span data-testid="dashboard-membership-status">{membership.statusFa}</span>
+            </StatusBadge>
+          </div>
+          <dl className="hz-kv hz-kv--2col">
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">وضعیت</dt>
+              <dd className="hz-kv__value" data-testid="dashboard-membership-note">
+                {membershipActive
+                  ? membership.lifetime
+                    ? 'عضویت مادام‌العمر شما برقرار است.'
+                    : membership.endsAt
+                      ? 'عضویت شما تا ' + formatCivilDateFa(membership.endsAt.slice(0, 10)) + ' معتبر است.'
+                      : 'عضویت شما معتبر است.'
+                  : 'عضویت پس از بررسی انجمن و پرداخت تأییدشده، برای یک دوره فعال می‌شود.'}
+              </dd>
+            </div>
+            {membershipActive ? (
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">شماره عضویت</dt>
+                <dd
+                  className={membership.membershipNo ? 'hz-kv__value' : 'hz-kv__value hz-kv__value--empty'}
+                  data-testid="dashboard-membership-number"
+                >
+                  {membership.membershipNo ? (
+                    <Identifier value={membership.membershipNo} />
+                  ) : (
+                    'در انتظار صدور — خدمات فعال شما متوقف نمی‌شود'
+                  )}
+                </dd>
+              </div>
+            ) : null}
+          </dl>
+          <div className="mt-md">
+            {membershipActive ? (
+              <Link href="/membership" className="hz-link hz-link--standalone">
+                مشاهده عضویت
+                <Icon name="arrowRight" size="xs" mirror />
+              </Link>
+            ) : (
+              <ButtonLink href="/membership">فعال‌سازی عضویت</ButtonLink>
+            )}
+          </div>
+        </section>
+
+        <div className="grid gap-lg lg:grid-cols-2 lg:items-start">
+          {/*
+            * §8: what each animal has completed, from the database. The two
+            * marketplace entries stay reachable from here (Phase 3 PROMPT-003,
+            * Phase 4 PROMPT-002).
+            */}
+          <section aria-labelledby="animals-heading" className="hz-card">
+            <SectionHeader
+              size="sm"
+              id="animals-heading"
+              title="حیوان‌های من"
+              count={myAnimals.length > 0 ? myAnimals.length.toLocaleString('fa-IR') + ' حیوان' : undefined}
+              link={myAnimals.length > 0 ? { href: '/animals', label: 'همه' } : undefined}
+            />
+            {myAnimals.length === 0 ? (
+              <div className="hz-state hz-state--compact">
+                <div className="hz-state__icon">
+                  <Icon name="pawPrint" size="lg" />
+                </div>
+                <p className="hz-state__title">هنوز حیوانی ثبت نکرده‌اید</p>
+                <p className="hz-state__body">
+                  {services.ANIMAL_REGISTRATION.allowed
+                    ? 'می‌توانید اولین حیوان خود را ثبت کنید.'
+                    : 'پس از تأیید احراز هویت، می‌توانید حیوان خود را در هم‌زیست ثبت کنید.'}
+                </p>
+              </div>
+            ) : (
+              <ul data-testid="dashboard-animals">
+                {myAnimals.slice(0, ANIMALS_ON_DASHBOARD).map((animal) => (
+                  <li key={animal.id}>
+                    <AnimalCard
+                      name={animal.name ?? 'بدون نام'}
+                      speciesBreed={'سگ · ' + generationLabel(animal.generation)}
+                      petId={animal.petId}
+                      status={
+                        animal.status === 'REGISTERED'
+                          ? animal.identityVerifiedAt === null
+                            ? { tone: 'info', label: 'پرونده اولیه' }
+                            : { tone: 'success', label: 'مشخصات رسمی ثبت‌شده' }
+                          : { tone: 'neutral', label: 'پیش‌نویس' }
+                      }
+                      href={animal.status === 'REGISTERED' ? '/animals/' + animal.id : '/animals/' + animal.id + '/edit'}
+                    />
                   </li>
                 ))}
               </ul>
-            ) : null}
-          </Card>
-        </section>
-
-        <section aria-labelledby="membership-heading">
-          <h2 id="membership-heading" className="sr-only">
-            عضویت انجمن
-          </h2>
-          <Card>
-            <div className="flex items-start justify-between gap-md">
-              <div>
-                <p className="text-label-lg">عضویت انجمن</p>
-                <p className="mt-2xs text-caption text-text-secondary" data-testid="dashboard-membership-note">
-                  {membershipActive
-                    ? membership.lifetime
-                      ? 'عضویت مادام‌العمر شما برقرار است.'
-                      : membership.endsAt
-                        ? 'عضویت شما تا ' + formatCivilDateFa(membership.endsAt.slice(0, 10)) + ' معتبر است.'
-                        : 'عضویت شما معتبر است.'
-                    : 'عضویت پس از بررسی انجمن و پرداخت تأییدشده، برای یک دوره فعال می‌شود.'}
-                </p>
-                {membershipActive ? (
-                  <p className="mt-sm text-caption text-text-secondary" data-testid="dashboard-membership-number">
-                    شماره عضویت:{' '}
-                    {membership.membershipNo ? (
-                      <Identifier value={membership.membershipNo} />
-                    ) : (
-                      'در انتظار صدور — خدمات فعال شما متوقف نمی‌شود'
-                    )}
-                  </p>
-                ) : null}
-              </div>
-              <StatusBadge tone={membershipActive ? 'success' : membership.status === 'APPROVED_AWAITING_PAYMENT' || membership.status === 'PENDING_REVIEW' ? 'info' : 'neutral'}>
-                <span data-testid="dashboard-membership-status">{membership.statusFa}</span>
-              </StatusBadge>
-            </div>
-            {/* Prototype OWN-001: a settled state is a line of text, not a
-                full-width call to action. The button appears when there is
-                actually something to do. */}
-            <div className="mt-lg">
-              {membershipActive ? (
-                <Link
-                  href="/membership"
-                  className="text-label-md text-text-brand underline underline-offset-4"
-                >
-                  مشاهده عضویت
-                </Link>
-              ) : (
-                <ButtonLink href="/membership" block>
-                  فعال‌سازی عضویت
-                </ButtonLink>
-              )}
-            </div>
-          </Card>
-        </section>
-
-        {/*
-          * §8: the dashboard has to answer what each animal has completed. It
-          * was drawing a fixed empty state and never asking the database, so a
-          * person with animals was told they had none.
-          */}
-        <section aria-labelledby="animals-heading" className="space-y-md">
-          <div className="flex items-baseline justify-between gap-md">
-            <h2 id="animals-heading" className="text-h4">
-              حیوان‌های من
-            </h2>
-            <div className="flex items-baseline gap-md">
-              {/* The seller's own adverts (Phase 3, PROMPT-003). Always offered:
-                  the page itself explains why an animal cannot be advertised
-                  yet, which is more useful than a link that is not there. */}
-              <Link
-                href="/account/listings"
-                className="text-label-md text-text-brand underline underline-offset-4"
-                data-testid="dashboard-listings-link"
-              >
+            )}
+            <div className="hz-card__footer">
+              <Link href="/account/listings" className="hz-link" data-testid="dashboard-listings-link">
                 آگهی‌های فروش
               </Link>
-              {/* The mating finder's subscription and capacity (Phase 4, PROMPT-002). */}
-              <Link
-                href="/account/mating-finder"
-                className="text-label-md text-text-brand underline underline-offset-4"
-                data-testid="dashboard-finder-link"
-              >
+              <Link href="/account/mating-finder" className="hz-link" data-testid="dashboard-finder-link">
                 جفت‌یابی
               </Link>
-              {myAnimals.length > 0 ? (
-                <Link href="/animals" className="text-label-md text-text-brand underline underline-offset-4">
-                  همه ({myAnimals.length})
-                </Link>
-              ) : null}
             </div>
-          </div>
+          </section>
 
-          {myAnimals.length === 0 ? (
-            <EmptyState
-              title="هنوز حیوانی ثبت نکرده‌اید"
-              description={
-                services.ANIMAL_REGISTRATION.allowed
-                  ? 'می‌توانید اولین حیوان خود را ثبت کنید.'
-                  : 'پس از تأیید احراز هویت، می‌توانید حیوان خود را در هم‌زیست ثبت کنید.'
-              }
+          <section aria-labelledby="requests-heading" className="hz-card">
+            <SectionHeader
+              size="sm"
+              id="requests-heading"
+              title="درخواست‌های فعال"
+              count={activeRequests.length > 0 ? activeRequests.length.toLocaleString('fa-IR') + ' درخواست' : undefined}
+              link={activeRequests.length > 0 ? { href: '/requests', label: 'همه درخواست‌ها' } : undefined}
             />
-          ) : (
-            <ul className="space-y-md" data-testid="dashboard-animals">
-              {myAnimals.slice(0, ANIMALS_ON_DASHBOARD).map((animal) => (
-                <li key={animal.id}>
-                  <AnimalCard
-                    name={animal.name ?? 'بدون نام'}
-                    speciesBreed={'سگ · ' + generationLabel(animal.generation)}
-                    petId={animal.petId}
-                    status={
-                      animal.status === 'REGISTERED'
-                        ? animal.identityVerifiedAt === null
-                          ? { tone: 'info', label: 'پرونده اولیه' }
-                          : { tone: 'success', label: 'مشخصات رسمی ثبت‌شده' }
-                        : { tone: 'neutral', label: 'پیش‌نویس' }
-                    }
-                    href={
-                      animal.status === 'REGISTERED'
-                        ? '/animals/' + animal.id
-                        : '/animals/' + animal.id + '/edit'
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+            {activeRequests.length === 0 ? (
+              <div className="hz-state hz-state--compact">
+                <div className="hz-state__icon">
+                  <Icon name="tray" size="lg" />
+                </div>
+                <p className="hz-state__title">درخواست فعالی ندارید</p>
+                <p className="hz-state__body">درخواست‌های مراجعه، صدور سند و بررسی پس از ایجاد در این بخش دیده می‌شوند.</p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-border-subtle" data-testid="dashboard-requests">
+                {activeRequests.slice(0, REQUESTS_ON_DASHBOARD).map((row) => (
+                  <li key={row.request.id} className="py-md first:pt-0 last:pb-0">
+                    <RequestCard
+                      title={SERVICE_TYPE_FA[row.request.serviceType]}
+                      requestCode={row.referral?.code ?? '—'}
+                      animalName={row.animalName ?? 'بدون نام'}
+                      status={{
+                        tone: row.expired ? 'warning' : REQUEST_STATUS_TONE[row.request.status]!,
+                        label: row.expired ? 'مهلت گذشته' : REQUEST_STATUS_FA[row.request.status]!,
+                      }}
+                      owner={row.request.status === 'ACTIVE' ? 'USER' : 'VET'}
+                      {...(row.referral
+                        ? { deadlineFa: formatCivilDateFa(row.referral.expiresAt.toISOString().slice(0, 10)) }
+                        : {})}
+                      resumeHref={'/requests/' + row.request.id}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
 
-        <section aria-labelledby="requests-heading" className="space-y-md">
-          <div className="flex items-baseline justify-between gap-md">
-            <h2 id="requests-heading" className="text-h4">
-              درخواست‌های فعال
-            </h2>
-            {activeRequests.length > 0 ? (
-              <Link href="/requests" className="text-label-md text-text-brand underline underline-offset-4">
-                همه ({activeRequests.length})
-              </Link>
-            ) : null}
-          </div>
-          {activeRequests.length === 0 ? (
-            <EmptyState
-              title="درخواست فعالی ندارید"
-              description="درخواست‌های مراجعه، صدور سند و بررسی پس از ایجاد در این بخش دیده می‌شوند."
-            />
-          ) : (
-            <ul className="space-y-lg" data-testid="dashboard-requests">
-              {activeRequests.slice(0, REQUESTS_ON_DASHBOARD).map((row) => (
-                <li key={row.request.id}>
-                  <RequestCard
-                    title={SERVICE_TYPE_FA[row.request.serviceType]}
-                    requestCode={row.referral?.code ?? '—'}
-                    animalName={row.animalName ?? 'بدون نام'}
-                    status={{
-                      tone: row.expired ? 'warning' : REQUEST_STATUS_TONE[row.request.status]!,
-                      label: row.expired ? 'مهلت گذشته' : REQUEST_STATUS_FA[row.request.status]!,
-                    }}
-                    owner={row.request.status === 'ACTIVE' ? 'USER' : 'VET'}
-                    {...(row.referral
-                      ? { deadlineFa: formatCivilDateFa(row.referral.expiresAt.toISOString().slice(0, 10)) }
-                      : {})}
-                    resumeHref={'/requests/' + row.request.id}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section aria-labelledby="services-heading" className="space-y-lg">
-          <h2 id="services-heading" className="text-h4">
-            سرویس‌ها
-          </h2>
-
-          {open.map((entry) => (
-            <ServiceCard
-              key={entry.service}
-              label={entry.label}
-              description={entry.description}
-              href={entry.href}
-              icon={entry.icon}
-            />
-          ))}
-
+        <section aria-labelledby="services-heading">
+          <SectionHeader id="services-heading" title="سرویس‌ها" />
           {open.length === 0 && locked.length > 0 ? (
-            <p className="text-body-sm text-text-secondary" data-testid="no-open-service">
+            <p className="mb-md text-body-sm text-text-secondary" data-testid="no-open-service">
               هنوز هیچ سرویسی برای شما باز نیست. با انجام کار زیر، سرویس‌های وابسته به آن باز می‌شوند.
             </p>
           ) : null}
-
-          {groupLocked(locked).map((group) => (
-            <div key={group.lock.reason + group.lock.cta.href} className="space-y-md">
-              <LockedServiceCard serviceLabel={group.labels[0]!} lock={group.lock} icon={group.icons[0]} />
-              {group.labels.length > 1 ? (
-                <p className="text-caption text-text-secondary" data-testid="locked-group-more">
-                  با همین کار، {group.labels.length - 1} سرویس دیگر هم باز می‌شود:{' '}
-                  {group.labels.slice(1).join('، ')}.
-                </p>
-              ) : null}
-            </div>
-          ))}
+          <div className="grid gap-lg md:grid-cols-2 lg:grid-cols-3">
+            {open.map((entry) => (
+              <ServiceCard key={entry.service} label={entry.label} description={entry.description} href={entry.href} icon={entry.icon} />
+            ))}
+            {groupLocked(locked).map((group) => (
+              <div key={group.lock.reason + group.lock.cta.href} className="space-y-sm">
+                <LockedServiceCard serviceLabel={group.labels[0]!} lock={group.lock} icon="lockSimple" />
+                {group.labels.length > 1 ? (
+                  <p className="hz-caption" data-testid="locked-group-more">
+                    با همین کار، {group.labels.length - 1} سرویس دیگر هم باز می‌شود: {group.labels.slice(1).join('، ')}.
+                  </p>
+                ) : null}
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </PublicShell>

@@ -212,7 +212,7 @@ export function EditContractForm({
       <input type="hidden" name="expectedNumber" value={number} />
       <TextAreaField label="جزئیات مالی (فقط برای دو طرف)" name="financialDetailsFa" rows={2} maxLength={2000} defaultValue={financialDetailsFa ?? ''} data-testid="finder-contract-financial" />
       {optional.map((clause) => (
-        <div key={clause.key} className="rounded-md border border-border-subtle p-sm">
+        <div key={clause.key} className="rounded-lg border border-border-default p-sm">
           <Check name="clause" value={clause.key} label={clause.titleFa + ' (اختیاری)'} defaultChecked={clause.chosen} testId={'finder-clause-' + clause.key} />
           <p className="text-caption text-text-secondary">{clause.bodyFa}</p>
           <TextField label="تکمیل این بند" name={'fill-' + clause.key} maxLength={500} defaultValue={clause.fillFa ?? ''} />
@@ -307,7 +307,7 @@ export function PublishTemplateForm({ expectedCurrentVersion, required }: { expe
         <TextAreaField key={clause.value} label={'بند اجباری: ' + clause.label} name={'body-' + clause.value} rows={2} required maxLength={3000} data-testid={'finder-template-body-' + clause.value} />
       ))}
       {[1, 2, 3].map((i) => (
-        <div key={i} className="grid gap-sm rounded-md border border-border-subtle p-sm sm:grid-cols-3">
+        <div key={i} className="grid gap-sm rounded-lg border border-border-default p-sm sm:grid-cols-3">
           <TextField label={'بند اختیاری ' + i.toLocaleString('fa-IR') + ' — کلید لاتین'} name={'optKey-' + i} ltr maxLength={40} />
           <TextField label="عنوان" name={'optTitle-' + i} maxLength={120} />
           <TextField label="متن" name={'optBody-' + i} maxLength={3000} />

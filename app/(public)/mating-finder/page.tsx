@@ -34,7 +34,7 @@ function Select({ name, label, value, options, testId }: { name: string; label: 
       <label htmlFor={id} className="text-label-md">
         {label}
       </label>
-      <select id={id} name={name} defaultValue={value} className="min-h-[var(--size-control-md)] w-full rounded-md border border-border-subtle bg-bg-surface px-md text-body-sm text-text-primary" data-testid={testId}>
+      <select id={id} name={name} defaultValue={value} className="min-h-[var(--size-control-md)] w-full rounded-md border border-border-control bg-bg-surface px-md text-body-sm text-text-primary" data-testid={testId}>
         {options.map(([v, l]) => (
           <option key={v} value={v}>
             {l}
@@ -52,7 +52,7 @@ function Input({ name, label, value, type = 'text', testId }: { name: string; la
       <label htmlFor={id} className="text-label-md">
         {label}
       </label>
-      <input id={id} name={name} type={type} defaultValue={value} inputMode={type === 'number' ? 'numeric' : undefined} className="min-h-[var(--size-control-md)] w-full rounded-md border border-border-subtle bg-bg-surface px-md text-body-sm text-text-primary" data-testid={testId} />
+      <input id={id} name={name} type={type} defaultValue={value} inputMode={type === 'number' ? 'numeric' : undefined} className="min-h-[var(--size-control-md)] w-full rounded-md border border-border-control bg-bg-surface px-md text-body-sm text-text-primary" data-testid={testId} />
     </div>
   );
 }
@@ -82,7 +82,7 @@ export default async function MatingFinderSearchPage({ searchParams }: { searchP
   return (
     <div className="mx-auto max-w-5xl space-y-lg px-lg py-lg">
       <header className="space-y-xs">
-        <h1 className="text-h3">جفت‌یابی</h1>
+        <h1 className="text-h2">جفت‌یابی</h1>
         <p className="text-body-sm text-text-secondary">
           فقط حیوانات هم‌نژاد و جنس مخالف به هم پیشنهاد می‌شوند. اشتراک فقط دسترسی می‌دهد و رتبه هیچ حیوانی را بالا نمی‌برد.
         </p>
@@ -96,7 +96,7 @@ export default async function MatingFinderSearchPage({ searchParams }: { searchP
         </div>
       ) : (
         <>
-          <form method="get" action="/mating-finder" className="grid gap-md rounded-lg border border-border-subtle p-lg sm:grid-cols-2 lg:grid-cols-4" data-testid="finder-filters" role="search" aria-label="فیلترهای جفت‌یابی">
+          <form method="get" action="/mating-finder" className="grid gap-md rounded-xl border border-border-default p-lg sm:grid-cols-2 lg:grid-cols-4" data-testid="finder-filters" role="search" aria-label="فیلترهای جفت‌یابی">
             {mine.length > 0 ? (
               <Select
                 name="for"
@@ -175,7 +175,7 @@ export default async function MatingFinderSearchPage({ searchParams }: { searchP
                     {actor ? <FavoriteForm profileId={item.profileId} favorite={item.favorite} /> : null}
                   </div>
                   {item.evaluation ? (
-                    <section className="rounded-lg border border-border-subtle p-md" aria-label="توضیح سازگاری" data-testid={'finder-evaluation-' + item.profileId}>
+                    <section className="rounded-lg border border-border-default p-md" aria-label="توضیح سازگاری" data-testid={'finder-evaluation-' + item.profileId}>
                       <p className="text-label-md" data-testid={'finder-score-' + item.profileId}>
                         {'امتیاز سازگاری: ' + fa(item.evaluation.score) + ' از ۱۰۰'}
                       </p>
@@ -217,8 +217,8 @@ export default async function MatingFinderSearchPage({ searchParams }: { searchP
           ) : null}
 
           {actor && query !== '' ? (
-            <section className="rounded-lg border border-border-subtle p-lg">
-              <h2 className="text-label-lg">ذخیره این جست‌وجو</h2>
+            <section className="rounded-xl border border-border-default p-lg">
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ذخیره این جست‌وجو</span></h2></div>
               <SaveSearchForm query={query} />
             </section>
           ) : null}

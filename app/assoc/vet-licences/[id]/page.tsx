@@ -43,7 +43,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
     <OpsShell actor={guard.actor} title="بررسی پروانه فعالیت" pathname="/assoc/vet-licences" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">متقاضی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>متقاضی</span></h2></div>
           <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
             <dt className="text-text-secondary">نام در حساب</dt>
             <dd>{detail.applicantNameFa ?? '—'}</dd>
@@ -62,7 +62,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
 
         {latest ? (
           <Card>
-            <h2 className="text-label-lg">{'نسخه جاری (' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR') + ')'}</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'نسخه جاری (' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR') + ')'}</span></h2></div>
             <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
               <dt className="text-text-secondary">کد نظام</dt>
               <dd dir="ltr">{latest.councilCode}</dd>
@@ -97,7 +97,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">مدارک همه نسخه‌ها</h2>
+          <h2 className="hz-card__title">مدارک همه نسخه‌ها</h2>
           <ul className="mt-md space-y-2xs text-body-sm">
             {detail.documents.map((document) => (
               <li key={document.id}>
@@ -121,7 +121,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
 
         {detail.submissions.length > 1 ? (
           <Card>
-            <h2 className="text-label-lg">نسخه‌ها</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نسخه‌ها</span></h2></div>
             <ol className="mt-md space-y-sm text-body-sm" data-testid="licence-submissions">
               {detail.submissions.map((submission) => (
                 <li key={submission.version}>
@@ -135,7 +135,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه</span></h2></div>
           <ol className="mt-md space-y-sm text-body-sm" data-testid="licence-case-history">
             {detail.history.map((event, index) => (
               <li key={index}>
@@ -148,7 +148,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
 
         {review && waiting ? (
           <Card>
-            <h2 className="text-label-lg">بررسی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بررسی</span></h2></div>
             <div className="mt-md">
               <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
             </div>
@@ -157,7 +157,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
 
         {waiting && !review?.claimedByOther ? (
           <Card>
-            <h2 className="text-label-lg">ثبت نتیجه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">تأیید مدارک، پرونده را «در انتظار پرداخت» می‌کند و Tag دارای پروانه را فعال نمی‌کند.</p>
             <div className="mt-lg">
               <DecideLicenceCaseForm caseId={detail.case.id} version={detail.case.version} />

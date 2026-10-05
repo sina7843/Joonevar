@@ -57,7 +57,7 @@ export default async function CommissionRulesPage() {
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">انتشار نسخه تازه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتشار نسخه تازه</span></h2></div>
           {options.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="commission-no-species">
               هنوز هیچ گونه‌ای در بازار فروش حیوان فعال نیست؛ ابتدا از صفحه «گونه‌های فعال» یکی را باز کنید.
@@ -70,7 +70,7 @@ export default async function CommissionRulesPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌ها</span></h2></div>
           {rules.length === 0 ? (
             <div className="mt-lg" data-testid="commission-history-empty">
               <EmptyState

@@ -21,21 +21,12 @@ import { SOCIAL_ICON } from '../brand/assets.ts';
 export const SITE_NAME = 'همزیست';
 
 /**
- * The official symbol from the Design System (`public/brand`, 144×162).
- *
- * This is the organisation's logo for structured data, where the bare mark is
- * what a consumer expects, so it stays the symbol.
+ * The organisation's logo for structured data: app icon option A at 512px
+ * (Brand › Files: `pwa-512.png` is the avatar), a raster consumers accept.
  */
-export const SITE_IMAGE = { path: '/brand/logo-symbol.png', width: 144, height: 162 } as const;
+export const SITE_IMAGE = { path: '/brand/app-icon/pwa-512.png', width: 512, height: 512 } as const;
 
-/**
- * The default share image.
- *
- * Section 05 of the handoff delivers a dedicated social asset; the bare symbol
- * was only ever a stand-in because no share asset existed. It is square rather
- * than 1200×630, so a card renders it as a thumbnail instead of a banner - that
- * is the asset the Design System supplies and nothing wider is invented here.
- */
+/** The default share image: the system's 1200×630 OpenGraph card (Brand › Files). */
 export const SHARE_IMAGE = {
   path: SOCIAL_ICON.path,
   width: SOCIAL_ICON.width,

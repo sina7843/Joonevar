@@ -27,7 +27,7 @@ export default async function AdminPage() {
     <OpsShell actor={guard.actor} title="سوپرادمین" pathname="/admin" nav={ADMIN_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">وضعیت داده مدیریتی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت داده مدیریتی</span></h2></div>
           <p className="mt-md text-body-sm">
             {report.settings.total} کلید تنظیم · {report.settings.notConfigured.length} مورد «تعیین‌نشده»
           </p>
@@ -42,7 +42,7 @@ export default async function AdminPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">صف‌های بررسی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>صف‌های بررسی</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">
             فقط صف‌هایی که این نقش اجازه خواندنشان را دارد نمایش داده می‌شوند؛ صف بسته‌شده صفر نشان داده نمی‌شود.
           </p>
@@ -56,7 +56,7 @@ export default async function AdminPage() {
                 <li key={queue.key}>
                   <Link
                     href={queue.href}
-                    className="flex items-center justify-between gap-md rounded-lg border border-border-subtle p-md hover:border-border-brand"
+                    className="flex items-center justify-between gap-md rounded-lg border border-border-default p-md hover:border-border-control"
                     data-testid={'queue-' + queue.key}
                   >
                     <span className="text-label-md">{queue.labelFa}</span>

@@ -56,7 +56,7 @@ export function AskToBuyForm({ listingId, negotiable }: { listingId: string; neg
   const [state, submit, pending] = useActionState(createInquiryAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">درخواست خرید</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست خرید</span></h2></div>
       <form action={submit} className="mt-lg space-y-md" data-testid="ask-to-buy">
         <input type="hidden" name="listingId" value={listingId} />
         <Result state={state} />
@@ -507,7 +507,7 @@ export function ConfirmHandoverForm({
       <input type="hidden" name="version" value={version} />
       <Result state={state} />
       <pre
-        className="hz-rail whitespace-pre-wrap rounded-md border border-border-subtle p-md text-body-sm"
+        className="hz-rail whitespace-pre-wrap rounded-lg border border-border-default p-md text-body-sm"
         data-testid="handover-statement"
       >
         {statementFa}

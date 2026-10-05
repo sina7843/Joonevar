@@ -2,11 +2,11 @@ import Link from 'next/link';
 import { ActionOwner, StatusBadge, type ActionOwnerKind, type StatusTone } from './status.tsx';
 
 /**
- * Animal timeline (§10).
+ * Animal timeline (§10) — DS *Timeline* (`.hz-timeline`).
  *
  * Every item carries the event, its time, its status, who the next action
- * belongs to, a short summary and a link that returns to that exact record —
- * not to a general list.
+ * belongs to, a short summary and a link that returns to that exact record,
+ * not to a general list. An item the user must act on is marked `attention`.
  */
 export interface TimelineItem {
   readonly id: string;
@@ -19,24 +19,35 @@ export interface TimelineItem {
   readonly ctaLabel: string;
 }
 
+const MARKER: Record<StatusTone, string> = {
+  neutral: 'hz-timeline__item--upcoming',
+  info: 'hz-timeline__item--current',
+  warning: 'hz-timeline__item--attention',
+  error: 'hz-timeline__item--attention',
+  success: 'hz-timeline__item--done',
+};
+
 export function Timeline({ items }: { items: readonly TimelineItem[] }) {
   return (
-    <ol className="space-y-md">
+    <ol className="hz-timeline">
       {items.map((item) => (
-        <li key={item.id} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
-          <div className="flex items-start justify-between gap-md">
-            <div className="min-w-0">
-              <p className="text-label-lg">{item.title}</p>
-              <p className="mt-2xs text-caption text-text-secondary">{item.whenFa}</p>
+        <li key={item.id} className={'hz-timeline__item ' + MARKER[item.status.tone]}>
+          <span className="hz-timeline__marker" aria-hidden="true" />
+          <div className="hz-timeline__content">
+            <div className="hz-timeline__head">
+              <span className="hz-timeline__title">{item.title}</span>
+              <StatusBadge tone={item.status.tone} size="sm">
+                {item.status.label}
+              </StatusBadge>
             </div>
-            <StatusBadge tone={item.status.tone}>{item.status.label}</StatusBadge>
-          </div>
-          <p className="mt-md text-body-sm text-text-secondary">{item.summary}</p>
-          <div className="mt-sm flex items-center justify-between gap-md">
-            <ActionOwner owner={item.owner} />
-            <Link href={item.href} className="text-label-md text-text-brand underline underline-offset-4">
-              {item.ctaLabel}
-            </Link>
+            <div className="hz-timeline__meta">{item.whenFa}</div>
+            <p className="hz-timeline__body">{item.summary}</p>
+            <div className="hz-timeline__actions">
+              <ActionOwner owner={item.owner} />
+              <Link href={item.href} className="hz-link hz-link--standalone">
+                {item.ctaLabel}
+              </Link>
+            </div>
           </div>
         </li>
       ))}

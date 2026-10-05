@@ -25,8 +25,14 @@ import { AA_NON_TEXT } from '../../src/a11y/contrast.ts';
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const fileOf = (asset: { path: string }): string => path.join(ROOT, 'public', asset.path.replace(/^\//, ''));
 
-/** PNG header: width and height are two big-endian 32-bit fields after the IHDR marker. */
-function pngSize(bytes: Buffer): { width: number; height: number } {
+/** PNG: width and height are two big-endian 32-bit fields after the IHDR marker; SVG: the root's attributes. */
+function assetSize(file: string): { width: number; height: number } {
+  const bytes = fs.readFileSync(file);
+  if (file.endsWith('.svg')) {
+    const root = /<svg[^>]*>/.exec(bytes.toString('utf8'))![0];
+    const attr = (name: string) => Number(new RegExp(' ' + name + '="([0-9.]+)"').exec(root)![1]);
+    return { width: attr('width'), height: attr('height') };
+  }
   assert.equal(bytes.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', 'not a PNG');
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
@@ -35,8 +41,10 @@ test('every asset the Design System delivered is shipped, at exactly the size it
   assert.ok(BRAND_ASSETS.length >= 7);
   for (const asset of BRAND_ASSETS) {
     const file = fileOf(asset);
-    assert.ok(fs.existsSync(file), 'missing brand asset ' + asset.path + ' (Figma ' + asset.figmaNode + ')');
-    const size = pngSize(fs.readFileSync(file));
+    assert.ok(fs.existsSync(file), 'missing brand asset ' + asset.path + ' (' + asset.source + ')');
+    // Byte for byte the delivered file, not a re-export.
+    assert.ok(fs.readFileSync(file).equals(fs.readFileSync(path.join(ROOT, asset.source))), asset.path + ' differs from ' + asset.source);
+    const size = assetSize(file);
     assert.deepEqual(
       size,
       { width: asset.width, height: asset.height },

@@ -35,7 +35,7 @@ export default async function PlacesPage() {
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">
           هر استان صفحه خودش را دارد و آنچه در آن منتشر شده است را نشان می‌دهد. نشانی دقیق و محل غیرعمومی هیچ‌جا منتشر
           نمی‌شود.
@@ -54,7 +54,7 @@ export default async function PlacesPage() {
           <li key={entry.province.code}>
             <Link
               href={entry.path}
-              className="flex h-full items-start gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
+              className="flex h-full items-start gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
               data-testid={'province-' + entry.province.code}
             >
               <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">

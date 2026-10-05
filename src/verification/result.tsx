@@ -33,7 +33,7 @@ export function VerificationResult({ answer }: { answer: VerificationAnswer }) {
 
   const tone = answer.state === 'VALID' ? 'success' : 'warning';
   return (
-    <div className="rounded-lg border border-border-subtle bg-bg-surface p-lg" data-testid="verify-result">
+    <div className="rounded-xl border border-border-default bg-bg-surface p-lg" data-testid="verify-result">
       <div className="flex flex-wrap items-start justify-between gap-sm">
         <div className="min-w-0">
           <p className="text-label-lg">{answer.kindFa}</p>
@@ -49,32 +49,32 @@ export function VerificationResult({ answer }: { answer: VerificationAnswer }) {
       </div>
 
       <dl className="mt-lg grid gap-sm sm:grid-cols-2">
-        <div className="rounded-md border border-border-subtle px-md py-sm">
+        <div className="rounded-lg border border-border-default px-md py-sm">
           <dt className="text-body-sm text-text-secondary">تاریخ صدور</dt>
           <dd className="mt-2xs text-label-md" data-testid="verify-issued-at">
             {answer.issuedAt ? formatCivilDateFa(answer.issuedAt.toISOString().slice(0, 10) as never) : '—'}
           </dd>
         </div>
         {answer.animal?.speciesFa ? (
-          <div className="rounded-md border border-border-subtle px-md py-sm">
+          <div className="rounded-lg border border-border-default px-md py-sm">
             <dt className="text-body-sm text-text-secondary">گونه</dt>
             <dd className="mt-2xs text-label-md">{answer.animal.speciesFa}</dd>
           </div>
         ) : null}
         {answer.animal?.breedFa ? (
-          <div className="rounded-md border border-border-subtle px-md py-sm">
+          <div className="rounded-lg border border-border-default px-md py-sm">
             <dt className="text-body-sm text-text-secondary">نژاد</dt>
             <dd className="mt-2xs text-label-md">{answer.animal.breedFa}</dd>
           </div>
         ) : null}
         {answer.animal?.sexFa ? (
-          <div className="rounded-md border border-border-subtle px-md py-sm">
+          <div className="rounded-lg border border-border-default px-md py-sm">
             <dt className="text-body-sm text-text-secondary">جنسیت</dt>
             <dd className="mt-2xs text-label-md">{answer.animal.sexFa}</dd>
           </div>
         ) : null}
         {answer.animal?.birthYear ? (
-          <div className="rounded-md border border-border-subtle px-md py-sm">
+          <div className="rounded-lg border border-border-default px-md py-sm">
             <dt className="text-body-sm text-text-secondary">سال تولد</dt>
             <dd className="mt-2xs text-label-md" dir="ltr">
               {answer.animal.birthYear}

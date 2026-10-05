@@ -41,7 +41,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
     <PublicShell actor={guard.actor} title="پرداخت‌ها و رسیدها" pathname="/payments">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">پرداخت‌ها و رسیدها</h1>
+          <h2 className="text-h3">پرداخت‌ها و رسیدها</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             هر پرداخت با مبلغی که در لحظه شروع آن قفل شده ثبت می‌شود. پرداخت وقتی «پرداخت‌شده» است که سرور آن را با درگاه تأیید کرده باشد، نه وقتی مرورگر از درگاه برگشته باشد.
           </p>
@@ -55,7 +55,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
               <li key={line.batchId}>
                 <Link
                   href={'/payments/' + line.batchId}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                   data-testid={'payment-' + line.batchId}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">

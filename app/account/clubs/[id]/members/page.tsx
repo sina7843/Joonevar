@@ -70,7 +70,7 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">در انتظار تصمیم</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>در انتظار تصمیم</span></h2></div>
           {waiting.length === 0 ? (
             <div className="mt-md">
               <EmptyState title="درخواستی در انتظار تصمیم نیست" description="درخواست‌هایی که شرط تأیید دستی دارند اینجا می‌آیند." />
@@ -78,7 +78,7 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
           ) : (
             <ul className="mt-md space-y-md" data-testid="club-membership-queue">
               {waiting.map((entry) => (
-                <li key={entry.membership.id} className="space-y-sm rounded-lg border border-border-subtle p-lg">
+                <li key={entry.membership.id} className="space-y-sm rounded-xl border border-border-default p-lg">
                   <div className="flex flex-wrap items-center justify-between gap-sm">
                     <p className="text-label-lg">{entry.nameFa ?? 'کاربر همزیست'}</p>
                     <StatusBadge tone="warning">{'درخواست ' + (entry.membership.appliedAt ? formatInstantFa(entry.membership.appliedAt) : '')}</StatusBadge>
@@ -91,7 +91,7 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">همه اعضا</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>همه اعضا</span></h2></div>
           {others.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">هنوز کسی در این کلاب عضو نشده است.</p>
           ) : (
@@ -99,7 +99,7 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
               {others.map((entry) => {
                 const status = entry.membership.status as ClubMembershipStatus;
                 return (
-                  <li key={entry.membership.id} className="space-y-sm rounded-lg border border-border-subtle p-lg">
+                  <li key={entry.membership.id} className="space-y-sm rounded-xl border border-border-default p-lg">
                     <div className="flex flex-wrap items-center justify-between gap-sm">
                       <p className="text-label-lg">{entry.nameFa ?? 'کاربر همزیست'}</p>
                       <div className="flex flex-wrap gap-xs">

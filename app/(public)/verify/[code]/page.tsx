@@ -44,7 +44,7 @@ export default async function VerifyByCodePage({ params }: { params: Promise<{ c
       />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">نتیجه استعلام کدی که با QR باز شده است.</p>
       </header>
 

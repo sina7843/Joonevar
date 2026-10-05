@@ -49,7 +49,7 @@ export default async function AccountSuggestionsPage() {
         )}
 
         <Card>
-          <h2 className="text-label-lg">پیشنهادهای شما</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیشنهادهای شما</span></h2></div>
           {suggestions.length === 0 ? (
             <div className="mt-lg">
               <EmptyState
@@ -60,7 +60,7 @@ export default async function AccountSuggestionsPage() {
           ) : (
             <ul className="mt-lg space-y-md" data-testid="my-suggestions">
               {suggestions.map((row) => (
-                <li key={row.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'suggestion-' + row.id}>
+                <li key={row.id} className="rounded-xl border border-border-default p-lg" data-testid={'suggestion-' + row.id}>
                   <div className="flex flex-wrap items-start justify-between gap-sm">
                     <div className="min-w-0">
                       <p className="text-caption text-text-secondary">{SUGGESTION_KIND_FA[row.kind as SuggestionKind]}</p>

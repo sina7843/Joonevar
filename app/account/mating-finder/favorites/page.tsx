@@ -23,7 +23,7 @@ export default async function FinderFavoritesPage() {
     <PublicShell actor={guard.actor} title="علاقه‌مندی‌های جفت‌یابی" pathname="/account/mating-finder">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">علاقه‌مندی‌های جفت‌یابی</h1>
+          <h2 className="text-h3">علاقه‌مندی‌های جفت‌یابی</h2>
           <p className="mt-xs text-caption">
             <Link href="/mating-finder" className="text-text-brand underline underline-offset-4">
               جست‌وجوی جفت

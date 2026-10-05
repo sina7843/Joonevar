@@ -43,9 +43,9 @@ export function DeclareDateForm({
   const suffix = replacesVersion === null ? '' : '-correction';
   return (
     <Card>
-      <h2 className="text-label-lg">
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>
         {replacesVersion === null ? 'اعلام تاریخ جفت‌گیری' : 'اصلاح تاریخ (نسخه جدید)'}
-      </h2>
+      </span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         هر دو طرف می‌توانند یک یا چند تاریخ اعلام کنند. اصلاح، نسخه تازه‌ای می‌سازد و رکورد قبلی حذف
         نمی‌شود؛ نسخه اصلاح‌شده دوباره باید به تأیید طرف مقابل برسد.
@@ -98,7 +98,7 @@ export function RespondToDateForm({
 
   return (
     <Card>
-      <h2 className="text-label-lg">پاسخ شما به نسخه {version}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پاسخ شما به نسخه {version}</span></h2></div>
       <p className="mt-md text-body-sm" data-testid="pending-date-value">
         تاریخ اعلام‌شده: <span dir="ltr" className="font-mono">{matedOn}</span>
       </p>

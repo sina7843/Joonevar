@@ -46,7 +46,7 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
           <div className="flex flex-wrap items-start justify-between gap-md">
             <div className="min-w-0">
               <p className="text-caption text-text-secondary">{KIND_FA[item.kind] + ' · نویسنده: ' + data.authorName}</p>
-              <h1 className="text-h4">{item.titleFa}</h1>
+              <h2 className="text-h3">{item.titleFa}</h2>
             </div>
             <div className="flex flex-wrap gap-xs">
               <StatusBadge tone="neutral">
@@ -79,7 +79,7 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">{'گزارش‌های باز (' + fa(data.open.length) + ')'}</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'گزارش‌های باز (' + fa(data.open.length) + ')'}</span></h2></div>
           {data.open.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="گزارش بازی برای این محتوا نیست" description="تصمیم‌های قبلی پایین همین صفحه آمده‌اند." />
@@ -87,7 +87,7 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
           ) : (
             <ul className="mt-lg space-y-sm" data-testid="open-reports">
               {data.open.map((report) => (
-                <li key={report.id} className="rounded-md border border-border-subtle p-md" data-testid="open-report">
+                <li key={report.id} className="rounded-lg border border-border-default p-md" data-testid="open-report">
                   <p className="text-label-md">{REASON_FA[report.reason]}</p>
                   {report.details ? <p className="mt-xs whitespace-pre-line text-body-sm">{report.details}</p> : null}
                   <p className="mt-xs text-caption text-text-secondary">
@@ -103,10 +103,10 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
 
         {data.decided.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">تصمیم‌های قبلی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم‌های قبلی</span></h2></div>
             <ul className="mt-lg space-y-sm" data-testid="decided-reports">
               {data.decided.map((report) => (
-                <li key={report.id} className="rounded-md border border-border-subtle p-md">
+                <li key={report.id} className="rounded-lg border border-border-default p-md">
                   <div className="flex flex-wrap items-center justify-between gap-sm">
                     <p className="text-label-md">
                       {REASON_FA[report.reason] + (report.decision ? ' ← ' + DECISION_FA[report.decision] : '')}

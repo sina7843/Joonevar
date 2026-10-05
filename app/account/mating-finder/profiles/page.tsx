@@ -26,7 +26,7 @@ export default async function FinderProfilesPage() {
     <PublicShell actor={guard.actor} title="پروفایل‌های جفت‌یابی" pathname="/account/mating-finder">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">پروفایل‌های جفت‌یابی</h1>
+          <h2 className="text-h3">پروفایل‌های جفت‌یابی</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             هیچ حیوانی بدون اقدام شما وارد جفت‌یابی نمی‌شود. برای هر حیوان شرایط ورود، تصویرها و وضعیت را از صفحه همان حیوان
             مدیریت کنید.

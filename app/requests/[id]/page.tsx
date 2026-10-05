@@ -71,7 +71,7 @@ export default async function RequestPage({
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">{SERVICE_TYPE_FA[request.serviceType]}</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{SERVICE_TYPE_FA[request.serviceType]}</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 {CONTEXT_FA[request.context]} · {view.animalName ?? 'بدون نام'}
               </p>
@@ -89,7 +89,7 @@ export default async function RequestPage({
         {referral === null ? null : (
           <Card>
             <h3 className="text-label-lg">کد مراجعه</h3>
-            <p className="mt-md text-h4" data-testid="referral-code">
+            <p className="mt-md text-h3" data-testid="referral-code">
               <Identifier value={referral.code} />
             </p>
             <p className="mt-sm text-caption text-text-secondary">

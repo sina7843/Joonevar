@@ -25,7 +25,7 @@ export default async function AdminRolesPage() {
       <div className="space-y-lg">
         <ContentRoleForm />
         <Card>
-          <h2 className="text-label-lg">نویسندگان و ادمین‌های محتوا</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نویسندگان و ادمین‌های محتوا</span></h2></div>
           {holders.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="هنوز نقشی داده نشده است" description="با فرم بالا نقش نویسنده یا ادمین محتوا را فعال کنید." />
@@ -35,7 +35,7 @@ export default async function AdminRolesPage() {
               {holders.map((holder) => (
                 <li
                   key={holder.accountId + holder.role}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
                   data-testid={'role-holder-' + holder.mobile + '-' + holder.role}
                 >
                   <div className="min-w-0">
@@ -60,7 +60,7 @@ export default async function AdminRolesPage() {
 
         <MarketplaceRoleForm />
         <Card>
-          <h2 className="text-label-lg">نقش‌های عملیاتی بازار و فروشگاه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نقش‌های عملیاتی بازار و فروشگاه</span></h2></div>
           {marketHolders.length === 0 ? (
             <div className="mt-lg">
               <EmptyState
@@ -73,7 +73,7 @@ export default async function AdminRolesPage() {
               {marketHolders.map((holder) => (
                 <li
                   key={holder.accountId + holder.role}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
                   data-testid={'market-role-holder-' + holder.mobile + '-' + holder.role}
                 >
                   <div className="min-w-0">

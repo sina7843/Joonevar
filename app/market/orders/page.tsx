@@ -31,7 +31,7 @@ export default async function MarketOrdersPage() {
   return (
     <OpsShell actor={guard.actor} title="سفارش‌های فروشگاه کالا" nav={marketNav(guard.actor)} pathname="/market/orders">
       <div className="space-y-lg p-lg">
-      <h1 className="text-h2">سفارش‌های فروشگاه کالا</h1>
+      <h2 className="text-h2">سفارش‌های فروشگاه کالا</h2>
 
       {expired > 0 ? (
         <Alert tone="info" title="زیرسفارش‌های بی‌پاسخ لغو شدند">
@@ -50,7 +50,7 @@ export default async function MarketOrdersPage() {
           {rows.map((row) => (
             <li
               key={row.order.id}
-              className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-lg"
+              className="flex flex-wrap items-center justify-between gap-sm rounded-xl border border-border-default p-lg"
               data-testid={'market-order-' + row.order.id}
             >
               <div className="space-y-2xs">

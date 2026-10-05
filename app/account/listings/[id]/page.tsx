@@ -87,7 +87,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
         <Card>
           <div className="flex flex-wrap items-start justify-between gap-sm">
-            <h2 className="text-label-lg">{animal.nameFa ?? 'بدون نام'}</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{animal.nameFa ?? 'بدون نام'}</span></h2></div>
             <StatusBadge tone={status === 'PUBLISHED' ? 'success' : 'neutral'}>
               <span data-testid="listing-status">{LISTING_STATUS_FA[status]}</span>
             </StatusBadge>
@@ -107,7 +107,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">اطلاعات قطعی از پرونده حیوان</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات قطعی از پرونده حیوان</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary">
             این موارد از پرونده حیوان خوانده می‌شوند و از این فرم تغییر نمی‌کنند؛ اصلاحشان از همان مسیری انجام
             می‌شود که ثبتشان کرده است.
@@ -181,7 +181,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">تصاویر و ویدئو</h2>
+          <h2 className="hz-card__title">تصاویر و ویدئو</h2>
           <p className="mt-2xs text-caption text-text-secondary">
             تصاویر تا زمانی که آگهی منتشر است دیده می‌شوند؛ با توقف یا حذف آگهی از دسترس عمومی خارج می‌شوند.
           </p>
@@ -192,7 +192,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               {detail.media.map((item) => (
                 <li
                   key={item.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
                   data-testid={'media-row-' + item.id}
                 >
                   <div className="min-w-0">
@@ -213,7 +213,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">اطلاعات آگهی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات آگهی</span></h2></div>
           {!editable ? (
             <p className="mt-sm text-caption text-text-disabled">
               آگهی در وضعیت «{LISTING_STATUS_FA[status]}» قابل ویرایش نیست.
@@ -243,7 +243,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">اظهارات فعلی و روش‌های تحویل</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اظهارات فعلی و روش‌های تحویل</span></h2></div>
           <ul className="mt-lg space-y-2xs text-body-sm" data-testid="listing-disclosures">
             <li>
               واکسیناسیون:{' '}
@@ -262,7 +262,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">وضعیت آگهی</h2>
+          <h2 className="hz-card__title">وضعیت آگهی</h2>
           {detail.blockers.length > 0 ? (
             <div className="mt-md">
               <Alert tone="warning" title="برای انتشار، این موارد باقی مانده است">
@@ -290,7 +290,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تبلیغ آگهی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تبلیغ آگهی</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="promotion-note">
             بسته تبلیغ فقط جایگاه نمایش آگهی را در نتایج مرتبط بالاتر می‌برد و همیشه با برچسب «تبلیغ» دیده
             می‌شود. روی اعتبار، تأیید یا امتیاز شما هیچ اثری ندارد و در تاریخ خودش تمام می‌شود.
@@ -300,7 +300,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               {promotions.map((promotion) => (
                 <li
                   key={promotion.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
                   data-testid={'promotion-row-' + promotion.id}
                 >
                   <span>{promotion.packageLabelFa}</span>
@@ -327,10 +327,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
         {listingAppeals.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">اعتراض‌های من درباره این آگهی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعتراض‌های من درباره این آگهی</span></h2></div>
             <ul className="mt-lg space-y-sm text-body-sm" data-testid="my-appeals">
               {listingAppeals.map((appeal) => (
-                <li key={appeal.id} className="rounded-lg border border-border-subtle p-md">
+                <li key={appeal.id} className="rounded-lg border border-border-default p-md">
                   <p>{appeal.statementFa}</p>
                   <p className="mt-2xs text-caption text-text-secondary">
                     {appeal.status === 'OPEN'
@@ -348,14 +348,14 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
         {appealable.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">اعتراض به تصمیم ناظر</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعتراض به تصمیم ناظر</span></h2></div>
             <p className="mt-2xs text-caption text-text-secondary">
               اگر این تصمیم را درست نمی‌دانید، دلیلتان را بنویسید. تصمیم قبلی حذف نمی‌شود؛ پاسخ اعتراض کنار
               آن ثبت می‌شود.
             </p>
             <ul className="mt-lg space-y-md" data-testid="appealable-reports">
               {appealable.map((report) => (
-                <li key={report.id} className="rounded-lg border border-border-subtle p-md">
+                <li key={report.id} className="rounded-lg border border-border-default p-md">
                   <p className="text-body-sm">{report.decisionReason ?? 'بدون دلیل ثبت‌شده'}</p>
                   <AppealForm reportId={report.id} />
                 </li>
@@ -365,10 +365,10 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌ها</span></h2></div>
           <ul className="mt-lg space-y-sm text-body-sm" data-testid="listing-revisions">
             {detail.revisions.map((revision) => (
-              <li key={revision.number} className="rounded-lg border border-border-subtle p-md">
+              <li key={revision.number} className="rounded-lg border border-border-default p-md">
                 <p className="text-label-md">
                   نسخه {revision.number.toLocaleString('fa-IR')} — {revision.action}
                 </p>

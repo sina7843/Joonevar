@@ -31,7 +31,7 @@ export default async function MyReviewsPage() {
     <PublicShell actor={guard.actor} title="نظرهای من" pathname="/account/reviews">
       <div className="space-y-lg p-lg">
         <Card>
-          <h2 className="text-label-lg">خریدهایی که می‌توانید درباره‌شان بنویسید</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>خریدهایی که می‌توانید درباره‌شان بنویسید</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="reviewable-note">
             نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد؛ همین است که آن را قابل اتکا می‌کند.
           </p>
@@ -44,7 +44,7 @@ export default async function MyReviewsPage() {
               {pending.map((purchase) => (
                 <li
                   key={purchase.subOrderId}
-                  className="space-y-sm rounded-md border border-border-subtle p-lg"
+                  className="space-y-sm rounded-lg border border-border-default p-lg"
                   data-testid={'reviewable-' + purchase.subOrderId}
                 >
                   <p className="text-label-sm">
@@ -63,7 +63,7 @@ export default async function MyReviewsPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">نظرهای ثبت‌شده شما</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نظرهای ثبت‌شده شما</span></h2></div>
           {mine.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="my-reviews-empty">
               هنوز نظری ثبت نکرده‌اید.

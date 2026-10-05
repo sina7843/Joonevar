@@ -55,7 +55,7 @@ export default async function AdminVetsPage() {
               {locations.map(({ vet, rows }) => (
                 <li key={vet.id}>
                   <Card>
-                    <h2 className="text-label-lg">{vet.displayNameFa}</h2>
+                    <h2 className="hz-card__title">{vet.displayNameFa}</h2>
                     <p className="mt-2xs text-caption text-text-secondary">
                       کد نظام دامپزشکی {vet.councilCode}
                     </p>
@@ -76,7 +76,7 @@ export default async function AdminVetsPage() {
                         {rows.map((location) => {
                           const microchip = eligibilityOf(location, 'MICROCHIP');
                           return (
-                            <li key={location.id} className="rounded-lg border border-border-subtle p-lg">
+                            <li key={location.id} className="rounded-xl border border-border-default p-lg">
                               <div className="flex items-start justify-between gap-md">
                                 <div className="min-w-0">
                                   <h3 className="text-label-md">{location.nameFa}</h3>

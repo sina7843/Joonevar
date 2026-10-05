@@ -65,7 +65,7 @@ export default async function ListingModerationPage() {
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">آگهی‌های گزارش‌شده</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>آگهی‌های گزارش‌شده</span></h2></div>
           {queue.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="گزارش بازی نیست" description="هر گزارش تازه همین‌جا با دلیل و سابقه‌اش می‌آید." />
@@ -75,7 +75,7 @@ export default async function ListingModerationPage() {
               {queue.map((entry) => (
                 <li
                   key={entry.listingId}
-                  className="rounded-lg border border-border-subtle p-md"
+                  className="rounded-lg border border-border-default p-md"
                   data-testid={'queue-row-' + entry.listingId}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">
@@ -138,7 +138,7 @@ export default async function ListingModerationPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">اعتراض‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعتراض‌ها</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary">
             پذیرفتن اعتراض تصمیم قبلی را بازنویسی نمی‌کند؛ هر دو در تاریخچه می‌مانند و آگهی از همان مسیری که
             متوقف شد برمی‌گردد.
@@ -152,7 +152,7 @@ export default async function ListingModerationPage() {
               {appeals.map((appeal) => (
                 <li
                   key={appeal.id}
-                  className="rounded-lg border border-border-subtle p-md"
+                  className="rounded-lg border border-border-default p-md"
                   data-testid={'appeal-row-' + appeal.id}
                 >
                   <p className="text-label-md">{appeal.listingTitleFa ?? 'آگهی'}</p>

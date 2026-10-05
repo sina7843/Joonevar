@@ -61,7 +61,7 @@ export default async function ForeignPedigreePage({ params }: { params: Promise<
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div>
-              <h2 className="text-label-lg">وضعیت پرونده</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت پرونده</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 بررسی با انجمن و بر اساس فهرست صادرکنندگان موردتأیید آن انجام می‌شود. زمان ثابتی برای پایان
                 بررسی وعده داده نمی‌شود.

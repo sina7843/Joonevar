@@ -48,7 +48,7 @@ export function StartPermitForm({
 
   return (
     <Card>
-      <h2 className="text-label-lg">شروع مجوز رسمی جفت‌گیری</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شروع مجوز رسمی جفت‌گیری</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         این مسیر رسمی است و پرونده، شناسه و وضعیت جدا از «اعلام توافق شخصی» دارد.
       </p>
@@ -164,7 +164,7 @@ export function AllocationRuleForm({
 
   return (
     <Card>
-      <h2 className="text-label-lg">توافق تقسیم (Allocation Rule)</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توافق تقسیم (Allocation Rule)</span></h2></div>
       <p className="mt-md text-caption text-text-secondary" data-testid="pre-birth-note">
         {PRE_BIRTH_RULE_NOTE_FA}
       </p>

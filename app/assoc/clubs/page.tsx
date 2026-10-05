@@ -26,14 +26,14 @@ export default async function AssocClubsPage() {
     <OpsShell actor={guard.actor} title="کلاب‌ها" pathname="/assoc/clubs" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">تأیید کلاب‌ها</h1>
+          <h2 className="text-h3">تأیید کلاب‌ها</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             تأیید اولیه کلاب و تصمیم درباره مالکیت آن با انجمن است. هر تصمیم دلیل می‌خواهد و در تاریخچه می‌ماند.
           </p>
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">در انتظار بررسی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>در انتظار بررسی</span></h2></div>
           {queue.waiting.length === 0 ? (
             <div className="mt-md">
               <EmptyState title="کلابی در انتظار بررسی نیست" description="کلاب‌های تازه پس از تکمیل معرفی و راه ارتباطی به این صف می‌آیند." />
@@ -44,7 +44,7 @@ export default async function AssocClubsPage() {
                 <li key={club.id}>
                   <Link
                     href={'/assoc/clubs/' + club.id}
-                    className="block rounded-lg border border-border-subtle p-lg hover:border-border-brand"
+                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
                     data-testid={'club-queue-' + club.id}
                   >
                     <p className="text-label-lg">{club.displayNameFa}</p>
@@ -57,13 +57,13 @@ export default async function AssocClubsPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">درخواست‌های مالکیت</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌های مالکیت</span></h2></div>
           {queue.requests.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">درخواست بازی درباره مالکیت کلاب‌ها نیست.</p>
           ) : (
             <ul className="mt-md space-y-md" data-testid="club-ownership-queue">
               {queue.requests.map((row) => (
-                <li key={row.request.id} className="space-y-sm rounded-lg border border-border-subtle p-lg">
+                <li key={row.request.id} className="space-y-sm rounded-xl border border-border-default p-lg">
                   <div className="flex flex-wrap items-center justify-between gap-sm">
                     <p className="text-label-lg">{row.club.displayNameFa}</p>
                     <StatusBadge tone="warning">{CLUB_OWNERSHIP_KIND_FA[row.request.kind as ClubOwnershipKind]}</StatusBadge>

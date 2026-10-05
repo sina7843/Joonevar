@@ -32,7 +32,7 @@ export default async function AccountClubsPage() {
     <PublicShell actor={guard.actor} title="کلاب من" pathname="/account/clubs">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">کلاب‌های شما</h1>
+          <h2 className="text-h3">کلاب‌های شما</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             هر نقش فقط در همان کلاب کار می‌کند. کلاب تازه به‌صورت پیش‌نویس ساخته می‌شود و پس از تأیید انجمن می‌تواند صفحه عمومی داشته باشد.
           </p>
@@ -46,7 +46,7 @@ export default async function AccountClubsPage() {
               <li key={row.club.id}>
                 <Link
                   href={'/account/clubs/' + row.club.id}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                   data-testid={'my-club-' + row.club.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">

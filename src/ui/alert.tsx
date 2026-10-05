@@ -3,27 +3,20 @@ import type { StatusTone } from './status.tsx';
 import { Icon } from './icon.tsx';
 import type { IconName } from './icon-paths.ts';
 
-const TONE: Record<StatusTone, string> = {
-  neutral: 'bg-status-neutral-bg border-status-neutral-border text-status-neutral-text',
-  info: 'bg-status-info-bg border-status-info-border text-status-info-text',
-  success: 'bg-status-success-bg border-status-success-border text-status-success-text',
-  warning: 'bg-status-warning-bg border-status-warning-border text-status-warning-text',
-  error: 'bg-status-error-bg border-status-error-border text-status-error-text',
-};
-
 /**
- * Alert — reason for a lock, a limitation, a correction request or a warning.
+ * Alert — DS *Alert* (`.hz-alert`): reason for a lock, a limitation, a
+ * correction request or a warning, in the tone of its status family.
  *
- * `role="alert"` is used only for messages the user must notice now (errors and
- * corrections). Advisory notices use `role="status"`, so a cooldown warning is
+ * `role="alert"` only for what the user must notice now (errors and
+ * corrections); advisory notices use `role="status"`, so a cooldown warning is
  * not announced with the urgency of a rejection (§24.3).
  */
 const GLYPH: Record<StatusTone, IconName> = {
   neutral: 'info',
   info: 'info',
-  success: 'check',
+  success: 'checkCircle',
   warning: 'warning',
-  error: 'warning',
+  error: 'warningCircle',
 };
 
 export function Alert({
@@ -39,18 +32,15 @@ export function Alert({
 }) {
   const urgent = tone === 'error' || tone === 'warning';
   return (
-    <div
-      role={urgent ? 'alert' : 'status'}
-      className={['rounded-lg border p-lg', TONE[tone]].join(' ')}
-    >
+    <div role={urgent ? 'alert' : 'status'} className={'hz-alert hz-alert--' + tone}>
       {/* The glyph repeats the tone the colour already carries, so it stays out
           of the accessibility tree; the title is what is announced. */}
-      <p className="flex items-start gap-sm text-label-lg">
-        <Icon name={GLYPH[tone]} size="sm" className="mt-2xs" />
-        <span>{title}</span>
-      </p>
-      {children ? <div className="mt-sm text-body-sm text-text-secondary">{children}</div> : null}
-      {action ? <div className="mt-md">{action}</div> : null}
+      <Icon name={GLYPH[tone]} size="sm" className="hz-alert__icon" />
+      <div className="hz-alert__body">
+        <span className="hz-alert__title">{title}</span>
+        {children ? <div>{children}</div> : null}
+        {action ? <div className="hz-alert__actions">{action}</div> : null}
+      </div>
     </div>
   );
 }

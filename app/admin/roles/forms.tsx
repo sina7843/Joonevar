@@ -14,7 +14,7 @@ export function ContentRoleForm() {
   const [state, submit, pending] = useActionState(setContentRoleAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">فعال‌سازی یا تعلیق نقش محتوا</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فعال‌سازی یا تعلیق نقش محتوا</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         نویسنده و ادمین محتوا نقش‌های مستقل‌اند و از هیچ نقش دیگری به ارث نمی‌رسند. صاحب شماره باید یک‌بار وارد همزیست شده باشد.
       </p>
@@ -62,7 +62,7 @@ export function MarketplaceRoleForm() {
   const [state, submit, pending] = useActionState(setMarketplaceRoleAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">فعال‌سازی یا تعلیق نقش بازار</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فعال‌سازی یا تعلیق نقش بازار</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         شش نقش عملیاتی بازار و فروشگاه مستقل‌اند و از هیچ نقش دیگری به ارث نمی‌رسند. هر نقش فقط محیط
         <bdi className="hz-ltr font-mono"> /market </bdi>

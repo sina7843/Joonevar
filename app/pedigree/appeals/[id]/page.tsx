@@ -51,7 +51,7 @@ export default async function AppealPage({ params }: { params: Promise<{ id: str
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <h2 className="text-label-lg">وضعیت اعتراض</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت اعتراض</span></h2></div>
             <StatusBadge tone={appeal.status === 'ANSWERED' ? 'success' : 'info'}>
               <span data-testid="appeal-status">{APPEAL_STATUS_FA[appeal.status]}</span>
             </StatusBadge>

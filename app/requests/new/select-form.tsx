@@ -50,7 +50,7 @@ export function SelectAnimalsForm({
 
   return (
     <Card>
-      <h2 className="text-label-lg">انتخاب حیوان و نوع خدمت</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب حیوان و نوع خدمت</span></h2></div>
       {single ? null : (
         <p className="mt-md text-caption text-text-secondary">
           نوع خدمت هر حیوان جداگانه انتخاب می‌شود؛ انتخاب یک حیوان روی بقیه اثری ندارد.
@@ -66,7 +66,7 @@ export function SelectAnimalsForm({
         {animals.map((animal) => {
           const selected = chosen[animal.id];
           return (
-            <li key={animal.id} className="rounded-lg border border-border-subtle p-lg">
+            <li key={animal.id} className="rounded-xl border border-border-default p-lg">
               <label className="flex items-center gap-sm text-body-sm">
                 <input
                   type="checkbox"

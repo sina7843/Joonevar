@@ -51,7 +51,7 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">پرونده مجوز جفت‌گیری</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده مجوز جفت‌گیری</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 {view.initiatorName + ' و ' + view.counterpartyName}
               </p>
@@ -109,7 +109,7 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
 
         {permit.status === 'UNDER_REVIEW' ? (
           <Card>
-            <h2 className="text-label-lg">تصمیم عملیاتی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم عملیاتی</span></h2></div>
             <PermitReviewForm permitId={permit.id} version={permit.version} />
           </Card>
         ) : (

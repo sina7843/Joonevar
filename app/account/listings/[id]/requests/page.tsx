@@ -61,7 +61,7 @@ export default async function ListingRequestsPage({ params }: { params: Promise<
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">درخواست‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌ها</span></h2></div>
           {requests.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="requests-empty">
               هنوز درخواستی برای این آگهی ثبت نشده است.
@@ -71,7 +71,7 @@ export default async function ListingRequestsPage({ params }: { params: Promise<
               {requests.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-md border border-border-subtle p-md"
+                  className="rounded-lg border border-border-default p-md"
                   data-testid={'listing-request-' + row.id}
                 >
                   <div className="flex flex-wrap items-center gap-sm">

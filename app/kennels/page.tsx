@@ -41,7 +41,7 @@ export default async function KennelsPage({
           <Card>
             <div className="flex items-start justify-between gap-md">
               <div className="min-w-0">
-                <h2 className="text-label-lg">{kennel.nameFa ?? 'کنل بدون نام'}</h2>
+                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{kennel.nameFa ?? 'کنل بدون نام'}</span></h2></div>
                 <p className="mt-2xs text-caption text-text-secondary">
                   {[kennel.provinceFa, kennel.cityFa].filter(Boolean).join(' · ') || 'نشانی ثبت نشده'}
                 </p>
@@ -70,7 +70,7 @@ export default async function KennelsPage({
           </Card>
         ) : eligibility.allowed ? (
           <Card>
-            <h2 className="text-label-lg">ثبت کنل</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت کنل</span></h2></div>
             <p className="mt-md text-caption text-text-secondary">
               مسیر: تکمیل فرم و انتخاب نژادها → مرور → پرداخت → ارسال → بررسی انجمن. مدرک اضافه‌ای خواسته
               نمی‌شود و پرداخت جداگانه‌ای برای «فعال‌سازی نقش» وجود ندارد.

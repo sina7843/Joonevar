@@ -25,7 +25,7 @@ export default async function AdminCommunitiesPage() {
         <CommunityCreateForm surface="admin" />
 
         <Card>
-          <h2 className="text-label-lg">انجمن‌ها و کلاب‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انجمن‌ها و کلاب‌ها</span></h2></div>
           {rows.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="هنوز رکوردی ثبت نشده است" description="با فرم بالا اولین انجمن یا کلاب را ثبت کنید." />
@@ -36,7 +36,7 @@ export default async function AdminCommunitiesPage() {
                 <li key={row.community.id}>
                   <Link
                     href={'/admin/communities/' + row.community.id}
-                    className="block rounded-lg border border-border-subtle p-lg hover:border-border-brand"
+                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
                     data-testid={'community-row-' + row.community.id}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-sm">

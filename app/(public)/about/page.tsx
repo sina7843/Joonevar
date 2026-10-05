@@ -39,15 +39,15 @@ export default function AboutPage() {
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-md">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">
           همزیست سامانه‌ای فارسی برای ثبت و پیگیری هویت، نسب، اسناد و چرخه تولیدمثل سگ‌هاست. مالک، پرورش‌دهنده،
           دامپزشک معتمد، انجمن و مرکز ژنتیک هر کدام در محیط خودشان همان پرونده مشترک را پیش می‌برند.
         </p>
       </header>
 
-      <section aria-labelledby="official-title" className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
-        <h2 id="official-title" className="text-h4">
+      <section aria-labelledby="official-title" className="rounded-xl border border-border-default bg-bg-surface p-lg">
+        <h2 id="official-title" className="text-h3">
           چه چیزی رسمی ثبت می‌شود
         </h2>
         <ul className="mt-md list-disc space-y-sm ps-xl text-body-md">
@@ -57,8 +57,8 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="privacy-title" className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
-        <h2 id="privacy-title" className="text-h4">
+      <section aria-labelledby="privacy-title" className="rounded-xl border border-border-default bg-bg-surface p-lg">
+        <h2 id="privacy-title" className="text-h3">
           از اطلاعات شما چگونه محافظت می‌شود
         </h2>
         <ul className="mt-md list-disc space-y-sm ps-xl text-body-md">

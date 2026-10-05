@@ -86,17 +86,17 @@ export default async function ParentageTestPage() {
       <JsonLdScript data={faqLd({ path: '/parentage-test', questions: FAQ }, origin)} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">{DESCRIPTION}</p>
       </header>
 
       <section aria-labelledby="parentage-facts-title" className="space-y-md">
-        <h2 id="parentage-facts-title" className="text-h5">
+        <h2 id="parentage-facts-title" className="text-h4">
           در یک نگاه
         </h2>
         <dl className="grid gap-md sm:grid-cols-2" data-testid="parentage-facts">
           {FACTS.map((fact) => (
-            <div key={fact.title} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <div key={fact.title} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <dt className="text-label-lg">{fact.title}</dt>
               <dd className="mt-xs text-body-sm text-text-secondary">{fact.body}</dd>
             </div>
@@ -105,7 +105,7 @@ export default async function ParentageTestPage() {
       </section>
 
       <section aria-labelledby="parentage-steps-title" className="space-y-md">
-        <h2 id="parentage-steps-title" className="text-h5">
+        <h2 id="parentage-steps-title" className="text-h4">
           مراحل
         </h2>
         <ol className="list-decimal space-y-sm pr-lg text-body-md" data-testid="parentage-steps">
@@ -122,12 +122,12 @@ export default async function ParentageTestPage() {
       </section>
 
       <section aria-labelledby="parentage-faq-title" className="space-y-md">
-        <h2 id="parentage-faq-title" className="text-h5">
+        <h2 id="parentage-faq-title" className="text-h4">
           پرسش‌های پرتکرار
         </h2>
         <dl className="space-y-md" data-testid="parentage-faq">
           {FAQ.map((entry) => (
-            <div key={entry.question} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <div key={entry.question} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <dt className="text-label-lg">{entry.question}</dt>
               <dd className="mt-xs text-body-sm text-text-secondary">{entry.answer}</dd>
             </div>
@@ -137,7 +137,7 @@ export default async function ParentageTestPage() {
 
       {related.items.length > 0 ? (
         <section aria-labelledby="parentage-related-title" className="space-y-md">
-          <h2 id="parentage-related-title" className="text-h5">
+          <h2 id="parentage-related-title" className="text-h4">
             خواندن بیشتر
           </h2>
           <ul className="space-y-sm" data-testid="parentage-related">

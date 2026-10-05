@@ -77,7 +77,7 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-md">
             <div>
-              <h1 className="text-h4">{panel === 'author' ? 'نوشته‌های من' : 'همه محتوا'}</h1>
+              <h1 className="text-h3">{panel === 'author' ? 'نوشته‌های من' : 'همه محتوا'}</h1>
               <p className="text-body-sm text-text-secondary">
                 {panel === 'author'
                   ? 'آموزش و خبری که نوشته‌اید، با وضعیت انتشار هرکدام.'
@@ -91,7 +91,7 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
           <form method="get" action={base} className="mt-lg flex flex-wrap items-end gap-md" data-testid="panel-filter">
             <label className="space-y-xs text-label-md">
               <span className="block">وضعیت</span>
-              <select name="status" defaultValue={status ?? ''} className="min-h-[var(--size-control-md)] rounded-md border border-border-subtle bg-bg-surface px-md text-body-sm">
+              <select name="status" defaultValue={status ?? ''} className="min-h-[var(--size-control-md)] rounded-md border border-border-control bg-bg-surface px-md text-body-sm">
                 <option value="">همه</option>
                 {CONTENT_STATUSES.map((value) => (
                   <option key={value} value={value}>
@@ -103,7 +103,7 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
             {panel === 'content' ? (
               <label className="space-y-xs text-label-md">
                 <span className="block">نوع</span>
-                <select name="kind" defaultValue={kind ?? ''} className="min-h-[var(--size-control-md)] rounded-md border border-border-subtle bg-bg-surface px-md text-body-sm">
+                <select name="kind" defaultValue={kind ?? ''} className="min-h-[var(--size-control-md)] rounded-md border border-border-control bg-bg-surface px-md text-body-sm">
                   <option value="">همه</option>
                   {CONTENT_KINDS.filter((value) => value !== 'CLUB_POST').map((value) => (
                     <option key={value} value={value}>
@@ -133,7 +133,7 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
               <li key={item.id}>
                 <Link
                   href={editorPathFor(panel, item.id)}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                   data-testid={'panel-item-' + item.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">
@@ -216,7 +216,7 @@ export async function ContentEditorView({ actor, panel, contentId }: { actor: Ac
           <div className="flex flex-wrap items-start justify-between gap-md">
             <div className="min-w-0">
               <p className="text-caption text-text-secondary">{KIND_FA[row.kind]}</p>
-              <h1 className="text-h4">{row.titleFa}</h1>
+              <h1 className="text-h3">{row.titleFa}</h1>
             </div>
             <div className="flex flex-wrap gap-xs">
               <StatusBadge tone={STATUS_TONE[row.status]}>
@@ -286,10 +286,10 @@ export async function ContentEditorView({ actor, panel, contentId }: { actor: Ac
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">نسخه‌ها</h2>
+          <h2 className="hz-card__title">نسخه‌ها</h2>
           <ul className="mt-lg space-y-sm" data-testid="content-revisions">
             {data.revisions.map((revision) => (
-              <li key={revision.number} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle p-md">
+              <li key={revision.number} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md">
                 <div>
                   <p className="text-label-md">{'نسخه ' + fa(revision.number)}</p>
                   <p className="text-caption text-text-secondary">

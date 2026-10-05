@@ -50,7 +50,7 @@ export default async function GeneticsReceiptPage({ params }: { params: Promise<
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <h2 className="text-label-lg">فیش پرداخت مستقیم</h2>
+            <h2 className="hz-card__title">فیش پرداخت مستقیم</h2>
             <StatusBadge tone="info">
               <span data-testid="centre-receipt-status">{RECEIPT_STATUS_FA[receipt.status]}</span>
             </StatusBadge>

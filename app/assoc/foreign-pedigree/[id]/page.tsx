@@ -51,7 +51,7 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
     <OpsShell actor={guard.actor} title="بررسی Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">اطلاعات پرونده</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات پرونده</span></h2></div>
           <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
             <dt className="text-text-secondary">حیوان</dt>
             <dd>{animal?.name ?? 'بدون نام'}</dd>
@@ -67,7 +67,7 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">مدارک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدارک</span></h2></div>
           <ul className="mt-md space-y-sm text-body-sm">
             <li>
               {record.frontFileId ? (
@@ -104,7 +104,7 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
 
         {record.status === 'UNDER_REVIEW' ? (
           <Card>
-            <h2 className="text-label-lg">ثبت نتیجه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
             <p className="mt-2xs text-caption text-text-secondary">
               مبنای تأیید، فهرست صادرکنندگان موردتأیید انجمن است. زمان ثابتی برای پایان بررسی وعده داده نمی‌شود.
             </p>

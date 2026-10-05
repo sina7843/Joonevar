@@ -1,0 +1,18 @@
+# role route — screens checked against the design system key screens (K1–K19)
+- /
+- /login
+- /articles
+- /veterinarians
+- /animals-market
+- /shop
+- /verify
+owner /dashboard
+owner /animals
+owner /requests
+vet /vet
+assoc /assoc
+assoc /assoc/kyc
+genetics /genetics/samples
+admin /admin/settings
+market /market
+content /content/reports

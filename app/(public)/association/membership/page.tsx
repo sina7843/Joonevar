@@ -70,12 +70,12 @@ export default async function AssociationMembershipPage() {
       <JsonLdScript data={faqLd({ path: '/association/membership', questions: FAQ }, origin)} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">{DESCRIPTION}</p>
       </header>
 
       <section aria-labelledby="membership-steps-title" className="space-y-md">
-        <h2 id="membership-steps-title" className="text-h5">
+        <h2 id="membership-steps-title" className="text-h4">
           مسیر عضویت
         </h2>
         <ol className="list-decimal space-y-sm pr-lg text-body-md" data-testid="membership-steps">
@@ -89,11 +89,11 @@ export default async function AssociationMembershipPage() {
       </section>
 
       <section aria-labelledby="membership-terms-title" className="space-y-md">
-        <h2 id="membership-terms-title" className="text-h5">
+        <h2 id="membership-terms-title" className="text-h4">
           متن شرایط عضویت
         </h2>
         {terms.configured ? (
-          <div className="rounded-lg border border-border-subtle bg-bg-surface p-lg" data-testid="membership-terms">
+          <div className="rounded-xl border border-border-default bg-bg-surface p-lg" data-testid="membership-terms">
             <RichText source={String(terms.value)} />
           </div>
         ) : (
@@ -106,12 +106,12 @@ export default async function AssociationMembershipPage() {
       </section>
 
       <section aria-labelledby="membership-faq-title" className="space-y-md">
-        <h2 id="membership-faq-title" className="text-h5">
+        <h2 id="membership-faq-title" className="text-h4">
           پرسش‌های پرتکرار
         </h2>
         <dl className="space-y-md" data-testid="membership-faq">
           {FAQ.map((entry) => (
-            <div key={entry.question} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <div key={entry.question} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <dt className="text-label-lg">{entry.question}</dt>
               <dd className="mt-xs text-body-sm text-text-secondary">{entry.answer}</dd>
             </div>

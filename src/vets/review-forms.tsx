@@ -66,7 +66,7 @@ export function ReviewPanel({ review, isSuperadmin }: { review: ReviewPanelState
           <input type="hidden" name="caseType" value={review.caseType} />
           <p className="text-caption text-text-secondary">{'بررسی‌ها برای نسخه ' + review.submissionVersion.toLocaleString('fa-IR') + ' ثبت می‌شوند. برای موردی که درست نیست توضیح لازم است.'}</p>
           {review.checks.map((check) => (
-            <fieldset key={check.code} className="space-y-xs rounded-md border border-border-subtle p-md" data-testid={'review-check-' + check.code}>
+            <fieldset key={check.code} className="space-y-xs rounded-lg border border-border-default p-md" data-testid={'review-check-' + check.code}>
               <legend className="px-2xs text-label-md">{check.labelFa}</legend>
               <div className="flex flex-wrap gap-md">
                 {REVIEW_CHECK_RESULTS.map((result) => (
@@ -120,7 +120,7 @@ export function ReviewPanel({ review, isSuperadmin }: { review: ReviewPanelState
  */
 export function DocumentPreview({ fileId, labelFa, testId }: { fileId: string; labelFa: string; testId: string }) {
   return (
-    <details className="rounded-md border border-border-subtle p-sm" data-testid={testId}>
+    <details className="rounded-lg border border-border-default p-sm" data-testid={testId}>
       <summary className="cursor-pointer text-label-md">{'پیش‌نمایش ' + labelFa}</summary>
       <iframe
         src={'/api/files/' + fileId}

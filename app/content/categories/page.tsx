@@ -22,7 +22,7 @@ export default async function ContentCategoriesPage() {
       <div className="space-y-lg">
         <CreateCategoryForm kinds={creatableKinds('CONTENT_ADMIN').map((value) => ({ value, label: KIND_FA[value] }))} />
         <Card>
-          <h2 className="text-label-lg">دسته‌ها</h2>
+          <h2 className="hz-card__title">دسته‌ها</h2>
           {categories.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="هنوز دسته‌ای نیست" description="دسته‌ها اختیاری‌اند؛ برای مرتب‌کردن آموزش‌ها و خبرها بسازید." />
@@ -30,7 +30,7 @@ export default async function ContentCategoriesPage() {
           ) : (
             <ul className="mt-lg space-y-sm" data-testid="category-list">
               {categories.map((category) => (
-                <li key={category.id} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle p-md">
+                <li key={category.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md">
                   <div>
                     <p className="text-label-md">{category.nameFa}</p>
                     <p className="text-caption text-text-secondary">

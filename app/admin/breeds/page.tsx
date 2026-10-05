@@ -38,12 +38,12 @@ export default async function AdminBreedsPage() {
         <AddBreedForm />
 
         <Card>
-          <h2 className="text-label-lg">فهرست مرجع نژادها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فهرست مرجع نژادها</span></h2></div>
           <ul className="mt-lg space-y-md" data-testid="breed-list">
             {rows.map((row) => (
               <li
                 key={row.id}
-                className="rounded-lg border border-border-subtle p-lg"
+                className="rounded-xl border border-border-default p-lg"
                 data-testid={'breed-' + row.nameEn}
               >
                 <div className="flex items-start justify-between gap-md">

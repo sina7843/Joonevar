@@ -102,7 +102,7 @@ export default async function VeterinarianPage({ params }: Params) {
 
       <header className="space-y-sm">
         <RecordImage priority fileId={page.imageFileId} altFa={page.imageAltFa} className="mb-lg" />
-        <h1 className="text-h3 md:text-h1">{page.nameFa}</h1>
+        <h1 className="text-h2 md:text-h1">{page.nameFa}</h1>
         {page.headlineFa ? <p className="text-body-md text-text-secondary">{page.headlineFa}</p> : null}
         {/* Each axis is its own badge; none of them implies another (P2-D05). */}
         <div className="flex flex-wrap gap-xs" data-testid="vet-axes">
@@ -144,7 +144,7 @@ export default async function VeterinarianPage({ params }: Params) {
 
       <dl className="grid gap-sm sm:grid-cols-2" data-testid="vet-facts">
         {page.councilCode ? (
-          <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
             <dt className="text-body-sm text-text-secondary">کد نظام دامپزشکی</dt>
             <dd className="text-label-md" dir="ltr" data-testid="vet-council-code">
               {page.councilCode}
@@ -152,7 +152,7 @@ export default async function VeterinarianPage({ params }: Params) {
           </div>
         ) : null}
         {page.phone ? (
-          <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
             <dt className="text-body-sm text-text-secondary">تلفن عمومی</dt>
             <dd className="text-label-md" dir="ltr" data-testid="vet-phone">
               <a href={'tel:' + page.phone}>{page.phone}</a>
@@ -160,7 +160,7 @@ export default async function VeterinarianPage({ params }: Params) {
           </div>
         ) : null}
         {page.specialtiesFa.length > 0 ? (
-          <div className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm sm:col-span-2">
+          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
             <dt className="text-body-sm text-text-secondary">تخصص‌ها</dt>
             <dd className="mt-2xs text-label-md" data-testid="vet-specialties">
               {page.specialtiesFa.join('، ')}
@@ -168,7 +168,7 @@ export default async function VeterinarianPage({ params }: Params) {
           </div>
         ) : null}
         {page.speciesFa.length > 0 ? (
-          <div className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm sm:col-span-2">
+          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
             <dt className="text-body-sm text-text-secondary">گونه‌هایی که پذیرفته می‌شوند</dt>
             <dd className="mt-2xs text-label-md" data-testid="vet-species">
               {page.speciesFa.join('، ')}
@@ -179,7 +179,7 @@ export default async function VeterinarianPage({ params }: Params) {
 
       {page.bioFa ? (
         <section aria-labelledby="vet-bio-title">
-          <h2 id="vet-bio-title" className="text-h4">
+          <h2 id="vet-bio-title" className="text-h3">
             معرفی
           </h2>
           <Prose text={page.bioFa} />
@@ -188,7 +188,7 @@ export default async function VeterinarianPage({ params }: Params) {
 
       {page.experienceFa ? (
         <section aria-labelledby="vet-experience-title">
-          <h2 id="vet-experience-title" className="text-h4">
+          <h2 id="vet-experience-title" className="text-h3">
             سوابق
           </h2>
           <Prose text={page.experienceFa} />
@@ -197,7 +197,7 @@ export default async function VeterinarianPage({ params }: Params) {
 
       {page.locations.length === 0 && !page.listed ? null : (
       <section aria-labelledby="vet-locations-title">
-        <h2 id="vet-locations-title" className="text-h4">
+        <h2 id="vet-locations-title" className="text-h3">
           محل‌های کار
         </h2>
         {page.listed ? (
@@ -208,7 +208,7 @@ export default async function VeterinarianPage({ params }: Params) {
         ) : null}
         <ul className="mt-md space-y-sm" data-testid="vet-locations">
           {page.locations.map((location) => (
-            <li key={location.id} className="rounded-lg border border-border-subtle bg-bg-surface p-md" data-testid="vet-location">
+            <li key={location.id} className="rounded-lg border border-border-default bg-bg-surface p-md" data-testid="vet-location">
               <p className="text-label-lg">{location.nameFa}</p>
               <p className="mt-2xs flex items-center gap-2xs text-body-sm text-text-secondary">
                 <Icon name="mapPin" size="xs" />

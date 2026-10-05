@@ -1,20 +1,38 @@
-import Image from 'next/image';
+import { LOCKUP_FA, SYMBOL } from '../brand/assets.ts';
 
 /**
- * Brand logo.
- *
- * Both files are official renders exported from the Design System file
- * (2GMJPgnnenGnr1zBN2yH5h): the Persian horizontal lockup `14:2` and the master
- * symbol `4:21`. They are used as delivered — never redrawn, recoloured,
- * stretched or cropped. Aspect ratio is preserved by giving both dimensions.
+ * Brand logo — DS *Logo*: the delivered SVGs in `public/brand/logo/`, never
+ * redrawn, recoloured or stretched. Only the height is set (`.hz-logo` sizes:
+ * header 36, mobile 30, ops 26, symbol 32); a custom `height` is honoured for
+ * places outside the shells.
  */
-export function Logo({ variant = 'lockup', height = 28 }: { variant?: 'lockup' | 'symbol'; height?: number }) {
-  if (variant === 'symbol') {
-    const width = Math.round((height * 144) / 162);
-    return (
-      <Image src="/brand/logo-symbol.png" alt="همزیست" width={width} height={height} priority />
-    );
-  }
-  const width = Math.round((height * 334) / 72);
-  return <Image src="/brand/logo-fa-horizontal.png" alt="همزیست" width={width} height={height} priority />;
+export type LogoSize = 'header' | 'mobile' | 'responsive' | 'ops' | 'symbol';
+
+const SIZE_CLASS: Record<LogoSize, string> = {
+  header: 'hz-logo',
+  mobile: 'hz-logo hz-logo--mobile',
+  responsive: 'hz-logo hz-logo--responsive',
+  ops: 'hz-logo hz-logo--ops',
+  symbol: 'hz-logo hz-logo--symbol',
+};
+
+export function Logo({
+  variant = 'lockup',
+  size,
+  height,
+  className = '',
+}: {
+  variant?: 'lockup' | 'symbol';
+  size?: LogoSize;
+  height?: number;
+  className?: string;
+}) {
+  const asset = variant === 'symbol' ? SYMBOL : LOCKUP_FA;
+  const resolved = size ?? (variant === 'symbol' ? 'symbol' : 'mobile');
+  const style = height === undefined ? undefined : { height, width: 'auto' };
+  return (
+    <span className={[SIZE_CLASS[resolved], className].join(' ')}>
+      <img src={asset.path} alt="همزیست" width={asset.width} height={asset.height} style={style} />
+    </span>
+  );
 }

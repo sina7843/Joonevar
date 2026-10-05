@@ -84,7 +84,7 @@ export default async function PermitDatesPage({ params }: { params: Promise<{ id
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">تاریخ‌های رسمی این پرونده</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخ‌های رسمی این پرونده</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {permit.permitNo ?? '—'} ·{' '}
                 <Link href={'/mating/permits/' + id} className="text-text-brand underline underline-offset-4">

@@ -63,7 +63,7 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
     <PublicShell actor={guard.actor} title="شجره‌نامه" pathname={'/documents/pedigree/' + id}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">شجره‌نامه هم‌زیست</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شجره‌نامه هم‌زیست</span></h2></div>
           <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="pedigree-document">
             <dt className="text-text-secondary">کد شجره‌نامه</dt>
             <dd data-testid="pedigree-code">

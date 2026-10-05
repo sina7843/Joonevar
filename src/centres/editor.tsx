@@ -82,7 +82,7 @@ export function CentreEditor({
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-md">
           <div>
-            <h1 className="text-h4">{centre.displayNameFa}</h1>
+            <h1 className="text-h3">{centre.displayNameFa}</h1>
             <p className="mt-2xs text-caption text-text-secondary">{facts.typeNameFa}</p>
           </div>
           <span data-testid="centre-public-status">
@@ -153,7 +153,7 @@ export function CentreEditor({
       {surface === 'admin' && centre.ownerAccountId === null ? <CentreOwnerForm centre={editable} /> : null}
 
       <Card>
-        <h2 className="text-label-lg">شعبه‌ها</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شعبه‌ها</span></h2></div>
         <p className="mt-xs text-body-sm text-text-secondary">
           هر شعبه یک محل کار در همان جدول فاز یک است. شعبه‌ای که اینجا ساخته می‌شود پروانه و امکانات خدمات همزیست ندارد و در Finder
           نمی‌آید.
@@ -165,7 +165,7 @@ export function CentreEditor({
         ) : (
           <ul className="mt-lg space-y-lg">
             {facts.branches.map((branch) => (
-              <li key={branch.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'centre-branch-' + branch.id}>
+              <li key={branch.id} className="rounded-xl border border-border-default p-lg" data-testid={'centre-branch-' + branch.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
                     <h3 className="text-label-md">{branch.nameFa}</h3>
@@ -231,7 +231,7 @@ export function CentreEditor({
       {surface === 'admin' && unlinkedLocations.length > 0 ? <AttachLocationForm centreId={centre.id} locations={unlinkedLocations} /> : null}
 
       <Card>
-        <h2 className="text-label-lg">تیم حرفه‌ای</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تیم حرفه‌ای</span></h2></div>
         <p className="mt-xs text-body-sm text-text-secondary">
           نام هر دامپزشک فقط پس از پذیرش دعوت در صفحه عمومی مرکز می‌آید.
         </p>
@@ -242,7 +242,7 @@ export function CentreEditor({
         ) : (
           <ul className="mt-lg space-y-sm" data-testid="centre-members">
             {facts.members.map((member) => (
-              <li key={member.id} className="rounded-lg border border-border-subtle p-md" data-testid={'centre-member-' + member.id}>
+              <li key={member.id} className="rounded-lg border border-border-default p-md" data-testid={'centre-member-' + member.id}>
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <div className="min-w-0">
                     <p className="text-label-md">{member.nameFa}</p>

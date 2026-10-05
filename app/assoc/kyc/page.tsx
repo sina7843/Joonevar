@@ -1,10 +1,8 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseQueue, ageInDays } from '../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { kycQueue } from '../../../src/identity/kyc.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
@@ -24,40 +22,41 @@ export default async function AssocKycPage() {
 
   const page = await kycQueue(db(), guard.actor, { page: 1, pageSize: 20 });
 
+  // P09: oldest first, age in whole days, the association's own clock.
+  const rows = [...page.items].sort((x, y) => (x.submittedAt?.getTime() ?? 0) - (y.submittedAt?.getTime() ?? 0));
+  const oldest = ageInDays(rows[0]?.submittedAt);
+
   return (
     <OpsShell actor={guard.actor} title="صف احراز هویت" pathname="/assoc/kyc" nav={ASSOC_NAV}>
-      {page.items.length === 0 ? (
+      {rows.length > 0 ? (
+        <p className="hz-page-header__meta">
+          <span>{page.total.toLocaleString('fa-IR') + ' پرونده در صف'}</span>
+          {oldest !== null ? <span>{'قدیمی‌ترین: ' + oldest.toLocaleString('fa-IR') + ' روز'}</span> : null}
+        </p>
+      ) : null}
+      {rows.length === 0 ? (
         <EmptyState
           title="پرونده‌ای در انتظار بررسی نیست"
           description="پرونده‌های ارسال‌شده کاربران در همین صف دیده می‌شوند."
         />
       ) : (
-        <ul className="space-y-md">
-          {page.items.map((item) => (
-            <li key={item.id}>
-              <Card>
-                <div className="flex items-start justify-between gap-md">
-                  <div className="min-w-0">
-                    <h2 className="text-label-lg">{item.applicantName}</h2>
-                    <p className="mt-2xs text-caption text-text-secondary">
-                      ارسال: {item.submittedAt ? formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : '—'}
-                    </p>
-                  </div>
-                  <StatusBadge tone="info">در حال بررسی</StatusBadge>
-                </div>
-                <div className="mt-lg">
-                  <Link
-                    href={'/assoc/kyc/' + item.id}
-                    className="text-label-md text-text-brand underline underline-offset-4"
-                    data-testid="open-case"
-                  >
-                    بررسی پرونده
-                  </Link>
-                </div>
-              </Card>
-            </li>
-          ))}
-        </ul>
+        <CaseQueue
+          label="صف احراز هویت"
+          showCode={false}
+          rows={rows.map((item) => ({
+            id: item.id,
+            href: '/assoc/kyc/' + item.id,
+            name: item.applicantName,
+            sub:
+              (item.submittedAt ? 'ارسال: ' + formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : 'ارسال: —') +
+              (item.version > 1 ? '، نسخه ' + item.version.toLocaleString('fa-IR') : ''),
+            ageDays: ageInDays(item.submittedAt),
+            status: { tone: 'info' as const, label: 'در انتظار بررسی' },
+            owner: 'ASSOCIATION' as const,
+            ownerIsUs: true,
+            testId: 'open-case',
+          }))}
+        />
       )}
     </OpsShell>
   );

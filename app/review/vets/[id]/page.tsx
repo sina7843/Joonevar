@@ -47,7 +47,7 @@ export default async function ReviewVetApplicationPage({ params }: { params: Pro
           <div className="flex flex-wrap items-start justify-between gap-md">
             <div>
               <p className="text-caption text-text-secondary">{APPLICATION_KIND_FA[application.kind]}</p>
-              <h1 className="text-h4">{application.displayNameFa}</h1>
+              <h2 className="text-h3">{application.displayNameFa}</h2>
             </div>
             <span data-testid="review-application-status">
               <StatusBadge tone={application.status === 'SUBMITTED' ? 'warning' : application.status === 'APPROVED' ? 'success' : 'neutral'}>
@@ -79,7 +79,7 @@ export default async function ReviewVetApplicationPage({ params }: { params: Pro
 
         {target ? (
           <Card>
-            <h2 className="text-label-lg">پروفایل بدون مالک مورد Claim</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پروفایل بدون مالک مورد Claim</span></h2></div>
             <p className="mt-sm text-body-sm" data-testid="review-claim-target">
               {target.displayNameFa + (target.councilCode ? ' · کد نظام ثبت‌شده ' + target.councilCode : ' · کد نظامی ثبت نشده است')}
             </p>
@@ -106,10 +106,10 @@ export default async function ReviewVetApplicationPage({ params }: { params: Pro
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">مدارک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدارک</span></h2></div>
           <ul className="mt-md space-y-sm" data-testid="review-documents">
             {documents.map((document) => (
-              <li key={document.id} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm">
+              <li key={document.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm">
                 <span className="text-body-sm">{DOCUMENT_KIND_FA[document.kind] + ' · ' + document.mime}</span>
                 <a
                   href={'/api/files/' + document.fileId}

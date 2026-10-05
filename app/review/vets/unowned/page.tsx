@@ -26,7 +26,7 @@ export default async function ReviewUnownedVetsPage() {
         <UnownedVetForm provinces={reference.provinces} cities={reference.cities} />
 
         <Card>
-          <h2 className="text-label-lg">پروفایل‌های بدون مالک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پروفایل‌های بدون مالک</span></h2></div>
           {profiles.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="پروفایل بدون مالکی ثبت نشده است" description="پروفایل‌هایی که با فرم بالا منتشر شوند اینجا می‌آیند تا Claim شوند." />
@@ -34,7 +34,7 @@ export default async function ReviewUnownedVetsPage() {
           ) : (
             <ul className="mt-lg space-y-md" data-testid="unowned-list">
               {profiles.map((profile) => (
-                <li key={profile.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'unowned-item-' + profile.id}>
+                <li key={profile.id} className="rounded-xl border border-border-default p-lg" data-testid={'unowned-item-' + profile.id}>
                   <div className="flex flex-wrap items-start justify-between gap-sm">
                     <div className="min-w-0">
                       <p className="text-label-lg">{profile.displayNameFa}</p>

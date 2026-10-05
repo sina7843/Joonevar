@@ -32,7 +32,7 @@ export default async function AdminSettingsPage() {
           <Card key={setting.key}>
             <div className="flex items-start justify-between gap-md">
               <div className="min-w-0">
-                <h2 className="text-label-lg">{setting.labelFa}</h2>
+                <h2 className="hz-card__title">{setting.labelFa}</h2>
                 <p className="mt-2xs text-caption text-text-secondary">
                   <bdi className="hz-ltr font-mono">{setting.key}</bdi>
                 </p>

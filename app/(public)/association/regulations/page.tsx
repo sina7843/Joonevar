@@ -50,16 +50,16 @@ export default async function AssociationRegulationsPage() {
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="text-body-md text-text-secondary">{DESCRIPTION}</p>
       </header>
 
       <section aria-labelledby="regulations-text-title" className="space-y-md">
-        <h2 id="regulations-text-title" className="text-h5">
+        <h2 id="regulations-text-title" className="text-h4">
           متن مقررات
         </h2>
         {regulations.configured ? (
-          <div className="rounded-lg border border-border-subtle bg-bg-surface p-lg" data-testid="regulations-text">
+          <div className="rounded-xl border border-border-default bg-bg-surface p-lg" data-testid="regulations-text">
             <RichText source={String(regulations.value)} />
           </div>
         ) : (
@@ -72,7 +72,7 @@ export default async function AssociationRegulationsPage() {
       </section>
 
       <section aria-labelledby="regulations-enforced-title" className="space-y-md">
-        <h2 id="regulations-enforced-title" className="text-h5">
+        <h2 id="regulations-enforced-title" className="text-h4">
           قواعدی که سامانه اجرا می‌کند
         </h2>
         <ul className="list-disc space-y-xs pr-lg text-body-md" data-testid="regulations-enforced">
@@ -83,7 +83,7 @@ export default async function AssociationRegulationsPage() {
       </section>
 
       <section aria-labelledby="regulations-notices-title" className="space-y-md">
-        <h2 id="regulations-notices-title" className="text-h5">
+        <h2 id="regulations-notices-title" className="text-h4">
           اطلاعیه‌های انجمن
         </h2>
         {notices.items.length === 0 ? (

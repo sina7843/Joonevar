@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { APPLE_ICON, FAVICONS } from '../src/brand/assets.ts';
+import { APPLE_ICON, FAVICONS, THEME_COLOR } from '../src/brand/assets.ts';
 
 export const metadata: Metadata = {
   title: 'همزیست',
@@ -8,26 +8,30 @@ export const metadata: Metadata = {
   // Nothing is indexed unless its page says so: public pages opt in through
   // `buildMetadata`, so a new application screen never lands in search (DEC-0151).
   robots: { index: false, follow: false },
+  manifest: '/manifest.webmanifest',
   /*
-   * The Design System ships one artwork per favicon size (section 05), because
-   * below 24px the mark uses the simplified single-ink glyph. Declaring all
-   * three lets the browser pick the right drawing instead of scaling one.
+   * Brand › Files: the SVG favicon first, then one artwork per PNG size
+   * (below 24px the mark is different artwork), the .ico as the shortcut.
    */
   icons: {
-    icon: FAVICONS.map((asset) => ({
-      url: asset.path,
-      sizes: asset.width + 'x' + asset.height,
-      type: 'image/png',
-    })),
+    icon: [
+      { url: '/brand/favicon/favicon.svg', type: 'image/svg+xml' },
+      ...FAVICONS.map((asset) => ({ url: asset.path, sizes: asset.width + 'x' + asset.height, type: 'image/png' })),
+    ],
+    shortcut: '/brand/favicon/favicon.ico',
     apple: [{ url: APPLE_ICON.path, sizes: APPLE_ICON.width + 'x' + APPLE_ICON.height, type: 'image/png' }],
   },
 };
 
+/** The status bar follows the cream chrome (Brand › app-icon manifest colours). */
+export const viewport: Viewport = { themeColor: THEME_COLOR };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // Persian and RTL are the product default, not a locale switch (§24.1).
+  // `hz` is the design system's root: type, focus ring and reduced motion.
   return (
     <html lang="fa" dir="rtl">
-      <body>{children}</body>
+      <body className="hz">{children}</body>
     </html>
   );
 }

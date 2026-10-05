@@ -82,7 +82,7 @@ export default async function CommunityPage({ params }: Params) {
 
       <header className="space-y-sm">
         <RecordImage priority fileId={page.imageFileId} altFa={page.imageAltFa} className="mb-lg" />
-        <h1 className="text-h3 md:text-h1">{page.nameFa}</h1>
+        <h1 className="text-h2 md:text-h1">{page.nameFa}</h1>
         <p className="text-body-md text-text-secondary">{kindFa + ' · حوزه ' + COMMUNITY_SCOPE_FA[page.scope]}</p>
         {/* Each axis is its own badge; a registration does not verify content and a badge never sells (P2-D05). */}
         <div className="flex flex-wrap gap-xs" data-testid="community-badges">
@@ -116,7 +116,7 @@ export default async function CommunityPage({ params }: Params) {
 
       <dl className="grid gap-sm sm:grid-cols-2" data-testid="community-facts">
         {page.contactPhone ? (
-          <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
             <dt className="text-body-sm text-text-secondary">تلفن</dt>
             <dd className="text-label-md" dir="ltr" data-testid="community-phone">
               <a href={'tel:' + page.contactPhone}>{page.contactPhone}</a>
@@ -124,7 +124,7 @@ export default async function CommunityPage({ params }: Params) {
           </div>
         ) : null}
         {page.websiteUrl ? (
-          <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
             <dt className="text-body-sm text-text-secondary">وب‌سایت</dt>
             <dd className="truncate text-label-md" dir="ltr">
               <a href={page.websiteUrl} target="_blank" rel="nofollow noopener noreferrer" className="text-text-brand underline underline-offset-4">
@@ -134,7 +134,7 @@ export default async function CommunityPage({ params }: Params) {
           </div>
         ) : null}
         {page.speciesFa.length > 0 ? (
-          <div className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm sm:col-span-2">
+          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
             <dt className="text-body-sm text-text-secondary">گونه‌ها</dt>
             <dd className="mt-2xs text-label-md" data-testid="community-species">
               {page.speciesFa.join('، ')}
@@ -142,7 +142,7 @@ export default async function CommunityPage({ params }: Params) {
           </div>
         ) : null}
         {page.breedNamesFa.length > 0 ? (
-          <div className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm sm:col-span-2">
+          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
             <dt className="text-body-sm text-text-secondary">نژادها</dt>
             <dd className="mt-2xs text-label-md" data-testid="community-breeds">
               {page.breedNamesFa.join('، ')}
@@ -153,7 +153,7 @@ export default async function CommunityPage({ params }: Params) {
 
       {page.aboutFa ? (
         <section aria-labelledby="community-about-title">
-          <h2 id="community-about-title" className="text-h4">
+          <h2 id="community-about-title" className="text-h3">
             معرفی
           </h2>
           <Prose text={page.aboutFa} />
@@ -161,7 +161,7 @@ export default async function CommunityPage({ params }: Params) {
       ) : null}
 
       <section aria-labelledby="community-membership-title">
-        <h2 id="community-membership-title" className="text-h4">
+        <h2 id="community-membership-title" className="text-h3">
           عضویت
         </h2>
         {page.membershipInfoFa ? <Prose text={page.membershipInfoFa} /> : null}
@@ -186,12 +186,12 @@ export default async function CommunityPage({ params }: Params) {
 
       {page.managers.length > 0 ? (
         <section aria-labelledby="community-managers-title">
-          <h2 id="community-managers-title" className="text-h4">
+          <h2 id="community-managers-title" className="text-h3">
             مدیران
           </h2>
           <ul className="mt-md space-y-sm" data-testid="community-managers">
             {page.managers.map((manager) => (
-              <li key={manager.nameFa + (manager.roleFa ?? '')} className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+              <li key={manager.nameFa + (manager.roleFa ?? '')} className="rounded-lg border border-border-default bg-bg-surface px-md py-sm">
                 <span className="text-label-md">{manager.nameFa}</span>
                 {manager.roleFa ? <span className="text-caption text-text-secondary">{' · ' + manager.roleFa}</span> : null}
               </li>
@@ -202,12 +202,12 @@ export default async function CommunityPage({ params }: Params) {
 
       {page.events.length > 0 ? (
         <section aria-labelledby="community-events-title">
-          <h2 id="community-events-title" className="text-h4">
+          <h2 id="community-events-title" className="text-h3">
             رویدادها
           </h2>
           <ul className="mt-md space-y-sm" data-testid="community-events">
             {[...upcoming, ...past].map((event) => (
-              <li key={event.id} className="rounded-lg border border-border-subtle bg-bg-surface p-md" data-testid="community-event">
+              <li key={event.id} className="rounded-lg border border-border-default bg-bg-surface p-md" data-testid="community-event">
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <p className="text-label-lg">{event.titleFa}</p>
                   {event.cancelled ? (
@@ -247,7 +247,7 @@ export default async function CommunityPage({ params }: Params) {
 
       {page.posts.length > 0 ? (
         <section aria-labelledby="community-posts-title">
-          <h2 id="community-posts-title" className="text-h4">
+          <h2 id="community-posts-title" className="text-h3">
             نوشته‌ها
           </h2>
           <ul className="mt-md space-y-sm" data-testid="community-posts">
@@ -255,7 +255,7 @@ export default async function CommunityPage({ params }: Params) {
               <li key={post.slug}>
                 <Link
                   href={path + '/posts/' + post.slug}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-md transition-colors hover:border-border-brand"
+                  className="block rounded-lg border border-border-default bg-bg-surface p-md transition-colors hover:border-border-control"
                   data-testid={'community-post-' + post.slug}
                 >
                   <p className="text-label-lg">{post.titleFa}</p>

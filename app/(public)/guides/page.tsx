@@ -69,12 +69,12 @@ export default async function GuidesPage() {
       <JsonLdScript data={faqLd({ path: '/guides', questions: FAQ }, origin)} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">{DESCRIPTION}</p>
       </header>
 
       <section aria-labelledby="guides-services-title" className="space-y-md">
-        <h2 id="guides-services-title" className="text-h5">
+        <h2 id="guides-services-title" className="text-h4">
           راهنمای خدمات
         </h2>
         <ul className="grid gap-md sm:grid-cols-2" data-testid="guides-services">
@@ -82,7 +82,7 @@ export default async function GuidesPage() {
             <li key={service.slug}>
               <Link
                 href={'/services/' + service.slug}
-                className="block h-full rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                className="block h-full rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
               >
                 <span className="block text-label-lg text-text-primary">{service.titleFa}</span>
                 <span className="mt-2xs block text-body-sm text-text-secondary">{service.summaryFa}</span>
@@ -93,7 +93,7 @@ export default async function GuidesPage() {
       </section>
 
       <section aria-labelledby="guides-tutorials-title" className="space-y-md">
-        <h2 id="guides-tutorials-title" className="text-h5">
+        <h2 id="guides-tutorials-title" className="text-h4">
           آموزش‌های منتشرشده
         </h2>
         {tutorials.items.length === 0 ? (
@@ -112,7 +112,7 @@ export default async function GuidesPage() {
               <li key={item.slug}>
                 <Link
                   href={'/articles/' + item.slug}
-                  className="block h-full rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block h-full rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                 >
                   <span className="block text-label-lg text-text-primary">{item.titleFa}</span>
                   <span className="mt-2xs block text-body-sm text-text-secondary">{item.summaryFa}</span>
@@ -124,12 +124,12 @@ export default async function GuidesPage() {
       </section>
 
       <section aria-labelledby="guides-faq-title" className="space-y-md">
-        <h2 id="guides-faq-title" className="text-h5">
+        <h2 id="guides-faq-title" className="text-h4">
           پرسش‌های پرتکرار
         </h2>
         <dl className="space-y-md" data-testid="guides-faq">
           {FAQ.map((entry) => (
-            <div key={entry.question} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+            <div key={entry.question} className="rounded-xl border border-border-default bg-bg-surface p-lg">
               <dt className="text-label-lg">{entry.question}</dt>
               <dd className="mt-xs text-body-sm text-text-secondary">{entry.answer}</dd>
             </div>

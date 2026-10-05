@@ -47,7 +47,7 @@ export function generateMetadata(): Metadata {
 }
 
 const CONTROL =
-  'w-full rounded-md border border-border-subtle bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
+  'w-full rounded-lg border border-border-default bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
   'min-h-[var(--size-control-md)] focus:border-border-brand';
 
 function Filter({
@@ -108,7 +108,7 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">
           انجمن‌ها و کلاب‌ها را با حوزه، نژاد، گونه و استان پیدا کنید. عضویت در هر انجمن یا کلاب با خود آن است و از همزیست انجام نمی‌شود.
         </p>
@@ -118,7 +118,7 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
         method="get"
         action="/associations"
         role="search"
-        className="grid gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
+        className="grid gap-md rounded-xl border border-border-default bg-bg-surface p-lg sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
         data-testid="community-search"
       >
         <div className="space-y-xs">
@@ -189,7 +189,7 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
               <li key={community.slug}>
                 <Link
                   href={'/associations/' + community.slug}
-                  className="flex h-full items-start gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
+                  className="flex h-full items-start gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
                   data-testid={'community-card-' + community.slug}
                 >
                   {community.imageFileId !== null ? (

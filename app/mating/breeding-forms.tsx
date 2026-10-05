@@ -43,7 +43,7 @@ export function DeclarePregnancyForm({
   const [state, submit, pending] = useActionState(declarePregnancyAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">{isCorrection ? 'اصلاح اعلام بارداری' : 'اعلام بارداری'}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{isCorrection ? 'اصلاح اعلام بارداری' : 'اعلام بارداری'}</span></h2></div>
       <form action={submit} className="mt-lg space-y-lg" data-testid="pregnancy-form">
         <input type="hidden" name="permitId" value={permitId} />
         <Result state={state} />
@@ -88,7 +88,7 @@ export function RequestPregnancyCheckForm({
   const [state, submit, pending] = useActionState(attachCheckAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">درخواست تأیید اختیاری دامپزشک</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست تأیید اختیاری دامپزشک</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         این مرحله اختیاری است. دامپزشک و مرکز را در Finder انتخاب می‌کنید، درخواست فقط به همان دامپزشک
         تخصیص می‌یابد و صف عمومی برای برداشتن پرونده وجود ندارد.
@@ -125,7 +125,7 @@ export function RecordBirthForm({ permitId }: { permitId: string }) {
   const [state, submit, pending] = useActionState(recordBirthAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">ثبت نتیجه زایمان</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه زایمان</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         تعداد توله زنده و مرده دو عدد مستقل و صفر یا بیشترند. برای هر توله زنده یک پرونده موقت ساخته می‌شود؛
         برای توله‌ای که در همین اعلام مرده ثبت شود، پرونده، کد موقت یا کارت ساخته نمی‌شود.
@@ -169,7 +169,7 @@ export function CorrectBirthForm({
 
   return (
     <Card>
-      <h2 className="text-label-lg">اصلاح تعداد</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اصلاح تعداد</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         وجود پرونده توله مانع اصلاح نیست و بررسی انجمن دوباره لازم نمی‌شود. نسخه و مقدار قبلی حذف نمی‌شود.
       </p>

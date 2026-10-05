@@ -75,7 +75,7 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
 
       <header className="space-y-sm">
         <div className="flex flex-wrap items-start justify-between gap-sm">
-          <h1 className="text-h3" data-testid="listing-title">
+          <h1 className="text-h2" data-testid="listing-title">
             {listing.titleFa}
           </h1>
           <div className="flex flex-wrap gap-xs">
@@ -119,15 +119,15 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
         <video
           controls
           preload="metadata"
-          className="w-full rounded-lg border border-border-subtle"
+          className="w-full rounded-lg border border-border-default"
           data-testid="listing-video"
         >
           <source src={'/media/' + video.fileId} type="video/mp4" />
         </video>
       ) : null}
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">اطلاعات قطعی از پرونده حیوان</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات قطعی از پرونده حیوان</span></h2></div>
         <p className="text-caption text-text-secondary">
           این موارد از پرونده ثبت‌شده حیوان در همزیست خوانده می‌شوند.
         </p>
@@ -162,8 +162,8 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
         </dl>
       </section>
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">اظهارات فروشنده</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اظهارات فروشنده</span></h2></div>
         <p className="text-caption text-text-secondary" data-testid="listing-disclaimer">
           همزیست سابقه واکسیناسیون، عقیم‌سازی و وضعیت سلامت را نگه نمی‌دارد. موارد زیر اظهار فروشنده‌اند و
           توسط همزیست تأیید نشده‌اند.
@@ -177,16 +177,16 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
       </section>
 
       {listing.descriptionFa ? (
-        <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-          <h2 className="text-label-lg">توضیح آگهی</h2>
+        <section className="space-y-sm rounded-xl border border-border-default p-lg">
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توضیح آگهی</span></h2></div>
           <p className="whitespace-pre-line text-body-sm" data-testid="listing-description">
             {listing.descriptionFa}
           </p>
         </section>
       ) : null}
 
-      <section className="space-y-sm rounded-lg border border-border-subtle p-lg">
-        <h2 className="text-label-lg">تحویل</h2>
+      <section className="space-y-sm rounded-xl border border-border-default p-lg">
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تحویل</span></h2></div>
         <p className="text-body-sm" data-testid="listing-delivery">
           {listing.deliveryFa.length > 0 ? listing.deliveryFa.join('، ') : 'اعلام نشده'}
         </p>

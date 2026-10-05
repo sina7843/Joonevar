@@ -94,7 +94,7 @@ test('metadata is absolute and canonical, and nothing is indexed outside product
     assert.equal(await page.locator('meta[property="og:locale"]').getAttribute('content'), 'fa_IR');
     assert.equal(
       await page.locator('meta[property="og:image"]').getAttribute('content'),
-      BASE_URL + '/brand/app-icon-social.png',
+      BASE_URL + '/brand/social/og-1200x630.png',
     );
     assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, nofollow');
     assert.equal(await page.title(), 'درباره همزیست');
@@ -159,7 +159,7 @@ test('the header links only built sections, marks the current one and offers sig
     assert.equal(await nav.count(), 16);
 
     // The breadcrumb reads right to left: home sits to the right of the page.
-    const crumbs = page.locator('[data-testid="breadcrumbs"] li');
+    const crumbs = page.locator('[data-testid="breadcrumbs"] li:not(.hz-breadcrumbs__sep)');
     const home = await crumbs.nth(0).boundingBox();
     const current = await crumbs.nth(1).boundingBox();
     assert.ok(home && current && home.x > current.x, 'the first crumb is on the right');

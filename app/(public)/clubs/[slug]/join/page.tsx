@@ -66,7 +66,7 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
         ) : (
           <>
             <Card>
-              <h2 className="text-label-lg">این کلاب چه می‌خواهد</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>این کلاب چه می‌خواهد</span></h2></div>
               <ul className="mt-md flex flex-wrap gap-xs" data-testid="club-asked">
                 {view.askedFa.map((asked) => (
                   <li key={asked}>
@@ -82,7 +82,7 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
             </Card>
 
             <Card>
-              <h2 className="text-label-lg">وضعیت شما</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت شما</span></h2></div>
               <p className="mt-sm text-body-md" data-testid="club-join-status">
                 {status ? CLUB_MEMBERSHIP_STATUS_FA[status] : 'هنوز درخواستی نداده‌اید.'}
               </p>

@@ -53,7 +53,7 @@ export default async function SellerReviewsPage({
     <PublicShell actor={guard.actor} title="نظرها و پرسش‌ها" pathname="/account/seller">
       <div className="space-y-lg p-lg">
         <Card>
-          <h2 className="text-label-lg">امتیاز فروشگاه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>امتیاز فروشگاه</span></h2></div>
           <p className="mt-sm text-h2" data-testid="seller-rating">
             {aggregate.count === 0 ? '—' : fa(aggregate.overall)}
           </p>
@@ -64,7 +64,7 @@ export default async function SellerReviewsPage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">نظرها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نظرها</span></h2></div>
           {reviews.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="seller-reviews-empty">
               هنوز نظری ثبت نشده است.
@@ -74,7 +74,7 @@ export default async function SellerReviewsPage({
               {reviews.map((view) => (
                 <li
                   key={view.row.id}
-                  className="space-y-sm rounded-md border border-border-subtle p-lg"
+                  className="space-y-sm rounded-lg border border-border-default p-lg"
                   data-testid={'seller-review-' + view.row.id}
                 >
                   <p className="text-body-sm">
@@ -105,7 +105,7 @@ export default async function SellerReviewsPage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">پرسش‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرسش‌ها</span></h2></div>
           <Alert tone="info" title="پرسش پس از بررسی ناظر به شما می‌رسد">
             <span data-testid="questions-note">
               پرسش‌های در انتظار بررسی اینجا نمایش داده نمی‌شوند.
@@ -120,7 +120,7 @@ export default async function SellerReviewsPage({
               {questions.map((entry) => (
                 <li
                   key={entry.row.id}
-                  className="space-y-sm rounded-md border border-border-subtle p-lg"
+                  className="space-y-sm rounded-lg border border-border-default p-lg"
                   data-testid={'seller-question-' + entry.row.id}
                 >
                   <p className="text-body-sm">

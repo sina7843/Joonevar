@@ -77,7 +77,7 @@ export function ClubRulesForm({
           {CLUB_RULE_KINDS.map((kind) => {
             const value = valueOf(kind);
             return (
-              <li key={kind} className="rounded-md border border-border-subtle p-md">
+              <li key={kind} className="rounded-lg border border-border-default p-md">
                 <label className="flex items-center gap-sm text-body-sm">
                   <input
                     type="checkbox"
@@ -221,7 +221,7 @@ export function ClubApplyForm({
       <Hidden surface="member" clubId={clubId} />
       {termsVersion ? <input type="hidden" name="acceptTermsVersion" value={termsVersion} /> : null}
       {termsFa ? (
-        <div className="rounded-md border border-border-subtle bg-bg-subtle p-md text-body-sm" data-testid="club-terms">
+        <div className="rounded-lg border border-border-default bg-bg-subtle p-md text-body-sm" data-testid="club-terms">
           <p className="whitespace-pre-line">{termsFa}</p>
           <p className="mt-sm text-caption text-text-secondary">{'با ارسال درخواست، نسخه ' + termsVersion + ' این شرایط را می‌پذیرید.'}</p>
         </div>

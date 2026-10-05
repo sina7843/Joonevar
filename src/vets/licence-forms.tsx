@@ -51,7 +51,7 @@ export function LicenceApplicationForm({
   const newDoctor = mode === 'NEW_DOCTOR';
   return (
     <Card>
-      <h2 className="text-label-lg">{revision ? 'ویرایش پرونده پروانه فعالیت' : 'ثبت پروانه فعالیت دامپزشکی'}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{revision ? 'ویرایش پرونده پروانه فعالیت' : 'ثبت پروانه فعالیت دامپزشکی'}</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         {revision
           ? 'ویرایش، نسخه تازه‌ای می‌سازد و نسخه‌های قبلی و مدارکشان همان‌طور نگهداری می‌شوند. اگر فایل پروانه تازه‌ای پیوست نکنید، همان فایل قبلی در نسخه تازه می‌ماند.'

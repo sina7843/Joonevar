@@ -36,7 +36,7 @@ export default async function MarketPromotionsPage() {
     <OpsShell actor={guard.actor} title="کمپین و تخفیف" nav={marketNav(guard.actor)} pathname="/market/promotions">
       <div className="space-y-lg p-lg">
         <Card>
-          <h2 className="text-label-lg">سیاست هم‌زمانی تخفیف‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>سیاست هم‌زمانی تخفیف‌ها</span></h2></div>
           {stacking.row === null ? (
             <Alert tone="warning" title="هنوز نسخه‌ای منتشر نشده است">
               <span data-testid="stacking-none">
@@ -54,7 +54,7 @@ export default async function MarketPromotionsPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">کمپین‌ها و کدهای همزیست</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کمپین‌ها و کدهای همزیست</span></h2></div>
           {rules.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="platform-rules-empty">
               هنوز کمپینی تعریف نشده است.
@@ -91,7 +91,7 @@ export default async function MarketPromotionsPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">کمپین تازه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کمپین تازه</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="platform-discount-note">
             هزینه این تخفیف‌ها از سهم همزیست کم می‌شود، نه از سهم فروشنده.
           </p>

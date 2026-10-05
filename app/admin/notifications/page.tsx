@@ -47,23 +47,23 @@ export default async function AdminNotificationsPage() {
           <dl className="mt-lg grid gap-md text-body-sm sm:grid-cols-3" data-testid="outbox-standing">
             <div>
               <dt className="text-caption text-text-secondary">در صف</dt>
-              <dd className="text-h5">{fa(standing.pending)}</dd>
+              <dd className="text-h4">{fa(standing.pending)}</dd>
             </div>
             <div>
               <dt className="text-caption text-text-secondary">رسیده به موعد</dt>
-              <dd className="text-h5">{fa(standing.due)}</dd>
+              <dd className="text-h4">{fa(standing.due)}</dd>
             </div>
             <div>
               <dt className="text-caption text-text-secondary">ارسال‌شده</dt>
-              <dd className="text-h5">{fa(standing.sent)}</dd>
+              <dd className="text-h4">{fa(standing.sent)}</dd>
             </div>
             <div>
               <dt className="text-caption text-text-secondary">ناموفق</dt>
-              <dd className="text-h5">{fa(standing.failed)}</dd>
+              <dd className="text-h4">{fa(standing.failed)}</dd>
             </div>
             <div>
               <dt className="text-caption text-text-secondary">صرف‌نظرشده</dt>
-              <dd className="text-h5">{fa(standing.suppressed)}</dd>
+              <dd className="text-h4">{fa(standing.suppressed)}</dd>
             </div>
             <div>
               <dt className="text-caption text-text-secondary">قدیمی‌ترین در صف</dt>
@@ -86,7 +86,7 @@ export default async function AdminNotificationsPage() {
           </p>
           <ul className="mt-lg space-y-sm" data-testid="outbox-templates">
             {NOTIFICATION_TEMPLATES.map((template) => (
-              <li key={template.kind} className="rounded-md border border-border-subtle p-md">
+              <li key={template.kind} className="rounded-lg border border-border-default p-md">
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <span dir="ltr" className="text-caption text-text-secondary">
                     {template.kind}

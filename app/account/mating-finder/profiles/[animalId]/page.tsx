@@ -65,7 +65,7 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
             </Link>
           </p>
           <div className="mt-xs flex flex-wrap items-center justify-between gap-sm">
-            <h1 className="text-h4">{animal.name ?? 'بدون نام'}</h1>
+            <h2 className="text-h3">{animal.name ?? 'بدون نام'}</h2>
             <span data-testid="finder-profile-state">
               <StatusBadge tone={state === 'INACTIVE' ? 'neutral' : 'success'}>{PROFILE_STATE_FA[state]}</StatusBadge>
             </span>
@@ -85,7 +85,7 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">شرایط ورود</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شرایط ورود</span></h2></div>
           {eligibility.problems.length === 0 ? (
             <p className="mt-sm text-body-sm" data-testid="finder-eligible">همه شرایط ورود برقرار است.</p>
           ) : (
@@ -111,13 +111,13 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">وضعیت باروری</h2>
+          <h2 className="hz-card__title">وضعیت باروری</h2>
           <p className="mt-xs text-caption text-text-secondary">این اظهار شماست و در سابقه می‌ماند؛ همزیست آن را تأیید دامپزشکی معرفی نمی‌کند.</p>
           <FertilityForm animalId={animal.id} current={eligibility.fertility} />
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تصویرها و ویدئو</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصویرها و ویدئو</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">
             یک تصویر تمام‌بدن و یک تصویر صورت لازم است. فایل اصلی خصوصی می‌ماند و فقط نسخه بدون اطلاعات جانبی (مانند موقعیت
             مکانی عکس) عمومی می‌شود. ویدئو فعلاً فقط برای خود شما نمایش داده می‌شود.
@@ -125,7 +125,7 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
           {media.length > 0 ? (
             <ul className="mt-md grid gap-sm sm:grid-cols-2" data-testid="finder-media-list">
               {media.map((item) => (
-                <li key={item.id} className="rounded-md border border-border-subtle p-sm" data-testid={'finder-media-' + item.id}>
+                <li key={item.id} className="rounded-lg border border-border-default p-sm" data-testid={'finder-media-' + item.id}>
                   <p className="text-body-sm">
                     {(item.kind === 'VIDEO' ? 'ویدئو' : ROLE_FA[item.role]) + ' · ' + item.altFa}
                     {profile?.primaryMediaId === item.id ? ' · تصویر اصلی' : ''}
@@ -140,12 +140,12 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">ترجیحات</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ترجیحات</span></h2></div>
           <PreferencesForm animalId={animal.id} current={profile?.preferencesFa ?? null} />
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">رویدادهای زندگی حیوان</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>رویدادهای زندگی حیوان</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">
             ثبت فوت، مفقودی یا بایگانی حیوان را فوراً از جفت‌یابی خارج می‌کند. هیچ سابقه‌ای حذف نمی‌شود و پس از پیدا شدن یا خروج از
             بایگانی، فعال‌سازی دوباره با خود شماست.
@@ -161,7 +161,7 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
 
         {card ? (
           <Card>
-            <h2 className="text-label-lg">پیش‌نمایش کارت</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیش‌نمایش کارت</span></h2></div>
             <div className="mt-md">
               <MatingProfileCardView card={card} />
             </div>

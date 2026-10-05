@@ -67,7 +67,7 @@ export default async function AnalyticsPage({
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">فروشگاه کالا</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فروشگاه کالا</span></h2></div>
           <dl className="mt-md grid gap-sm md:grid-cols-4" data-testid="analytics-shop">
             <div>
               <dt className="text-caption text-text-secondary">ارزش سفارش‌ها</dt>
@@ -102,7 +102,7 @@ export default async function AnalyticsPage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">بازار حیوان</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بازار حیوان</span></h2></div>
           <dl className="mt-md grid gap-sm md:grid-cols-3" data-testid="analytics-animals">
             <div>
               <dt className="text-caption text-text-secondary">ارزش معامله‌های کامل‌شده</dt>
@@ -139,14 +139,14 @@ export default async function AnalyticsPage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">گزارش‌ها و moderation</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گزارش‌ها و moderation</span></h2></div>
           <div className="mt-md">
             <Breakdown titleFa="نتیجه گزارش‌ها" rows={view.moderation} testId="analytics-reports" />
           </div>
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">مالی فروشندگان</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مالی فروشندگان</span></h2></div>
           <dl className="mt-md grid gap-sm md:grid-cols-4" data-testid="analytics-balances">
             <div>
               <dt className="text-caption text-text-secondary">در جریان</dt>
@@ -172,7 +172,7 @@ export default async function AnalyticsPage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تبلیغ</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تبلیغ</span></h2></div>
           <p className="mt-sm text-body-sm" data-testid="analytics-advertising">
             بسته‌های خریداری‌شده: {fa(view.advertising.promotions)} — فعال در این لحظه:{' '}
             {fa(view.advertising.activeNow)}

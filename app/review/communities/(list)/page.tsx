@@ -29,7 +29,7 @@ export default async function ReviewCommunitiesPage() {
         <CommunityCreateForm surface="review" />
 
         <Card>
-          <h2 className="text-label-lg">انجمن‌ها و کلاب‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انجمن‌ها و کلاب‌ها</span></h2></div>
           <p className="mt-xs text-body-sm text-text-secondary">
             مجوز انتشار مستقیم نوشته کلاب را سوپرادمین می‌دهد؛ اینجا فقط ثبت، مجوز و انتشار پرونده انجام می‌شود.
           </p>
@@ -43,7 +43,7 @@ export default async function ReviewCommunitiesPage() {
                 <li key={row.community.id}>
                   <Link
                     href={'/review/communities/' + row.community.id}
-                    className="block rounded-lg border border-border-subtle p-lg hover:border-border-brand"
+                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
                     data-testid={'community-row-' + row.community.id}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-sm">

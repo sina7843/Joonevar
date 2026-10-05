@@ -39,7 +39,7 @@ export function PatternGallery() {
   return (
     <main className="mx-auto max-w-3xl space-y-xl p-lg">
       <header className="space-y-sm">
-        <h1 className="text-h3">الگوهای رابط کاربری</h1>
+        <h1 className="text-h2">الگوهای رابط کاربری</h1>
         <p className="text-body-sm text-text-secondary">
           این صفحه فقط برای بررسی الگوها در مرورگر است و بخشی از محصول نیست.
         </p>
@@ -62,7 +62,7 @@ export function PatternGallery() {
       </SyntheticNotice>
 
       <section className="space-y-md" aria-labelledby="h-forms">
-        <h2 id="h-forms" className="text-h4">
+        <h2 id="h-forms" className="text-h3">
           فرم و خطای دسترس‌پذیر
         </h2>
         <Card>
@@ -103,7 +103,7 @@ export function PatternGallery() {
       </section>
 
       <section className="space-y-md" aria-labelledby="h-states">
-        <h2 id="h-states" className="text-h4">
+        <h2 id="h-states" className="text-h3">
           حالت‌ها
         </h2>
         <LoadingState rows={2} />
@@ -122,7 +122,7 @@ export function PatternGallery() {
       </section>
 
       <section className="space-y-lg" aria-labelledby="h-locks">
-        <h2 id="h-locks" className="text-h4">
+        <h2 id="h-locks" className="text-h3">
           سرویس قفل‌شده
         </h2>
         <LockedServiceCard serviceLabel="ثبت حیوان هم‌زیست" lock={LOCK_KYC_REQUIRED} />
@@ -133,7 +133,7 @@ export function PatternGallery() {
       </section>
 
       <section className="space-y-md" aria-labelledby="h-cards">
-        <h2 id="h-cards" className="text-h4">
+        <h2 id="h-cards" className="text-h3">
           کارت‌ها
         </h2>
         <AnimalCard
@@ -155,7 +155,7 @@ export function PatternGallery() {
       </section>
 
       <section className="space-y-md" aria-labelledby="h-timeline">
-        <h2 id="h-timeline" className="text-h4">
+        <h2 id="h-timeline" className="text-h3">
           تاریخچه
         </h2>
         <Timeline
@@ -185,7 +185,7 @@ export function PatternGallery() {
       </section>
 
       <section className="space-y-md" aria-labelledby="h-overlays">
-        <h2 id="h-overlays" className="text-h4">
+        <h2 id="h-overlays" className="text-h3">
           لایه‌های روی صفحه
         </h2>
         <div className="flex flex-wrap gap-md">

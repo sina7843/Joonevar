@@ -32,7 +32,7 @@ export default async function CompleteAccountPage({
     <main className="mx-auto max-w-(--size-content-md) space-y-xl p-lg">
       <div className="flex flex-col items-center gap-md">
         <Logo height={32} />
-        <h1 className="text-h3">تکمیل حساب</h1>
+        <h1 className="text-h2">تکمیل حساب</h1>
         <p className="text-center text-body-sm text-text-secondary">
           برای ادامه، اطلاعات هویتی خود را وارد کنید. احراز هویت مرحله جداگانه‌ای است.
         </p>

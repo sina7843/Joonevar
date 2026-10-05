@@ -49,7 +49,7 @@ export function SelectPedigreeAnimals({
 
   return (
     <Card>
-      <h2 className="text-label-lg">انتخاب حیوان‌ها</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب حیوان‌ها</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         نمونه ثبت‌شده همین حیوان استفاده می‌شود؛ انتخاب دامپزشک یا نمونه‌گیری دوباره لازم نیست.
       </p>
@@ -57,7 +57,7 @@ export function SelectPedigreeAnimals({
         <Result state={state} />
         <ul className="space-y-md" data-testid="pedigree-animal-list">
           {animals.map((animal) => (
-            <li key={animal.animalId} className="rounded-lg border border-border-subtle p-lg">
+            <li key={animal.animalId} className="rounded-xl border border-border-default p-lg">
               <label className="flex items-start gap-sm text-body-sm">
                 <input
                   type="checkbox"
@@ -156,7 +156,7 @@ export function SelectIssuanceAnimals({
 
   return (
     <Card>
-      <h2 className="text-label-lg">صدور شجره‌نامه</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>صدور شجره‌نامه</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         صدور سند به دو شرط نیاز دارد: نتیجه Parentage نهایی و پرداخت صدور در هم‌زیست. تأیید فیش مرکز، این
         پرداخت نیست.
@@ -165,7 +165,7 @@ export function SelectIssuanceAnimals({
         <Result state={state} />
         <ul className="space-y-md" data-testid="issuance-animal-list">
           {animals.map((animal) => (
-            <li key={animal.animalId} className="rounded-lg border border-border-subtle p-lg">
+            <li key={animal.animalId} className="rounded-xl border border-border-default p-lg">
               <label className="flex items-start gap-sm text-body-sm">
                 <input
                   type="checkbox"

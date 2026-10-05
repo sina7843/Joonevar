@@ -44,7 +44,7 @@ export function DoctorApplicationForm({
   const [state, submit, pending] = useActionState(correction ? resubmitDoctorApplicationAction : submitDoctorApplicationAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">{correction ? 'اصلاح درخواست دامپزشک' : claimSlug ? 'درخواست Claim پروفایل' : 'درخواست دکتر دامپزشک (بدون پروانه فعالیت)'}</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{correction ? 'اصلاح درخواست دامپزشک' : claimSlug ? 'درخواست Claim پروفایل' : 'درخواست دکتر دامپزشک (بدون پروانه فعالیت)'}</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         ادمین انجمن کد نظام را دستی بررسی می‌کند. پس از تأیید، Tag «دکتر دامپزشک - عمومی/متخصص - بدون پروانه فعالیت» و معرفی در دایرکتوری
         برای شما فعال می‌شود. پروانه فعالیت و دامپزشک معتمد مسیرهای جدا هستند و از این تأیید نتیجه نمی‌شوند.

@@ -41,7 +41,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
     <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک معتمد" pathname="/assoc/vet-trusted" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">متقاضی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>متقاضی</span></h2></div>
           <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
             <dt className="text-text-secondary">نام</dt>
             <dd>{detail.applicantNameFa ?? '—'}</dd>
@@ -51,7 +51,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">شرایط، همین حالا</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شرایط، همین حالا</span></h2></div>
           <ul className="mt-md space-y-2xs text-body-sm" data-testid="trusted-eligibility-now">
             {detail.eligibilityNow.map((requirement) => (
               <li key={requirement.code}>
@@ -70,7 +70,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">خوداظهاری نسخه جاری</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>خوداظهاری نسخه جاری</span></h2></div>
           {current ? (
             <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm" data-testid="trusted-declaration">
               <dt className="text-text-secondary">نسخه تعهدنامه پذیرفته‌شده</dt>
@@ -97,7 +97,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
 
         {detail.submissions.length > 1 ? (
           <Card>
-            <h2 className="text-label-lg">نسخه‌ها</h2>
+            <h2 className="hz-card__title">نسخه‌ها</h2>
             <ol className="mt-md space-y-sm text-body-sm" data-testid="trusted-submissions">
               {detail.submissions.map((submission) => (
                 <li key={submission.version}>
@@ -111,7 +111,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
 
         {review && waiting ? (
           <Card>
-            <h2 className="text-label-lg">بررسی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بررسی</span></h2></div>
             <div className="mt-md">
               <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
             </div>
@@ -120,7 +120,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
 
         {waiting && !review?.claimedByOther ? (
           <Card>
-            <h2 className="text-label-lg">ثبت نتیجه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">تأیید فقط پرداخت دوره معتمد را باز می‌کند؛ Tag معتمد با پرداخت تأییدشده سرور فعال می‌شود.</p>
             <div className="mt-lg">
               <DecideTrustedCaseForm caseId={detail.case.id} version={detail.case.version} />
@@ -130,7 +130,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
 
         {detail.case.status === 'ACTIVE_TRUSTED_VET' || detail.case.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT' ? (
           <Card>
-            <h2 className="text-label-lg">تعلیق دسترسی معتمد</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تعلیق دسترسی معتمد</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">
               تعلیق، دسترسی معتمد را برمی‌دارد و Tag را به وضعیت پروانه برمی‌گرداند. هیچ کار انجام‌شده‌ای حذف نمی‌شود و پرداخت‌ها سر جای خود می‌مانند.
             </p>

@@ -74,7 +74,7 @@ export default async function ClubPage({ params }: Params) {
       <header className="flex flex-wrap items-start gap-lg">
         {page.imageFileId !== null ? <RecordImage variant="banner" fileId={page.imageFileId} altFa={page.imageAltFa} /> : null}
         <div className="min-w-0 space-y-sm">
-          <h1 className="text-h3 md:text-h1">{page.nameFa}</h1>
+          <h1 className="text-h2 md:text-h1">{page.nameFa}</h1>
           <p className="text-body-sm text-text-secondary">
             {'کلاب · حوزه ' + (COMMUNITY_SCOPE_FA[page.scope] ?? page.scope) + (page.placeFa ? ' · ' + page.placeFa : '')}
           </p>
@@ -88,7 +88,7 @@ export default async function ClubPage({ params }: Params) {
 
       {page.aboutFa ? (
         <section aria-labelledby="club-about-title" className="space-y-md">
-          <h2 id="club-about-title" className="text-h5">
+          <h2 id="club-about-title" className="text-h4">
             درباره کلاب
           </h2>
           <div className="space-y-md text-body-md">
@@ -100,7 +100,7 @@ export default async function ClubPage({ params }: Params) {
       ) : null}
 
       <section aria-labelledby="club-contact-title" className="space-y-sm">
-        <h2 id="club-contact-title" className="text-h5">
+        <h2 id="club-contact-title" className="text-h4">
           راه ارتباطی و عضویت
         </h2>
         {page.membershipInfoFa ? <p className="text-body-md">{page.membershipInfoFa}</p> : null}
@@ -133,12 +133,12 @@ export default async function ClubPage({ params }: Params) {
 
       {events.length > 0 ? (
         <section aria-labelledby="club-events-title" className="space-y-md">
-          <h2 id="club-events-title" className="text-h5">
+          <h2 id="club-events-title" className="text-h4">
             رویدادها
           </h2>
           <ul className="space-y-sm" data-testid="club-events">
             {events.map((event) => (
-              <li key={event.id} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+              <li key={event.id} className="rounded-xl border border-border-default bg-bg-surface p-lg">
                 <p className="text-label-lg">{event.titleFa}</p>
                 <p className="mt-2xs text-caption text-text-secondary">
                   {dateFa(event.startsOn) + (event.endsOn ? ' تا ' + dateFa(event.endsOn) : '') + (event.cityNameFa ? ' · ' + event.cityNameFa : '')}
@@ -153,7 +153,7 @@ export default async function ClubPage({ params }: Params) {
 
       {page.posts.length > 0 ? (
         <section aria-labelledby="club-posts-title" className="space-y-md">
-          <h2 id="club-posts-title" className="text-h5">
+          <h2 id="club-posts-title" className="text-h4">
             نوشته‌های کلاب
           </h2>
           <ul className="space-y-sm" data-testid="club-posts">
@@ -169,8 +169,8 @@ export default async function ClubPage({ params }: Params) {
         </section>
       ) : null}
 
-      <section aria-labelledby="club-join-title" className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
-        <h2 id="club-join-title" className="text-h5">
+      <section aria-labelledby="club-join-title" className="rounded-xl border border-border-default bg-bg-surface p-lg">
+        <h2 id="club-join-title" className="text-h4">
           عضویت در این کلاب
         </h2>
         <p className="mt-xs text-body-sm text-text-secondary">

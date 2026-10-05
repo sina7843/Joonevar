@@ -108,7 +108,7 @@ export default async function CentrePage({ params }: Params) {
 
       <header className="space-y-sm">
         <RecordImage priority fileId={page.imageFileId} altFa={page.imageAltFa} className="mb-lg" />
-        <h1 className="text-h3 md:text-h1">{page.nameFa}</h1>
+        <h1 className="text-h2 md:text-h1">{page.nameFa}</h1>
         <p className="text-body-md text-text-secondary">{page.typeFa}</p>
         {/* Each axis is its own badge; none of them implies another (P2-D05). */}
         <div className="flex flex-wrap gap-xs" data-testid="centre-badges">
@@ -154,7 +154,7 @@ export default async function CentrePage({ params }: Params) {
 
       <dl className="grid gap-sm sm:grid-cols-2" data-testid="centre-facts">
         {page.phone ? (
-          <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
             <dt className="text-body-sm text-text-secondary">تلفن</dt>
             <dd className="text-label-md" dir="ltr" data-testid="centre-phone">
               <a href={'tel:' + page.phone}>{page.phone}</a>
@@ -162,7 +162,7 @@ export default async function CentrePage({ params }: Params) {
           </div>
         ) : null}
         {page.websiteUrl ? (
-          <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
             <dt className="text-body-sm text-text-secondary">وب‌سایت</dt>
             <dd className="truncate text-label-md" dir="ltr">
               <a href={page.websiteUrl} target="_blank" rel="nofollow noopener noreferrer" className="text-text-brand underline underline-offset-4">
@@ -172,7 +172,7 @@ export default async function CentrePage({ params }: Params) {
           </div>
         ) : null}
         {page.licence ? (
-          <div className="flex items-center justify-between gap-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
             <dt className="text-body-sm text-text-secondary">مجوز</dt>
             <dd className="text-label-md" data-testid="centre-licence">
               {page.licence.statusFa + (page.licence.number ? ' · ' + page.licence.number : '')}
@@ -180,7 +180,7 @@ export default async function CentrePage({ params }: Params) {
           </div>
         ) : null}
         {page.servicesFa.length > 0 ? (
-          <div className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm sm:col-span-2">
+          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
             <dt className="text-body-sm text-text-secondary">خدمات</dt>
             <dd className="mt-2xs text-label-md" data-testid="centre-services">
               {page.servicesFa.join('، ')}
@@ -188,7 +188,7 @@ export default async function CentrePage({ params }: Params) {
           </div>
         ) : null}
         {page.speciesFa.length > 0 ? (
-          <div className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm sm:col-span-2">
+          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
             <dt className="text-body-sm text-text-secondary">گونه‌هایی که پذیرفته می‌شوند</dt>
             <dd className="mt-2xs text-label-md" data-testid="centre-species">
               {page.speciesFa.join('، ')}
@@ -196,7 +196,7 @@ export default async function CentrePage({ params }: Params) {
           </div>
         ) : null}
         {page.facilitiesFa.length > 0 ? (
-          <div className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm sm:col-span-2">
+          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
             <dt className="text-body-sm text-text-secondary">امکانات</dt>
             <dd className="mt-2xs text-label-md" data-testid="centre-facilities">
               {page.facilitiesFa.join('، ')}
@@ -207,7 +207,7 @@ export default async function CentrePage({ params }: Params) {
 
       {page.aboutFa ? (
         <section aria-labelledby="centre-about-title">
-          <h2 id="centre-about-title" className="text-h4">
+          <h2 id="centre-about-title" className="text-h3">
             معرفی
           </h2>
           <Prose text={page.aboutFa} />
@@ -216,7 +216,7 @@ export default async function CentrePage({ params }: Params) {
 
       {page.branches.length === 0 && !page.listed ? null : (
         <section aria-labelledby="centre-branches-title">
-          <h2 id="centre-branches-title" className="text-h4">
+          <h2 id="centre-branches-title" className="text-h3">
             شعبه‌ها
           </h2>
           {page.listed ? (
@@ -227,7 +227,7 @@ export default async function CentrePage({ params }: Params) {
           ) : null}
           <ul className="mt-md space-y-sm" data-testid="centre-branches">
             {page.branches.map((branch) => (
-              <li key={branch.id} className="rounded-lg border border-border-subtle bg-bg-surface p-md" data-testid="centre-branch">
+              <li key={branch.id} className="rounded-lg border border-border-default bg-bg-surface p-md" data-testid="centre-branch">
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <p className="text-label-lg">{branch.nameFa}</p>
                   {branch.isOpen24h ? <StatusBadge tone="info">شبانه‌روزی</StatusBadge> : null}
@@ -287,12 +287,12 @@ export default async function CentrePage({ params }: Params) {
 
       {page.team.length > 0 ? (
         <section aria-labelledby="centre-team-title">
-          <h2 id="centre-team-title" className="text-h4">
+          <h2 id="centre-team-title" className="text-h3">
             تیم حرفه‌ای
           </h2>
           <ul className="mt-md space-y-sm" data-testid="centre-team">
             {page.team.map((member) => (
-              <li key={member.nameFa + (member.slug ?? '')} className="rounded-md border border-border-subtle bg-bg-surface px-md py-sm">
+              <li key={member.nameFa + (member.slug ?? '')} className="rounded-lg border border-border-default bg-bg-surface px-md py-sm">
                 {member.slug ? (
                   <Link href={'/veterinarians/' + member.slug} className="text-label-md text-text-brand underline underline-offset-4">
                     {member.nameFa}

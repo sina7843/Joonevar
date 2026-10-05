@@ -86,13 +86,13 @@ export default async function FinderReportsPage({ searchParams }: { searchParams
           ))
         )}
         <Card>
-          <h2 className="text-label-lg">اعتراض‌های باز</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعتراض‌های باز</span></h2></div>
           {appeals.length === 0 ? (
             <p className="mt-xs text-body-sm text-text-secondary">اعتراض بازی نیست.</p>
           ) : (
             <ul className="mt-sm space-y-md">
               {appeals.map(({ appeal, report }) => (
-                <li key={appeal.id} className="rounded-md border border-border-subtle p-md" data-testid={'finder-appeal-' + appeal.id}>
+                <li key={appeal.id} className="rounded-lg border border-border-default p-md" data-testid={'finder-appeal-' + appeal.id}>
                   <p className="text-label-md">{TARGET_FA[report.targetKind] ?? report.targetKind}</p>
                   <p className="mt-xs text-body-sm">{'تصمیم: ' + (report.decisionReason ?? '')}</p>
                   <p className="mt-xs text-body-sm">{'اعتراض: ' + appeal.statementFa}</p>

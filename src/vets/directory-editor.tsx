@@ -58,7 +58,7 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-md">
           <div>
-            <h1 className="text-h4">{profile.displayNameFa}</h1>
+            <h1 className="text-h3">{profile.displayNameFa}</h1>
             <p className="mt-2xs text-caption text-text-secondary">پروفایل عمومی دایرکتوری</p>
           </div>
           <span data-testid="directory-public-status">
@@ -118,7 +118,7 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
       <VetPublicProfileForm surface={surface} profile={editable} specialties={reference.specialties} species={reference.species} />
 
       <Card>
-        <h2 className="text-label-lg">محل‌های کار</h2>
+        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>محل‌های کار</span></h2></div>
         <p className="mt-xs text-body-sm text-text-secondary">
           {surface === 'admin'
             ? 'نشانی، تلفن، پروانه و امکانات در فهرست دامپزشکان ثبت می‌شوند. اینجا فقط شهر و نمایش عمومی هر محل تعیین می‌شود و Finder تغییری نمی‌کند.'
@@ -134,7 +134,7 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
         ) : (
           <ul className="mt-lg space-y-lg">
             {facts.locations.map((location) => (
-              <li key={location.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'directory-location-' + location.id}>
+              <li key={location.id} className="rounded-xl border border-border-default p-lg" data-testid={'directory-location-' + location.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
                     <h3 className="text-label-md">{location.nameFa}</h3>

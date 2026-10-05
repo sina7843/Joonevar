@@ -68,13 +68,13 @@ export default async function SellerFinancePage({
         </p>
 
         <Card>
-          <h2 className="text-label-lg">موجودی‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>موجودی‌ها</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="balances-note">
             هیچ‌کدام از این عددها جایی نوشته نشده‌اند؛ هرکدام جمع ردیف‌های دفتر زیر است.
           </p>
           <dl className="mt-md grid gap-sm md:grid-cols-4" data-testid="balances">
             {(['PENDING', 'HELD', 'AVAILABLE', 'DEBT'] as LedgerBucket[]).map((bucket) => (
-              <div key={bucket} className="rounded-md border border-border-subtle p-md">
+              <div key={bucket} className="rounded-lg border border-border-default p-md">
                 <dt className="text-caption text-text-secondary">{LEDGER_BUCKET_FA[bucket]}</dt>
                 <dd className="text-label-lg" data-testid={'balance-' + bucket}>
                   {fa(view.balances[bucket])} تومان
@@ -85,7 +85,7 @@ export default async function SellerFinancePage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تسویه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تسویه</span></h2></div>
           <p className="mt-2xs text-body-sm" data-testid="settlement-preview">
             دوره فعلی: {CADENCE_FA[view.preview.cadence as Cadence]} — پایان دوره جاری{' '}
             {view.preview.periodEnd.toLocaleDateString('fa-IR')} — قابل واریز {fa(view.preview.payoutToman)} تومان
@@ -118,7 +118,7 @@ export default async function SellerFinancePage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">دسته‌های تسویه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دسته‌های تسویه</span></h2></div>
           {view.batches.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="batches-empty">
               هنوز دسته تسویه‌ای ساخته نشده است.
@@ -147,7 +147,7 @@ export default async function SellerFinancePage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">دفتر مالی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دفتر مالی</span></h2></div>
           {view.entries.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="ledger-empty">
               هنوز ردیفی در دفتر مالی این فروشگاه ثبت نشده است.

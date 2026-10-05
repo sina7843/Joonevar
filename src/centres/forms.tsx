@@ -79,7 +79,7 @@ export function CentreCreateForm({
   const [state, submit, pending] = useActionState(createCentreAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">ثبت مرکز تازه</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت مرکز تازه</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         مرکز تازه پیش‌نویس است و تا افزودن شعبه و انتشار در فهرست عمومی دیده نمی‌شود. فقط اطلاعات عمومی و قابل استناد را ثبت کنید.
       </p>
@@ -133,7 +133,7 @@ export function CentreProfileForm({
   const [state, submit, pending] = useActionState(updateCentreProfileAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">پرونده مرکز</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده مرکز</span></h2></div>
       <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="centre-profile-form">
         <Hidden surface={surface} centreId={centre.id} />
         <input type="hidden" name="expectedVersion" value={centre.version} />
@@ -215,7 +215,7 @@ export function CentreLicenceForm({ surface, centre }: { surface: CentreSurface;
   const [state, submit, pending] = useActionState(setCentreLicenceAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">مجوز مرکز</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مجوز مرکز</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         فقط همان چیزی که در مدارک دیده شده است ثبت می‌شود. وضعیت «معتبر» یعنی مجوز بررسی و تأیید شده است.
       </p>
@@ -257,7 +257,7 @@ export function CentreStatusForm({
   const lockedForOwner = surface === 'owner' && centre.hiddenByReview && centre.publicStatus === 'HIDDEN';
   return (
     <Card>
-      <h2 className="text-label-lg">انتشار</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتشار</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">{'وضعیت فعلی: ' + CENTRE_STATUS_FA[centre.publicStatus]}</p>
       <Result state={state} testId="centre-status-result" />
       {lockedForOwner ? (
@@ -305,7 +305,7 @@ export function CentreOwnerForm({ centre }: { centre: EditableCentre }) {
   const [state, submit, pending] = useActionState(assignCentreOwnerAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">مدیر مرکز</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدیر مرکز</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         مدیریت این مرکز به حسابی که شماره‌اش را می‌نویسید سپرده می‌شود. Claim با بررسی مدارک در مرحله بعدی ساخته می‌شود.
       </p>
@@ -438,7 +438,7 @@ export function AttachLocationForm({ centreId, locations }: { centreId: string; 
   const [state, submit, pending] = useActionState(attachLocationToCentreAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">پیوند محل کار موجود</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیوند محل کار موجود</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         محل کاری که در فهرست دامپزشکان ثبت شده است به این مرکز پیوند می‌خورد؛ پروانه، امکانات و جایگاه آن در Finder دست نمی‌خورد.
       </p>
@@ -513,7 +513,7 @@ export function MemberRemoveForm({ surface, member }: { surface: CentreSurface; 
 export function CentreInvitationForm({ invitation }: { invitation: { id: string; version: number; centreNameFa: string; roleFa: string | null } }) {
   const [state, submit, pending] = useActionState(respondToCentreInvitationAction, EMPTY);
   return (
-    <div className="rounded-lg border border-border-subtle p-lg" data-testid={'centre-invitation-' + invitation.id}>
+    <div className="rounded-xl border border-border-default p-lg" data-testid={'centre-invitation-' + invitation.id}>
       <p className="text-label-md">{invitation.centreNameFa}</p>
       {invitation.roleFa ? <p className="mt-2xs text-caption text-text-secondary">{'سمت پیشنهادی: ' + invitation.roleFa}</p> : null}
       <p className="mt-xs text-body-sm text-text-secondary">تا وقتی نپذیرید، نام شما در صفحه این مرکز نمایش داده نمی‌شود.</p>

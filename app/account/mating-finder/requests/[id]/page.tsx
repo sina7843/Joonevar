@@ -89,7 +89,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             </Link>
           </p>
           <div className="mt-xs flex flex-wrap items-center justify-between gap-sm">
-            <h1 className="text-h4">{(snap.sender.nameFa ?? 'بدون نام') + ' ← ' + snap.receiver.nameFa}</h1>
+            <h2 className="text-h3">{(snap.sender.nameFa ?? 'بدون نام') + ' ← ' + snap.receiver.nameFa}</h2>
             <span data-testid="finder-request-status">
               <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'}>{REQUEST_STATUS_FA[status]}</StatusBadge>
             </span>
@@ -119,7 +119,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">اقدام‌ها</h2>
+          <h2 className="hz-card__title">اقدام‌ها</h2>
           <div className="mt-md space-y-md">
             {can('ACCEPT') ? <CommandForm action="respond-accept" requestId={id} version={request.version} label="پذیرش اولیه" tone="primary" testId="finder-accept" /> : null}
             {can('REJECT') ? <CommandForm action="respond-reject" requestId={id} version={request.version} label="رد درخواست" reason testId="finder-reject" /> : null}
@@ -140,7 +140,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
 
         {contract ? (
           <Card>
-            <h2 className="text-label-lg">قرارداد</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>قرارداد</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">{CONFIRMATION_NAME_FA + '. ' + NOT_A_LEGAL_SIGNATURE_FA}</p>
             <div className="mt-sm flex flex-wrap items-center gap-sm">
               <span data-testid="finder-contract-state">
@@ -201,7 +201,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
         {downstream ? (
           <Card>
             <div data-testid="finder-downstream">
-              <h2 className="text-label-lg">مسیر پس از قرارداد: {ROUTE_FA[downstream.route]}</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مسیر پس از قرارداد: {ROUTE_FA[downstream.route]}</span></h2></div>
               {downstream.link === null ? (
                 <>
                   <ul className="mt-sm list-inside list-disc space-y-xs text-body-sm" data-testid="finder-consequences">
@@ -267,7 +267,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
 
         {['CONTRACT_CONFIRMED', 'MATING_COMPLETED', 'MATING_NOT_COMPLETED'].includes(status) ? (
           <Card>
-            <h2 className="text-label-lg">اطلاعات تماس</h2>
+            <h2 className="hz-card__title">اطلاعات تماس</h2>
             <p className="mt-xs text-caption text-text-secondary">شماره تماس و نشانی فقط وقتی نمایش داده می‌شود که هر دو طرف موافقت کنند.</p>
             {contact ? (
               <p className="mt-sm text-body-sm" data-testid="finder-contact">
@@ -286,11 +286,11 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
 
         {chat.conversation ? (
           <Card>
-            <h2 className="text-label-lg">گفت‌وگو</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گفت‌وگو</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">تا پیش از قرارداد و موافقت دو طرف، شماره تماس و نشانی در پیام‌ها پنهان می‌شود.</p>
             <ul className="mt-md space-y-sm" data-testid="finder-messages">
               {chat.messages.map((m) => (
-                <li key={m.id} className={'rounded-md border border-border-subtle p-sm ' + (m.senderAccountId === guard.actor.accountId ? 'ms-lg' : 'me-lg')}>
+                <li key={m.id} className={'rounded-lg border border-border-default p-sm ' + (m.senderAccountId === guard.actor.accountId ? 'ms-lg' : 'me-lg')}>
                   <p className="whitespace-pre-line text-body-sm">{m.hiddenAt ? 'این پیام پنهان شد.' : (m.bodyFa ?? '')}</p>
                   {m.fileId ? (
                     <a href={'/api/finder/messages/' + m.id + '/file'} className="text-caption text-text-brand underline underline-offset-4">
@@ -315,7 +315,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
 
         {['MATING_COMPLETED', 'MATING_NOT_COMPLETED'].includes(status) ? (
           <Card>
-            <h2 className="text-label-lg">بازخورد محرمانه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بازخورد محرمانه</span></h2></div>
             <p className="mt-xs text-caption text-text-secondary">
               فقط مدیریت همزیست این بازخورد را می‌بیند؛ به طرف مقابل نشان داده نمی‌شود و امتیاز عمومی نمی‌سازد.
             </p>
@@ -328,7 +328,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">گزارش و مسدودکردن</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گزارش و مسدودکردن</span></h2></div>
           <p className="mt-xs text-caption text-text-secondary">
             گزارش را مدیریت بررسی می‌کند و مدرک شما خصوصی می‌ماند. با مسدودکردن، درخواست‌های باز میان شما بسته می‌شود و
             دیگر پروفایل‌ها و پیام‌های یکدیگر را نمی‌بینید؛ به طرف مقابل گفته نمی‌شود چه کسی مسدود کرده است.
@@ -347,7 +347,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه</span></h2></div>
           <ol className="mt-sm space-y-xs text-caption" data-testid="finder-request-history">
             {events.map((e) => (
               <li key={e.id}>{formatInstantFa(e.createdAt) + ' — ' + REQUEST_STATUS_FA[e.toStatus as RequestStatus] + (e.reasonFa ? ' — ' + e.reasonFa : '')}</li>

@@ -72,7 +72,7 @@ export function BodyEditor({ name, defaultValue }: { name: string; defaultValue:
         <button
           type="button"
           onClick={() => setPreview((on) => !on)}
-          className="min-h-[var(--size-control-sm)] rounded-md border border-border-subtle px-md text-label-md"
+          className="min-h-[var(--size-control-sm)] rounded-md border border-border-control px-md text-label-md"
           data-testid="body-preview-toggle"
         >
           {preview ? 'ویرایش' : 'پیش‌نمایش'}
@@ -80,7 +80,7 @@ export function BodyEditor({ name, defaultValue }: { name: string; defaultValue:
       </div>
 
       {preview ? (
-        <div className="rounded-md border border-border-subtle bg-bg-surface p-lg text-body-md" data-testid="body-preview">
+        <div className="rounded-lg border border-border-default bg-bg-surface p-lg text-body-md" data-testid="body-preview">
           <RichText source={value} />
         </div>
       ) : (
@@ -92,7 +92,7 @@ export function BodyEditor({ name, defaultValue }: { name: string; defaultValue:
                 type="button"
                 title={mark.title}
                 onClick={() => apply(mark)}
-                className="min-h-[var(--size-control-sm)] rounded-md border border-border-subtle bg-bg-surface px-md text-label-md hover:border-border-brand"
+                className="min-h-[var(--size-control-sm)] rounded-md border border-border-control bg-bg-surface px-md text-label-md hover:border-border-control"
                 data-testid={'body-mark-' + mark.before.trim().replace(/[^a-z0-9*#>[\]-]/gi, '') || 'body-mark'}
               >
                 {mark.labelFa}
@@ -105,7 +105,7 @@ export function BodyEditor({ name, defaultValue }: { name: string; defaultValue:
             rows={14}
             value={value}
             onChange={(event) => setValue(event.target.value)}
-            className="w-full rounded-md border border-border-subtle bg-bg-surface p-md text-body-sm text-text-primary focus:border-border-brand"
+            className="w-full rounded-md border border-border-control bg-bg-surface p-md text-body-sm text-text-primary focus:border-border-brand"
             data-testid="content-body"
           />
         </>

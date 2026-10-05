@@ -31,7 +31,7 @@ export default async function RegistrationPage() {
 
         {sheets.length === 0 ? null : (
           <Card>
-            <h2 className="text-label-lg">برگه‌های صادرشده</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>برگه‌های صادرشده</span></h2></div>
             <ul className="mt-md space-y-sm text-body-sm" data-testid="issued-sheets">
               {sheets.map((sheet) => (
                 <li key={sheet.id} className="flex items-center justify-between gap-md">
@@ -57,7 +57,7 @@ export default async function RegistrationPage() {
           />
         ) : (
           <Card>
-            <h2 className="text-label-lg">درخواست‌های صدور</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌های صدور</span></h2></div>
             <ul className="mt-md space-y-sm text-body-sm" data-testid="sheet-batches">
               {batches.map((batch) => (
                 <li key={batch.id}>

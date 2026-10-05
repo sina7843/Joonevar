@@ -44,7 +44,7 @@ export default async function ProfilePage() {
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div>
-              <h2 className="text-label-lg">شماره موبایل حساب</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شماره موبایل حساب</span></h2></div>
               <p className="mt-sm">
                 <bdi className="hz-ltr font-mono" data-testid="account-mobile">{account?.mobile}</bdi>
               </p>
@@ -61,7 +61,7 @@ export default async function ProfilePage() {
         </Card>
 
         <section className="space-y-md">
-          <h2 className="text-h4">اطلاعات هویتی</h2>
+          <h2 className="text-h3">اطلاعات هویتی</h2>
           <Card>
             <IdentityForm
               values={{
@@ -79,7 +79,7 @@ export default async function ProfilePage() {
         </section>
 
         <section className="space-y-md">
-          <h2 className="text-h4">سکونت</h2>
+          <h2 className="text-h3">سکونت</h2>
           <Card>
             <ResidenceForm
               mapAvailable={mapKeyConfigured}
@@ -93,7 +93,7 @@ export default async function ProfilePage() {
           </Card>
         </section>
         <section className="space-y-md">
-          <h2 className="text-h4">نشست</h2>
+          <h2 className="text-h3">نشست</h2>
           <Card>
             <form action={signOutAction}>
               <Button tone="secondary" type="submit" block data-testid="sign-out">

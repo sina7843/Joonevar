@@ -35,7 +35,7 @@ export function SelectSheetAnimals({
 
   return (
     <Card>
-      <h2 className="text-label-lg">انتخاب حیوان‌ها</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب حیوان‌ها</span></h2></div>
       <p className="mt-md text-caption text-text-secondary">
         هزینه هر حیوان جداگانه محاسبه می‌شود و در یک پرداخت گروهی جمع می‌شود. پس از پرداخت، دامپزشک معتمد و
         نوع خدمت هر حیوان انتخاب می‌شود. مبلغ خدمت دامپزشک جدا است و در این پرداخت نیست.
@@ -46,7 +46,7 @@ export function SelectSheetAnimals({
 
         <ul className="space-y-md" data-testid="sheet-animal-list">
           {animals.map((animal) => (
-            <li key={animal.animalId} className="rounded-lg border border-border-subtle p-lg">
+            <li key={animal.animalId} className="rounded-xl border border-border-default p-lg">
               <label className="flex items-start gap-sm text-body-sm">
                 <input
                   type="checkbox"

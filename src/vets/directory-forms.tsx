@@ -150,7 +150,7 @@ export function VetPublicProfileForm({
   const [state, submit, pending] = useActionState(updateVetPublicProfileAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">اطلاعات پروفایل عمومی</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات پروفایل عمومی</span></h2></div>
       <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="directory-profile-form">
         <Hidden surface={surface} />
         <input type="hidden" name="profileId" value={profile.profileId} />
@@ -241,7 +241,7 @@ export function VetPublicStatusForm({
   const lockedForOwner = surface === 'owner' && profile.hiddenByReview && profile.publicStatus === 'HIDDEN';
   return (
     <Card>
-      <h2 className="text-label-lg">انتشار</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتشار</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">{'وضعیت فعلی: ' + VET_PUBLIC_STATUS_FA[profile.publicStatus]}</p>
       <Result state={state} testId="directory-status-result" />
       {lockedForOwner ? (
@@ -351,7 +351,7 @@ export function AddOwnLocationForm({ provinces, cities }: { provinces: readonly 
   const [state, submit, pending] = useActionState(addOwnLocationAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">افزودن محل کار</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>افزودن محل کار</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         پروانه و امکانات خدمات همزیست (میکروچیپ، نمونه خون، بارداری) از اینجا ثبت نمی‌شوند. اگر شهرتان در فهرست نیست به پشتیبانی
         همزیست اطلاع دهید.
@@ -390,7 +390,7 @@ export function AddCityForm({ surface, provinces }: { surface: DirectorySurface;
   const [state, submit, pending] = useActionState(addCityAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">افزودن شهر</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>افزودن شهر</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">مرکز استان‌ها از قبل ثبت شده‌اند. شهر دیگر را فقط وقتی دامپزشکی در آن هست اضافه کنید.</p>
       <form onSubmit={submitWith(submit)} className="mt-lg grid gap-md md:grid-cols-[1fr_1fr_auto] md:items-end" data-testid="add-city-form">
         <Hidden surface={surface} />

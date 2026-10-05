@@ -137,7 +137,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
       <div className="space-y-lg">
         {trusted.isActiveLicensedVet || trustedCase ? (
           <Card>
-            <h2 className="text-label-lg">دامپزشک معتمد</h2>
+            <h2 className="hz-card__title">دامپزشک معتمد</h2>
             <p className="mt-xs text-caption text-text-secondary">
               معتمد شدن دو شرط دارد: دوره فعال پروانه فعالیت و عضویت معتبر انجمن. برای دستگاه میکروچیپ‌ریدر مدرکی لازم نیست و همه‌جا «تجهیزات اعلام‌شده» نوشته می‌شود.
             </p>
@@ -249,7 +249,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
 
         {professional.currentTag || professional.cases.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">هویت حرفه‌ای</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>هویت حرفه‌ای</span></h2></div>
             {professional.currentTag ? (
               <p className="mt-xs text-body" data-testid="vet-current-tag">
                 {professional.currentTag.labelFa}
@@ -273,7 +273,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
                 <p className="text-caption text-text-secondary">پرونده دانشجوی دامپزشکی</p>
-                <h2 className="text-label-lg">{studentCase.fields?.displayNameFa ?? '—'}</h2>
+                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{studentCase.fields?.displayNameFa ?? '—'}</span></h2></div>
               </div>
               <span data-testid="student-case-status">
                 <StatusBadge tone={CASE_TONE[studentCase.status] ?? 'neutral'}>{studentCase.statusFa}</StatusBadge>
@@ -307,7 +307,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
                 <p className="text-caption text-text-secondary">{doctorCase.claimProfileId ? 'Claim پروفایل بدون مالک' : 'درخواست دکتر دامپزشک'}</p>
-                <h2 className="text-label-lg">{doctorCase.fields?.displayNameFa ?? '—'}</h2>
+                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{doctorCase.fields?.displayNameFa ?? '—'}</span></h2></div>
               </div>
               <span data-testid="doctor-case-status">
                 <StatusBadge tone={CASE_TONE[doctorCase.status] ?? 'neutral'}>{doctorCase.statusFa}</StatusBadge>
@@ -357,10 +357,10 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
                 <p className="text-caption text-text-secondary">پرونده پروانه فعالیت</p>
-                <h2 className="text-label-lg">
+                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>
                   {'کد پروانه '}
                   <span dir="ltr">{licenceCase.fields?.licenceCode ?? '—'}</span>
-                </h2>
+                </span></h2></div>
               </div>
               <span data-testid="licence-case-status">
                 <StatusBadge tone={CASE_TONE[licenceCase.status] ?? 'neutral'}>{licenceCase.statusFa}</StatusBadge>
@@ -446,7 +446,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
           <VetDirectoryEditor data={own} surface="owner" />
         ) : !verifiedStudent ? (
           <Card>
-            <h1 className="text-h4">مسیر دامپزشکی در همزیست</h1>
+            <h2 className="text-h3">مسیر دامپزشکی در همزیست</h2>
             <p className="mt-xs text-body-sm text-text-secondary">
               حساب کاربری عادی شما همان می‌ماند و این مسیر اختیاری است. دانشجوی دامپزشکی با شماره دانشجویی و دانشگاه، دکتر دامپزشک با کد نظام و
               کارت نظام، و دکتر دارای پروانه با کد، تاریخ و فایل پروانه نیز اقدام می‌کند. اگر پروفایلی «بدون مالک» از شما منتشر شده است، از صفحه
@@ -457,7 +457,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
 
         {invitations.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">دعوت‌های مراکز</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دعوت‌های مراکز</span></h2></div>
             <p className="mt-xs text-body-sm text-text-secondary">
               مرکزی شما را به تیم حرفه‌ای خود دعوت کرده است. نام شما فقط پس از پذیرش در صفحه آن مرکز نمایش داده می‌شود.
             </p>
@@ -482,7 +482,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
                 <p className="text-caption text-text-secondary">{APPLICATION_KIND_FA[latest.kind]}</p>
-                <h2 className="text-label-lg">{latest.displayNameFa}</h2>
+                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{latest.displayNameFa}</span></h2></div>
               </div>
               <span data-testid="vet-application-status">
                 <StatusBadge tone={TONE[latest.status]}>{APPLICATION_STATUS_FA[latest.status]}</StatusBadge>
@@ -519,7 +519,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
 
         {canChoosePath ? (
           <Card>
-            <h2 className="text-label-lg">کدام مسیر؟</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کدام مسیر؟</span></h2></div>
             <div className="mt-md flex flex-wrap gap-md" data-testid="vet-path-choice">
               {(
                 [

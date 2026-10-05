@@ -64,7 +64,7 @@ export default async function LocationPage({
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">{location.nameFa}</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{location.nameFa}</span></h2></div>
               {vet ? (
                 <p className="mt-2xs text-caption text-text-secondary">
                   {vet.displayNameFa} · کد نظام دامپزشکی {vet.councilCode}

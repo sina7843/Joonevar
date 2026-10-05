@@ -78,7 +78,7 @@ export function BreedProfileForm({
   const [state, submit, pending] = useActionState(updateBreedProfileAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">مشخصات و محتوای نژاد</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مشخصات و محتوای نژاد</span></h2></div>
       {/*
         Submitted from onSubmit rather than the `action` prop. React resets a
         form after its action, and a reset <select> falls back to its first
@@ -213,7 +213,7 @@ export function BreedStatusForm({
   const targets = BREED_PROFILE_STATUSES.filter((to) => canTransition(status, to));
   return (
     <Card>
-      <h2 className="text-label-lg">وضعیت صفحه عمومی</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت صفحه عمومی</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary" data-testid="breed-profile-status">
         {'وضعیت فعلی: ' + STATUS_FA[status]}
       </p>
@@ -241,7 +241,7 @@ export function MedicalClaimForm({ breedId }: { breedId: string }) {
   const [state, submit, pending] = useActionState(addMedicalClaimAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">افزودن مطلب سلامت و ژنتیک</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>افزودن مطلب سلامت و ژنتیک</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         هر مطلب سلامت منبع و تاریخ بازبینی لازم دارد. آزمایش پیشنهادی فقط اطلاع‌رسانی است و درخواستی نمی‌سازد.
       </p>
@@ -297,7 +297,7 @@ export function DuplicateForm({
   const [state, submit, pending] = useActionState(markBreedDuplicateAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">ثبت به‌عنوان نژاد تکراری</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت به‌عنوان نژاد تکراری</span></h2></div>
       <p className="mt-xs text-body-sm text-text-secondary">
         نژاد تکراری از انتخاب‌های جدید کنار می‌رود و صفحه‌اش به نژاد اصلی اشاره می‌کند. حیوان‌ها و کنل‌هایی که با این
         نژاد ثبت شده‌اند تغییر نمی‌کنند.

@@ -78,7 +78,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">اعلام بارداری</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام بارداری</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {permit.permitNo ?? '—'} · حیوان ماده: {dam?.name ?? 'بدون نام'} ·{' '}
                 <Link href={'/mating/permits/' + id} className="text-text-brand underline underline-offset-4">
@@ -116,7 +116,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
         />
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه اعلام‌های مالک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه اعلام‌های مالک</span></h2></div>
           {records.declarations.length === 0 ? (
             <div className="mt-lg">
               <EmptyState
@@ -129,7 +129,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
               {records.declarations.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-lg border border-border-subtle p-lg"
+                  className="rounded-xl border border-border-default p-lg"
                   data-testid={'declaration-' + row.version}
                 >
                   <p className="text-label-md">
@@ -156,7 +156,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
         />
 
         <Card>
-          <h2 className="text-label-lg">نتیجه مستقل دامپزشک</h2>
+          <h2 className="hz-card__title">نتیجه مستقل دامپزشک</h2>
           {records.checks.length === 0 ? (
             <div className="mt-lg">
               <EmptyState
@@ -167,7 +167,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
           ) : (
             <ul className="mt-lg space-y-md" data-testid="vet-results">
               {records.checks.map(({ check, results, latest, locationNameFa }) => (
-                <li key={check.id} className="rounded-lg border border-border-subtle p-lg">
+                <li key={check.id} className="rounded-xl border border-border-default p-lg">
                   {latest === null ? (
                     <p className="text-body-sm" data-testid="vet-result-pending">
                       مراجعه ثبت شده است و نتیجه‌ای هنوز ثبت نشده؛ انتظار نتیجه، مهلت مسدودکننده‌ای برای

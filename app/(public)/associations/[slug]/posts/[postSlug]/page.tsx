@@ -71,7 +71,7 @@ export default async function CommunityPostPage({ params }: Params) {
       />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{post.titleFa}</h1>
+        <h1 className="text-h2 md:text-h1">{post.titleFa}</h1>
         <p className="text-body-md text-text-secondary">{post.summaryFa}</p>
         <p className="text-caption text-text-secondary" data-testid="community-post-author">
           {'نوشته '}

@@ -113,7 +113,7 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">{SERVICE_TYPE_FA[request.serviceType]}</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{SERVICE_TYPE_FA[request.serviceType]}</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 {CONTEXT_FA[request.context]} · {view.locationNameFa}
               </p>
@@ -235,7 +235,7 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
             <h3 className="text-label-lg">نمونه و Custody</h3>
             <ul className="mt-md space-y-lg" data-testid="sample-list">
               {sampleRows.map((sample) => (
-                <li key={sample.id} className="rounded-lg border border-border-subtle p-lg">
+                <li key={sample.id} className="rounded-xl border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <p className="text-body-sm">
                       <Identifier label="کد رهگیری نمونه:" value={sample.trackingCode} />

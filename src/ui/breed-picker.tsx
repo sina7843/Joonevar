@@ -74,7 +74,7 @@ export function BreedPicker({
               aria-describedby={describedBy}
               autoComplete="off"
               placeholder="جست‌وجوی نژاد"
-              className="w-full rounded-md border border-border-subtle bg-bg-surface py-sm ps-[calc(var(--size-icon-sm)+var(--spacing-lg))] pe-md text-body-sm focus:border-border-brand"
+              className="w-full rounded-md border border-border-control bg-bg-surface py-sm ps-[calc(var(--size-icon-sm)+var(--spacing-lg))] pe-md text-body-sm focus:border-border-brand"
               data-testid={testId ? testId + '-search' : undefined}
             />
           </div>
@@ -93,7 +93,7 @@ export function BreedPicker({
         </p>
       ) : (
         <ul
-          className="hz-rail max-h-[240px] space-y-2xs overflow-y-auto rounded-md border border-border-subtle p-2xs"
+          className="hz-rail max-h-[240px] space-y-2xs overflow-y-auto rounded-lg border border-border-default p-2xs"
           data-testid={testId ? testId + '-list' : undefined}
         >
           {matches.map((breed) => {

@@ -50,7 +50,7 @@ export default async function SellerPlansPage() {
         </Alert>
 
         <Card>
-          <h2 className="text-label-lg">پلن‌های قابل خرید</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پلن‌های قابل خرید</span></h2></div>
           {live.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="live-plans-empty">
               هنوز پلنی منتشر نشده است.
@@ -79,14 +79,14 @@ export default async function SellerPlansPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">انتشار نسخه تازه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتشار نسخه تازه</span></h2></div>
           <div className="mt-lg">
             <SellerPlanForm />
           </div>
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌ها</span></h2></div>
           {history.length === 0 ? (
             <div className="mt-lg" data-testid="plan-history-empty">
               <EmptyState title="هنوز نسخه‌ای منتشر نشده است" description="هر نسخه‌ای که منتشر شود اینجا می‌ماند." />

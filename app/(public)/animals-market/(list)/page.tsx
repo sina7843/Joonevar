@@ -65,7 +65,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 }
 
 const CONTROL =
-  'w-full rounded-md border border-border-subtle bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
+  'w-full rounded-lg border border-border-default bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
   'min-h-[var(--size-control-md)] focus:border-border-brand';
 
 function Select({
@@ -143,7 +143,7 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
     <div className="mx-auto max-w-6xl space-y-lg px-lg py-lg">
       <Breadcrumbs items={CRUMBS} origin={site().origin} />
       <header className="space-y-xs">
-        <h1 className="text-h3">{TITLE}</h1>
+        <h1 className="text-h2">{TITLE}</h1>
         <p className="text-body-sm text-text-secondary">{DESCRIPTION}</p>
       </header>
 
@@ -155,7 +155,7 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
         </Alert>
       ) : null}
 
-      <form method="get" className="space-y-lg rounded-lg border border-border-subtle p-lg" data-testid="market-filters">
+      <form method="get" className="space-y-lg rounded-xl border border-border-default p-lg" data-testid="market-filters">
         <div className="grid gap-lg md:grid-cols-3">
           <div className="space-y-xs">
             <label htmlFor="market-q" className="block text-label-md">
@@ -277,7 +277,7 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
           </button>
           <Link
             href="/animals-market"
-            className="rounded-md border border-border-subtle px-lg py-sm text-label-md"
+            className="rounded-lg border border-border-default px-lg py-sm text-label-md"
             data-testid="market-clear-filters"
           >
             پاک کردن
@@ -300,11 +300,11 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
             <li key={card.id} data-testid={'market-card-' + card.id}>
               <Link
                 href={card.path}
-                className="flex h-full flex-col gap-sm rounded-lg border border-border-subtle p-lg hover:border-border-brand"
+                className="flex h-full flex-col gap-sm rounded-xl border border-border-default p-lg hover:border-border-control"
               >
                 <RecordImage fileId={card.coverFileId} altFa={card.coverAltFa} variant="thumb" />
                 <div className="flex flex-wrap items-start justify-between gap-xs">
-                  <h2 className="text-label-lg">{card.titleFa}</h2>
+                  <h2 className="hz-card__title">{card.titleFa}</h2>
                   <div className="flex flex-wrap gap-xs">
                     {card.promoted ? (
                       <StatusBadge tone="warning">

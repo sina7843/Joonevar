@@ -45,7 +45,7 @@ export default async function MarketReturnsPage() {
     <OpsShell actor={guard.actor} title="مرجوعی و سیاست آن" nav={marketNav(guard.actor)} pathname="/market/returns">
       <div className="space-y-lg p-lg">
         <Card>
-          <h2 className="text-label-lg">سیاست مرجوعی در جریان</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>سیاست مرجوعی در جریان</span></h2></div>
           {policy === null ? (
             <Alert tone="warning" title="هنوز هیچ نسخه‌ای منتشر نشده است">
               <span data-testid="policy-missing">
@@ -78,7 +78,7 @@ export default async function MarketReturnsPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">مرجوعی‌های مورد اختلاف</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرجوعی‌های مورد اختلاف</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="disputed-hold-note">
             تا تعیین تکلیف، مبلغ این زیرسفارش‌ها نگه داشته می‌شود و در هیچ دسته تسویه‌ای نمی‌آید.
           </p>
@@ -89,7 +89,7 @@ export default async function MarketReturnsPage() {
           ) : (
             <ul className="mt-md space-y-lg" data-testid="disputed-returns">
               {disputes.map((view) => (
-                <li key={view.row.id} className="space-y-sm rounded-md border border-border-subtle p-lg">
+                <li key={view.row.id} className="space-y-sm rounded-lg border border-border-default p-lg">
                   <div className="flex flex-wrap items-center justify-between gap-sm">
                     <span className="text-label-sm" data-testid={'disputed-ref-' + view.row.id}>
                       {view.row.reference} — {view.sellerNameFa} — زیرسفارش {view.subOrderReference}

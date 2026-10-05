@@ -55,7 +55,7 @@ export default async function CardCheckoutPage({
             <LockedServiceCard serviceLabel="کارت توله" lock={eligibility.lock} />
           )}
           <Card>
-            <h2 className="text-label-lg">کارت‌های صادرشده شما</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کارت‌های صادرشده شما</span></h2></div>
             {myCards.length === 0 ? (
               <div className="mt-lg">
                 <EmptyState
@@ -66,7 +66,7 @@ export default async function CardCheckoutPage({
             ) : (
               <ul className="mt-lg space-y-md" data-testid="my-cards">
                 {myCards.map((row) => (
-                  <li key={row.card.id} className="rounded-lg border border-border-subtle p-lg">
+                  <li key={row.card.id} className="rounded-xl border border-border-default p-lg">
                     <Link
                       href={'/documents/puppy-card/' + row.card.id}
                       className="text-text-brand underline underline-offset-4"
@@ -106,7 +106,7 @@ export default async function CardCheckoutPage({
     <PublicShell actor={guard.actor} title="صدور کارت توله" pathname="/puppy-cards/checkout">
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">کارت توله</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کارت توله</span></h2></div>
           <p className="mt-md text-caption text-text-secondary" data-testid="card-distinction-note">
             {CARD_DISTINCTION_NOTE_FA}
           </p>
@@ -127,12 +127,12 @@ export default async function CardCheckoutPage({
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">وضعیت هر توله</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت هر توله</span></h2></div>
           <ul className="mt-lg space-y-md" data-testid="card-eligibility">
             {rows.map((row) => (
               <li
                 key={row.puppyId}
-                className="rounded-lg border border-border-subtle p-lg"
+                className="rounded-xl border border-border-default p-lg"
                 data-testid={'card-row-' + row.tempCode}
               >
                 <p className="text-label-md">
@@ -173,7 +173,7 @@ export default async function CardCheckoutPage({
           </Alert>
         ) : (
           <Card>
-            <h2 className="text-label-lg">انتخاب و پرداخت</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب و پرداخت</span></h2></div>
             <p className="mt-md text-caption text-text-secondary">
               می‌توانید یک یا چند توله را انتخاب کنید؛ هزینه هر توله جدا محاسبه و در یک پرداخت جمع می‌شود و
               کارت هر توله مستقل صادر می‌شود.

@@ -42,7 +42,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
     <OpsShell actor={guard.actor} title="بررسی کد نظام دامپزشک" pathname="/assoc/vet-doctors" nav={ASSOC_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">اطلاعات متقاضی</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات متقاضی</span></h2></div>
           <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
             <dt className="text-text-secondary">نام در حساب</dt>
             <dd>{detail.applicantNameFa ?? '—'}</dd>
@@ -64,7 +64,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
 
         {detail.claimTarget ? (
           <Card>
-            <h2 className="text-label-lg">پروفایل موردِ Claim</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پروفایل موردِ Claim</span></h2></div>
             <p className="mt-md text-body-sm" data-testid="doctor-claim-target">
               {detail.claimTarget.displayNameFa + (detail.claimTarget.cityNameFa ? ' · ' + detail.claimTarget.cityNameFa : '')}
               {detail.claimTarget.accountId ? ' — این پروفایل اکنون مالک دارد و Claim دیگر تأیید نمی‌شود.' : ' — بدون مالک'}
@@ -86,7 +86,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">مدارک</h2>
+          <h2 className="hz-card__title">مدارک</h2>
           <ul className="mt-md space-y-2xs text-body-sm">
             {detail.documents.map((document) => (
               <li key={document.id}>
@@ -109,7 +109,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
 
         {detail.submissions.length > 1 ? (
           <Card>
-            <h2 className="text-label-lg">نسخه‌های ارسال</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نسخه‌های ارسال</span></h2></div>
             <ol className="mt-md space-y-sm text-body-sm" data-testid="doctor-submissions">
               {detail.submissions.map((submission) => (
                 <li key={submission.version}>
@@ -122,7 +122,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه</span></h2></div>
           <ol className="mt-md space-y-sm text-body-sm" data-testid="doctor-case-history">
             {detail.history.map((event, index) => (
               <li key={index}>
@@ -135,7 +135,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
 
         {review && waiting ? (
           <Card>
-            <h2 className="text-label-lg">بررسی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بررسی</span></h2></div>
             <div className="mt-md">
               <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
             </div>
@@ -144,7 +144,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
 
         {waiting && !review?.claimedByOther ? (
           <Card>
-            <h2 className="text-label-lg">ثبت نتیجه</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
             <div className="mt-lg">
               <DecideDoctorCaseForm caseId={detail.case.id} version={detail.case.version} />
             </div>

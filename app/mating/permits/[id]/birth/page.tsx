@@ -68,7 +68,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <h2 className="text-label-lg">نتیجه زایمان</h2>
+              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نتیجه زایمان</span></h2></div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {permit.permitNo ?? '—'} ·{' '}
                 <Link
@@ -132,7 +132,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
 
         {view.litter ? (
           <Card>
-            <h2 className="text-label-lg">توله‌ها</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توله‌ها</span></h2></div>
             {view.puppies.length === 0 ? (
               <div className="mt-lg">
                 <EmptyState
@@ -145,7 +145,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                 {view.puppies.map((puppy) => (
                   <li
                     key={puppy.id}
-                    className="rounded-lg border border-border-subtle p-lg"
+                    className="rounded-xl border border-border-default p-lg"
                     data-testid={'puppy-' + puppy.tempCode}
                   >
                     <div className="flex items-start justify-between gap-md">
@@ -222,10 +222,10 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
 
         {view.history.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌ها</span></h2></div>
             <ul className="mt-lg space-y-md" data-testid="birth-history">
               {view.history.map((row) => (
-                <li key={row.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'birth-version-' + row.version}>
+                <li key={row.id} className="rounded-xl border border-border-default p-lg" data-testid={'birth-version-' + row.version}>
                   <p className="text-label-md">
                     نسخه {row.version} · {row.liveCount} زنده · {row.deadCount} مرده ·{' '}
                     {row.kind === 'INITIAL' ? 'گزارش اولیه' : 'اصلاح'}

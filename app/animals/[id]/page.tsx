@@ -130,7 +130,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                 <Icon name="dog" size="md" />
               </span>
               <div className="min-w-0 flex-1">
-                <h2 id="animal-identity" className="truncate text-h4">
+                <h2 id="animal-identity" className="truncate text-h3">
                   {animal.name ?? 'بدون نام'}
                 </h2>
                 <p className="mt-2xs text-caption text-text-secondary">
@@ -495,7 +495,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
         ) : null}
 
         <section aria-labelledby="timeline-heading" className="space-y-md">
-          <h3 id="timeline-heading" className="text-h4">
+          <h3 id="timeline-heading" className="text-h3">
             تاریخچه
           </h3>
           <Timeline items={items} />

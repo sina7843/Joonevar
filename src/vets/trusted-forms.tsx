@@ -57,7 +57,7 @@ export function TrustedApplicationForm({
 
       <section className="space-y-sm">
         <h3 className="text-label-lg">{'تعهدنامه (نسخه ' + termsVersion + ')'}</h3>
-        <div className="max-h-64 overflow-y-auto rounded-md border border-border-subtle p-md text-body-sm whitespace-pre-line" data-testid="trusted-terms-text">
+        <div className="max-h-64 overflow-y-auto rounded-lg border border-border-default p-md text-body-sm whitespace-pre-line" data-testid="trusted-terms-text">
           {termsFa}
         </div>
         <label className="flex items-start gap-sm text-body-sm">

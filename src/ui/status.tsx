@@ -2,43 +2,39 @@ import type { ReactNode } from 'react';
 
 export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'error';
 
-const TONE: Record<StatusTone, string> = {
-  neutral: 'bg-status-neutral-bg text-status-neutral-text border-status-neutral-border',
-  info: 'bg-status-info-bg text-status-info-text border-status-info-border',
-  success: 'bg-status-success-bg text-status-success-text border-status-success-border',
-  warning: 'bg-status-warning-bg text-status-warning-text border-status-warning-border',
-  error: 'bg-status-error-bg text-status-error-text border-status-error-border',
-};
-
 /**
- * Status badge. A tone is chosen by the caller from the product meaning of the
- * state; the badge never reinterprets it, and a warning is never rendered the
- * same way as a rejection (§24.3).
+ * Status badge — DS *StatusBadge* (`.hz-badge`): dot + Persian label, one tone
+ * per status family (draft/closed neutral, waiting info, action warning, done
+ * success, blocked error). The tone says whose move it is; who acts next is
+ * `ActionOwner`'s job, never the label's. `sm` (20px) is for tables, card lists
+ * and timelines.
  */
-export function StatusBadge({ tone = 'neutral', children }: { tone?: StatusTone; children: ReactNode }) {
+export function StatusBadge({
+  tone = 'neutral',
+  size = 'md',
+  children,
+}: {
+  tone?: StatusTone;
+  size?: 'md' | 'sm';
+  children: ReactNode;
+}) {
   return (
-    <span
-      className={[
-        'inline-flex items-center gap-xs rounded-full border px-md py-2xs text-label-sm',
-        'min-h-[var(--size-badge-sm)] whitespace-nowrap',
-        TONE[tone],
-      ].join(' ')}
-    >
-      <span aria-hidden="true" className="size-[6px] rounded-full bg-current" />
+    <span className={['hz-badge', 'hz-badge--' + tone, size === 'sm' ? 'hz-badge--sm' : ''].join(' ').trim()}>
+      <span className="hz-badge__dot" aria-hidden="true" />
       {children}
     </span>
   );
 }
 
 /**
- * An identifier stays left-to-right inside Persian text. `bdi` plus explicit
- * isolation keeps the stored value untouched while it renders correctly (§24.3).
+ * An identifier stays left-to-right inside Persian text — DS *Identifier*:
+ * `<bdi dir="ltr">`, 13/20 · 600, never wraps (§24.3).
  */
 export function Identifier({ value, label }: { value: string; label?: string }) {
   return (
-    <span className="inline-flex items-center gap-xs">
-      {label ? <span className="text-text-secondary">{label}</span> : null}
-      <bdi className="hz-ltr font-mono text-label-md" data-testid="identifier">
+    <span className="hz-identifier">
+      {label ? <span className="hz-identifier__label">{label}</span> : null}
+      <bdi dir="ltr" data-testid="identifier">
         {value}
       </bdi>
     </span>
@@ -46,8 +42,9 @@ export function Identifier({ value, label }: { value: string; label?: string }) 
 }
 
 /**
- * Who the next action belongs to (§8, §24.3). A waiting state must never leave
- * this unanswered, so the label is a required part of every waiting card.
+ * Who the next action belongs to (§8, §24.3) — DS *ActionOwner* (`.hz-owner`).
+ * When the user must act the strip turns warning (`--you`). A waiting state must
+ * never leave this unanswered.
  */
 export type ActionOwnerKind = 'USER' | 'VET' | 'ASSOCIATION' | 'GENETICS_CENTRE' | 'COUNTERPARTY' | 'SYSTEM';
 
@@ -60,10 +57,22 @@ const OWNER_FA: Record<ActionOwnerKind, string> = {
   SYSTEM: 'همزیست',
 };
 
-export function ActionOwner({ owner }: { owner: ActionOwnerKind }) {
+export function ActionOwner({
+  owner,
+  extra,
+  stack = false,
+}: {
+  owner: ActionOwnerKind;
+  /** Deadline, amount or a short note at the inline end. */
+  extra?: ReactNode;
+  stack?: boolean;
+}) {
   return (
-    <p className="text-caption text-text-secondary">
-      اقدام بعدی با: <span className="text-text-primary">{OWNER_FA[owner]}</span>
-    </p>
+    <div className={['hz-owner', owner === 'USER' ? 'hz-owner--you' : '', stack ? 'hz-owner--stack' : ''].join(' ').trim()}>
+      <span>
+        اقدام بعدی با: <b className="hz-owner__who">{OWNER_FA[owner]}</b>
+      </span>
+      {extra ? <span className="hz-owner__extra">{extra}</span> : null}
+    </div>
   );
 }

@@ -31,11 +31,11 @@ export default async function ReportListingPage({ params }: { params: Promise<{ 
       <div className="space-y-lg p-lg">
         <Card>
           <p className="text-caption text-text-secondary">آگهی</p>
-          <h1 className="text-h4">
+          <h2 className="text-h3">
             <Link href={listing.path} className="hover:text-text-brand" data-testid="report-listing-title">
               {listing.titleFa}
             </Link>
-          </h1>
+          </h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             گزارش شما به ناظر آگهی می‌رسد و با دلیل بررسی می‌شود. هر حساب برای هر موضوع تا بسته‌شدن بررسی،
             یک گزارش باز دارد. نام شما به فروشنده گفته نمی‌شود.

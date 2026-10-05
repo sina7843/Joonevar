@@ -76,7 +76,7 @@ export default async function MyListingsPage() {
         ) : null}
 
         <Card>
-          <h2 className="text-label-lg">آگهی‌های من</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>آگهی‌های من</span></h2></div>
           {listings.length === 0 ? (
             <div className="mt-lg">
               <EmptyState
@@ -90,7 +90,7 @@ export default async function MyListingsPage() {
                 <li key={row.id} data-testid={'listing-row-' + row.id}>
                   <Link
                     href={'/account/listings/' + row.id}
-                    className="block rounded-lg border border-border-subtle p-lg hover:border-border-brand"
+                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-sm">
                       <div className="min-w-0">
@@ -115,12 +115,12 @@ export default async function MyListingsPage() {
 
         {ready.length > 0 && marketOpen && creationOpen ? (
           <Card>
-            <h2 className="text-label-lg">آماده برای آگهی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>آماده برای آگهی</span></h2></div>
             <ul className="mt-lg space-y-sm" data-testid="sellable-animals">
               {ready.map((row) => (
                 <li
                   key={row.animalId}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-subtle p-md"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
                 >
                   <div className="min-w-0">
                     <p className="text-label-md">{row.name ?? 'بدون نام'}</p>
@@ -141,7 +141,7 @@ export default async function MyListingsPage() {
 
         {blocked.length > 0 ? (
           <div className="space-y-sm">
-            <h2 className="text-label-lg">حیوان‌هایی که هنوز قابل آگهی نیستند</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>حیوان‌هایی که هنوز قابل آگهی نیستند</span></h2></div>
             {blocked.map((row) => (
               <BlockedAnimalCard
                 key={row.animalId}

@@ -42,7 +42,7 @@ export default async function SavedPage() {
     <PublicShell actor={guard.actor} title="فهرست من" pathname="/account/saved">
       <div className="space-y-lg p-lg">
         <Card>
-          <h2 className="text-label-lg">نگه‌داشته‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نگه‌داشته‌ها</span></h2></div>
           {saved.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="saved-empty">
               هنوز چیزی نگه نداشته‌اید.
@@ -83,7 +83,7 @@ export default async function SavedPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">دنبال‌شده‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دنبال‌شده‌ها</span></h2></div>
           {following.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="following-empty">
               هنوز فروشگاه یا کنلی را دنبال نکرده‌اید.
@@ -107,7 +107,7 @@ export default async function SavedPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">پیشنهادها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیشنهادها</span></h2></div>
           <p className="mt-2xs text-caption text-text-secondary" data-testid="suggestions-note">
             هر پیشنهاد دلیل خودش را همراه دارد. هیچ پیشنهادی از روی حدس درباره شما ساخته نمی‌شود و جایگاه تبلیغی
             جداگانه و برچسب‌دار است.
@@ -131,7 +131,7 @@ export default async function SavedPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">بازدیدهای اخیر</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بازدیدهای اخیر</span></h2></div>
           {viewed.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="viewed-empty">
               تاریخچه بازدیدی نگه داشته نشده است.
@@ -148,7 +148,7 @@ export default async function SavedPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تنظیمات حریم خصوصی</h2>
+          <h2 className="hz-card__title">تنظیمات حریم خصوصی</h2>
           <Alert tone="info" title="این سه کلید مال شماست">
             <span data-testid="privacy-note">
               خاموش‌کردن تاریخچه، آنچه تا امروز نگه داشته شده را هم پاک می‌کند؛ وگرنه کلید فقط درباره آینده وعده

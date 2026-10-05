@@ -45,7 +45,7 @@ export default async function ReviewSuggestionPage({ params }: { params: Promise
           <div className="flex flex-wrap items-start justify-between gap-md">
             <div>
               <p className="text-caption text-text-secondary">{SUGGESTION_KIND_FA[suggestion.kind as SuggestionKind]}</p>
-              <h1 className="text-h4">{suggestion.displayNameFa}</h1>
+              <h2 className="text-h3">{suggestion.displayNameFa}</h2>
             </div>
             <span data-testid="suggestion-review-status">
               <StatusBadge tone={suggestion.status === 'SUBMITTED' ? 'warning' : suggestion.status === 'APPROVED' ? 'success' : 'neutral'}>

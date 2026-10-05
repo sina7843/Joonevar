@@ -40,7 +40,7 @@ export default async function ReviewVetsPage({ searchParams }: { searchParams: S
     <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/vets" nav={REVIEW_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">درخواست‌های دامپزشک</h1>
+          <h2 className="text-h3">درخواست‌های دامپزشک</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             ساخت پروفایل و Claim با کد نظام و مدارک. تأیید، نقش دامپزشک معتمد خدمات همزیست را نمی‌دهد.
           </p>
@@ -70,7 +70,7 @@ export default async function ReviewVetsPage({ searchParams }: { searchParams: S
               <li key={item.id}>
                 <Link
                   href={'/review/vets/' + item.id}
-                  className="block rounded-lg border border-border-subtle bg-bg-surface p-lg hover:border-border-brand"
+                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
                   data-testid={'review-item-' + item.id}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-sm">

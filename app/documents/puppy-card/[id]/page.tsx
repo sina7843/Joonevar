@@ -39,7 +39,7 @@ export default async function PuppyCardPage({ params }: { params: Promise<{ id: 
     <PublicShell actor={guard.actor} title="کارت توله" pathname={'/documents/puppy-card/' + id}>
       <div className="space-y-lg">
         <Card>
-          <h2 className="text-label-lg">کارت توله</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کارت توله</span></h2></div>
           <div className="mt-lg" data-testid="card-no">
             <Identifier label="شماره کارت" value={view.card.cardNo} />
           </div>

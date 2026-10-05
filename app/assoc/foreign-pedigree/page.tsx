@@ -50,7 +50,7 @@ export default async function AssocForeignPedigreePage() {
                 <Card>
                   <div className="flex items-start justify-between gap-md">
                     <div className="min-w-0">
-                      <h2 className="text-label-lg">{item.animalName}</h2>
+                      <h2 className="hz-card__title">{item.animalName}</h2>
                       <p className="mt-2xs text-caption text-text-secondary">
                         صادرکننده: {item.issuerName ?? '—'} · ارسال:{' '}
                         {item.submittedAt ? formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : '—'}

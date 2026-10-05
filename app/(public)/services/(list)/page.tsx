@@ -33,7 +33,7 @@ export default async function ServicesPage() {
       <Breadcrumbs items={CRUMBS} origin={origin} />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{TITLE}</h1>
+        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">
           هر خدمت را با پیش‌نیازها، مراحل، مدارک و هزینه ثبت‌شده‌اش بخوانید. همزیست نوبت نمی‌دهد و زمان انجام هیچ خدمتی را
           تضمین نمی‌کند.
@@ -45,7 +45,7 @@ export default async function ServicesPage() {
           <li key={service.slug}>
             <Link
               href={servicePath(service.slug)}
-              className="flex h-full items-start gap-md rounded-lg border border-border-subtle bg-bg-surface p-lg transition-colors hover:border-border-brand"
+              className="flex h-full items-start gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
               data-testid={'service-card-' + service.slug}
             >
               <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">

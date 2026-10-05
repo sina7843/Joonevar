@@ -28,7 +28,7 @@ export default async function ReviewCentresPage() {
         <CentreCreateForm surface="review" types={reference.types} provinces={reference.provinces} cities={reference.cities} />
 
         <Card>
-          <h2 className="text-label-lg">مراکز</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مراکز</span></h2></div>
           <p className="mt-xs text-body-sm text-text-secondary">
             مرکز بدون مالک با برچسب خودش منتشر می‌شود و تا Claim، مدیری ندارد.
           </p>
@@ -42,7 +42,7 @@ export default async function ReviewCentresPage() {
                 <li key={row.centre.id}>
                   <Link
                     href={'/review/centres/' + row.centre.id}
-                    className="block rounded-lg border border-border-subtle p-lg hover:border-border-brand"
+                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
                     data-testid={'centre-row-' + row.centre.id}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-sm">

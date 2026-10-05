@@ -33,7 +33,7 @@ export default async function AdminPackagesPage() {
     <OpsShell actor={guard.actor} title="هم‌زیست — سوپرادمین" pathname="/admin/packages" nav={ADMIN_NAV}>
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">بسته‌های تبلیغاتی</h1>
+          <h2 className="text-h3">بسته‌های تبلیغاتی</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             پروفایل پایه رایگان است. قیمت هر بسته از{' '}
             <Link href="/admin/settings" className="text-text-brand underline underline-offset-4" data-testid="packages-settings-link">
@@ -47,7 +47,7 @@ export default async function AdminPackagesPage() {
           <Card key={entry.plan.id}>
             <div className="flex flex-wrap items-start justify-between gap-md">
               <div className="min-w-0">
-                <h2 className="text-label-lg">{entry.tierFa + ' ' + entry.periodFa}</h2>
+                <h2 className="hz-card__title">{entry.tierFa + ' ' + entry.periodFa}</h2>
                 <p className="mt-2xs text-caption text-text-secondary">
                   <bdi className="hz-ltr font-mono">{entry.plan.priceSettingKey}</bdi>
                 </p>
@@ -80,7 +80,7 @@ export default async function AdminPackagesPage() {
         ))}
 
         <Card>
-          <h2 className="text-label-lg">خریدهای ثبت‌شده</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>خریدهای ثبت‌شده</span></h2></div>
           {subscriptions.length === 0 ? (
             <div className="mt-lg">
               <EmptyState title="هنوز بسته‌ای خریداری نشده است" description="هر خرید پس از تأیید پرداخت اینجا می‌آید." />
@@ -90,7 +90,7 @@ export default async function AdminPackagesPage() {
               {subscriptions.map((row) => {
                 const state = adState(row, now);
                 return (
-                  <li key={row.id} className="rounded-lg border border-border-subtle p-md" data-testid={'subscription-' + row.id}>
+                  <li key={row.id} className="rounded-lg border border-border-default p-md" data-testid={'subscription-' + row.id}>
                     <div className="flex flex-wrap items-start justify-between gap-sm">
                       <div className="min-w-0">
                         <p className="text-label-md">{row.target?.nameFa ?? 'پرونده حذف‌شده'}</p>

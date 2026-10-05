@@ -95,7 +95,7 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
     <div className="min-w-0 space-y-xl">
       <Breadcrumbs items={crumbs} origin={origin} />
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{KIND_PLURAL_FA[kind]}</h1>
+        <h1 className="text-h2 md:text-h1">{KIND_PLURAL_FA[kind]}</h1>
         <p className="max-w-2xl text-body-md text-text-secondary">{LIST_DESCRIPTION[kind]}</p>
       </header>
 
@@ -110,7 +110,7 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
           type="search"
           defaultValue={term}
           placeholder={'جست‌وجو در ' + KIND_PLURAL_FA[kind]}
-          className="min-h-[var(--size-control-md)] w-full max-w-md rounded-md border border-border-subtle bg-bg-surface px-md py-sm text-body-sm focus:border-border-brand"
+          className="min-h-[var(--size-control-md)] w-full max-w-md rounded-md border border-border-control bg-bg-surface px-md py-sm text-body-sm focus:border-border-brand"
           data-testid="content-search-input"
         />
         <Button type="submit" data-testid="content-search-submit">
@@ -163,7 +163,7 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
               <li key={item.slug}>
                 <Link
                   href={base + '/' + item.slug}
-                  className="flex h-full flex-col overflow-hidden rounded-lg border border-border-subtle bg-bg-surface transition-colors hover:border-border-brand"
+                  className="flex h-full flex-col overflow-hidden rounded-lg border border-border-default bg-bg-surface transition-colors hover:border-border-control"
                   data-testid={'content-card-' + item.slug}
                 >
                   {item.imageFileId ? (
@@ -286,7 +286,7 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
 
       <header>
         {categoryNameFa ? <p className="text-label-md text-text-brand">{categoryNameFa}</p> : null}
-        <h1 className="mt-xs text-h3 md:text-h1">{item.titleFa}</h1>
+        <h1 className="mt-xs text-h2 md:text-h1">{item.titleFa}</h1>
         <p className="mt-sm text-body-sm text-text-secondary" data-testid="content-meta">
           {['نوشته: ' + byline, 'انتشار: ' + DATE_FA.format(item.publishAt!), item.reviewedOn ? 'بازبینی: ' + formatCivilDateFa(item.reviewedOn) : null]
             .filter(Boolean)
@@ -330,7 +330,7 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
 
       {item.sources.length > 0 ? (
         <section aria-labelledby="content-sources-title" data-testid="content-sources">
-          <h2 id="content-sources-title" className="text-h4">
+          <h2 id="content-sources-title" className="text-h3">
             منابع
           </h2>
           <ol className="mt-md list-decimal space-y-xs ps-xl text-body-sm">

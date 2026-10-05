@@ -4,12 +4,15 @@ import { useId, useState, type ReactNode } from 'react';
 import { Icon } from './icon.tsx';
 
 /**
- * Form field wrapper.
+ * Form fields — DS *Field*, *TextField*, *SelectField*, *TextAreaField*,
+ * *LocationField*, *FileField* (`.hz-field`, `.hz-input`, `.hz-select`,
+ * `.hz-textarea`, `.hz-file`).
  *
- * The error is wired with `aria-invalid` and `aria-describedby` and announced
- * through `role="alert"`, so a screen reader user learns which field failed and
- * why. Hint and error share one describedby list, so the hint is not lost when
- * an error appears.
+ * The label sits above the control, the hint below it and the error below the
+ * hint. The error is wired with `aria-invalid` and `aria-describedby` and
+ * announced through `role="alert"`; hint and error share one describedby list,
+ * so the hint is not lost when an error appears. Text fields draw focus with
+ * their own 2px border (bundle), not an outer ring.
  */
 interface FieldShellProps {
   label: string;
@@ -27,39 +30,32 @@ export function Field({ label, hint, error, required, children }: FieldShellProp
   const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined;
 
   return (
-    <div className="space-y-xs">
-      <label htmlFor={inputId} className="block text-label-md text-text-primary">
+    <div className="hz-field">
+      <label htmlFor={inputId} className="hz-field__label">
         {label}
         {required ? (
-          <span className="text-status-error-text" aria-hidden="true">
-            {' *'}
+          <span className="hz-field__req" aria-hidden="true">
+            *
           </span>
         ) : (
-          <span className="mr-xs text-caption text-text-secondary">(اختیاری)</span>
+          <span className="hz-field__opt">(اختیاری)</span>
         )}
       </label>
       {children({ inputId, describedBy, invalid: Boolean(error) })}
       {hint ? (
-        <p id={hintId} className="text-caption text-text-secondary">
+        <div id={hintId} className="hz-field__hint">
           {hint}
-        </p>
+        </div>
       ) : null}
       {error ? (
-        <p id={errorId} role="alert" className="text-caption text-status-error-text">
-          {error}
-        </p>
+        <div id={errorId} role="alert" className="hz-field__error">
+          <Icon name="warning" size="xs" />
+          <span>{error}</span>
+        </div>
       ) : null}
     </div>
   );
 }
-
-const CONTROL =
-  'w-full rounded-md border bg-bg-surface px-md text-body-sm text-text-primary ' +
-  'min-h-[var(--size-control-md)] placeholder:text-text-disabled ' +
-  'disabled:bg-bg-disabled disabled:text-text-disabled';
-
-const controlTone = (invalid: boolean) =>
-  invalid ? 'border-status-error-border' : 'border-border-subtle focus:border-border-brand';
 
 export function TextField({
   label,
@@ -67,6 +63,8 @@ export function TextField({
   error,
   required,
   ltr = false,
+  suffix,
+  className = '',
   ...rest
 }: {
   label: string;
@@ -75,20 +73,32 @@ export function TextField({
   required?: boolean;
   /** Identifiers, codes and phone numbers read left-to-right (§24.3). */
   ltr?: boolean;
+  /** A unit at the end: «تومان»، «کیلوگرم». */
+  suffix?: string;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <Field label={label} hint={hint} error={error} required={required}>
-      {({ inputId, describedBy, invalid }) => (
-        <input
-          id={inputId}
-          aria-invalid={invalid || undefined}
-          aria-describedby={describedBy}
-          aria-required={required || undefined}
-          dir={ltr ? 'ltr' : undefined}
-          className={[CONTROL, controlTone(invalid), ltr ? 'text-left font-mono' : ''].join(' ')}
-          {...rest}
-        />
-      )}
+      {({ inputId, describedBy, invalid }) => {
+        const input = (
+          <input
+            id={inputId}
+            aria-invalid={invalid || undefined}
+            aria-describedby={describedBy}
+            aria-required={required || undefined}
+            dir={ltr ? 'ltr' : undefined}
+            className={['hz-input', ltr ? 'hz-input--ltr' : '', className].join(' ').trim()}
+            {...rest}
+          />
+        );
+        return suffix ? (
+          <span className="hz-input-wrap hz-input-wrap--suffix">
+            {input}
+            <span className="hz-input-wrap__suffix">{suffix}</span>
+          </span>
+        ) : (
+          input
+        );
+      }}
     </Field>
   );
 }
@@ -99,6 +109,7 @@ export function TextAreaField({
   error,
   required,
   rows = 5,
+  className = '',
   ...rest
 }: {
   label: string;
@@ -115,11 +126,7 @@ export function TextAreaField({
           aria-invalid={invalid || undefined}
           aria-describedby={describedBy}
           aria-required={required || undefined}
-          className={[
-            'w-full rounded-md border bg-bg-surface p-md text-body-sm text-text-primary',
-            'disabled:bg-bg-disabled disabled:text-text-disabled',
-            controlTone(invalid),
-          ].join(' ')}
+          className={['hz-textarea', className].join(' ').trim()}
           {...rest}
         />
       )}
@@ -134,6 +141,7 @@ export function SelectField({
   required,
   options,
   placeholder = 'انتخاب کنید',
+  className = '',
   ...rest
 }: {
   label: string;
@@ -146,21 +154,23 @@ export function SelectField({
   return (
     <Field label={label} hint={hint} error={error} required={required}>
       {({ inputId, describedBy, invalid }) => (
-        <select
-          id={inputId}
-          aria-invalid={invalid || undefined}
-          aria-describedby={describedBy}
-          aria-required={required || undefined}
-          className={[CONTROL, controlTone(invalid), 'py-sm'].join(' ')}
-          {...rest}
-        >
-          <option value="">{placeholder}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <span className="hz-select-wrap">
+          <select
+            id={inputId}
+            aria-invalid={invalid || undefined}
+            aria-describedby={describedBy}
+            aria-required={required || undefined}
+            className={['hz-select', className].join(' ').trim()}
+            {...rest}
+          >
+            <option value="">{placeholder}</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </span>
       )}
     </Field>
   );
@@ -169,10 +179,9 @@ export function SelectField({
 /**
  * Location field.
  *
- * No map provider is configured yet, and MAP-001 is still open in the
- * prototype, so the map is presented as unavailable while manual entry stays
- * fully usable. An empty residence location must not block KYC, animal
- * registration or kennel submission (§6.2, §15.2).
+ * No map provider is configured yet (MAP-001), so the map is presented as
+ * unavailable while manual entry stays fully usable. An empty residence location
+ * must not block KYC, animal registration or kennel submission (§6.2, §15.2).
  */
 export function LocationField({
   label,
@@ -205,40 +214,30 @@ export function LocationField({
             value={value}
             onChange={(event) => onChange?.(event.target.value)}
             rows={3}
-            className={[
-              'w-full rounded-md border bg-bg-surface p-md text-body-sm',
-              'min-h-[var(--size-textarea-rows-3)]',
-              controlTone(invalid),
-            ].join(' ')}
+            className="hz-textarea"
           />
         )}
       </Field>
       {mapAvailable ? (
-        <button
-          type="button"
-          onClick={onPickOnMap}
-          className="text-label-md text-text-brand underline underline-offset-4"
-        >
+        <button type="button" onClick={onPickOnMap} className="hz-link hz-link--standalone">
+          <Icon name="mapPin" size="sm" />
           انتخاب موقعیت روی نقشه
         </button>
       ) : (
-        <p className="text-caption text-text-secondary">
-          انتخاب موقعیت روی نقشه در این نسخه در دسترس نیست؛ نشانی را دستی وارد کنید.
-        </p>
+        <p className="hz-caption">انتخاب موقعیت روی نقشه در این نسخه در دسترس نیست؛ نشانی را دستی وارد کنید.</p>
       )}
     </div>
   );
 }
 
 /**
- * A file input that refuses an oversized file in the browser.
+ * A file input that refuses an oversized file in the browser — DS *FileField*.
  *
- * Uploads travel through a Server Action, and a request larger than the
- * configured body limit fails before any of the product's own checks run — the
- * person sees a blank application error instead of a reason. This says the
- * reason in the form, in Persian, and clears the selection so the request is
- * never sent. The server still applies the real limit, the accepted types and
- * the signature check: this is a courtesy, not the rule.
+ * Uploads travel through a Server Action, and a request larger than the body
+ * limit fails before any of the product's own checks run. This says the reason
+ * in the form, in Persian, and clears the selection so the request is never
+ * sent. The server still applies the real limit, the accepted types and the
+ * signature check: this is a courtesy, not the rule.
  */
 export function FileField({
   label,
@@ -269,59 +268,44 @@ export function FileField({
   return (
     <Field label={label} hint={hint} required={required} error={error ?? undefined}>
       {({ inputId, describedBy, invalid }) => (
-        /*
-         * A bare file input is a grey box with a browser-chosen English label,
-         * and nothing about it says it can be clicked. The label is the control:
-         * it fills the width, states what to do, and after a choice it shows the
-         * file's own name and size so the person can see what they picked
-         * without opening the dialog again. The input itself stays a real file
-         * input, focusable and keyboard-operable — it is only visually hidden.
-         */
-        <label
-          htmlFor={inputId}
-          className={[
-            'flex w-full cursor-pointer items-center gap-md rounded-lg border border-dashed p-lg text-body-sm',
-            'transition-colors hover:bg-bg-brand-subtle',
-            'focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-border-brand',
-            invalid ? 'border-status-error-border' : 'border-border-brand',
-          ].join(' ')}
-        >
-          <span
-            aria-hidden="true"
-            className="flex size-[var(--size-control-sm)] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand"
-          >
-            <Icon name={chosen ? 'check' : 'uploadSimple'} size="sm" />
+        <div className={['hz-file', chosen ? '' : 'hz-file--empty', invalid ? 'hz-file--invalid' : ''].join(' ').trim()}>
+          <span className="hz-file__icon" aria-hidden="true">
+            <Icon name={invalid ? 'warning' : chosen ? 'fileText' : 'uploadSimple'} size="md" />
           </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-label-md text-text-brand">
-              {chosen ? 'تغییر فایل انتخاب‌شده' : 'انتخاب فایل'}
+          <span className="hz-file__body">
+            <span className="hz-file__name" data-testid={testId ? testId + '-name' : undefined}>
+              {chosen ? chosen.name : 'فایلی انتخاب نشده'}
             </span>
-            <span className="mt-2xs block truncate text-caption text-text-secondary" data-testid={testId ? testId + '-name' : undefined}>
-              {chosen ? chosen.name + ' · ' + chosen.sizeFa : 'برای انتخاب، همین‌جا را لمس یا کلیک کنید.'}
-            </span>
+            <span className="hz-file__meta">{chosen ? chosen.sizeFa : 'حداکثر ' + megabytes + ' مگابایت'}</span>
           </span>
-          <input
-            id={inputId}
-            name={name}
-            type="file"
-            accept={accept}
-            aria-describedby={describedBy}
-            aria-invalid={invalid || undefined}
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              if (file && file.size > maxBytes) {
-                setError('حجم این فایل بیش از حد مجاز است (حداکثر ' + megabytes + ' مگابایت).');
-                event.target.value = '';
-                setChosen(null);
-                return;
-              }
-              setError(null);
-              setChosen(file ? { name: file.name, sizeFa: sizeFa(file.size) } : null);
-            }}
-            className="sr-only"
-            data-testid={testId}
-          />
-        </label>
+          <span className="hz-file__actions">
+            <input
+              id={inputId}
+              name={name}
+              type="file"
+              accept={accept}
+              aria-describedby={describedBy}
+              aria-invalid={invalid || undefined}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file && file.size > maxBytes) {
+                  setError('حجم این فایل بیش از حد مجاز است (حداکثر ' + megabytes + ' مگابایت).');
+                  event.target.value = '';
+                  setChosen(null);
+                  return;
+                }
+                setError(null);
+                setChosen(file ? { name: file.name, sizeFa: sizeFa(file.size) } : null);
+              }}
+              className="hz-visually-hidden"
+              data-testid={testId}
+            />
+            <label htmlFor={inputId} className="hz-btn hz-btn--secondary hz-btn--sm">
+              <Icon name="uploadSimple" size="xs" />
+              {chosen ? 'تغییر فایل' : 'انتخاب فایل'}
+            </label>
+          </span>
+        </div>
       )}
     </Field>
   );

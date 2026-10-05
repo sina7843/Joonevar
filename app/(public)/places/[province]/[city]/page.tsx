@@ -62,7 +62,7 @@ export default async function CityPage({ params }: Params) {
       />
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{page.city.nameFa}</h1>
+        <h1 className="text-h2 md:text-h1">{page.city.nameFa}</h1>
         <p className="text-body-md text-text-secondary">{'استان ' + page.province.nameFa}</p>
         <div className="flex flex-wrap gap-xs" data-testid="city-counts">
           {page.counts.vets > 0 ? <StatusBadge tone="info">{fa(page.counts.vets) + ' دامپزشک'}</StatusBadge> : null}
@@ -76,7 +76,7 @@ export default async function CityPage({ params }: Params) {
 
       {page.indexable ? (
         <section aria-labelledby="city-links-title" className="space-y-sm">
-          <h2 id="city-links-title" className="text-h4">
+          <h2 id="city-links-title" className="text-h3">
             فهرست‌ها با فیلتر این شهر
           </h2>
           <div className="flex flex-wrap gap-sm">

@@ -89,10 +89,10 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">اقلام</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اقلام</span></h2></div>
           <ul className="mt-md space-y-sm text-body-sm" data-testid="receipt-lines">
             {receipt.lines.map((line) => (
-              <li key={line.targetType + line.targetId} className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle p-md">
+              <li key={line.targetType + line.targetId} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md">
                 <span>{line.targetType}</span>
                 <span>{fa(line.amountToman) + ' تومان'}</span>
               </li>
@@ -105,7 +105,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
 
         {receipt.attempts.length > 0 ? (
           <Card>
-            <h2 className="text-label-lg">تلاش‌های پرداخت</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تلاش‌های پرداخت</span></h2></div>
             <ul className="mt-md space-y-xs text-body-sm" data-testid="receipt-attempts">
               {receipt.attempts.map((attempt, index) => (
                 <li key={index}>

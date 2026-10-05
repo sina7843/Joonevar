@@ -60,7 +60,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <h2 className="text-label-lg">وضعیت فیش</h2>
+            <h2 className="hz-card__title">وضعیت فیش</h2>
             <StatusBadge
               tone={
                 receipt.status === 'APPROVED'

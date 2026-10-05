@@ -102,7 +102,7 @@ export default async function ClubRulesPage({ params }: { params: Promise<{ id: 
 
         {workbench.published ? (
           <Card>
-            <h2 className="text-label-lg">آنچه اکنون اجرا می‌شود</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>آنچه اکنون اجرا می‌شود</span></h2></div>
             <p className="mt-sm text-body-sm" data-testid="club-published-summary">
               {summaryOf(workbench.published.tree as ClubRuleNode)}
             </p>
@@ -183,7 +183,7 @@ export default async function ClubRulesPage({ params }: { params: Promise<{ id: 
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه نسخه‌ها</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌ها</span></h2></div>
           <ul className="mt-md space-y-xs text-body-sm" data-testid="club-rule-versions">
             {workbench.versions.map((version) => (
               <li key={version.id}>

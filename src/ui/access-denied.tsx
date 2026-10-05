@@ -1,52 +1,84 @@
+import Link from 'next/link';
 import { Logo } from './logo.tsx';
+import { Icon } from './icon.tsx';
 import type { AppError } from '../domain/errors.ts';
 
 /**
- * Denial screen.
+ * Denial screen — DS *AccessDenied* (`.hz-state`).
  *
  * It states which of the two things is missing — being signed in, or holding
- * the context — without leaking whether the target record exists. Sign-in does
- * not exist yet (PROMPT-004), so the page says so plainly instead of linking to
- * a route that is not built.
+ * the context — without leaking whether the target record exists.
  */
 export function AccessDenied({ error }: { error: AppError }) {
   const unauthenticated = error.code === 'UNAUTHENTICATED';
   return (
-    <main className="mx-auto flex min-h-dvh max-w-(--size-content-lg) flex-col items-center justify-center gap-lg p-xl text-center">
-      <Logo height={32} />
-      <h1 className="text-h3">{unauthenticated ? 'ورود لازم است' : 'دسترسی مجاز نیست'}</h1>
-      <p className="text-body-sm text-text-secondary">
-        {unauthenticated
-          ? 'برای دیدن این صفحه باید وارد حساب خود شوید. مسیر ورود و کد یک‌بارمصرف در مرحله بعدِ پیاده‌سازی ساخته می‌شود.'
-          : 'این صفحه در نقش فعلی شما در دسترس نیست. محیط‌های عملیاتی انجمن، مرکز ژنتیک و سوپرادمین جدا هستند و با تغییر نقش عمومی باز نمی‌شوند.'}
-      </p>
-      <p className="text-caption text-text-disabled" data-testid="denial-code">
-        {error.code}
-      </p>
+    <main id="main" tabIndex={-1} className="mx-auto flex min-h-dvh max-w-(--size-content-lg) flex-col items-center justify-center gap-lg p-xl">
+      <Link href="/" aria-label="همزیست — صفحه اصلی">
+        <Logo size="mobile" />
+      </Link>
+      <div className="hz-card w-full">
+        <div className="hz-state">
+          <span className="hz-state__icon">
+            <Icon name={unauthenticated ? 'signIn' : 'lockSimple'} size="lg" mirror={unauthenticated} />
+          </span>
+          <h1 className="hz-state__title">{unauthenticated ? 'ورود لازم است' : 'دسترسی مجاز نیست'}</h1>
+          <p className="hz-state__body">
+            {unauthenticated
+              ? 'برای دیدن این صفحه باید وارد حساب خود شوید.'
+              : 'این صفحه در نقش فعلی شما در دسترس نیست. محیط‌های عملیاتی انجمن، مرکز ژنتیک و سوپرادمین جدا هستند و با تغییر نقش عمومی باز نمی‌شوند.'}
+          </p>
+          <p className="hz-state__missing" data-testid="denial-code">
+            <bdi dir="ltr">{error.code}</bdi>
+          </p>
+          <div className="hz-state__actions">
+            {unauthenticated ? (
+              <Link href="/login" className="hz-btn hz-btn--primary">
+                ورود / ثبت‌نام
+              </Link>
+            ) : (
+              <Link href="/dashboard" className="hz-btn hz-btn--secondary">
+                بازگشت به پنل من
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
 
 /**
- * A record that this actor may not see.
- *
- * Ownership is checked per record on the server, and the answer is the same
- * whether the record belongs to somebody else or does not exist at all, so
- * one owner cannot probe for another owner's identifiers.
+ * A record that this actor may not see. The answer is the same whether the
+ * record belongs to somebody else or does not exist, so one owner cannot probe
+ * for another owner's identifiers.
  */
 export function RecordNotFound({ error }: { error: AppError }) {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-(--size-content-lg) flex-col items-center justify-center gap-lg p-xl text-center">
-      <Logo height={32} />
-      <h1 className="text-h3" data-testid="record-not-found">
-        {error.message}
-      </h1>
-      <p className="text-body-sm text-text-secondary">
-        اگر فکر می‌کنید این پرونده باید در دسترس شما باشد، از فهرست حیوان‌های خود وارد شوید.
-      </p>
-      <p className="text-caption text-text-disabled" data-testid="denial-code">
-        {error.code}
-      </p>
+    <main id="main" tabIndex={-1} className="mx-auto flex min-h-dvh max-w-(--size-content-lg) flex-col items-center justify-center gap-lg p-xl">
+      <Link href="/" aria-label="همزیست — صفحه اصلی">
+        <Logo size="mobile" />
+      </Link>
+      <div className="hz-card w-full">
+        <div className="hz-state">
+          <span className="hz-state__icon">
+            <Icon name="magnifyingGlass" size="lg" />
+          </span>
+          <h1 className="hz-state__title" data-testid="record-not-found">
+            {error.message}
+          </h1>
+          <p className="hz-state__body">
+            اگر فکر می‌کنید این پرونده باید در دسترس شما باشد، از فهرست حیوان‌های خود وارد شوید.
+          </p>
+          <p className="hz-state__missing" data-testid="denial-code">
+            <bdi dir="ltr">{error.code}</bdi>
+          </p>
+          <div className="hz-state__actions">
+            <Link href="/animals" className="hz-btn hz-btn--secondary">
+              حیوان‌های من
+            </Link>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

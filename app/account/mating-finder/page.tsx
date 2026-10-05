@@ -62,7 +62,7 @@ export default async function MatingFinderAccountPage() {
     <PublicShell actor={actor} title="اشتراک جفت‌یابی" pathname="/account/mating-finder">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">اشتراک جفت‌یابی</h1>
+          <h2 className="text-h3">اشتراک جفت‌یابی</h2>
           <p className="mt-xs text-body-sm text-text-secondary">
             اشتراک فقط دسترسی می‌دهد: حیوانات فعال مالک مشترک برای همه دیده می‌شوند و مشترک، حیوانات آماده مالکان بدون
             اشتراک را هم می‌بیند. برای شکل‌گرفتن درخواست کافی است یکی از دو مالک اشتراک فعال داشته باشد. اشتراک رتبه حیوان
@@ -75,7 +75,7 @@ export default async function MatingFinderAccountPage() {
 
         <Card>
           <div className="flex flex-wrap items-start justify-between gap-md">
-            <h2 className="text-label-lg">وضعیت فعلی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت فعلی</span></h2></div>
             <span data-testid="finder-standing">
               <StatusBadge tone={standing.state === 'ACTIVE' ? 'success' : standing.state === 'EXPIRED' ? 'warning' : 'neutral'}>
                 {standing.state === 'ACTIVE' ? 'اشتراک فعال' : standing.state === 'EXPIRED' ? 'اشتراک منقضی شده' : 'بدون اشتراک'}
@@ -115,7 +115,7 @@ export default async function MatingFinderAccountPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">{standing.state === 'ACTIVE' ? 'تمدید' : 'خرید اشتراک'}</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{standing.state === 'ACTIVE' ? 'تمدید' : 'خرید اشتراک'}</span></h2></div>
           {standing.state === 'ACTIVE' ? (
             <p className="mt-xs text-caption text-text-secondary">تمدید زودهنگام روزهای باقی‌مانده را حفظ می‌کند: دوره تازه از پایان دوره فعلی شروع می‌شود.</p>
           ) : null}
@@ -135,7 +135,7 @@ export default async function MatingFinderAccountPage() {
                 const planRow = slot.current!;
                 const testId = slot.audience + '-' + slot.durationMonths;
                 return (
-                  <li key={planRow.id} className="rounded-lg border border-border-subtle p-lg" data-testid={'finder-plan-' + testId}>
+                  <li key={planRow.id} className="rounded-xl border border-border-default p-lg" data-testid={'finder-plan-' + testId}>
                     <p className="text-caption text-text-secondary">
                       {'طرح ' + FINDER_AUDIENCE_FA[slot.audience] + ' — ' + FINDER_DURATION_FA[slot.durationMonths as FinderDuration]}
                     </p>
@@ -164,7 +164,7 @@ export default async function MatingFinderAccountPage() {
 
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-sm">
-            <h2 className="text-label-lg">حیوانات شما برای جفت‌یابی</h2>
+            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>حیوانات شما برای جفت‌یابی</span></h2></div>
             <Link href="/account/mating-finder/profiles" className="text-label-md text-text-brand underline underline-offset-4" data-testid="finder-profiles-link">
               مدیریت پروفایل‌ها
             </Link>
@@ -182,7 +182,7 @@ export default async function MatingFinderAccountPage() {
               {animals.map((animal) => (
                 <li
                   key={animal.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm"
                   data-testid={'finder-animal-' + animal.id}
                 >
                   <span className="text-body-sm">
@@ -198,7 +198,7 @@ export default async function MatingFinderAccountPage() {
         </Card>
 
         <Card>
-          <h2 className="text-label-lg">تاریخچه اشتراک</h2>
+          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه اشتراک</span></h2></div>
           {history.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">هنوز خریدی ثبت نشده است.</p>
           ) : (
@@ -206,7 +206,7 @@ export default async function MatingFinderAccountPage() {
               {history.map((row) => (
                 <li
                   key={row.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-md border border-border-subtle px-md py-sm"
+                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm"
                   data-testid={'finder-history-' + row.id}
                 >
                   <span className="text-body-sm">

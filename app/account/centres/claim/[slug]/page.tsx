@@ -29,7 +29,7 @@ export default async function ClaimCentrePage({ params }: { params: Promise<{ sl
     <PublicShell actor={guard.actor} title="درخواست مدیریت مرکز" pathname="/account/centres">
       <div className="space-y-lg">
         <Card>
-          <h1 className="text-h4">{centre.displayNameFa}</h1>
+          <h2 className="text-h3">{centre.displayNameFa}</h2>
           <p className="mt-xs text-body-sm text-text-secondary">{(centre.cityNameFa ? centre.cityNameFa + ' · ' : '') + 'مرکز بدون مالک'}</p>
           <p className="mt-md text-body-sm">
             برای واگذاری مدیریت، مدرکی لازم است که نشان دهد از طرف این مرکز صحبت می‌کنید: پروانه مرکز، معرفی‌نامه یا وکالت‌نامه.

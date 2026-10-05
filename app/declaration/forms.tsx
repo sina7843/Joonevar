@@ -42,7 +42,7 @@ export function StartDeclarationForm({
   const [state, submit, pending] = useActionState(startDeclarationAction, EMPTY);
   return (
     <Card>
-      <h2 className="text-label-lg">اعلام وجود توافق شخصی</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام وجود توافق شخصی</span></h2></div>
       <p className="mt-md text-caption text-text-secondary" data-testid="declaration-scope-note">
         {SCOPE_NOTE_FA}
       </p>
@@ -138,7 +138,7 @@ export function PersonalNoteForm({ declarationId }: { declarationId: string }) {
   const [kind, setKind] = useState<'MATING_DATE' | 'PREGNANCY' | 'BIRTH'>('MATING_DATE');
   return (
     <Card>
-      <h2 className="text-label-lg">یادداشت شخصی (اختیاری)</h2>
+      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>یادداشت شخصی (اختیاری)</span></h2></div>
       <p className="mt-md text-caption text-text-secondary" data-testid="note-unverified-note">
         {UNVERIFIED_NOTE_FA}
       </p>

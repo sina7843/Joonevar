@@ -60,12 +60,12 @@ export default async function ServicePage({ params }: Params) {
       ) : null}
 
       <header className="space-y-sm">
-        <h1 className="text-h3 md:text-h1">{service.titleFa}</h1>
+        <h1 className="text-h2 md:text-h1">{service.titleFa}</h1>
         <p className="text-body-md text-text-secondary">{service.summaryFa}</p>
       </header>
 
       <section aria-labelledby="service-definition-title">
-        <h2 id="service-definition-title" className="text-h4">
+        <h2 id="service-definition-title" className="text-h3">
           این خدمت چیست
         </h2>
         <p className="mt-md text-body-md">{service.definitionFa}</p>
@@ -95,7 +95,7 @@ export default async function ServicePage({ params }: Params) {
       </section>
 
       <section aria-labelledby="service-prerequisites-title">
-        <h2 id="service-prerequisites-title" className="text-h4">
+        <h2 id="service-prerequisites-title" className="text-h3">
           پیش‌نیازها
         </h2>
         <ul className="mt-md list-disc space-y-xs pr-lg text-body-md" data-testid="service-prerequisites">
@@ -106,12 +106,12 @@ export default async function ServicePage({ params }: Params) {
       </section>
 
       <section aria-labelledby="service-steps-title">
-        <h2 id="service-steps-title" className="text-h4">
+        <h2 id="service-steps-title" className="text-h3">
           مراحل
         </h2>
         <ol className="mt-md space-y-sm" data-testid="service-steps">
           {service.stepsFa.map((step, index) => (
-            <li key={step} className="flex gap-md rounded-lg border border-border-subtle bg-bg-surface p-md">
+            <li key={step} className="flex gap-md rounded-lg border border-border-default bg-bg-surface p-md">
               <span className="flex size-[28px] shrink-0 items-center justify-center rounded-full bg-action-primary-default text-label-md text-action-primary-on">
                 {(index + 1).toLocaleString('fa-IR')}
               </span>
@@ -125,7 +125,7 @@ export default async function ServicePage({ params }: Params) {
       </section>
 
       <section aria-labelledby="service-documents-title">
-        <h2 id="service-documents-title" className="text-h4">
+        <h2 id="service-documents-title" className="text-h3">
           مدارک
         </h2>
         <ul className="mt-md list-disc space-y-xs pr-lg text-body-md" data-testid="service-documents">
@@ -137,12 +137,12 @@ export default async function ServicePage({ params }: Params) {
 
       {service.faq.length > 0 ? (
         <section aria-labelledby="service-faq-title">
-          <h2 id="service-faq-title" className="text-h4">
+          <h2 id="service-faq-title" className="text-h3">
             پرسش‌های پرتکرار
           </h2>
           <dl className="mt-md space-y-md" data-testid="service-faq">
             {service.faq.map((entry) => (
-              <div key={entry.question} className="rounded-lg border border-border-subtle bg-bg-surface p-lg">
+              <div key={entry.question} className="rounded-xl border border-border-default bg-bg-surface p-lg">
                 <dt className="text-label-lg">{entry.question}</dt>
                 <dd className="mt-xs text-body-md text-text-secondary">{entry.answer}</dd>
               </div>
@@ -152,7 +152,7 @@ export default async function ServicePage({ params }: Params) {
       ) : null}
 
       <section aria-labelledby="service-cta-title" className="rounded-lg bg-bg-brand-subtle p-lg">
-        <h2 id="service-cta-title" className="text-h4">
+        <h2 id="service-cta-title" className="text-h3">
           شروع این خدمت
         </h2>
         <p className="mt-xs text-body-sm text-text-secondary">

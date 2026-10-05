@@ -38,7 +38,7 @@ export default async function SellerOrdersPage({
   if (store === null) {
     return (
       <div className="space-y-lg">
-        <h1 className="text-h2">سفارش‌های فروشگاه</h1>
+        <h2 className="text-h2">سفارش‌های فروشگاه</h2>
         <p className="text-body-sm text-text-secondary" data-testid="seller-orders-no-store">
           هنوز فروشگاهی ندارید.
         </p>
@@ -51,7 +51,7 @@ export default async function SellerOrdersPage({
   return (
     <PublicShell actor={guard.actor} title="سفارش‌های فروشگاه" pathname="/account/seller">
       <div className="space-y-lg p-lg">
-      <h1 className="text-h2">سفارش‌های {store.displayNameFa ?? 'فروشگاه'}</h1>
+      <h2 className="text-h2">سفارش‌های {store.displayNameFa ?? 'فروشگاه'}</h2>
 
       {stores.length > 1 ? (
         <nav className="hz-rail flex gap-sm" data-testid="seller-order-stores">
@@ -59,7 +59,7 @@ export default async function SellerOrdersPage({
             <Link
               key={row.id}
               href={'/account/seller/orders?store=' + row.id}
-              className="whitespace-nowrap rounded-full border border-border-subtle px-md py-2xs text-caption"
+              className="whitespace-nowrap rounded-full border border-border-default px-md py-2xs text-caption"
             >
               {row.displayNameFa ?? 'فروشگاه'}
             </Link>
@@ -83,7 +83,7 @@ export default async function SellerOrdersPage({
           {orders.map((row) => (
             <li
               key={row.subOrder.id}
-              className="space-y-md rounded-lg border border-border-subtle p-lg"
+              className="space-y-md rounded-xl border border-border-default p-lg"
               data-testid={'seller-suborder-' + row.subOrder.id}
             >
               <header className="flex flex-wrap items-center justify-between gap-sm">

@@ -41,7 +41,7 @@ export default async function AdminBreedPage({ params }: { params: Promise<{ id:
         <Card>
           <div className="flex flex-wrap items-start justify-between gap-md">
             <div className="min-w-0">
-              <h1 className="text-h4">{breed.nameFa}</h1>
+              <h2 className="text-h3">{breed.nameFa}</h2>
               <p className="text-caption text-text-secondary">
                 <bdi>{breed.nameEn}</bdi>
               </p>
@@ -116,13 +116,13 @@ export default async function AdminBreedPage({ params }: { params: Promise<{ id:
         <MedicalClaimForm breedId={breed.id} />
 
         <Card>
-          <h2 className="text-label-lg">مطالب سلامت و ژنتیک</h2>
+          <h2 className="hz-card__title">مطالب سلامت و ژنتیک</h2>
           {claims.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">هنوز مطلبی ثبت نشده است.</p>
           ) : (
             <ul className="mt-lg space-y-md" data-testid="admin-claims">
               {claims.map((claim) => (
-                <li key={claim.id} className="rounded-lg border border-border-subtle p-lg" data-testid="admin-claim">
+                <li key={claim.id} className="rounded-xl border border-border-default p-lg" data-testid="admin-claim">
                   <div className="flex flex-wrap items-start justify-between gap-sm">
                     <div className="min-w-0">
                       <p className="text-caption text-text-secondary">{CLAIM_KIND_FA[claim.kind]}</p>
