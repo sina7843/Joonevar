@@ -1,0 +1,84 @@
+<!-- @dsCard group="Data display" height=840 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .demo-cell { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border: 1px solid var(--border-default); border-radius: var(--radius-lg); background: var(--bg-surface); min-width: 0; }
+  .demo-cap { font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-row > section { flex: 1 1 360px; min-width: 0; }
+  .demo-skel { display: flex; align-items: center; gap: 8px; height: 28px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>اندازه‌ها</b></p>
+    <div class="demo-grid">
+      <div class="demo-cell"><span class="demo-cap">lg — صفحه آگهی</span>
+        <div class="hz-price hz-price--lg"><span class="hz-price__amount">۴۵٬۰۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span><span class="hz-price__mode">قابل مذاکره</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">md (پیش‌فرض) — کارت آگهی</span>
+        <div class="hz-price"><span class="hz-price__amount">۳۸٬۰۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span><span class="hz-price__mode">قابل مذاکره</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">sm — سلول جدول، ردیف سبد</span>
+        <div class="hz-price hz-price--sm"><span class="hz-price__amount">۴۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label"><b>واریانت‌ها و حالت‌ها</b></p>
+    <div class="demo-grid">
+      <div class="demo-cell"><span class="demo-cap">کالای چندواریانتی — کمترین قیمت</span>
+        <div class="hz-price"><span class="hz-price__from">از</span><span class="hz-price__amount">۲٬۸۵۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">تخفیف — قیمت قبلی خط‌خورده + مبلغ تخفیف</span>
+        <div class="hz-price hz-price--stack">
+          <del class="hz-price__old"><span class="hz-visually-hidden">قیمت قبلی: </span>۴٬۱۲۰٬۰۰۰ تومان</del>
+          <span class="hz-price__row"><span class="hz-price__amount">۳٬۹۲۰٬۰۰۰</span><span class="hz-price__unit">تومان</span><span class="hz-price__save">۲۰۰٬۰۰۰ تومان تخفیف</span></span>
+        </div></div>
+      <div class="demo-cell"><span class="demo-cap">تعیین‌نشده — هرگز ۰؛ مسیر پرداخت بسته</span>
+        <div class="hz-price hz-price--unset"><span class="hz-price__amount">تعیین‌نشده</span><span class="hz-price__note">پرداخت این خدمت هنوز باز نیست.</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">مبلغ بزرگ</span>
+        <div class="hz-price"><span class="hz-price__amount">۴۵۰٬۰۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span><span class="hz-price__mode">قابل مذاکره</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">آگهی پایان‌یافته — قیمت کم‌رنگ</span>
+        <div class="hz-price hz-price--muted"><span class="hz-price__amount">۲۶٬۰۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span><span class="hz-badge hz-badge--neutral hz-badge--sm"><span class="hz-badge__dot"></span>فروخته‌شده</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">پیشنهاد قیمت در گفتگو</span>
+        <div class="hz-price"><span class="hz-price__prefix">پیشنهاد خریدار:</span><span class="hz-price__amount">۴۱٬۰۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">در حال بارگذاری</span>
+        <div class="demo-skel" aria-busy="true"><span class="hz-skeleton" style="width: 112px; height: 18px"></span><span class="hz-skeleton" style="width: 36px; height: 12px"></span></div></div>
+      <div class="demo-cell"><span class="demo-cap">خطا — مبلغ دریافت نشد</span>
+        <div class="hz-price hz-price--unset"><span class="hz-price__amount">—</span><span class="hz-price__note">مبلغ بارگذاری نشد. صفحه را دوباره بار کنید.</span></div></div>
+      <div class="demo-cell"><span class="demo-cap">در دکمه — مبلغ در فعل</span>
+        <button class="hz-btn hz-btn--primary hz-btn--block" type="button">پرداخت ۴۰۰٬۰۰۰ تومان</button></div>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label"><b>ستون عددی</b> — تعرفه‌ها؛ مبلغ‌ها روی لبه پایان هم‌تراز (<code dir="ltr">--sm --end</code>)</p>
+      <div class="hz-table-wrap">
+        <table class="hz-table hz-table--dense">
+          <thead><tr><th scope="col">خدمت</th><th scope="col" class="hz-num">مبلغ</th></tr></thead>
+          <tbody>
+            <tr><td>هزینه عضویت انجمن</td><td class="hz-num"><div class="hz-price hz-price--sm hz-price--end"><span class="hz-price__amount">۳۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></td></tr>
+            <tr><td>هزینه صدور برگه ثبتی (هر حیوان)</td><td class="hz-num"><div class="hz-price hz-price--sm hz-price--end"><span class="hz-price__amount">۲۵۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></td></tr>
+            <tr><td>هزینه آزمایش مرکز ژنتیک</td><td class="hz-num"><div class="hz-price hz-price--sm hz-price--end"><span class="hz-price__amount">۱٬۵۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></td></tr>
+            <tr><td>هزینه بسته تبلیغاتی</td><td class="hz-num"><div class="hz-price hz-price--sm hz-price--unset hz-price--end"><span class="hz-price__amount">تعیین‌نشده</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label"><b>خلاصه سبد</b> — جمع، ارسال، تخفیف، مبلغ نهایی</p>
+      <div class="hz-card hz-card--compact">
+        <dl class="hz-kv">
+          <div class="hz-kv__row"><dt class="hz-kv__key">جمع کالاها (۳)</dt><dd class="hz-kv__value"><div class="hz-price hz-price--sm hz-price--end"><span class="hz-price__amount">۴٬۱۲۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">هزینه ارسال</dt><dd class="hz-kv__value"><div class="hz-price hz-price--sm hz-price--end"><span class="hz-price__amount">۸۵٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">تخفیف</dt><dd class="hz-kv__value"><div class="hz-price hz-price--sm hz-price--end hz-price--discount"><span class="hz-price__amount">۲۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></dd></div>
+          <div class="hz-kv__row" style="border: 0"><dt class="hz-kv__key"><b style="color: var(--text-primary)">مبلغ نهایی</b></dt><dd class="hz-kv__value"><div class="hz-price hz-price--end"><span class="hz-price__amount">۴٬۰۰۵٬۰۰۰</span><span class="hz-price__unit">تومان</span></div></dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

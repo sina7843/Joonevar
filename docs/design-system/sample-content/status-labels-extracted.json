@@ -1,0 +1,2847 @@
+{
+ "ACCEPTED": {
+  "label": "تأییدشده",
+  "variants": [
+   "پذیرفته‌شده، در انتظار پرداخت بیعانه",
+   "پذیرفته‌شده"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ACCEPTED_BY_SELLER": {
+  "label": "پذیرفته‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ACCOUNT_ACTIVE": {
+  "label": "حساب فعال در همزیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ACTIONED": {
+  "label": "اقدام شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ACTIVATION": {
+  "label": "فعال‌سازی پروانه",
+  "variants": [
+   "دوره معتمد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ACTIVE": {
+  "label": "فعال",
+  "variants": [
+   "عضو فعال",
+   "فعال و تأییدشده",
+   "در حال فروش",
+   "در انتظار مراجعه",
+   "پرداخت‌شده"
+  ],
+  "tone": "success",
+  "toneVariants": [
+   "info"
+  ]
+ },
+ "ACTIVE_LICENSED_VET": {
+  "label": "پروانه فعال",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ACTIVE_TRUSTED_VET": {
+  "label": "معتمد فعال",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ADJUST": {
+  "label": "اصلاح",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ADJUSTMENT": {
+  "label": "اصلاح دستی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ADMIN": {
+  "label": "مدیر",
+  "variants": [
+   "مدیر فروشگاه"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ADVERTISING_PACKAGE": {
+  "label": "بسته تبلیغاتی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ALIVE": {
+  "label": "زنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ALL": {
+  "label": "همه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_ABUSE": {
+  "label": "آزار حیوان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_DRAFT_STARTED": {
+  "label": "پیش‌نویس پرونده ساخته شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_GENERATION_FROM_FOREIGN_PEDIGREE": {
+  "label": "نسل از Export Pedigree ثبت شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_LINEAGE_RESOLVED": {
+  "label": "بررسی نسب انجام شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_LISTING": {
+  "label": "آگهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_LISTING_PROMOTION": {
+  "label": "بسته تبلیغ آگهی حیوان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_MARKET": {
+  "label": "بازار فروش حیوان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_MATING_DATE_CONFIRMED": {
+  "label": "تاریخ جفت‌گیری دوطرفه تأیید شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_MATING_PERMIT_ISSUED": {
+  "label": "مجوز رسمی جفت‌گیری صادر شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_MATING_PERMIT_REVIEWED": {
+  "label": "پرونده مجوز جفت‌گیری بررسی شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_PHOTO_ATTACHED": {
+  "label": "تصویر حیوان بارگذاری شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_REGISTERED": {
+  "label": "حیوان در هم‌زیست ثبت شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_SALE": {
+  "label": "بازار فروش حیوان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_SALE_DEPOSIT": {
+  "label": "بیعانه خرید حیوان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANIMAL_UPDATED": {
+  "label": "اطلاعات پرونده به‌روزرسانی شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANNOUNCEMENT": {
+  "label": "اطلاعیه",
+  "variants": [
+   "اطلاعیه‌ها",
+   "هنوز اطلاعیه‌ای منتشر نشده است"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ANSWERED": {
+  "label": "پاسخ داده شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "APPROVE": {
+  "label": "تأیید درخواست؛ پرداخت دوره باز می‌شود",
+  "variants": [
+   "تأیید",
+   "تأیید مدارک پروانه (در انتظار پرداخت)",
+   "تأیید؛ پرداخت دوره معتمد باز می‌شود"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "APPROVED": {
+  "label": "تأییدشده",
+  "variants": [
+   "تأیید شده",
+   "Export Pedigree شما تأیید شد",
+   "پذیرفته‌شده — در انتظار ارسال به فروشگاه",
+   "تأییدشده، در انتظار فعال‌سازی",
+   "احراز هویت شما تأیید شد"
+  ],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "APPROVED_AWAITING_PAYMENT": {
+  "label": "تأییدشده، در انتظار پرداخت",
+  "variants": [],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "ARCHIVED": {
+  "label": "بایگانی‌شده",
+  "variants": [
+   "بایگانی",
+   "بایگانی؛ نشانی باز است"
+  ],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "ARTICLE": {
+  "label": "آموزش",
+  "variants": [
+   "آموزش‌ها",
+   "هنوز آموزشی منتشر نشده است"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ASSOCIATION": {
+  "label": "انجمن",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ASSOCIATION_MEMBERSHIP": {
+  "label": "عضویت معتبر انجمن",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ASSOCIATION_OPERATOR": {
+  "label": "اپراتور انجمن",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "AS_SOLD": {
+  "label": "همان‌طور که فروخته شده بود",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "AUTHOR": {
+  "label": "نویسنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "AUTHORIZATION_LETTER": {
+  "label": "معرفی‌نامه یا وکالت‌نامه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "AVAILABLE": {
+  "label": "قابل تسویه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "AWAITING_COUNTERPARTY": {
+  "label": "در انتظار تأیید طرف مقابل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "AWAITING_ISSUANCE": {
+  "label": "در انتظار صدور",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "AWAITING_PAYMENT": {
+  "label": "در انتظار پرداخت",
+  "variants": [
+   "در انتظار پرداخت صدور"
+  ],
+  "tone": "info",
+  "toneVariants": [
+   "warning"
+  ]
+ },
+ "AWAITING_REVIEW": {
+  "label": "در انتظار رأی داور",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BASE": {
+  "label": "پایه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BIRTH": {
+  "label": "یادداشت زایمان (شخصی)",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BLOCK": {
+  "label": "مانع درخواست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BLOCKED": {
+  "label": "متوقف",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BLOOD_SAMPLE": {
+  "label": "نمونه‌گیری خون",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BLUETOOTH_READER": {
+  "label": "ریدر بلوتوث",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BOUGHT_BEFORE": {
+  "label": "چون پیش از این چیزی شبیه آن خریده‌اید",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BREED": {
+  "label": "نژادی",
+  "variants": [
+   "نژاد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BREEDER": {
+  "label": "پرورش‌دهنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BUYER_CANCELLED": {
+  "label": "انصراف خریدار",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BUYER_FAVOURED": {
+  "label": "به سود خریدار — استرداد بیعانه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "BUYER_NO_SHOW": {
+  "label": "عدم حضور خریدار در زمان تحویل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CANCELLATION": {
+  "label": "لغو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CANCELLED": {
+  "label": "لغوشده",
+  "variants": [
+   "پرداخت لغوشده",
+   "پس‌گرفته‌شده",
+   "لغوشده توسط آغازکننده",
+   "لغو شد",
+   "تحویل لغو شد"
+  ],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "CATEGORY_CAMPAIGN": {
+  "label": "کمپین دسته",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CENTRE": {
+  "label": "مرکز دامپزشکی",
+  "variants": [
+   "مرکز"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CENTRE_LICENCE": {
+  "label": "پروانه یا مجوز مرکز",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CERTIFICATE": {
+  "label": "گواهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CHECKED_IN": {
+  "label": "پذیرش‌شده",
+  "variants": [],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "CITY": {
+  "label": "شهری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CLAIM": {
+  "label": "Claim پروفایل بدون مالک",
+  "variants": [
+   "درخواست مالکیت"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CLINIC": {
+  "label": "کلینیک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CLOSED": {
+  "label": "بسته شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CLUB": {
+  "label": "کلاب",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CLUB_APPROVAL": {
+  "label": "تأیید دستی کلاب",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CLUB_MEMBERSHIP": {
+  "label": "حق عضویت کلاب",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CLUB_POST": {
+  "label": "نوشته کلاب",
+  "variants": [
+   "نوشته‌های کلاب"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CODE_ISSUED": {
+  "label": "کد تحویل صادر شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COLLECTED": {
+  "label": "نمونه‌گیری انجام شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COMMERCE": {
+  "label": "فروشگاه کالا",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COMMERCE_ORDER": {
+  "label": "سفارش فروشگاه کالا",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COMMERCE_SELLER_PLAN": {
+  "label": "پلن فروشندگی کالا",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COMMISSION": {
+  "label": "کارمزد همزیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COMMUNITY": {
+  "label": "انجمن یا کلاب",
+  "variants": [
+   "انجمن و کلاب"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COMPLETE": {
+  "label": "پروفایل کامل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COMPLETED": {
+  "label": "تحویل انجام و مالکیت منتقل شد",
+  "variants": [
+   "انجام‌شده"
+  ],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "CONFIRMED": {
+  "label": "وجود توافق تأیید شد",
+  "variants": [
+   "تأییدشده دوطرفه"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CONFLICTED": {
+  "label": "مغایرت تاریخ (DATE_CONFLICT)",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CONSUMED": {
+  "label": "استفاده‌شده",
+  "variants": [],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "CONTENT_ADMIN": {
+  "label": "ادمین محتوا",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CONTRACT_BREACH": {
+  "label": "نقض قرارداد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CONTRACT_CONFIRMED": {
+  "label": "قرارداد تأییدشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CONTRACT_DRAFTING": {
+  "label": "ورود به قرارداد",
+  "variants": [
+   "در حال تنظیم قرارداد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CONVERTED": {
+  "label": "بیعانه پرداخت شد و رزرو انجام شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COORDINATING": {
+  "label": "در حال هماهنگی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COPYRIGHT": {
+  "label": "استفاده بدون اجازه از اثر دیگران",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CORRECTION": {
+  "label": "منتظر اصلاح متقاضی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COUNCIL": {
+  "label": "احراز کد نظام",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COUNCIL_CARD": {
+  "label": "کارت نظام دامپزشکی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COUNTERPARTY": {
+  "label": "طرف مقابل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "COURIER": {
+  "label": "پیک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CROSS_BREED_REQUEST": {
+  "label": "درخواست خارج از نژاد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CURLY": {
+  "label": "فرفری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "CUSTODY_RECORDED": {
+  "label": "نگهداری نزد همین دامپزشک ثبت شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "D30": {
+  "label": "۳۰ روزه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "D365": {
+  "label": "۳۶۵ روزه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "D90": {
+  "label": "۹۰ روزه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DAMAGED": {
+  "label": "آسیب‌دیده",
+  "variants": [
+   "خراب"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DAM_OWNER": {
+  "label": "نزد مالک ماده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DAM_SIDE": {
+  "label": "سمت مادر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DEBT": {
+  "label": "بدهی به همزیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DEBT_RECOVERY": {
+  "label": "کسر بدهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DECEASED": {
+  "label": "فوت",
+  "variants": [
+   "فوت‌شده",
+   "فوت‌شده پس از تولد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DECIDED": {
+  "label": "تصمیم‌گرفته",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DECLINED": {
+  "label": "ردشده",
+  "variants": [
+   "رد شد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DELETED": {
+  "label": "حذف‌شده",
+  "variants": [
+   "حذف (قابل بازگردانی)"
+  ],
+  "tone": "error",
+  "toneVariants": []
+ },
+ "DELIVERED": {
+  "label": "تحویل‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DEPOSIT": {
+  "label": "بیعانه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DISCOUNT_CODE_TRY": {
+  "label": "امتحان کد تخفیف",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DISMISS": {
+  "label": "رد گزارش",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DISMISSED": {
+  "label": "رد شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DISPUTED": {
+  "label": "در حال بررسی اختلاف",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DISPUTE_REVIEWER": {
+  "label": "داور اختلاف",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DNA": {
+  "label": "نمونه‌گیری DNA",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DNA_RESAMPLING": {
+  "label": "نمونه‌گیری مجدد DNA",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DOCTOR": {
+  "label": "دکتر دامپزشک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DOCUMENTED_POLICY": {
+  "label": "سیاست مستند",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "DRAFT": {
+  "label": "پیش‌نویس",
+  "variants": [
+   "تکمیل مدارک",
+   "آماده پرداخت",
+   "برگرداندن به پیش‌نویس",
+   "تکمیل اطلاعات"
+  ],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "EARN": {
+  "label": "امتیاز خرید",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "EXACT": {
+  "label": "قیمت مشخص",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "EXPIRE": {
+  "label": "انقضا",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "EXPIRED": {
+  "label": "منقضی",
+  "variants": [
+   "منقضی‌شده",
+   "مهلت کد تحویل گذشت",
+   "مهلت پرداخت گذشت"
+  ],
+  "tone": "warning",
+  "toneVariants": [
+   "neutral"
+  ]
+ },
+ "FACE": {
+  "label": "صورت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FAIL": {
+  "label": "درست نیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FAILED": {
+  "label": "ناموفق",
+  "variants": [
+   "پرداخت ناموفق",
+   "واریز ناموفق",
+   "اجرا ناموفق بود"
+  ],
+  "tone": "error",
+  "toneVariants": []
+ },
+ "FALSE_ANIMAL_DATA": {
+  "label": "اطلاعات نادرست حیوان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FALSE_LISTING": {
+  "label": "اطلاعات خلاف واقع در آگهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FEATURED": {
+  "label": "ویژه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FEE_PAID": {
+  "label": "پرداخت حق عضویت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FEMALE": {
+  "label": "ماده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FINAL": {
+  "label": "نتیجه نهایی",
+  "variants": [
+   "نهایی‌شده با تأیید دوطرفه"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FINANCE_OPERATOR": {
+  "label": "اپراتور مالی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FINDER_ACCOUNT": {
+  "label": "کاربر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FINDER_MESSAGE": {
+  "label": "پیام گفت‌وگو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FINDER_MESSAGE_POST": {
+  "label": "پیام جفت‌یابی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FINDER_REQUEST": {
+  "label": "درخواست جفت‌گیری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FINDER_REQUEST_CREATE": {
+  "label": "درخواست جفت‌گیری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FIXED": {
+  "label": "سهم ثابت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FIXED_AMOUNT": {
+  "label": "مبلغ ثابت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FOUND": {
+  "label": "پیدا شدن",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FREE_SHIPPING": {
+  "label": "ارسال رایگان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FULL_BODY": {
+  "label": "تمام‌بدن",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "FULL_REFUND": {
+  "label": "استرداد کامل بیعانه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "GENERAL": {
+  "label": "عمومی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "GENETICS_CENTRE": {
+  "label": "مرکز ژنتیک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "GENETICS_OPERATOR": {
+  "label": "اپراتور مرکز ژنتیک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "GIANT": {
+  "label": "خیلی بزرگ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "GRACE": {
+  "label": "در مهلت ارفاقی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HAIRLESS": {
+  "label": "بدون مو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HANDOVER": {
+  "label": "انجام‌شدن تحویل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HARASSMENT": {
+  "label": "مزاحمت یا رفتار نامناسب",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HEALTH_ISSUE": {
+  "label": "مشکل سلامت حیوان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HEALTH_MISINFORMATION": {
+  "label": "ادعای سلامت نادرست یا خطرناک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HEALTH_NOTE": {
+  "label": "نکته سلامت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HELD": {
+  "label": "نگه‌داشته‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HIDDEN": {
+  "label": "پنهان",
+  "variants": [
+   "پنهان‌شده توسط ادمین محتوا",
+   "پنهان‌کردن"
+  ],
+  "tone": "warning",
+  "toneVariants": []
+ },
+ "HIDE": {
+  "label": "توقف آگهی توسط ناظر",
+  "variants": [
+   "مخفی‌سازی محتوا"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HIDE_MEDIA": {
+  "label": "پنهان‌کردن تصویر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HIDE_MESSAGE": {
+  "label": "پنهان‌کردن پیام",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HIGH": {
+  "label": "زیاد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "HOSPITAL": {
+  "label": "بیمارستان",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "IDENTITY": {
+  "label": "مدرک هویتی",
+  "variants": [
+   "مدرک هویتی نماینده"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "IDENTITY_VERIFIED": {
+  "label": "احراز هویت تأییدشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "IMPLANT": {
+  "label": "کاشت میکروچیپ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INACTIVE": {
+  "label": "غیرفعال",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INCORRECT_INFO": {
+  "label": "اطلاعات نادرست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INELIGIBLE": {
+  "label": "فاقد شرایط",
+  "variants": [],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "INFO_MISMATCH": {
+  "label": "عدم تطابق حیوان با اطلاعات آگهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INITIAL": {
+  "label": "عضویت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INSUFFICIENT": {
+  "label": "ناکافی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INVALID": {
+  "label": "نامعتبر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INVALID_CHIP_CLAIM": {
+  "label": "ادعای میکروچیپ نامعتبر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INVITED": {
+  "label": "در انتظار پذیرش",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "INVITE_ONLY": {
+  "label": "فقط با دعوت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "IN_CUSTODY": {
+  "label": "نزد دامپزشک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "IN_PERSON": {
+  "label": "تحویل حضوری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ISSUED": {
+  "label": "صادر شد",
+  "variants": [
+   "مجوز صادر شد",
+   "صادرشده"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "KENNEL": {
+  "label": "کنل",
+  "variants": [
+   "کنل تأییدشده"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "KENNEL_APPROVED": {
+  "label": "کنل تأییدشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "KENNEL_REGISTRATION": {
+  "label": "ثبت کنل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LARGE": {
+  "label": "بزرگ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LEFT": {
+  "label": "خارج‌شده",
+  "variants": [],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "LICENCE": {
+  "label": "ثبت پروانه فعالیت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LICENSED": {
+  "label": "دامپزشک دارای پروانه فعالیت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LICENSE_APPROVED_AWAITING_PAYMENT": {
+  "label": "پروانه تأییدشده، در انتظار پرداخت",
+  "variants": [],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "LIFE_EVENT": {
+  "label": "رویداد فوت، مفقودی یا بایگانی ثبت شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LISTING_FACTS": {
+  "label": "صحت اطلاعات ثبت‌شده آگهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LISTING_INQUIRY_CREATE": {
+  "label": "درخواست خرید",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LISTING_MEDIA": {
+  "label": "تصویر یا ویدئوی آگهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LISTING_MODERATOR": {
+  "label": "ناظر آگهی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LONG": {
+  "label": "بلند",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LOST": {
+  "label": "مفقود",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "LOW": {
+  "label": "کم",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MALE": {
+  "label": "نر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MANUAL": {
+  "label": "ورود دستی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MANUAL_REQUIRED": {
+  "label": "نیازمند اقدام دستی مالی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MANY_CANCELLED_DEALS": {
+  "label": "لغو پیاپی معامله",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MANY_FAILED_PAYMENTS": {
+  "label": "پرداخت‌های ناموفق پیاپی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MANY_REFUNDS": {
+  "label": "بازپرداخت‌های متعدد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MANY_REPORTS_AGAINST": {
+  "label": "گزارش‌های متعدد علیه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MARKED_UNUSABLE": {
+  "label": "نمونه غیرقابل‌استفاده ثبت شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MARKETPLACE_ADMIN": {
+  "label": "مدیر بازار",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MARKETPLACE_OPERATIONS": {
+  "label": "کلیدهای قطع و وصل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATCH_SELECTED": {
+  "label": "جفت انتخاب‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING": {
+  "label": "جفت‌یابی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING_COMPLETED": {
+  "label": "جفت‌گیری انجام‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING_DATE": {
+  "label": "تاریخ جفت‌گیری (شخصی)",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING_FINDER_SUBSCRIPTION": {
+  "label": "اشتراک جفت‌یابی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING_NOT_COMPLETED": {
+  "label": "جفت‌گیری انجام‌نشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING_PERMIT": {
+  "label": "مجوز جفت‌گیری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING_PROFILE": {
+  "label": "پروفایل جفت‌یابی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MATING_PROFILE_MEDIA": {
+  "label": "تصویر پروفایل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MEDIUM": {
+  "label": "متوسط",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MEMBER": {
+  "label": "عضو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MEMBERSHIP": {
+  "label": "عضویت انجمن",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MERCHANDISE": {
+  "label": "فروشگاه کالا",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MERGED": {
+  "label": "ادغام‌شده در محصول پایه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MICROCHIP": {
+  "label": "میکروچیپ ثبت‌شده",
+  "variants": [
+   "میکروچیپ"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MICROCHIP_IMPLANT": {
+  "label": "کاشت میکروچیپ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MICROCHIP_VERIFICATION": {
+  "label": "تأیید میکروچیپ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MINE": {
+  "label": "در دست من",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MISSING": {
+  "label": "نرسید",
+  "variants": [
+   "مفقود شدن",
+   "مفقود"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MIXED": {
+  "label": "ترکیبی",
+  "variants": [
+   "ترکیب مبلغ و سهم توله"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MOBILE_READER": {
+  "label": "ریدر متصل به موبایل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MODERATE": {
+  "label": "متوسط",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MODERATION": {
+  "label": "توسط مدیریت از جفت‌یابی خارج شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MODERATOR": {
+  "label": "ناظر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "MONTHLY": {
+  "label": "ماهانه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NATIONAL": {
+  "label": "کشوری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NATURAL_RISK": {
+  "label": "پذیرش ریسک طبیعی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NEEDS_CORRECTION": {
+  "label": "نیازمند اصلاح",
+  "variants": [
+   "Export Pedigree شما نیازمند اصلاح است",
+   "احراز هویت شما نیازمند اصلاح است"
+  ],
+  "tone": "warning",
+  "toneVariants": []
+ },
+ "NEGOTIABLE": {
+  "label": "توافقی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NEGOTIATING": {
+  "label": "در حال مذاکره",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NEUTRAL": {
+  "label": "محل بی‌طرف",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NEW": {
+  "label": "نو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NEWEST": {
+  "label": "تازه‌ترین",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NEWS": {
+  "label": "خبر",
+  "variants": [
+   "اخبار",
+   "هنوز خبری منتشر نشده است"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NONE": {
+  "label": "ثبت‌نشده",
+  "variants": [
+   "بدون عضویت",
+   "بدون دوره فعالیت"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NOT_APPLICABLE": {
+  "label": "موضوعیت ندارد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NOT_AS_DESCRIBED": {
+  "label": "با آنچه اعلام شده بود نمی‌خواند",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NOT_DECLARED": {
+  "label": "اعلام‌نشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NOT_FOUND": {
+  "label": "یافت نشد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NOT_PUBLIC": {
+  "label": "در سایت دیده نمی‌شود",
+  "variants": [],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "NOT_RETURNABLE": {
+  "label": "غیرقابل مرجوع",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NO_FAULT": {
+  "label": "بدون تقصیر طرفین — استرداد کامل بیعانه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NO_PAYMENT": {
+  "label": "بدون وجه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "NO_REFUND": {
+  "label": "بدون استرداد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OFFENSIVE": {
+  "label": "توهین‌آمیز یا نامناسب",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OFFICIAL": {
+  "label": "مسیر رسمی",
+  "variants": [
+   "مسیر رسمی (مجوز انجمن)"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OFFICIAL_DETACHED": {
+  "label": "رسمی — جداشده با لغو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OFFSPRING_SHARE": {
+  "label": "سهم توله",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OFFSPRING_SHARE_REGISTRATION": {
+  "label": "سهم و ثبت توله",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "ON_HOLD": {
+  "label": "به دلیل پرونده اختلاف متوقف است",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OPEN": {
+  "label": "در انتظار بررسی",
+  "variants": [
+   "باز",
+   "در انتظار پاسخ فروشنده",
+   "در حال بررسی"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OPENED": {
+  "label": "باز شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OPERATIONAL_DATA": {
+  "label": "داده عملیاتی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OTHER": {
+  "label": "سایر مدارک",
+  "variants": [
+   "سایر",
+   "دلیل دیگر",
+   "تصویر دیگر"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OTHERS": {
+  "label": "در دست دیگران",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OTHER_POLICY": {
+  "label": "نقض دیگر قوانین",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OUT_OF_SCOPE": {
+  "label": "خارج از دامنه داوری همزیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OVERTURNED": {
+  "label": "اعتراض پذیرفته شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OWNER": {
+  "label": "مالک",
+  "variants": [
+   "مالک فروشگاه",
+   "غیرفعال‌شده توسط مالک",
+   "مالک حیوان"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "OWNS_DOG": {
+  "label": "داشتن سگ ثبت‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PACKAGE_BARCODE": {
+  "label": "بارکد بسته‌بندی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PAID": {
+  "label": "پرداخت‌شده",
+  "variants": [
+   "پرداخت تأییدشده",
+   "واریزشده — در انتظار مغایرت‌گیری",
+   "در انتظار پذیرش فروشنده",
+   "پرداخت شد"
+  ],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "PARTIAL_REFUND": {
+  "label": "استرداد بیعانه پس از کسر جریمه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PASS": {
+  "label": "درست است",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PAUSED": {
+  "label": "موقتاً متوقف",
+  "variants": [
+   "متوقف‌شده توسط فروشنده",
+   "توقف موقت آگهی"
+  ],
+  "tone": "warning",
+  "toneVariants": []
+ },
+ "PAYMENT_FAILED": {
+  "label": "پرداخت ناموفق",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PAYMENT_PENDING": {
+  "label": "در انتظار پرداخت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PAYOUT": {
+  "label": "واریز تسویه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PEDIGREE": {
+  "label": "شجره‌نامه",
+  "variants": [
+   "شجره‌نامه صادرشده"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PENALTY": {
+  "label": "جریمه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PENDING": {
+  "label": "در جریان",
+  "variants": [
+   "در انتظار تصمیم انجمن",
+   "در انتظار اجرا",
+   "صادرنشده"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PENDING_BOTH_OWNERS": {
+  "label": "در انتظار تأیید هر دو طرف",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PENDING_COUNTERPARTY_CONFIRMATION": {
+  "label": "در انتظار تأیید طرف مقابل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PENDING_PAYMENT": {
+  "label": "در انتظار پرداخت",
+  "variants": [],
+  "tone": "warning",
+  "toneVariants": []
+ },
+ "PENDING_REVIEW": {
+  "label": "در انتظار بررسی انجمن",
+  "variants": [
+   "در انتظار تصمیم",
+   "در انتظار بررسی"
+  ],
+  "tone": "info",
+  "toneVariants": [
+   "warning"
+  ]
+ },
+ "PENDING_VERIFICATION": {
+  "label": "در انتظار بررسی",
+  "variants": [],
+  "tone": "warning",
+  "toneVariants": []
+ },
+ "PERCENTAGE": {
+  "label": "سهم درصدی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PERSONAL": {
+  "label": "مسیر شخصی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PERSONAL_DETACHED": {
+  "label": "شخصی — جداشده با لغو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PET_SHOP": {
+  "label": "پت‌شاپ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PICKUP": {
+  "label": "تحویل حضوری در فروشگاه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PLATFORM": {
+  "label": "فروشگاه خود همزیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PLATFORM_CODE": {
+  "label": "کد تخفیف همزیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "POPULAR_IN_CATEGORY": {
+  "label": "چون در این دسته پرفروش است",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "POST": {
+  "label": "پست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRACTICE_LICENCE": {
+  "label": "پروانه اشتغال",
+  "variants": [
+   "پروانه فعالیت"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PREDISPOSED_CONDITION": {
+  "label": "بیماری‌های مستعد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PREGNANCY": {
+  "label": "یادداشت بارداری (شخصی)",
+  "variants": [
+   "بررسی بارداری"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PREGNANCY_CHECK": {
+  "label": "بررسی بارداری",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRELIMINARILY_ACCEPTED": {
+  "label": "پذیرش اولیه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PREPARING": {
+  "label": "در حال آماده‌سازی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRICE_ASC": {
+  "label": "ارزان‌ترین",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRICE_CHANGED": {
+  "label": "قیمت تغییر کرده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRICE_DESC": {
+  "label": "گران‌ترین",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRIVACY": {
+  "label": "انتشار اطلاعات شخصی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRIVATE_DETAILS": {
+  "label": "جزئیات مالی خصوصی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRO": {
+  "label": "حرفه‌ای",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PROCESSING": {
+  "label": "در حال پردازش",
+  "variants": [
+   "در حال اجرا"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PRODUCT_DECISION": {
+  "label": "تصمیم محصول",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PROFILE": {
+  "label": "ساخت پروفایل دامپزشک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PROMOTED": {
+  "label": "تبلیغ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PROMOTION_CHARGE": {
+  "label": "هزینه تبلیغ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PROPOSED": {
+  "label": "پیشنهاد فعلی",
+  "variants": [
+   "در انتظار تأیید طرف مقابل"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PROVINCIAL": {
+  "label": "استانی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "PUBLISHED": {
+  "label": "منتشرشده",
+  "variants": [
+   "انتشار",
+   "انتشار آگهی"
+  ],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "PUPPY_CARD": {
+  "label": "کارت توله",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "QUESTION_ASK": {
+  "label": "ثبت پرسش",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RATE_LIMITED": {
+  "label": "تعداد استعلام بیش از حد مجاز",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RATE_LIMIT_TRIPPED": {
+  "label": "برخورد با سقف نرخ",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "READY": {
+  "label": "آماده واریز",
+  "variants": [
+   "آماده دریافت درخواست",
+   "آماده ارسال"
+  ],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "READY_TO_SUBMIT": {
+  "label": "آماده ارسال",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RECEIVED": {
+  "label": "دریافت‌شده در فروشگاه",
+  "variants": [
+   "دریافت‌شده در مرکز"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RECONCILED": {
+  "label": "مغایرت‌گیری‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REDEEM": {
+  "label": "استفاده در سبد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REFUND": {
+  "label": "بازپرداخت به خریدار",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REFUNDED": {
+  "label": "بازپرداخت‌شده",
+  "variants": [],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "REFURBISHED": {
+  "label": "بازسازی‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REFUSED": {
+  "label": "تحویل انجام نشد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REGISTRATION_SHEET": {
+  "label": "برگه ثبتی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REJECT": {
+  "label": "رد",
+  "variants": [
+   "رد درخواست"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REJECTED": {
+  "label": "ردشده",
+  "variants": [
+   "رد شده",
+   "Export Pedigree شما رد شد",
+   "طرف مقابل وجود توافق را رد کرد",
+   "احراز هویت شما رد شد",
+   "رد شد",
+   "ردشده؛ نیازمند نسخه جدید"
+  ],
+  "tone": "error",
+  "toneVariants": []
+ },
+ "RELEASE": {
+  "label": "آزادسازی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REMOVED": {
+  "label": "برداشته‌شده",
+  "variants": [
+   "حذف‌شده",
+   "حذف آگهی"
+  ],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "RENEWAL": {
+  "label": "تمدید عضویت",
+  "variants": [
+   "تمدید پروانه",
+   "تمدید دوره معتمد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REPEAT_AFTER_NO_PREGNANCY": {
+  "label": "تکرار در صورت عدم آبستنی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REPLACED": {
+  "label": "جایگزین‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REPORT_SUBMIT": {
+  "label": "ثبت گزارش",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REQUESTED": {
+  "label": "در انتظار بررسی فروشنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REQUEST_CORRECTION": {
+  "label": "درخواست اصلاح",
+  "variants": [
+   "درخواست اصلاح از فروشنده",
+   "درخواست اصلاح از نویسنده"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RESAMPLED": {
+  "label": "نمونه‌گیری مجدد در همین درخواست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RESERVED": {
+  "label": "رزروشده",
+  "variants": [],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "RESOLVED": {
+  "label": "تعیین تکلیف شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RESTORED": {
+  "label": "خروج از بایگانی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RESTRICT_PUBLISHER": {
+  "label": "محدود کردن فروشنده",
+  "variants": [
+   "محدود کردن ناشر"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RETURNED": {
+  "label": "مرجوع‌شده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "RETURN_REQUESTED": {
+  "label": "درخواست مرجوعی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REVIEW_OPERATOR": {
+  "label": "اپراتور بررسی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REVIEW_SUBMIT": {
+  "label": "ثبت نظر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "REVOKED": {
+  "label": "باطل‌شده",
+  "variants": [
+   "لغوشده"
+  ],
+  "tone": "error",
+  "toneVariants": []
+ },
+ "SALE": {
+  "label": "فروش",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SAME_CATEGORY": {
+  "label": "چون کالایی از همین دسته را دیده‌اید",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SCHEDULED": {
+  "label": "زمان‌بندی‌شده",
+  "variants": [
+   "زمان و محل تعیین شد"
+  ],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "SEALED_ONLY": {
+  "label": "فقط در صورت باز نشدن و استفاده نشدن",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SEARCH_QUERY": {
+  "label": "جست‌وجو",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER": {
+  "label": "فروشنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_CANCELLED": {
+  "label": "انصراف فروشنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_CODE": {
+  "label": "کد تخفیف فروشگاه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_DISCOUNT": {
+  "label": "تخفیف فروشگاه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_FAVOURED": {
+  "label": "به سود فروشنده — بیعانه مسترد نمی‌شود",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_LOCATION": {
+  "label": "محل یا کنل فروشنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_NO_SHOW": {
+  "label": "عدم حضور فروشنده در زمان تحویل",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_REVIEWER": {
+  "label": "بررسی‌کننده فروشنده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SELLER_UNAVAILABLE": {
+  "label": "این فروشگاه در حال حاضر فروش ندارد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SEND_INSTRUCTED": {
+  "label": "دستور ارسال صادر شد",
+  "variants": [
+   "دستور ارسال از مرکز ژنتیک"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SETTLEMENT": {
+  "label": "تسویه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SHIPPED": {
+  "label": "ارسال‌شده",
+  "variants": [
+   "ارسال ثبت شد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SHIPPED_BACK": {
+  "label": "در راه بازگشت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SHIPPING_CHANGED": {
+  "label": "هزینه ارسال تغییر کرده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SHIPPING_UNKNOWN": {
+  "label": "هزینه ارسال این فروشگاه اعلام نشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SHORT": {
+  "label": "کوتاه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SIRE_OWNER": {
+  "label": "نزد مالک نر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SIRE_SIDE": {
+  "label": "سمت پدر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SMALL": {
+  "label": "کوچک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SOFT_DELETE": {
+  "label": "حذف آگهی",
+  "variants": [
+   "حذف نرم محتوا"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SOLD": {
+  "label": "فروخته‌شده",
+  "variants": [],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "SPAM": {
+  "label": "تبلیغ یا هرزنامه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SPECIALIST": {
+  "label": "متخصص",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SPORT": {
+  "label": "ورزشی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "STAFF": {
+  "label": "کارمند فروشگاه",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "STANDARD": {
+  "label": "قابل مرجوع در مهلت عمومی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "STOCK_SHORT": {
+  "label": "موجودی کافی نیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "STUDENT": {
+  "label": "دانشجوی دامپزشکی",
+  "variants": [
+   "احراز دانشجویی"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "STUDENT_CARD": {
+  "label": "کارت دانشجویی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SUBMITTED": {
+  "label": "در انتظار بررسی",
+  "variants": [
+   "ارسال‌شده برای بررسی",
+   "ثبت‌شده",
+   "ارسال‌شده"
+  ],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "SUGGESTED_GENETIC_TEST": {
+  "label": "آزمایش‌های ژنتیکی پیشنهادی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SUPERADMIN": {
+  "label": "سوپرادمین",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SUPERSEDED": {
+  "label": "جایگزین‌شده",
+  "variants": [
+   "جایگزین‌شده با نسخه جدید",
+   "با پیشنهاد تازه جایگزین شد",
+   "جایگزین‌شده با خرید تازه‌تر"
+  ],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "SUPPORT_AGENT": {
+  "label": "پشتیبانی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SUSPENDED": {
+  "label": "تعلیق‌شده",
+  "variants": [
+   "معلق",
+   "متوقف‌شده توسط ناظر"
+  ],
+  "tone": "error",
+  "toneVariants": [
+   "warning"
+  ]
+ },
+ "SUSPENSION": {
+  "label": "دسترسی جفت‌یابی این حساب تعلیق شد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "SYSTEM": {
+  "label": "همزیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TECHNICAL_DEFAULT": {
+  "label": "پیش‌فرض فنی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TECHNICAL_REVIEW": {
+  "label": "در مرحله تأیید فنی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TEMPORARILY_UNAVAILABLE": {
+  "label": "موقتاً غیرفعال",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TEMPORARY_CARE": {
+  "label": "نگهداری موقت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TERMINATED": {
+  "label": "خاتمه‌یافته",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TERMS_ACCEPTED": {
+  "label": "پذیرش شرایط کلاب",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TOY": {
+  "label": "خیلی کوچک",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TRANSFER": {
+  "label": "واگذاری مالکیت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TRAVEL": {
+  "label": "رفت‌وآمد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TRUSTED": {
+  "label": "دامپزشک معتمد همزیست",
+  "variants": [
+   "معتمد",
+   "دکتر دامپزشک معتمد - {scope}",
+   "درخواست دامپزشک معتمد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TRUSTED_APPROVED_AWAITING_PAYMENT": {
+  "label": "معتمد تأییدشده، در انتظار پرداخت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TRUSTED_VET": {
+  "label": "دامپزشک معتمد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TRUSTED_VET_ACTIVATION": {
+  "label": "فعال‌سازی دامپزشک معتمد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "TRUSTED_VET_RENEWAL": {
+  "label": "تمدید دامپزشک معتمد",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "UNAUTHORIZED_BROKERAGE": {
+  "label": "واسطه‌گری غیرمجاز",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "UNAVAILABLE": {
+  "label": "این قلم دیگر قابل خرید نیست",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "UNCLAIMED": {
+  "label": "برداشته‌نشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "UNDER_REVIEW": {
+  "label": "در حال بررسی",
+  "variants": [
+   "در حال بررسی مرکز ژنتیک",
+   "در حال بررسی مرکز",
+   "در حال بررسی انجمن"
+  ],
+  "tone": "info",
+  "toneVariants": []
+ },
+ "UNKNOWN": {
+  "label": "فروشنده نمی‌داند",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "UNLIST_PROFILE": {
+  "label": "خارج‌کردن پروفایل از جفت‌یابی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "UPHELD": {
+  "label": "تصمیم قبلی پابرجا ماند",
+  "variants": [
+   "تصمیم پابرجا ماند"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "USED": {
+  "label": "کارکرده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "USER": {
+  "label": "کاربر",
+  "variants": [
+   "شما"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VALID": {
+  "label": "معتبر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VERIFIED": {
+  "label": "تأییدشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VERIFIED_BUSINESS": {
+  "label": "کسب‌وکار تأییدشده",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VERIFIED_NO_LICENSE": {
+  "label": "کد نظام تأییدشده",
+  "variants": [],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "VERIFIED_STUDENT": {
+  "label": "دانشجوی تأییدشده",
+  "variants": [],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "VERIFY": {
+  "label": "تأیید دانشجو",
+  "variants": [
+   "تأیید کد نظام (بدون پروانه فعالیت)"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VET": {
+  "label": "پروفایل دامپزشک",
+  "variants": [
+   "دامپزشک",
+   "دامپزشک معتمد"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VET_CLINIC": {
+  "label": "دامپزشکی منتخب",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VET_COSTS": {
+  "label": "هزینه‌های دامپزشکی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VET_LICENSE_ACTIVATION": {
+  "label": "فعال‌سازی پروانه فعالیت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VET_LICENSE_RENEWAL": {
+  "label": "تمدید پروانه فعالیت",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VET_STATUS": {
+  "label": "وضعیت دامپزشکی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "VISIBLE": {
+  "label": "در سایت دیده می‌شود",
+  "variants": [],
+  "tone": "success",
+  "toneVariants": []
+ },
+ "WAITING_PARENT_RESULTS": {
+  "label": "در انتظار تکمیل نتایج والدین",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "WAITING_REVIEW": {
+  "label": "درخواست ارسال‌شده",
+  "variants": [
+   "در انتظار بررسی"
+  ],
+  "tone": null,
+  "toneVariants": []
+ },
+ "WARN": {
+  "label": "فقط هشدار",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "WARN_ONLY": {
+  "label": "تأیید تخلف با اخطار",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "WEEKLY": {
+  "label": "هفتگی",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "WIRE": {
+  "label": "زبر",
+  "variants": [],
+  "tone": null,
+  "toneVariants": []
+ },
+ "WITHDRAWN": {
+  "label": "پس گرفته شد",
+  "variants": [
+   "پس‌گرفته‌شده",
+   "توسط خریدار پس گرفته شد",
+   "حذف‌شده با اصلاح گزارش اولیه",
+   "بایگانی‌شده با انصراف",
+   "انصراف"
+  ],
+  "tone": "neutral",
+  "toneVariants": []
+ },
+ "YES": {
+  "label": "واکسیناسیون انجام شده است",
+  "variants": [
+   "عقیم‌سازی انجام شده است"
+  ],
+  "tone": null,
+  "toneVariants": []
+ }
+}

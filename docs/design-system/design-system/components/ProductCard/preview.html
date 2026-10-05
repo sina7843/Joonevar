@@ -1,0 +1,80 @@
+<!-- @dsCard group="Domain cards" height=896 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-16); align-items: stretch; }
+  .demo-mobile { width: 360px; padding: 16px; border: 1px dashed var(--border-default); border-radius: var(--radius-md); }
+  .demo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">چند واریانت («از» کمترین قیمت) · نام بلند دوخطی · ناموجود (یک واریانت، بدون «از») · فوکوس</p>
+    <div class="demo-grid">
+      <a class="hz-listing hz-product" href="#">
+        <div class="hz-media hz-media--1x1"><img src="../../assets/imagery/products-chicken-training-treats.jpg" alt="تشویقی تمرینی مرغ"></div>
+        <div class="hz-listing__body">
+          <span class="hz-product__brand">بایت‌لند</span>
+          <span class="hz-product__name">تشویقی تمرینی مرغ</span>
+          <span class="hz-rating" role="img" aria-label="امتیاز ۴٫۸ از ۵، ۹۷ نظر"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۸<span class="hz-rating__count">(۹۷ نظر)</span></span>
+          <div class="hz-price"><span class="hz-price__from">از</span><span class="hz-price__amount">۳۸۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div>
+        </div>
+      </a>
+      <a class="hz-listing hz-product" href="#">
+        <div class="hz-media hz-media--1x1"><img src="../../assets/imagery/products-dry-food-large-adult.jpg" alt="غذای خشک سگ بالغ نژاد بزرگ"></div>
+        <div class="hz-listing__body">
+          <span class="hz-product__brand">نوتری‌پت</span>
+          <span class="hz-product__name">غذای خشک سگ بالغ نژاد بزرگ</span>
+          <span class="hz-rating" role="img" aria-label="امتیاز ۴٫۶ از ۵، ۹۳ نظر"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۶<span class="hz-rating__count">(۹۳ نظر)</span></span>
+          <div class="hz-price"><span class="hz-price__from">از</span><span class="hz-price__amount">۲٬۸۵۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div>
+        </div>
+      </a>
+      <a class="hz-listing hz-product" href="#">
+        <div class="hz-media hz-media--1x1"><img src="../../assets/imagery/products-hypoallergenic-shampoo.jpg" alt="شامپو ضدحساسیت"></div>
+        <div class="hz-listing__body">
+          <span class="hz-product__brand">کلین‌پت</span>
+          <span class="hz-product__name">شامپو ضدحساسیت</span>
+          <span class="hz-rating" role="img" aria-label="امتیاز ۴٫۳ از ۵، ۱۱۱ نظر"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۳<span class="hz-rating__count">(۱۱۱ نظر)</span></span>
+          <div class="hz-price hz-price--muted"><span class="hz-price__amount">۴۷۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div>
+          <span class="hz-stock hz-stock--sm hz-stock--out"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span>
+        </div>
+      </a>
+      <a class="hz-listing hz-product" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">
+        <div class="hz-media hz-media--1x1"><img src="../../assets/imagery/products-knotted-rope-toy.jpg" alt="اسباب‌بازی طناب گره‌دار"></div>
+        <div class="hz-listing__body">
+          <span class="hz-product__brand">پلی‌داگ</span>
+          <span class="hz-product__name">اسباب‌بازی طناب گره‌دار</span>
+          <span class="hz-rating" role="img" aria-label="امتیاز ۴٫۱ از ۵، ۴۸ نظر"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۱<span class="hz-rating__count">(۴۸ نظر)</span></span>
+          <div class="hz-price"><span class="hz-price__from">از</span><span class="hz-price__amount">۲۱۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">موبایل (۳۶۰، دو ستون): قیمت بزرگ در کاشی باریک · بارگذاری</p>
+    <div class="demo-mobile">
+      <div class="demo-grid demo-grid--2">
+        <a class="hz-listing hz-product" href="#">
+          <div class="hz-media hz-media--1x1"><img src="../../assets/imagery/products-orthopedic-bed.jpg" alt="تشک ارتوپدی سگ"></div>
+          <div class="hz-listing__body">
+            <span class="hz-product__brand">سافت‌بد</span>
+            <span class="hz-product__name">تشک ارتوپدی سگ</span>
+            <span class="hz-rating" role="img" aria-label="امتیاز ۴٫۷ از ۵، ۱۰۰ نظر"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۷<span class="hz-rating__count">(۱۰۰ نظر)</span></span>
+            <div class="hz-price"><span class="hz-price__from">از</span><span class="hz-price__amount">۳٬۴۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></div>
+          </div>
+        </a>
+        <div class="hz-listing hz-product" aria-hidden="true">
+          <span class="hz-skeleton"></span>
+          <div class="hz-listing__body">
+            <span class="hz-skeleton hz-skeleton--text" style="width: 40%"></span>
+            <span class="hz-skeleton hz-skeleton--title" style="width: 85%"></span>
+            <span class="hz-skeleton hz-skeleton--text" style="width: 50%"></span>
+            <span class="hz-skeleton hz-skeleton--text" style="width: 65%"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

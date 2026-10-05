@@ -1,0 +1,49 @@
+{
+  "source": "src/settings/keys.ts — editable by SUPERADMIN at /admin/settings; every change is versioned and audited.",
+  "configured": [
+    {
+      "key": "fee.membership_toman",
+      "labelFa": "هزینه عضویت انجمن",
+      "toman": 300000,
+      "displayFa": "۳۰۰٬۰۰۰ تومان"
+    },
+    {
+      "key": "fee.registration_sheet_toman",
+      "labelFa": "هزینه صدور برگه ثبتی (هر حیوان)",
+      "toman": 250000,
+      "displayFa": "۲۵۰٬۰۰۰ تومان"
+    },
+    {
+      "key": "fee.pedigree_toman",
+      "labelFa": "هزینه صدور شجره‌نامه",
+      "toman": 400000,
+      "displayFa": "۴۰۰٬۰۰۰ تومان"
+    },
+    {
+      "key": "fee.mating_permit_toman",
+      "labelFa": "هزینه مجوز جفت‌گیری",
+      "toman": 300000,
+      "displayFa": "۳۰۰٬۰۰۰ تومان"
+    },
+    {
+      "key": "fee.kennel_registration_toman",
+      "labelFa": "هزینه ثبت کنل",
+      "toman": 150000,
+      "displayFa": "۱۵۰٬۰۰۰ تومان"
+    },
+    {
+      "key": "fee.puppy_card_toman",
+      "labelFa": "هزینه صدور کارت هر توله",
+      "toman": 120000,
+      "displayFa": "۱۲۰٬۰۰۰ تومان"
+    },
+    {
+      "key": "genetics_centre.test_fee_toman",
+      "labelFa": "هزینه آزمایش مرکز ژنتیک",
+      "toman": 1500000,
+      "displayFa": "۱٬۵۰۰٬۰۰۰ تومان"
+    }
+  ],
+  "notConfiguredCount": 26,
+  "notConfiguredNote": "26 money settings ship null (advertising, licences, marketplace, finder). The UI must show «تعیین‌نشده» and keep that payment path closed — never a zero."
+}

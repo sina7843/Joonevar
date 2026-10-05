@@ -1,0 +1,181 @@
+<!-- @dsCard group="Data display" height=1168 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-note { display: block; margin-block-start: 8px; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-phone { width: 390px; flex-shrink: 0; padding: 16px; background: var(--bg-page); border: 1px dashed var(--border-control); border-radius: var(--radius-xl); }
+  .demo-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-block-end: 8px; }
+  .demo code { white-space: nowrap; font-size: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>دسکتاپ ≥۱۰۲۴</b> — جدول کامل · سرستون چسبان · مرتب‌سازی (<code dir="ltr">aria-sort</code>) · ستون عددی هم‌تراز پایان · انتخاب ردیف</p>
+    <div class="demo-bar">
+      <span class="hz-body-sm"><b>۱</b> مورد از ۵ درخواست انتخاب شد</span>
+      <button class="hz-btn hz-btn--secondary hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg> دریافت فهرست</button>
+    </div>
+    <div class="hz-table-wrap">
+      <table class="hz-table">
+        <caption class="hz-visually-hidden">درخواست‌های من، مرتب‌شده بر اساس آخرین به‌روزرسانی</caption>
+        <thead>
+          <tr>
+            <th class="hz-table__check" scope="col"><label class="hz-check"><input type="checkbox" id="all" aria-label="انتخاب همه"></label></th>
+            <th scope="col" aria-sort="none"><button type="button">کد درخواست <svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z"/></svg></button></th>
+            <th scope="col">درخواست</th>
+            <th scope="col">حیوان</th>
+            <th scope="col">وضعیت</th>
+            <th scope="col">اقدام بعدی با</th>
+            <th scope="col" class="hz-num">مبلغ</th>
+            <th scope="col" aria-sort="descending"><button type="button">به‌روزرسانی <svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></th>
+            <th scope="col"><span class="hz-visually-hidden">کنش</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="hz-table__check"><label class="hz-check"><input type="checkbox" aria-label="انتخاب HZ-32AHW6V6PC"></label></td>
+            <td><bdi class="hz-id" dir="ltr">HZ-32AHW6V6PC</bdi></td>
+            <td>ثبت و احراز حیوان</td>
+            <td>مکس</td>
+            <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در حال بررسی</span></td>
+            <td><span class="hz-owner hz-owner--compact"><span class="hz-owner__who">دامپزشک معتمد</span></span></td>
+            <td class="hz-num hz-muted">—</td>
+            <td>۱۴۰۵/۰۷/۰۸</td>
+            <td><a class="hz-link" href="#">پیگیری</a></td>
+          </tr>
+          <tr aria-selected="true">
+            <td class="hz-table__check"><label class="hz-check"><input type="checkbox" checked aria-label="انتخاب HZ-49UQ9KAEBE"></label></td>
+            <td><bdi class="hz-id" dir="ltr">HZ-49UQ9KAEBE</bdi></td>
+            <td>صدور شجره‌نامه</td>
+            <td>تارا</td>
+            <td><span class="hz-badge hz-badge--warning"><span class="hz-badge__dot"></span>در انتظار پرداخت</span></td>
+            <td><span class="hz-owner hz-owner--you hz-owner--compact"><span class="hz-owner__who">شما</span></span></td>
+            <td class="hz-num">۴۰۰٬۰۰۰ تومان</td>
+            <td>۱۴۰۵/۰۷/۰۷</td>
+            <td><a class="hz-link" href="#">پرداخت</a></td>
+          </tr>
+          <tr>
+            <td class="hz-table__check"><label class="hz-check"><input type="checkbox" aria-label="انتخاب HZ-MYUKV79KBC"></label></td>
+            <td><bdi class="hz-id" dir="ltr">HZ-MYUKV79KBC</bdi></td>
+            <td>ثبت کنل</td>
+            <td class="hz-muted">—</td>
+            <td><span class="hz-badge hz-badge--warning"><span class="hz-badge__dot"></span>نیازمند اصلاح</span></td>
+            <td><span class="hz-owner hz-owner--you hz-owner--compact"><span class="hz-owner__who">شما</span></span></td>
+            <td class="hz-num hz-muted">—</td>
+            <td>۱۴۰۵/۰۷/۰۵</td>
+            <td><a class="hz-link" href="#">اصلاح</a></td>
+          </tr>
+          <tr>
+            <td class="hz-table__check"><label class="hz-check"><input type="checkbox" aria-label="انتخاب HZ-767PEG578Z"></label></td>
+            <td><bdi class="hz-id" dir="ltr">HZ-767PEG578Z</bdi></td>
+            <td>مجوز جفت‌گیری</td>
+            <td>رعد × لونا</td>
+            <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار تأیید طرف مقابل</span></td>
+            <td><span class="hz-owner hz-owner--compact"><span class="hz-owner__who">طرف مقابل</span></span></td>
+            <td class="hz-num hz-muted">—</td>
+            <td>۱۴۰۵/۰۷/۰۳</td>
+            <td><a class="hz-link" href="#">پیگیری</a></td>
+          </tr>
+          <tr>
+            <td class="hz-table__check"><label class="hz-check"><input type="checkbox" aria-label="انتخاب HZ-V9P4HGPVY6"></label></td>
+            <td><bdi class="hz-id" dir="ltr">HZ-V9P4HGPVY6</bdi></td>
+            <td>تست اصالت نسب</td>
+            <td>تارا</td>
+            <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در حال بررسی</span></td>
+            <td><span class="hz-owner hz-owner--compact"><span class="hz-owner__who">مرکز ژنتیک</span></span></td>
+            <td class="hz-num hz-muted">—</td>
+            <td>۱۴۰۵/۰۶/۳۰</td>
+            <td><a class="hz-link" href="#">پیگیری</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <span class="demo-note">ردیف انتخاب‌شده: <code dir="ltr">aria-selected="true"</code> با bg-brand-subtle · hover فقط با اشاره‌گر · سرستون مرتب‌شده متن پررنگ‌تر و پیکان جهت</span>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — همان ردیف‌ها به‌صورت فهرست کارتی؛ هرگز اسکرول افقی</p>
+      <div class="demo-phone">
+        <ul class="hz-cardlist" aria-label="درخواست‌های من">
+          <li class="hz-cardlist__item">
+            <div class="hz-cardlist__row"><span class="hz-cardlist__title">ثبت و احراز حیوان · مکس</span><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>در حال بررسی</span></div>
+            <div class="hz-cardlist__row hz-cardlist__meta"><bdi class="hz-id" dir="ltr">HZ-32AHW6V6PC</bdi><span>۸ مهر ۱۴۰۵</span></div>
+            <div class="hz-owner"><span>اقدام بعدی با: <span class="hz-owner__who">دامپزشک معتمد</span></span><a class="hz-link" href="#">پیگیری</a></div>
+          </li>
+          <li class="hz-cardlist__item">
+            <div class="hz-cardlist__row"><span class="hz-cardlist__title">صدور شجره‌نامه · تارا</span><span class="hz-badge hz-badge--sm hz-badge--warning"><span class="hz-badge__dot"></span>در انتظار پرداخت</span></div>
+            <div class="hz-cardlist__row hz-cardlist__meta"><bdi class="hz-id" dir="ltr">HZ-49UQ9KAEBE</bdi><span>۷ مهر ۱۴۰۵</span></div>
+            <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">شما</span></span><span class="hz-owner__extra">۴۰۰٬۰۰۰ تومان</span></div>
+          </li>
+          <li class="hz-cardlist__item">
+            <div class="hz-cardlist__row"><span class="hz-cardlist__title">ثبت کنل</span><span class="hz-badge hz-badge--sm hz-badge--warning"><span class="hz-badge__dot"></span>نیازمند اصلاح</span></div>
+            <div class="hz-cardlist__row hz-cardlist__meta"><bdi class="hz-id" dir="ltr">HZ-MYUKV79KBC</bdi><span>۵ مهر ۱۴۰۵</span></div>
+            <p class="hz-body-sm" style="margin:0">تصویر پروانه کسب خوانا نیست؛ نسخه واضح‌تری بارگذاری کنید.</p>
+            <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">شما</span></span><a class="hz-link" href="#">اصلاح</a></div>
+          </li>
+          <li class="hz-cardlist__item">
+            <div class="hz-cardlist__row"><span class="hz-cardlist__title">مجوز جفت‌گیری · رعد × لونا</span></div>
+            <div class="hz-cardlist__row"><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>در انتظار تأیید طرف مقابل</span><span class="hz-cardlist__meta">۳ مهر ۱۴۰۵</span></div>
+            <div class="hz-owner"><span>اقدام بعدی با: <span class="hz-owner__who">طرف مقابل</span></span><a class="hz-link" href="#">پیگیری</a></div>
+          </li>
+        </ul>
+      </div>
+      <span class="demo-note">برچسب وضعیت بلند به سطر خودش می‌رود؛ دلیل اصلاح کامل نمایش داده می‌شود</span>
+    </section>
+
+    <div class="demo-col">
+      <section>
+        <p class="demo-label"><b>فشرده (OpsShell)</b> — <code dir="ltr">.hz-table--dense</code> ردیف ۴۰ · سرستون چسبان در ظرف اسکرول عمودی</p>
+        <div class="hz-table-wrap hz-table-wrap--scroll" id="dense" style="max-height:178px">
+          <table class="hz-table hz-table--dense">
+            <caption class="hz-visually-hidden">پرداخت‌ها</caption>
+            <thead><tr><th scope="col">شناسه پرداخت</th><th scope="col">خدمت</th><th scope="col">وضعیت</th><th scope="col" class="hz-num">مبلغ</th></tr></thead>
+            <tbody>
+              <tr><td><bdi class="hz-id" dir="ltr">HZP-GTGB8MQFU5DTR62Z</bdi></td><td>صدور شجره‌نامه</td><td><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>در جریان</span></td><td class="hz-num">۴۰۰٬۰۰۰ تومان</td></tr>
+              <tr><td><bdi class="hz-id" dir="ltr">HZP-TEQUAKE8YGA7CDQP</bdi></td><td>مجوز جفت‌گیری</td><td><span class="hz-badge hz-badge--sm hz-badge--error"><span class="hz-badge__dot"></span>ناموفق</span></td><td class="hz-num">۳۰۰٬۰۰۰ تومان</td></tr>
+              <tr><td><bdi class="hz-id" dir="ltr">HZP-K9ZQXFYDGX5PJUSB</bdi></td><td>صدور برگه ثبتی — ۲ حیوان</td><td><span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>پرداخت‌شده</span></td><td class="hz-num">۵۰۰٬۰۰۰ تومان</td></tr>
+              <tr><td><bdi class="hz-id" dir="ltr">HZP-EMN2VJ25FJFFN7SA</bdi></td><td>عضویت انجمن (مادام‌العمر)</td><td><span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>پرداخت‌شده</span></td><td class="hz-num">۳۰۰٬۰۰۰ تومان</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <p class="demo-label">در حال بارگذاری</p>
+        <div class="hz-table-wrap" aria-busy="true">
+          <table class="hz-table hz-table--dense">
+            <thead><tr><th scope="col">کد درخواست</th><th scope="col">درخواست</th><th scope="col">وضعیت</th><th scope="col" class="hz-num">به‌روزرسانی</th></tr></thead>
+            <tbody>
+              <tr><td><span class="hz-skeleton hz-skeleton--text" style="width:110px"></span></td><td><span class="hz-skeleton hz-skeleton--text" style="width:140px"></span></td><td><span class="hz-skeleton hz-skeleton--text" style="width:80px"></span></td><td><span class="hz-skeleton hz-skeleton--text" style="width:72px;margin-inline-start:auto"></span></td></tr>
+              <tr><td><span class="hz-skeleton hz-skeleton--text" style="width:110px"></span></td><td><span class="hz-skeleton hz-skeleton--text" style="width:120px"></span></td><td><span class="hz-skeleton hz-skeleton--text" style="width:96px"></span></td><td><span class="hz-skeleton hz-skeleton--text" style="width:72px;margin-inline-start:auto"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <p class="demo-label">خالی</p>
+        <div class="hz-table-wrap">
+          <div class="hz-state">
+            <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg></div>
+            <p class="hz-state__title">هنوز درخواستی ثبت نکرده‌اید</p>
+            <p class="hz-state__body">پس از ثبت حیوان می‌توانید برای برگه ثبتی، شجره‌نامه یا مجوز جفت‌گیری درخواست بدهید.</p>
+            <a class="hz-btn hz-btn--secondary" href="#">ثبت حیوان</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script>
+  (function () {
+    var all = document.getElementById('all'); if (all) all.indeterminate = true;
+    var d = document.getElementById('dense'); if (d) d.scrollTop = 22;
+  })();
+</script>

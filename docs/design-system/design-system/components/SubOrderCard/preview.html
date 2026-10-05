@@ -1,0 +1,93 @@
+<!-- @dsCard group="Commerce" height=976 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-stack { display: flex; flex-direction: column; gap: 16px; }
+  .demo-matrix { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 16px; margin: 0; padding: 0; list-style: none; }
+  .demo-matrix li { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding-block: 8px; border-block-end: 1px solid var(--border-subtle); }
+  .demo-matrix__who { font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-matrix__who b { color: var(--text-primary); font-weight: 700; }
+  .demo-matrix__group { grid-column: 1 / -1; margin: 8px 0 0; font-size: 12px; line-height: 20px; font-weight: 700; color: var(--text-secondary); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section class="demo-stack">
+    <p class="demo-label" style="margin: 0">یک سبد → دو فروشگاه → دو زیرسفارش مستقل؛ هر کدام وضعیت، اقدام بعدی و کنش خودش را دارد</p>
+    <header class="hz-order-head">
+      <h2 class="hz-order-head__title">سفارش <bdi class="hz-id" dir="ltr" style="font-size: 16px">854Q6KUX</bdi><span class="hz-badge hz-badge--success"><span class="hz-badge__dot" aria-hidden="true"></span>پرداخت‌شده</span></h2>
+      <div class="hz-order-head__meta"><span>ثبت: ۵ مهر ۱۴۰۵، ۲۱:۱۰</span><span>مبلغ پرداخت‌شده: <b>۴٬۰۰۵٬۰۰۰ تومان</b></span><span>۲ زیرسفارش از ۲ فروشگاه</span></div>
+    </header>
+    <div class="hz-suborders">
+      <article class="hz-card hz-suborder" aria-labelledby="so-1">
+        <div class="hz-suborder__head">
+          <div class="hz-suborder__shop"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg><div class="hz-suborder__shop-text"><h3 class="hz-suborder__name" id="so-1">پت‌شاپ آریا</h3><span class="hz-suborder__sub">زیرسفارش ۱ از ۲، کرج</span></div></div>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot" aria-hidden="true"></span>ارسال‌شده</span>
+        </div>
+        <div class="hz-suborder__track">
+          <ol class="hz-suborder__steps" aria-label="مسیر ارسال: مرحله ۴ از ۵">
+            <li class="hz-suborder__step hz-suborder__step--done"><span class="hz-visually-hidden">پرداخت‌شده</span></li>
+            <li class="hz-suborder__step hz-suborder__step--done"><span class="hz-visually-hidden">پذیرفته‌شده</span></li>
+            <li class="hz-suborder__step hz-suborder__step--done"><span class="hz-visually-hidden">در حال آماده‌سازی</span></li>
+            <li class="hz-suborder__step hz-suborder__step--done" aria-current="step"><span class="hz-visually-hidden">ارسال‌شده</span></li>
+            <li class="hz-suborder__step"><span class="hz-visually-hidden">تحویل‌شده</span></li>
+          </ol>
+          <span class="hz-suborder__track-label" aria-hidden="true">مرحله ۴ از ۵ — بعدی: تحویل</span>
+        </div>
+        <ul class="hz-suborder__items">
+          <li class="hz-suborder__item"><div class="hz-media hz-media--thumb"><img src="../../assets/imagery/products-dry-food-large-adult.jpg" alt="غذای خشک سگ بالغ نژاد بزرگ"></div><div class="hz-suborder__item-text"><span class="hz-suborder__item-name">غذای خشک سگ بالغ نژاد بزرگ</span><span class="hz-suborder__item-meta">۳ کیلوگرم، ۱ عدد</span></div><span class="hz-suborder__item-amount">۲٬۸۵۰٬۰۰۰ تومان</span></li>
+          <li class="hz-suborder__item"><div class="hz-media hz-media--thumb"><img src="../../assets/imagery/products-leather-collar.jpg" alt="قلاده چرمی قابل تنظیم"></div><div class="hz-suborder__item-text"><span class="hz-suborder__item-name">قلاده چرمی قابل تنظیم</span><span class="hz-suborder__item-meta">اندازه S، ۱ عدد</span></div><span class="hz-suborder__item-amount">۶۴۰٬۰۰۰ تومان</span></li>
+        </ul>
+        <dl class="hz-suborder__sum"><dt>جمع کالاهای این فروشگاه</dt><dd>۳٬۴۹۰٬۰۰۰ تومان</dd></dl>
+        <div class="hz-suborder__foot">
+          <div class="hz-owner"><span>اقدام بعدی با: <b class="hz-owner__who">شرکت حمل</b></span></div>
+          <a class="hz-btn hz-btn--secondary hz-btn--sm" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">جزئیات و پیگیری مرسوله</a>
+        </div>
+      </article>
+
+      <article class="hz-card hz-suborder" aria-labelledby="so-2">
+        <div class="hz-suborder__head">
+          <div class="hz-suborder__shop"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg><div class="hz-suborder__shop-text"><h3 class="hz-suborder__name" id="so-2">فروشگاه نمونه همزیست</h3><span class="hz-suborder__sub">زیرسفارش ۲ از ۲، تهران</span></div></div>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot" aria-hidden="true"></span>در حال آماده‌سازی</span>
+        </div>
+        <div class="hz-suborder__track">
+          <ol class="hz-suborder__steps" aria-label="مسیر ارسال: مرحله ۳ از ۵">
+            <li class="hz-suborder__step hz-suborder__step--done"><span class="hz-visually-hidden">پرداخت‌شده</span></li>
+            <li class="hz-suborder__step hz-suborder__step--done"><span class="hz-visually-hidden">پذیرفته‌شده</span></li>
+            <li class="hz-suborder__step hz-suborder__step--done" aria-current="step"><span class="hz-visually-hidden">در حال آماده‌سازی</span></li>
+            <li class="hz-suborder__step"><span class="hz-visually-hidden">ارسال‌شده</span></li>
+            <li class="hz-suborder__step"><span class="hz-visually-hidden">تحویل‌شده</span></li>
+          </ol>
+          <span class="hz-suborder__track-label" aria-hidden="true">مرحله ۳ از ۵ — بعدی: ارسال</span>
+        </div>
+        <ul class="hz-suborder__items">
+          <li class="hz-suborder__item"><div class="hz-media hz-media--thumb"><img src="../../assets/imagery/products-knotted-rope-toy.jpg" alt="اسباب‌بازی طناب گره‌دار"></div><div class="hz-suborder__item-text"><span class="hz-suborder__item-name">اسباب‌بازی طناب گره‌دار</span><span class="hz-suborder__item-meta">کوچک، ۳ عدد</span></div><span class="hz-suborder__item-amount">۶۳۰٬۰۰۰ تومان</span></li>
+        </ul>
+        <dl class="hz-suborder__sum"><dt>جمع کالاهای این فروشگاه</dt><dd>۶۳۰٬۰۰۰ تومان</dd></dl>
+        <div class="hz-suborder__foot">
+          <div class="hz-owner"><span>اقدام بعدی با: <b class="hz-owner__who">فروشنده</b></span></div>
+          <a class="hz-btn hz-btn--secondary hz-btn--sm" href="#">جزئیات زیرسفارش</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">۱۱ وضعیت زیرسفارش ← فرهنگ وضعیت (برچسب و رنگ از فرهنگ؛ «اقدام بعدی با» از نگاه خریدار)</p>
+    <ul class="demo-matrix">
+      <li class="demo-matrix__group" aria-hidden="true">مسیر ارسال</li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--warning"><span class="hz-badge__dot"></span>در انتظار پرداخت</span><span class="demo-matrix__who"><bdi dir="ltr">PENDING_PAYMENT</bdi> · اقدام بعدی با: <b>شما</b></span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>پرداخت‌شده</span><span class="demo-matrix__who"><bdi dir="ltr">PAID</bdi> · اقدام بعدی با: <b>فروشنده</b> (پذیرش)</span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>پذیرفته‌شده</span><span class="demo-matrix__who"><bdi dir="ltr">ACCEPTED_BY_SELLER</bdi> · اقدام بعدی با: <b>فروشنده</b></span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>در حال آماده‌سازی</span><span class="demo-matrix__who"><bdi dir="ltr">PREPARING</bdi> · اقدام بعدی با: <b>فروشنده</b></span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>ارسال‌شده</span><span class="demo-matrix__who"><bdi dir="ltr">SHIPPED</bdi> · اقدام بعدی با: <b>شرکت حمل</b></span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>تحویل‌شده</span><span class="demo-matrix__who"><bdi dir="ltr">DELIVERED</bdi> · اقدامی لازم نیست؛ مرجوعی ممکن</span></li>
+      <li class="demo-matrix__group" aria-hidden="true">خارج از مسیر (نوار مراحل پنهان می‌شود)</li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--warning"><span class="hz-badge__dot"></span>درخواست مرجوعی</span><span class="demo-matrix__who"><bdi dir="ltr">RETURN_REQUESTED</bdi> · اقدام بعدی با: <b>فروشنده</b></span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--neutral"><span class="hz-badge__dot"></span>مرجوع‌شده</span><span class="demo-matrix__who"><bdi dir="ltr">RETURNED</bdi> · پایان‌یافته</span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--neutral"><span class="hz-badge__dot"></span>بازپرداخت‌شده</span><span class="demo-matrix__who"><bdi dir="ltr">REFUNDED</bdi> · پایان‌یافته</span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--neutral"><span class="hz-badge__dot"></span>لغوشده</span><span class="demo-matrix__who"><bdi dir="ltr">CANCELLED</bdi> · پایان‌یافته</span></li>
+      <li><span class="hz-badge hz-badge--sm hz-badge--error"><span class="hz-badge__dot"></span>ردشده</span><span class="demo-matrix__who"><bdi dir="ltr">REJECTED</bdi> · اقدام بعدی با: <b>همزیست</b> (بازپرداخت)</span></li>
+    </ul>
+  </section>
+</div>
+<script></script>

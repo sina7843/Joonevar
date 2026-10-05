@@ -1,0 +1,85 @@
+<!-- @dsCard group="Print documents" height=776 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">سه نسل — شاخه پدری ثبت نشده (یک خانه جمع‌شده)، شاخه مادری از شجره خارجی با یک جد نامشخص</p>
+    <figure class="hz-pedigree" style="margin:0" aria-label="شجره سه‌نسلی نیکا">
+      <div class="hz-pedigree__cols" aria-hidden="true"><span class="hz-pedigree__col">حیوان</span><span class="hz-pedigree__col">والدین</span><span class="hz-pedigree__col">پدربزرگ و مادربزرگ</span><span class="hz-pedigree__col">نسل سوم</span></div>
+      <ol class="hz-pedigree__grid" style="margin:0;padding:0;list-style:none">
+        <li class="hz-ped hz-ped--g0 hz-ped--has-parents">
+          <div class="hz-ped__node hz-ped__node--subject">
+            <span class="hz-ped__role">توله</span>
+            <span class="hz-ped__name">نیکا</span>
+            <span class="hz-ped__meta">تولد ۲۳ مرداد ۱۴۰۵</span>
+            <bdi class="hz-id hz-ped__id" dir="ltr">PUP-CC744Q7D</bdi>
+            <span class="hz-ped__meta">مجوز <bdi class="hz-id" dir="ltr">MP-7RYZNEN3</bdi></span>
+          </div>
+        </li>
+        <li class="hz-ped hz-ped--g1 hz-ped--collapsed-parents" style="--r:1">
+          <div class="hz-ped__node">
+            <span class="hz-ped__role">پدر</span>
+            <span class="hz-ped__name">آرا</span>
+            <span class="hz-ped__meta">سگ سرابی</span>
+            <bdi class="hz-id hz-ped__id" dir="ltr">PET-2GKRHEW6</bdi>
+          </div>
+        </li>
+        <li class="hz-ped hz-ped--rest2" style="--r:1">
+          <div class="hz-ped__node hz-ped__node--unknown">
+            <span class="hz-ped__role">اجداد پدری</span>
+            <span class="hz-ped__name">نامشخص</span>
+            <span class="hz-ped__meta">آرا با نسل <bdi dir="ltr">G0</bdi> ثبت شده است؛ والدین او در همزیست ثبت نشده‌اند.</span>
+          </div>
+        </li>
+        <li class="hz-ped hz-ped--g1 hz-ped--has-parents" style="--r:5">
+          <div class="hz-ped__node">
+            <span class="hz-ped__role">مادر <span class="hz-tag hz-tag--neutral">شجره خارجی</span></span>
+            <span class="hz-ped__name">تارا</span>
+            <span class="hz-ped__meta">ژرمن شپرد</span>
+            <bdi class="hz-id hz-ped__id" dir="ltr">PET-6DP9RN3R</bdi>
+          </div>
+        </li>
+        <li class="hz-ped hz-ped--g2 hz-ped--has-parents" style="--r:5">
+          <div class="hz-ped__node">
+            <span class="hz-ped__role">پدرِ مادر</span>
+            <span class="hz-ped__name"><bdi dir="ltr">Arko vom Talblick</bdi></span>
+            <bdi class="hz-id hz-ped__id" dir="ltr">SZ 2291457</bdi>
+          </div>
+        </li>
+        <li class="hz-ped hz-ped--g2 hz-ped--has-parents" style="--r:7">
+          <div class="hz-ped__node">
+            <span class="hz-ped__role">مادرِ مادر</span>
+            <span class="hz-ped__name"><bdi dir="ltr">Bella vom Talblick</bdi></span>
+            <bdi class="hz-id hz-ped__id" dir="ltr">SZ 2290866</bdi>
+          </div>
+        </li>
+        <li class="hz-ped hz-ped--g3" style="--r:5">
+          <div class="hz-ped__node"><span class="hz-ped__role">پدر<bdi class="hz-id hz-ped__id" dir="ltr">SZ 2210384</bdi></span><span class="hz-ped__name"><bdi dir="ltr">Falko von der Burg</bdi></span></div>
+        </li>
+        <li class="hz-ped hz-ped--g3" style="--r:6">
+          <div class="hz-ped__node"><span class="hz-ped__role">مادر<bdi class="hz-id hz-ped__id" dir="ltr">SZ 2203117</bdi></span><span class="hz-ped__name"><bdi dir="ltr">Elsa vom Seeblick</bdi></span></div>
+        </li>
+        <li class="hz-ped hz-ped--g3" style="--r:7">
+          <div class="hz-ped__node"><span class="hz-ped__role">پدر<bdi class="hz-id hz-ped__id" dir="ltr">SZ 2217750</bdi></span><span class="hz-ped__name"><bdi dir="ltr">Quinto vom Mühlenhof</bdi></span></div>
+        </li>
+        <li class="hz-ped hz-ped--g3" style="--r:8">
+          <div class="hz-ped__node hz-ped__node--unknown"><span class="hz-ped__role">مادر<span>در شجره خارجی نیامده</span></span><span class="hz-ped__name">نامشخص</span></div>
+        </li>
+      </ol>
+    </figure>
+  </section>
+  <section>
+    <p class="demo-label">خانه‌ها — ثبت در همزیست · شجره خارجی · نامشخص · نام بلند (حداکثر دو خط) · فوکوس (وقتی خانه پیوند به پرونده است)</p>
+    <div class="demo-row">
+      <div class="hz-ped__node"><span class="hz-ped__role">پدر</span><span class="hz-ped__name">رکس</span><span class="hz-ped__meta">ژرمن شپرد</span><bdi class="hz-id hz-ped__id" dir="ltr">PET-8JDUN4GH</bdi></div>
+      <div class="hz-ped__node"><span class="hz-ped__role">مادر <span class="hz-tag hz-tag--neutral">شجره خارجی</span></span><span class="hz-ped__name"><bdi dir="ltr">Bella vom Talblick</bdi></span><bdi class="hz-id hz-ped__id" dir="ltr">SZ 2290866</bdi></div>
+      <div class="hz-ped__node hz-ped__node--unknown"><span class="hz-ped__role">پدر</span><span class="hz-ped__name">نامشخص</span><span class="hz-ped__meta">در همزیست ثبت نشده</span></div>
+      <a class="hz-ped__node" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px"><span class="hz-ped__role">مادر</span><span class="hz-ped__name">شاهزاده کوچولوی باغ ارم شیراز</span><span class="hz-ped__meta">پرشین (اگزوتیک موکوتاه)</span><bdi class="hz-id hz-ped__id" dir="ltr">PET-W7KQ3MZP</bdi></a>
+    </div>
+  </section>
+</div>
+<script></script>

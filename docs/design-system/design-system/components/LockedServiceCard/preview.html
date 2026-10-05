@@ -1,0 +1,68 @@
+<!-- @dsCard group="Feedback" height=696 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  .demo-anatomy { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 24px; align-items: center; }
+  .demo-parts { margin: 0; list-style-type: persian; padding-inline-start: 20px; font-size: 13px; line-height: 24px; color: var(--text-secondary); }
+  .demo-parts b { color: var(--text-primary); }
+  .demo-fee { font-size: 13px; line-height: 22px; color: var(--text-secondary); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">سه‌جزئی — چه قفل است · چرا · چه بازش می‌کند</p>
+    <div class="demo-anatomy">
+      <article class="hz-locked" aria-labelledby="lk-kennel">
+        <h3 class="hz-locked__title" id="lk-kennel"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>ثبت کنل</h3>
+        <p class="hz-locked__why">فقط حساب <b>پرورش‌دهنده</b> می‌تواند کنل ثبت کند.</p>
+        <a href="#" class="hz-btn hz-btn--secondary hz-btn--sm hz-locked__unlock">فعال‌سازی حساب پرورش‌دهنده</a>
+      </article>
+      <ol class="demo-parts">
+        <li><b>چه:</b> نام خدمت، با آیکن <bdi dir="ltr">lock-simple</bdi></li>
+        <li><b>چرا:</b> یک جمله؛ شرط کم‌شده پررنگ</li>
+        <li><b>چه بازش می‌کند:</b> کنش (لینک) یا جمله‌ای که می‌گوید منتظر چه هستیم</li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">در بخش «سرویس‌ها» کنار خدمت باز — نقش، پیش‌نیاز، تعرفه تعیین‌نشده</p>
+    <div class="demo-grid">
+      <a href="#" class="hz-card hz-card--compact hz-card--interactive hz-service">
+        <span class="hz-service__title">ثبت حیوان تازه <svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></span>
+        <span class="hz-service__desc">فرم شش‌مرحله‌ای؛ هر مرحله ذخیره می‌شود.</span>
+        <span class="hz-service__price">برگه ثبتی: ۲۵۰٬۰۰۰ تومان</span>
+      </a>
+      <article class="hz-locked" aria-labelledby="lk-puppy">
+        <h3 class="hz-locked__title" id="lk-puppy"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>کارت توله</h3>
+        <p class="hz-locked__why">کارت توله فقط برای <b>زایمان ثبت‌شده</b> صادر می‌شود.</p>
+        <span class="demo-fee">تعرفه: ۱۲۰٬۰۰۰ تومان برای هر توله</span>
+        <a href="#" class="hz-btn hz-btn--secondary hz-btn--sm hz-locked__unlock">ثبت زایمان</a>
+      </article>
+      <article class="hz-locked" aria-labelledby="lk-ad">
+        <h3 class="hz-locked__title" id="lk-ad"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>آگهی ویژه در بازار</h3>
+        <p class="hz-locked__why">تعرفه این خدمت <b>تعیین‌نشده</b> است و پرداختش باز نیست.</p>
+        <span class="demo-fee">پس از اعلام تعرفه فعال می‌شود.</span>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">متن بلند · فوکوس روی کنش</p>
+    <div class="demo-grid">
+      <article class="hz-locked" aria-labelledby="lk-animal" style="grid-column: span 2">
+        <h3 class="hz-locked__title" id="lk-animal"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>ثبت حیوان تازه</h3>
+        <p class="hz-locked__why">احراز هویت شما <b>نیازمند اصلاح</b> است: تصویر کارت ملی ارسالی خوانا نیست و تاریخ تولد واردشده با کارت ملی مطابقت ندارد. تا اصلاح پرونده، ثبت حیوان تازه امکان‌پذیر نیست.</p>
+        <a href="#" class="hz-btn hz-btn--secondary hz-btn--sm hz-locked__unlock" style="outline: 2px solid var(--focus-ring); outline-offset: 2px">اصلاح احراز هویت</a>
+      </article>
+      <article class="hz-locked" aria-labelledby="lk-permit">
+        <h3 class="hz-locked__title" id="lk-permit"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>مجوز جفت‌گیری</h3>
+        <p class="hz-locked__why">فقط حساب <b>پرورش‌دهنده</b> می‌تواند مجوز جفت‌گیری درخواست کند.</p>
+        <a href="#" class="hz-btn hz-btn--secondary hz-btn--sm hz-locked__unlock">فعال‌سازی حساب پرورش‌دهنده</a>
+      </article>
+    </div>
+  </section>
+</div>
+<script></script>

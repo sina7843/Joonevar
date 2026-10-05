@@ -1,0 +1,113 @@
+<!-- @dsCard group="Inputs" height=536 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; align-items: start; }
+  .demo-cell { display: flex; flex-direction: column; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">جداکننده هزارگان زنده «٬» · پسوند «تومان» · مبلغ به حروف در راهنما</p>
+    <div class="demo-grid">
+      <div class="demo-cell">
+        <p class="demo-label">پیش‌فرض — قیمت آگهی</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-1">قیمت<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-num" id="m-1" type="text" inputmode="numeric" autocomplete="off" value="۴۵٬۰۰۰٬۰۰۰" aria-describedby="m-1-w"><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__hint" id="m-1-w">چهل و پنج میلیون تومان</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">زنده — عدد تایپ کنید (فارسی یا لاتین)</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-2">قیمت کالا<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-num" id="m-2" type="text" inputmode="numeric" autocomplete="off" value="۲٬۸۵۰٬۰۰۰" data-money aria-describedby="m-2-w"><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__hint" id="m-2-w">دو میلیون و هشتصد و پنجاه هزار تومان</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">مبلغ بزرگ</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-3">قیمت<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-num" id="m-3" type="text" inputmode="numeric" autocomplete="off" value="۴۵۰٬۰۰۰٬۰۰۰" aria-describedby="m-3-w"><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__hint" id="m-3-w">چهارصد و پنجاه میلیون تومان</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خالی — تعرفه تعیین‌نشده (مدیر سامانه)</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-4">هزینه انتشار آگهی در بازار <span class="hz-field__opt">(اختیاری)</span></label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-num" id="m-4" type="text" inputmode="numeric" autocomplete="off" data-money aria-describedby="m-4-h"><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__hint" id="m-4-h">خالی یعنی «تعیین‌نشده»؛ تا مبلغ وارد نشود، این مسیر پرداخت بسته می‌ماند.</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خطا — صفر</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-5">قیمت<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-num" id="m-5" type="text" inputmode="numeric" autocomplete="off" value="۰" aria-invalid="true" aria-describedby="m-5-e"><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__error" id="m-5-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>قیمت باید بیشتر از صفر باشد. قیمت قابل مذاکره هم یک مبلغ پایه لازم دارد.</span></div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">فوکوس</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-6">هزینه صدور شجره‌نامه<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-num" id="m-6" type="text" inputmode="numeric" autocomplete="off" value="۴۰۰٬۰۰۰" aria-describedby="m-6-w" style="border-color:var(--focus-ring);box-shadow:inset 0 0 0 1px var(--focus-ring)"><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__hint" id="m-6-w">چهارصد هزار تومان</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">غیرفعال — با دلیل</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-7">قیمت</label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-num" id="m-7" type="text" inputmode="numeric" value="۲۶٬۰۰۰٬۰۰۰" aria-describedby="m-7-h" disabled><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__hint" id="m-7-h">این آگهی فروخته شده و قیمتش دیگر تغییر نمی‌کند.</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">کوچک — جدول تنظیمات OpsShell</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="m-8">هزینه ثبت کنل<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <div class="hz-input-wrap hz-input-wrap--suffix"><input class="hz-input hz-input--sm hz-num" id="m-8" type="text" inputmode="numeric" autocomplete="off" value="۱۵۰٬۰۰۰" data-money aria-describedby="m-8-w"><span class="hz-input-wrap__suffix">تومان</span></div>
+          <div class="hz-field__hint" id="m-8-w">صد و پنجاه هزار تومان</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  (function () {
+    var ones = ['', 'یک', 'دو', 'سه', 'چهار', 'پنج', 'شش', 'هفت', 'هشت', 'نه'];
+    var teens = ['ده', 'یازده', 'دوازده', 'سیزده', 'چهارده', 'پانزده', 'شانزده', 'هفده', 'هجده', 'نوزده'];
+    var tens = ['', '', 'بیست', 'سی', 'چهل', 'پنجاه', 'شصت', 'هفتاد', 'هشتاد', 'نود'];
+    var hundreds = ['', 'صد', 'دویست', 'سیصد', 'چهارصد', 'پانصد', 'ششصد', 'هفتصد', 'هشتصد', 'نهصد'];
+    var scales = ['', 'هزار', 'میلیون', 'میلیارد', 'هزار میلیارد'];
+    function three(n) {
+      var p = [], h = Math.floor(n / 100), r = n % 100;
+      if (h) p.push(hundreds[h]);
+      if (r >= 10 && r < 20) p.push(teens[r - 10]);
+      else { if (Math.floor(r / 10)) p.push(tens[Math.floor(r / 10)]); if (r % 10) p.push(ones[r % 10]); }
+      return p.join(' و ');
+    }
+    function words(n) {
+      if (!n) return '';
+      var parts = [], i = 0;
+      while (n > 0 && i < scales.length) { var g = n % 1000; if (g) parts.unshift(three(g) + (scales[i] ? ' ' + scales[i] : '')); n = Math.floor(n / 1000); i++; }
+      return parts.join(' و ') + ' تومان';
+    }
+    function toLatin(s) { return s.replace(/[۰-۹]/g, function (d) { return d.charCodeAt(0) - 1776; }).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }); }
+    document.querySelectorAll('input[data-money]').forEach(function (inp) {
+      var hint = document.getElementById(inp.getAttribute('aria-describedby').split(' ')[0]);
+      var empty = hint ? hint.textContent : '';
+      inp.addEventListener('input', function () {
+        var digits = toLatin(inp.value).replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, 13);
+        var n = digits ? Number(digits) : null;
+        inp.value = n === null ? '' : n.toLocaleString('fa-IR');
+        inp.setSelectionRange(inp.value.length, inp.value.length);
+        if (hint) hint.textContent = n === null ? empty : (n === 0 ? 'صفر پذیرفته نمی‌شود.' : words(n));
+      });
+    });
+  })();
+</script>

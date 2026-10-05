@@ -1,0 +1,631 @@
+{
+ "version": "1.0.3",
+ "count": 78,
+ "rule": "Every photo below is used in the app, imported through the app's file storage with its altFa. One record = one image (listings: 2). Crops follow RecordImage (object-position 50% 40%).",
+ "images": [
+  {
+   "slot": "breeds/german-shepherd",
+   "file": "design-system/assets/imagery/breeds-german-shepherd.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد ژرمن شپرد",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/labrador-retriever",
+   "file": "design-system/assets/imagery/breeds-labrador-retriever.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد لابرادور رتریور",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/golden-retriever",
+   "file": "design-system/assets/imagery/breeds-golden-retriever.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد گلدن رتریور",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/siberian-husky",
+   "file": "design-system/assets/imagery/breeds-siberian-husky.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد هاسکی سیبری",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/rottweiler",
+   "file": "design-system/assets/imagery/breeds-rottweiler.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد روتوایلر",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/doberman-pinscher",
+   "file": "design-system/assets/imagery/breeds-doberman-pinscher.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد دوبرمن پینشر",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/poodle",
+   "file": "design-system/assets/imagery/breeds-poodle.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد پودل",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/beagle",
+   "file": "design-system/assets/imagery/breeds-beagle.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد بیگل",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/shih-tzu",
+   "file": "design-system/assets/imagery/breeds-shih-tzu.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد شیتزو",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "breeds/sarabi-dog",
+   "file": "design-system/assets/imagery/breeds-sarabi-dog.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ نژاد سگ سرابی",
+   "entitySource": "taxonomy.json → breeds[] (by slug)",
+   "usedIn": "Breed card image, /breeds and /breeds/[slug] hero, home «نژادها»"
+  },
+  {
+   "slot": "people/acc-owner-1",
+   "file": "design-system/assets/imagery/people-acc-owner-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل سارا احمدی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-breeder-1",
+   "file": "design-system/assets/imagery/people-acc-breeder-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل رضا کریمی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-vet-1",
+   "file": "design-system/assets/imagery/people-acc-vet-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل مریم صادقی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-assoc-1",
+   "file": "design-system/assets/imagery/people-acc-assoc-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل حمید نوروزی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-genetics-1",
+   "file": "design-system/assets/imagery/people-acc-genetics-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل لیلا موسوی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-admin-1",
+   "file": "design-system/assets/imagery/people-acc-admin-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل امیر حسینی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-author-1",
+   "file": "design-system/assets/imagery/people-acc-author-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل نگار رستمی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-owner-2",
+   "file": "design-system/assets/imagery/people-acc-owner-2.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل علی رضایی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-owner-3",
+   "file": "design-system/assets/imagery/people-acc-owner-3.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل مینا جعفری",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "people/acc-breeder-2",
+   "file": "design-system/assets/imagery/people-acc-breeder-2.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر پروفایل بهرام فراهانی",
+   "entitySource": "people.json → accounts (by id)",
+   "usedIn": "Avatar: account menu, top bar, vet/owner rows, decision desk applicant, chat"
+  },
+  {
+   "slot": "animals/animal-1",
+   "file": "design-system/assets/imagery/animals-animal-1.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ رکس",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "animals/animal-2",
+   "file": "design-system/assets/imagery/animals-animal-2.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ لونا",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "animals/animal-3",
+   "file": "design-system/assets/imagery/animals-animal-3.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ آرا",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "animals/animal-4",
+   "file": "design-system/assets/imagery/animals-animal-4.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ تارا",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "animals/animal-5",
+   "file": "design-system/assets/imagery/animals-animal-5.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ مکس",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "animals/animal-6",
+   "file": "design-system/assets/imagery/animals-animal-6.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ بلا",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "animals/animal-7",
+   "file": "design-system/assets/imagery/animals-animal-7.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ رعد",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "animals/animal-8",
+   "file": "design-system/assets/imagery/animals-animal-8.jpg",
+   "ratio": "4:3",
+   "altFa": "گربه شیرین",
+   "entitySource": "animals.json (by id)",
+   "usedIn": "Animal photo: AnimalCard, animal file (K9), vet check-in (K12), mating finder, dashboards"
+  },
+  {
+   "slot": "vets/vet-1",
+   "file": "design-system/assets/imagery/vets-vet-1.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر دکتر مریم صادقی",
+   "entitySource": "directory.json → vets[]",
+   "usedIn": "VetCard photo: /veterinarians (K5), vet profile, home «دامپزشکان معتمد»"
+  },
+  {
+   "slot": "vets/vet-2",
+   "file": "design-system/assets/imagery/vets-vet-2.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر دکتر کیوان شریفی",
+   "entitySource": "directory.json → vets[]",
+   "usedIn": "VetCard photo: /veterinarians (K5), vet profile, home «دامپزشکان معتمد»"
+  },
+  {
+   "slot": "vets/vet-3",
+   "file": "design-system/assets/imagery/vets-vet-3.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر دکتر الهام نادری",
+   "entitySource": "directory.json → vets[]",
+   "usedIn": "VetCard photo: /veterinarians (K5), vet profile, home «دامپزشکان معتمد»"
+  },
+  {
+   "slot": "vets/vet-4",
+   "file": "design-system/assets/imagery/vets-vet-4.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر دکتر بابک امینی",
+   "entitySource": "directory.json → vets[]",
+   "usedIn": "VetCard photo: /veterinarians (K5), vet profile, home «دامپزشکان معتمد»"
+  },
+  {
+   "slot": "vets/vet-5",
+   "file": "design-system/assets/imagery/vets-vet-5.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر دکتر نسرین طاهری",
+   "entitySource": "directory.json → vets[]",
+   "usedIn": "VetCard photo: /veterinarians (K5), vet profile, home «دامپزشکان معتمد»"
+  },
+  {
+   "slot": "vets/vet-6",
+   "file": "design-system/assets/imagery/vets-vet-6.jpg",
+   "ratio": "1:1",
+   "altFa": "تصویر دکتر پویا مرادی",
+   "entitySource": "directory.json → vets[]",
+   "usedIn": "VetCard photo: /veterinarians (K5), vet profile, home «دامپزشکان معتمد»"
+  },
+  {
+   "slot": "centres/centre-1",
+   "file": "design-system/assets/imagery/centres-centre-1.jpg",
+   "ratio": "16:9",
+   "altFa": "نمای بیمارستان دامپزشکی مهرگان",
+   "entitySource": "directory.json → centres[]",
+   "usedIn": "CenterCard banner: /centers, centre profile"
+  },
+  {
+   "slot": "centres/centre-2",
+   "file": "design-system/assets/imagery/centres-centre-2.jpg",
+   "ratio": "16:9",
+   "altFa": "نمای کلینیک دامپزشکی آوا",
+   "entitySource": "directory.json → centres[]",
+   "usedIn": "CenterCard banner: /centers, centre profile"
+  },
+  {
+   "slot": "centres/centre-3",
+   "file": "design-system/assets/imagery/centres-centre-3.jpg",
+   "ratio": "16:9",
+   "altFa": "نمای درمانگاه دامپزشکی پارس",
+   "entitySource": "directory.json → centres[]",
+   "usedIn": "CenterCard banner: /centers, centre profile"
+  },
+  {
+   "slot": "centres/centre-4",
+   "file": "design-system/assets/imagery/centres-centre-4.jpg",
+   "ratio": "16:9",
+   "altFa": "نمای آزمایشگاه دامپزشکی نوین",
+   "entitySource": "directory.json → centres[]",
+   "usedIn": "CenterCard banner: /centers, centre profile"
+  },
+  {
+   "slot": "centres/centre-5",
+   "file": "design-system/assets/imagery/centres-centre-5.jpg",
+   "ratio": "16:9",
+   "altFa": "نمای مرکز ژنتیک همزیست",
+   "entitySource": "directory.json → centres[]",
+   "usedIn": "CenterCard banner: /centers, centre profile"
+  },
+  {
+   "slot": "communities/community-1",
+   "file": "design-system/assets/imagery/communities-community-1.jpg",
+   "ratio": "16:9",
+   "altFa": "تصویر انجمن سگ‌های اصیل ایران",
+   "entitySource": "directory.json → communities[]",
+   "usedIn": "ClubCard/association image: /associations, /clubs, club page"
+  },
+  {
+   "slot": "communities/community-2",
+   "file": "design-system/assets/imagery/communities-community-2.jpg",
+   "ratio": "16:9",
+   "altFa": "تصویر انجمن دوستداران حیوانات خانگی اصفهان",
+   "entitySource": "directory.json → communities[]",
+   "usedIn": "ClubCard/association image: /associations, /clubs, club page"
+  },
+  {
+   "slot": "communities/community-3",
+   "file": "design-system/assets/imagery/communities-community-3.jpg",
+   "ratio": "16:9",
+   "altFa": "تصویر کلاب ژرمن شپرد ایران",
+   "entitySource": "directory.json → communities[]",
+   "usedIn": "ClubCard/association image: /associations, /clubs, club page"
+  },
+  {
+   "slot": "communities/community-4",
+   "file": "design-system/assets/imagery/communities-community-4.jpg",
+   "ratio": "16:9",
+   "altFa": "تصویر کلاب رتریورهای تهران",
+   "entitySource": "directory.json → communities[]",
+   "usedIn": "ClubCard/association image: /associations, /clubs, club page"
+  },
+  {
+   "slot": "communities/community-5",
+   "file": "design-system/assets/imagery/communities-community-5.jpg",
+   "ratio": "16:9",
+   "altFa": "تصویر کلاب سگ سرابی",
+   "entitySource": "directory.json → communities[]",
+   "usedIn": "ClubCard/association image: /associations, /clubs, club page"
+  },
+  {
+   "slot": "content/article-6617",
+   "file": "design-system/assets/imagery/content-article-6617.jpg",
+   "ratio": "16:9",
+   "altFa": "دامپزشک در حال خواندن میکروچیپ سگ",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/article-4654",
+   "file": "design-system/assets/imagery/content-article-4654.jpg",
+   "ratio": "16:9",
+   "altFa": "صاحب سگ در پذیرش کلینیک",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/article-5274",
+   "file": "design-system/assets/imagery/content-article-5274.jpg",
+   "ratio": "16:9",
+   "altFa": "شجره‌نامه کنار پنجه سگ",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/article-5461",
+   "file": "design-system/assets/imagery/content-article-5461.jpg",
+   "ratio": "16:9",
+   "altFa": "دو سگ هم‌نژاد در باغ",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/article-3492",
+   "file": "design-system/assets/imagery/content-article-3492.jpg",
+   "ratio": "16:9",
+   "altFa": "ژرمن شپرد در حال دویدن",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/article-544",
+   "file": "design-system/assets/imagery/content-article-544.jpg",
+   "ratio": "16:9",
+   "altFa": "دامپزشک در حال معاینه گلدن رتریور",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/news-1195",
+   "file": "design-system/assets/imagery/content-news-1195.jpg",
+   "ratio": "16:9",
+   "altFa": "رینگ نمایشگاه سگ",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/news-3448",
+   "file": "design-system/assets/imagery/content-news-3448.jpg",
+   "ratio": "16:9",
+   "altFa": "پیاده‌روی گروهی با ژرمن شپردها",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/news-8066",
+   "file": "design-system/assets/imagery/content-news-8066.jpg",
+   "ratio": "16:9",
+   "altFa": "واکسیناسیون توله‌سگ",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/news-9641",
+   "file": "design-system/assets/imagery/content-news-9641.jpg",
+   "ratio": "16:9",
+   "altFa": "سگ سرابی روی تپه",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "content/club_post-7601",
+   "file": "design-system/assets/imagery/content-club_post-7601.jpg",
+   "ratio": "16:9",
+   "altFa": "تمرین اطاعت‌پذیری در پارک",
+   "entitySource": "content.json (by kind-id)",
+   "usedIn": "Article/news/club-post lead image: K4, ArticleCard, home «تازه‌ها», /articles, /news"
+  },
+  {
+   "slot": "listings/توله ژرمن شپرد-1",
+   "file": "design-system/assets/imagery/listings-german-shepherd-puppy-1.jpg",
+   "ratio": "4:3",
+   "altFa": "ژرمن شپرد — تمام‌قد",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/توله ژرمن شپرد-2",
+   "file": "design-system/assets/imagery/listings-german-shepherd-puppy-2.jpg",
+   "ratio": "4:3",
+   "altFa": "ژرمن شپرد — چهره",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/توله گلدن رتریور-1",
+   "file": "design-system/assets/imagery/listings-golden-retriever-puppy-1.jpg",
+   "ratio": "4:3",
+   "altFa": "گلدن رتریور — تمام‌قد",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/توله گلدن رتریور-2",
+   "file": "design-system/assets/imagery/listings-golden-retriever-puppy-2.jpg",
+   "ratio": "4:3",
+   "altFa": "گلدن رتریور — چهره",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/هاسکی جوان-1",
+   "file": "design-system/assets/imagery/listings-young-husky-1.jpg",
+   "ratio": "4:3",
+   "altFa": "هاسکی سیبری — تمام‌قد",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/هاسکی جوان-2",
+   "file": "design-system/assets/imagery/listings-young-husky-2.jpg",
+   "ratio": "4:3",
+   "altFa": "هاسکی سیبری — چهره",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/بیگل بالغ-1",
+   "file": "design-system/assets/imagery/listings-adult-beagle-1.jpg",
+   "ratio": "4:3",
+   "altFa": "بیگل — تمام‌قد",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/بیگل بالغ-2",
+   "file": "design-system/assets/imagery/listings-adult-beagle-2.jpg",
+   "ratio": "4:3",
+   "altFa": "بیگل — چهره",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/توله شیتزو-1",
+   "file": "design-system/assets/imagery/listings-shih-tzu-puppy-1.jpg",
+   "ratio": "4:3",
+   "altFa": "شیتزو — تمام‌قد",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/توله شیتزو-2",
+   "file": "design-system/assets/imagery/listings-shih-tzu-puppy-2.jpg",
+   "ratio": "4:3",
+   "altFa": "شیتزو — چهره",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/توله سگ سرابی-1",
+   "file": "design-system/assets/imagery/listings-sarabi-puppy-1.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ سرابی — تمام‌قد",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "listings/توله سگ سرابی-2",
+   "file": "design-system/assets/imagery/listings-sarabi-puppy-2.jpg",
+   "ratio": "4:3",
+   "altFa": "سگ سرابی — چهره",
+   "entitySource": "marketplace.json → listings[] (two photos each)",
+   "usedIn": "Listing gallery: K6, ListingCard in /animals-market, seller K17, ops K14"
+  },
+  {
+   "slot": "products/غذای خشک سگ بالغ نژاد بزرگ",
+   "file": "design-system/assets/imagery/products-dry-food-large-adult.jpg",
+   "ratio": "1:1",
+   "altFa": "غذای خشک سگ بالغ نژاد بزرگ",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "products/غذای خشک توله‌سگ",
+   "file": "design-system/assets/imagery/products-dry-food-puppy.jpg",
+   "ratio": "1:1",
+   "altFa": "غذای خشک توله‌سگ",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "products/تشویقی تمرینی مرغ",
+   "file": "design-system/assets/imagery/products-chicken-training-treats.jpg",
+   "ratio": "1:1",
+   "altFa": "تشویقی تمرینی مرغ",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "products/قلاده چرمی قابل تنظیم",
+   "file": "design-system/assets/imagery/products-leather-collar.jpg",
+   "ratio": "1:1",
+   "altFa": "قلاده چرمی قابل تنظیم",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "products/افسار ۵ متری جمع‌شو",
+   "file": "design-system/assets/imagery/products-retractable-leash-5m.jpg",
+   "ratio": "1:1",
+   "altFa": "افسار ۵ متری جمع‌شو",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "products/اسباب‌بازی طناب گره‌دار",
+   "file": "design-system/assets/imagery/products-knotted-rope-toy.jpg",
+   "ratio": "1:1",
+   "altFa": "اسباب‌بازی طناب گره‌دار",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "products/شامپو ضدحساسیت",
+   "file": "design-system/assets/imagery/products-hypoallergenic-shampoo.jpg",
+   "ratio": "1:1",
+   "altFa": "شامپو ضدحساسیت",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "products/تشک ارتوپدی سگ",
+   "file": "design-system/assets/imagery/products-orthopedic-bed.jpg",
+   "ratio": "1:1",
+   "altFa": "تشک ارتوپدی سگ",
+   "entitySource": "shop.json → products[]",
+   "usedIn": "Product packshot: K7, ProductCard in /shop, cart, order rows"
+  },
+  {
+   "slot": "home/hero-cat-owner",
+   "file": "design-system/assets/imagery/home-hero-cat-owner.jpg",
+   "ratio": "16:9",
+   "altFa": "زنی با گربه خاکستری‌اش کنار پنجره آفتابی خانه",
+   "entitySource": "—",
+   "usedIn": "Home hero (K1) — already used as /brand/imagery/home-hero-*.jpg"
+  },
+  {
+   "slot": "home/hero-sarabi-courtyard",
+   "file": "design-system/assets/imagery/home-hero-sarabi-courtyard.jpg",
+   "ratio": "16:9",
+   "altFa": "مردی کنار سگ سرابی‌اش در حیاط باغ ایرانی",
+   "entitySource": "—",
+   "usedIn": "Home hero (K1) — already used as /brand/imagery/home-hero-*.jpg"
+  },
+  {
+   "slot": "home/hero-dog",
+   "file": "design-system/assets/imagery/sample-hero-dog.jpg",
+   "ratio": "16:9",
+   "altFa": "زنی با گربه و سگ ژرمن شپرد روی مبل خانه",
+   "entitySource": "—",
+   "usedIn": "Home hero rotation (K1) / login side image / empty-state illustrations where a photo helps"
+  }
+ ]
+}

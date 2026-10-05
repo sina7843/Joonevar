@@ -1,0 +1,203 @@
+<!-- @dsCard group="Operations" width=1280 height=1864 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; flex: 1 1 0; }
+  .demo-phone { position: relative; width: 390px; height: 720px; flex-shrink: 0; overflow: auto; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-phone__bar { display: flex; align-items: center; gap: 4px; height: 56px; padding-inline: 4px 12px; background: var(--bg-chrome); border-block-end: 1px solid var(--border-default); }
+  .demo-phone__body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .demo .hz-merge__result { position: static; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label">دسکتاپ ≥۱۰۲۴ — مقایسه کنار هم، نتیجه در ستون ثابت · یک فیلد هنوز انتخاب نشده (خطا)</p>
+    <div class="demo-col" style="gap: 16px">
+      <div class="hz-page-header">
+        <div class="hz-page-header__text">
+          <h1 class="hz-h2">ادغام رکورد تکراری</h1>
+          <span class="hz-page-header__meta">دو رکورد یک مرکز را یکی کنید؛ رکورد تکراری حذف می‌شود و نشانی آن به رکورد اصلی می‌رود.</span>
+        </div>
+      </div>
+      <div class="hz-tabs hz-tabs--sm" role="tablist" aria-label="نوع رکورد">
+        <button class="hz-tabs__tab" type="button" role="tab" aria-selected="false" tabindex="-1">دامپزشکان <span class="hz-count">۴</span></button>
+        <button class="hz-tabs__tab" type="button" role="tab" aria-selected="true">مراکز دامپزشکی <span class="hz-count">۲</span></button>
+        <button class="hz-tabs__tab" type="button" role="tab" aria-selected="false" tabindex="-1">انجمن و کلاب‌ها <span class="hz-count">۰</span></button>
+      </div>
+
+      <div class="hz-merge" role="tabpanel" aria-label="مراکز دامپزشکی">
+        <div class="hz-card hz-merge__main">
+          <div class="hz-merge__records">
+            <div class="hz-merge__record hz-merge__record--kept">
+              <span class="hz-merge__role"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>رکورد اصلی — می‌ماند</span>
+              <span class="hz-merge__name">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</span>
+              <span class="hz-merge__meta">مالک تأییدشده دارد، ثبت ۱۲ فروردین ۱۴۰۴</span>
+            </div>
+            <div class="hz-merge__record hz-merge__record--discarded">
+              <span class="hz-merge__role"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>رکورد تکراری — حذف می‌شود</span>
+              <span class="hz-merge__name">مرکز درمانی دامپزشکی دکتر صالحی</span>
+              <span class="hz-merge__meta">پروفایل بدون مالک، ثبت ۳ تیر ۱۴۰۵</span>
+            </div>
+          </div>
+          <div class="hz-action-row" style="justify-content: flex-end; margin-block-start: -4px">
+            <button class="hz-btn hz-btn--ghost hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,181.66l-32,32a8,8,0,0,1-11.32-11.32L188.69,184H48a8,8,0,0,1,0-16H188.69l-18.35-18.34a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,213.66,181.66Zm-139.32-64a8,8,0,0,0,11.32-11.32L67.31,88H208a8,8,0,0,0,0-16H67.31L85.66,53.66A8,8,0,0,0,74.34,42.34l-32,32a8,8,0,0,0,0,11.32Z"/></svg>جابه‌جایی اصلی و تکراری</button>
+          </div>
+
+          <div class="hz-merge__fields">
+            <div class="hz-merge__row hz-merge__row--head" aria-hidden="true"><span>فیلد</span><span>از رکورد اصلی</span><span>از رکورد تکراری</span></div>
+
+            <div class="hz-merge__row" role="radiogroup" aria-labelledby="mf-name">
+              <span class="hz-merge__field" id="mf-name">نام</span>
+              <label class="hz-option"><input type="radio" name="mf-name" checked><span class="hz-option__text"><span class="hz-merge__src">اصلی</span><span class="hz-merge__value">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</span></span></label>
+              <label class="hz-option"><input type="radio" name="mf-name"><span class="hz-option__text"><span class="hz-merge__src">تکراری</span><span class="hz-merge__value">مرکز درمانی دامپزشکی دکتر صالحی</span></span></label>
+            </div>
+
+            <div class="hz-merge__row hz-merge__row--error" role="radiogroup" aria-labelledby="mf-type" aria-describedby="mf-type-err" aria-invalid="true">
+              <span class="hz-merge__field" id="mf-type">نوع مرکز</span>
+              <label class="hz-option"><input type="radio" name="mf-type"><span class="hz-option__text"><span class="hz-merge__src">اصلی</span><span class="hz-merge__value">بیمارستان دامپزشکی</span></span></label>
+              <label class="hz-option"><input type="radio" name="mf-type"><span class="hz-option__text"><span class="hz-merge__src">تکراری</span><span class="hz-merge__value">درمانگاه دامپزشکی</span></span></label>
+              <span class="hz-field__error" id="mf-type-err"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>برای «نوع مرکز» یکی از دو مقدار را انتخاب کنید.</span>
+            </div>
+
+            <div class="hz-merge__row">
+              <span class="hz-merge__field">شهر</span>
+              <div class="hz-merge__same"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>یکسان در هر دو: <b>اصفهان</b></div>
+            </div>
+
+            <div class="hz-merge__row" role="radiogroup" aria-labelledby="mf-addr">
+              <span class="hz-merge__field" id="mf-addr">نشانی</span>
+              <label class="hz-option"><input type="radio" name="mf-addr"><span class="hz-option__text"><span class="hz-merge__src">اصلی</span><span class="hz-merge__value hz-merge__value--empty">— وارد نشده</span></span></label>
+              <label class="hz-option"><input type="radio" name="mf-addr" checked><span class="hz-option__text"><span class="hz-merge__src">تکراری</span><span class="hz-merge__value">اصفهان، خیابان چهارباغ بالا، کوچه ۱۴</span></span></label>
+            </div>
+
+            <div class="hz-merge__row" role="radiogroup" aria-labelledby="mf-phone">
+              <span class="hz-merge__field" id="mf-phone">تلفن</span>
+              <label class="hz-option"><input type="radio" name="mf-phone" checked><span class="hz-option__text"><span class="hz-merge__src">اصلی</span><bdi class="hz-id hz-merge__value" dir="ltr">09990000031</bdi></span></label>
+              <label class="hz-option"><input type="radio" name="mf-phone"><span class="hz-option__text"><span class="hz-merge__src">تکراری</span><bdi class="hz-id hz-merge__value" dir="ltr">09990000032</bdi></span></label>
+            </div>
+
+            <div class="hz-merge__row" role="radiogroup" aria-labelledby="mf-lic">
+              <span class="hz-merge__field" id="mf-lic">پروانه فعالیت</span>
+              <label class="hz-option"><input type="radio" name="mf-lic" checked><span class="hz-option__text"><span class="hz-merge__src">اصلی</span><span class="hz-badge hz-badge--warning hz-badge--sm" style="align-self: flex-start"><span class="hz-badge__dot"></span>منقضی</span></span></label>
+              <label class="hz-option"><input type="radio" name="mf-lic"><span class="hz-option__text"><span class="hz-merge__src">تکراری</span><span class="hz-merge__value hz-merge__value--empty">— بارگذاری نشده</span></span></label>
+            </div>
+
+            <div class="hz-merge__row">
+              <span class="hz-merge__field">حساب مالک<span class="hz-merge__field-note">قابل انتخاب نیست</span></span>
+              <div class="hz-merge__same"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>همیشه از رکورد اصلی: <b>مالک تأییدشده</b></div>
+            </div>
+
+            <div class="hz-merge__row">
+              <span class="hz-merge__field">تصویر</span>
+              <div class="hz-merge__same"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V158.75l-26.07-26.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L40,149.37V56ZM40,172l52-52,80,80H40Zm176,28H194.63l-36-36,20-20L216,181.38V200ZM144,100a12,12,0,1,1,12,12A12,12,0,0,1,144,100Z"/></svg>در هیچ‌کدام ثبت نشده</div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hz-card hz-merge__result" aria-labelledby="mr-h">
+          <div class="hz-section-header hz-section-header--sm" style="margin-block-end: 0"><h2 class="hz-section-header__title" id="mr-h"><span class="hz-section-header__bar"></span>نتیجه ادغام</h2></div>
+          <dl class="hz-kv">
+            <div class="hz-kv__row"><dt class="hz-kv__key">نام</dt><dd class="hz-kv__value">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">نوع مرکز</dt><dd class="hz-kv__value hz-merge__pending">انتخاب نشده</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">شهر</dt><dd class="hz-kv__value">اصفهان</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">نشانی</dt><dd class="hz-kv__value">اصفهان، خیابان چهارباغ بالا، کوچه ۱۴</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">تلفن</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">09990000031</bdi></dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">پروانه فعالیت</dt><dd class="hz-kv__value">منقضی</dd></div>
+          </dl>
+          <p class="hz-caption" style="margin: 0">۲ دامپزشک وابسته و نشانی صفحه رکورد تکراری به رکورد اصلی منتقل می‌شوند.</p>
+          <div class="demo-col" style="gap: 8px">
+            <button class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" type="button" disabled>ادغام دو رکورد</button>
+            <p class="hz-desk__note" role="status">۱ فیلد انتخاب نشده است.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label">موبایل &lt;۷۶۸ — فیلدها زیر هم، هر مقدار با برچسب منبع</p>
+      <div class="demo-phone">
+        <div class="demo-phone__bar">
+          <a class="hz-icon-btn" href="#" aria-label="بازگشت"><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg></a>
+          <span class="hz-h4" style="flex: 1 1 auto">ادغام رکورد تکراری</span>
+        </div>
+        <div class="demo-phone__body">
+          <div class="hz-merge hz-merge--stacked"><div class="hz-merge__main">
+            <div class="hz-merge__records">
+              <div class="hz-merge__record hz-merge__record--kept"><span class="hz-merge__role"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>رکورد اصلی — می‌ماند</span><span class="hz-merge__name">دکتر نسرین فرهادی</span><span class="hz-merge__meta">مالک تأییدشده دارد</span></div>
+              <div class="hz-merge__record hz-merge__record--discarded"><span class="hz-merge__role"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>رکورد تکراری — حذف می‌شود</span><span class="hz-merge__name">نسرین فرهادی</span><span class="hz-merge__meta">پروفایل بدون مالک</span></div>
+            </div>
+            <div class="hz-merge__fields">
+              <div class="hz-merge__row" role="radiogroup" aria-labelledby="mm-name">
+                <span class="hz-merge__field" id="mm-name">نام نمایشی</span>
+                <label class="hz-option"><input type="radio" name="mm-name" checked><span class="hz-option__text"><span class="hz-merge__src">اصلی</span><span class="hz-merge__value">دکتر نسرین فرهادی</span></span></label>
+                <label class="hz-option"><input type="radio" name="mm-name"><span class="hz-option__text"><span class="hz-merge__src">تکراری</span><span class="hz-merge__value">نسرین فرهادی</span></span></label>
+              </div>
+              <div class="hz-merge__row" role="radiogroup" aria-labelledby="mm-code">
+                <span class="hz-merge__field" id="mm-code">کد نظام دامپزشکی<span class="hz-merge__field-note">در صفحه عمومی پنهان</span></span>
+                <label class="hz-option"><input type="radio" name="mm-code" checked><span class="hz-option__text"><span class="hz-merge__src">اصلی</span><span class="hz-merge__value">د-۴۸۲۱۷</span></span></label>
+                <label class="hz-option"><input type="radio" name="mm-code"><span class="hz-option__text"><span class="hz-merge__src">تکراری</span><span class="hz-merge__value hz-merge__value--empty">— وارد نشده</span></span></label>
+              </div>
+            </div>
+          </div></div>
+        </div>
+        <div class="hz-desk__bar">
+          <span class="hz-caption">همه فیلدها انتخاب شده‌اند</span>
+          <button class="hz-btn hz-btn--primary hz-btn--block" type="button">ادغام دو رکورد</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="demo-col">
+      <section>
+        <p class="demo-label">در حال ادغام</p>
+        <div class="hz-card hz-merge__result">
+          <button class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" type="button" aria-busy="true"><span class="hz-spinner" aria-hidden="true"></span>در حال ادغام</button>
+          <p class="hz-desk__note">انتخاب‌ها قفل است؛ صفحه را نبندید.</p>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label">انجام شد</p>
+        <div class="hz-alert hz-alert--success" role="status">
+          <span class="hz-alert__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg></span>
+          <div class="hz-alert__body">
+            <span class="hz-alert__title">دو رکورد ادغام شد</span>
+            <span>«مرکز درمانی دامپزشکی دکتر صالحی» حذف شد و نشانی آن به رکورد اصلی می‌رود. این ادغام در تاریخچه تغییرات ثبت شد.</span>
+            <div class="hz-alert__actions"><a class="hz-btn hz-btn--secondary hz-btn--sm" href="#">مشاهده رکورد اصلی</a><a class="hz-btn hz-btn--ghost hz-btn--sm" href="#">تکراری بعدی</a></div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label">ادغام ممکن نیست — هر دو رکورد مالک تأییدشده دارند</p>
+        <div class="hz-alert hz-alert--warning" role="alert">
+          <span class="hz-alert__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg></span>
+          <div class="hz-alert__body">
+            <span class="hz-alert__title">این دو رکورد ادغام نمی‌شوند</span>
+            <span>هر دو مالک تأییدشده دارند. اول ادعای مالکیت یکی را در «Claim مراکز» بررسی کنید، سپس دوباره ادغام کنید.</span>
+          </div>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label">خالی — تکراری‌ای پیدا نشد</p>
+        <div class="hz-card">
+          <div class="hz-state hz-state--compact">
+            <span class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,112a32.05,32.05,0,0,0-30.69,23l-42.21-6a8,8,0,0,1-4.95-2.71L94.43,84.55A32,32,0,1,0,72,87v82a32,32,0,1,0,16,0V101.63l30,35a24,24,0,0,0,14.83,8.14l44,6.28A32,32,0,1,0,208,112ZM64,56A16,16,0,1,1,80,72,16,16,0,0,1,64,56ZM96,200a16,16,0,1,1-16-16A16,16,0,0,1,96,200Zm112-40a16,16,0,1,1,16-16A16,16,0,0,1,208,160Z"/></svg></span>
+            <h3 class="hz-state__title">رکورد تکراری‌ای در «انجمن و کلاب‌ها» نیست</h3>
+            <p class="hz-state__body">تکراری‌ها با نام، شهر و تلفن یکسان پیدا می‌شوند.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.hz-merge__row[role=radiogroup]').forEach(function (row) {
+    row.addEventListener('change', function () {
+      row.classList.remove('hz-merge__row--error'); row.removeAttribute('aria-invalid');
+      var err = row.querySelector('.hz-field__error'); if (err) err.hidden = true;
+    });
+  });
+</script>

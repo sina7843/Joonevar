@@ -1,0 +1,145 @@
+<!-- @dsCard group="Operations" height=1008 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+  .demo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .demo-stage { position: relative; overflow: hidden; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage .hz-scrim, .demo-stage .hz-modal-layer { position: absolute; }
+  .demo-stage .hz-modal-layer { padding: 16px 12px; }
+  .demo-stage .hz-modal { width: 100%; }
+  .demo-page { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .demo-frag { display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-xl); }
+  .demo-frag .hz-modal__foot { padding: 12px 0 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+
+    <section>
+      <p class="demo-label">نوشتن برای تأیید — ابطال سند با شناسه (دکمه تا تطابق غیرفعال)</p>
+      <div class="demo-stage" style="height: 640px">
+        <div class="demo-page" aria-hidden="true">
+          <h1 class="hz-h3">شجره‌نامه رکس</h1>
+          <span class="hz-badge hz-badge--success" style="align-self: flex-start"><span class="hz-badge__dot"></span>معتبر</span>
+        </div>
+        <div class="hz-scrim"></div>
+        <div class="hz-modal-layer">
+          <div class="hz-modal" role="alertdialog" aria-modal="true" aria-labelledby="sc1-t" aria-describedby="sc1-d">
+            <div class="hz-modal__head">
+              <h2 class="hz-modal__title hz-confirm__title" id="sc1-t"><span class="hz-confirm__mark"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg></span>ابطال شجره‌نامه رکس</h2>
+              <button type="button" class="hz-icon-btn" aria-label="بستن"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+            </div>
+            <div class="hz-modal__body hz-confirm">
+              <div id="sc1-d">
+                <p class="hz-modal__lead" style="margin-block-end: 8px">این کار برگشت‌ناپذیر است.</p>
+                <ul class="hz-confirm__list">
+                  <li>استعلام <bdi class="hz-id" dir="ltr">PD-P52ZXV92</bdi> از این پس «باطل‌شده» نشان می‌دهد.</li>
+                  <li>مالک، سارا احمدی، با پیامک و اعلان باخبر می‌شود.</li>
+                  <li>برای سند تازه، مالک باید درخواست تازه بدهد.</li>
+                </ul>
+              </div>
+              <div class="hz-field">
+                <div class="hz-field__label-row"><label class="hz-field__label" for="sc1-r">دلیل ابطال<span class="hz-field__req" aria-hidden="true">*</span></label><span class="hz-reason__audience hz-reason__audience--public"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>به مالک نمایش داده می‌شود</span></div>
+                <textarea class="hz-textarea" id="sc1-r" rows="2" required maxlength="500" style="min-height: 72px">نسب مادری با نتیجه آزمون اصالت نسب مرکز ژنتیک مطابقت ندارد.</textarea>
+              </div>
+              <div class="hz-field">
+                <label class="hz-field__label" for="sc1-c">برای تأیید، شناسه سند را بنویسید: <span class="hz-confirm__code"><bdi class="hz-id" dir="ltr">PD-P52ZXV92</bdi></span></label>
+                <input class="hz-input hz-input--ltr" id="sc1-c" type="text" autocomplete="off" spellcheck="false" aria-describedby="sc1-h" data-expect="PD-P52ZXV92">
+                <span class="hz-field__hint" id="sc1-h">کوچکی و بزرگی حروف مهم نیست.</span>
+              </div>
+            </div>
+            <div class="hz-modal__foot">
+              <button type="button" class="hz-btn hz-btn--destructive" disabled data-submit>ابطال شجره‌نامه</button>
+              <button type="button" class="hz-btn hz-btn--secondary">انصراف</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">چک‌باکس صریح — تیک خورده، دکمه فعال · متن بلند فارسی</p>
+      <div class="demo-stage" style="height: 640px">
+        <div class="demo-page" aria-hidden="true">
+          <h1 class="hz-h3">مجوز جفت‌گیری آرا × تارا</h1>
+          <span class="hz-badge hz-badge--success" style="align-self: flex-start"><span class="hz-badge__dot"></span>صادر شد</span>
+        </div>
+        <div class="hz-scrim"></div>
+        <div class="hz-modal-layer">
+          <div class="hz-modal" role="alertdialog" aria-modal="true" aria-labelledby="sc2-t" aria-describedby="sc2-d">
+            <div class="hz-modal__head">
+              <h2 class="hz-modal__title hz-confirm__title" id="sc2-t"><span class="hz-confirm__mark"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg></span>ابطال مجوز جفت‌گیری</h2>
+              <button type="button" class="hz-icon-btn" aria-label="بستن"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+            </div>
+            <div class="hz-modal__body hz-confirm">
+              <div id="sc2-d">
+                <p class="hz-modal__lead" style="margin-block-end: 8px">مجوز <bdi class="hz-id" dir="ltr">MP-7RYZNEN3</bdi> برای آرا (سگ سرابی، نر) و تارا (ژرمن شپرد، ماده) باطل می‌شود.</p>
+                <ul class="hz-confirm__list">
+                  <li>استعلام مجوز از این پس «باطل‌شده» نشان می‌دهد.</li>
+                  <li>هر دو مالک با پیامک و اعلان باخبر می‌شوند.</li>
+                </ul>
+              </div>
+              <div class="hz-field">
+                <div class="hz-field__label-row"><label class="hz-field__label" for="sc2-r">دلیل ابطال<span class="hz-field__req" aria-hidden="true">*</span></label><span class="hz-reason__audience hz-reason__audience--public"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>به هر دو مالک نمایش داده می‌شود</span></div>
+                <textarea class="hz-textarea" id="sc2-r" rows="2" required maxlength="500" style="min-height: 72px">گواهی سلامت پیش از جفت‌گیری تارا باطل اعلام شد.</textarea>
+              </div>
+              <label class="hz-check">
+                <input type="checkbox" checked data-ack>
+                <span class="hz-check__text"><span class="hz-check__label">می‌دانم مجوز باطل‌شده بازگردانی نمی‌شود و برای جفت‌گیری دوباره این دو حیوان، مالکان باید درخواست تازه بدهند و هزینه مجوز را دوباره بپردازند.</span></span>
+              </label>
+            </div>
+            <div class="hz-modal__foot">
+              <button type="button" class="hz-btn hz-btn--destructive" data-submit>ابطال مجوز</button>
+              <button type="button" class="hz-btn hz-btn--secondary">انصراف</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <p class="demo-label">حالت‌ها</p>
+    <div class="demo-grid demo-grid--3">
+      <div class="demo-frag">
+        <p class="demo-label" style="margin: 0">خطا — شناسه یکی نیست</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="st1">برای تأیید، شناسه سند را بنویسید</label>
+          <input class="hz-input hz-input--ltr" id="st1" type="text" value="PD-P52ZXV29" aria-invalid="true" aria-describedby="st1-e">
+          <span class="hz-field__error" id="st1-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>شناسه با سند این صفحه یکی نیست.</span>
+        </div>
+      </div>
+      <div class="demo-frag">
+        <p class="demo-label" style="margin: 0">تطابق — دکمه فعال · فوکوس روی دکمه</p>
+        <div class="hz-field">
+          <input class="hz-input hz-input--ltr" type="text" value="pd-p52zxv92" aria-label="شناسه سند" aria-describedby="st2-m">
+          <span class="hz-field__hint hz-confirm__match" id="st2-m" style="display: inline-flex; align-items: center; gap: 6px"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>شناسه درست است</span>
+        </div>
+        <div class="hz-modal__foot">
+          <button type="button" class="hz-btn hz-btn--destructive" style="outline: 2px solid var(--focus-ring); outline-offset: 2px">ابطال شجره‌نامه</button>
+          <button type="button" class="hz-btn hz-btn--secondary">انصراف</button>
+        </div>
+      </div>
+      <div class="demo-frag">
+        <p class="demo-label" style="margin: 0">در حال ثبت — بستن و انصراف قفل</p>
+        <div class="hz-alert hz-alert--neutral"><div class="hz-alert__body"><span>ابطال ثبت می‌شود؛ صفحه را نبندید.</span></div></div>
+        <div class="hz-modal__foot">
+          <button type="button" class="hz-btn hz-btn--destructive" aria-busy="true"><span class="hz-spinner" aria-hidden="true"></span>در حال ابطال</button>
+          <button type="button" class="hz-btn hz-btn--secondary" disabled>انصراف</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  document.querySelectorAll('[data-expect]').forEach(function (inp) {
+    var btn = inp.closest('.hz-modal').querySelector('[data-submit]');
+    inp.addEventListener('input', function () { btn.disabled = inp.value.trim().toUpperCase() !== inp.dataset.expect; });
+  });
+  document.querySelectorAll('[data-ack]').forEach(function (cb) {
+    var btn = cb.closest('.hz-modal').querySelector('[data-submit]');
+    cb.addEventListener('change', function () { btn.disabled = !cb.checked; });
+  });
+</script>

@@ -1,0 +1,70 @@
+<!-- @dsCard group="Feedback" height=832 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-list { display: grid; grid-template-columns: 440px minmax(0, 1fr); gap: 12px 20px; align-items: center; }
+  .demo-note { margin: 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-note b { color: var(--text-primary); }
+  .demo-stages { display: flex; gap: 16px; align-items: flex-start; }
+  .demo-stage { position: relative; overflow: hidden; height: 300px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage .hz-toast-region { position: absolute; }
+  .demo-stage .hz-toast { animation: none; }
+  .demo-stage--m { width: 360px; flex-shrink: 0; }
+  .demo-stage--m .hz-toast-region { inset-inline: 12px; inset-block-end: calc(var(--tabbar) + 8px); width: auto; }
+  .demo-stage--m .hz-tabbar { position: absolute; inset-inline: 0; inset-block-end: 0; }
+  .demo-stage--d { flex: 1 1 auto; display: grid; grid-template-columns: 120px minmax(0, 1fr); }
+  .demo-stage--d .hz-toast-region { inset-inline: 136px 16px; inset-block-end: 16px; width: auto; }
+  .demo-side { background: var(--bg-chrome); border-inline-end: 1px solid var(--border-default); }
+  .demo-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .demo-line { display: block; height: 12px; border-radius: var(--radius-sm); background: var(--bg-subtle); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-intro" style="margin:0 0 16px;font-size:14px;line-height:24px;color:var(--text-secondary)"><b style="color:var(--text-primary)">Toast</b> پیام کوتاه و موقتی است که بعد از یک کنش کاربر (کپی، ذخیره، حذف، ارسال) پایین صفحه ظاهر می‌شود و خودش بسته می‌شود؛ جای پیام‌های مهم یا تصمیم‌گیری نیست — آن‌ها Alert یا Modal هستند.</p>
+    <p class="demo-label">واریانت‌ها و قاعده بسته‌شدن خودکار</p>
+    <div class="demo-list">
+      <div class="hz-toast hz-toast--success"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><p class="hz-toast__text" style="margin: 0">شناسه کپی شد.</p></div>
+      <p class="demo-note"><b>موفق کوتاه</b> — کپی؛ ۴ ثانیه، بدون دکمه بستن</p>
+
+      <div class="hz-toast hz-toast--success"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><p class="hz-toast__text" style="margin: 0">تنظیم «هزینه صدور شجره‌نامه» ذخیره شد.</p><div class="hz-toast__actions"><button class="hz-icon-btn" type="button" aria-label="بستن"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+      <p class="demo-note"><b>موفق</b> — ذخیره تنظیم، ارسال؛ ۵ ثانیه</p>
+
+      <div class="hz-toast hz-toast--success"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><p class="hz-toast__text" style="margin: 0">آگهی «توله ژرمن شپرد» حذف شد.</p><div class="hz-toast__actions"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button">بازگرداندن</button><button class="hz-icon-btn" type="button" aria-label="بستن"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+      <p class="demo-note"><b>با «بازگرداندن»</b> — ۸ ثانیه؛ تا بسته نشده، بازگرداندن ممکن است</p>
+
+      <div class="hz-toast hz-toast--error" role="alert"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg><p class="hz-toast__text" style="margin: 0">پیام ارسال نشد. اتصال اینترنت را بررسی کنید.</p><div class="hz-toast__actions"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button">تلاش دوباره</button><button class="hz-icon-btn" type="button" aria-label="بستن"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+      <p class="demo-note"><b>خطا</b> — خودکار بسته نمی‌شود؛ با «تلاش دوباره» یا بستن</p>
+
+      <div class="hz-toast hz-toast--success"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><p class="hz-toast__text" style="margin: 0">پیش‌نویس ثبت «شاهزاده کوچولوی باغ ارم شیراز» حذف شد.</p><div class="hz-toast__actions"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button" style="outline: 2px solid var(--focus-ring); outline-offset: 2px">بازگرداندن</button><button class="hz-icon-btn" type="button" aria-label="بستن"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+      <p class="demo-note"><b>متن بلند + فوکوس</b> — متن می‌شکند، کنش‌ها کنار سطر اول؛ فوکوس یا hover زمان‌سنج را نگه می‌دارد</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">جایگاه — موبایل: پایین، تمام‌عرض، بالای تب‌بار؛ دسکتاپ: پایین-شروع، ۳۶۰px</p>
+    <div class="demo-stages">
+      <div class="demo-stage demo-stage--m">
+        <div class="demo-body" aria-hidden="true"><span class="demo-line"></span><span class="demo-line" style="width: 70%"></span><span class="demo-line"></span><span class="demo-line" style="width: 55%"></span></div>
+        <div class="hz-toast-region hz-toast-region--above-bar" role="region" aria-label="پیام‌های کوتاه">
+          <div class="hz-toast hz-toast--success" role="status"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><p class="hz-toast__text" style="margin: 0">درخواست ارسال شد.</p><div class="hz-toast__actions"><button class="hz-icon-btn" type="button" aria-label="بستن"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+        </div>
+        <nav class="hz-tabbar" aria-label="ناوبری اصلی">
+          <a class="hz-tab" href="#"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg>خانه</a>
+          <a class="hz-tab" href="#" aria-current="page"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,176H96a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Zm0-32H96a8,8,0,0,1,0-16h64a8,8,0,0,1,0,16Zm-8-56V44l44,44Z"/></svg>درخواست‌ها</a>
+          <a class="hz-tab" href="#"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"/></svg>اعلان‌ها</a>
+          <a class="hz-tab" href="#"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>پروفایل</a>
+        </nav>
+      </div>
+      <div class="demo-stage demo-stage--d">
+        <div class="demo-side" aria-hidden="true"></div>
+        <div class="demo-body" aria-hidden="true"><span class="demo-line" style="width: 40%"></span><span class="demo-line"></span><span class="demo-line" style="width: 80%"></span><span class="demo-line"></span></div>
+        <div class="hz-toast-region" role="region" aria-label="پیام‌های کوتاه">
+          <div class="hz-toast hz-toast--success" role="status"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><p class="hz-toast__text" style="margin: 0">شناسه کپی شد.</p></div>
+          <div class="hz-toast hz-toast--success" role="status"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><p class="hz-toast__text" style="margin: 0">آگهی «هاسکی جوان» حذف شد.</p><div class="hz-toast__actions"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button">بازگرداندن</button></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

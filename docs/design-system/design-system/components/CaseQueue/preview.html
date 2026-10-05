@@ -1,0 +1,215 @@
+<!-- @dsCard group="Operations" width=1280 height=1376 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-phone { width: 390px; flex-shrink: 0; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); overflow: hidden; }
+  .demo-phone__bar { display: flex; align-items: center; gap: 8px; height: 56px; padding-inline: 16px 8px; background: var(--bg-chrome); border-block-end: 1px solid var(--border-default); }
+  .demo-phone__body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .demo-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+  .demo-skel-row { display: grid; grid-template-columns: 72px 120px minmax(0, 1fr) 120px 140px; gap: 16px; align-items: center; padding: 14px 16px; border-block-end: 1px solid var(--border-subtle); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label">دسکتاپ ≥۱۰۲۴ — جدول متراکم، پیش‌فرض: قدیمی‌ترین اول · صف همه پرونده‌های انجمن · ردیف ۵: فوکوس روی نام و متن بلند فارسی (کوتاه‌شده با …)</p>
+    <div class="hz-queue">
+      <div class="hz-queue__head">
+        <div class="hz-queue__title">
+          <h1 class="hz-h2">صف‌ها</h1>
+          <span class="hz-section-header__count" aria-live="polite">۱۸ پرونده باز · ۶ مورد نمایش</span>
+        </div>
+        <div class="hz-queue__tools">
+          <label class="hz-input-wrap hz-input-wrap--icon hz-search hz-queue__search">
+            <span class="hz-visually-hidden">جستجو در صف</span>
+            <span class="hz-input-wrap__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg></span>
+            <input class="hz-input hz-input--sm" type="search" placeholder="نام، کد پرونده یا کد ملی">
+          </label>
+          <label class="hz-select-wrap hz-queue__sort">
+            <span class="hz-visually-hidden">مرتب‌سازی</span>
+            <select class="hz-select hz-input--sm"><option>قدیمی‌ترین اول</option><option>تازه‌ترین اول</option><option>نوع پرونده</option></select>
+          </label>
+        </div>
+      </div>
+
+      <div class="hz-filterbar" role="group" aria-label="نوع پرونده">
+        <button class="hz-chip" type="button" aria-pressed="true">همه <span class="hz-chip__count">۱۸</span></button>
+        <button class="hz-chip" type="button" aria-pressed="false">احراز هویت <span class="hz-chip__count">۴</span></button>
+        <button class="hz-chip" type="button" aria-pressed="false">عضویت <span class="hz-chip__count">۶</span></button>
+        <button class="hz-chip" type="button" aria-pressed="false">دامپزشکان <span class="hz-chip__count">۵</span></button>
+        <button class="hz-chip" type="button" aria-pressed="false">کنل <span class="hz-chip__count">۱</span></button>
+        <button class="hz-chip" type="button" aria-pressed="false">مجوز جفت‌گیری <span class="hz-chip__count">۲</span></button>
+        <span class="hz-muted" aria-hidden="true">|</span>
+        <button class="hz-chip" type="button" aria-pressed="false"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>اقدام با انجمن</button>
+        <button class="hz-chip" type="button" aria-pressed="false">تخصیص‌نیافته</button>
+      </div>
+
+      <div class="hz-table-wrap">
+        <table class="hz-table hz-table--dense">
+          <caption class="hz-visually-hidden">صف پرونده‌های انجمن، مرتب بر اساس سن پرونده</caption>
+          <thead>
+            <tr>
+              <th scope="col" aria-sort="descending"><button type="button">سن پرونده <svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></th>
+              <th scope="col">کد پرونده</th>
+              <th scope="col">متقاضی</th>
+              <th scope="col">نوع</th>
+              <th scope="col">وضعیت</th>
+              <th scope="col">اقدام بعدی با</th>
+              <th scope="col">مسئول</th>
+              <th scope="col"><span class="hz-visually-hidden">باز کردن</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="hz-age hz-age--overdue" title="بیش از مهلت بررسی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۱۲ روز</span></td>
+              <td><bdi class="hz-id" dir="ltr">HZ-R6KD2WQ8NA</bdi></td>
+              <td><div class="hz-case"><a class="hz-case__name" href="#">علی رضایی</a><span class="hz-case__sub">اصفهان · ارسال دوباره ۷ مهر · نسخه ۳</span></div></td>
+              <td>احراز هویت</td>
+              <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی انجمن</span></td>
+              <td><span class="hz-owner hz-owner--you hz-owner--inline"><span class="hz-owner__who">انجمن</span></span></td>
+              <td>حمید نوروزی</td>
+              <td><a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="باز کردن پرونده علی رضایی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td><span class="hz-age" title="ساعت این پرونده با طرف مقابل است"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۷ روز</span></td>
+              <td><bdi class="hz-id" dir="ltr">HZ-767PEG578Z</bdi></td>
+              <td><div class="hz-case"><a class="hz-case__name" href="#">رضا کریمی</a><span class="hz-case__sub">رعد × لونا</span></div></td>
+              <td>مجوز جفت‌گیری</td>
+              <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار تأیید طرف مقابل</span></td>
+              <td><span class="hz-owner hz-owner--inline"><span class="hz-owner__who">طرف مقابل</span></span></td>
+              <td>حمید نوروزی</td>
+              <td><a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="باز کردن پرونده رضا کریمی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td><span class="hz-age hz-age--late" title="نزدیک به مهلت بررسی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۶ روز</span></td>
+              <td><bdi class="hz-id" dir="ltr">HZ-T3MW8XBQ5E</bdi></td>
+              <td><div class="hz-case"><a class="hz-case__name" href="#">مینا جعفری</a><span class="hz-case__sub">شیراز</span></div></td>
+              <td>عضویت</td>
+              <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی</span></td>
+              <td><span class="hz-owner hz-owner--you hz-owner--inline"><span class="hz-owner__who">انجمن</span></span></td>
+              <td class="hz-queue__assignee--none">تخصیص‌نیافته</td>
+              <td><a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="باز کردن پرونده مینا جعفری"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td><span class="hz-age" title="ساعت این پرونده با متقاضی است"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۵ روز</span></td>
+              <td><bdi class="hz-id" dir="ltr">HZ-MYUKV79KBC</bdi></td>
+              <td><div class="hz-case"><a class="hz-case__name" href="#">بهرام فراهانی</a><span class="hz-case__sub">کنل البرز · تبریز</span></div></td>
+              <td>کنل</td>
+              <td><span class="hz-badge hz-badge--warning"><span class="hz-badge__dot"></span>نیازمند اصلاح</span></td>
+              <td><span class="hz-owner hz-owner--inline"><span class="hz-owner__who">متقاضی</span></span></td>
+              <td>حمید نوروزی</td>
+              <td><a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="باز کردن پرونده بهرام فراهانی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td><span class="hz-age"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۲ روز</span></td>
+              <td><bdi class="hz-id" dir="ltr">HZ-9FJP4CNW2H</bdi></td>
+              <td><div class="hz-case"><a class="hz-case__name" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">دکتر الهام نادری</a><span class="hz-case__sub" title="مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</span></div></td>
+              <td>میز بررسی دامپزشکان</td>
+              <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی انجمن</span></td>
+              <td><span class="hz-owner hz-owner--you hz-owner--inline"><span class="hz-owner__who">انجمن</span></span></td>
+              <td class="hz-queue__assignee--none">تخصیص‌نیافته</td>
+              <td><a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="باز کردن پرونده دکتر الهام نادری"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></td>
+            </tr>
+            <tr>
+              <td><span class="hz-age"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۲ روز</span></td>
+              <td><bdi class="hz-id" dir="ltr">HZ-4NQ7VHC3KS</bdi></td>
+              <td><div class="hz-case"><a class="hz-case__name" href="#">دکتر نسرین طاهری</a><span class="hz-case__sub">مشهد</span></div></td>
+              <td>کد نظام دامپزشکان</td>
+              <td><span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی انجمن</span></td>
+              <td><span class="hz-owner hz-owner--you hz-owner--inline"><span class="hz-owner__who">انجمن</span></span></td>
+              <td class="hz-queue__assignee--none">تخصیص‌نیافته</td>
+              <td><a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="باز کردن پرونده دکتر نسرین طاهری"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="hz-pagination" aria-label="صفحه‌بندی صف">
+        <span class="hz-muted">۱ تا ۶ از ۱۸ پرونده</span>
+        <ul class="hz-pagination__pages">
+          <li><a class="hz-page" href="#" aria-label="صفحه قبل"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></a></li>
+          <li><a class="hz-page" href="#" aria-current="page">۱</a></li>
+          <li><a class="hz-page" href="#">۲</a></li>
+          <li><a class="hz-page" href="#">۳</a></li>
+          <li><a class="hz-page" href="#" aria-label="صفحه بعد"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label">موبایل &lt;۷۶۸ — فهرست کارتی (همان داده، بدون اسکرول افقی)</p>
+      <div class="demo-phone">
+        <div class="demo-phone__bar">
+          <span class="hz-h4" style="flex: 1 1 auto">صف‌ها <span class="hz-section-header__count">۱۸</span></span>
+          <button class="hz-icon-btn" type="button" aria-label="جستجو در صف"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg></button>
+          <button class="hz-icon-btn" type="button" aria-label="فیلتر و مرتب‌سازی"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg></button>
+        </div>
+        <div class="demo-phone__body">
+          <div class="hz-filterbar hz-filterbar--scroll" role="group" aria-label="نوع پرونده">
+            <button class="hz-chip" type="button" aria-pressed="true">همه <span class="hz-chip__count">۱۸</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">احراز هویت <span class="hz-chip__count">۴</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">عضویت <span class="hz-chip__count">۶</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">دامپزشکان <span class="hz-chip__count">۵</span></button>
+          </div>
+          <ul class="hz-cardlist">
+            <li class="hz-cardlist__item">
+              <div class="hz-cardlist__row"><span class="hz-tag hz-tag--neutral">احراز هویت</span><span class="hz-age hz-age--overdue"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۱۲ روز</span></div>
+              <div class="hz-case"><a class="hz-case__name" href="#">علی رضایی</a><span class="hz-case__sub">اصفهان · <bdi class="hz-id" dir="ltr">HZ-R6KD2WQ8NA</bdi></span></div>
+              <div class="hz-cardlist__row"><span class="hz-badge hz-badge--info hz-badge--sm"><span class="hz-badge__dot"></span>در انتظار بررسی انجمن</span><span class="hz-caption">حمید نوروزی</span></div>
+              <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">انجمن</span></span></div>
+            </li>
+            <li class="hz-cardlist__item">
+              <div class="hz-cardlist__row"><span class="hz-tag hz-tag--neutral">مجوز جفت‌گیری</span><span class="hz-age"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۷ روز</span></div>
+              <div class="hz-case"><a class="hz-case__name" href="#">رضا کریمی</a><span class="hz-case__sub">رعد × لونا · <bdi class="hz-id" dir="ltr">HZ-767PEG578Z</bdi></span></div>
+              <div class="hz-cardlist__row"><span class="hz-badge hz-badge--info hz-badge--sm"><span class="hz-badge__dot"></span>در انتظار تأیید طرف مقابل</span><span class="hz-caption">حمید نوروزی</span></div>
+              <div class="hz-owner"><span>اقدام بعدی با: <span class="hz-owner__who">طرف مقابل</span></span></div>
+            </li>
+          </ul>
+          <button class="hz-btn hz-btn--secondary hz-btn--block" type="button">نمایش پرونده‌های بیشتر</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="demo-col">
+      <section>
+        <p class="demo-label">خالی — صف بدون پرونده باز</p>
+        <div class="hz-table-wrap">
+          <div class="hz-state">
+            <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm0,16V152h-28.7A15.86,15.86,0,0,0,168,156.69L148.69,176H107.31L88,156.69A15.86,15.86,0,0,0,76.69,152H48V48Zm0,160H48V168H76.69L96,187.31A15.86,15.86,0,0,0,107.31,192h41.38A15.86,15.86,0,0,0,160,187.31L179.31,168H208v40Z"/></svg></div>
+            <p class="hz-state__title">پرونده‌ای در صف کنل نیست</p>
+            <p class="hz-state__body">همه پرونده‌های کنل تعیین تکلیف شده‌اند. پرونده تازه پس از ارسال متقاضی اینجا می‌آید.</p>
+          </div>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label">خالی پس از فیلتر</p>
+        <div class="hz-table-wrap">
+          <div class="hz-state">
+            <p class="hz-state__title">با این فیلترها پرونده‌ای پیدا نشد</p>
+            <p class="hz-state__body">«تخصیص‌نیافته» و «مجوز جفت‌گیری» با هم نتیجه‌ای ندارند.</p>
+            <button class="hz-btn hz-btn--secondary hz-btn--sm" type="button">پاک کردن فیلترها</button>
+          </div>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label">در حال بارگذاری — اسکلت ردیف‌ها (aria-busy)</p>
+        <div class="hz-table-wrap" aria-busy="true">
+          <div class="demo-skel-row"><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span></div>
+          <div class="demo-skel-row"><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span></div>
+          <div class="demo-skel-row" style="border-block-end: 0"><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span><span class="hz-skeleton hz-skeleton--text"></span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.hz-filterbar').forEach(function (bar) {
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('.hz-chip'); if (!b) return;
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    });
+  });
+</script>

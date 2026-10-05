@@ -1,0 +1,268 @@
+<!-- @dsCard group="Operations" width=1280 height=2032 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  /* stand-in for the uploaded image of a private document (never a real ID) */
+  .demo-idcard { width: 72%; aspect-ratio: 1.586; display: flex; gap: 12px; padding: 14px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); }
+  .demo-idcard__photo { width: 30%; border-radius: var(--radius-xs); background: var(--bg-subtle); }
+  .demo-idcard__lines { flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; padding-block-start: 6px; }
+  .demo-idcard__lines span { height: 8px; border-radius: var(--radius-xs); background: var(--bg-subtle); }
+  .demo-idcard--rotated { transform: rotate(90deg); width: 52%; }
+  /* phone frames: a scroll container so the sticky decision bar really sticks */
+  .demo-phone { position: relative; width: 390px; height: 720px; flex-shrink: 0; overflow: auto; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-phone--stage { overflow: hidden; }
+  .demo-phone__bar { display: flex; align-items: center; gap: 4px; height: 56px; padding-inline: 4px; background: var(--bg-chrome); border-block-end: 1px solid var(--border-default); }
+  .demo-phone__body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .demo-phone .hz-scrim, .demo-phone .hz-sheet { position: absolute; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label">دسکتاپ ≥۱۰۲۴ — مدارک و جزئیات کنار ستون تصمیم ثابت · حالت: تصمیم کهنه رد شد (پرونده نسخه ۳ → ۴)</p>
+    <div class="demo-col">
+      <header class="hz-card hz-desk__head">
+        <div class="hz-desk__title">
+          <ol class="hz-breadcrumbs">
+            <li><a href="#">صف‌ها</a></li><li class="hz-breadcrumbs__sep" aria-hidden="true">/</li>
+            <li><a href="#">احراز هویت</a></li><li class="hz-breadcrumbs__sep" aria-hidden="true">/</li>
+            <li aria-current="page">علی رضایی</li>
+          </ol>
+          <div class="hz-desk__nav">
+            <a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="پرونده قبلی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></a>
+            <span>پرونده ۲ از ۴</span>
+            <a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="پرونده بعدی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a>
+          </div>
+        </div>
+        <div class="hz-desk__title">
+          <h1 class="hz-h2">احراز هویت · علی رضایی</h1>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی انجمن</span>
+        </div>
+        <div class="hz-desk__meta">
+          <span>کد پرونده <bdi class="hz-id" dir="ltr">HZ-R6KD2WQ8NA</bdi></span>
+          <span>کد ملی <bdi class="hz-id" dir="ltr">9000009606</bdi></span>
+          <span>موبایل <bdi class="hz-id" dir="ltr">09990000021</bdi></span>
+          <span>ارسال دوباره: ۷ مهر ۱۴۰۵، ۱۱:۲۰</span>
+          <span class="hz-age hz-age--overdue"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۱۲ روز در صف</span>
+          <span>نسخه ۳</span>
+        </div>
+        <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">انجمن</span></span><span class="hz-owner__extra">مسئول: حمید نوروزی</span></div>
+      </header>
+
+      <div class="hz-desk">
+        <div class="demo-col">
+          <section class="hz-card" aria-labelledby="docs-h">
+            <div class="hz-section-header hz-section-header--sm">
+              <h2 class="hz-section-header__title" id="docs-h"><span class="hz-section-header__bar"></span>مدارک</h2>
+              <span class="hz-doc__private"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>مدرک خصوصی — فقط در میز تصمیم، بدون دانلود</span>
+            </div>
+            <div class="hz-desk__docs">
+              <figure class="hz-doc-figure">
+                <div class="hz-doc">
+                  <div class="demo-idcard" role="img" aria-label="روی کارت ملی علی رضایی"><span class="demo-idcard__photo"></span><span class="demo-idcard__lines"><span style="width: 80%"></span><span style="width: 60%"></span><span style="width: 70%"></span><span style="width: 40%"></span></span></div>
+                  <div class="hz-doc__tools" role="toolbar" aria-label="ابزار مدرک">
+                    <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+                    <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="چرخش ۹۰ درجه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+                    <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="تمام‌صفحه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM88,40H48a8,8,0,0,0-8,8V88a8,8,0,0,0,16,0V56H88a8,8,0,0,0,0-16Z"/></svg></button>
+                  </div>
+                </div>
+                <figcaption class="hz-doc-figure__caption"><b>روی کارت ملی</b><span>بارگذاری ۷ مهر · ۱٫۲ مگابایت</span></figcaption>
+              </figure>
+              <figure class="hz-doc-figure">
+                <div class="hz-doc">
+                  <div class="demo-idcard demo-idcard--rotated" role="img" aria-label="پشت کارت ملی علی رضایی، ۹۰ درجه چرخانده‌شده"><span class="demo-idcard__photo"></span><span class="demo-idcard__lines"><span style="width: 80%"></span><span style="width: 60%"></span><span style="width: 70%"></span></span></div>
+                  <div class="hz-doc__tools" role="toolbar" aria-label="ابزار مدرک">
+                    <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+                    <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="چرخش ۹۰ درجه" aria-pressed="true" style="background: var(--bg-subtle)"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+                    <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="تمام‌صفحه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM88,40H48a8,8,0,0,0-8,8V88a8,8,0,0,0,16,0V56H88a8,8,0,0,0,0-16Z"/></svg></button>
+                  </div>
+                </div>
+                <figcaption class="hz-doc-figure__caption"><b>پشت کارت ملی</b><span>چرخانده‌شده ۹۰° · ۹۸۰ کیلوبایت</span></figcaption>
+              </figure>
+            </div>
+          </section>
+
+          <section class="hz-card" aria-labelledby="facts-h">
+            <div class="hz-section-header hz-section-header--sm">
+              <h2 class="hz-section-header__title" id="facts-h"><span class="hz-section-header__bar"></span>اطلاعات اعلام‌شده</h2>
+              <span class="hz-caption" style="display: inline-flex; align-items: center; gap: 6px; color: var(--status-success-text)"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>رقم کنترل کد ملی معتبر است</span>
+            </div>
+            <dl class="hz-kv hz-kv--2col">
+              <div class="hz-kv__row"><dt class="hz-kv__key">نام و نام خانوادگی</dt><dd class="hz-kv__value">علی رضایی</dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">کد ملی</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">9000009606</bdi></dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ تولد</dt><dd class="hz-kv__value">۱۳۷۰/۰۵/۱۲</dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">موبایل</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">09990000021</bdi></dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">شهر</dt><dd class="hz-kv__value">اصفهان</dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">نشانی سکونت</dt><dd class="hz-kv__value hz-kv__value--empty">— اختیاری؛ وارد نشده</dd></div>
+            </dl>
+          </section>
+
+          <section class="hz-card" aria-labelledby="hist-h">
+            <div class="hz-section-header hz-section-header--sm">
+              <h2 class="hz-section-header__title" id="hist-h"><span class="hz-section-header__bar"></span>سابقه پرونده</h2>
+            </div>
+            <ol class="hz-timeline">
+              <li class="hz-timeline__item hz-timeline__item--current"><span class="hz-timeline__marker"></span><div><div class="hz-timeline__head"><span class="hz-timeline__title">ارسال دوباره · نسخه ۳</span><span class="hz-timeline__meta">علی رضایی · ۷ مهر ۱۴۰۵، ۱۱:۲۰</span></div><p class="hz-timeline__body">تصویر تازه کارت ملی بارگذاری شد.</p></div></li>
+              <li class="hz-timeline__item hz-timeline__item--done"><span class="hz-timeline__marker"></span><div><div class="hz-timeline__head"><span class="hz-timeline__title">تصمیم انجمن · نسخه ۲</span><span class="hz-badge hz-badge--warning hz-badge--sm"><span class="hz-badge__dot"></span>نیازمند اصلاح</span><span class="hz-timeline__meta">حمید نوروزی · ۵ مهر ۱۴۰۵، ۱۶:۴۵</span></div><p class="hz-timeline__body">تصویر کارت ملی مات است.</p></div></li>
+              <li class="hz-timeline__item hz-timeline__item--done"><span class="hz-timeline__marker"></span><div><div class="hz-timeline__head"><span class="hz-timeline__title">ارسال درخواست · نسخه ۱</span><span class="hz-timeline__meta">علی رضایی · ۲۹ شهریور ۱۴۰۵، ۰۹:۱۰</span></div></div></li>
+            </ol>
+          </section>
+        </div>
+
+        <aside class="hz-card hz-desk__decision" aria-labelledby="decide-h">
+          <div class="hz-alert hz-alert--warning" role="alert">
+            <span class="hz-alert__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg></span>
+            <div class="hz-alert__body">
+              <span class="hz-alert__title">تصمیم ثبت نشد</span>
+              <span>این پرونده پس از باز کردن شما تغییر کرده است. صفحه را دوباره بار کنید و سپس تصمیم بگیرید.</span>
+              <div class="hz-alert__actions"><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg>بارگذاری دوباره</button></div>
+            </div>
+          </div>
+
+          <div class="hz-section-header hz-section-header--sm" style="margin-block-end: 0"><h2 class="hz-section-header__title" id="decide-h"><span class="hz-section-header__bar"></span>تصمیم</h2></div>
+          <fieldset class="hz-desk__options">
+            <legend class="hz-visually-hidden">نتیجه بررسی</legend>
+            <label class="hz-option"><input type="radio" name="decision-d" value="approve"><span class="hz-radio__text"><b>تأیید</b><span class="hz-radio__desc">هویت تأیید می‌شود و خدمات وابسته برای کاربر باز می‌شود.</span></span></label>
+            <label class="hz-option"><input type="radio" name="decision-d" value="correct" checked><span class="hz-radio__text"><b>نیازمند اصلاح</b><span class="hz-radio__desc">پرونده با دلیل به کاربر برمی‌گردد.</span></span></label>
+            <label class="hz-option"><input type="radio" name="decision-d" value="reject"><span class="hz-radio__text"><b>رد</b><span class="hz-radio__desc">درخواست بسته می‌شود؛ کاربر می‌تواند درخواست تازه بدهد.</span></span></label>
+          </fieldset>
+
+          <div class="hz-field">
+            <label class="hz-field__label" for="reason-d">دلیل<span class="hz-field__req" aria-hidden="true">*</span> <span class="hz-field__opt">به کاربر نمایش داده می‌شود</span></label>
+            <div class="hz-filterbar" role="group" aria-label="دلیل‌های آماده">
+              <button class="hz-chip" type="button" aria-pressed="false">تصویر خوانا نیست</button>
+              <button class="hz-chip" type="button" aria-pressed="true">تاریخ تولد مطابقت ندارد</button>
+              <button class="hz-chip" type="button" aria-pressed="false">مدرک ناقص است</button>
+            </div>
+            <textarea class="hz-textarea" id="reason-d" rows="4" required aria-describedby="reason-d-count">تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تاریخ تولد را مطابق کارت ملی اصلاح کنید.</textarea>
+            <span class="hz-field__counter" id="reason-d-count">۹۱ از ۵۰۰ نویسه</span>
+          </div>
+
+          <div class="demo-col" style="gap: 8px">
+            <button class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" type="button">ثبت تصمیم: نیازمند اصلاح</button>
+            <p class="hz-desk__note">تصمیم روی نسخه ۳ پرونده ثبت می‌شود و در سابقه می‌ماند.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label">موبایل &lt;۱۰۲۴ — مدارک بالا، تصمیم چسبان پایین</p>
+      <div class="demo-phone">
+        <div class="demo-phone__bar">
+          <a class="hz-icon-btn" href="#" aria-label="بازگشت به صف"><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg></a>
+          <div style="flex: 1 1 auto; display: flex; flex-direction: column; line-height: 20px">
+            <span class="hz-h4">احراز هویت</span>
+            <span class="hz-caption">محیط عملیاتی انجمن · پرونده ۲ از ۴</span>
+          </div>
+          <button class="hz-icon-btn" type="button" aria-label="ناوبری محیط عملیاتی"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg></button>
+        </div>
+        <div class="demo-phone__body">
+          <div class="hz-desk__head">
+            <h1 class="hz-h3">علی رضایی</h1>
+            <span class="hz-badge hz-badge--info" style="align-self: flex-start"><span class="hz-badge__dot"></span>در انتظار بررسی انجمن</span>
+            <div class="hz-desk__meta" style="font-size: 12px; gap: 4px 14px">
+              <span>کد ملی <bdi class="hz-id" dir="ltr">9000009606</bdi></span>
+              <span class="hz-age hz-age--overdue"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۱۲ روز در صف</span>
+              <span>نسخه ۳</span>
+            </div>
+            <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">انجمن</span></span></div>
+          </div>
+          <section class="hz-card hz-card--compact" aria-label="مدارک">
+            <div class="hz-section-header hz-section-header--sm">
+              <h2 class="hz-section-header__title"><span class="hz-section-header__bar"></span>مدارک</h2>
+              <span class="hz-doc__private"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>۱ از ۲ · خصوصی</span>
+            </div>
+            <div class="hz-doc">
+              <div class="demo-idcard" role="img" aria-label="روی کارت ملی علی رضایی"><span class="demo-idcard__photo"></span><span class="demo-idcard__lines"><span style="width: 80%"></span><span style="width: 60%"></span><span style="width: 70%"></span></span></div>
+            </div>
+            <div class="hz-cardlist__row" style="margin-block-start: 8px">
+              <b class="hz-body-sm" style="font-weight: 700">روی کارت ملی</b>
+              <div style="display: flex">
+                <button class="hz-icon-btn" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+                <button class="hz-icon-btn" type="button" aria-label="چرخش ۹۰ درجه"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+                <button class="hz-icon-btn" type="button" aria-label="مدرک بعدی"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button>
+              </div>
+            </div>
+          </section>
+          <section class="hz-card hz-card--compact" aria-label="اطلاعات اعلام‌شده">
+            <div class="hz-section-header hz-section-header--sm">
+              <h2 class="hz-section-header__title"><span class="hz-section-header__bar"></span>اطلاعات اعلام‌شده</h2>
+            </div>
+            <dl class="hz-kv">
+              <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ تولد</dt><dd class="hz-kv__value">۱۳۷۰/۰۵/۱۲</dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">موبایل</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">09990000021</bdi></dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">شهر</dt><dd class="hz-kv__value">اصفهان</dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">نشانی سکونت</dt><dd class="hz-kv__value hz-kv__value--empty">— اختیاری؛ وارد نشده</dd></div>
+            </dl>
+          </section>
+        </div>
+        <div class="hz-desk__bar" role="group" aria-label="تصمیم">
+          <span class="hz-caption">تصمیم شما روی نسخه ۳ ثبت می‌شود</span>
+          <div class="hz-desk__bar-actions">
+            <button class="hz-btn hz-btn--secondary" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>تأیید</button>
+            <button class="hz-btn hz-btn--secondary" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></svg>اصلاح</button>
+            <button class="hz-btn hz-btn--destructive-outline" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>رد</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">موبایل — «رد» انتخاب شد: دلیل اجباری در BottomSheet · خطای «دلیل خالی»</p>
+      <div class="demo-phone demo-phone--stage">
+        <div class="demo-phone__bar">
+          <a class="hz-icon-btn" href="#" aria-label="بازگشت به صف"><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg></a>
+          <span class="hz-h4" style="flex: 1 1 auto">احراز هویت</span>
+        </div>
+        <div class="hz-scrim"></div>
+        <div class="hz-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h">
+          <div class="hz-sheet__handle"></div>
+          <div class="demo-phone__body" style="gap: 14px">
+            <div class="hz-cardlist__row">
+              <h2 class="hz-h3" id="sheet-h">رد درخواست احراز هویت</h2>
+              <button class="hz-icon-btn" type="button" aria-label="بستن"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+            </div>
+            <p class="hz-body-sm hz-muted" style="margin: 0">درخواست علی رضایی بسته می‌شود؛ کاربر می‌تواند درخواست تازه بدهد.</p>
+            <div class="hz-field">
+              <label class="hz-field__label" for="reason-m">دلیل رد<span class="hz-field__req" aria-hidden="true">*</span> <span class="hz-field__opt">به کاربر نمایش داده می‌شود</span></label>
+              <div class="hz-filterbar" role="group" aria-label="دلیل‌های آماده">
+                <button class="hz-chip" type="button" aria-pressed="false">کد ملی با نام مطابقت ندارد</button>
+                <button class="hz-chip" type="button" aria-pressed="false">درخواست تکراری است</button>
+                <button class="hz-chip" type="button" aria-pressed="false">مدرک معتبر نیست</button>
+              </div>
+              <textarea class="hz-textarea" id="reason-m" rows="3" required aria-invalid="true" aria-describedby="reason-m-err" placeholder="دلیل را دقیق بنویسید"></textarea>
+              <span class="hz-field__error" id="reason-m-err"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>برای رد، دلیل را بنویسید یا یکی از دلیل‌های آماده را انتخاب کنید.</span>
+            </div>
+            <div class="hz-action-row" style="flex-direction: column; align-items: stretch; gap: 8px">
+              <button class="hz-btn hz-btn--destructive hz-btn--block" type="button">ثبت تصمیم: رد</button>
+              <button class="hz-btn hz-btn--secondary hz-btn--block" type="button">انصراف</button>
+            </div>
+            <p class="hz-desk__note">تصمیم روی نسخه ۳ پرونده ثبت می‌شود و در سابقه می‌ماند.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.hz-filterbar').forEach(function (bar) {
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('.hz-chip'); if (!b) return;
+      bar.querySelectorAll('.hz-chip').forEach(function (c) { c.setAttribute('aria-pressed', c === b ? 'true' : 'false'); });
+      var ta = bar.parentElement.querySelector('textarea');
+      if (ta && !ta.value.trim()) { ta.value = b.textContent.trim() + '.'; ta.removeAttribute('aria-invalid'); }
+    });
+  });
+  document.querySelectorAll('input[name="decision-d"]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      var btn = document.querySelector('.hz-desk__decision .hz-btn--primary');
+      var t = { approve: 'تأیید', correct: 'نیازمند اصلاح', reject: 'رد' }[r.value];
+      if (btn) btn.textContent = 'ثبت تصمیم: ' + t;
+    });
+  });
+</script>

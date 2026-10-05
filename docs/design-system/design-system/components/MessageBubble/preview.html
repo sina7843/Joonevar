@@ -1,0 +1,101 @@
+<!-- @dsCard group="Messaging" height=872 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-col { flex: 1 1 0; min-width: 0; }
+  .demo-pane { padding: 16px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-row">
+    <section class="demo-col">
+      <p class="demo-label">متن · تصویر · پیشنهاد قیمت — طرف مقابل در شروع، شما در پایان</p>
+      <div class="hz-thread demo-pane" role="log" aria-label="گفتگو با سارا احمدی درباره توله ژرمن شپرد">
+        <p class="hz-thread__day" role="separator">۷ مهر ۱۴۰۵</p>
+        <div class="hz-msg">
+          <div class="hz-msg__bubble">
+            <p class="hz-msg__text">سلام، امکان بازدید حضوری در کرج هست؟</p>
+            <div class="hz-msg__meta"><time datetime="2026-09-29T19:20:00+03:30">۱۹:۲۰</time></div>
+          </div>
+        </div>
+        <div class="hz-msg hz-msg--mine">
+          <div class="hz-msg__bubble">
+            <p class="hz-msg__text">بله، پنجشنبه عصر هماهنگ کنیم.</p>
+            <div class="hz-msg__meta"><time datetime="2026-09-29T20:05:00+03:30">۲۰:۰۵</time><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M149.61,85.71l-89.6,88a8,8,0,0,1-11.22,0L10.39,136a8,8,0,1,1,11.22-11.41L54.4,156.79l84-82.5a8,8,0,1,1,11.22,11.42Zm96.1-11.32a8,8,0,0,0-11.32-.1l-84,82.5-18.83-18.5a8,8,0,0,0-11.21,11.42l24.43,24a8,8,0,0,0,11.22,0l89.6-88A8,8,0,0,0,245.71,74.39Z"/></svg><span class="hz-visually-hidden">خوانده شد</span></div>
+          </div>
+        </div>
+        <div class="hz-msg hz-msg--mine hz-msg--cont">
+          <div class="hz-msg__bubble hz-msg__bubble--media">
+            <div class="hz-media hz-media--4x3"><img src="../../assets/imagery/listings-german-shepherd-puppy-1.jpg" alt="ژرمن شپرد — تمام‌قد"></div>
+            <p class="hz-msg__caption">عکس تازه، امروز عصر</p>
+            <div class="hz-msg__meta"><time datetime="2026-09-29T20:07:00+03:30">۲۰:۰۷</time><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M149.61,85.71l-89.6,88a8,8,0,0,1-11.22,0L10.39,136a8,8,0,1,1,11.22-11.41L54.4,156.79l84-82.5a8,8,0,1,1,11.22,11.42Zm96.1-11.32a8,8,0,0,0-11.32-.1l-84,82.5-18.83-18.5a8,8,0,0,0-11.21,11.42l24.43,24a8,8,0,0,0,11.22,0l89.6-88A8,8,0,0,0,245.71,74.39Z"/></svg><span class="hz-visually-hidden">خوانده شد</span></div>
+          </div>
+        </div>
+        <p class="hz-thread__day" role="separator">۸ مهر ۱۴۰۵</p>
+        <div class="hz-msg">
+          <div class="hz-msg__card hz-offer">
+            <div class="hz-offer__head"><span class="hz-offer__label"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63Zm-96,96L48,132.69V48h84.69L232,147.31ZM96,84A12,12,0,1,1,84,72,12,12,0,0,1,96,84Z"/></svg>پیشنهاد قیمت از خریدار</span></div>
+            <div class="hz-offer__amount"><span class="hz-offer__value">۴۱٬۰۰۰٬۰۰۰</span><span class="hz-offer__unit">تومان</span></div>
+            <p class="hz-offer__compare">قیمت آگهی: <b>۴۵٬۰۰۰٬۰۰۰ تومان</b></p>
+            <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <b class="hz-owner__who">شما</b></span></div>
+            <div class="hz-offer__actions"><button class="hz-btn hz-btn--primary hz-btn--sm" type="button">پذیرش پیشنهاد</button><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button">رد پیشنهاد</button></div>
+          </div>
+          <div class="hz-msg__meta"><time datetime="2026-09-30T10:15:00+03:30">۱۰:۱۵</time></div>
+        </div>
+      </div>
+    </section>
+    <section class="demo-col">
+      <p class="demo-label">سند · قرار تحویل · پیام سیستم · در حال ارسال · ارسال‌نشده · متن بلند</p>
+      <div class="hz-thread demo-pane">
+        <div class="hz-msg hz-msg--mine">
+          <div class="hz-msg__card hz-appt">
+            <div class="hz-appt__head"><p class="hz-appt__title"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z"/></svg>قرار تحویل</p><span class="hz-badge hz-badge--info hz-badge--sm"><span class="hz-badge__dot"></span>زمان‌بندی‌شده</span></div>
+            <ul class="hz-appt__list">
+              <li class="hz-appt__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg><span>پنجشنبه ۱۶ مهر ۱۴۰۵، ساعت ۱۷:۰۰</span></li>
+              <li class="hz-appt__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/></svg><span>کرج، محل کنل آریا</span></li>
+            </ul>
+          </div>
+          <div class="hz-msg__meta"><time datetime="2026-10-01T11:30:00+03:30">۱۱:۳۰</time><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M149.61,85.71l-89.6,88a8,8,0,0,1-11.22,0L10.39,136a8,8,0,1,1,11.22-11.41L54.4,156.79l84-82.5a8,8,0,1,1,11.22,11.42Zm96.1-11.32a8,8,0,0,0-11.32-.1l-84,82.5-18.83-18.5a8,8,0,0,0-11.21,11.42l24.43,24a8,8,0,0,0,11.22,0l89.6-88A8,8,0,0,0,245.71,74.39Z"/></svg><span class="hz-visually-hidden">خوانده شد</span></div>
+        </div>
+        <div class="hz-msg hz-msg--mine hz-msg--cont">
+          <div class="hz-msg__bubble">
+            <div class="hz-msg__file">
+              <span class="hz-msg__file-icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,152a8,8,0,0,1-8,8H192v16h16a8,8,0,0,1,0,16H192v16a8,8,0,0,1-16,0V152a8,8,0,0,1,8-8h32A8,8,0,0,1,224,152ZM92,172a28,28,0,0,1-28,28H56v8a8,8,0,0,1-16,0V152a8,8,0,0,1,8-8H64A28,28,0,0,1,92,172Zm-16,0a12,12,0,0,0-12-12H56v24h8A12,12,0,0,0,76,172Zm88,8a36,36,0,0,1-36,36H112a8,8,0,0,1-8-8V152a8,8,0,0,1,8-8h16A36,36,0,0,1,164,180Zm-16,0a20,20,0,0,0-20-20h-8v40h8A20,20,0,0,0,148,180ZM40,112V40A16,16,0,0,1,56,24h96a8,8,0,0,1,5.66,2.34l56,56A8,8,0,0,1,216,88v24a8,8,0,0,1-16,0V96H152a8,8,0,0,1-8-8V40H56v72a8,8,0,0,1-16,0ZM160,80h28.69L160,51.31Z"/></svg></span>
+              <span class="hz-msg__file-body"><span class="hz-msg__file-name">کارت واکسن توله ژرمن شپرد</span><span class="hz-msg__file-meta">PDF، ۲۴۰ کیلوبایت</span></span>
+              <a class="hz-icon-btn hz-icon-btn--sm" href="#" aria-label="دریافت کارت واکسن توله ژرمن شپرد"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg></a>
+            </div>
+            <div class="hz-msg__meta"><time datetime="2026-09-29T20:08:00+03:30">۲۰:۰۸</time><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg><span class="hz-visually-hidden">ارسال شد</span></div>
+          </div>
+        </div>
+        <div class="hz-msg hz-msg--system" role="note">
+          <p class="hz-msg__system"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/></svg><span><b>کد تحویل</b> برای خریدار صادر شد؛ هنگام تحویل آن را از خریدار بگیرید.</span></p>
+        </div>
+        <div class="hz-msg">
+          <div class="hz-msg__bubble">
+            <p class="hz-msg__text">سلام، من در شیراز هستم و امکان مراجعه حضوری ندارم؛ آیا امکان ارسال توله با پرواز و تحویل در فرودگاه شیراز وجود دارد؟ هزینه ارسال و قفس حمل را هم خودم پرداخت می‌کنم.</p>
+            <div class="hz-msg__meta"><time datetime="2026-10-01T21:10:00+03:30">۲۱:۱۰</time></div>
+          </div>
+        </div>
+        <div class="hz-msg hz-msg--mine hz-msg--sending">
+          <div class="hz-msg__bubble">
+            <p class="hz-msg__text">ارسال هوایی ممکن است؛ هماهنگی آن با شماست.</p>
+            <div class="hz-msg__meta"><span>در حال ارسال</span><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg></div>
+          </div>
+        </div>
+        <div class="hz-msg hz-msg--mine hz-msg--failed hz-msg--cont">
+          <div class="hz-msg__bubble">
+            <p class="hz-msg__text">شناسه حیوان <bdi class="hz-id" dir="ltr">PET-8JDUN4GH</bdi> است.</p>
+          </div>
+          <span class="hz-msg__failed" role="alert"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>ارسال نشد. <button class="hz-msg__retry" type="button">ارسال دوباره</button></span>
+        </div>
+        <div class="hz-msg hz-msg--system" role="note">
+          <p class="hz-msg__system"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg><span>آگهی فروخته شد و این گفتگو بسته شد.</span></p>
+        </div>
+      </div>
+      <p class="demo-note">پیام‌های پیاپی یک طرف (<bdi dir="ltr">hz-msg--cont</bdi>) گوشه تیز ندارند؛ فقط اولین پیام هر گروه به سمت فرستنده تیز است.</p>
+    </section>
+  </div>
+</div>
+<script></script>

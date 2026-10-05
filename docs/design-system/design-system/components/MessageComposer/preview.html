@@ -1,0 +1,87 @@
+<!-- @dsCard group="Messaging" height=600 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; align-items: start; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-frame { border: 1px solid var(--border-default); border-radius: var(--radius-xl); overflow: hidden; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">خالی — دکمه ارسال غیرفعال</p>
+      <form class="demo-frame hz-composer" aria-label="نوشتن پیام">
+        <div class="hz-composer__row">
+          <button class="hz-icon-btn" type="button" aria-label="پیوست تصویر یا سند"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"/></svg></button>
+          <label class="hz-composer__field"><span class="hz-visually-hidden">پیام</span><textarea class="hz-composer__input" rows="1" placeholder="پیام خود را بنویسید"></textarea></label>
+          <button class="hz-composer__send" type="submit" aria-label="ارسال پیام" disabled><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M231.87,114l-168-95.89A16,16,0,0,0,40.92,37.34L71.55,128,40.92,218.67A16,16,0,0,0,56,240a16.15,16.15,0,0,0,7.93-2.1l167.92-96.05a16,16,0,0,0,.05-27.89ZM56,224a.56.56,0,0,0,0-.12L85.74,136H144a8,8,0,0,0,0-16H85.74L56.06,32.16A.46.46,0,0,0,56,32l168,95.83Z"/></svg></button>
+        </div>
+      </form>
+    </section>
+    <section>
+      <p class="demo-label">فوکوس، در حال نوشتن — ارسال فعال</p>
+      <form class="demo-frame hz-composer" aria-label="نوشتن پیام">
+        <div class="hz-composer__row">
+          <button class="hz-icon-btn" type="button" aria-label="پیوست تصویر یا سند"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"/></svg></button>
+          <label class="hz-composer__field"><span class="hz-visually-hidden">پیام</span><textarea class="hz-composer__input" rows="1" style="border-color:var(--focus-ring);box-shadow:inset 0 0 0 1px var(--focus-ring)">پنجشنبه ساعت ۱۷ در کرج خوب است؟</textarea></label>
+          <button class="hz-composer__send" type="submit" aria-label="ارسال پیام"><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M231.87,114l-168-95.89A16,16,0,0,0,40.92,37.34L71.55,128,40.92,218.67A16,16,0,0,0,56,240a16.15,16.15,0,0,0,7.93-2.1l167.92-96.05a16,16,0,0,0,.05-27.89ZM56,224a.56.56,0,0,0,0-.12L85.74,136H144a8,8,0,0,0,0-16H85.74L56.06,32.16A.46.46,0,0,0,56,32l168,95.83Z"/></svg></button>
+        </div>
+      </form>
+    </section>
+    <section>
+      <p class="demo-label">خریدار — با «پیشنهاد قیمت» و پیوست؛ یک پیوست خطا دارد</p>
+      <form class="demo-frame hz-composer" aria-label="نوشتن پیام">
+        <div class="hz-composer__attachments">
+          <span class="hz-attach-chip"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V158.75l-26.07-26.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L40,149.37V56ZM40,172l52-52,80,80H40Zm176,28H194.63l-36-36,20-20L216,181.38V200ZM144,100a12,12,0,1,1,12,12A12,12,0,0,1,144,100Z"/></svg><span class="hz-attach-chip__name">عکس قفس حمل</span><span class="hz-attach-chip__size">۸۴۰ کیلوبایت</span><button class="hz-icon-btn" type="button" aria-label="حذف پیوست عکس قفس حمل"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+          <span class="hz-attach-chip hz-attach-chip--error"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg><span class="hz-attach-chip__name">فیلم بازدید</span><span class="hz-attach-chip__size">این نوع فایل پذیرفته نمی‌شود</span><button class="hz-icon-btn" type="button" aria-label="حذف پیوست فیلم بازدید"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+        </div>
+        <div class="hz-composer__row">
+          <button class="hz-icon-btn" type="button" aria-label="پیوست تصویر یا سند"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"/></svg></button>
+          <label class="hz-composer__field"><span class="hz-visually-hidden">پیام</span><textarea class="hz-composer__input" rows="1" placeholder="پیام خود را بنویسید"></textarea></label>
+          <button class="hz-composer__send" type="submit" aria-label="ارسال پیام"><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M231.87,114l-168-95.89A16,16,0,0,0,40.92,37.34L71.55,128,40.92,218.67A16,16,0,0,0,56,240a16.15,16.15,0,0,0,7.93-2.1l167.92-96.05a16,16,0,0,0,.05-27.89ZM56,224a.56.56,0,0,0,0-.12L85.74,136H144a8,8,0,0,0,0-16H85.74L56.06,32.16A.46.46,0,0,0,56,32l168,95.83Z"/></svg></button>
+        </div>
+        <div class="hz-composer__meta"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63Zm-96,96L48,132.69V48h84.69L232,147.31ZM96,84A12,12,0,1,1,84,72,12,12,0,0,1,96,84Z"/></svg>پیشنهاد قیمت</button><span>فقط تصویر و PDF</span></div>
+      </form>
+    </section>
+    <section>
+      <p class="demo-label">متن بلند — تا ۵ خط بزرگ می‌شود، بعد اسکرول</p>
+      <form class="demo-frame hz-composer" aria-label="نوشتن پیام">
+        <div class="hz-composer__row">
+          <button class="hz-icon-btn" type="button" aria-label="پیوست تصویر یا سند"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"/></svg></button>
+          <label class="hz-composer__field"><span class="hz-visually-hidden">پیام</span><textarea class="hz-composer__input" rows="4">سلام، من در شیراز هستم و امکان مراجعه حضوری ندارم؛ آیا امکان ارسال توله با پرواز و تحویل در فرودگاه شیراز وجود دارد؟ هزینه ارسال و قفس حمل را هم خودم پرداخت می‌کنم و در صورت نیاز کارت واکسن را هم پیش از پرواز ببینم.</textarea></label>
+          <button class="hz-composer__send" type="submit" aria-label="ارسال پیام"><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M231.87,114l-168-95.89A16,16,0,0,0,40.92,37.34L71.55,128,40.92,218.67A16,16,0,0,0,56,240a16.15,16.15,0,0,0,7.93-2.1l167.92-96.05a16,16,0,0,0,.05-27.89ZM56,224a.56.56,0,0,0,0-.12L85.74,136H144a8,8,0,0,0,0-16H85.74L56.06,32.16A.46.46,0,0,0,56,32l168,95.83Z"/></svg></button>
+        </div>
+      </form>
+    </section>
+    <section>
+      <p class="demo-label">در حال ارسال</p>
+      <form class="demo-frame hz-composer" aria-label="نوشتن پیام">
+        <div class="hz-composer__row">
+          <button class="hz-icon-btn" type="button" aria-label="پیوست تصویر یا سند" disabled><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"/></svg></button>
+          <label class="hz-composer__field"><span class="hz-visually-hidden">پیام</span><textarea class="hz-composer__input" rows="1" readonly>بله، کارت واکسن را می‌فرستم.</textarea></label>
+          <button class="hz-composer__send" type="submit" aria-label="در حال ارسال پیام" aria-busy="true"><span class="hz-spinner" aria-hidden="true"></span></button>
+        </div>
+      </form>
+    </section>
+    <section>
+      <p class="demo-label">گفتگوی بسته — غیرفعال</p>
+      <form class="demo-frame hz-composer" aria-label="نوشتن پیام">
+        <p class="hz-composer__closed" style="margin:0"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg><span><b>این گفتگو بسته شده است.</b> آگهی «هاسکی جوان» رزرو شد و دیگر نمی‌توانید پیام بفرستید.</span></p>
+        <div class="hz-composer__row">
+          <button class="hz-icon-btn" type="button" aria-label="پیوست تصویر یا سند" disabled><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M209.66,122.34a8,8,0,0,1,0,11.32l-82.05,82a56,56,0,0,1-79.2-79.21L147.67,35.73a40,40,0,1,1,56.61,56.55L105,193A24,24,0,1,1,71,159L154.3,74.38A8,8,0,1,1,165.7,85.6L82.39,170.31a8,8,0,1,0,11.27,11.36L192.93,81A24,24,0,1,0,159,47L59.76,147.68a40,40,0,1,0,56.53,56.62l82.06-82A8,8,0,0,1,209.66,122.34Z"/></svg></button>
+          <label class="hz-composer__field"><span class="hz-visually-hidden">پیام</span><textarea class="hz-composer__input" rows="1" placeholder="ارسال پیام ممکن نیست" disabled></textarea></label>
+          <button class="hz-composer__send" type="submit" aria-label="ارسال پیام" disabled><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M231.87,114l-168-95.89A16,16,0,0,0,40.92,37.34L71.55,128,40.92,218.67A16,16,0,0,0,56,240a16.15,16.15,0,0,0,7.93-2.1l167.92-96.05a16,16,0,0,0,.05-27.89ZM56,224a.56.56,0,0,0,0-.12L85.74,136H144a8,8,0,0,0,0-16H85.74L56.06,32.16A.46.46,0,0,0,56,32l168,95.83Z"/></svg></button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.hz-composer').forEach(function (form) {
+  var ta = form.querySelector('textarea'), send = form.querySelector('.hz-composer__send');
+  if (!ta || ta.disabled || ta.readOnly) return;
+  ta.addEventListener('input', function () { send.disabled = !ta.value.trim(); });
+  ta.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer: fine)').matches) { e.preventDefault(); } });
+  form.addEventListener('submit', function (e) { e.preventDefault(); });
+});
+</script>

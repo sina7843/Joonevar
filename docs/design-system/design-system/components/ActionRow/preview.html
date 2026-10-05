@@ -1,0 +1,52 @@
+<!-- @dsCard group="Actions" height=824 width=390 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-stage { position: relative; height: 280px; overflow: auto; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage__content { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+  .demo-line { display: block; height: 12px; border-radius: var(--radius-sm); background: var(--bg-subtle); }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">۲ کنش — شروع = اصلی، پایان = فرعی</p>
+    <div class="hz-action-row">
+      <button class="hz-btn hz-btn--primary" type="button">ارسال درخواست</button>
+      <button class="hz-btn hz-btn--secondary" type="button">ذخیره پیش‌نویس</button>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">۳ کنش — میز تصمیم (اصلی، فرعی، مخرب در پایان)</p>
+    <div class="hz-action-row">
+      <button class="hz-btn hz-btn--primary" type="button">تأیید پرونده</button>
+      <button class="hz-btn hz-btn--secondary" type="button">درخواست اصلاح</button>
+      <button class="hz-btn hz-btn--destructive-outline" type="button">رد پرونده</button>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">چسبان موبایل — hz-action-row--sticky (فقط زیر ۷۶۸)</p>
+    <div class="demo-stage">
+      <div class="demo-stage__content" aria-hidden="true">
+        <p class="hz-h4">مرحله ۴ از ۶ · مدارک</p>
+        <span class="demo-line"></span><span class="demo-line" style="width: 80%;"></span><span class="demo-line"></span><span class="demo-line" style="width: 60%;"></span>
+        <span class="demo-line"></span><span class="demo-line" style="width: 85%;"></span><span class="demo-line"></span><span class="demo-line" style="width: 70%;"></span>
+        <span class="demo-line"></span><span class="demo-line" style="width: 50%;"></span>
+      </div>
+      <div class="hz-action-row hz-action-row--sticky">
+        <button class="hz-btn hz-btn--primary hz-btn--lg" type="button">ادامه</button>
+        <button class="hz-btn hz-btn--secondary hz-btn--lg" type="button">مرحله قبل</button>
+      </div>
+    </div>
+    <p class="demo-note">زیر ۷۶۸: نوار با bg-chrome، خط بالایی border-default و shadow-sticky به پایین صفحه می‌چسبد و دکمه‌ها هم‌عرض‌اند. از ۷۶۸ به بالا همین نشانه‌گذاری یک ردیف عادی درون محتواست (بدون پس‌زمینه و سایه).</p>
+  </section>
+  <section>
+    <p class="demo-label">متن بلند — دکمه‌ها به خط بعد می‌روند، ترتیب حفظ می‌شود</p>
+    <div class="hz-action-row">
+      <button class="hz-btn hz-btn--primary" type="button">پرداخت ۴۰۰٬۰۰۰ تومان</button>
+      <button class="hz-btn hz-btn--secondary" type="button">بازگشت به پرونده شاهزاده کوچولو</button>
+    </div>
+  </section>
+</div>
+<script></script>

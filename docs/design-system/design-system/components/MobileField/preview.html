@@ -1,0 +1,35 @@
+<!-- @dsCard group="Inputs" height=672 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 16px; align-items: start; }
+  .demo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .demo-cell { display: flex; flex-direction: column; min-width: 0; }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-focus { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">حالت‌ها</p>
+    <div class="demo-grid"><div class="demo-cell"><p class="demo-label">خالی</p><div class="hz-field"><label class="hz-field__label" for="m-1">شماره موبایل<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input hz-input--ltr" id="m-1" placeholder="09xxxxxxxxx" aria-describedby="m-1-hint" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" data-mobile><div class="hz-field__hint" id="m-1-hint">کد تأیید به این شماره پیامک می‌شود.</div></div></div><div class="demo-cell"><p class="demo-label">با مقدار</p><div class="hz-field"><label class="hz-field__label" for="m-2">شماره موبایل<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input hz-input--ltr" id="m-2" value="09990001234" placeholder="09xxxxxxxxx" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" data-mobile></div></div><div class="demo-cell"><p class="demo-label">فوکوس</p><div class="hz-field"><label class="hz-field__label" for="m-3">شماره موبایل<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input hz-input--ltr" id="m-3" value="0999000" placeholder="09xxxxxxxxx" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" data-mobile style="border-color:var(--focus-ring);box-shadow:inset 0 0 0 1px var(--focus-ring)"></div></div><div class="demo-cell"><p class="demo-label">خطا</p><div class="hz-field"><label class="hz-field__label" for="m-4">شماره موبایل<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input hz-input--ltr" id="m-4" value="9990001234" placeholder="09xxxxxxxxx" aria-invalid="true" aria-describedby="m-4-error" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" data-mobile><div class="hz-field__error" id="m-4-error"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>شماره موبایل باید ۱۱ رقم باشد و با ۰۹ شروع شود.</span></div></div></div><div class="demo-cell"><p class="demo-label">غیرفعال</p><div class="hz-field"><label class="hz-field__label" for="m-5">شماره موبایل</label><input class="hz-input hz-input--ltr" id="m-5" value="09990000001" placeholder="09xxxxxxxxx" aria-describedby="m-5-hint" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" data-mobile disabled><div class="hz-field__hint" id="m-5-hint">شماره ورود شما؛ از بخش پروفایل تغییر می‌کند.</div></div></div><div class="demo-cell"><p class="demo-label">رقم فارسی/عربی، یکسان‌سازی‌شده</p><div class="hz-field"><label class="hz-field__label" for="m-6">شماره تماس فروشنده<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input hz-input--ltr" id="m-6" value="09990001234" placeholder="09xxxxxxxxx" aria-describedby="m-6-hint" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" data-mobile><div class="hz-field__hint" id="m-6-hint">تایپ‌شده: ۰۹۹۹۰۰۰۱۲۳۴ — ذخیره‌شده: <bdi dir="ltr" class="hz-id">09990001234</bdi></div></div></div></div>
+  </section>
+  <section>
+    <p class="demo-label">در صفحه ورود</p>
+    <div class="hz-card" style="max-width:360px;display:flex;flex-direction:column;gap:16px">
+      <h2 class="hz-h4">ورود به همزیست</h2>
+      <div class="hz-field"><label class="hz-field__label" for="m-7">شماره موبایل<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input hz-input--ltr" id="m-7" value="09990001234" placeholder="09xxxxxxxxx" aria-describedby="m-7-hint" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="11" data-mobile><div class="hz-field__hint" id="m-7-hint">کد تأیید به این شماره پیامک می‌شود.</div></div>
+      <button class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" type="submit">دریافت کد تأیید</button>
+    </div>
+  </section>
+</div>
+<script>
+var map = { '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9','٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9' };
+document.querySelectorAll('[data-mobile]').forEach(function (el) {
+  el.addEventListener('input', function () {
+    el.value = el.value.replace(/[۰-۹٠-٩]/g, function (d) { return map[d]; }).replace(/\D/g, '').slice(0, 11);
+  });
+});
+</script>

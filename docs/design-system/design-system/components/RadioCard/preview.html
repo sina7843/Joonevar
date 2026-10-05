@@ -1,0 +1,61 @@
+<!-- @dsCard group="Inputs" height=688 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .demo-cell { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <div class="demo-grid">
+      <div class="demo-cell">
+        <div>
+          <p class="demo-label">خدمت — با آیکن و قیمت · انتخاب‌شده · فوکوس · قفل «تعیین‌نشده»</p>
+          <fieldset class="hz-fieldset">
+            <legend class="hz-field__label">خدمت<span class="hz-field__req" aria-hidden="true">*</span></legend>
+            <div class="hz-choice-group hz-choice-group--stack">
+              <label class="hz-option hz-option--card"><input type="radio" name="svc" checked aria-describedby="svc-1-d"><span class="hz-option__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg></span><span class="hz-option__text"><span class="hz-option__label">صدور شجره‌نامه</span><span class="hz-option__desc" id="svc-1-d">سند نسب رسمی برای حیوان ثبت‌شده</span></span><span class="hz-option__price">۴۰۰٬۰۰۰ تومان</span></label>
+              <label class="hz-option hz-option--card" style="outline:2px solid var(--focus-ring);outline-offset:2px"><input type="radio" name="svc" aria-describedby="svc-2-d"><span class="hz-option__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M225.86,102.82c-3.77-3.94-7.67-8-9.14-11.57-1.36-3.27-1.44-8.69-1.52-13.94-.15-9.76-.31-20.82-8-28.51s-18.75-7.85-28.51-8c-5.25-.08-10.67-.16-13.94-1.52-3.56-1.47-7.63-5.37-11.57-9.14C146.28,23.51,138.44,16,128,16s-18.27,7.51-25.18,14.14c-3.94,3.77-8,7.67-11.57,9.14C88,40.64,82.56,40.72,77.31,40.8c-9.76.15-20.82.31-28.51,8S41,67.55,40.8,77.31c-.08,5.25-.16,10.67-1.52,13.94-1.47,3.56-5.37,7.63-9.14,11.57C23.51,109.72,16,117.56,16,128s7.51,18.27,14.14,25.18c3.77,3.94,7.67,8,9.14,11.57,1.36,3.27,1.44,8.69,1.52,13.94.15,9.76.31,20.82,8,28.51s18.75,7.85,28.51,8c5.25.08,10.67.16,13.94,1.52,3.56,1.47,7.63,5.37,11.57,9.14C109.72,232.49,117.56,240,128,240s18.27-7.51,25.18-14.14c3.94-3.77,8-7.67,11.57-9.14,3.27-1.36,8.69-1.44,13.94-1.52,9.76-.15,20.82-.31,28.51-8s7.85-18.75,8-28.51c.08-5.25.16-10.67,1.52-13.94,1.47-3.56,5.37-7.63,9.14-11.57C232.49,146.28,240,138.44,240,128S232.49,109.73,225.86,102.82Zm-11.55,39.29c-4.79,5-9.75,10.17-12.38,16.52-2.52,6.1-2.63,13.07-2.73,19.82-.1,7-.21,14.33-3.32,17.43s-10.39,3.22-17.43,3.32c-6.75.1-13.72.21-19.82,2.73-6.35,2.63-11.52,7.59-16.52,12.38S132,224,128,224s-9.15-4.92-14.11-9.69-10.17-9.75-16.52-12.38c-6.1-2.52-13.07-2.63-19.82-2.73-7-.1-14.33-.21-17.43-3.32s-3.22-10.39-3.32-17.43c-.1-6.75-.21-13.72-2.73-19.82-2.63-6.35-7.59-11.52-12.38-16.52S32,132,32,128s4.92-9.15,9.69-14.11,9.75-10.17,12.38-16.52c2.52-6.1,2.63-13.07,2.73-19.82.1-7,.21-14.33,3.32-17.43S70.51,56.9,77.55,56.8c6.75-.1,13.72-.21,19.82-2.73,6.35-2.63,11.52-7.59,16.52-12.38S124,32,128,32s9.15,4.92,14.11,9.69,10.17,9.75,16.52,12.38c6.1,2.52,13.07,2.63,19.82,2.73,7,.1,14.33.21,17.43,3.32s3.22,10.39,3.32,17.43c.1,6.75.21,13.72,2.73,19.82,2.63,6.35,7.59,11.52,12.38,16.52S224,124,224,128,219.08,137.15,214.31,142.11ZM173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34Z"/></svg></span><span class="hz-option__text"><span class="hz-option__label">مجوز جفت‌گیری</span><span class="hz-option__desc" id="svc-2-d">برای دو حیوان ثبت‌شده؛ تأیید طرف مقابل لازم است.</span></span><span class="hz-option__price">۳۰۰٬۰۰۰ تومان</span></label>
+              <label class="hz-option hz-option--card"><input type="radio" name="svc" aria-describedby="svc-3-d"><span class="hz-option__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg></span><span class="hz-option__text"><span class="hz-option__label">ثبت کنل</span><span class="hz-option__desc" id="svc-3-d">ثبت نام کنل برای پرورش‌دهندگان</span></span><span class="hz-option__price">۱۵۰٬۰۰۰ تومان</span></label>
+              <label class="hz-option hz-option--card"><input type="radio" name="svc" disabled aria-describedby="svc-4-d"><span class="hz-option__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg></span><span class="hz-option__text"><span class="hz-option__label">انتشار آگهی در بازار</span><span class="hz-option__desc" id="svc-4-d">هزینه این خدمت هنوز تعیین نشده است. پس از آنکه انجمن تعرفه را تعیین کند، این گزینه فعال می‌شود.</span></span><span class="hz-option__price hz-option__price--unset"><span class="hz-option__lock"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>تعیین‌نشده</span></span></label>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <div>
+          <p class="demo-label">روش ارسال — پت‌شاپ آریا</p>
+          <fieldset class="hz-fieldset">
+            <legend class="hz-field__label">روش ارسال<span class="hz-field__req" aria-hidden="true">*</span></legend>
+            <div class="hz-choice-group hz-choice-group--stack">
+              <label class="hz-option hz-option--card"><input type="radio" name="ship" checked aria-describedby="ship-1-d"><span class="hz-option__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M255.42,117l-14-35A15.93,15.93,0,0,0,226.58,72H192V64a8,8,0,0,0-8-8H32A16,16,0,0,0,16,72V184a16,16,0,0,0,16,16H49a32,32,0,0,0,62,0h50a32,32,0,0,0,62,0h17a16,16,0,0,0,16-16V120A7.94,7.94,0,0,0,255.42,117ZM192,88h34.58l9.6,24H192ZM32,72H176v64H32ZM80,208a16,16,0,1,1,16-16A16,16,0,0,1,80,208Zm81-24H111a32,32,0,0,0-62,0H32V152H176v12.31A32.11,32.11,0,0,0,161,184Zm31,24a16,16,0,1,1,16-16A16,16,0,0,1,192,208Zm48-24H223a32.06,32.06,0,0,0-31-24V128h48Z"/></svg></span><span class="hz-option__text"><span class="hz-option__label">ارسال توسط فروشگاه</span><span class="hz-option__desc" id="ship-1-d">از کرج؛ رایگان برای خرید بالای ۱٬۵۰۰٬۰۰۰ تومان از این فروشگاه</span></span><span class="hz-option__price">۸۵٬۰۰۰ تومان</span></label>
+              <label class="hz-option hz-option--card"><input type="radio" name="ship" aria-describedby="ship-2-d"><span class="hz-option__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg></span><span class="hz-option__text"><span class="hz-option__label">تحویل حضوری</span><span class="hz-option__desc" id="ship-2-d">از پت‌شاپ آریا، کرج</span></span><span class="hz-option__price">رایگان</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <div>
+          <p class="demo-label">خطا — چیزی انتخاب نشده</p>
+          <fieldset class="hz-fieldset" aria-describedby="ship2-e">
+            <legend class="hz-field__label">روش ارسال — فروشگاه نمونه همزیست<span class="hz-field__req" aria-hidden="true">*</span></legend>
+            <div class="hz-choice-group hz-choice-group--stack">
+              <label class="hz-option hz-option--card"><input type="radio" name="ship2" aria-invalid="true"><span class="hz-option__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M255.42,117l-14-35A15.93,15.93,0,0,0,226.58,72H192V64a8,8,0,0,0-8-8H32A16,16,0,0,0,16,72V184a16,16,0,0,0,16,16H49a32,32,0,0,0,62,0h50a32,32,0,0,0,62,0h17a16,16,0,0,0,16-16V120A7.94,7.94,0,0,0,255.42,117ZM192,88h34.58l9.6,24H192ZM32,72H176v64H32ZM80,208a16,16,0,1,1,16-16A16,16,0,0,1,80,208Zm81-24H111a32,32,0,0,0-62,0H32V152H176v12.31A32.11,32.11,0,0,0,161,184Zm31,24a16,16,0,1,1,16-16A16,16,0,0,1,192,208Zm48-24H223a32.06,32.06,0,0,0-31-24V128h48Z"/></svg></span><span class="hz-option__text"><span class="hz-option__label">ارسال توسط فروشگاه</span><span class="hz-option__desc">از تهران؛ رایگان برای خرید بالای ۲٬۰۰۰٬۰۰۰ تومان</span></span><span class="hz-option__price">۹۵٬۰۰۰ تومان</span></label>
+            </div>
+            <div class="hz-field__error" id="ship2-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>روش ارسال این بسته را انتخاب کنید.</span></div>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">بدون آیکن — شبکه دوستونه از ۷۶۸ به بالا · متن بلند فارسی</p>
+    <fieldset class="hz-fieldset">
+      <legend class="hz-field__label">درخواست<span class="hz-field__req" aria-hidden="true">*</span></legend>
+      <div class="hz-choice-group hz-choice-group--cards">
+        <label class="hz-option hz-option--card"><input type="radio" name="req" checked><span class="hz-option__text"><span class="hz-option__label">صدور برگه ثبتی — ۲ حیوان</span><span class="hz-option__desc">۲۵۰٬۰۰۰ تومان برای هر حیوان</span></span><span class="hz-option__price">۵۰۰٬۰۰۰ تومان</span></label>
+        <label class="hz-option hz-option--card"><input type="radio" name="req"><span class="hz-option__text"><span class="hz-option__label">تست اصالت نسب در مرکز ژنتیک با ارسال نمونه از طریق دامپزشک معتمد</span><span class="hz-option__desc">نمونه فقط با کد پیگیری نمونه پذیرفته می‌شود.</span></span><span class="hz-option__price">۱٬۵۰۰٬۰۰۰ تومان</span></label>
+      </div>
+    </fieldset>
+  </section>
+</div>
+<script></script>

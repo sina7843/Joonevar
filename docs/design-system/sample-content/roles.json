@@ -1,0 +1,225 @@
+[
+  {
+    "key": "VISITOR",
+    "labelFa": "بازدیدکننده",
+    "shell": "SiteShell",
+    "home": "/",
+    "account": null,
+    "density": "editorial",
+    "devicePriority": "mobile = desktop"
+  },
+  {
+    "key": "USER",
+    "labelFa": "کاربر",
+    "shell": "PublicShell",
+    "home": "/dashboard",
+    "account": "09990000001",
+    "density": "comfortable",
+    "devicePriority": "mobile first",
+    "nav": [
+      "خانه /dashboard",
+      "درخواست‌ها /requests",
+      "اعلان‌ها /notifications",
+      "پروفایل /profile"
+    ]
+  },
+  {
+    "key": "BREEDER",
+    "labelFa": "پرورش‌دهنده",
+    "shell": "PublicShell",
+    "home": "/dashboard",
+    "account": "09990000002",
+    "density": "comfortable",
+    "devicePriority": "mobile first",
+    "extraAreas": [
+      "/kennels",
+      "/mating",
+      "/litters",
+      "/puppy-cards",
+      "/breeder"
+    ]
+  },
+  {
+    "key": "TRUSTED_VET",
+    "labelFa": "دامپزشک معتمد",
+    "shell": "PublicShell (VET_TABS)",
+    "home": "/vet",
+    "account": "09990000003",
+    "density": "compact",
+    "devicePriority": "mobile first — used at the clinic desk",
+    "nav": [
+      "صف من /vet",
+      "پذیرش /vet/check-in",
+      "نمونه‌ها /vet/samples",
+      "پروفایل /profile"
+    ]
+  },
+  {
+    "key": "ASSOCIATION_OPERATOR",
+    "labelFa": "اپراتور انجمن",
+    "shell": "OpsShell",
+    "home": "/assoc",
+    "account": "09990000004",
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "nav": [
+      "صف‌ها",
+      "احراز هویت",
+      "دانشجویان دامپزشکی",
+      "کد نظام دامپزشکان",
+      "پروانه فعالیت",
+      "میز بررسی دامپزشکان",
+      "دامپزشک معتمد",
+      "عضویت",
+      "کلاب‌ها",
+      "کنل",
+      "مجوز جفت‌گیری",
+      "درخواست‌های پستی",
+      "Export Pedigree",
+      "صادرکنندگان"
+    ]
+  },
+  {
+    "key": "GENETICS_OPERATOR",
+    "labelFa": "اپراتور مرکز ژنتیک",
+    "shell": "OpsShell",
+    "home": "/genetics",
+    "account": "09990000005",
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "nav": [
+      "داشبورد",
+      "فیش‌ها",
+      "نمونه‌ها",
+      "نتایج",
+      "اعتراض‌ها"
+    ]
+  },
+  {
+    "key": "SUPERADMIN",
+    "labelFa": "سوپرادمین",
+    "shell": "OpsShell",
+    "home": "/admin",
+    "account": "09990000006",
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "nav": [
+      "مرور",
+      "تنظیمات",
+      "دامپزشکان معتمد",
+      "مراکز دامپزشکی",
+      "انجمن و کلاب",
+      "بسته‌های تبلیغاتی",
+      "جفت‌یابی",
+      "نژادها",
+      "نقش‌های محتوا",
+      "اعلان‌ها و پیامک",
+      "تاریخچه",
+      "بازار و فروشگاه"
+    ]
+  },
+  {
+    "key": "AUTHOR",
+    "labelFa": "نویسنده",
+    "shell": "OpsShell",
+    "home": "/author",
+    "account": "09990000007",
+    "density": "comfortable",
+    "devicePriority": "desktop first",
+    "nav": [
+      "نوشته‌های من",
+      "نوشته تازه"
+    ]
+  },
+  {
+    "key": "CONTENT_ADMIN",
+    "labelFa": "ادمین محتوا",
+    "shell": "OpsShell",
+    "home": "/content",
+    "account": "09990000008",
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "nav": [
+      "همه محتوا",
+      "محتوای تازه",
+      "گزارش‌ها",
+      "گزارش کلاب‌ها",
+      "محدودیت ناشر",
+      "دسته‌ها"
+    ]
+  },
+  {
+    "key": "REVIEW_OPERATOR",
+    "labelFa": "اپراتور بررسی",
+    "shell": "OpsShell",
+    "home": "/review",
+    "account": "09990000009",
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "nav": [
+      "درخواست‌های دامپزشک",
+      "پروفایل‌های بدون مالک",
+      "مراکز دامپزشکی",
+      "Claim مراکز",
+      "انجمن و کلاب",
+      "پیشنهادهای کاربران"
+    ]
+  },
+  {
+    "key": "MARKETPLACE_ADMIN",
+    "labelFa": "مدیر بازار",
+    "shell": "OpsShell (marketNav)",
+    "home": "/market",
+    "account": "09990000010",
+    "density": "dense",
+    "devicePriority": "desktop first"
+  },
+  {
+    "key": "LISTING_MODERATOR",
+    "labelFa": "ناظر آگهی",
+    "shell": "OpsShell (marketNav)",
+    "home": "/market",
+    "account": "09990000011",
+    "density": "dense",
+    "devicePriority": "desktop first"
+  },
+  {
+    "key": "SELLER_REVIEWER",
+    "labelFa": "بررسی‌کننده فروشنده",
+    "shell": "OpsShell (marketNav)",
+    "home": "/market",
+    "account": null,
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "note": "No synthetic test account in dev-fixtures.ts"
+  },
+  {
+    "key": "FINANCE_OPERATOR",
+    "labelFa": "اپراتور مالی",
+    "shell": "OpsShell (marketNav)",
+    "home": "/market",
+    "account": "09990000012",
+    "density": "dense",
+    "devicePriority": "desktop first"
+  },
+  {
+    "key": "DISPUTE_REVIEWER",
+    "labelFa": "داور اختلاف",
+    "shell": "OpsShell (marketNav)",
+    "home": "/market",
+    "account": null,
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "note": "No synthetic test account in dev-fixtures.ts"
+  },
+  {
+    "key": "SUPPORT_AGENT",
+    "labelFa": "پشتیبانی",
+    "shell": "OpsShell (marketNav)",
+    "home": "/market",
+    "account": null,
+    "density": "dense",
+    "devicePriority": "desktop first",
+    "note": "No synthetic test account in dev-fixtures.ts"
+  }
+]

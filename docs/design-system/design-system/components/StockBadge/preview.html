@@ -1,0 +1,81 @@
+<!-- @dsCard group="Commerce" height=752 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-item { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 14px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); }
+  .demo-item__name { font-size: 14px; line-height: 22px; font-weight: 700; }
+  .demo-narrow { width: 300px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); }
+  .demo-narrow .demo-item__name { min-width: 0; }
+  .demo-tag { font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">نمای خریدار — چهار حالت (قابل فروش = <bdi dir="ltr">stockOnHand − stockReserved</bdi>) · اندازه ۲۴ و ۲۰</p>
+    <div class="demo-cols">
+      <div class="demo-item">
+        <span class="demo-item__name">غذای خشک سگ بالغ نژاد بزرگ — ۱۰ کیلوگرم</span>
+        <span class="hz-stock hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span>
+        <span class="demo-tag">موجودی ۲۰، رزرو ۱ → قابل فروش ۱۹</span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-item__name">تشک ارتوپدی سگ — L</span>
+        <span class="hz-stock hz-stock--low"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"/></svg>فقط ۱ عدد موجود</span>
+        <span class="demo-tag">موجودی ۲، رزرو ۱ → قابل فروش ۱ (آستانه پیشنهادی «کم»: ۵ یا کمتر)</span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-item__name">شامپو ضدحساسیت — ۲۵۰ میلی‌لیتر</span>
+        <span class="hz-stock hz-stock--out"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span>
+        <span class="demo-tag">موجودی ۰، رزرو ۰</span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-item__name">افسار ۵ متری جمع‌شو — تا ۵۰ کیلوگرم</span>
+        <span class="hz-stock hz-stock--reserved"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>رزروشده</span>
+        <p class="hz-stock-note">همه موجودی برای سفارش‌های در جریان رزرو است و ممکن است دوباره آزاد شود.</p>
+        <span class="demo-tag">نمونه ساختگی: موجودی ۵، رزرو ۵</span>
+      </div>
+    </div>
+    <div class="demo-row" style="margin-block-start: 12px">
+      <span class="hz-stock hz-stock--sm hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span>
+      <span class="hz-stock hz-stock--sm hz-stock--low"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"/></svg>فقط ۵ عدد موجود</span>
+      <span class="hz-stock hz-stock--sm hz-stock--out"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span>
+      <span class="hz-stock hz-stock--sm hz-stock--reserved"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>رزروشده</span>
+      <span class="demo-tag">اندازه کوچک (۲۰) برای کارت محصول و ردیف سبد</span>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">نمای فروشنده (<bdi dir="ltr">/account/seller/catalog</bdi>) — عددها دیده می‌شوند؛ ناموجود یعنی «اقدام با شما»؛ رزرو هرگز از موجودی بیشتر نمی‌شود</p>
+    <div class="hz-table-wrap">
+      <table class="hz-table">
+        <thead><tr><th>واریانت</th><th>کد کالا</th><th>موجودی</th><th>وضعیت موجودی</th></tr></thead>
+        <tbody>
+          <tr><td>تشک ارتوپدی سگ — M</td><td><bdi class="hz-id" dir="ltr">SKU-BYQC7R</bdi></td><td><span class="hz-stock-detail"><span>موجودی <b>۶</b></span><span>رزرو <b>۰</b></span><span>قابل فروش <b>۶</b></span></span></td><td><span class="hz-stock hz-stock--sm hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span></td></tr>
+          <tr><td>تشک ارتوپدی سگ — L</td><td><bdi class="hz-id" dir="ltr">SKU-D6YS3K</bdi></td><td><span class="hz-stock-detail"><span>موجودی <b>۲</b></span><span>رزرو <b>۱</b></span><span>قابل فروش <b>۱</b></span></span></td><td><span class="hz-stock hz-stock--sm hz-stock--low"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"/></svg>فقط ۱ عدد موجود</span></td></tr>
+          <tr><td>تشک ارتوپدی سگ — XL</td><td><bdi class="hz-id" dir="ltr">SKU-GZ29X4</bdi></td><td><span class="hz-stock-detail"><span>موجودی <b>۲</b></span><span>رزرو <b>۲</b></span><span>قابل فروش <b>۰</b></span></span></td><td><span class="hz-stock hz-stock--sm hz-stock--reserved"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>رزروشده</span></td></tr>
+          <tr><td>شامپو ضدحساسیت — ۲۵۰ میلی‌لیتر</td><td><bdi class="hz-id" dir="ltr">SKU-P7E8X7</bdi></td><td><span class="hz-stock-detail"><span>موجودی <b>۰</b></span><span>رزرو <b>۰</b></span><span>قابل فروش <b>۰</b></span></span></td><td><span class="hz-stock hz-stock--sm hz-stock--action"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">متن بلند در ستون باریک (۳۰۰px) — نام می‌شکند، نشان کوچک نمی‌شود</p>
+      <div class="demo-narrow">
+        <span class="demo-item__name">غذای خشک سگ بالغ نژاد بزرگ — ۱۵ کیلوگرم</span>
+        <span class="hz-stock hz-stock--sm hz-stock--out"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">در حال بارگذاری (موجودی هنوز نرسیده) — جای نشان با اسکلت پر می‌شود</p>
+      <div class="demo-narrow" aria-busy="true">
+        <span class="demo-item__name">قلاده چرمی قابل تنظیم — M</span>
+        <span class="hz-skeleton hz-skeleton--pill" aria-hidden="true"></span>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

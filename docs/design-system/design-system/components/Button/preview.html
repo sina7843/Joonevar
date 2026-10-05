@@ -1,0 +1,69 @@
+<!-- @dsCard group="Actions" height=792 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .demo-cols { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; align-items: start; }
+  .demo-phone { display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px dashed var(--border-default); border-radius: var(--radius-xl); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">لحن‌ها (tone) · اندازه md ۴۴ — حداکثر یک primary در هر نما</p>
+    <div class="demo-row">
+      <div class="demo-cell"><button class="hz-btn hz-btn--primary" type="button">ثبت حیوان</button><span class="hz-caption">primary</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--secondary" type="button">انصراف</button><span class="hz-caption">secondary</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--ghost" type="button">ویرایش پیش‌نویس</button><span class="hz-caption">ghost</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--destructive" type="button">رد پرونده</button><span class="hz-caption">destructive</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--destructive-outline" type="button">تعلیق فروشنده</button><span class="hz-caption">destructive-outline</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">اندازه‌ها — sm ۳۶ فقط OpsShell دسکتاپ · md ۴۴ پیش‌فرض · lg ۴۸ کنش اصلی و دکمه تمام‌عرض موبایل</p>
+    <div class="demo-row" style="align-items: flex-end;">
+      <div class="demo-cell"><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button">بارگذاری دوباره</button><span class="hz-caption">sm</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--secondary" type="button">بارگذاری دوباره</button><span class="hz-caption">md</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--secondary hz-btn--lg" type="button">بارگذاری دوباره</button><span class="hz-caption">lg</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">آیکن در شروع (iconStart) — sm ۲۰ در دکمه md/lg، xs ۱۶ در دکمه sm</p>
+    <div class="demo-row">
+      <button class="hz-btn hz-btn--primary hz-btn--lg" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>ثبت حیوان</button>
+      <button class="hz-btn hz-btn--secondary" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg>دریافت برگه ثبتی</button>
+      <button class="hz-btn hz-btn--ghost" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></svg>ویرایش</button>
+      <button class="hz-btn hz-btn--secondary hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg>فیلتر</button>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">حالت‌ها</p>
+    <div class="demo-row" style="align-items: flex-start;">
+      <div class="demo-cell"><button class="hz-btn hz-btn--primary" type="button">پرداخت ۴۰۰٬۰۰۰ تومان</button><span class="hz-caption">پیش‌فرض · hover: action-primary-hover</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--primary" type="button" style="outline: 2px solid var(--focus-ring); outline-offset: 2px;">پرداخت ۴۰۰٬۰۰۰ تومان</button><span class="hz-caption">فوکوس</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--primary" type="button" aria-busy="true"><span class="hz-spinner" aria-hidden="true"></span>در حال ارسال…</button><span class="hz-caption">loading · aria-busy</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--primary" type="button" disabled aria-describedby="fee-unset">پرداخت</button><span class="hz-caption" id="fee-unset">غیرفعال · هزینه تعیین‌نشده</span></div>
+      <div class="demo-cell"><button class="hz-btn hz-btn--secondary" type="button" disabled>ذخیره پیش‌نویس</button><span class="hz-caption">secondary غیرفعال</span></div>
+    </div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">متن بلند فارسی — در عرض آزاد یک‌خطی می‌ماند</p>
+      <div class="demo-row">
+        <button class="hz-btn hz-btn--secondary" type="button">ثبت درخواست صدور شجره‌نامه برای شاهزاده کوچولوی باغ ارم شیراز</button>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">block · موبایل (۳۶۰) — hz-btn--wrap برای برچسب داده‌محور</p>
+      <div class="demo-phone">
+        <button class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" type="button">پرداخت ۱٬۵۰۰٬۰۰۰ تومان</button>
+        <button class="hz-btn hz-btn--secondary hz-btn--block hz-btn--wrap" type="button">ثبت درخواست صدور شجره‌نامه برای شاهزاده کوچولوی باغ ارم شیراز</button>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

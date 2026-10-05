@@ -1,0 +1,95 @@
+<!-- @dsCard group="Commerce" height=656 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .demo-panel { display: flex; flex-direction: column; gap: 16px; }
+  .demo-name { margin: 0; font-size: 16px; line-height: 26px; font-weight: 700; }
+  .demo-static { display: flex; align-items: baseline; gap: 8px; font-size: 14px; line-height: 22px; }
+  .demo-static b { font-weight: 700; }
+  .demo-sk { height: 64px; border-radius: var(--radius-md); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">وزن — یک گزینه ناموجود، قیمت هر واریانت روی خودش · خلاصه انتخاب زیر آن (ناحیه زنده)</p>
+      <div class="hz-card demo-panel">
+        <p class="demo-name">غذای خشک سگ بالغ نژاد بزرگ</p>
+        <fieldset class="hz-variant-picker" id="vp-food">
+          <legend class="hz-variant-picker__legend">وزن بسته <span class="hz-variant-picker__value" id="vp-food-value">۱۰ کیلوگرم</span></legend>
+          <div class="hz-variant-picker__options">
+            <label class="hz-variant"><input type="radio" name="food" value="SKU-6HA8HN" data-label="۳ کیلوگرم" data-price="۲٬۸۵۰٬۰۰۰" data-stock="in"><span class="hz-variant__label">۳ کیلوگرم</span><span class="hz-variant__price">۲٬۸۵۰٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+            <label class="hz-variant"><input type="radio" name="food" value="SKU-P72YM6" data-label="۱۰ کیلوگرم" data-price="۳٬۸۴۷٬۰۰۰" data-stock="in" checked><span class="hz-variant__label">۱۰ کیلوگرم</span><span class="hz-variant__price">۳٬۸۴۷٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+            <label class="hz-variant"><input type="radio" name="food" value="SKU-EJYCMV" disabled aria-describedby="vp-food-out"><span class="hz-variant__label">۱۵ کیلوگرم</span><span class="hz-variant__price">۴٬۸۴۴٬۰۰۰ تومان</span><span class="hz-variant__note" id="vp-food-out">ناموجود</span></label>
+          </div>
+        </fieldset>
+        <div class="hz-variant-summary" aria-live="polite">
+          <div class="hz-price"><span class="hz-price__amount" id="vp-food-price">۳٬۸۴۷٬۰۰۰</span><span class="hz-price__unit">تومان</span></div>
+          <span class="hz-stock hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span>
+        </div>
+        <button type="button" class="hz-btn hz-btn--primary hz-btn--block">افزودن به سبد</button>
+      </div>
+    </section>
+
+    <section class="demo-panel" style="gap: 24px">
+      <div>
+        <p class="demo-label">اندازه (فشرده) — انتخاب‌شده · فوکوس روی L</p>
+        <fieldset class="hz-variant-picker hz-variant-picker--compact">
+          <legend class="hz-variant-picker__legend">اندازه <span class="hz-variant-picker__value">M</span></legend>
+          <div class="hz-variant-picker__options">
+            <label class="hz-variant"><input type="radio" name="collar"><span class="hz-variant__label">S</span><span class="hz-variant__price">۶۴۰٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+            <label class="hz-variant"><input type="radio" name="collar" checked><span class="hz-variant__label">M</span><span class="hz-variant__price">۸۶۴٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+            <label class="hz-variant" style="outline:2px solid var(--focus-ring);outline-offset:2px"><input type="radio" name="collar"><span class="hz-variant__label">L</span><span class="hz-variant__price">۱٬۰۸۸٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+          </div>
+        </fieldset>
+      </div>
+      <div>
+        <p class="demo-label">خطا — «افزودن به سبد» بدون انتخاب · XL ناموجود</p>
+        <fieldset class="hz-variant-picker hz-variant-picker--compact" aria-invalid="true" aria-describedby="vp-bed-err">
+          <legend class="hz-variant-picker__legend">اندازه <span class="hz-variant-picker__value">انتخاب نشده</span></legend>
+          <div class="hz-variant-picker__options">
+            <label class="hz-variant"><input type="radio" name="bed"><span class="hz-variant__label">M</span><span class="hz-variant__price">۳٬۴۰۰٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+            <label class="hz-variant"><input type="radio" name="bed"><span class="hz-variant__label">L</span><span class="hz-variant__price">۴٬۵۹۰٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+            <label class="hz-variant"><input type="radio" name="bed" disabled><span class="hz-variant__label">XL</span><span class="hz-variant__price">۵٬۷۸۰٬۰۰۰ تومان</span><span class="hz-variant__note">ناموجود</span></label>
+          </div>
+          <div class="hz-field__error" id="vp-bed-err"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>یک اندازه را انتخاب کنید؛ قیمت به اندازه بستگی دارد.</div>
+        </fieldset>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">برچسب بلند — «مناسب برای» با دو گزینه (افسار)</p>
+      <fieldset class="hz-variant-picker">
+        <legend class="hz-variant-picker__legend">مناسب برای وزن سگ <span class="hz-variant-picker__value">تا ۲۵ کیلوگرم</span></legend>
+        <div class="hz-variant-picker__options">
+          <label class="hz-variant"><input type="radio" name="leash" checked><span class="hz-variant__label">تا ۲۵ کیلوگرم</span><span class="hz-variant__price">۱٬۱۵۰٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+          <label class="hz-variant"><input type="radio" name="leash"><span class="hz-variant__label">تا ۵۰ کیلوگرم</span><span class="hz-variant__price">۱٬۵۵۳٬۰۰۰ تومان</span><span class="hz-variant__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></label>
+        </div>
+      </fieldset>
+    </section>
+    <section class="demo-panel" style="gap: 16px">
+      <div>
+        <p class="demo-label">فقط یک واریانت — انتخابی در کار نیست، متن ساده</p>
+        <p class="demo-static">حجم: <b>۲۵۰ میلی‌لیتر</b> <span class="hz-stock hz-stock--sm hz-stock--out"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span></p>
+      </div>
+      <div aria-busy="true">
+        <p class="demo-label">در حال بارگذاری</p>
+        <div class="hz-variant-picker">
+          <span class="hz-skeleton hz-skeleton--text" style="width: 96px" aria-hidden="true"></span>
+          <div class="hz-variant-picker__options"><span class="hz-skeleton demo-sk"></span><span class="hz-skeleton demo-sk"></span><span class="hz-skeleton demo-sk"></span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('#vp-food input').forEach(function (r) {
+    r.addEventListener('change', function () {
+      document.getElementById('vp-food-value').textContent = r.dataset.label;
+      document.getElementById('vp-food-price').textContent = r.dataset.price;
+    });
+  });
+</script>

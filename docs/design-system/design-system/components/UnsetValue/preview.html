@@ -1,0 +1,92 @@
+<!-- @dsCard group="Feedback" height=864 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-dont { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px dashed var(--status-error-border); border-radius: var(--radius-md); font-size: 14px; line-height: 22px; }
+  .demo-dont s { color: var(--text-secondary); }
+  .demo-dont b { font-size: 12px; color: var(--status-error-text); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">درون جمله — مقدار تعیین‌نشده، مسیر پرداخت بسته</p>
+      <p class="hz-body-sm" style="margin: 0">هزینه انتشار آگهی جفت‌یابی <span class="hz-unset">تعیین‌نشده</span> است و پرداختش هنوز باز نیست.</p>
+    </section>
+    <section>
+      <p class="demo-label">نادرست — هرگز صفر یا «رایگان» به‌جای مقدار null</p>
+      <div class="demo-row">
+        <span class="demo-dont"><s>۰ تومان</s><b>نادرست</b></span>
+        <span class="demo-dont"><s>رایگان</s><b>نادرست</b></span>
+        <span class="demo-dont"><s>—</s><b>یعنی «داده ندارد»</b></span>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">در فهرست کلید-مقدار — «تعیین‌نشده» (تنظیم نشده) کنار «—» (داده نیست)</p>
+      <div class="hz-card">
+        <dl class="hz-kv">
+          <div class="hz-kv__row"><dt class="hz-kv__key">هزینه عضویت انجمن</dt><dd class="hz-kv__value">۳۰۰٬۰۰۰ تومان</dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">هزینه بسته تبلیغاتی پایه</dt><dd class="hz-kv__value"><span class="hz-unset">تعیین‌نشده</span><span class="hz-unset__note">تا تعیین هزینه، خرید بسته باز نیست.</span></dd></div>
+          <div class="hz-kv__row" style="border: 0"><dt class="hz-kv__key">میکروچیپ</dt><dd class="hz-kv__value hz-kv__value--empty">—</dd></div>
+        </dl>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">در قیمت و کارت خدمت — دکمه پرداخت غیرفعال با دلیل دیدنی</p>
+      <div class="hz-card">
+        <div class="hz-service">
+          <h3 class="hz-service__title">مجوز فعالیت مرکز دامپزشکی</h3>
+          <p class="hz-service__desc">صدور پروانه فعالیت برای مراکز تأییدشده انجمن.</p>
+        </div>
+        <div class="hz-card__footer">
+          <div class="hz-price hz-price--unset"><span class="hz-price__amount">تعیین‌نشده</span></div>
+          <button class="hz-btn hz-btn--primary hz-btn--sm" type="button" disabled aria-describedby="uv-why">پرداخت</button>
+        </div>
+        <p class="hz-caption" id="uv-why" style="margin: 8px 0 0">هزینه این خدمت هنوز تعیین نشده است.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">در جدول — ستون عددی، هم‌تراز پایان؛ در مرتب‌سازی همیشه آخر</p>
+      <div class="hz-table-wrap">
+        <table class="hz-table hz-table--dense">
+          <thead><tr><th scope="col">تعرفه</th><th scope="col" class="hz-num">مبلغ</th></tr></thead>
+          <tbody>
+            <tr><td>صدور شجره‌نامه</td><td class="hz-num">۴۰۰٬۰۰۰ تومان</td></tr>
+            <tr><td>صدور برگه ثبتی (هر حیوان)</td><td class="hz-num">۲۵۰٬۰۰۰ تومان</td></tr>
+            <tr><td>صدور کارت هر توله</td><td class="hz-num">۱۲۰٬۰۰۰ تومان</td></tr>
+            <tr><td>بسته تبلیغاتی پایه</td><td class="hz-num"><span class="hz-unset">تعیین‌نشده</span></td></tr>
+            <tr><td>انتشار آگهی جفت‌یابی</td><td class="hz-num"><span class="hz-unset">تعیین‌نشده</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">محیط عملیاتی (سوپرادمین) — --action: کسی که می‌تواند تعیینش کند</p>
+      <div class="hz-card">
+        <div class="hz-setting" style="padding-block-start: 0">
+          <div class="hz-setting__label"><span class="hz-setting__name">هزینه صدور پروانه فعالیت مرکز</span><bdi class="hz-setting__key" dir="ltr">licence.centre_issue_toman</bdi></div>
+          <div class="hz-setting__end"><span class="hz-unset hz-unset--action">تعیین‌نشده</span><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button" style="outline: 2px solid var(--focus-ring); outline-offset: 2px">تعیین مقدار</button></div>
+        </div>
+        <p class="hz-caption" style="margin: 8px 0 0">۲۶ تعرفه از ۳۳ تعرفه تعیین‌نشده است. فوکوس روی «تعیین مقدار».</p>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <p class="demo-label">متن بلند — برچسب می‌شکند، «تعیین‌نشده» هرگز نمی‌شکند (۳۶۰px)</p>
+    <div class="hz-card" style="max-width: 360px">
+      <dl class="hz-kv">
+        <div class="hz-kv__row" style="border: 0; padding-block: 0"><dt class="hz-kv__key">هزینه تمدید پروانه — مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</dt><dd class="hz-kv__value"><span class="hz-unset">تعیین‌نشده</span></dd></div>
+      </dl>
+    </div>
+  </section>
+</div>
+<script></script>

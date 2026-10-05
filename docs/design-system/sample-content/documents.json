@@ -1,0 +1,218 @@
+{
+  "registrationSheets": [
+    {
+      "sheetNo": "RS-JTFZYEWD",
+      "animalId": "animal-1",
+      "animalName": "رکس",
+      "petId": "PET-8JDUN4GH",
+      "microchipNumber": "364416562459223",
+      "sampleTrackingCode": "SM-W5BQ6VRPDQ",
+      "issuedAt": {
+        "iso": "2026-04-01T11:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۱/۱۲",
+        "longFa": "۱۲ فروردین ۱۴۰۵"
+      }
+    },
+    {
+      "sheetNo": "RS-93KHPW8P",
+      "animalId": "animal-2",
+      "animalName": "لونا",
+      "petId": "PET-GSBH65DC",
+      "microchipNumber": "364508823499330",
+      "sampleTrackingCode": "SM-X8D8GB7ATX",
+      "issuedAt": {
+        "iso": "2026-05-02T11:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۲/۱۲",
+        "longFa": "۱۲ اردیبهشت ۱۴۰۵"
+      }
+    },
+    {
+      "sheetNo": "RS-7W4CRUM2",
+      "animalId": "animal-3",
+      "animalName": "آرا",
+      "petId": "PET-2GKRHEW6",
+      "microchipNumber": "364093802394719",
+      "sampleTrackingCode": "SM-8F6TQH844E",
+      "issuedAt": {
+        "iso": "2026-06-03T11:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۳/۱۳",
+        "longFa": "۱۳ خرداد ۱۴۰۵"
+      }
+    },
+    {
+      "sheetNo": "RS-HW5RKHA5",
+      "animalId": "animal-4",
+      "animalName": "تارا",
+      "petId": "PET-6DP9RN3R",
+      "microchipNumber": "364990800282495",
+      "sampleTrackingCode": "SM-FBKJYKGYDY",
+      "issuedAt": {
+        "iso": "2026-07-04T11:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۴/۱۳",
+        "longFa": "۱۳ تیر ۱۴۰۵"
+      }
+    },
+    {
+      "sheetNo": "RS-ZWEJEBSX",
+      "animalId": "animal-6",
+      "animalName": "بلا",
+      "petId": "PET-6H57P94P",
+      "microchipNumber": "364586042922501",
+      "sampleTrackingCode": "SM-WSZCS3CXR4",
+      "issuedAt": {
+        "iso": "2026-08-05T11:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۵/۱۴",
+        "longFa": "۱۴ مرداد ۱۴۰۵"
+      }
+    },
+    {
+      "sheetNo": "RS-HM8G94ZS",
+      "animalId": "animal-7",
+      "animalName": "رعد",
+      "petId": "PET-T4UPBJCQ",
+      "microchipNumber": "364929721401685",
+      "sampleTrackingCode": "SM-8HGU9ZBVD6",
+      "issuedAt": {
+        "iso": "2026-04-06T11:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۱/۱۷",
+        "longFa": "۱۷ فروردین ۱۴۰۵"
+      }
+    }
+  ],
+  "pedigrees": [
+    {
+      "pedigreeCode": "PD-P52ZXV92",
+      "animalId": "animal-1",
+      "animalName": "رکس",
+      "generationAtIssue": 0,
+      "issuedAt": {
+        "iso": "2026-06-10T12:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۳/۲۰",
+        "longFa": "۲۰ خرداد ۱۴۰۵"
+      }
+    },
+    {
+      "pedigreeCode": "PD-475VU8E2",
+      "animalId": "animal-2",
+      "animalName": "لونا",
+      "generationAtIssue": 1,
+      "issuedAt": {
+        "iso": "2026-07-11T12:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۴/۲۰",
+        "longFa": "۲۰ تیر ۱۴۰۵"
+      }
+    },
+    {
+      "pedigreeCode": "PD-FCXX6DVM",
+      "animalId": "animal-3",
+      "animalName": "آرا",
+      "generationAtIssue": 0,
+      "issuedAt": {
+        "iso": "2026-08-12T12:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۵/۲۱",
+        "longFa": "۲۱ مرداد ۱۴۰۵"
+      }
+    }
+  ],
+  "matingPermits": [
+    {
+      "permitNo": "MP-7RYZNEN3",
+      "status": "ISSUED",
+      "sireAnimalId": "animal-3",
+      "sireName": "آرا",
+      "damAnimalId": "animal-4",
+      "damName": "تارا",
+      "issuedAt": {
+        "iso": "2026-05-22T10:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۳/۰۱",
+        "longFa": "۱ خرداد ۱۴۰۵"
+      }
+    },
+    {
+      "permitNo": null,
+      "status": "AWAITING_COUNTERPARTY",
+      "sireAnimalId": "animal-7",
+      "sireName": "رعد",
+      "damAnimalId": "animal-2",
+      "damName": "لونا",
+      "createdAt": {
+        "iso": "2026-09-25T10:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۰۳",
+        "longFa": "۳ مهر ۱۴۰۵"
+      }
+    }
+  ],
+  "litters": [
+    {
+      "id": "litter-1",
+      "permitNo": "MP (issued above)",
+      "bornOn": {
+        "iso": "2026-08-14",
+        "displayFa": "۱۴۰۵/۰۵/۲۳",
+        "longFa": "۲۳ مرداد ۱۴۰۵"
+      },
+      "puppies": [
+        {
+          "tempCode": "PUP-CC744Q7D",
+          "nameFa": "نیکا",
+          "status": "ALIVE"
+        },
+        {
+          "tempCode": "PUP-3PQ84K33",
+          "nameFa": "داریوش",
+          "status": "ALIVE"
+        },
+        {
+          "tempCode": "PUP-5AJFS256",
+          "nameFa": null,
+          "status": "ALIVE"
+        },
+        {
+          "tempCode": "PUP-RWZX7B5E",
+          "nameFa": null,
+          "status": "DECEASED",
+          "diedOn": {
+            "iso": "2026-08-20",
+            "displayFa": "۱۴۰۵/۰۵/۲۹",
+            "longFa": "۲۹ مرداد ۱۴۰۵"
+          }
+        }
+      ]
+    }
+  ],
+  "puppyCards": [
+    {
+      "cardNo": "PC-S3RRHVNQ",
+      "puppyName": "نیکا",
+      "ownerAccountId": "acc-owner-3",
+      "issuedAt": {
+        "iso": "2026-09-28T10:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۰۶",
+        "longFa": "۶ مهر ۱۴۰۵"
+      }
+    }
+  ],
+  "referralCodes": [
+    {
+      "code": "HZ-SCMXFSFNPW",
+      "animalName": "مکس",
+      "vetName": "دکتر مریم صادقی",
+      "validDays": 21,
+      "expiresAt": {
+        "iso": "2026-10-20T23:59:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۲۸",
+        "longFa": "۲۸ مهر ۱۴۰۵"
+      }
+    }
+  ],
+  "verifyExamples": [
+    {
+      "query": "RS (any sheetNo above)",
+      "resultFa": "سند معتبر است — صادرشده برای «رکس»"
+    },
+    {
+      "query": "RS-ZZZZZZZZ",
+      "resultFa": "سندی با این شناسه پیدا نشد"
+    }
+  ]
+}

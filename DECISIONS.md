@@ -2931,3 +2931,16 @@
 - **Data/API impact:** migration تازه‌ای ندارد. تغییر محصول فقط لینک پرش و `id="main"` در دو پوسته است.
 - **Security/operations impact:** هیچ push، استقرار، پرداخت یا پیام واقعی انجام نشد. آمادگی کد از موارد تنظیم‌نشده جدا در `docs/ops/release-readiness-phase-4.md` ثبت شد.
 - **Evidence/tests:** `tests/config/phase-4-invariants.test.ts` (۴) · `tests/db/finder-acceptance.test.ts` (۱) · `tests/browser/finder-evidence.test.ts` (۵) · `npm run db:upgrade-check` · `docs/reports/PHASE-4-PROMPT-008.json`
+
+## DEC-0225 — سیستم طراحی v1.0.3 تنها منبع ظاهری؛ کلاس‌های `.hz-*` از `bundle.css` در لایه components
+
+- **تاریخ:** ۲۰۲۶-۱۰-۰۵ · **نوع:** USER_INSTRUCTION / TECHNICAL_CHOICE
+- **Context:** کاربر بسته سیستم طراحی همزیست v1.0.3 (تأیید ۱۱ مهر ۱۴۰۵) را داد و خواست همه صفحه‌ها طبق آن چیده شوند؛ سیستم طراحی اولویت اول و غیرقابل‌تغییر است. بسته جایگزین فایل Figma `2GMJPgnnenGnr1zBN2yH5h` و مقادیر توکن نمونه اولیه در `app/globals.css` است.
+- **Decision:**
+  - بسته در `docs/design-system/` کپی شد (بدون خانواده کامل فونت Pro که طبق handoff فقط در بسته تحویل می‌ماند). اسناد ورودی اصلی `File/` دست نخورد.
+  - پیاده‌سازی: `tokens.css` و `components/bundle.css` بدون تغییر در `src/ui/design-system/` کپی و در لایه `components` تیلویند وارد می‌شوند، تا utilityهای صفحه هنوز بتوانند فاصله و چیدمان را تنظیم کنند. کامپوننت‌های `src/ui/*` همان markup و کلاس‌های `.hz-*` سیستم را رندر می‌کنند (گزینه «import the .hz-* classes» در HANDOFF).
+  - نام‌های توکن قدیمی `@theme` تا پایان مهاجرت به‌عنوان alias به متغیرهای سیستم نگه داشته می‌شوند؛ تنها تغییر مقدار، جوهر متن `#171A17 → #3A3B36` است.
+  - تم تیره و ابزارهای خواندن مقاله (بک‌لاگ) ساخته نمی‌شوند. رفتار محصول تغییر نمی‌کند.
+- **Alternatives:** ترجمه دستی `bundle.css` به utilityهای تیلویند — رد شد: ۲۸۰۰ خط CSS مرجع دوباره‌نویسی می‌شد و وفاداری «نزدیک» (DEC سیستم) را به خطر می‌انداخت.
+- **Data/API impact:** ندارد.
+- **Evidence/tests:** `npm run check`، اسکرین‌شات‌ها در `docs/qa/design-system/`.

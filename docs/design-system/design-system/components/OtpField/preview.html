@@ -1,0 +1,68 @@
+<!-- @dsCard group="Inputs" height=632 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 16px; align-items: start; }
+  .demo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .demo-cell { display: flex; flex-direction: column; min-width: 0; }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-focus { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">واریانت‌ها و حالت‌ها</p>
+    <div class="demo-grid demo-grid--2">
+      <div class="demo-cell"><div class="demo-cell"><p class="demo-label">پیش‌فرض — در حال وارد کردن، شمارش معکوس</p><div class="hz-card hz-otp-field"><h2 class="hz-h4" style="margin:0">کد تأیید را وارد کنید</h2>
+        <p class="hz-body-sm hz-muted" style="margin:0">کد ۶ رقمی به <bdi dir="ltr" class="hz-id">09990001234</bdi> پیامک شد. <a class="hz-link" href="#">ویرایش شماره</a></p>
+        <span class="hz-visually-hidden" id="o-1-l">کد تأیید ۶ رقمی</span>
+        <div class="hz-otp" role="group" aria-labelledby="o-1-l" data-otp><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۱ از ۶" value="4" autocomplete="one-time-code"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۲ از ۶" value="8"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۳ از ۶" value="2"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۴ از ۶" value="1"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۵ از ۶" style="border-color:var(--focus-ring);box-shadow:inset 0 0 0 1px var(--focus-ring)"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۶ از ۶"></div>
+        <p class="hz-otp-field__resend" style="margin:0" aria-live="polite"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg><span>ارسال دوباره کد تا ۰۱:۵۸</span></p><button class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" type="submit" disabled>تأیید و ورود</button>
+      </div></div></div>
+      <div class="demo-cell" style="gap:12px"><div class="demo-cell"><p class="demo-label">زمان تمام شد — ارسال دوباره</p><div class="hz-card hz-otp-field">
+        <span class="hz-visually-hidden" id="o-2-l">کد تأیید ۶ رقمی</span>
+        <div class="hz-otp" role="group" aria-labelledby="o-2-l" data-otp><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۱ از ۶" autocomplete="one-time-code"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۲ از ۶"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۳ از ۶"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۴ از ۶"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۵ از ۶"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۶ از ۶"></div>
+        <button class="hz-btn hz-btn--ghost" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg>ارسال دوباره کد</button>
+      </div></div><div class="demo-cell"><p class="demo-label">خطا</p><div class="hz-card hz-otp-field">
+        <span class="hz-visually-hidden" id="o-3-l">کد تأیید ۶ رقمی</span>
+        <div class="hz-otp" role="group" aria-labelledby="o-3-l" aria-invalid="true" data-otp><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۱ از ۶" value="4" autocomplete="one-time-code"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۲ از ۶" value="8"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۳ از ۶" value="2"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۴ از ۶" value="1"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۵ از ۶" value="7"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۶ از ۶" value="0"></div>
+        <div class="hz-field__error" role="alert"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>کد واردشده درست نیست. دوباره وارد کنید یا کد تازه بگیرید.</span></div>
+      </div></div><div class="demo-cell"><p class="demo-label">در حال بررسی</p><div class="hz-card hz-otp-field">
+        <span class="hz-visually-hidden" id="o-4-l">کد تأیید ۶ رقمی</span>
+        <div class="hz-otp" role="group" aria-labelledby="o-4-l" data-otp><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۱ از ۶" value="4" autocomplete="one-time-code" disabled><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۲ از ۶" value="8" disabled><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۳ از ۶" value="2" disabled><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۴ از ۶" value="1" disabled><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۵ از ۶" value="7" disabled><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" aria-label="رقم ۶ از ۶" value="3" disabled></div>
+        <p class="hz-otp-field__resend" style="margin:0" aria-live="polite"><span class="hz-spinner" aria-hidden="true"></span><span>در حال بررسی کد</span></p>
+      </div></div></div>
+    </div>
+    <p class="demo-note">ترتیب خانه‌ها چپ‌به‌راست است (<bdi dir="ltr">CODE_LENGTH = 6</bdi>)؛ چسباندن کد همه خانه‌ها را پر می‌کند و رقم فارسی/عربی به لاتین تبدیل می‌شود.</p>
+  </section>
+</div>
+<script>
+var map = { '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9','٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9' };
+function norm(s) { return s.replace(/[۰-۹٠-٩]/g, function (d) { return map[d]; }).replace(/\D/g, ''); }
+document.querySelectorAll('[data-otp]').forEach(function (group) {
+  var boxes = Array.prototype.slice.call(group.querySelectorAll('input'));
+  boxes.forEach(function (box, i) {
+    box.addEventListener('input', function () {
+      var v = norm(box.value);
+      if (v.length > 1) { fill(v, i); return; }
+      box.value = v;
+      if (v && boxes[i + 1]) boxes[i + 1].focus();
+    });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !box.value && boxes[i - 1]) { boxes[i - 1].focus(); boxes[i - 1].value = ''; e.preventDefault(); }
+      if (e.key === 'ArrowLeft' && boxes[i - 1]) boxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && boxes[i + 1]) boxes[i + 1].focus();
+    });
+    box.addEventListener('paste', function (e) {
+      e.preventDefault();
+      fill(norm((e.clipboardData || window.clipboardData).getData('text')), 0);
+    });
+  });
+  function fill(v, from) {
+    for (var k = 0; k < v.length && from + k < boxes.length; k++) boxes[from + k].value = v[k];
+    boxes[Math.min(from + v.length, boxes.length - 1)].focus();
+  }
+});
+</script>

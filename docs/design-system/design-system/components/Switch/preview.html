@@ -1,0 +1,53 @@
+<!-- @dsCard group="Inputs" height=664 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 32px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-item { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 72px; }
+  .demo-item .demo-label { margin: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">کلید — حالت‌ها</p>
+    <div class="demo-row">
+      <div class="demo-item"><button class="hz-switch" type="button" role="switch" aria-checked="false" aria-label="نمونه خاموش"></button><p class="demo-label">خاموش</p></div>
+      <div class="demo-item"><button class="hz-switch" type="button" role="switch" aria-checked="true" aria-label="نمونه روشن"></button><p class="demo-label">روشن</p></div>
+      <div class="demo-item"><button class="hz-switch" type="button" role="switch" aria-checked="true" aria-label="نمونه فوکوس" style="outline:2px solid var(--focus-ring);outline-offset:2px"></button><p class="demo-label">فوکوس</p></div>
+      <div class="demo-item"><button class="hz-switch" type="button" role="switch" aria-checked="false" aria-label="نمونه غیرفعال خاموش" disabled></button><p class="demo-label">غیرفعال، خاموش</p></div>
+      <div class="demo-item"><button class="hz-switch" type="button" role="switch" aria-checked="true" aria-label="نمونه غیرفعال روشن" disabled></button><p class="demo-label">غیرفعال، روشن</p></div>
+      <div class="demo-item"><button class="hz-switch" type="button" role="switch" aria-checked="true" aria-busy="true" aria-label="نمونه در حال ذخیره"></button><p class="demo-label">در حال ذخیره</p></div>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">ردیف تنظیمات — برچسب و توضیح در شروع، کلید در پایان؛ تغییر بی‌درنگ ذخیره می‌شود</p>
+    <div class="hz-card">
+      <h3 class="hz-card__title">تنظیمات آگهی و پروفایل</h3>
+      <div class="hz-switch-row">
+        <span class="hz-switch-row__text"><label class="hz-switch-row__label" for="sw-1" id="sw-1-l">نمایش شماره تماس در آگهی</label><span class="hz-switch-row__desc" id="sw-1-d">خریداران شماره <bdi class="hz-id" dir="ltr">09990000002</bdi> را در صفحه آگهی می‌بینند. خاموش که باشد، فقط از راه پیام‌های همزیست با شما تماس می‌گیرند.</span></span>
+        <button class="hz-switch" id="sw-1" type="button" role="switch" aria-checked="true" aria-labelledby="sw-1-l" aria-describedby="sw-1-d"></button>
+      </div>
+      <div class="hz-switch-row">
+        <span class="hz-switch-row__text"><label class="hz-switch-row__label" for="sw-2" id="sw-2-l">نمایش کد نظام دامپزشکی در پروفایل عمومی</label><span class="hz-switch-row__desc" id="sw-2-d">کد نظام کنار نام شما در فهرست دامپزشکان دیده می‌شود.</span><span class="hz-switch-row__status" role="status"><span class="hz-spinner" aria-hidden="true"></span>در حال ذخیره…</span></span>
+        <button class="hz-switch" id="sw-2" type="button" role="switch" aria-checked="true" aria-busy="true" aria-labelledby="sw-2-l" aria-describedby="sw-2-d"></button>
+      </div>
+      <div class="hz-switch-row">
+        <span class="hz-switch-row__text"><label class="hz-switch-row__label" for="sw-3" id="sw-3-l">اجازه انتشار نوشته برای این کلاب</label><span class="hz-switch-row__desc" id="sw-3-d">نوشته‌های کلاب پس از انتشار در مجله همزیست نمایش داده می‌شوند.</span><span class="hz-field__error" id="sw-3-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>ذخیره نشد و کلید به حالت قبل برگشت. اتصال را بررسی کنید و دوباره امتحان کنید.</span></span></span>
+        <button class="hz-switch" id="sw-3" type="button" role="switch" aria-checked="false" aria-labelledby="sw-3-l" aria-describedby="sw-3-d sw-3-e"></button>
+      </div>
+      <div class="hz-switch-row">
+        <span class="hz-switch-row__text"><label class="hz-switch-row__label" for="sw-4" id="sw-4-l">نمایش نشان «دامپزشک معتمد»</label><span class="hz-switch-row__desc" id="sw-4-d">این نشان فقط برای دامپزشکان معتمد است. پس از آنکه انجمن درخواست شما را تأیید کند، فعال می‌شود.</span></span>
+        <button class="hz-switch" id="sw-4" type="button" role="switch" aria-checked="false" aria-labelledby="sw-4-l" aria-describedby="sw-4-d" disabled></button>
+      </div>
+      <div class="hz-switch-row">
+        <span class="hz-switch-row__text"><label class="hz-switch-row__label" for="sw-5" id="sw-5-l">نمایش شماره تماس در همه آگهی‌های فعال کنل آریا، از جمله آگهی‌های رزروشده و آگهی‌هایی که در انتظار بررسی هستند</label><span class="hz-switch-row__desc" id="sw-5-d">برچسب بلند می‌شکند و کلید در بالای ردیف می‌ماند.</span></span>
+        <button class="hz-switch" id="sw-5" type="button" role="switch" aria-checked="true" aria-labelledby="sw-5-l" aria-describedby="sw-5-d"></button>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  document.querySelectorAll('.hz-switch:not([aria-busy])').forEach(function (b) {
+    b.addEventListener('click', function () { b.setAttribute('aria-checked', b.getAttribute('aria-checked') === 'true' ? 'false' : 'true'); });
+  });
+</script>

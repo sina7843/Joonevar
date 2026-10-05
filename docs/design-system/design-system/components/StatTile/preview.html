@@ -1,0 +1,82 @@
+<!-- @dsCard group="Data display" height=616 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-phone { width: 390px; padding: 16px; border: 1px dashed var(--border-control); border-radius: var(--radius-xl); }
+  .demo-phone .hz-queue-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .demo-col { flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .demo-states { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>ردیف آمار</b> — خانه «مرور بازار» (OpsShell)؛ با روند، بدون روند، با هشدار، مبلغ</p>
+    <div class="hz-section-header hz-section-header--sm"><h2 class="hz-section-header__title"><span class="hz-section-header__bar" aria-hidden="true"></span>مرور بازار</h2><span class="hz-caption">تا ۱۰ مهر ۱۴۰۵</span></div>
+    <div class="hz-queue-tiles">
+      <a class="hz-stat-tile hz-card--interactive" href="#">
+        <span class="hz-stat-tile__label">آگهی‌های منتشرشده</span>
+        <span class="hz-stat-tile__value">۳</span>
+        <span class="hz-stat-tile__sub">۱ رزروشده، ۱ فروخته‌شده</span>
+      </a>
+      <a class="hz-stat-tile hz-card--interactive" href="#">
+        <span class="hz-stat-tile__label">سفارش‌های فروشگاه در مهر</span>
+        <span class="hz-stat-tile__value">۱</span>
+        <span class="hz-stat-tile__delta"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg><span>بدون تغییر نسبت به شهریور</span></span>
+      </a>
+      <a class="hz-stat-tile hz-stat-tile--alert hz-card--interactive" href="#">
+        <span class="hz-stat-tile__label">مرجوعی</span>
+        <span class="hz-stat-tile__value">۱</span>
+        <span class="hz-stat-tile__flag"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>۱ درخواست مرجوعی منتظر شماست</span></span>
+      </a>
+      <a class="hz-stat-tile hz-card--interactive" href="#">
+        <span class="hz-stat-tile__label">فروش ناخالص مهر</span>
+        <span class="hz-stat-tile__value hz-stat-tile__value--long">۴٬۰۰۵٬۰۰۰<span class="hz-stat-tile__unit">تومان</span></span>
+        <span class="hz-stat-tile__delta"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z"/></svg><span><b>۲٬۸۵۵٬۰۰۰ تومان</b> بیشتر از شهریور</span></span>
+      </a>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — ۲ × ۲؛ کل کاشی یک هدف لمسی است</p>
+      <div class="demo-phone">
+        <div class="hz-queue-tiles">
+          <a class="hz-stat-tile" href="#"><span class="hz-stat-tile__label">پرداخت‌های موفق</span><span class="hz-stat-tile__value">۲</span><span class="hz-stat-tile__sub">از ۴ پرداخت</span></a>
+          <a class="hz-stat-tile hz-stat-tile--alert" href="#"><span class="hz-stat-tile__label">پرداخت ناموفق</span><span class="hz-stat-tile__value">۱</span><span class="hz-stat-tile__flag"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>نیازمند پیگیری</span></span></a>
+          <a class="hz-stat-tile" href="#"><span class="hz-stat-tile__label">اعضای انجمن سگ‌های اصیل ایران</span><span class="hz-stat-tile__value">۱۲۰</span></a>
+          <a class="hz-stat-tile" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px"><span class="hz-stat-tile__label">کالاهای منتشرشده</span><span class="hz-stat-tile__value">۸</span><span class="hz-stat-tile__sub">۱ ناموجود</span></a>
+        </div>
+      </div>
+    </section>
+    <section class="demo-col">
+      <p class="demo-label"><b>حالت‌ها</b> — چهارمی در موبایل: فوکوس؛ برچسب بلند دو خط می‌شود</p>
+      <div class="demo-states">
+        <div class="hz-stat-tile" aria-busy="true" aria-label="در حال بارگذاری">
+          <span class="hz-skeleton hz-skeleton--text" style="width: 60%; margin: 0"></span>
+          <span class="hz-skeleton" style="width: 40%; height: 28px"></span>
+          <span class="hz-skeleton hz-skeleton--text" style="width: 80%; margin: 0"></span>
+        </div>
+        <div class="hz-stat-tile">
+          <span class="hz-stat-tile__label">فروش ناخالص مهر</span>
+          <span class="hz-stat-tile__value hz-stat-tile__value--muted">—</span>
+          <span class="hz-stat-tile__sub">بارگذاری نشد. صفحه را دوباره بار کنید.</span>
+        </div>
+        <div class="hz-stat-tile">
+          <span class="hz-stat-tile__label">کارمزد بازار در مهر</span>
+          <span class="hz-stat-tile__value hz-stat-tile__value--muted">تعیین‌نشده</span>
+          <span class="hz-stat-tile__sub">قاعده کارمزد هنوز تعریف نشده است.</span>
+        </div>
+        <div class="hz-stat-tile">
+          <span class="hz-stat-tile__label">ارزش آگهی‌های منتشرشده</span>
+          <span class="hz-stat-tile__value hz-stat-tile__value--long">۱۰۱٬۵۰۰٬۰۰۰<span class="hz-stat-tile__unit">تومان</span></span>
+          <span class="hz-stat-tile__delta"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"/></svg><span><b>۳۲٬۰۰۰٬۰۰۰ تومان</b> کمتر از ۳ مهر</span></span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

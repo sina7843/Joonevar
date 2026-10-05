@@ -1,0 +1,98 @@
+<!-- @dsCard group="Feedback" height=944 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .fams { display: flex; flex-direction: column; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-surface); }
+  .fam { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 12px; padding: 12px 16px; }
+  .fam + .fam { border-block-start: 1px solid var(--border-subtle); }
+  .fam__head { display: flex; flex-direction: column; gap: 0; }
+  .fam__meaning { font-size: 13px; line-height: 22px; font-weight: 600; }
+  .fam__badges { gap: 6px 8px; align-content: flex-start; }
+  .narrow { width: 300px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">پنج tone — رنگ + متن + نقطه (هرگز فقط رنگ)</p>
+    <div class="demo-row">
+      <span class="hz-badge hz-badge--neutral"><span class="hz-badge__dot" aria-hidden="true"></span>پیش‌نویس</span>
+      <span class="hz-badge hz-badge--info"><span class="hz-badge__dot" aria-hidden="true"></span>در حال بررسی</span>
+      <span class="hz-badge hz-badge--warning"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار پرداخت</span>
+      <span class="hz-badge hz-badge--success"><span class="hz-badge__dot" aria-hidden="true"></span>تأییدشده</span>
+      <span class="hz-badge hz-badge--error"><span class="hz-badge__dot" aria-hidden="true"></span>ردشده</span>
+    </div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">دو اندازه — ۲۴ (پیش‌فرض) · ۲۰ برای جدول و فهرست متراکم</p>
+      <div class="demo-row">
+        <span class="hz-badge hz-badge--info"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار تأیید طرف مقابل</span>
+        <span class="hz-badge hz-badge--info hz-badge--sm"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار تأیید طرف مقابل</span>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">با آیکن — فقط جایی که نقطه کافی نیست (پرونده، سرصفحه)</p>
+      <div class="demo-row">
+        <span class="hz-badge hz-badge--success"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>صادر شد</span>
+        <span class="hz-badge hz-badge--warning"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg>نیازمند اصلاح</span>
+        <span class="hz-badge hz-badge--error"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,101.66,139.31,128l26.35,26.34a8,8,0,0,1-11.32,11.32L128,139.31l-26.34,26.35a8,8,0,0,1-11.32-11.32L116.69,128,90.34,101.66a8,8,0,0,1,11.32-11.32L128,116.69l26.34-26.35a8,8,0,0,1,11.32,11.32ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>پرداخت ناموفق</span>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <p class="demo-label">از فرهنگ وضعیت — یک ردیف برای هر خانواده (برچسب واقعی، اندازه کوچک)</p>
+    <div class="fams">
+      <div class="fam">
+        <div class="fam__head"><bdi class="hz-id" dir="ltr">draft</bdi><span class="fam__meaning">ناقص یا هنوز ارسال‌نشده</span><span class="hz-caption">۴ وضعیت · رنگ <bdi dir="ltr">neutral</bdi></span></div>
+        <div class="demo-row fam__badges"><span class="hz-badge hz-badge--neutral hz-badge--sm" title="DRAFT"><span class="hz-badge__dot" aria-hidden="true"></span>پیش‌نویس</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="READY_TO_SUBMIT"><span class="hz-badge__dot" aria-hidden="true"></span>آماده ارسال</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="INACTIVE"><span class="hz-badge__dot" aria-hidden="true"></span>غیرفعال</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="NONE"><span class="hz-badge__dot" aria-hidden="true"></span>ثبت‌نشده</span></div>
+      </div>
+      <div class="fam">
+        <div class="fam__head"><bdi class="hz-id" dir="ltr">waiting</bdi><span class="fam__meaning">منتظر دیگری — کاری از شما برنمی‌آید</span><span class="hz-caption">۲۱ وضعیت · رنگ <bdi dir="ltr">info</bdi></span></div>
+        <div class="demo-row fam__badges"><span class="hz-badge hz-badge--info hz-badge--sm" title="SUBMITTED"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار بررسی</span><span class="hz-badge hz-badge--info hz-badge--sm" title="UNDER_REVIEW"><span class="hz-badge__dot" aria-hidden="true"></span>در حال بررسی</span><span class="hz-badge hz-badge--info hz-badge--sm" title="PENDING_REVIEW"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار بررسی انجمن</span><span class="hz-badge hz-badge--info hz-badge--sm" title="WAITING_REVIEW"><span class="hz-badge__dot" aria-hidden="true"></span>درخواست ارسال‌شده</span><span class="hz-badge hz-badge--info hz-badge--sm" title="AWAITING_COUNTERPARTY"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار تأیید طرف مقابل</span><span class="hz-badge hz-badge--info hz-badge--sm" title="PROCESSING"><span class="hz-badge__dot" aria-hidden="true"></span>در حال پردازش</span><span class="hz-badge hz-badge--info hz-badge--sm" title="SCHEDULED"><span class="hz-badge__dot" aria-hidden="true"></span>زمان‌بندی‌شده</span><span class="hz-badge hz-badge--info hz-badge--sm" title="PREPARING"><span class="hz-badge__dot" aria-hidden="true"></span>در حال آماده‌سازی</span><span class="hz-badge hz-badge--info hz-badge--sm" title="ACCEPTED_BY_SELLER"><span class="hz-badge__dot" aria-hidden="true"></span>پذیرفته‌شده</span><span class="hz-badge hz-badge--info hz-badge--sm" title="SHIPPED"><span class="hz-badge__dot" aria-hidden="true"></span>ارسال‌شده</span><span class="hz-badge hz-badge--info hz-badge--sm" title="TECHNICAL_REVIEW"><span class="hz-badge__dot" aria-hidden="true"></span>در مرحله تأیید فنی</span><span class="hz-badge hz-badge--info hz-badge--sm" title="WAITING_PARENT_RESULTS"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار تکمیل نتایج والدین</span><span class="hz-badge hz-badge--info hz-badge--sm" title="NEGOTIATING"><span class="hz-badge__dot" aria-hidden="true"></span>در حال مذاکره</span><span class="hz-badge hz-badge--info hz-badge--sm" title="CONTRACT_DRAFTING"><span class="hz-badge__dot" aria-hidden="true"></span>ورود به قرارداد</span><span class="hz-badge hz-badge--info hz-badge--sm" title="PENDING"><span class="hz-badge__dot" aria-hidden="true"></span>در جریان</span><span class="hz-badge hz-badge--info hz-badge--sm" title="PROPOSED"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار پاسخ</span><span class="hz-badge hz-badge--info hz-badge--sm" title="CODE_ISSUED"><span class="hz-badge__dot" aria-hidden="true"></span>کد تحویل صادر شد</span><span class="hz-badge hz-badge--info hz-badge--sm" title="FINDER_INVITE_ONLY"><span class="hz-badge__dot" aria-hidden="true"></span>فقط با دعوت</span><span class="hz-badge hz-badge--info hz-badge--sm" title="FINDER_UNAVAILABLE"><span class="hz-badge__dot" aria-hidden="true"></span>موقتاً در دسترس نیست</span></div>
+      </div>
+      <div class="fam">
+        <div class="fam__head"><bdi class="hz-id" dir="ltr">action</bdi><span class="fam__meaning">نیازمند اقدام شما</span><span class="hz-caption">۷ وضعیت · رنگ <bdi dir="ltr">warning</bdi></span></div>
+        <div class="demo-row fam__badges"><span class="hz-badge hz-badge--warning hz-badge--sm" title="NEEDS_CORRECTION"><span class="hz-badge__dot" aria-hidden="true"></span>نیازمند اصلاح</span><span class="hz-badge hz-badge--warning hz-badge--sm" title="AWAITING_PAYMENT" data-tone-changed="true"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار پرداخت</span><span class="hz-badge hz-badge--warning hz-badge--sm" title="EXPIRED"><span class="hz-badge__dot" aria-hidden="true"></span>منقضی</span><span class="hz-badge hz-badge--warning hz-badge--sm" title="PAUSED"><span class="hz-badge__dot" aria-hidden="true"></span>موقتاً متوقف</span><span class="hz-badge hz-badge--warning hz-badge--sm" title="RETURN_REQUESTED"><span class="hz-badge__dot" aria-hidden="true"></span>درخواست مرجوعی</span><span class="hz-badge hz-badge--warning hz-badge--sm" title="TEMPORARILY_UNAVAILABLE"><span class="hz-badge__dot" aria-hidden="true"></span>موقتاً غیرفعال</span></div>
+      </div>
+      <div class="fam">
+        <div class="fam__head"><bdi class="hz-id" dir="ltr">done</bdi><span class="fam__meaning">کامل، معتبر یا فعال</span><span class="hz-caption">۱۹ وضعیت · رنگ <bdi dir="ltr">success</bdi></span></div>
+        <div class="demo-row fam__badges"><span class="hz-badge hz-badge--success hz-badge--sm" title="APPROVED"><span class="hz-badge__dot" aria-hidden="true"></span>تأییدشده</span><span class="hz-badge hz-badge--success hz-badge--sm" title="ACTIVE"><span class="hz-badge__dot" aria-hidden="true"></span>فعال</span><span class="hz-badge hz-badge--success hz-badge--sm" title="PUBLISHED"><span class="hz-badge__dot" aria-hidden="true"></span>منتشرشده</span><span class="hz-badge hz-badge--success hz-badge--sm" title="ISSUED"><span class="hz-badge__dot" aria-hidden="true"></span>صادر شد</span><span class="hz-badge hz-badge--success hz-badge--sm" title="PAID"><span class="hz-badge__dot" aria-hidden="true"></span>پرداخت‌شده</span><span class="hz-badge hz-badge--success hz-badge--sm" title="COMPLETED"><span class="hz-badge__dot" aria-hidden="true"></span>تحویل انجام و مالکیت منتقل شد</span><span class="hz-badge hz-badge--success hz-badge--sm" title="DELIVERED"><span class="hz-badge__dot" aria-hidden="true"></span>تحویل‌شده</span><span class="hz-badge hz-badge--success hz-badge--sm" title="FINAL"><span class="hz-badge__dot" aria-hidden="true"></span>نتیجه نهایی</span><span class="hz-badge hz-badge--success hz-badge--sm" title="VALID"><span class="hz-badge__dot" aria-hidden="true"></span>معتبر</span><span class="hz-badge hz-badge--success hz-badge--sm" title="CONFIRMED"><span class="hz-badge__dot" aria-hidden="true"></span>وجود توافق تأیید شد</span><span class="hz-badge hz-badge--success hz-badge--sm" title="READY" data-tone-changed="true"><span class="hz-badge__dot" aria-hidden="true"></span>آماده واریز</span><span class="hz-badge hz-badge--success hz-badge--sm" title="RESOLVED"><span class="hz-badge__dot" aria-hidden="true"></span>تعیین تکلیف شد</span><span class="hz-badge hz-badge--success hz-badge--sm" title="ALIVE"><span class="hz-badge__dot" aria-hidden="true"></span>زنده</span><span class="hz-badge hz-badge--success hz-badge--sm" title="ACCEPTED"><span class="hz-badge__dot" aria-hidden="true"></span>پذیرفته‌شده</span><span class="hz-badge hz-badge--success hz-badge--sm" title="IN_STOCK"><span class="hz-badge__dot" aria-hidden="true"></span>موجود</span><span class="hz-badge hz-badge--success hz-badge--sm" title="LOW_STOCK"><span class="hz-badge__dot" aria-hidden="true"></span>فقط ۳ عدد موجود</span><span class="hz-badge hz-badge--success hz-badge--sm" title="FINDER_READY"><span class="hz-badge__dot" aria-hidden="true"></span>آماده دریافت درخواست</span></div>
+      </div>
+      <div class="fam">
+        <div class="fam__head"><bdi class="hz-id" dir="ltr">blocked</bdi><span class="fam__meaning">رد، ناموفق یا مسدود</span><span class="hz-caption">۸ وضعیت · رنگ <bdi dir="ltr">error</bdi></span></div>
+        <div class="demo-row fam__badges"><span class="hz-badge hz-badge--error hz-badge--sm" title="REJECTED"><span class="hz-badge__dot" aria-hidden="true"></span>ردشده</span><span class="hz-badge hz-badge--error hz-badge--sm" title="FAILED"><span class="hz-badge__dot" aria-hidden="true"></span>ناموفق</span><span class="hz-badge hz-badge--error hz-badge--sm" title="SUSPENDED"><span class="hz-badge__dot" aria-hidden="true"></span>تعلیق‌شده</span><span class="hz-badge hz-badge--error hz-badge--sm" title="REVOKED"><span class="hz-badge__dot" aria-hidden="true"></span>باطل‌شده</span><span class="hz-badge hz-badge--error hz-badge--sm" title="DISPUTED"><span class="hz-badge__dot" aria-hidden="true"></span>در حال بررسی اختلاف</span><span class="hz-badge hz-badge--error hz-badge--sm" title="DELETED"><span class="hz-badge__dot" aria-hidden="true"></span>حذف‌شده</span><span class="hz-badge hz-badge--error hz-badge--sm" title="TERMINATED"><span class="hz-badge__dot" aria-hidden="true"></span>خاتمه‌یافته</span><span class="hz-badge hz-badge--error hz-badge--sm" title="PAYMENT_FAILED"><span class="hz-badge__dot" aria-hidden="true"></span>پرداخت ناموفق</span></div>
+      </div>
+      <div class="fam">
+        <div class="fam__head"><bdi class="hz-id" dir="ltr">closed</bdi><span class="fam__meaning">پایان‌یافته بدون خطا</span><span class="hz-caption">۱۶ وضعیت · رنگ <bdi dir="ltr">neutral</bdi></span></div>
+        <div class="demo-row fam__badges"><span class="hz-badge hz-badge--neutral hz-badge--sm" title="CANCELLED"><span class="hz-badge__dot" aria-hidden="true"></span>لغوشده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="WITHDRAWN"><span class="hz-badge__dot" aria-hidden="true"></span>پس گرفته شد</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="ARCHIVED"><span class="hz-badge__dot" aria-hidden="true"></span>بایگانی‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="REMOVED"><span class="hz-badge__dot" aria-hidden="true"></span>برداشته‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="SUPERSEDED" data-tone-changed="true"><span class="hz-badge__dot" aria-hidden="true"></span>جایگزین‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="SOLD" data-tone-changed="true"><span class="hz-badge__dot" aria-hidden="true"></span>فروخته‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="RESERVED" data-tone-changed="true"><span class="hz-badge__dot" aria-hidden="true"></span>رزروشده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="REFUNDED"><span class="hz-badge__dot" aria-hidden="true"></span>بازپرداخت‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="RETURNED"><span class="hz-badge__dot" aria-hidden="true"></span>مرجوع‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="HIDDEN" data-tone-changed="true"><span class="hz-badge__dot" aria-hidden="true"></span>پنهان</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="DECEASED"><span class="hz-badge__dot" aria-hidden="true"></span>فوت</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="MERGED"><span class="hz-badge__dot" aria-hidden="true"></span>ادغام‌شده در محصول پایه</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="LEFT"><span class="hz-badge__dot" aria-hidden="true"></span>خارج‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="DECLINED"><span class="hz-badge__dot" aria-hidden="true"></span>پذیرفته نشد</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="CLOSED"><span class="hz-badge__dot" aria-hidden="true"></span>بسته‌شده</span><span class="hz-badge hz-badge--neutral hz-badge--sm" title="OUT_OF_STOCK"><span class="hz-badge__dot" aria-hidden="true"></span>ناموجود</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">متن بلند در کارت باریک (۳۰۰px) — برچسب نمی‌شکند؛ ردیف می‌شکند</p>
+      <div class="hz-cardlist narrow">
+        <div class="hz-cardlist__item">
+          <div class="hz-cardlist__row" style="flex-wrap: wrap">
+            <span class="hz-body-sm" style="font-weight: 700">خرید از بازار حیوانات</span>
+            <span class="hz-badge hz-badge--success hz-badge--sm"><span class="hz-badge__dot" aria-hidden="true"></span>تحویل انجام و مالکیت منتقل شد</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">تغییر رنگ تأییدشده ★ — نمونه: رنگ از خانواده می‌آید، نه از کد امروز</p>
+      <div class="demo-row">
+        <span class="hz-badge hz-badge--warning hz-badge--sm"><span class="hz-badge__dot" aria-hidden="true"></span>در انتظار پرداخت</span>
+        <span class="hz-badge hz-badge--success hz-badge--sm"><span class="hz-badge__dot" aria-hidden="true"></span>آماده واریز</span>
+        <span class="hz-badge hz-badge--neutral hz-badge--sm"><span class="hz-badge__dot" aria-hidden="true"></span>فروخته‌شده</span>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

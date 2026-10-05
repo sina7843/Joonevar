@@ -1,0 +1,63 @@
+<!-- @dsCard group="Base" height=640 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 40px; }
+  .demo-stub { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .demo-stub > span { display: block; height: 40px; border: 1px solid var(--border-default); border-radius: var(--radius-md); background: var(--bg-surface); }
+  .demo-ops { padding: 16px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-surface); }
+  .demo-narrow { max-width: 640px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">پیش‌فرض — نوار تأکید + عنوان Bold + «مشاهده همه» در پایان · اندازه دسکتاپ (۲۴/۳۸، نوار ۴×۲۴)</p>
+    <div class="hz-section-header">
+      <h2 class="hz-section-header__title"><span class="hz-section-header__bar" aria-hidden="true"></span>تازه‌ها</h2>
+      <a class="hz-link hz-link--standalone hz-section-header__link" href="#">مشاهده همه<span class="hz-visually-hidden"> تازه‌ها</span><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a>
+    </div>
+    <div class="demo-stub" aria-hidden="true"><span></span><span></span><span></span></div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">با شمارنده و پیوند</p>
+      <div class="hz-section-header">
+        <h2 class="hz-section-header__title"><span class="hz-section-header__bar" aria-hidden="true"></span>مجله همزیست<span class="hz-section-header__count">۱۴ مطلب</span></h2>
+        <a class="hz-link hz-link--standalone hz-section-header__link" href="#">مشاهده همه<span class="hz-visually-hidden"> مطالب مجله</span><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">بدون پیوند (همه موارد همین‌جا دیده می‌شود)</p>
+      <div class="hz-section-header">
+        <h2 class="hz-section-header__title"><span class="hz-section-header__bar" aria-hidden="true"></span>درخواست‌های فعال</h2>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">با شمارنده، بدون پیوند</p>
+      <div class="hz-section-header">
+        <h2 class="hz-section-header__title"><span class="hz-section-header__bar" aria-hidden="true"></span>اطلاعیه‌ها<span class="hz-section-header__count">۳ مطلب</span></h2>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">کوچک — OpsShell (hz-section-header--sm · ۱۶/۲۶، نوار ۳×۱۶)</p>
+      <div class="demo-ops">
+        <div class="hz-section-header hz-section-header--sm">
+          <h3 class="hz-section-header__title"><span class="hz-section-header__bar" aria-hidden="true"></span>صف احراز هویت<span class="hz-section-header__count">قدیمی‌ترین: ۱۲ روز</span></h3>
+          <a class="hz-link hz-link--standalone hz-section-header__link" href="#">مشاهده صف<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a>
+        </div>
+        <div class="demo-stub" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="demo-narrow">
+    <p class="demo-label">عنوان بلند در ستون باریک — عنوان می‌شکند، پیوند جای خود را در پایان نگه می‌دارد</p>
+    <div class="hz-section-header">
+      <h2 class="hz-section-header__title"><span class="hz-section-header__bar" aria-hidden="true"></span>مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</h2>
+      <a class="hz-link hz-link--standalone hz-section-header__link" href="#">مشاهده همه<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a>
+    </div>
+  </section>
+</div>
+<script></script>

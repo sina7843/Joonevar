@@ -1,0 +1,96 @@
+<!-- @dsCard group="Domain cards" height=888 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: 328px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .demo-stack { display: flex; flex-direction: column; gap: 16px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">ردیف جدول (<bdi dir="ltr">/payments</bdi> از ۷۶۸ به بالا): در جریان · ناموفق (پرداخت دوباره، فوکوس) · پرداخت‌شده · نام خدمت بلند</p>
+    <div class="hz-table-wrap">
+      <table class="hz-table">
+        <caption class="hz-visually-hidden">پرداخت‌های شما، جدیدترین در بالا</caption>
+        <thead>
+          <tr><th scope="col">خدمت و تاریخ</th><th scope="col">شناسه پرداخت</th><th scope="col" class="hz-num">مبلغ</th><th scope="col">وضعیت</th><th scope="col"><span class="hz-visually-hidden">اقدام</span></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="hz-payment"><span class="hz-payment__service">صدور شجره‌نامه</span><span class="hz-payment__date">۷ مهر ۱۴۰۵، ۹:۱۰</span></span></td>
+            <td><bdi class="hz-id hz-payment__id" dir="ltr">HZP-GTGB8MQFU5DTR62Z</bdi></td>
+            <td class="hz-num hz-payment__amount">۴۰۰٬۰۰۰ تومان</td>
+            <td><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>در جریان</span></td>
+            <td class="hz-payment__action"></td>
+          </tr>
+          <tr>
+            <td><span class="hz-payment"><span class="hz-payment__service">مجوز جفت‌گیری</span><span class="hz-payment__date">۲۷ شهریور ۱۴۰۵، ۲۰:۰۵</span></span></td>
+            <td><bdi class="hz-id hz-payment__id" dir="ltr">HZP-TEQUAKE8YGA7CDQP</bdi></td>
+            <td class="hz-num hz-payment__amount">۳۰۰٬۰۰۰ تومان</td>
+            <td><span class="hz-badge hz-badge--sm hz-badge--error"><span class="hz-badge__dot"></span>ناموفق</span></td>
+            <td class="hz-payment__action"><a class="hz-btn hz-btn--secondary hz-btn--sm" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">پرداخت دوباره</a></td>
+          </tr>
+          <tr>
+            <td><span class="hz-payment"><span class="hz-payment__service">صدور برگه ثبتی — ۲ حیوان</span><span class="hz-payment__date">۱۳ فروردین ۱۴۰۵، ۱۸:۴۰</span></span></td>
+            <td><bdi class="hz-id hz-payment__id" dir="ltr">HZP-K9ZQXFYDGX5PJUSB</bdi></td>
+            <td class="hz-num hz-payment__amount">۵۰۰٬۰۰۰ تومان</td>
+            <td><span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>پرداخت‌شده</span></td>
+            <td class="hz-payment__action"></td>
+          </tr>
+          <tr>
+            <td><span class="hz-payment"><span class="hz-payment__service">عضویت انجمن (مادام‌العمر)</span><span class="hz-payment__date">۲۳ اسفند ۱۴۰۴، ۱۰:۱۲</span></span></td>
+            <td><bdi class="hz-id hz-payment__id" dir="ltr">HZP-EMN2VJ25FJFFN7SA</bdi></td>
+            <td class="hz-num hz-payment__amount">۳۰۰٬۰۰۰ تومان</td>
+            <td><span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>پرداخت‌شده</span></td>
+            <td class="hz-payment__action"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">کارت فهرست زیر ۷۶۸ (صفحه ۳۶۰ منهای حاشیه ۱۶) — شناسه ۲۰ نویسه در یک خط</p>
+      <ul class="hz-cardlist" aria-label="پرداخت‌های شما">
+        <li class="hz-cardlist__item">
+          <div class="hz-cardlist__row"><span class="hz-cardlist__title">مجوز جفت‌گیری</span><span class="hz-badge hz-badge--sm hz-badge--error"><span class="hz-badge__dot"></span>ناموفق</span></div>
+          <div class="hz-cardlist__row"><span class="hz-price"><span class="hz-price__amount">۳۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></span><span class="hz-cardlist__meta">۲۷ شهریور ۱۴۰۵، ۲۰:۰۵</span></div>
+          <span class="hz-identifier"><span class="hz-identifier__label">شناسه پرداخت:</span><bdi dir="ltr">HZP-TEQUAKE8YGA7CDQP</bdi><button type="button" class="hz-icon-btn" aria-label="کپی شناسه پرداخت"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg></button></span>
+          <a class="hz-btn hz-btn--secondary hz-btn--block" href="#">پرداخت دوباره ۳۰۰٬۰۰۰ تومان</a>
+        </li>
+        <li class="hz-cardlist__item">
+          <div class="hz-cardlist__row"><span class="hz-cardlist__title">صدور شجره‌نامه</span><span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>در جریان</span></div>
+          <div class="hz-cardlist__row"><span class="hz-price"><span class="hz-price__amount">۴۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></span><span class="hz-cardlist__meta">۷ مهر ۱۴۰۵، ۹:۱۰</span></div>
+          <span class="hz-identifier"><span class="hz-identifier__label">شناسه پرداخت:</span><bdi dir="ltr">HZP-GTGB8MQFU5DTR62Z</bdi><button type="button" class="hz-icon-btn" aria-label="کپی شناسه پرداخت"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg></button></span>
+        </li>
+        <li class="hz-cardlist__item">
+          <div class="hz-cardlist__row"><span class="hz-cardlist__title">عضویت انجمن (مادام‌العمر)</span><span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>پرداخت‌شده</span></div>
+          <div class="hz-cardlist__row"><span class="hz-price"><span class="hz-price__amount">۳۰۰٬۰۰۰</span><span class="hz-price__unit">تومان</span></span><span class="hz-cardlist__meta">۲۳ اسفند ۱۴۰۴، ۱۰:۱۲</span></div>
+          <span class="hz-identifier"><span class="hz-identifier__label">شناسه پرداخت:</span><bdi dir="ltr">HZP-EMN2VJ25FJFFN7SA</bdi><button type="button" class="hz-icon-btn" aria-label="کپی شناسه پرداخت"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg></button></span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="demo-stack">
+      <div>
+        <p class="demo-label">خالی</p>
+        <div class="hz-card hz-state hz-state--compact">
+          <span class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M72,104a8,8,0,0,1,8-8h96a8,8,0,0,1,0,16H80A8,8,0,0,1,72,104Zm8,40h96a8,8,0,0,0,0-16H80a8,8,0,0,0,0,16ZM232,56V208a8,8,0,0,1-11.58,7.15L192,200.94l-28.42,14.21a8,8,0,0,1-7.16,0L128,200.94,99.58,215.15a8,8,0,0,1-7.16,0L64,200.94,35.58,215.15A8,8,0,0,1,24,208V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V195.06l20.42-10.22a8,8,0,0,1,7.16,0L96,199.06l28.42-14.22a8,8,0,0,1,7.16,0L160,199.06l28.42-14.22a8,8,0,0,1,7.16,0L216,195.06Z"/></svg></span>
+          <p class="hz-state__title">هنوز پرداختی ندارید</p>
+          <p class="hz-state__body">پرداخت صدور سند، عضویت انجمن و مجوزها اینجا با شناسه پرداخت ثبت می‌شود.</p>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">بارگذاری</p>
+        <ul class="hz-cardlist" aria-hidden="true">
+          <li class="hz-cardlist__item">
+            <div class="hz-cardlist__row"><span class="hz-skeleton hz-skeleton--title" style="width: 45%"></span><span class="hz-skeleton hz-skeleton--pill"></span></div>
+            <span class="hz-skeleton hz-skeleton--text" style="width: 60%"></span>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

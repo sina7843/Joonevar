@@ -1,0 +1,79 @@
+<!-- @dsCard group="Commerce" height=688 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .demo-col { display: flex; flex-direction: column; gap: 24px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">پیش‌فرض — سبد نمونه (۲ فروشگاه، ۵ عدد کالا) با تخفیف</p>
+      <section class="hz-card hz-summary" aria-labelledby="os-1">
+        <h2 class="hz-summary__title" id="os-1">خلاصه سفارش</h2>
+        <dl class="hz-summary__list">
+          <div class="hz-summary__row"><dt>جمع کالاها (۵ عدد)</dt><dd>۴٬۱۲۰٬۰۰۰ تومان</dd></div>
+          <div class="hz-summary__row"><dt>هزینه ارسال</dt><dd>۸۵٬۰۰۰ تومان</dd></div>
+          <div class="hz-summary__row hz-summary__row--sub"><dt>پت‌شاپ آریا</dt><dd>۸۵٬۰۰۰ تومان</dd></div>
+          <div class="hz-summary__row hz-summary__row--sub"><dt>فروشگاه نمونه همزیست (بالای ۲٬۰۰۰٬۰۰۰ تومان)</dt><dd class="hz-summary__free">رایگان</dd></div>
+          <div class="hz-summary__row"><dt>تخفیف</dt><dd>−۲۰۰٬۰۰۰ تومان</dd></div>
+          <div class="hz-summary__row hz-summary__row--total"><dt>مبلغ قابل پرداخت</dt><dd>۴٬۰۰۵٬۰۰۰ <small>تومان</small></dd></div>
+        </dl>
+        <div class="hz-summary__actions">
+          <button type="button" class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block">پرداخت ۴٬۰۰۵٬۰۰۰ تومان</button>
+          <p class="hz-summary__note">سفارش شما به ۲ زیرسفارش تقسیم می‌شود و هر فروشگاه جداگانه ارسال می‌کند. نتیجه پرداخت را سرور همزیست تأیید می‌کند.</p>
+        </div>
+      </section>
+    </section>
+
+    <section>
+      <p class="demo-label">هزینه ارسال «تعیین‌نشده» — جمع قابل محاسبه نیست، مسیر پرداخت بسته است (هرگز ۰)</p>
+      <section class="hz-card hz-summary" aria-labelledby="os-2">
+        <h2 class="hz-summary__title" id="os-2">خلاصه سفارش</h2>
+        <dl class="hz-summary__list">
+          <div class="hz-summary__row"><dt>جمع کالاها (۵ عدد)</dt><dd>۴٬۱۲۰٬۰۰۰ تومان</dd></div>
+          <div class="hz-summary__row"><dt>هزینه ارسال</dt><dd><span class="hz-unset">تعیین‌نشده</span></dd></div>
+          <div class="hz-summary__row hz-summary__row--sub"><dt>پت‌شاپ آریا</dt><dd>۸۵٬۰۰۰ تومان</dd></div>
+          <div class="hz-summary__row hz-summary__row--sub"><dt>فروشگاه نمونه همزیست</dt><dd><span class="hz-unset">تعیین‌نشده</span></dd></div>
+          <div class="hz-summary__row hz-summary__row--total"><dt>مبلغ قابل پرداخت</dt><dd><span class="hz-unset">تعیین‌نشده</span></dd></div>
+        </dl>
+        <div class="hz-summary__actions">
+          <p class="hz-inline-msg hz-inline-msg--warning" id="os-2-why"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg><span class="hz-inline-msg__text">پرداخت فعلاً بسته است: هزینه ارسال «فروشگاه نمونه همزیست» هنوز تعیین نشده است. با تعیین آن باز می‌شود؛ یا کالای این فروشگاه را از سبد حذف کنید.</span></p>
+          <div class="hz-owner"><span>اقدام بعدی با: <b class="hz-owner__who">فروشنده</b></span></div>
+          <button type="button" class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" disabled aria-describedby="os-2-why">پرداخت</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="demo-col">
+      <div>
+        <p class="demo-label">یک فروشگاه، ارسال رایگان (بالای ۱٬۵۰۰٬۰۰۰ تومان) · در حال انتقال به درگاه</p>
+        <section class="hz-card hz-summary" aria-labelledby="os-3">
+          <h2 class="hz-summary__title" id="os-3">خلاصه سفارش</h2>
+          <dl class="hz-summary__list">
+            <div class="hz-summary__row"><dt>جمع کالاها (۲ عدد)</dt><dd>۳٬۴۹۰٬۰۰۰ تومان</dd></div>
+            <div class="hz-summary__row"><dt>هزینه ارسال</dt><dd class="hz-summary__free">رایگان</dd></div>
+            <div class="hz-summary__row hz-summary__row--total"><dt>مبلغ قابل پرداخت</dt><dd>۳٬۴۹۰٬۰۰۰ <small>تومان</small></dd></div>
+          </dl>
+          <div class="hz-summary__actions">
+            <button type="button" class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" aria-busy="true" aria-disabled="true"><span class="hz-spinner" aria-hidden="true"></span>در حال انتقال به درگاه بانکی</button>
+          </div>
+        </section>
+      </div>
+      <div>
+        <p class="demo-label">در حال به‌روزرسانی (تعداد یک ردیف عوض شد)</p>
+        <section class="hz-card hz-summary" aria-labelledby="os-4" aria-busy="true">
+          <h2 class="hz-summary__title" id="os-4">خلاصه سفارش</h2>
+          <dl class="hz-summary__list">
+            <div class="hz-summary__row"><dt>جمع کالاها</dt><dd><span class="hz-skeleton hz-skeleton--text" style="width: 104px"></span></dd></div>
+            <div class="hz-summary__row"><dt>هزینه ارسال</dt><dd><span class="hz-skeleton hz-skeleton--text" style="width: 72px"></span></dd></div>
+            <div class="hz-summary__row hz-summary__row--total"><dt>مبلغ قابل پرداخت</dt><dd><span class="hz-skeleton hz-skeleton--title" style="width: 128px"></span></dd></div>
+          </dl>
+          <button type="button" class="hz-btn hz-btn--primary hz-btn--lg hz-btn--block" disabled>پرداخت</button>
+        </section>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

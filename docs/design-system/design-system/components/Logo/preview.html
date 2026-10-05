@@ -1,0 +1,47 @@
+<!-- @dsCard group="Base" height=520 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .demo-ground { display: flex; flex-direction: column; gap: 0; padding: 4px 20px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); }
+  .demo-ground--page { background: var(--bg-page); }
+  .demo-ground--chrome { background: var(--bg-chrome); }
+  .demo-spec { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding-block: 12px; }
+  .demo-spec + .demo-spec { border-block-start: 1px solid var(--border-subtle); }
+  .demo-spec .hz-caption { text-align: end; }
+  .demo-note { margin: 0; padding: 12px 16px; border-radius: var(--radius-md); background: var(--bg-subtle); font-size: 13px; line-height: 22px; color: var(--text-secondary); }
+  .demo-note b { color: var(--text-primary); }
+  .demo-thumb { width: 160px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">روی bg-page (صفحه، کارت، فرم ورود)</p>
+      <div class="demo-ground demo-ground--page">
+        <div class="demo-spec"><a class="hz-logo" href="#" aria-label="همزیست — صفحه اصلی"><img src="../../assets/imagery/hamzist-lockup-fa-horizontal.svg" alt="همزیست"></a><span class="hz-caption">hz-logo · ۳۶<br>سربرگ سایت، دسکتاپ</span></div>
+        <div class="demo-spec"><span class="hz-logo hz-logo--mobile"><img src="../../assets/imagery/hamzist-lockup-fa-horizontal.svg" alt="همزیست"></span><span class="hz-caption">hz-logo--mobile · ۳۰<br>سربرگ موبایل</span></div>
+        <div class="demo-spec"><span class="hz-logo hz-logo--ops"><img src="../../assets/imagery/hamzist-lockup-fa-horizontal.svg" alt="همزیست"></span><span class="hz-caption">hz-logo--ops · ۲۶<br>نوار کناری OpsShell</span></div>
+        <div class="demo-spec"><span class="hz-logo hz-logo--symbol"><img src="../../assets/imagery/hamzist-symbol.svg" alt="همزیست"></span><span class="hz-caption">hz-logo--symbol · ۳۲<br>نوار کناری جمع‌شده، favicon</span></div>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">روی bg-chrome (سربرگ، پابرگ، نوار کناری)</p>
+      <div class="demo-ground demo-ground--chrome">
+        <div class="demo-spec"><span class="hz-logo"><img src="../../assets/imagery/hamzist-lockup-fa-horizontal.svg" alt="همزیست"></span><span class="hz-caption">hz-logo · ۳۶</span></div>
+        <div class="demo-spec"><span class="hz-logo hz-logo--mobile"><img src="../../assets/imagery/hamzist-lockup-fa-horizontal.svg" alt="همزیست"></span><span class="hz-caption">hz-logo--mobile · ۳۰</span></div>
+        <div class="demo-spec"><span class="hz-logo hz-logo--ops"><img src="../../assets/imagery/hamzist-lockup-fa-horizontal.svg" alt="همزیست"></span><span class="hz-caption">hz-logo--ops · ۲۶</span></div>
+        <div class="demo-spec"><span class="hz-logo hz-logo--symbol"><img src="../../assets/imagery/hamzist-symbol.svg" alt="همزیست"></span><span class="hz-caption">hz-logo--symbol · ۳۲</span></div>
+      </div>
+    </section>
+  </div>
+  <section>
+    <p class="demo-label">نماد در جای تصویر ثبت‌نشده (RecordImage، شفافیت ۴۰٪)</p>
+    <div class="demo-row" style="align-items: flex-start; gap: 24px;">
+      <div class="demo-thumb"><div class="hz-media hz-media--4x3"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">تصویر ثبت نشده</span></div></div></div>
+      <p class="demo-note" style="flex: 1 1 320px;"><b>ثابت است:</b> لاک‌آپ افقی فارسی — واژه‌نگار «همزیست» (پیوسته، بدون فاصله و نیم‌فاصله) با IRANSansX Black و نماد در انتهای آن. هرگز بازکشیده، چرخانده، بازرنگ یا سایه‌دار نشود و روی عکس شلوغ ننشیند. لاک‌آپ عمودی، لاک‌آپ‌های انگلیسی و نسخه روی سطح برند در مرحله ۴ (brand.md) تحویل می‌شوند.</p>
+    </div>
+  </section>
+</div>
+<script></script>

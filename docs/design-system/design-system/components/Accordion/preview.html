@@ -1,0 +1,95 @@
+<!-- @dsCard group="Data display" height=968 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-row > section { flex: 1 1 360px; min-width: 0; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-note { display: block; margin-block-start: 8px; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-skel { display: flex; flex-direction: column; gap: 2px; padding-block-end: 16px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>پرسش‌ها (boxed)</b> — <code dir="ltr">&lt;details&gt;</code> بدون جاوااسکریپت؛ پهنای خواندن ۷۲۰؛ پرسش اول باز، پرسش بلند می‌پیچد و آیکن بالا می‌ماند</p>
+    <div class="hz-accordion hz-accordion--boxed" style="max-width: var(--container-reading)">
+      <details class="hz-accordion__item" open>
+        <summary class="hz-accordion__trigger"><span class="hz-accordion__title">برای ثبت حیوان عضویت انجمن لازم است؟</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></summary>
+        <div class="hz-accordion__panel"><p>خیر. برای ثبت حیوان، عضویت انجمن لازم نیست و نشانی سکونت هم اجباری نیست. فقط احراز هویت شما باید تأیید شده باشد.</p></div>
+      </details>
+      <details class="hz-accordion__item">
+        <summary class="hz-accordion__trigger"><span class="hz-accordion__title">هزینه صدور شجره‌نامه چقدر است؟</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></summary>
+        <div class="hz-accordion__panel"><p>۴۰۰٬۰۰۰ تومان. پرداخت پس از تأیید درخواست باز می‌شود.</p></div>
+      </details>
+      <details class="hz-accordion__item">
+        <summary class="hz-accordion__trigger" style="outline:2px solid var(--focus-ring);outline-offset:-2px"><span class="hz-accordion__title">کد معرف دامپزشک تا کی معتبر است؟</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></summary>
+        <div class="hz-accordion__panel"><p>۲۱ روز از صدور. پس از آن کد تازه بگیرید.</p></div>
+      </details>
+      <details class="hz-accordion__item">
+        <summary class="hz-accordion__trigger"><span class="hz-accordion__title">تمدید مهلت ثبت‌نام آزمون اصالت نسب برای پرورش‌دهندگان عضو انجمن تا پایان آبان‌ماه ۱۴۰۵ و تغییر نحوه ارسال نمونه</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></summary>
+        <div class="hz-accordion__panel"><p>با توجه به درخواست‌های رسیده، مهلت ثبت‌نام آزمون اصالت نسب تمدید شد. نمونه‌ها از این پس فقط از طریق دامپزشک معتمد و با کد پیگیری نمونه پذیرفته می‌شوند و ارسال پستی مستقیم به مرکز ژنتیک امکان‌پذیر نیست.</p></div>
+      </details>
+    </div>
+    <span class="demo-note">سومی: فوکوس. hover (فقط اشاره‌گر): زیرخط عنوان.</span>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label"><b>جزئیات سفارش</b> — <code dir="ltr">button[aria-expanded]</code>، متا (وضعیت، تعداد) در سرِ ردیف</p>
+      <div class="hz-accordion hz-accordion--boxed">
+        <div class="hz-accordion__item">
+          <h3 class="hz-accordion__heading"><button class="hz-accordion__trigger" type="button" aria-expanded="true" aria-controls="so-1" id="so-1-h"><span class="hz-accordion__title">پت‌شاپ آریا</span><span class="hz-accordion__meta"><span class="hz-badge hz-badge--info hz-badge--sm"><span class="hz-badge__dot"></span>ارسال‌شده</span>۲ کالا</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></h3>
+          <div class="hz-accordion__panel" role="region" id="so-1" aria-labelledby="so-1-h">
+            <dl class="hz-kv">
+              <div class="hz-kv__row"><dt class="hz-kv__key">هزینه ارسال</dt><dd class="hz-kv__value">۸۵٬۰۰۰ تومان</dd></div>
+              <div class="hz-kv__row"><dt class="hz-kv__key">ارسال رایگان از</dt><dd class="hz-kv__value">۱٬۵۰۰٬۰۰۰ تومان</dd></div>
+              <div class="hz-kv__row" style="border: 0"><dt class="hz-kv__key">شهر فروشنده</dt><dd class="hz-kv__value">کرج</dd></div>
+            </dl>
+          </div>
+        </div>
+        <div class="hz-accordion__item">
+          <h3 class="hz-accordion__heading"><button class="hz-accordion__trigger" type="button" aria-expanded="false" aria-controls="so-2"><span class="hz-accordion__title">فروشگاه نمونه همزیست</span><span class="hz-accordion__meta"><span class="hz-badge hz-badge--info hz-badge--sm"><span class="hz-badge__dot"></span>در حال آماده‌سازی</span>۱ کالا</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></h3>
+          <div class="hz-accordion__panel" role="region" id="so-2" hidden></div>
+        </div>
+        <div class="hz-accordion__item">
+          <h3 class="hz-accordion__heading"><button class="hz-accordion__trigger" type="button" aria-expanded="true" aria-controls="so-3" aria-busy="true"><span class="hz-accordion__title">خلاصه پرداخت</span><span class="hz-accordion__meta">۴٬۰۰۵٬۰۰۰ تومان</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></h3>
+          <div class="hz-accordion__panel" role="region" id="so-3">
+            <div class="demo-skel" aria-hidden="true"><span class="hz-skeleton hz-skeleton--text" style="width: 70%"></span><span class="hz-skeleton hz-skeleton--text" style="width: 55%"></span><span class="hz-skeleton hz-skeleton--text" style="width: 62%"></span></div>
+          </div>
+        </div>
+      </div>
+      <span class="demo-note">سومی: محتوای پنل در حال بارگذاری (Skeleton). سرِ ردیف همیشه از داده‌ای است که داریم.</span>
+    </section>
+    <section>
+      <p class="demo-label"><b>متراکم (<code dir="ltr">--sm</code>)</b> — گروه‌های تنظیمات در موبایل؛ بدون کادر</p>
+      <div class="hz-accordion hz-accordion--sm">
+        <div class="hz-accordion__item">
+          <h3 class="hz-accordion__heading"><button class="hz-accordion__trigger" type="button" aria-expanded="false"><span class="hz-accordion__title">تعرفه‌ها</span><span class="hz-accordion__meta"><span class="hz-queue-tile__flag" style="margin: 0"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg>۲۶ تعیین‌نشده</span>۳۳ کلید</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></h3>
+        </div>
+        <div class="hz-accordion__item">
+          <h3 class="hz-accordion__heading"><button class="hz-accordion__trigger" type="button" aria-expanded="false"><span class="hz-accordion__title">مهلت‌ها</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></h3>
+        </div>
+        <div class="hz-accordion__item">
+          <h3 class="hz-accordion__heading"><button class="hz-accordion__trigger" type="button" aria-expanded="false"><span class="hz-accordion__title">اتصال‌ها</span><svg class="hz-icon hz-icon--sm hz-accordion__icon" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></h3>
+        </div>
+        <div class="hz-accordion__item">
+          <h3 class="hz-accordion__heading"><button class="hz-accordion__trigger" type="button" aria-expanded="false" aria-disabled="true" aria-describedby="acc-why"><span class="hz-accordion__title">جفت‌یابی</span><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></button></h3>
+        </div>
+      </div>
+      <span class="demo-note" id="acc-why">چهارمی: غیرفعال — گروه فقط برای نقشی باز است که دسترسی دارد؛ به‌جای caret، قفل.</span>
+    </section>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.hz-accordion button.hz-accordion__trigger').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      var open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var p = document.getElementById(b.getAttribute('aria-controls'));
+      if (p) p.hidden = !open;
+    });
+  });
+</script>

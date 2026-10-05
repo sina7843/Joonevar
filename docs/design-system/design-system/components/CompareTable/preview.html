@@ -1,0 +1,213 @@
+<!-- @dsCard group="Commerce" height=1280 width=1440 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: grid; grid-template-columns: minmax(0, 1fr) 362px; gap: 32px; align-items: start; }
+  .demo-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-phone { width: 362px; padding: 0; border: 1px dashed var(--border-control); border-radius: var(--radius-md); }
+  .demo-phone > .hz-compare { width: 360px; padding: 12px 16px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">≥۷۶۸ — جدول کنار هم، ستون برچسب؛ ۲ کالا + جای خالی «افزودن کالا» (حداکثر ۴) · فوکوس روی «حذف از مقایسه»</p>
+      <div class="hz-compare" id="cmp-d" style="--hz-compare-cols: 3">
+        <div class="hz-compare__bar">
+          <h2 class="hz-compare__title" id="cmp-d-t">مقایسه ۲ کالا</h2>
+          <div class="hz-compare__tools">
+            <label class="hz-check"><input type="checkbox" class="js-diff"><span class="hz-check__text">فقط تفاوت‌ها</span></label>
+            <button type="button" class="hz-btn hz-btn--ghost hz-btn--sm">پاک کردن همه</button>
+          </div>
+        </div>
+        <div class="hz-compare__nav">
+          <span class="js-pos" aria-live="polite">ستون ۱ و ۲ از ۳</span>
+          <span class="hz-compare__nav-btns"><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-icon-btn--outline js-prev" aria-label="ستون قبلی" disabled><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></button><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-icon-btn--outline js-next" aria-label="ستون بعدی"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button></span>
+        </div>
+        <div class="hz-compare__table"><div class="hz-compare__scroll js-scroll" role="table" aria-labelledby="cmp-d-t">
+          <div class="hz-compare__row hz-compare__row--head" role="row">
+            <div class="hz-compare__label" role="columnheader"><span class="hz-visually-hidden">ویژگی</span></div>
+            <div class="hz-compare__cell" role="columnheader"><div class="hz-compare__product"><div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-dry-food-large-adult.jpg" alt="غذای خشک سگ بالغ نژاد بزرگ"></div><a class="hz-compare__name" href="#">غذای خشک سگ بالغ نژاد بزرگ</a><span class="hz-compare__brand">نوتری‌پت</span><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-compare__remove" aria-label="حذف غذای خشک سگ بالغ نژاد بزرگ از مقایسه"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+            <div class="hz-compare__cell" role="columnheader"><div class="hz-compare__product"><div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-dry-food-puppy.jpg" alt="غذای خشک توله‌سگ"></div><a class="hz-compare__name" href="#">غذای خشک توله‌سگ</a><span class="hz-compare__brand">نوتری‌پت</span><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-compare__remove" aria-label="حذف غذای خشک توله‌سگ از مقایسه" style="outline:2px solid var(--focus-ring);outline-offset:2px"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+            <div class="hz-compare__cell" role="columnheader"><div class="hz-compare__add"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg><a class="hz-link hz-link--standalone" href="#">افزودن کالا</a><span>تا ۴ کالا</span></div></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>قیمت</span></div>
+            <div class="hz-compare__cell" role="cell">از <b>۲٬۸۵۰٬۰۰۰</b> تومان</div>
+            <div class="hz-compare__cell" role="cell">از <b>۱٬۹۵۰٬۰۰۰</b> تومان</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>واریانت‌ها</span></div>
+            <div class="hz-compare__cell" role="cell">۳، ۱۰ و ۱۵ کیلوگرم</div>
+            <div class="hz-compare__cell" role="cell">۲ و ۷ کیلوگرم</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>امتیاز</span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-compare__rating"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۶ <small>از ۵، ۹۳ نظر</small></span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-compare__rating"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۴ <small>از ۵، ۳۲ نظر</small></span></div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row hz-compare__row--same" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>برند</span></div>
+            <div class="hz-compare__cell" role="cell">نوتری‌پت</div>
+            <div class="hz-compare__cell" role="cell">نوتری‌پت</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row hz-compare__row--same" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>دسته</span></div>
+            <div class="hz-compare__cell" role="cell">غذای خشک</div>
+            <div class="hz-compare__cell" role="cell">غذای خشک</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row hz-compare__row--same" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>وضعیت کالا</span></div>
+            <div class="hz-compare__cell" role="cell">نو</div>
+            <div class="hz-compare__cell" role="cell">نو</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>فروشنده</span></div>
+            <div class="hz-compare__cell" role="cell">پت‌شاپ آریا، کرج</div>
+            <div class="hz-compare__cell" role="cell">فروشگاه نمونه همزیست، تهران</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>هزینه ارسال</span></div>
+            <div class="hz-compare__cell" role="cell">۸۵٬۰۰۰ تومان؛ رایگان از ۱٬۵۰۰٬۰۰۰ تومان</div>
+            <div class="hz-compare__cell" role="cell">۹۵٬۰۰۰ تومان؛ رایگان از ۲٬۰۰۰٬۰۰۰ تومان</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>موجودی</span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-stock hz-stock--sm hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span><br><span class="hz-caption">۱۵ کیلوگرم ناموجود</span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-stock hz-stock--sm hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span></div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span class="hz-visually-hidden">خرید</span></div>
+            <div class="hz-compare__cell" role="cell"><a class="hz-btn hz-btn--secondary hz-btn--sm hz-btn--block" href="#" aria-label="انتخاب وزن و خرید غذای خشک سگ بالغ نژاد بزرگ">انتخاب وزن و خرید</a></div>
+            <div class="hz-compare__cell" role="cell"><a class="hz-btn hz-btn--secondary hz-btn--sm hz-btn--block" href="#" aria-label="انتخاب وزن و خرید غذای خشک توله‌سگ">انتخاب وزن و خرید</a></div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+        </div></div>
+      </div>
+  </section>
+  <div class="demo-col">
+    <section>
+      <p class="demo-label">موبایل (<bdi dir="ltr">--swipe</bdi>، ۳۶۰px، صفحه عمودی اسکرول می‌شود) — دو ستون پیدا، بقیه با کشیدن یا دکمه‌ها؛ برچسب ردیف ثابت · «فقط تفاوت‌ها» روشن</p>
+      <div class="demo-phone">
+      <div class="hz-compare hz-compare--swipe hz-compare--diff" id="cmp-m" style="--hz-compare-cols: 3">
+        <div class="hz-compare__bar">
+          <h2 class="hz-compare__title" id="cmp-m-t">مقایسه ۲ کالا</h2>
+          <div class="hz-compare__tools">
+            <label class="hz-check"><input type="checkbox" class="js-diff" checked><span class="hz-check__text">فقط تفاوت‌ها</span></label>
+            <button type="button" class="hz-btn hz-btn--ghost hz-btn--sm">پاک کردن همه</button>
+          </div>
+        </div>
+        <div class="hz-compare__nav">
+          <span class="js-pos" aria-live="polite">ستون ۱ و ۲ از ۳</span>
+          <span class="hz-compare__nav-btns"><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-icon-btn--outline js-prev" aria-label="ستون قبلی" disabled><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></button><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-icon-btn--outline js-next" aria-label="ستون بعدی"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button></span>
+        </div>
+        <div class="hz-compare__table"><div class="hz-compare__scroll js-scroll" role="table" aria-labelledby="cmp-m-t">
+          <div class="hz-compare__row hz-compare__row--head" role="row">
+            <div class="hz-compare__label" role="columnheader"><span class="hz-visually-hidden">ویژگی</span></div>
+            <div class="hz-compare__cell" role="columnheader"><div class="hz-compare__product"><div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-dry-food-large-adult.jpg" alt="غذای خشک سگ بالغ نژاد بزرگ"></div><a class="hz-compare__name" href="#">غذای خشک سگ بالغ نژاد بزرگ</a><span class="hz-compare__brand">نوتری‌پت</span><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-compare__remove" aria-label="حذف غذای خشک سگ بالغ نژاد بزرگ از مقایسه"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+            <div class="hz-compare__cell" role="columnheader"><div class="hz-compare__product"><div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-dry-food-puppy.jpg" alt="غذای خشک توله‌سگ"></div><a class="hz-compare__name" href="#">غذای خشک توله‌سگ</a><span class="hz-compare__brand">نوتری‌پت</span><button type="button" class="hz-icon-btn hz-icon-btn--sm hz-compare__remove" aria-label="حذف غذای خشک توله‌سگ از مقایسه"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></div></div>
+            <div class="hz-compare__cell" role="columnheader"><div class="hz-compare__add"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg><a class="hz-link hz-link--standalone" href="#">افزودن کالا</a><span>تا ۴ کالا</span></div></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>قیمت</span></div>
+            <div class="hz-compare__cell" role="cell">از <b>۲٬۸۵۰٬۰۰۰</b> تومان</div>
+            <div class="hz-compare__cell" role="cell">از <b>۱٬۹۵۰٬۰۰۰</b> تومان</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>واریانت‌ها</span></div>
+            <div class="hz-compare__cell" role="cell">۳، ۱۰ و ۱۵ کیلوگرم</div>
+            <div class="hz-compare__cell" role="cell">۲ و ۷ کیلوگرم</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>امتیاز</span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-compare__rating"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۶ <small>از ۵، ۹۳ نظر</small></span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-compare__rating"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>۴٫۴ <small>از ۵، ۳۲ نظر</small></span></div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row hz-compare__row--same" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>برند</span></div>
+            <div class="hz-compare__cell" role="cell">نوتری‌پت</div>
+            <div class="hz-compare__cell" role="cell">نوتری‌پت</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row hz-compare__row--same" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>دسته</span></div>
+            <div class="hz-compare__cell" role="cell">غذای خشک</div>
+            <div class="hz-compare__cell" role="cell">غذای خشک</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row hz-compare__row--same" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>وضعیت کالا</span></div>
+            <div class="hz-compare__cell" role="cell">نو</div>
+            <div class="hz-compare__cell" role="cell">نو</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>فروشنده</span></div>
+            <div class="hz-compare__cell" role="cell">پت‌شاپ آریا، کرج</div>
+            <div class="hz-compare__cell" role="cell">فروشگاه نمونه همزیست، تهران</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>هزینه ارسال</span></div>
+            <div class="hz-compare__cell" role="cell">۸۵٬۰۰۰ تومان؛ رایگان از ۱٬۵۰۰٬۰۰۰ تومان</div>
+            <div class="hz-compare__cell" role="cell">۹۵٬۰۰۰ تومان؛ رایگان از ۲٬۰۰۰٬۰۰۰ تومان</div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span>موجودی</span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-stock hz-stock--sm hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span><br><span class="hz-caption">۱۵ کیلوگرم ناموجود</span></div>
+            <div class="hz-compare__cell" role="cell"><span class="hz-stock hz-stock--sm hz-stock--in"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg>موجود</span></div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+          <div class="hz-compare__row" role="row">
+            <div class="hz-compare__label" role="rowheader"><span class="hz-visually-hidden">خرید</span></div>
+            <div class="hz-compare__cell" role="cell"><a class="hz-btn hz-btn--secondary hz-btn--sm hz-btn--block" href="#" aria-label="انتخاب وزن و خرید غذای خشک سگ بالغ نژاد بزرگ">انتخاب وزن و خرید</a></div>
+            <div class="hz-compare__cell" role="cell"><a class="hz-btn hz-btn--secondary hz-btn--sm hz-btn--block" href="#" aria-label="انتخاب وزن و خرید غذای خشک توله‌سگ">انتخاب وزن و خرید</a></div>
+            <div class="hz-compare__cell" role="cell"></div>
+          </div>
+        </div></div>
+      </div>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">خالی — کمتر از دو کالا</p>
+      <div class="hz-card hz-card--flush">
+        <div class="hz-state hz-state--compact">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg></div>
+          <p class="hz-state__title">برای مقایسه دست‌کم دو کالا لازم است</p>
+          <p class="hz-state__body">«غذای خشک سگ بالغ نژاد بزرگ» در فهرست مقایسه است. از صفحه هر کالا «افزودن به مقایسه» را بزنید؛ تا ۴ کالا.</p>
+          <div class="hz-state__actions"><a class="hz-btn hz-btn--secondary" href="#">رفتن به فروشگاه</a></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.hz-compare').forEach(function (c) {
+    var diff = c.querySelector('.js-diff');
+    if (diff) diff.addEventListener('change', function () { c.classList.toggle('hz-compare--diff', diff.checked); });
+    var sc = c.querySelector('.js-scroll'), prev = c.querySelector('.js-prev'), next = c.querySelector('.js-next'), pos = c.querySelector('.js-pos');
+    var n = parseInt(getComputedStyle(c).getPropertyValue('--hz-compare-cols'), 10) || 2;
+    var digits = '۰۱۲۳۴۵۶۷۸۹', fa = function (x) { return String(x).replace(/[0-9]/g, function (d) { return digits[d]; }); };
+    var colW = function () { return (sc.clientWidth) / 2; };
+    var update = function () {
+      var i = Math.round(Math.abs(sc.scrollLeft) / colW());
+      pos.textContent = 'ستون ' + fa(i + 1) + ' و ' + fa(i + 2) + ' از ' + fa(n);
+      prev.disabled = i <= 0; next.disabled = i >= n - 2;
+    };
+    var dirSign = getComputedStyle(sc).direction === 'rtl' ? -1 : 1;
+    next.addEventListener('click', function () { sc.scrollBy({ left: dirSign * colW(), behavior: 'smooth' }); });
+    prev.addEventListener('click', function () { sc.scrollBy({ left: -dirSign * colW(), behavior: 'smooth' }); });
+    sc.addEventListener('scroll', update, { passive: true });
+  });
+</script>

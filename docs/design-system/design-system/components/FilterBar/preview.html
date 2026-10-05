@@ -1,0 +1,145 @@
+<!-- @dsCard group="Data display" height=952 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-note { display: block; margin-block-start: 8px; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-stack { display: flex; flex-direction: column; gap: 16px; }
+  .demo-box { padding: 16px 20px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-surface); }
+  .demo-phone { width: 390px; padding: 16px; border: 1px dashed var(--border-control); border-radius: var(--radius-xl); display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .demo-stage { position: relative; overflow: hidden; width: 390px; height: 600px; border: 1px dashed var(--border-control); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage .hz-drawer { position: absolute; }
+  .demo-flex { display: flex; gap: 8px; align-items: center; }
+  .demo code { white-space: nowrap; font-size: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>دسکتاپ ≥۱۰۲۴</b> — نوار بالای فهرست: چیپ‌های فوری با شمار · «فیلترها» با شمار فعال · مرتب‌سازی · «پاک کردن همه»</p>
+    <div class="demo-stack">
+      <div class="demo-box">
+        <div class="hz-filterbar">
+          <fieldset class="hz-filterbar__chips" aria-label="وضعیت درخواست">
+            <button class="hz-chip" type="button" aria-pressed="true">همه <span class="hz-chip__count">۵</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">نیازمند اقدام شما <span class="hz-chip__count">۲</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">در انتظار دیگران <span class="hz-chip__count">۳</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">پایان‌یافته <span class="hz-chip__count">۰</span></button>
+          </fieldset>
+          <div class="hz-filterbar__end">
+            <button class="hz-btn hz-btn--secondary hz-btn--sm hz-filterbar__btn" type="button" aria-haspopup="dialog"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg>فیلترها</button>
+            <label class="hz-select-wrap hz-filterbar__sort"><span class="hz-visually-hidden">مرتب‌سازی</span>
+              <select class="hz-select hz-select--sm"><option>جدیدترین به‌روزرسانی</option><option>نزدیک‌ترین مهلت</option><option>کد درخواست</option></select>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="demo-box">
+        <div class="hz-filterbar">
+          <fieldset class="hz-filterbar__chips" aria-label="وضعیت درخواست">
+            <button class="hz-chip" type="button" aria-pressed="false">همه <span class="hz-chip__count">۵</span></button>
+            <button class="hz-chip" type="button" aria-pressed="true">نیازمند اقدام شما <span class="hz-chip__count">۲</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false" style="outline:2px solid var(--focus-ring);outline-offset:2px">در انتظار دیگران <span class="hz-chip__count">۳</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">پایان‌یافته <span class="hz-chip__count">۰</span></button>
+          </fieldset>
+          <div class="hz-filterbar__end">
+            <a class="hz-link hz-body-sm" href="#">پاک کردن همه</a>
+            <button class="hz-btn hz-btn--secondary hz-btn--sm hz-filterbar__btn" type="button" aria-haspopup="dialog"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg>فیلترها<span class="hz-count hz-count--alert" aria-label="۲ فیلتر فعال">۲</span></button>
+            <label class="hz-select-wrap hz-filterbar__sort"><span class="hz-visually-hidden">مرتب‌سازی</span>
+              <select class="hz-select hz-select--sm"><option>نزدیک‌ترین مهلت</option><option>جدیدترین به‌روزرسانی</option></select>
+            </label>
+          </div>
+        </div>
+        <span class="demo-note">فعال: چیپ «نیازمند اقدام شما» (<code dir="ltr">aria-pressed="true"</code>) + یک فیلتر از «فیلترها» = ۲ · «پاک کردن همه» فقط وقتی فیلتری فعال است · فوکوس روی «در انتظار دیگران»</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — چیپ‌ها در یک ردیف با اسکرول افقی (<code dir="ltr">.hz-filterbar--scroll</code>)</p>
+      <div class="demo-phone">
+        <h2 class="hz-h3">درخواست‌های من</h2>
+        <div class="hz-filterbar hz-filterbar--scroll hz-filterbar--bleed">
+          <fieldset class="hz-filterbar__chips" aria-label="وضعیت درخواست">
+            <button class="hz-chip" type="button" aria-pressed="false">همه <span class="hz-chip__count">۵</span></button>
+            <button class="hz-chip" type="button" aria-pressed="true">نیازمند اقدام شما <span class="hz-chip__count">۲</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">در انتظار دیگران <span class="hz-chip__count">۳</span></button>
+            <button class="hz-chip" type="button" aria-pressed="false">پایان‌یافته <span class="hz-chip__count">۰</span></button>
+          </fieldset>
+        </div>
+        <div class="demo-flex">
+          <button class="hz-btn hz-btn--secondary hz-filterbar__btn" type="button" aria-haspopup="dialog" aria-expanded="false"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg>فیلترها<span class="hz-count hz-count--alert" aria-label="۱ فیلتر فعال">۱</span></button>
+          <label class="hz-select-wrap" style="flex:1 1 auto"><span class="hz-visually-hidden">مرتب‌سازی</span>
+            <select class="hz-select hz-input--sm"><option>نزدیک‌ترین مهلت</option></select>
+          </label>
+        </div>
+        <p class="hz-caption" style="margin:0" aria-live="polite">۲ درخواست</p>
+        <ul class="hz-cardlist">
+          <li class="hz-cardlist__item">
+            <div class="hz-cardlist__row"><span class="hz-h4">صدور شجره‌نامه · تارا</span><span class="hz-badge hz-badge--sm hz-badge--warning"><span class="hz-badge__dot"></span>در انتظار پرداخت</span></div>
+            <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">شما</span></span><span class="hz-owner__extra">۴۰۰٬۰۰۰ تومان</span></div>
+          </li>
+          <li class="hz-cardlist__item">
+            <div class="hz-cardlist__row"><span class="hz-h4">ثبت کنل</span><span class="hz-badge hz-badge--sm hz-badge--warning"><span class="hz-badge__dot"></span>نیازمند اصلاح</span></div>
+            <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">شما</span></span><a class="hz-link" href="#">اصلاح</a></div>
+          </li>
+        </ul>
+        <span class="demo-note" style="margin:0">ردیف چیپ تا لبه صفحه ادامه دارد (<code dir="ltr">--bleed</code>) و چیپ بریده‌شده نشان می‌دهد که ردیف اسکرول می‌خورد؛ خود صفحه هرگز اسکرول افقی نمی‌گیرد.</span>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — «فیلترها» یک Drawer تمام‌صفحه باز می‌کند</p>
+      <div class="demo-stage">
+        <div class="hz-drawer hz-drawer--full-mobile" role="dialog" aria-modal="true" aria-labelledby="flt-title">
+          <div class="hz-drawer__head">
+            <h2 class="hz-drawer__title" id="flt-title">فیلترها</h2>
+            <button class="hz-icon-btn" type="button" aria-label="بستن"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+          </div>
+          <div class="hz-drawer__body">
+            <fieldset class="hz-filter-group">
+              <legend class="hz-filter-group__title">وضعیت</legend>
+              <label class="hz-check"><input type="checkbox" checked><span class="hz-check__text">نیازمند اقدام شما</span><span class="hz-chip__count">۲</span></label>
+              <label class="hz-check"><input type="checkbox"><span class="hz-check__text">در انتظار دیگران</span><span class="hz-chip__count">۳</span></label>
+              <label class="hz-check"><input type="checkbox" disabled><span class="hz-check__text">پایان‌یافته</span><span class="hz-chip__count">۰</span></label>
+            </fieldset>
+            <fieldset class="hz-filter-group">
+              <legend class="hz-filter-group__title">نوع درخواست</legend>
+              <label class="hz-check"><input type="checkbox"><span class="hz-check__text">ثبت و احراز حیوان</span><span class="hz-chip__count">۱</span></label>
+              <label class="hz-check"><input type="checkbox" checked><span class="hz-check__text">صدور شجره‌نامه</span><span class="hz-chip__count">۱</span></label>
+              <label class="hz-check"><input type="checkbox"><span class="hz-check__text">مجوز جفت‌گیری</span><span class="hz-chip__count">۱</span></label>
+              <label class="hz-check"><input type="checkbox"><span class="hz-check__text">ثبت کنل</span><span class="hz-chip__count">۱</span></label>
+            </fieldset>
+          </div>
+          <div class="hz-drawer__foot">
+            <button class="hz-btn hz-btn--primary" type="button">نمایش ۱ نتیجه</button>
+            <button class="hz-btn hz-btn--ghost" type="button">پاک کردن همه</button>
+          </div>
+        </div>
+      </div>
+      <span class="demo-note">در Drawer انتخاب‌ها تا «نمایش … نتیجه» اعمال نمی‌شوند؛ شمار روی دکمه با هر تغییر به‌روز می‌شود.</span>
+    </section>
+
+    <section style="flex:1 1 0;min-width:0">
+      <p class="demo-label"><b>دسکتاپ — ستون کناری</b> (فهرست‌های بلند عمومی: راهنما، بازار)</p>
+      <div class="demo-box">
+        <fieldset class="hz-filter-group">
+          <legend class="hz-filter-group__title">شهر</legend>
+          <label class="hz-check"><input type="checkbox" checked><span class="hz-check__text">تهران</span></label>
+          <label class="hz-check"><input type="checkbox"><span class="hz-check__text">اصفهان</span></label>
+        </fieldset>
+        <fieldset class="hz-filter-group">
+          <legend class="hz-filter-group__title">نوع مرکز</legend>
+          <label class="hz-check"><input type="checkbox"><span class="hz-check__text">بیمارستان دامپزشکی</span></label>
+          <label class="hz-check"><input type="checkbox"><span class="hz-check__text">کلینیک دامپزشکی</span></label>
+        </fieldset>
+        <a class="hz-link hz-link--standalone" href="#">پاک کردن همه</a>
+      </div>
+      <span class="demo-note">ستون ۲۸۰ در آغاز صفحه؛ تغییر هر گزینه بلافاصله اعمال می‌شود و شمار نتایج با <code dir="ltr">aria-live</code> اعلام می‌شود.</span>
+    </section>
+  </div>
+</div>
+<script></script>

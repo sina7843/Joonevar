@@ -1,0 +1,37 @@
+<!-- @dsCard group="Inputs" height=696 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 16px; align-items: start; }
+  .demo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .demo-cell { display: flex; flex-direction: column; min-width: 0; }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-focus { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">واریانت‌ها و حالت‌ها</p>
+    <div class="demo-grid demo-grid--2">
+      <div class="demo-cell" style="gap:12px"><div class="demo-cell"><p class="demo-label">تأیید (تیک‌خورده)</p><label class="hz-check"><input type="checkbox" id="c-1" checked><span class="hz-check__text"><span>اطلاعات واردشده را درست می‌دانم و مسئولیت درستی آن با من است.</span></span></label></div><div class="demo-cell"><p class="demo-label">با توضیح</p><label class="hz-check"><input type="checkbox" id="c-2" aria-describedby="c-2-d"><span class="hz-check__text"><span class="hz-check__label">قوانین ثبت آگهی در بازار همزیست را خوانده‌ام و می‌پذیرم.</span><span class="hz-check__desc" id="c-2-d">آگهی پس از بررسی بازار منتشر می‌شود و ۳۰ روز نمایش داده می‌شود.</span></span></label></div><div class="demo-cell"><p class="demo-label">خطا — تأیید اجباری</p><div class="hz-field"><label class="hz-check"><input type="checkbox" id="c-3" aria-invalid="true" aria-describedby="c-3-e"><span class="hz-check__text"><span>اطلاعات واردشده را درست می‌دانم و مسئولیت درستی آن با من است.</span></span></label><div class="hz-field__error" id="c-3-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>برای ارسال درخواست، تأیید درستی اطلاعات لازم است.</span></div></div></div><div class="demo-cell"><p class="demo-label">فوکوس</p><label class="hz-check"><input type="checkbox" id="c-4" style="outline:2px solid var(--focus-ring);outline-offset:2px"><span class="hz-check__text"><span>نمایش شماره تماس در آگهی</span></span></label></div><div class="demo-cell"><p class="demo-label">غیرفعال</p><label class="hz-check"><input type="checkbox" id="c-5" checked disabled aria-describedby="c-5-d"><span class="hz-check__text"><span class="hz-check__label">کاشت میکروچیپ</span><span class="hz-check__desc" id="c-5-d">این خدمت از پروانه فعالیت مرکز می‌آید و از اینجا تغییر نمی‌کند.</span></span></label><label class="hz-check"><input type="checkbox" id="c-6" disabled><span class="hz-check__text"><span>آمبولانس</span></span></label></div></div>
+      <div class="demo-cell" style="gap:12px"><div class="demo-cell"><p class="demo-label">نیمه‌انتخاب (والد گروه)</p><fieldset class="hz-fieldset"><legend class="hz-field__label">امکانات مرکز <span class="hz-field__opt">(اختیاری)</span></legend>
+      <label class="hz-check" data-parent><input type="checkbox" id="c-all" data-indeterminate aria-checked="mixed"><span class="hz-check__text"><span class="hz-check__label">همه امکانات</span></span></label>
+      <div class="hz-choice-group hz-choice-group--nested"><label class="hz-check"><input type="checkbox" id="c-f0" checked name="facility"><span class="hz-check__text"><span>پارکینگ</span></span></label><label class="hz-check"><input type="checkbox" id="c-f1" checked name="facility"><span class="hz-check__text"><span>بخش بستری</span></span></label><label class="hz-check"><input type="checkbox" id="c-f2" name="facility"><span class="hz-check__text"><span>آمبولانس</span></span></label><label class="hz-check"><input type="checkbox" id="c-f3" name="facility"><span class="hz-check__text"><span>دسترسی بدون پله</span></span></label></div></fieldset></div><div class="demo-cell"><p class="demo-label">خطای گروه</p><fieldset class="hz-fieldset" aria-describedby="c-s-e"><legend class="hz-field__label">خدمات مرکز<span class="hz-field__req" aria-hidden="true">*</span></legend>
+      <div class="hz-choice-group hz-choice-group--inline"><label class="hz-check"><input type="checkbox" id="c-s0" aria-invalid="true" name="service" aria-describedby="c-s-e"><span class="hz-check__text"><span>ویزیت و معاینه</span></span></label><label class="hz-check"><input type="checkbox" id="c-s1" aria-invalid="true" name="service" aria-describedby="c-s-e"><span class="hz-check__text"><span>واکسیناسیون</span></span></label><label class="hz-check"><input type="checkbox" id="c-s2" aria-invalid="true" name="service" aria-describedby="c-s-e"><span class="hz-check__text"><span>جراحی</span></span></label><label class="hz-check"><input type="checkbox" id="c-s3" aria-invalid="true" name="service" aria-describedby="c-s-e"><span class="hz-check__text"><span>کاشت میکروچیپ</span></span></label></div><div class="hz-field__error" id="c-s-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>دست‌کم یک خدمت را انتخاب کنید.</span></div></fieldset></div><div class="demo-cell"><p class="demo-label">متن بلند فارسی</p><label class="hz-check"><input type="checkbox" id="c-l" aria-describedby="c-l-d"><span class="hz-check__text"><span>تصویر کارت ملی و تاریخ تولد واردشده را بررسی کرده‌ام و می‌دانم تا اصلاح پرونده، ثبت حیوان تازه امکان‌پذیر نیست.</span><span class="hz-check__desc" id="c-l-d">تصویر کارت ملی ارسالی خوانا نیست و تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تصویر واضح‌تری بارگذاری کنید و تاریخ تولد را بررسی کنید.</span></span></label></div></div>
+    </div>
+  </section>
+</div>
+<script>
+document.querySelectorAll('[data-indeterminate]').forEach(function (i) { i.indeterminate = true; });
+var parent = document.querySelector('[data-parent] input');
+var kids = Array.prototype.slice.call(document.querySelectorAll('input[name="facility"]'));
+function sync() {
+  var n = kids.filter(function (k) { return k.checked; }).length;
+  parent.checked = n === kids.length; parent.indeterminate = n > 0 && n < kids.length;
+  parent.setAttribute('aria-checked', parent.indeterminate ? 'mixed' : String(parent.checked));
+}
+parent.addEventListener('change', function () { kids.forEach(function (k) { k.checked = parent.checked; }); sync(); });
+kids.forEach(function (k) { k.addEventListener('change', sync); });
+</script>

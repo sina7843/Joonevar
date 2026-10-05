@@ -1,0 +1,68 @@
+<!-- @dsCard group="Feedback" height=600 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .demo-phones { display: flex; flex-direction: column; gap: 16px; }
+  .demo-phone { display: flex; flex-direction: column; gap: 12px; width: 360px; padding: 16px; background: var(--bg-chrome); border: 1px solid var(--border-default); border-radius: var(--radius-xl); }
+  .demo-phone__title { margin: 0; font-size: 18px; line-height: 30px; font-weight: 700; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">افقی — تبلت و دسکتاپ، بالای فرم <bdi dir="ltr">/animals/new</bdi> · «مکس» از مرحله ۳ ادامه می‌دهد</p>
+    <div class="hz-card">
+      <nav aria-label="مرحله‌های ثبت حیوان">
+        <ol class="hz-stepper">
+          <li class="hz-step hz-step--done"><span class="hz-step__dot"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><a href="#" class="hz-step__link">گونه و نژاد<span class="hz-visually-hidden"> (انجام‌شده)</span></a></li>
+          <li class="hz-step hz-step--done"><span class="hz-step__dot"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><a href="#" class="hz-step__link">نام و جنس<span class="hz-visually-hidden"> (انجام‌شده)</span></a></li>
+          <li class="hz-step hz-step--current" aria-current="step"><span class="hz-step__dot">۳</span><span>تولد و رنگ</span></li>
+          <li class="hz-step"><span class="hz-step__dot">۴</span><span>میکروچیپ</span></li>
+          <li class="hz-step"><span class="hz-step__dot">۵</span><span>تصویر</span></li>
+          <li class="hz-step"><span class="hz-step__dot">۶</span><span>بازبینی و ارسال</span></li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">عمودی — ستون کناری دسکتاپ، با خلاصه هر مرحله</p>
+      <div class="hz-card">
+        <nav aria-label="مرحله‌های ثبت حیوان">
+          <ol class="hz-stepper hz-stepper--vertical">
+            <li class="hz-step hz-step--done"><span class="hz-step__dot"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><span class="hz-step__label"><a href="#" class="hz-step__link">گونه و نژاد</a><span class="hz-step__sub">گربه · پرشین (اگزوتیک موکوتاه)</span></span></li>
+            <li class="hz-step hz-step--done"><span class="hz-step__dot"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><span class="hz-step__label"><a href="#" class="hz-step__link" style="outline: 2px solid var(--focus-ring); outline-offset: 2px">نام و جنس</a><span class="hz-step__sub">شاهزاده کوچولوی باغ ارم شیراز · ماده</span></span></li>
+            <li class="hz-step hz-step--current" aria-current="step"><span class="hz-step__dot">۳</span><span class="hz-step__label">تولد و رنگ<span class="hz-step__sub">در حال تکمیل</span></span></li>
+            <li class="hz-step"><span class="hz-step__dot">۴</span><span class="hz-step__label">میکروچیپ</span></li>
+            <li class="hz-step"><span class="hz-step__dot">۵</span><span class="hz-step__label">تصویر</span></li>
+            <li class="hz-step"><span class="hz-step__dot">۶</span><span class="hz-step__label">بازبینی و ارسال</span></li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">فشرده موبایل (زیر ۷۶۸) — نوار پیشرفت؛ دومی: پیش‌نویس بدون نام در مرحله ۱</p>
+      <div class="demo-phones">
+        <div class="demo-phone">
+          <h1 class="demo-phone__title">ثبت حیوان · مکس</h1>
+          <div class="hz-progress">
+            <div class="hz-progress__label"><b>مرحله ۳ از ۶</b><span>تولد و رنگ</span></div>
+            <div class="hz-progress__track" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="3" aria-valuetext="مرحله ۳ از ۶: تولد و رنگ"><div class="hz-progress__fill" style="width: 50%"></div></div>
+            <span class="hz-progress__next">بعدی: میکروچیپ · مرحله‌های ۱ و ۲ ذخیره شده‌اند</span>
+          </div>
+        </div>
+        <div class="demo-phone">
+          <h1 class="demo-phone__title">ثبت حیوان · بدون نام</h1>
+          <div class="hz-progress">
+            <div class="hz-progress__label"><b>مرحله ۱ از ۶</b><span>گونه و نژاد</span></div>
+            <div class="hz-progress__track" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1" aria-valuetext="مرحله ۱ از ۶: گونه و نژاد"><div class="hz-progress__fill" style="width: 16.67%"></div></div>
+            <span class="hz-progress__next">بعدی: نام و جنس</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "acc-owner-1",
+    "firstName": "سارا",
+    "lastName": "احمدی",
+    "displayName": "سارا احمدی",
+    "role": "USER",
+    "mobile": "09990000001",
+    "city": "تهران",
+    "nationalId": "9000000009",
+    "avatar": {
+      "slot": "people/acc-owner-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل سارا احمدی"
+    }
+  },
+  {
+    "id": "acc-breeder-1",
+    "firstName": "رضا",
+    "lastName": "کریمی",
+    "displayName": "رضا کریمی",
+    "role": "BREEDER",
+    "mobile": "09990000002",
+    "city": "کرج",
+    "nationalId": "9000001380",
+    "avatar": {
+      "slot": "people/acc-breeder-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل رضا کریمی"
+    }
+  },
+  {
+    "id": "acc-vet-1",
+    "firstName": "مریم",
+    "lastName": "صادقی",
+    "displayName": "مریم صادقی",
+    "role": "TRUSTED_VET",
+    "mobile": "09990000003",
+    "city": "تهران",
+    "nationalId": "9000002751",
+    "avatar": {
+      "slot": "people/acc-vet-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل مریم صادقی"
+    }
+  },
+  {
+    "id": "acc-assoc-1",
+    "firstName": "حمید",
+    "lastName": "نوروزی",
+    "displayName": "حمید نوروزی",
+    "role": "ASSOCIATION_OPERATOR",
+    "mobile": "09990000004",
+    "city": "تهران",
+    "nationalId": "9000004122",
+    "avatar": {
+      "slot": "people/acc-assoc-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل حمید نوروزی"
+    }
+  },
+  {
+    "id": "acc-genetics-1",
+    "firstName": "لیلا",
+    "lastName": "موسوی",
+    "displayName": "لیلا موسوی",
+    "role": "GENETICS_OPERATOR",
+    "mobile": "09990000005",
+    "city": "تهران",
+    "nationalId": "9000005493",
+    "avatar": {
+      "slot": "people/acc-genetics-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل لیلا موسوی"
+    }
+  },
+  {
+    "id": "acc-admin-1",
+    "firstName": "امیر",
+    "lastName": "حسینی",
+    "displayName": "امیر حسینی",
+    "role": "SUPERADMIN",
+    "mobile": "09990000006",
+    "city": "تهران",
+    "nationalId": "9000006864",
+    "avatar": {
+      "slot": "people/acc-admin-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل امیر حسینی"
+    }
+  },
+  {
+    "id": "acc-author-1",
+    "firstName": "نگار",
+    "lastName": "رستمی",
+    "displayName": "نگار رستمی",
+    "role": "AUTHOR",
+    "mobile": "09990000007",
+    "city": "اصفهان",
+    "nationalId": "9000008235",
+    "avatar": {
+      "slot": "people/acc-author-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل نگار رستمی"
+    }
+  },
+  {
+    "id": "acc-owner-2",
+    "firstName": "علی",
+    "lastName": "رضایی",
+    "displayName": "علی رضایی",
+    "role": "USER",
+    "mobile": "09990000021",
+    "city": "اصفهان",
+    "nationalId": "9000009606",
+    "avatar": {
+      "slot": "people/acc-owner-2",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل علی رضایی"
+    }
+  },
+  {
+    "id": "acc-owner-3",
+    "firstName": "مینا",
+    "lastName": "جعفری",
+    "displayName": "مینا جعفری",
+    "role": "USER",
+    "mobile": "09990000022",
+    "city": "شیراز",
+    "nationalId": "9000010977",
+    "avatar": {
+      "slot": "people/acc-owner-3",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل مینا جعفری"
+    }
+  },
+  {
+    "id": "acc-breeder-2",
+    "firstName": "بهرام",
+    "lastName": "فراهانی",
+    "displayName": "بهرام فراهانی",
+    "role": "BREEDER",
+    "mobile": "09990000023",
+    "city": "تبریز",
+    "nationalId": "9000012348",
+    "avatar": {
+      "slot": "people/acc-breeder-2",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل بهرام فراهانی"
+    }
+  }
+]

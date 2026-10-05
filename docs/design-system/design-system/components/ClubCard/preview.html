@@ -1,0 +1,78 @@
+<!-- @dsCard group="Domain cards" height=456 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-16); align-items: start; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">فهرست عمومی (<bdi dir="ltr">/associations</bdi> · <bdi dir="ltr">/clubs</bdi> · صفحه اصلی): انجمن بدون رویداد · کلاب با رویداد پیش‌رو (فوکوس) · کلاب استانی</p>
+    <div class="demo-grid">
+      <a class="hz-card hz-card--interactive hz-community" href="#">
+        <div class="hz-entity">
+          <div class="hz-media hz-media--avatar"><img src="../../assets/imagery/communities-community-1.jpg" alt="تصویر انجمن سگ‌های اصیل ایران"></div>
+          <div class="hz-entity__body">
+            <h3 class="hz-entity__name">انجمن سگ‌های اصیل ایران</h3>
+            <span class="hz-entity__meta">انجمن، کشوری، ۱۲۰ عضو</span>
+          </div>
+        </div>
+      </a>
+      <a class="hz-card hz-card--interactive hz-community" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">
+        <div class="hz-entity">
+          <div class="hz-media hz-media--avatar"><img src="../../assets/imagery/communities-community-3.jpg" alt="تصویر کلاب ژرمن شپرد ایران"></div>
+          <div class="hz-entity__body">
+            <h3 class="hz-entity__name">کلاب ژرمن شپرد ایران</h3>
+            <span class="hz-entity__meta">کلاب، کشوری، ۲۹۴ عضو</span>
+          </div>
+        </div>
+        <div class="hz-community__event"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z"/></svg><span class="hz-community__event-text"><span class="hz-visually-hidden">رویداد پیش‌رو: </span><span class="hz-community__event-title">گردهمایی ماهانه اعضا</span><span class="hz-community__event-when">۱ آبان ۱۴۰۵، ۱۶:۰۰</span><span class="hz-community__event-when">تهران، بوستان آب و آتش</span></span></div>
+      </a>
+      <a class="hz-card hz-card--interactive hz-community" href="#">
+        <div class="hz-entity">
+          <div class="hz-media hz-media--avatar"><img src="../../assets/imagery/communities-community-4.jpg" alt="تصویر کلاب رتریورهای تهران"></div>
+          <div class="hz-entity__body">
+            <h3 class="hz-entity__name">کلاب رتریورهای تهران</h3>
+            <span class="hz-entity__meta">کلاب، استانی، ۳۸۱ عضو</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">نمای مدیر و اپراتور (وضعیت فقط وقتی «فعال» نیست): نام بلند + در انتظار بررسی · تعلیق‌شده · بارگذاری</p>
+    <div class="demo-grid">
+      <a class="hz-card hz-card--interactive hz-community" href="#">
+        <div class="hz-entity">
+          <div class="hz-media hz-media--avatar"><img src="../../assets/imagery/communities-community-2.jpg" alt="تصویر انجمن دوستداران حیوانات خانگی اصفهان"></div>
+          <div class="hz-entity__body">
+            <h3 class="hz-entity__name">انجمن دوستداران حیوانات خانگی اصفهان</h3>
+            <span class="hz-entity__meta">انجمن، استانی، ۲۰۷ عضو</span>
+            <span class="hz-badge hz-badge--sm hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی</span>
+          </div>
+        </div>
+      </a>
+      <a class="hz-card hz-card--interactive hz-community" href="#">
+        <div class="hz-entity">
+          <div class="hz-media hz-media--avatar"><img src="../../assets/imagery/communities-community-5.jpg" alt="تصویر کلاب سگ سرابی"></div>
+          <div class="hz-entity__body">
+            <h3 class="hz-entity__name">کلاب سگ سرابی</h3>
+            <span class="hz-entity__meta">کلاب، کشوری، ۴۶۸ عضو</span>
+            <span class="hz-badge hz-badge--sm hz-badge--error"><span class="hz-badge__dot"></span>تعلیق‌شده</span>
+          </div>
+        </div>
+      </a>
+      <div class="hz-card hz-community" aria-hidden="true">
+        <div class="hz-entity">
+          <span class="hz-skeleton hz-media--avatar"></span>
+          <div class="hz-entity__body">
+            <span class="hz-skeleton hz-skeleton--title"></span>
+            <span class="hz-skeleton hz-skeleton--text" style="width: 50%"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

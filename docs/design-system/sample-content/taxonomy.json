@@ -1,0 +1,412 @@
+{
+  "species": [
+    {
+      "code": "DOG",
+      "nameFa": "سگ",
+      "nameEn": "Dog"
+    },
+    {
+      "code": "CAT",
+      "nameFa": "گربه",
+      "nameEn": "Cat"
+    }
+  ],
+  "breedGroups": [
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 1,
+      "nameFa": "سگ‌های گله و دام (به‌جز سگ‌های دام سوئیسی)"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 2,
+      "nameFa": "پینشر و شناوزر، مولوسوئیدها و سگ‌های کوهستان و دام سوئیسی"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 3,
+      "nameFa": "تریرها"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 4,
+      "nameFa": "داکسهوندها"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 5,
+      "nameFa": "اشپیتز و نژادهای ابتدایی"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 6,
+      "nameFa": "سگ‌های شکاری ردیاب و نژادهای وابسته"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 7,
+      "nameFa": "سگ‌های شکاری نشانگر"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 8,
+      "nameFa": "رتریورها، سگ‌های بیرون‌ران و سگ‌های آبی"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 9,
+      "nameFa": "سگ‌های همراه و اسباب‌بازی"
+    },
+    {
+      "speciesCode": "DOG",
+      "fciGroup": 10,
+      "nameFa": "سگ‌های تازی"
+    }
+  ],
+  "breeds": [
+    {
+      "id": "breed-german-shepherd",
+      "nameFa": "ژرمن شپرد",
+      "nameEn": "German Shepherd",
+      "slug": "german-shepherd",
+      "speciesCode": "DOG",
+      "fciGroup": 1,
+      "size": "LARGE",
+      "sizeFa": "بزرگ",
+      "sortOrder": 0,
+      "image": {
+        "slot": "breeds/german-shepherd",
+        "ratio": "16:9",
+        "subject": "A healthy adult German Shepherd standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد ژرمن شپرد"
+      },
+      "originCountry": "آلمان",
+      "coat": "MEDIUM",
+      "energy": "HIGH",
+      "trainability": "HIGH",
+      "careNeed": "MODERATE",
+      "withChildren": "HIGH",
+      "withOtherAnimals": "MODERATE",
+      "historyFa": "ژرمن شپرد در اواخر قرن نوزدهم در آلمان به‌عنوان سگ گله پرورش داده شد و به‌خاطر هوش و وفاداری‌اش به یکی از پرطرفدارترین نژادهای کار و همراهی تبدیل شد.",
+      "altNames": [
+        "شپرد آلمانی",
+        "Alsatian"
+      ]
+    },
+    {
+      "id": "breed-labrador-retriever",
+      "nameFa": "لابرادور رتریور",
+      "nameEn": "Labrador Retriever",
+      "slug": "labrador-retriever",
+      "speciesCode": "DOG",
+      "fciGroup": 8,
+      "size": "LARGE",
+      "sizeFa": "بزرگ",
+      "sortOrder": 1,
+      "image": {
+        "slot": "breeds/labrador-retriever",
+        "ratio": "16:9",
+        "subject": "A healthy adult Labrador Retriever standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد لابرادور رتریور"
+      }
+    },
+    {
+      "id": "breed-golden-retriever",
+      "nameFa": "گلدن رتریور",
+      "nameEn": "Golden Retriever",
+      "slug": "golden-retriever",
+      "speciesCode": "DOG",
+      "fciGroup": 8,
+      "size": "LARGE",
+      "sizeFa": "بزرگ",
+      "sortOrder": 2,
+      "image": {
+        "slot": "breeds/golden-retriever",
+        "ratio": "16:9",
+        "subject": "A healthy adult Golden Retriever standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد گلدن رتریور"
+      }
+    },
+    {
+      "id": "breed-siberian-husky",
+      "nameFa": "هاسکی سیبری",
+      "nameEn": "Siberian Husky",
+      "slug": "siberian-husky",
+      "speciesCode": "DOG",
+      "fciGroup": 5,
+      "size": "MEDIUM",
+      "sizeFa": "متوسط",
+      "sortOrder": 3,
+      "image": {
+        "slot": "breeds/siberian-husky",
+        "ratio": "16:9",
+        "subject": "A healthy adult Siberian Husky standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد هاسکی سیبری"
+      }
+    },
+    {
+      "id": "breed-rottweiler",
+      "nameFa": "روتوایلر",
+      "nameEn": "Rottweiler",
+      "slug": "rottweiler",
+      "speciesCode": "DOG",
+      "fciGroup": 2,
+      "size": "LARGE",
+      "sizeFa": "بزرگ",
+      "sortOrder": 4,
+      "image": {
+        "slot": "breeds/rottweiler",
+        "ratio": "16:9",
+        "subject": "A healthy adult Rottweiler standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد روتوایلر"
+      }
+    },
+    {
+      "id": "breed-doberman-pinscher",
+      "nameFa": "دوبرمن پینشر",
+      "nameEn": "Doberman Pinscher",
+      "slug": "doberman-pinscher",
+      "speciesCode": "DOG",
+      "fciGroup": 2,
+      "size": "LARGE",
+      "sizeFa": "بزرگ",
+      "sortOrder": 5,
+      "image": {
+        "slot": "breeds/doberman-pinscher",
+        "ratio": "16:9",
+        "subject": "A healthy adult Doberman Pinscher standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد دوبرمن پینشر"
+      }
+    },
+    {
+      "id": "breed-poodle",
+      "nameFa": "پودل",
+      "nameEn": "Poodle",
+      "slug": "poodle",
+      "speciesCode": "DOG",
+      "fciGroup": 9,
+      "size": "MEDIUM",
+      "sizeFa": "متوسط",
+      "sortOrder": 6,
+      "image": {
+        "slot": "breeds/poodle",
+        "ratio": "16:9",
+        "subject": "A healthy adult Poodle standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد پودل"
+      }
+    },
+    {
+      "id": "breed-beagle",
+      "nameFa": "بیگل",
+      "nameEn": "Beagle",
+      "slug": "beagle",
+      "speciesCode": "DOG",
+      "fciGroup": 6,
+      "size": "SMALL",
+      "sizeFa": "کوچک",
+      "sortOrder": 7,
+      "image": {
+        "slot": "breeds/beagle",
+        "ratio": "16:9",
+        "subject": "A healthy adult Beagle standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد بیگل"
+      }
+    },
+    {
+      "id": "breed-shih-tzu",
+      "nameFa": "شیتزو",
+      "nameEn": "Shih Tzu",
+      "slug": "shih-tzu",
+      "speciesCode": "DOG",
+      "fciGroup": 9,
+      "size": "TOY",
+      "sizeFa": "خیلی کوچک",
+      "sortOrder": 8,
+      "image": {
+        "slot": "breeds/shih-tzu",
+        "ratio": "16:9",
+        "subject": "A healthy adult Shih Tzu standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد شیتزو"
+      }
+    },
+    {
+      "id": "breed-sarabi-dog",
+      "nameFa": "سگ سرابی",
+      "nameEn": "Sarabi Dog",
+      "slug": "sarabi-dog",
+      "speciesCode": "DOG",
+      "fciGroup": 2,
+      "size": "GIANT",
+      "sizeFa": "خیلی بزرگ",
+      "sortOrder": 9,
+      "image": {
+        "slot": "breeds/sarabi-dog",
+        "ratio": "16:9",
+        "subject": "A healthy adult Sarabi Dog standing outdoors in warm daylight, three-quarter view",
+        "altFa": "سگ نژاد سگ سرابی"
+      },
+      "originCountry": "ایران",
+      "coat": "SHORT",
+      "energy": "MODERATE",
+      "trainability": "MODERATE",
+      "careNeed": "MODERATE",
+      "withChildren": "MODERATE",
+      "withOtherAnimals": "LOW",
+      "historyFa": "سگ سرابی از نژادهای بومی شمال‌غرب ایران است که قرن‌ها از گله و خانه‌های روستایی نگهبانی کرده است.",
+      "altNames": [
+        "سرابی",
+        "Sarabi Mastiff"
+      ]
+    }
+  ],
+  "breedLevelsFa": {
+    "LOW": "کم",
+    "MODERATE": "متوسط",
+    "HIGH": "زیاد"
+  },
+  "provincesSample": [
+    {
+      "code": "tehran",
+      "nameFa": "تهران"
+    },
+    {
+      "code": "isfahan",
+      "nameFa": "اصفهان"
+    },
+    {
+      "code": "fars",
+      "nameFa": "فارس"
+    },
+    {
+      "code": "khorasan-razavi",
+      "nameFa": "خراسان رضوی"
+    },
+    {
+      "code": "east-azerbaijan",
+      "nameFa": "آذربایجان شرقی"
+    },
+    {
+      "code": "gilan",
+      "nameFa": "گیلان"
+    },
+    {
+      "code": "mazandaran",
+      "nameFa": "مازندران"
+    },
+    {
+      "code": "alborz",
+      "nameFa": "البرز"
+    }
+  ],
+  "citiesSample": [
+    "تهران",
+    "کرج",
+    "اصفهان",
+    "شیراز",
+    "مشهد",
+    "تبریز",
+    "رشت",
+    "ساری"
+  ],
+  "vetSpecialties": [
+    "داخلی حیوانات کوچک",
+    "جراحی",
+    "ارتوپدی",
+    "پوست",
+    "دندان‌پزشکی",
+    "چشم‌پزشکی",
+    "قلب",
+    "تصویربرداری تشخیصی",
+    "بیهوشی",
+    "اورژانس و مراقبت‌های ویژه",
+    "مامایی و تولیدمثل",
+    "سرطان‌شناسی",
+    "تغذیه",
+    "رفتارشناسی",
+    "آزمایشگاه و آسیب‌شناسی"
+  ],
+  "centreTypes": [
+    "بیمارستان دامپزشکی",
+    "کلینیک دامپزشکی",
+    "درمانگاه دامپزشکی",
+    "مطب دامپزشکی",
+    "آزمایشگاه دامپزشکی",
+    "مرکز تصویربرداری",
+    "داروخانه دامپزشکی",
+    "مرکز ژنتیک",
+    "مرکز توان‌بخشی",
+    "سایر مراکز"
+  ],
+  "centreServices": [
+    "ویزیت و معاینه",
+    "واکسیناسیون",
+    "جراحی",
+    "دندان‌پزشکی",
+    "بستری",
+    "اورژانس",
+    "آزمایشگاه",
+    "تصویربرداری",
+    "داروخانه",
+    "کاشت میکروچیپ",
+    "نمونه‌گیری",
+    "فیزیوتراپی",
+    "مشاوره تغذیه",
+    "آرایش و بهداشت"
+  ],
+  "centreFacilities": [
+    "پارکینگ",
+    "بخش بستری",
+    "بخش ایزوله",
+    "آمبولانس",
+    "دسترسی بدون پله",
+    "اتاق انتظار",
+    "پرداخت کارتی",
+    "آزمایشگاه داخلی",
+    "تصویربرداری داخلی",
+    "داروخانه داخلی"
+  ],
+  "contentCategories": {
+    "ARTICLE": [
+      "آموزش کار با سامانه",
+      "شجره‌نامه",
+      "برگه ثبتی",
+      "میکروچیپ",
+      "مجوز جفت‌گیری",
+      "تست اصالت نسب",
+      "نژادهای سگ",
+      "دامپزشک معتمد",
+      "بیمارستان و کلینیک دامپزشکی",
+      "انجمن",
+      "کلاب",
+      "The Kennel Club",
+      "American Kennel Club"
+    ],
+    "NEWS": [
+      "اخبار انجمن",
+      "اخبار کلاب‌ها",
+      "اخبار دامپزشکی",
+      "اخبار نژادها"
+    ],
+    "ANNOUNCEMENT": [
+      "اطلاعیه‌های انجمن",
+      "اطلاعیه‌های سامانه",
+      "اطلاعیه‌های کلاب‌ها"
+    ]
+  },
+  "contentKindsFa": {
+    "ARTICLE": "آموزش",
+    "NEWS": "خبر",
+    "ANNOUNCEMENT": "اطلاعیه",
+    "CLUB_POST": "نوشته کلاب"
+  },
+  "shopCategoriesProposed": [
+    "غذای خشک",
+    "غذای مرطوب",
+    "تشویقی و مکمل",
+    "قلاده و افسار",
+    "اسباب‌بازی",
+    "بهداشت و آرایش",
+    "لوازم خواب و حمل"
+  ],
+  "shopCategoriesNote": "product_category is admin-managed and not seeded; these are proposed sample values."
+}

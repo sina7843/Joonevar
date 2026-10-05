@@ -1,0 +1,86 @@
+<!-- @dsCard group="Commerce" height=824 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">در انتظار تأیید سرور — صفحه خودکار به‌روز می‌شود؛ پرداخت دوباره لازم نیست</p>
+      <section class="hz-card hz-pay-result" aria-labelledby="pr-1">
+        <div class="hz-state hz-state--waiting" role="status" aria-live="polite">
+          <div class="hz-state__icon"><span class="hz-spinner hz-spinner--lg" aria-hidden="true"></span></div>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot" aria-hidden="true"></span>در جریان</span>
+          <h1 class="hz-state__title" id="pr-1">در حال تأیید پرداخت</h1>
+          <p class="hz-state__body">بانک شما را به همزیست برگرداند. تأیید نهایی با سرور همزیست است و این صفحه خودکار به‌روز می‌شود.</p>
+        </div>
+        <dl class="hz-kv">
+          <div class="hz-kv__row"><dt class="hz-kv__key">شناسه پرداخت</dt><dd class="hz-kv__value"><span class="hz-identifier"><bdi dir="ltr">HZP-GTGB8MQFU5DTR62Z</bdi></span></dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">خدمت</dt><dd class="hz-kv__value">صدور شجره‌نامه</dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">مبلغ</dt><dd class="hz-kv__value">۴۰۰٬۰۰۰ تومان</dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">شروع پرداخت</dt><dd class="hz-kv__value">۷ مهر ۱۴۰۵، ۹:۱۰</dd></div>
+        </dl>
+        <div class="hz-owner"><span>اقدام بعدی با: <b class="hz-owner__who">همزیست</b></span></div>
+        <p class="hz-pay-result__notice"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/></svg><span>اگر وضعیت تا چند دقیقه روشن نشد، از «پرداخت‌ها» پیگیری کنید. <b>دوباره پرداخت نکنید.</b></span></p>
+        <div class="hz-pay-result__actions">
+          <button type="button" class="hz-btn hz-btn--secondary hz-btn--block">بررسی دوباره وضعیت</button>
+        </div>
+      </section>
+    </section>
+
+    <section>
+      <p class="demo-label">موفق — تأییدشده سمت سرور؛ این صفحه رسید نیست · فوکوس روی کپی</p>
+      <section class="hz-card hz-pay-result" aria-labelledby="pr-2">
+        <div class="hz-state hz-state--success" role="status">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></div>
+          <span class="hz-badge hz-badge--success"><span class="hz-badge__dot" aria-hidden="true"></span>پرداخت‌شده</span>
+          <h1 class="hz-state__title" id="pr-2">پرداخت تأیید شد</h1>
+          <p class="hz-state__body">سرور همزیست پرداخت شما را برای «عضویت انجمن (مادام‌العمر)» تأیید کرد.</p>
+        </div>
+        <dl class="hz-kv">
+          <div class="hz-kv__row"><dt class="hz-kv__key">شناسه پرداخت</dt><dd class="hz-kv__value"><span class="hz-identifier"><bdi dir="ltr">HZP-EMN2VJ25FJFFN7SA</bdi><button type="button" class="hz-icon-btn" aria-label="کپی شناسه پرداخت" style="outline:2px solid var(--focus-ring);outline-offset:2px"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg></button></span></dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">خدمت</dt><dd class="hz-kv__value">عضویت انجمن (مادام‌العمر)</dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">مبلغ</dt><dd class="hz-kv__value">۳۰۰٬۰۰۰ تومان</dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">زمان تأیید</dt><dd class="hz-kv__value">۲۳ اسفند ۱۴۰۴، ۱۰:۱۲</dd></div>
+        </dl>
+        <p class="hz-pay-result__notice"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg><span>این صفحه رسید پرداخت نیست. سابقه رسمی این پرداخت در <b>«پرداخت‌ها»</b> نگه داشته می‌شود.</span></p>
+        <div class="hz-pay-result__next">
+          <p class="hz-pay-result__next-title">قدم بعد</p>
+          <ul class="hz-pay-result__next-list">
+            <li>عضویت شما فعال شد؛ ثبت حیوان و درخواست برگه ثبتی باز است.</li>
+          </ul>
+        </div>
+        <div class="hz-pay-result__actions">
+          <a class="hz-btn hz-btn--primary hz-btn--block" href="#">ثبت حیوان</a>
+          <a class="hz-btn hz-btn--secondary hz-btn--block" href="#">مشاهده پرداخت‌ها</a>
+        </div>
+      </section>
+    </section>
+
+    <section>
+      <p class="demo-label">ناموفق — علت و راه بعدی؛ پرداخت دوباره با مبلغ در برچسب</p>
+      <section class="hz-card hz-pay-result" aria-labelledby="pr-3">
+        <div class="hz-state hz-state--error" role="alert">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></div>
+          <span class="hz-badge hz-badge--error"><span class="hz-badge__dot" aria-hidden="true"></span>ناموفق</span>
+          <h1 class="hz-state__title" id="pr-3">پرداخت انجام نشد</h1>
+          <p class="hz-state__body">بانک این پرداخت را تأیید نکرد، پس هزینه «مجوز جفت‌گیری» هنوز پرداخت نشده است. اگر مبلغی از حساب شما کم شده، بانک آن را به همان حساب برمی‌گرداند.</p>
+        </div>
+        <dl class="hz-kv">
+          <div class="hz-kv__row"><dt class="hz-kv__key">شناسه پرداخت</dt><dd class="hz-kv__value"><span class="hz-identifier"><bdi dir="ltr">HZP-TEQUAKE8YGA7CDQP</bdi></span></dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">خدمت</dt><dd class="hz-kv__value">مجوز جفت‌گیری</dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">مبلغ</dt><dd class="hz-kv__value">۳۰۰٬۰۰۰ تومان</dd></div>
+          <div class="hz-kv__row"><dt class="hz-kv__key">زمان تلاش</dt><dd class="hz-kv__value">۲۷ شهریور ۱۴۰۵، ۲۰:۰۵</dd></div>
+        </dl>
+        <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <b class="hz-owner__who">شما</b></span></div>
+        <div class="hz-pay-result__actions">
+          <button type="button" class="hz-btn hz-btn--primary hz-btn--block">پرداخت دوباره ۳۰۰٬۰۰۰ تومان</button>
+          <a class="hz-btn hz-btn--secondary hz-btn--block" href="#">بازگشت به درخواست</a>
+        </div>
+      </section>
+    </section>
+  </div>
+</div>
+<script></script>

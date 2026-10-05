@@ -1,0 +1,282 @@
+[
+  {
+    "id": "animal-1",
+    "name": "رکس",
+    "species": "DOG",
+    "speciesFa": "سگ",
+    "breedId": "breed-german-shepherd",
+    "breedFa": "ژرمن شپرد",
+    "sex": "MALE",
+    "sexFa": "نر",
+    "birthDate": {
+      "iso": "2023-04-11",
+      "displayFa": "۱۴۰۲/۰۱/۲۲",
+      "longFa": "۲۲ فروردین ۱۴۰۲"
+    },
+    "birthDateApproximate": false,
+    "color": "سیاه و قهوه‌ای",
+    "ownerAccountId": "acc-owner-1",
+    "status": "REGISTERED",
+    "origin": "G0",
+    "generation": 0,
+    "petId": "PET-8JDUN4GH",
+    "microchipNumber": "364416562459223",
+    "draftStep": null,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-1",
+      "ratio": "4:3",
+      "subject": "German Shepherd, سیاه و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ رکس"
+    },
+    "registeredAt": {
+      "iso": "2026-03-10T10:00:00+03:30",
+      "displayFa": "۱۴۰۴/۱۲/۱۹",
+      "longFa": "۱۹ اسفند ۱۴۰۴"
+    }
+  },
+  {
+    "id": "animal-2",
+    "name": "لونا",
+    "species": "DOG",
+    "speciesFa": "سگ",
+    "breedId": "breed-golden-retriever",
+    "breedFa": "گلدن رتریور",
+    "sex": "FEMALE",
+    "sexFa": "ماده",
+    "birthDate": {
+      "iso": "2022-09-03",
+      "displayFa": "۱۴۰۱/۰۶/۱۲",
+      "longFa": "۱۲ شهریور ۱۴۰۱"
+    },
+    "birthDateApproximate": false,
+    "color": "طلایی",
+    "ownerAccountId": "acc-owner-1",
+    "status": "REGISTERED",
+    "origin": "INTERNAL_G1PLUS",
+    "generation": 1,
+    "petId": "PET-GSBH65DC",
+    "microchipNumber": "364508823499330",
+    "draftStep": null,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-2",
+      "ratio": "4:3",
+      "subject": "Golden Retriever, طلایی, natural light, eye level",
+      "altFa": "سگ لونا"
+    },
+    "registeredAt": {
+      "iso": "2026-04-11T10:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۱/۲۲",
+      "longFa": "۲۲ فروردین ۱۴۰۵"
+    }
+  },
+  {
+    "id": "animal-3",
+    "name": "آرا",
+    "species": "DOG",
+    "speciesFa": "سگ",
+    "breedId": "breed-sarabi-dog",
+    "breedFa": "سگ سرابی",
+    "sex": "MALE",
+    "sexFa": "نر",
+    "birthDate": {
+      "iso": "2021-12-20",
+      "displayFa": "۱۴۰۰/۰۹/۲۹",
+      "longFa": "۲۹ آذر ۱۴۰۰"
+    },
+    "birthDateApproximate": false,
+    "color": "کرم و قهوه‌ای",
+    "ownerAccountId": "acc-breeder-1",
+    "status": "REGISTERED",
+    "origin": "G0",
+    "generation": 0,
+    "petId": "PET-2GKRHEW6",
+    "microchipNumber": "364093802394719",
+    "draftStep": null,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-3",
+      "ratio": "4:3",
+      "subject": "Sarabi Dog, کرم و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ آرا"
+    },
+    "registeredAt": {
+      "iso": "2026-05-12T10:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۲/۲۲",
+      "longFa": "۲۲ اردیبهشت ۱۴۰۵"
+    }
+  },
+  {
+    "id": "animal-4",
+    "name": "تارا",
+    "species": "DOG",
+    "speciesFa": "سگ",
+    "breedId": "breed-german-shepherd",
+    "breedFa": "ژرمن شپرد",
+    "sex": "FEMALE",
+    "sexFa": "ماده",
+    "birthDate": {
+      "iso": "2022-02-14",
+      "displayFa": "۱۴۰۰/۱۱/۲۵",
+      "longFa": "۲۵ بهمن ۱۴۰۰"
+    },
+    "birthDateApproximate": false,
+    "color": "سیاه و قهوه‌ای",
+    "ownerAccountId": "acc-breeder-1",
+    "status": "REGISTERED",
+    "origin": "FOREIGN_PEDIGREE",
+    "generation": 1,
+    "petId": "PET-6DP9RN3R",
+    "microchipNumber": "364990800282495",
+    "draftStep": null,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-4",
+      "ratio": "4:3",
+      "subject": "German Shepherd, سیاه و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ تارا"
+    },
+    "registeredAt": {
+      "iso": "2026-06-13T10:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۳/۲۳",
+      "longFa": "۲۳ خرداد ۱۴۰۵"
+    }
+  },
+  {
+    "id": "animal-5",
+    "name": "مکس",
+    "species": "DOG",
+    "speciesFa": "سگ",
+    "breedId": "breed-siberian-husky",
+    "breedFa": "هاسکی سیبری",
+    "sex": "MALE",
+    "sexFa": "نر",
+    "birthDate": {
+      "iso": "2024-01-05",
+      "displayFa": "۱۴۰۲/۱۰/۱۵",
+      "longFa": "۱۵ دی ۱۴۰۲"
+    },
+    "birthDateApproximate": false,
+    "color": "خاکستری و سفید",
+    "ownerAccountId": "acc-owner-2",
+    "status": "DRAFT",
+    "origin": "G0",
+    "generation": 0,
+    "petId": null,
+    "microchipNumber": null,
+    "draftStep": 3,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-5",
+      "ratio": "4:3",
+      "subject": "Siberian Husky, خاکستری و سفید, natural light, eye level",
+      "altFa": "سگ مکس"
+    },
+    "registeredAt": null
+  },
+  {
+    "id": "animal-6",
+    "name": "بلا",
+    "species": "DOG",
+    "speciesFa": "سگ",
+    "breedId": "breed-beagle",
+    "breedFa": "بیگل",
+    "sex": "FEMALE",
+    "sexFa": "ماده",
+    "birthDate": {
+      "iso": "2023-07-30",
+      "displayFa": "۱۴۰۲/۰۵/۰۸",
+      "longFa": "۸ مرداد ۱۴۰۲"
+    },
+    "birthDateApproximate": false,
+    "color": "سفید",
+    "ownerAccountId": "acc-owner-3",
+    "status": "REGISTERED",
+    "origin": "G0",
+    "generation": 0,
+    "petId": "PET-6H57P94P",
+    "microchipNumber": "364586042922501",
+    "draftStep": null,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-6",
+      "ratio": "4:3",
+      "subject": "Beagle, سفید, natural light, eye level",
+      "altFa": "سگ بلا"
+    },
+    "registeredAt": {
+      "iso": "2026-08-15T10:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۵/۲۴",
+      "longFa": "۲۴ مرداد ۱۴۰۵"
+    }
+  },
+  {
+    "id": "animal-7",
+    "name": "رعد",
+    "species": "DOG",
+    "speciesFa": "سگ",
+    "breedId": "breed-rottweiler",
+    "breedFa": "روتوایلر",
+    "sex": "MALE",
+    "sexFa": "نر",
+    "birthDate": {
+      "iso": "2020-05-18",
+      "displayFa": "۱۳۹۹/۰۲/۲۹",
+      "longFa": "۲۹ اردیبهشت ۱۳۹۹"
+    },
+    "birthDateApproximate": false,
+    "color": "سیاه و قهوه‌ای",
+    "ownerAccountId": "acc-breeder-2",
+    "status": "REGISTERED",
+    "origin": "INTERNAL_G1PLUS",
+    "generation": 1,
+    "petId": "PET-T4UPBJCQ",
+    "microchipNumber": "364929721401685",
+    "draftStep": null,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-7",
+      "ratio": "4:3",
+      "subject": "Rottweiler, سیاه و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ رعد"
+    },
+    "registeredAt": {
+      "iso": "2026-03-16T10:00:00+03:30",
+      "displayFa": "۱۴۰۴/۱۲/۲۵",
+      "longFa": "۲۵ اسفند ۱۴۰۴"
+    }
+  },
+  {
+    "id": "animal-8",
+    "name": "شیرین",
+    "species": "CAT",
+    "speciesFa": "گربه",
+    "breedId": null,
+    "breedFa": "نامشخص",
+    "sex": "FEMALE",
+    "sexFa": "ماده",
+    "birthDate": {
+      "iso": "2023-03-01",
+      "displayFa": "۱۴۰۱/۱۲/۱۰",
+      "longFa": "۱۰ اسفند ۱۴۰۱"
+    },
+    "birthDateApproximate": false,
+    "color": "خاکستری",
+    "ownerAccountId": "acc-owner-2",
+    "status": "DRAFT",
+    "origin": "G0",
+    "generation": 0,
+    "petId": null,
+    "microchipNumber": null,
+    "draftStep": 3,
+    "draftStepsTotal": 6,
+    "photo": {
+      "slot": "animals/animal-8",
+      "ratio": "4:3",
+      "subject": "grey domestic cat, خاکستری, natural light, eye level",
+      "altFa": "گربه شیرین"
+    },
+    "registeredAt": null
+  }
+]

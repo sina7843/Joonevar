@@ -1,0 +1,82 @@
+<!-- @dsCard group="Base" height=736 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-page { display: flex; flex-direction: column; gap: 16px; }
+  .demo-stack { display: flex; flex-direction: column; gap: 12px; }
+  .demo-narrow { max-width: 360px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">افقی — border-default، بین دو ناحیه روی صفحه</p>
+      <div class="demo-page">
+        <div class="hz-section-header hz-section-header--sm" style="margin: 0"><h2 class="hz-section-header__title"><span class="hz-section-header__bar"></span>حیوان‌های من</h2></div>
+        <hr class="hz-divider">
+        <div class="hz-section-header hz-section-header--sm" style="margin: 0"><h2 class="hz-section-header__title"><span class="hz-section-header__bar"></span>درخواست‌های فعال</h2></div>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">افقی ملایم — border-subtle، درون کارت بین دو گروه</p>
+      <div class="hz-card">
+        <dl class="hz-kv">
+          <div class="hz-kv__row" style="border: 0"><dt class="hz-kv__key">شناسه حیوان</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">PET-8JDUN4GH</bdi></dd></div>
+          <div class="hz-kv__row" style="border: 0"><dt class="hz-kv__key">میکروچیپ</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">364416562459223</bdi></dd></div>
+        </dl>
+        <hr class="hz-divider hz-divider--subtle" style="margin-block: 8px">
+        <dl class="hz-kv">
+          <div class="hz-kv__row" style="border: 0"><dt class="hz-kv__key">برگه ثبتی</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">RS-JTFZYEWD</bdi></dd></div>
+        </dl>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">عمودی — بین گروه‌های ابزار و بین آیتم‌های متا (به‌جای نقطه میانی کنار رقم‌ها)</p>
+      <div class="demo-stack">
+        <div class="demo-row" style="gap: 4px; padding: 4px; border: 1px solid var(--border-default); border-radius: var(--radius-md); align-self: flex-start">
+          <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+          <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="چرخش ۹۰ درجه"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+          <span class="hz-divider hz-divider--vertical hz-divider--subtle" aria-hidden="true" style="margin-inline: 4px"></span>
+          <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بارگیری"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg></button>
+        </div>
+        <div class="hz-meta">
+          <span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۶ دقیقه مطالعه</span>
+          <span class="hz-divider hz-divider--vertical" aria-hidden="true" style="min-height: 14px"></span>
+          <span class="hz-meta__item">۶ مهر ۱۴۰۵</span>
+        </div>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">با برچسب — میانه («یا») و در شروع (زیربخش فرم)</p>
+      <div class="demo-stack">
+        <p class="hz-divider hz-divider--label"><span class="hz-divider__label">یا</span></p>
+        <p class="hz-divider hz-divider--label hz-divider--label-start"><span class="hz-divider__label">اطلاعات تکمیلی (اختیاری)</span></p>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <p class="demo-label">در استعلام اصالت سند — دو راه هم‌ارز با «یا»</p>
+    <div class="hz-card demo-stack" style="max-width: 520px">
+      <div class="hz-field">
+        <label class="hz-field__label" for="dv-doc">شماره سند</label>
+        <input class="hz-input hz-input--ltr" id="dv-doc" value="PD-P52ZXV92">
+      </div>
+      <p class="hz-divider hz-divider--label hz-divider--subtle"><span class="hz-divider__label">یا</span></p>
+      <button class="hz-btn hz-btn--secondary hz-btn--block" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm0,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48ZM200,40H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-64,72V144a8,8,0,0,1,16,0v32a8,8,0,0,1-16,0Zm80-16a8,8,0,0,1-8,8H184v40a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h24V144a8,8,0,0,1,16,0v8h24A8,8,0,0,1,216,160Zm0,32v16a8,8,0,0,1-16,0V192a8,8,0,0,1,16,0Z"/></svg>اسکن کد QR روی سند</button>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">متن بلند — برچسب می‌شکند، خط‌ها دست‌کم ۲۴px می‌مانند (۳۶۰px)</p>
+    <div class="demo-narrow">
+      <p class="hz-divider hz-divider--label"><span class="hz-divider__label">یا اگر سند چاپی ندارید، شماره میکروچیپ ۱۵ رقمی حیوان را وارد کنید</span></p>
+    </div>
+  </section>
+</div>
+<script></script>

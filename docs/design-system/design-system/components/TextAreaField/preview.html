@@ -1,0 +1,95 @@
+<!-- @dsCard group="Inputs" height=768 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .demo-cell { display: flex; flex-direction: column; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">واریانت‌ها و حالت‌ها — شمارنده نویسه در انتهای سطر راهنما</p>
+    <div class="demo-grid">
+      <div class="demo-cell">
+        <p class="demo-label">پیش‌فرض — ۳ ردیف، با شمارنده</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="ta-1">توضیحات آگهی<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <textarea class="hz-textarea" id="ta-1" rows="3" data-max="500" aria-describedby="ta-1-hint ta-1-count">توله ژرمن شپرد سه‌ماهه، واکسن نوبت اول را زده و میکروچیپ دارد. والدین او در کنل آریا هستند.</textarea>
+          <div class="hz-field__foot">
+            <div class="hz-field__hint" id="ta-1-hint">سن، واکسن و شرایط تحویل را بنویسید.</div>
+            <div class="hz-field__counter" id="ta-1-count">۹۱ از ۵۰۰ نویسه</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خالی — شمارنده صفر</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="ta-2">دلیل درخواست اصلاح<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <textarea class="hz-textarea" id="ta-2" rows="3" data-max="500" aria-describedby="ta-2-hint ta-2-count" placeholder="مثلاً: تصویر پروانه کسب خوانا نیست؛ نسخه واضح‌تری بارگذاری کنید."></textarea>
+          <div class="hz-field__foot">
+            <div class="hz-field__hint" id="ta-2-hint">متقاضی همین متن را می‌بیند؛ بنویسید چه چیزی و چطور اصلاح شود.</div>
+            <div class="hz-field__counter" id="ta-2-count">۰ از ۵۰۰ نویسه</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">نزدیک سقف (۹۰٪ به بالا) — متن بلند فارسی، ۶ ردیف</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="ta-3">پیام به متقاضی<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <textarea class="hz-textarea" id="ta-3" rows="6" data-max="200" aria-describedby="ta-3-count">تصویر کارت ملی ارسالی خوانا نیست و تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تصویر واضح‌تری بارگذاری کنید و تاریخ تولد را بررسی کنید. تا اصلاح پرونده، ثبت حیوان تازه امکان‌پذیر نیست.</textarea>
+          <div class="hz-field__foot">
+            <div class="hz-field__counter hz-field__counter--near" id="ta-3-count">۱۹۱ از ۲۰۰ نویسه</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خطا — از سقف گذشته (متن بریده نمی‌شود)</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="ta-4">خلاصه مطلب<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <textarea class="hz-textarea" id="ta-4" rows="6" data-max="200" aria-invalid="true" aria-describedby="ta-4-count ta-4-error">با توجه به درخواست‌های رسیده، مهلت ثبت‌نام آزمون اصالت نسب تمدید شد. نمونه‌ها از این پس فقط از طریق دامپزشک معتمد و با کد پیگیری نمونه پذیرفته می‌شوند و ارسال پستی مستقیم به مرکز ژنتیک امکان‌پذیر نیست.</textarea>
+          <div class="hz-field__foot">
+            <div class="hz-field__error" id="ta-4-error"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>خلاصه ۱ نویسه از حد مجاز بیشتر است؛ کوتاهش کنید.</span></div>
+            <div class="hz-field__counter hz-field__counter--over" id="ta-4-count">۲۰۱ از ۲۰۰ نویسه</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">فوکوس</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="ta-5">پرسش درباره کالا</label>
+          <textarea class="hz-textarea" id="ta-5" rows="3" data-max="300" aria-describedby="ta-5-count" style="border-color:var(--focus-ring);box-shadow:inset 0 0 0 1px var(--focus-ring)">برای سگ ۸ ساله هم مناسب است؟</textarea>
+          <div class="hz-field__foot">
+            <div class="hz-field__counter" id="ta-5-count">۲۸ از ۳۰۰ نویسه</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">غیرفعال — با دلیل</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="ta-6">نظر شما درباره کالا</label>
+          <textarea class="hz-textarea" id="ta-6" rows="3" disabled aria-describedby="ta-6-hint">بسته‌بندی مرتب بود و سگم با اشتها خورد.</textarea>
+          <div class="hz-field__foot">
+            <div class="hz-field__hint" id="ta-6-hint">نظر ثبت‌شده در انتظار بررسی است و تا آن زمان ویرایش نمی‌شود.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  (function () {
+    var fa = function (n) { return n.toLocaleString('fa-IR'); };
+    document.querySelectorAll('.hz-textarea[data-max]').forEach(function (ta) {
+      var max = +ta.dataset.max, out = document.getElementById(ta.id + '-count');
+      if (!out) return;
+      ta.addEventListener('input', function () {
+        var n = ta.value.length;
+        out.textContent = fa(n) + ' از ' + fa(max) + ' نویسه';
+        out.classList.toggle('hz-field__counter--near', n >= max * 0.9 && n <= max);
+        out.classList.toggle('hz-field__counter--over', n > max);
+        // announce only near/over the limit (aria-live set on demand)
+        if (n >= max * 0.9) out.setAttribute('aria-live', 'polite'); else out.removeAttribute('aria-live');
+      });
+    });
+  })();
+</script>

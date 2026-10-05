@@ -1,0 +1,105 @@
+<!-- @dsCard group="Data display" height=616 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-box { padding: 12px 16px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-surface); }
+  .demo-stack { display: flex; flex-direction: column; gap: 12px; }
+  .demo-phone { width: 390px; padding: 16px; border: 1px dashed var(--border-control); border-radius: var(--radius-xl); display: flex; flex-direction: column; gap: 16px; }
+  .demo-sub { margin: 0; font-size: 11px; line-height: 18px; color: var(--text-secondary); }
+  .demo code { white-space: nowrap; font-size: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>دسکتاپ و تبلت ≥۷۶۸</b> — شماره صفحه با فاصله «…»، قبلی/بعدی و شمار نتایج</p>
+    <div class="demo-stack">
+      <div class="demo-box">
+        <nav class="hz-pagination" aria-label="صفحه‌بندی درخواست‌ها">
+          <p class="hz-pagination__count" aria-live="polite">نمایش <b>۲۱</b> تا <b>۴۰</b> از <b>۲۳۸</b></p>
+          <ul class="hz-pagination__pages">
+            <li><a class="hz-page hz-page--step" href="#" rel="prev"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg>قبلی</a></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۱">۱</a></li>
+            <li><a class="hz-page" href="#" aria-current="page" aria-label="صفحه ۲، صفحه فعلی">۲</a></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۳">۳</a></li>
+            <li><span class="hz-page hz-page--gap" aria-hidden="true">…</span></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۱۲">۱۲</a></li>
+            <li><a class="hz-page hz-page--step" href="#" rel="next">بعدی<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="demo-box">
+        <nav class="hz-pagination" aria-label="صفحه‌بندی درخواست‌ها">
+          <p class="hz-pagination__count">نمایش <b>۱۰۱</b> تا <b>۱۲۰</b> از <b>۲۳۸</b></p>
+          <ul class="hz-pagination__pages">
+            <li><a class="hz-page hz-page--step" href="#" rel="prev"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg>قبلی</a></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۱">۱</a></li>
+            <li><span class="hz-page hz-page--gap" aria-hidden="true">…</span></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۵">۵</a></li>
+            <li><a class="hz-page" href="#" aria-current="page" aria-label="صفحه ۶، صفحه فعلی">۶</a></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۷" style="outline:2px solid var(--focus-ring);outline-offset:2px">۷</a></li>
+            <li><span class="hz-page hz-page--gap" aria-hidden="true">…</span></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۱۲">۱۲</a></li>
+            <li><a class="hz-page hz-page--step" href="#" rel="next">بعدی<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></li>
+          </ul>
+        </nav>
+        <p class="demo-sub">صفحه میانی: دو فاصله «…» · فوکوس روی صفحه ۷</p>
+      </div>
+      <div class="demo-box">
+        <nav class="hz-pagination" aria-label="صفحه‌بندی درخواست‌ها">
+          <p class="hz-pagination__count">نمایش <b>۲۲۱</b> تا <b>۲۳۸</b> از <b>۲۳۸</b></p>
+          <ul class="hz-pagination__pages">
+            <li><a class="hz-page hz-page--step" href="#" rel="prev"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg>قبلی</a></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۱">۱</a></li>
+            <li><span class="hz-page hz-page--gap" aria-hidden="true">…</span></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۱۰">۱۰</a></li>
+            <li><a class="hz-page" href="#" aria-label="صفحه ۱۱">۱۱</a></li>
+            <li><a class="hz-page" href="#" aria-current="page" aria-label="صفحه ۱۲، صفحه فعلی">۱۲</a></li>
+            <li><a class="hz-page hz-page--step" aria-disabled="true">بعدی<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a></li>
+          </ul>
+        </nav>
+        <p class="demo-sub">صفحه آخر: «بعدی» غیرفعال (<code dir="ltr">aria-disabled</code>، بدون href)</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — قبلی / بعدی</p>
+      <div class="demo-phone">
+        <nav class="hz-pagination" aria-label="صفحه‌بندی درخواست‌ها">
+          <a class="hz-btn hz-btn--secondary" href="#" rel="prev"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg>قبلی</a>
+          <span class="hz-pagination__count" aria-live="polite">صفحه <b>۲</b> از <b>۱۲</b></span>
+          <a class="hz-btn hz-btn--secondary" href="#" rel="next">بعدی<svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a>
+        </nav>
+        <nav class="hz-pagination" aria-label="صفحه‌بندی درخواست‌ها">
+          <span class="hz-btn hz-btn--secondary" aria-disabled="true"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg>قبلی</span>
+          <span class="hz-pagination__count">صفحه <b>۱</b> از <b>۱۲</b></span>
+          <a class="hz-btn hz-btn--secondary" href="#" rel="next">بعدی<svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></a>
+        </nav>
+        <p class="demo-sub">صفحه اول: «قبلی» غیرفعال</p>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — «نمایش بیشتر» (فهرست‌های پیمایشی)</p>
+      <div class="demo-phone">
+        <div class="hz-pagination__more">
+          <p class="hz-pagination__count" aria-live="polite"><b>۴۰</b> از <b>۲۳۸</b> مورد نمایش داده شد</p>
+          <button class="hz-btn hz-btn--secondary hz-btn--block" type="button">نمایش بیشتر</button>
+        </div>
+        <div class="hz-pagination__more">
+          <p class="hz-pagination__count"><b>۴۰</b> از <b>۲۳۸</b> مورد نمایش داده شد</p>
+          <button class="hz-btn hz-btn--secondary hz-btn--block" type="button" aria-busy="true"><span class="hz-spinner"></span>در حال بارگذاری</button>
+        </div>
+        <div class="hz-pagination__more">
+          <p class="hz-pagination__count">همه <b>۲۳۸</b> مورد نمایش داده شد</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

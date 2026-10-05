@@ -1,0 +1,126 @@
+<!-- @dsCard group="Operations" height=1000 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+
+    <section>
+      <p class="demo-label">نیازمند اصلاح — دلیل برای کاربر + یادداشت داخلی</p>
+      <div class="hz-card hz-reason">
+        <div class="hz-field">
+          <div class="hz-field__label-row">
+            <label class="hz-field__label" for="r1">دلیل اصلاح<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <span class="hz-reason__audience hz-reason__audience--public" id="r1-aud"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>به کاربر نمایش داده می‌شود</span>
+          </div>
+          <div class="hz-filterbar" role="group" aria-label="دلیل‌های آماده">
+            <button class="hz-chip" type="button" aria-pressed="false">تصویر خوانا نیست</button>
+            <button class="hz-chip" type="button" aria-pressed="true">تاریخ تولد مطابقت ندارد</button>
+            <button class="hz-chip" type="button" aria-pressed="false">مدرک ناقص است</button>
+          </div>
+          <textarea class="hz-textarea" id="r1" rows="3" required maxlength="500" aria-describedby="r1-aud r1-count">تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تاریخ تولد را مطابق کارت ملی اصلاح کنید.</textarea>
+          <div class="hz-field__foot"><span class="hz-field__hint">کاربر همین متن را در پیامک و پرونده می‌بیند.</span><span class="hz-field__counter" id="r1-count" aria-live="polite">۹۱ از ۵۰۰ نویسه</span></div>
+        </div>
+        <div class="hz-field">
+          <div class="hz-field__label-row">
+            <label class="hz-field__label" for="r1n">یادداشت داخلی <span class="hz-field__opt">اختیاری</span></label>
+            <span class="hz-reason__audience" id="r1n-aud"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>فقط کارکنان انجمن</span>
+          </div>
+          <textarea class="hz-textarea hz-textarea--internal" id="r1n" rows="3" maxlength="1000" aria-describedby="r1n-aud">کاربر در تماس تلفنی گفت کارت ملی تازه صادر شده است؛ اگر تصویر تازه هم مغایرت داشت، به مدیر انجمن ارجاع شود.</textarea>
+          <span class="hz-field__counter">۱۰۷ از ۱۰۰۰ نویسه</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">رد — خطا: دلیل خالی · یادداشت داخلی بسته</p>
+      <div class="hz-card hz-reason">
+        <div class="hz-field">
+          <div class="hz-field__label-row">
+            <label class="hz-field__label" for="r2">دلیل رد<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <span class="hz-reason__audience hz-reason__audience--public" id="r2-aud"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>به کاربر نمایش داده می‌شود</span>
+          </div>
+          <div class="hz-filterbar" role="group" aria-label="دلیل‌های آماده">
+            <button class="hz-chip" type="button" aria-pressed="false">کد ملی با نام مطابقت ندارد</button>
+            <button class="hz-chip" type="button" aria-pressed="false">درخواست تکراری است</button>
+            <button class="hz-chip" type="button" aria-pressed="false">مدرک معتبر نیست</button>
+          </div>
+          <textarea class="hz-textarea" id="r2" rows="3" required maxlength="500" aria-invalid="true" aria-describedby="r2-aud r2-err" placeholder="دلیل را دقیق بنویسید؛ همین متن برای کاربر فرستاده می‌شود."></textarea>
+          <div class="hz-field__foot">
+            <span class="hz-field__error" id="r2-err"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></svg>برای رد، دلیل را بنویسید یا یکی از دلیل‌های آماده را انتخاب کنید.</span>
+            <span class="hz-field__counter">۰ از ۵۰۰ نویسه</span>
+          </div>
+        </div>
+        <button class="hz-btn hz-btn--ghost hz-btn--sm hz-reason__add" type="button" aria-expanded="false"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>افزودن یادداشت داخلی</button>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">تعلیق — متن بلند، نزدیک سقف ۵۰۰ نویسه</p>
+      <div class="hz-card hz-reason">
+        <div class="hz-field">
+          <div class="hz-field__label-row">
+            <label class="hz-field__label" for="r3">دلیل تعلیق کلاب سگ سرابی<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <span class="hz-reason__audience hz-reason__audience--public" id="r3-aud"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>به مدیران کلاب نمایش داده می‌شود</span>
+          </div>
+          <div class="hz-filterbar" role="group" aria-label="دلیل‌های آماده">
+            <button class="hz-chip" type="button" aria-pressed="true">آگهی فروش بدون مجوز جفت‌گیری</button>
+            <button class="hz-chip" type="button" aria-pressed="false">بی‌توجهی به اخطار رسمی</button>
+          </div>
+          <textarea class="hz-textarea" id="r3" rows="10" required maxlength="500" aria-describedby="r3-aud r3-count">کلاب در یک ماه گذشته دست‌کم هفت آگهی فروش توله بدون مجوز جفت‌گیری منتشر کرده و پس از دو اخطار رسمی در ۱۲ و ۲۸ شهریور ۱۴۰۵ نیز آن‌ها را برنداشته است. تا بررسی کامل در جلسه هیئت‌مدیره انجمن، انتشار نوشته و آگهی و پذیرش عضو تازه برای این کلاب متوقف می‌شود. عضویت اعضای فعلی و سوابق ثبتی حیوان‌هایشان تغییری نمی‌کند. برای رفع تعلیق، کلاب باید آگهی‌های بدون مجوز را بردارد و فهرست توله‌های فروخته‌شده را همراه شماره مجوز به انجمن بفرستد تا وضعیت آن‌ها بررسی شود.</textarea>
+          <div class="hz-field__foot"><span class="hz-field__hint">بیش از ۴۵۰ نویسه: کوتاه‌تر بنویسید یا جزئیات را در یادداشت داخلی بگذارید.</span><span class="hz-field__counter hz-field__counter--near" id="r3-count" aria-live="polite">۴۵۷ از ۵۰۰ نویسه</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">فوکوس · غیرفعال (در حال ثبت تصمیم)</p>
+      <div class="hz-card hz-reason">
+        <div class="hz-field">
+          <div class="hz-field__label-row">
+            <label class="hz-field__label" for="r4">دلیل اصلاح<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <span class="hz-reason__audience hz-reason__audience--public"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>به کاربر نمایش داده می‌شود</span>
+          </div>
+          <textarea class="hz-textarea" id="r4" rows="2" required maxlength="500" placeholder="دلیل را دقیق بنویسید؛ همین متن برای کاربر فرستاده می‌شود." style="min-height: 72px;border-color:var(--focus-ring);box-shadow:inset 0 0 0 1px var(--focus-ring)"></textarea>
+          <span class="hz-field__counter">۰ از ۵۰۰ نویسه</span>
+        </div>
+        <div class="hz-field">
+          <div class="hz-field__label-row">
+            <label class="hz-field__label" for="r5">دلیل رد<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <span class="hz-reason__audience hz-reason__audience--public"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"/></svg>به کاربر نمایش داده می‌شود</span>
+          </div>
+          <div class="hz-filterbar" role="group" aria-label="دلیل‌های آماده">
+            <button class="hz-chip" type="button" aria-pressed="true" disabled>درخواست تکراری است</button>
+          </div>
+          <textarea class="hz-textarea" id="r5" rows="2" disabled style="min-height: 72px">درخواست تکراری است. درخواست قبلی شما برای همین حیوان هنوز در حال بررسی است.</textarea>
+          <span class="hz-field__counter">۷۵ از ۵۰۰ نویسه</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+  var fa = function (n) { return String(n).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }); };
+  document.querySelectorAll('.hz-reason .hz-field').forEach(function (f) {
+    var ta = f.querySelector('textarea'), c = f.querySelector('.hz-field__counter'), max = +(ta && ta.getAttribute('maxlength')) || 500;
+    if (!ta || !c || ta.disabled) return;
+    function upd() {
+      var n = ta.value.length;
+      c.textContent = fa(n) + ' از ' + fa(max) + ' نویسه';
+      c.classList.toggle('hz-field__counter--near', n >= max * 0.9);
+      if (n > 0) ta.removeAttribute('aria-invalid');
+    }
+    ta.addEventListener('input', upd);
+    var bar = f.querySelector('.hz-filterbar');
+    if (bar) bar.addEventListener('click', function (e) {
+      var b = e.target.closest('.hz-chip'); if (!b || b.disabled) return;
+      var s = b.textContent.trim() + '.';
+      if (ta.value.indexOf(s) === -1) { ta.value = ta.value.trim() ? ta.value.trim() + ' ' + s : s; b.setAttribute('aria-pressed', 'true'); upd(); }
+      ta.focus();
+    });
+  });
+</script>

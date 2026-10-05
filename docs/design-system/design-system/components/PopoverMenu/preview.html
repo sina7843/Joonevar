@@ -1,0 +1,130 @@
+<!-- @dsCard group="Overlays" height=752 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-stage { position: relative; height: 400px; padding: 12px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage .hz-topbar { position: static; margin: -12px -12px 0; border-start-start-radius: var(--radius-xl); border-start-end-radius: var(--radius-xl); }
+  .demo-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-static { position: static; width: 280px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">منوی حساب — پایان نوار بالای OpsShell (جزئیات: AccountMenu)</p>
+      <div class="demo-stage">
+        <header class="hz-topbar">
+          <span class="hz-h4" style="padding-inline-start: 8px">احراز هویت</span>
+          <span class="hz-topbar__spacer"></span>
+          <div class="hz-popover" data-menu>
+            <button class="hz-topbar__account hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="true" aria-controls="pm-acc" aria-label="حساب کاربری حمید نوروزی"><span class="hz-avatar hz-avatar--sm"><img src="../../assets/imagery/people-acc-assoc-1.jpg" alt="تصویر پروفایل حمید نوروزی" width="32" height="32"></span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+            <div class="hz-menu hz-menu--popover" id="pm-acc" role="menu" aria-label="حساب کاربری">
+              <div class="hz-menu__head" role="none">
+                <span class="hz-avatar"><img src="../../assets/imagery/people-acc-assoc-1.jpg" alt="تصویر پروفایل حمید نوروزی" width="40" height="40"></span>
+                <span class="hz-menu__head-text"><span class="hz-menu__head-name">حمید نوروزی</span><span class="hz-menu__head-sub">اپراتور انجمن، <bdi class="hz-id" dir="ltr">09990000004</bdi></span></span>
+              </div>
+              <a class="hz-menu__action" role="menuitem" href="#" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg><span class="hz-menu__action-label">پروفایل</span></a>
+              <a class="hz-menu__action" role="menuitem" href="#" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"/></svg><span class="hz-menu__action-label">اعلان‌ها</span></a>
+              <div class="hz-menu__sep" role="separator"></div>
+              <button class="hz-menu__action" role="menuitem" type="button" tabindex="-1"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg><span class="hz-menu__action-label">خروج از حساب</span></button>
+            </div>
+          </div>
+        </header>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">مرتب‌سازی — menuitemradio، فوکوس چرخان روی «ارزان‌ترین» (جزئیات: SortMenu)</p>
+      <div class="demo-stage">
+        <div class="hz-popover" data-menu>
+          <button class="hz-btn hz-btn--secondary hz-btn--sm hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="true" aria-controls="pm-sort"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span data-sort-label>مرتب‌سازی: جدیدترین</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+          <div class="hz-menu hz-menu--popover hz-menu--align-start" id="pm-sort" role="menu" aria-label="مرتب‌سازی آگهی‌ها">
+            <div role="group" aria-label="ترتیب">
+              <button class="hz-menu__action" role="menuitemradio" aria-checked="true" type="button" tabindex="-1"><span class="hz-menu__action-label">جدیدترین</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+              <button class="hz-menu__action" role="menuitemradio" aria-checked="false" type="button" tabindex="-1"><span class="hz-menu__action-label">قدیمی‌ترین</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+              <button class="hz-menu__action" role="menuitemradio" aria-checked="false" type="button" tabindex="0" style="background: var(--bg-subtle); outline: 2px solid var(--focus-ring); outline-offset: -2px"><span class="hz-menu__action-label">ارزان‌ترین</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+              <button class="hz-menu__action" role="menuitemradio" aria-checked="false" type="button" tabindex="-1"><span class="hz-menu__action-label">گران‌ترین</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">«بیشتر» — کنش‌های آگهی؛ غیرفعال با دلیل، مخرب در پایان</p>
+      <div class="demo-stage">
+        <div class="demo-head">
+          <span class="hz-card__title">توله ژرمن شپرد</span>
+          <div class="hz-popover" data-menu>
+            <button class="hz-icon-btn hz-icon-btn--sm hz-icon-btn--outline hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="true" aria-controls="pm-more" aria-label="کنش‌های بیشتر برای توله ژرمن شپرد"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Zm56-12a12,12,0,1,0,12,12A12,12,0,0,0,196,116ZM60,116a12,12,0,1,0,12,12A12,12,0,0,0,60,116Z"/></svg></button>
+            <div class="hz-menu hz-menu--popover" id="pm-more" role="menu" aria-label="کنش‌های آگهی">
+              <a class="hz-menu__action" role="menuitem" href="#" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></svg><span class="hz-menu__action-label">ویرایش آگهی</span></a>
+              <button class="hz-menu__action" role="menuitem" type="button" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,32H160a16,16,0,0,0-16,16V208a16,16,0,0,0,16,16h40a16,16,0,0,0,16-16V48A16,16,0,0,0,200,32Zm0,176H160V48h40ZM96,32H56A16,16,0,0,0,40,48V208a16,16,0,0,0,16,16H96a16,16,0,0,0,16-16V48A16,16,0,0,0,96,32Zm0,176H56V48H96Z"/></svg><span class="hz-menu__action-label">توقف موقت</span></button>
+              <button class="hz-menu__action" role="menuitem" type="button" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,88.23a54.43,54.43,0,0,1-16,37L189.25,160a54.27,54.27,0,0,1-38.63,16h-.05A54.63,54.63,0,0,1,96,119.84a8,8,0,0,1,16,.45A38.62,38.62,0,0,0,150.58,160h0a38.39,38.39,0,0,0,27.31-11.31l34.75-34.75a38.63,38.63,0,0,0-54.63-54.63l-11,11A8,8,0,0,1,135.7,59l11-11A54.65,54.65,0,0,1,224,48,54.86,54.86,0,0,1,240,88.23ZM109,185.66l-11,11A38.41,38.41,0,0,1,70.6,208h0a38.63,38.63,0,0,1-27.29-65.94L78,107.31A38.63,38.63,0,0,1,144,135.71a8,8,0,0,0,16,.45A54.86,54.86,0,0,0,144,96a54.65,54.65,0,0,0-77.27,0L32,130.75A54.62,54.62,0,0,0,70.56,224h0a54.28,54.28,0,0,0,38.64-16l11-11A8,8,0,0,0,109,185.66Z"/></svg><span class="hz-menu__action-label">کپی پیوند</span></button>
+              <button class="hz-menu__action" role="menuitem" type="button" tabindex="-1" aria-disabled="true" aria-describedby="pm-why"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,114.34l-96-96a8,8,0,0,0-11.32,0l-96,96A8,8,0,0,0,32,128H72v56a8,8,0,0,0,8,8h96a8,8,0,0,0,8-8V128h40a8,8,0,0,0,5.66-13.66ZM176,112a8,8,0,0,0-8,8v56H88V120a8,8,0,0,0-8-8H51.31L128,35.31,204.69,112Zm8,104a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h96A8,8,0,0,1,184,216Z"/></svg><span class="hz-menu__action-label">ارتقای آگهی<span class="hz-menu__hint" id="pm-why">هزینه ارتقا تعیین‌نشده است</span></span></button>
+              <div class="hz-menu__sep" role="separator"></div>
+              <button class="hz-menu__action hz-menu__action--destructive" role="menuitem" type="button" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg><span class="hz-menu__action-label">حذف آگهی</span></button>
+            </div>
+          </div>
+        </div>
+        <p class="hz-caption" style="margin: 4px 0 0">کرج، قابل مذاکره</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">متن بلند — نام حساب حداکثر ۲ سطر، سپس «…»</p>
+      <div class="hz-menu demo-static" role="menu" aria-label="حساب کاربری">
+        <div class="hz-menu__head" role="none">
+          <span class="hz-avatar-initials">م</span>
+          <span class="hz-menu__head-text"><span class="hz-menu__head-name">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</span><span class="hz-menu__head-sub">مرکز دامپزشکی، اصفهان</span></span>
+        </div>
+        <a class="hz-menu__action" role="menuitem" href="#" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg><span class="hz-menu__action-label">صفحه عمومی مرکز</span></a>
+        <div class="hz-menu__sep" role="separator"></div>
+        <button class="hz-menu__action" role="menuitem" type="button" tabindex="-1"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg><span class="hz-menu__action-label">خروج از حساب</span></button>
+      </div>
+    </section>
+    <section style="grid-column: span 2">
+      <p class="demo-label">صفحه‌کلید</p>
+      <dl class="hz-kv">
+        <div class="hz-kv__row"><dt class="hz-kv__key">Enter، Space، ↓</dt><dd class="hz-kv__value">باز کردن و رفتن به اولین گزینه (↑: آخرین گزینه)</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">↓ ↑، Home، End</dt><dd class="hz-kv__value">جابه‌جایی چرخان میان گزینه‌ها؛ گزینه غیرفعال فوکوس می‌گیرد ولی اجرا نمی‌شود</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">حرف اول</dt><dd class="hz-kv__value">پرش به گزینه‌ای که با آن حرف شروع می‌شود</dd></div>
+        <div class="hz-kv__row" style="border: 0"><dt class="hz-kv__key">Escape، Tab</dt><dd class="hz-kv__value">بستن؛ Escape فوکوس را به دکمه بازکننده برمی‌گرداند</dd></div>
+      </dl>
+    </section>
+  </div>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('[data-menu]').forEach(function (wrap) {
+    var trigger = wrap.querySelector('.hz-menu-trigger'), menu = wrap.querySelector('[role="menu"]');
+    var items = function () { return Array.prototype.slice.call(menu.querySelectorAll('[role^="menuitem"]')); };
+    var focusAt = function (i) { var list = items(); if (!list.length) return; i = (i + list.length) % list.length; list.forEach(function (el, k) { el.tabIndex = k === i ? 0 : -1; el.removeAttribute('style'); }); list[i].focus(); };
+    var setOpen = function (open) { menu.hidden = !open; trigger.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    trigger.addEventListener('click', function () { var open = menu.hidden; setOpen(open); if (open) focusAt(0); });
+    trigger.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); setOpen(true); focusAt(e.key === 'ArrowDown' ? 0 : -1); } });
+    menu.addEventListener('keydown', function (e) {
+      var list = items(), i = list.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); focusAt(i + 1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); focusAt(i - 1); }
+      else if (e.key === 'Home') { e.preventDefault(); focusAt(0); }
+      else if (e.key === 'End') { e.preventDefault(); focusAt(-1); }
+      else if (e.key === 'Escape') { e.preventDefault(); setOpen(false); trigger.focus(); }
+      else if (e.key === 'Tab') { setOpen(false); }
+    });
+    menu.addEventListener('click', function (e) {
+      var item = e.target.closest('[role^="menuitem"]');
+      if (!item || item.getAttribute('aria-disabled') === 'true') { e.preventDefault(); return; }
+      if (item.getAttribute('role') === 'menuitemradio') {
+        items().forEach(function (el) { if (el.getAttribute('role') === 'menuitemradio') el.setAttribute('aria-checked', el === item ? 'true' : 'false'); });
+        var label = wrap.querySelector('[data-sort-label]'); if (label) label.textContent = 'مرتب‌سازی: ' + item.textContent.trim();
+      }
+      e.preventDefault(); setOpen(false); trigger.focus();
+    });
+  });
+})();
+</script>

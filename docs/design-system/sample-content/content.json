@@ -1,0 +1,375 @@
+[
+  {
+    "slug": "c-372435",
+    "kind": "ARTICLE",
+    "kindFa": "آموزش",
+    "categoryFa": "میکروچیپ",
+    "titleFa": "میکروچیپ چیست و چرا فقط یک بار کاشته می‌شود؟",
+    "summaryFa": "آشنایی با کاشت میکروچیپ، شماره ۱۵ رقمی و نقش آن در شناسایی دائمی حیوان در سامانه همزیست.",
+    "readMinutes": 6,
+    "readTimeFa": "۶ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-28T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۶",
+      "longFa": "۶ مهر ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "نگار رستمی",
+    "reviewedOn": {
+      "iso": "2026-09-20",
+      "displayFa": "۱۴۰۵/۰۶/۲۹",
+      "longFa": "۲۹ شهریور ۱۴۰۵"
+    },
+    "image": {
+      "slot": "content/article-6617",
+      "ratio": "16:9",
+      "subject": "Veterinarian gently scanning a calm dog with a microchip reader",
+      "altFa": "دامپزشک در حال خواندن میکروچیپ سگ"
+    },
+    "tags": [
+      "میکروچیپ",
+      "ثبت حیوان"
+    ],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-56536",
+    "kind": "ARTICLE",
+    "kindFa": "آموزش",
+    "categoryFa": "برگه ثبتی",
+    "titleFa": "برگه ثبتی؛ از نمونه‌گیری تا صدور",
+    "summaryFa": "گام‌به‌گام: مراجعه به دامپزشک معتمد، نمونه‌گیری خون، پرداخت و دریافت برگه ثبتی.",
+    "readMinutes": 7,
+    "readTimeFa": "۷ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-21T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۶/۳۰",
+      "longFa": "۳۰ شهریور ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "نگار رستمی",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/article-4654",
+      "ratio": "16:9",
+      "subject": "Owner and dog at a clinic desk, paperwork in soft focus",
+      "altFa": "صاحب سگ در پذیرش کلینیک"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-113724",
+    "kind": "ARTICLE",
+    "kindFa": "آموزش",
+    "categoryFa": "شجره‌نامه",
+    "titleFa": "شجره‌نامه سگ را چطور بخوانیم؟",
+    "summaryFa": "هر بخش شجره‌نامه چه می‌گوید، نسل‌ها چگونه نمایش داده می‌شوند و اصالت آن را از کجا استعلام کنیم.",
+    "readMinutes": 8,
+    "readTimeFa": "۸ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-14T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۶/۲۳",
+      "longFa": "۲۳ شهریور ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "نگار رستمی",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/article-5274",
+      "ratio": "16:9",
+      "subject": "Close-up of an official certificate next to a dog paw, warm light",
+      "altFa": "شجره‌نامه کنار پنجه سگ"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-260534",
+    "kind": "ARTICLE",
+    "kindFa": "آموزش",
+    "categoryFa": "مجوز جفت‌گیری",
+    "titleFa": "مجوز جفت‌گیری: شرایط، مدارک و زمان‌بندی",
+    "summaryFa": "چه کسانی می‌توانند درخواست بدهند، تأیید دوطرفه چطور کار می‌کند و مجوز چه زمانی صادر می‌شود.",
+    "readMinutes": 6,
+    "readTimeFa": "۶ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-07T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۶/۱۶",
+      "longFa": "۱۶ شهریور ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "نگار رستمی",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/article-5461",
+      "ratio": "16:9",
+      "subject": "Two adult dogs of the same breed resting side by side in a garden",
+      "altFa": "دو سگ هم‌نژاد در باغ"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-45035",
+    "kind": "ARTICLE",
+    "kindFa": "آموزش",
+    "categoryFa": "نژادهای سگ",
+    "titleFa": "ژرمن شپرد؛ همراه وفادار برای خانواده‌های فعال",
+    "summaryFa": "ویژگی‌های رفتاری، نیاز به تحرک و نکات نگهداری ژرمن شپرد در آپارتمان و خانه‌های حیاط‌دار.",
+    "readMinutes": 5,
+    "readTimeFa": "۵ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-08-31T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۶/۰۹",
+      "longFa": "۹ شهریور ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "نگار رستمی",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/article-3492",
+      "ratio": "16:9",
+      "subject": "German Shepherd running across a green field",
+      "altFa": "ژرمن شپرد در حال دویدن"
+    },
+    "tags": [
+      "ژرمن شپرد"
+    ],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-600375",
+    "kind": "ARTICLE",
+    "kindFa": "آموزش",
+    "categoryFa": "دامپزشک معتمد",
+    "titleFa": "دامپزشک معتمد کیست و چه نقشی دارد؟",
+    "summaryFa": "دامپزشک معتمد هویت حیوان را تأیید می‌کند، نمونه می‌گیرد و میکروچیپ را ثبت می‌کند؛ چطور پیدایش کنیم.",
+    "readMinutes": 4,
+    "readTimeFa": "۴ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-08-24T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۶/۰۲",
+      "longFa": "۲ شهریور ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "نگار رستمی",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/article-544",
+      "ratio": "16:9",
+      "subject": "Veterinarian smiling while examining a golden retriever",
+      "altFa": "دامپزشک در حال معاینه گلدن رتریور"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-51547",
+    "kind": "NEWS",
+    "kindFa": "خبر",
+    "categoryFa": "اخبار انجمن",
+    "titleFa": "برگزاری نخستین نمایشگاه سگ‌های اصیل انجمن",
+    "summaryFa": "انجمن از برگزاری نمایشگاه سالانه با داوری بین‌المللی خبر داد؛ ثبت‌نام از طریق سامانه انجام می‌شود.",
+    "readMinutes": 3,
+    "readTimeFa": "۳ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-30T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۸",
+      "longFa": "۸ مهر ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "تحریریه همزیست",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/news-1195",
+      "ratio": "16:9",
+      "subject": "Dog show ring with handlers and dogs, wide shot, faces not identifiable",
+      "altFa": "رینگ نمایشگاه سگ"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-629495",
+    "kind": "NEWS",
+    "kindFa": "خبر",
+    "categoryFa": "اخبار کلاب‌ها",
+    "titleFa": "کلاب ژرمن شپرد ایران عضو تازه می‌پذیرد",
+    "summaryFa": "دوره تازه عضوگیری کلاب آغاز شد؛ شرایط، هزینه و مدارک لازم در صفحه کلاب آمده است.",
+    "readMinutes": 2,
+    "readTimeFa": "۲ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-26T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۴",
+      "longFa": "۴ مهر ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "تحریریه همزیست",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/news-3448",
+      "ratio": "16:9",
+      "subject": "Group walk with German Shepherds on a trail",
+      "altFa": "پیاده‌روی گروهی با ژرمن شپردها"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-57686",
+    "kind": "NEWS",
+    "kindFa": "خبر",
+    "categoryFa": "اخبار دامپزشکی",
+    "titleFa": "توصیه دامپزشکان برای واکسیناسیون پاییزه",
+    "summaryFa": "با سرد شدن هوا، برنامه واکسن و ضدانگل را با دامپزشک خود مرور کنید.",
+    "readMinutes": 3,
+    "readTimeFa": "۳ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-23T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۱",
+      "longFa": "۱ مهر ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "تحریریه همزیست",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/news-8066",
+      "ratio": "16:9",
+      "subject": "Puppy receiving a vaccine, calm, gloved hands",
+      "altFa": "واکسیناسیون توله‌سگ"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-327261",
+    "kind": "NEWS",
+    "kindFa": "خبر",
+    "categoryFa": "اخبار نژادها",
+    "titleFa": "به‌روزرسانی استاندارد نژاد سگ سرابی",
+    "summaryFa": "کمیته نژاد، نسخه تازه استاندارد سگ سرابی را منتشر کرد.",
+    "readMinutes": 4,
+    "readTimeFa": "۴ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-16T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۶/۲۵",
+      "longFa": "۲۵ شهریور ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "تحریریه همزیست",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/news-9641",
+      "ratio": "16:9",
+      "subject": "Sarabi dog standing on a hill at golden hour",
+      "altFa": "سگ سرابی روی تپه"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-35835",
+    "kind": "ANNOUNCEMENT",
+    "kindFa": "اطلاعیه",
+    "categoryFa": "اطلاعیه‌های انجمن",
+    "titleFa": "تمدید مهلت ثبت کنل تا پایان آبان",
+    "summaryFa": "مهلت ثبت و اصلاح پرونده کنل‌ها تا ۳۰ آبان ۱۴۰۵ تمدید شد.",
+    "readMinutes": 1,
+    "readTimeFa": "۱ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-29T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۷",
+      "longFa": "۷ مهر ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "انجمن",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/announcement-7602",
+      "ratio": "16:9",
+      "subject": "No photo — announcement uses an icon or brand pattern",
+      "altFa": "اطلاعیه انجمن"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-406461",
+    "kind": "ANNOUNCEMENT",
+    "kindFa": "اطلاعیه",
+    "categoryFa": "اطلاعیه‌های سامانه",
+    "titleFa": "به‌روزرسانی برنامه‌ریزی‌شده سامانه",
+    "summaryFa": "سامانه در بامداد جمعه از ساعت ۲ تا ۴ برای به‌روزرسانی در دسترس نخواهد بود.",
+    "readMinutes": 1,
+    "readTimeFa": "۱ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-10-01T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۹",
+      "longFa": "۹ مهر ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "سامانه همزیست",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/announcement-3311",
+      "ratio": "16:9",
+      "subject": "No photo — announcement uses an icon or brand pattern",
+      "altFa": "اطلاعیه سامانه"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-410384",
+    "kind": "ANNOUNCEMENT",
+    "kindFa": "اطلاعیه",
+    "categoryFa": "اطلاعیه‌های کلاب‌ها",
+    "titleFa": "زمان‌بندی تازه جلسات کلاب‌ها",
+    "summaryFa": "جلسات ماهانه کلاب‌ها از مهر ماه پنجشنبه‌ها برگزار می‌شود.",
+    "readMinutes": 1,
+    "readTimeFa": "۱ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-24T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۲",
+      "longFa": "۲ مهر ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "انجمن",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/announcement-4574",
+      "ratio": "16:9",
+      "subject": "No photo — announcement uses an icon or brand pattern",
+      "altFa": "اطلاعیه کلاب‌ها"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  },
+  {
+    "slug": "c-586403",
+    "kind": "CLUB_POST",
+    "kindFa": "نوشته کلاب",
+    "categoryFa": "کلاب ژرمن شپرد ایران",
+    "titleFa": "گزارش گردهمایی شهریور",
+    "summaryFa": "خلاصه گردهمایی ماهانه، تمرین‌های اطاعت‌پذیری و برنامه ماه بعد.",
+    "readMinutes": 3,
+    "readTimeFa": "۳ دقیقه مطالعه",
+    "publishAt": {
+      "iso": "2026-09-19T09:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۶/۲۸",
+      "longFa": "۲۸ شهریور ۱۴۰۵"
+    },
+    "status": "PUBLISHED",
+    "authorFa": "کلاب ژرمن شپرد ایران",
+    "reviewedOn": null,
+    "image": {
+      "slot": "content/club_post-7601",
+      "ratio": "16:9",
+      "subject": "Owners training German Shepherds in a park",
+      "altFa": "تمرین اطاعت‌پذیری در پارک"
+    },
+    "tags": [],
+    "readTimeNote": "readMinutes is not stored in content_item; derive it from bodyFa length at render time."
+  }
+]

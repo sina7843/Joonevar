@@ -1,0 +1,90 @@
+<!-- @dsCard group="Inputs" height=440 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; align-items: start; }
+  .demo-cell { display: flex; flex-direction: column; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">۱۰ رقم لاتین، چپ‌به‌راست · بررسی رقم کنترل هنگام خروج از فیلد</p>
+    <div class="demo-grid">
+      <div class="demo-cell">
+        <p class="demo-label">زنده — معتبر</p>
+        <div class="hz-field" data-nid>
+          <label class="hz-field__label" for="n-1">کد ملی<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <input class="hz-input hz-input--ltr hz-input--digits" id="n-1" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="10" value="9000000009" aria-describedby="n-1-h n-1-s">
+          <div class="hz-field__hint" id="n-1-h">۱۰ رقم روی کارت ملی، بدون خط تیره.</div>
+          <div class="hz-field__success" id="n-1-s" data-msg><svg class="hz-icon hz-icon--xs hz-nid-ok" viewBox="0 0 256 256" aria-hidden="true"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg><svg class="hz-icon hz-icon--xs hz-nid-bad" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>رقم کنترل کد ملی معتبر است.</span></div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خالی</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="n-2">کد ملی<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <input class="hz-input hz-input--ltr hz-input--digits" id="n-2" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="10" aria-describedby="n-2-h">
+          <div class="hz-field__hint" id="n-2-h">۱۰ رقم روی کارت ملی، بدون خط تیره. رقم فارسی هم پذیرفته می‌شود.</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">فوکوس — در حال تایپ (هنوز خطا نشان نمی‌دهد)</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="n-3">کد ملی<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <input class="hz-input hz-input--ltr hz-input--digits" id="n-3" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="10" value="900000" aria-describedby="n-3-h" style="border-color:var(--focus-ring);box-shadow:inset 0 0 0 1px var(--focus-ring)">
+          <div class="hz-field__hint" id="n-3-h">۱۰ رقم روی کارت ملی، بدون خط تیره.</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خطا — کمتر از ۱۰ رقم</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="n-4">کد ملی<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <input class="hz-input hz-input--ltr hz-input--digits" id="n-4" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="10" value="90000054" aria-invalid="true" aria-describedby="n-4-h n-4-e">
+          <div class="hz-field__hint" id="n-4-h">۱۰ رقم روی کارت ملی، بدون خط تیره.</div>
+          <div class="hz-field__error" id="n-4-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>کد ملی ۱۰ رقم است؛ ۸ رقم وارد کرده‌اید.</span></div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خطا — رقم کنترل نادرست</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="n-5">کد ملی<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <input class="hz-input hz-input--ltr hz-input--digits" id="n-5" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="10" value="9000005494" aria-invalid="true" aria-describedby="n-5-h n-5-e">
+          <div class="hz-field__hint" id="n-5-h">۱۰ رقم روی کارت ملی، بدون خط تیره.</div>
+          <div class="hz-field__error" id="n-5-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>این کد ملی معتبر نیست؛ رقم آخر با بقیه رقم‌ها نمی‌خواند. کد را دوباره از روی کارت بخوانید.</span></div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">غیرفعال — پس از تأیید احراز هویت</p>
+        <div class="hz-field">
+          <label class="hz-field__label" for="n-6">کد ملی</label>
+          <input class="hz-input hz-input--ltr hz-input--digits" id="n-6" type="text" value="9000006864" aria-describedby="n-6-h" disabled>
+          <div class="hz-field__hint" id="n-6-h">احراز هویت شما تأیید شده و کد ملی دیگر تغییر نمی‌کند.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  (function () {
+    function toLatin(s) { return s.replace(/[۰-۹]/g, function (d) { return d.charCodeAt(0) - 1776; }).replace(/[٠-٩]/g, function (d) { return d.charCodeAt(0) - 1632; }); }
+    function valid(c) {
+      if (!/^\d{10}$/.test(c) || /^(\d)\1{9}$/.test(c)) return false;
+      var s = 0; for (var i = 0; i < 9; i++) s += +c[i] * (10 - i);
+      var r = s % 11; return +c[9] === (r < 2 ? r : 11 - r);
+    }
+    var fa = function (n) { return n.toLocaleString('fa-IR'); };
+    document.querySelectorAll('[data-nid]').forEach(function (f) {
+      var inp = f.querySelector('input'), msg = f.querySelector('[data-msg]'), okI = msg.querySelector('.hz-nid-ok'), badI = msg.querySelector('.hz-nid-bad');
+      badI.style.display = 'none';
+      inp.addEventListener('input', function () { inp.value = toLatin(inp.value).replace(/\D/g, '').slice(0, 10); msg.style.display = 'none'; inp.removeAttribute('aria-invalid'); });
+      inp.addEventListener('blur', function () {
+        var v = inp.value; if (!v) { msg.style.display = 'none'; return; }
+        var ok = valid(v);
+        okI.style.display = ok ? '' : 'none'; badI.style.display = ok ? 'none' : '';
+        msg.style.display = ''; msg.className = ok ? 'hz-field__success' : 'hz-field__error';
+        msg.lastElementChild.textContent = ok ? 'رقم کنترل کد ملی معتبر است.' : (v.length < 10 ? 'کد ملی ۱۰ رقم است؛ ' + fa(v.length) + ' رقم وارد کرده‌اید.' : 'این کد ملی معتبر نیست؛ رقم آخر با بقیه رقم‌ها نمی‌خواند. کد را دوباره از روی کارت بخوانید.');
+        if (ok) inp.removeAttribute('aria-invalid'); else inp.setAttribute('aria-invalid', 'true');
+      });
+    });
+  })();
+</script>

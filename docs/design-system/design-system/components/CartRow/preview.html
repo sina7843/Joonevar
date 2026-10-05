@@ -1,0 +1,132 @@
+<!-- @dsCard group="Commerce" height=936 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-shop { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--bg-subtle); border-block-end: 1px solid var(--border-subtle); }
+  .demo-shop__name { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; line-height: 24px; font-weight: 700; }
+  .demo-shop__name .hz-icon { color: var(--icon-default); }
+  .demo-list { padding-inline: 16px; }
+  .demo-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .demo-thumb-empty { width: 64px; height: 64px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">ردیف‌های سبد در گروه فروشگاه (≥۷۶۸: یک خط) — پیش‌فرض</p>
+    <div class="hz-card hz-card--flush">
+      <div class="demo-shop"><span class="demo-shop__name"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg>پت‌شاپ آریا</span><span class="hz-caption">کرج</span></div>
+      <ul class="hz-cart-list demo-list">
+        <li class="hz-cart-row">
+          <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-dry-food-large-adult.jpg" alt="غذای خشک سگ بالغ نژاد بزرگ"></div>
+          <div class="hz-cart-row__body">
+            <a class="hz-cart-row__name" href="#">غذای خشک سگ بالغ نژاد بزرگ</a>
+            <span class="hz-cart-row__variant">وزن بسته: ۳ کیلوگرم</span>
+            <span class="hz-cart-row__unit">قیمت واحد ۲٬۸۵۰٬۰۰۰ تومان</span>
+          </div>
+          <div class="hz-cart-row__qty" role="group" aria-label="تعداد غذای خشک سگ بالغ نژاد بزرگ">
+            <button type="button" class="hz-icon-btn" aria-label="یکی بیشتر"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></button>
+            <output class="hz-cart-row__count" aria-live="polite">۱</output>
+            <button type="button" class="hz-icon-btn" aria-label="یکی کمتر" disabled><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg></button>
+          </div>
+          <div class="hz-cart-row__total"><span class="hz-cart-row__amount">۲٬۸۵۰٬۰۰۰ <small>تومان</small></span></div>
+          <button type="button" class="hz-icon-btn hz-cart-row__remove" aria-label="حذف غذای خشک سگ بالغ نژاد بزرگ از سبد"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">حالت‌ها — سقف موجودی (فوکوس روی «حذف») · در حال به‌روزرسانی · ناموجود‌شده پس از افزودن (متن بلند، از مبلغ کنار گذاشته می‌شود)</p>
+    <div class="hz-card hz-card--flush">
+      <ul class="hz-cart-list demo-list">
+        <li class="hz-cart-row">
+          <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-orthopedic-bed.jpg" alt="تشک ارتوپدی سگ"></div>
+          <div class="hz-cart-row__body">
+            <a class="hz-cart-row__name" href="#">تشک ارتوپدی سگ</a>
+            <span class="hz-cart-row__variant">اندازه: L</span>
+            <span class="hz-cart-row__unit">قیمت واحد ۴٬۵۹۰٬۰۰۰ تومان</span>
+            <p class="hz-inline-msg hz-inline-msg--info" id="cr-max"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/></svg><span class="hz-inline-msg__text">قابل فروش همین ۱ عدد است.</span></p>
+          </div>
+          <div class="hz-cart-row__qty" role="group" aria-label="تعداد تشک ارتوپدی سگ">
+            <button type="button" class="hz-icon-btn" aria-label="یکی بیشتر" disabled aria-describedby="cr-max"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></button>
+            <output class="hz-cart-row__count" aria-live="polite">۱</output>
+            <button type="button" class="hz-icon-btn" aria-label="یکی کمتر" disabled><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg></button>
+          </div>
+          <div class="hz-cart-row__total"><span class="hz-cart-row__amount">۴٬۵۹۰٬۰۰۰ <small>تومان</small></span></div>
+          <button type="button" class="hz-icon-btn hz-cart-row__remove" aria-label="حذف تشک ارتوپدی سگ از سبد" style="outline:2px solid var(--focus-ring);outline-offset:2px"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button>
+        </li>
+        <li class="hz-cart-row" aria-busy="true">
+          <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-chicken-training-treats.jpg" alt="تشویقی تمرینی مرغ"></div>
+          <div class="hz-cart-row__body">
+            <a class="hz-cart-row__name" href="#">تشویقی تمرینی مرغ</a>
+            <span class="hz-cart-row__variant">وزن بسته: ۱۰۰ گرم</span>
+            <span class="hz-cart-row__unit">قیمت واحد ۳۸۰٬۰۰۰ تومان</span>
+          </div>
+          <div class="hz-cart-row__qty" role="group" aria-label="تعداد تشویقی تمرینی مرغ">
+            <button type="button" class="hz-icon-btn" aria-label="یکی بیشتر" disabled><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></button>
+            <output class="hz-cart-row__count"><span class="hz-spinner" aria-hidden="true"></span><span class="hz-visually-hidden">در حال به‌روزرسانی</span></output>
+            <button type="button" class="hz-icon-btn" aria-label="یکی کمتر" disabled><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg></button>
+          </div>
+          <div class="hz-cart-row__total"><span class="hz-skeleton hz-skeleton--text" style="width: 96px" aria-hidden="true"></span></div>
+          <button type="button" class="hz-icon-btn hz-cart-row__remove" aria-label="حذف تشویقی تمرینی مرغ از سبد" disabled><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button>
+        </li>
+        <li class="hz-cart-row hz-cart-row--unavailable">
+          <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-dry-food-large-adult.jpg" alt="غذای خشک سگ بالغ نژاد بزرگ"></div>
+          <div class="hz-cart-row__body">
+            <a class="hz-cart-row__name" href="#">غذای خشک سگ بالغ نژاد بزرگ — ۱۵ کیلوگرم</a>
+            <span class="hz-cart-row__unit">قیمت واحد ۴٬۸۴۴٬۰۰۰ تومان</span>
+            <span class="hz-stock hz-stock--sm hz-stock--out"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span>
+            <p class="hz-inline-msg hz-inline-msg--warning"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span class="hz-inline-msg__text">این کالا پس از افزودن به سبد ناموجود شد و در مبلغ حساب نمی‌شود. آن را حذف کنید تا بقیه سبد پرداخت شود.</span></p>
+          </div>
+          <button type="button" class="hz-btn hz-btn--secondary hz-btn--sm hz-cart-row__fix">حذف از سبد</button>
+          <div class="hz-cart-row__total"><span class="hz-cart-row__amount">—</span></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">موبایل (<bdi dir="ltr">--stacked</bdi>) — چند عدد: زیر جمع ردیف، ضرب نوشته می‌شود</p>
+      <div class="hz-card hz-card--flush">
+        <div class="demo-shop"><span class="demo-shop__name"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg>فروشگاه نمونه همزیست</span><span class="hz-caption">تهران</span></div>
+        <ul class="hz-cart-list demo-list">
+          <li class="hz-cart-row hz-cart-row--stacked">
+            <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-knotted-rope-toy.jpg" alt="اسباب‌بازی طناب گره‌دار"></div>
+            <div class="hz-cart-row__body">
+              <a class="hz-cart-row__name" href="#">اسباب‌بازی طناب گره‌دار</a>
+              <span class="hz-cart-row__variant">اندازه: کوچک</span>
+              <span class="hz-cart-row__unit">قیمت واحد ۲۱۰٬۰۰۰ تومان</span>
+            </div>
+            <div class="hz-cart-row__qty" role="group" aria-label="تعداد اسباب‌بازی طناب گره‌دار">
+              <button type="button" class="hz-icon-btn" aria-label="یکی بیشتر"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></button>
+              <output class="hz-cart-row__count" aria-live="polite">۳</output>
+              <button type="button" class="hz-icon-btn" aria-label="یکی کمتر"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg></button>
+            </div>
+            <div class="hz-cart-row__total"><span class="hz-cart-row__amount">۶۳۰٬۰۰۰ <small>تومان</small></span><span class="hz-cart-row__math">۳ × ۲۱۰٬۰۰۰</span></div>
+            <button type="button" class="hz-icon-btn hz-cart-row__remove" aria-label="حذف اسباب‌بازی طناب گره‌دار از سبد"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button>
+          </li>
+        </ul>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">موبایل — ناموجودشده، متن بلند</p>
+      <div class="hz-card hz-card--flush">
+        <ul class="hz-cart-list demo-list">
+          <li class="hz-cart-row hz-cart-row--stacked hz-cart-row--unavailable">
+            <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/products-dry-food-large-adult.jpg" alt="غذای خشک سگ بالغ نژاد بزرگ"></div>
+            <div class="hz-cart-row__body">
+              <a class="hz-cart-row__name" href="#">غذای خشک سگ بالغ نژاد بزرگ — ۱۵ کیلوگرم</a>
+              <span class="hz-cart-row__unit">قیمت واحد ۴٬۸۴۴٬۰۰۰ تومان</span>
+              <span class="hz-stock hz-stock--sm hz-stock--out"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg>ناموجود</span>
+              <p class="hz-inline-msg hz-inline-msg--warning"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span class="hz-inline-msg__text">این کالا پس از افزودن به سبد ناموجود شد و در مبلغ حساب نمی‌شود. آن را حذف کنید تا بقیه سبد پرداخت شود.</span></p>
+            </div>
+            <button type="button" class="hz-btn hz-btn--secondary hz-btn--sm hz-cart-row__fix">حذف از سبد</button>
+            <div class="hz-cart-row__total"><span class="hz-cart-row__amount">—</span></div>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

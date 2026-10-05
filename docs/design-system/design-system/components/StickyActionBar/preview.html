@@ -1,0 +1,78 @@
+<!-- @dsCard group="Actions" height=1064 width=390 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px 16px; display: flex; flex-direction: column; gap: 20px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-stage { position: relative; height: 248px; overflow: auto; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage__content { display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+  .demo-line { display: block; height: 12px; border-radius: var(--radius-sm); background: var(--bg-subtle); }
+  .demo-frame { overflow: hidden; border: 1px solid var(--border-default); border-radius: var(--radius-xl); }
+  .demo-safe { position: relative; }
+  .demo-safe__mark { position: absolute; inset-inline: 0; inset-block-end: 0; height: 34px; display: flex; align-items: center; justify-content: center; border-block-start: 1px dashed var(--border-control); font-size: 11px; line-height: 16px; color: var(--text-secondary); z-index: calc(var(--z-sticky) + 1); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">فرم ۶ مرحله‌ای ثبت حیوان — نوار به پایین صفحه می‌چسبد، محتوا زیرش اسکرول می‌شود</p>
+    <div class="demo-stage hz-has-sticky-bar">
+      <div class="demo-stage__content" aria-hidden="true">
+        <p class="hz-caption" style="margin: 0">مرحله ۴ از ۶</p>
+        <p class="hz-h4">مدارک</p>
+        <span class="demo-line"></span><span class="demo-line" style="width: 80%"></span><span class="demo-line"></span><span class="demo-line" style="width: 60%"></span>
+        <span class="demo-line"></span><span class="demo-line" style="width: 85%"></span><span class="demo-line"></span><span class="demo-line" style="width: 70%"></span>
+        <span class="demo-line"></span><span class="demo-line" style="width: 50%"></span><span class="demo-line"></span>
+      </div>
+      <div class="hz-sticky-bar" role="region" aria-label="کنش‌های مرحله">
+        <div class="hz-sticky-bar__summary"><span class="hz-sticky-bar__context">مرحله ۴ از ۶، مدارک</span><span>پیش‌نویس ذخیره شد</span></div>
+        <div class="hz-sticky-bar__actions">
+          <button class="hz-btn hz-btn--primary hz-btn--lg" type="submit">ادامه</button>
+          <button class="hz-btn hz-btn--secondary hz-btn--lg" type="button">مرحله قبل</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">پرداخت — خدمت و مبلغ در خلاصه، فعل و مبلغ روی دکمه</p>
+    <div class="demo-frame">
+      <div class="hz-sticky-bar">
+        <div class="hz-sticky-bar__summary"><span class="hz-sticky-bar__context">صدور شجره‌نامه، لونا</span><span class="hz-sticky-bar__total">۴۰۰٬۰۰۰ تومان</span></div>
+        <div class="hz-sticky-bar__actions"><button class="hz-btn hz-btn--primary hz-btn--lg" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>پرداخت ۴۰۰٬۰۰۰ تومان</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">غیرفعال — تعرفه تعیین‌نشده، دلیل دیده می‌شود (هرگز ۰)</p>
+    <div class="demo-frame">
+      <div class="hz-sticky-bar">
+        <div class="hz-sticky-bar__summary"><span class="hz-sticky-bar__context">انتشار آگهی جفت‌یابی</span><span class="hz-sticky-bar__total hz-sticky-bar__total--unset">تعیین‌نشده</span></div>
+        <div class="hz-sticky-bar__actions"><button class="hz-btn hz-btn--primary hz-btn--lg" type="button" disabled aria-describedby="sab-why">پرداخت</button></div>
+        <p class="hz-sticky-bar__note" id="sab-why">هزینه این خدمت هنوز تعیین نشده است؛ پرداخت پس از تعیین هزینه باز می‌شود.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">ناحیه امن آیفون — padding پایین + env(safe-area-inset-bottom)، فوکوس</p>
+    <div class="demo-frame demo-safe">
+      <div class="hz-sticky-bar" style="padding-block-end: calc(12px + 34px)">
+        <div class="hz-sticky-bar__actions">
+          <button class="hz-btn hz-btn--primary hz-btn--lg" type="button" style="outline: 2px solid var(--focus-ring); outline-offset: 2px">ارسال درخواست</button>
+          <button class="hz-btn hz-btn--secondary hz-btn--lg" type="button">مرحله قبل</button>
+        </div>
+      </div>
+      <span class="demo-safe__mark" aria-hidden="true">ناحیه امن ۳۴px — خالی</span>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">بارگذاری + متن بلند — انتقال به درگاه؛ خلاصه با «…» کوتاه می‌شود، مبلغ کامل می‌ماند</p>
+    <div class="demo-frame">
+      <div class="hz-sticky-bar">
+        <div class="hz-sticky-bar__summary"><span class="hz-sticky-bar__context">صدور برگه ثبتی، شاهزاده کوچولوی باغ ارم شیراز</span><span class="hz-sticky-bar__total">۲۵۰٬۰۰۰ تومان</span></div>
+        <div class="hz-sticky-bar__actions"><button class="hz-btn hz-btn--primary hz-btn--lg" type="button" aria-busy="true"><span class="hz-spinner" aria-hidden="true"></span>در حال انتقال به درگاه</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

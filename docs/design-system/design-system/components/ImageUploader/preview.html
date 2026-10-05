@@ -1,0 +1,104 @@
+<!-- @dsCard group="Inputs" height=912 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 16px; align-items: start; }
+  .demo-grid--editor { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 24px; }
+  .demo-cell { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">قاب‌ها — آواتار · مربع · کاور</p>
+    <div class="demo-grid">
+      <div class="hz-field">
+        <span class="hz-field__label" id="iu-1-l">تصویر پروفایل <span class="hz-field__opt">(اختیاری)</span></span>
+        <div class="hz-image-up">
+          <div class="hz-media hz-image-up__preview hz-image-up__preview--avatar"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></div></div>
+          <div class="hz-image-up__actions"><input class="hz-visually-hidden" type="file" id="iu-1" accept=".jpg,.jpeg,.png" aria-labelledby="iu-1-l" aria-describedby="iu-1-h"><label class="hz-btn hz-btn--secondary hz-btn--sm" for="iu-1"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></svg>افزودن تصویر</label></div>
+        </div>
+        <div class="hz-field__hint" id="iu-1-h">خالی — در همه جا جای‌نگهدار همزیست نمایش داده می‌شود.</div>
+      </div>
+      <div class="hz-field">
+        <span class="hz-field__label">نشان فروشگاه<span class="hz-field__req" aria-hidden="true">*</span></span>
+        <div class="hz-image-up">
+          <div class="hz-media hz-image-up__preview hz-image-up__preview--square" aria-busy="true"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></div><div class="hz-image-up__busy" role="status"><span class="hz-spinner" aria-hidden="true"></span>۴۰٪</div></div>
+          <div class="hz-image-up__actions"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button">لغو بارگذاری</button></div>
+        </div>
+        <div class="hz-field__hint">در حال بارگذاری <bdi>logo-aria.png</bdi></div>
+      </div>
+      <div class="hz-field">
+        <span class="hz-field__label">نشان فروشگاه</span>
+        <div class="hz-image-up">
+          <div class="hz-media hz-image-up__preview hz-image-up__preview--square hz-image-up__preview--disabled"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">تصویر ثبت نشده</span></div></div>
+          <div class="hz-image-up__actions"><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button" disabled><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></svg>افزودن تصویر</button></div>
+        </div>
+        <div class="hz-field__hint">فروشگاه در حال بررسی است؛ پس از تأیید می‌توانید نشان را تغییر دهید.</div>
+      </div>
+      <div class="hz-field">
+        <span class="hz-field__label" id="iu-4-l">تصویر کاور<span class="hz-field__req" aria-hidden="true">*</span></span>
+        <div class="hz-image-up" style="align-items:stretch">
+          <div class="hz-media hz-image-up__preview hz-image-up__preview--cover hz-image-up__preview--invalid"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">تصویر ثبت نشده</span></div></div>
+          <div class="hz-image-up__actions"><input class="hz-visually-hidden" type="file" id="iu-4" accept=".jpg,.jpeg,.png" aria-labelledby="iu-4-l" aria-invalid="true" aria-describedby="iu-4-e"><label class="hz-btn hz-btn--secondary hz-btn--sm" for="iu-4"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"/></svg>انتخاب تصویر</label></div>
+        </div>
+        <div class="hz-field__error" id="iu-4-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>قالب <bdi>HEIC</bdi> پذیرفته نمی‌شود؛ تصویر <bdi>JPG</bdi> یا <bdi>PNG</bdi> بارگذاری کنید.</span></div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">تصویر حیوان — نقطه کانونی و پیش‌نمایش برش در چند قاب · فوکوس روی نقطه کانونی</p>
+    <div class="demo-grid demo-grid--editor">
+      <div class="demo-cell">
+        <div class="hz-crop" dir="ltr">
+          <img src="../../assets/imagery/breeds-german-shepherd.jpg" alt="" id="iu-src">
+          <button class="hz-crop__focus" type="button" id="iu-focus" aria-label="نقطه کانونی تصویر؛ با کلیدهای جهت جابه‌جا کنید" aria-describedby="iu-focus-h" style="inset-inline-start:58%;inset-block-start:30%;outline:2px solid var(--focus-ring);outline-offset:2px"></button>
+        </div>
+        <p class="hz-crop__hint" id="iu-focus-h">نقطه کانونی را روی سوژه بگذارید یا بکشید؛ همه قاب‌ها دور همین نقطه بریده می‌شوند.</p>
+        <div class="hz-image-up__actions"><input class="hz-visually-hidden" type="file" id="iu-5" accept=".jpg,.jpeg,.png"><label class="hz-btn hz-btn--secondary hz-btn--sm" for="iu-5"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"/></svg>تغییر تصویر</label><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg>حذف تصویر</button></div>
+        <div class="hz-field">
+          <label class="hz-field__label" for="iu-alt">متن جایگزین<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <input class="hz-input" id="iu-alt" type="text" value="سگ ژرمن شپرد بالغ ایستاده روی چمن باغ" aria-describedby="iu-alt-h">
+          <div class="hz-field__hint" id="iu-alt-h">بنویسید در تصویر چه دیده می‌شود؛ صفحه‌خوان‌ها همین را می‌خوانند.</div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <div class="hz-crop-frames" aria-label="پیش‌نمایش برش">
+          <figure class="hz-crop-frame" style="grid-column:1 / -1"><div class="hz-media hz-media--16x9"><img src="../../assets/imagery/breeds-german-shepherd.jpg" alt="" data-crop></div><figcaption class="hz-crop-frame__caption"><b>۱۶:۹</b>بنر صفحه و کارت</figcaption></figure>
+          <figure class="hz-crop-frame"><div class="hz-media hz-media--4x3"><img src="../../assets/imagery/breeds-german-shepherd.jpg" alt="" data-crop></div><figcaption class="hz-crop-frame__caption"><b>۴:۳</b>عکس حیوان و آگهی</figcaption></figure>
+          <figure class="hz-crop-frame"><div class="hz-media hz-media--1x1"><img src="../../assets/imagery/breeds-german-shepherd.jpg" alt="" data-crop></div><figcaption class="hz-crop-frame__caption"><b>۱:۱</b>محصول و فهرست</figcaption></figure>
+          <figure class="hz-crop-frame" style="grid-column:1 / -1"><div class="hz-crop-frame__row"><div class="hz-media hz-media--thumb"><img src="../../assets/imagery/breeds-german-shepherd.jpg" alt="" data-crop></div><div class="hz-media hz-media--avatar"><img src="../../assets/imagery/breeds-german-shepherd.jpg" alt="" data-crop></div><figcaption class="hz-crop-frame__caption"><b>۵۶ پیکسل</b>بندانگشتی و دایره</figcaption></div></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  (function () {
+    var stage = document.querySelector('.hz-crop'), h = document.getElementById('iu-focus');
+    if (!stage || !h) return;
+    var x = 58, y = 30;
+    function apply() {
+      h.style.insetInlineStart = x + '%'; h.style.insetBlockStart = y + '%';
+      // object-position that puts the focal point in the centre of each frame (clamped to the image edges)
+      document.querySelectorAll('img[data-crop]').forEach(function (i) {
+        var bw = i.clientWidth, bh = i.clientHeight, iw = i.naturalWidth || 1280, ih = i.naturalHeight || 716;
+        var s = Math.max(bw / iw, bh / ih), W = iw * s, H = ih * s;
+        var px = W - bw > 0.5 ? Math.min(100, Math.max(0, (x / 100 * W - bw / 2) / (W - bw) * 100)) : 50;
+        var py = H - bh > 0.5 ? Math.min(100, Math.max(0, (y / 100 * H - bh / 2) / (H - bh) * 100)) : 50;
+        i.style.objectPosition = px.toFixed(1) + '% ' + py.toFixed(1) + '%';
+      });
+    }
+    function fromEvent(e) { var r = stage.getBoundingClientRect(); x = Math.round(Math.min(100, Math.max(0, (e.clientX - r.left) / r.width * 100))); y = Math.round(Math.min(100, Math.max(0, (e.clientY - r.top) / r.height * 100))); apply(); }
+    var drag = false;
+    stage.addEventListener('pointerdown', function (e) { drag = true; stage.setPointerCapture(e.pointerId); fromEvent(e); h.focus(); });
+    stage.addEventListener('pointermove', function (e) { if (drag) fromEvent(e); });
+    stage.addEventListener('pointerup', function () { drag = false; });
+    h.addEventListener('keydown', function (e) {
+      var d = e.shiftKey ? 10 : 2, k = e.key;
+      if (k === 'ArrowLeft') x -= d; else if (k === 'ArrowRight') x += d; else if (k === 'ArrowUp') y -= d; else if (k === 'ArrowDown') y += d; else return;
+      e.preventDefault(); x = Math.min(100, Math.max(0, x)); y = Math.min(100, Math.max(0, y)); apply();
+    });
+    apply();
+    window.addEventListener('load', apply);
+  })();
+</script>

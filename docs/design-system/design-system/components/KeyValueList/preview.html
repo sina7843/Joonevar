@@ -1,0 +1,75 @@
+<!-- @dsCard group="Data display" height=792 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-note { display: block; margin-block-start: 8px; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo code { white-space: nowrap; font-size: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label">دو ستون از ۱۰۲۴ به بالا — <code dir="ltr">.hz-kv--2col</code> (این پیش‌نمایش در عرض ۱۲۸۰ است؛ زیر ۱۰۲۴ همین فهرست یک‌ستونی می‌شود)</p>
+    <article class="hz-card">
+      <div class="hz-section-header hz-section-header--sm"><h3 class="hz-section-header__title"><span class="hz-section-header__bar"></span>مشخصات رکس</h3></div>
+      <dl class="hz-kv hz-kv--2col">
+        <div class="hz-kv__row"><dt class="hz-kv__key">نام</dt><dd class="hz-kv__value">رکس</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">شناسه حیوان</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">PET-8JDUN4GH</bdi></dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">گونه · نژاد</dt><dd class="hz-kv__value">سگ · ژرمن شپرد</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">شماره میکروچیپ</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">364416562459223</bdi></dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">جنس</dt><dd class="hz-kv__value">نر</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ تولد</dt><dd class="hz-kv__value">۲۲ فروردین ۱۴۰۲</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">رنگ</dt><dd class="hz-kv__value">سیاه و قهوه‌ای</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ ثبت</dt><dd class="hz-kv__value">۱۹ اسفند ۱۴۰۴</dd></div>
+      </dl>
+    </article>
+    <span class="demo-note">ترتیب خواندن ردیف‌به‌ردیف است: ستون آغاز (راست) سپس ستون پایان. جفت‌های مرتبط را کنار هم بچینید، نه زیر هم.</span>
+  </section>
+
+  <section>
+    <p class="demo-label">یک ستون (موبایل، ستون‌های باریک) · مقدار خالی · متن بلند</p>
+    <div class="demo-grid">
+      <div>
+        <article class="hz-card">
+          <h3 class="hz-card__title" style="margin-block-end:4px">برگه ثبتی</h3>
+          <dl class="hz-kv">
+            <div class="hz-kv__row"><dt class="hz-kv__key">شماره برگه</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">RS-JTFZYEWD</bdi></dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">حیوان</dt><dd class="hz-kv__value">رکس · <bdi class="hz-id" dir="ltr">PET-8JDUN4GH</bdi></dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">کد رهگیری نمونه</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">SM-W5BQ6VRPDQ</bdi></dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ صدور</dt><dd class="hz-kv__value">۱۲ فروردین ۱۴۰۵</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">شناسه پرداخت</dt><dd class="hz-kv__value"><bdi class="hz-id" dir="ltr">HZP-K9ZQXFYDGX5PJUSB</bdi></dd></div>
+          </dl>
+        </article>
+        <span class="demo-note">سند — شناسه‌های لاتین در <code dir="ltr">bdi</code>، تاریخ جلالی</span>
+      </div>
+      <div>
+        <article class="hz-card">
+          <h3 class="hz-card__title" style="margin-block-end:4px">مکس</h3>
+          <dl class="hz-kv">
+            <div class="hz-kv__row"><dt class="hz-kv__key">وضعیت</dt><dd class="hz-kv__value"><span class="hz-badge hz-badge--sm hz-badge--neutral"><span class="hz-badge__dot"></span>پیش‌نویس</span></dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">شناسه حیوان</dt><dd class="hz-kv__value hz-kv__value--empty">—</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">شماره میکروچیپ</dt><dd class="hz-kv__value hz-kv__value--empty">ثبت نشده</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ تولد</dt><dd class="hz-kv__value">۱۵ دی ۱۴۰۲</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ ثبت</dt><dd class="hz-kv__value hz-kv__value--empty">—</dd></div>
+          </dl>
+        </article>
+        <span class="demo-note">خالی — «—» یا «ثبت نشده» با <code dir="ltr">__value--empty</code>، هرگز جای خالی</span>
+      </div>
+      <div>
+        <article class="hz-card">
+          <h3 class="hz-card__title" style="margin-block-end:4px">مورد مرزی</h3>
+          <dl class="hz-kv">
+            <div class="hz-kv__row"><dt class="hz-kv__key">نام</dt><dd class="hz-kv__value">شاهزاده کوچولوی باغ ارم شیراز</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">گونه · نژاد</dt><dd class="hz-kv__value">گربه · پرشین (اگزوتیک موکوتاه)</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">تاریخ تولد</dt><dd class="hz-kv__value">حدود ۱۴۰۲/۰۱</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">دلیل اصلاح</dt><dd class="hz-kv__value">تصویر کارت ملی ارسالی خوانا نیست و تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تصویر واضح‌تری بارگذاری کنید.</dd></div>
+          </dl>
+        </article>
+        <span class="demo-note">متن بلند — مقدار می‌شکند، کلید در بالای ردیف می‌ماند</span>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

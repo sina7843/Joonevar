@@ -33,3 +33,6 @@ Never silently restore obsolete annual membership, scheduling, vet onboarding, s
 9. When asked to execute the whole project, proceed to the next eligible prompt yourself. Do not ask the user to run done or approve a routine decision. If the context window ends, leave an exact resume instruction.
 
 If required work/checks remain incomplete: a truthful checkpoint commit is allowed, but use PARTIAL/BLOCKED report and do not run complete. If Git identity or signing is enforced by the environment and fails, report COMMIT_BLOCKED; never weaken those policies to continue. Local commits are authorized; changing permissions is not.
+
+## Design System v1.0.3 (binding, 2026-10-05)
+The design system in `docs/design-system/` (v1.0.3, approved 11 Mehr 1405) is the only visual source and an explicit user instruction (precedence item 1); it overrides the prototype for layout, composition, components, colour, type, spacing and imagery. Product behaviour (Requirements.md, D01–D19, flows) is unchanged. Read `docs/design-system/CLAUDE-CODE-DESIGN-SYSTEM-RULES.md` before any UI work; key screens K1–K19 are in `docs/design-system/key-screens/`. Gaps go to `docs/design-system/GAPS.md` with a DEC entry.

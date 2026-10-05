@@ -1,0 +1,96 @@
+<!-- @dsCard group="Feedback" height=1176 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  .demo-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-name { display: block; padding: 8px 14px; border-block-end: 1px solid var(--border-subtle); font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-sk-row { display: flex; align-items: center; gap: 14px; }
+  .demo-sk-body { flex: 1 1 auto; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">پنج حالت صفحه (<bdi dir="ltr">src/ui/states.tsx</bdi>) — هر حالت می‌گوید چه شده و قدم بعد چیست</p>
+    <div class="demo-grid">
+      <div class="hz-card hz-card--flush">
+        <span class="demo-name"><bdi dir="ltr">LoadingState</bdi></span>
+        <div class="hz-state" role="status" aria-live="polite">
+          <div class="hz-state__icon"><span class="hz-spinner hz-spinner--lg" aria-hidden="true"></span></div>
+          <p class="hz-state__title">در حال بارگذاری</p>
+          <p class="hz-state__body">فهرست حیوان‌های شما در حال دریافت است.</p>
+        </div>
+      </div>
+      <div class="hz-card hz-card--flush">
+        <span class="demo-name"><bdi dir="ltr">EmptyState</bdi></span>
+        <div class="hz-state">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M212,80a28,28,0,1,0,28,28A28,28,0,0,0,212,80Zm0,40a12,12,0,1,1,12-12A12,12,0,0,1,212,120ZM72,108a28,28,0,1,0-28,28A28,28,0,0,0,72,108ZM44,120a12,12,0,1,1,12-12A12,12,0,0,1,44,120ZM92,88A28,28,0,1,0,64,60,28,28,0,0,0,92,88Zm0-40A12,12,0,1,1,80,60,12,12,0,0,1,92,48Zm72,40a28,28,0,1,0-28-28A28,28,0,0,0,164,88Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,164,48Zm23.12,100.86a35.3,35.3,0,0,1-16.87-21.14,44,44,0,0,0-84.5,0A35.25,35.25,0,0,1,69,148.82,40,40,0,0,0,88,224a39.48,39.48,0,0,0,15.52-3.13,64.09,64.09,0,0,1,48.87,0,40,40,0,0,0,34.73-72ZM168,208a24,24,0,0,1-9.45-1.93,80.14,80.14,0,0,0-61.19,0,24,24,0,0,1-20.71-43.26,51.22,51.22,0,0,0,24.46-30.67,28,28,0,0,1,53.78,0,51.27,51.27,0,0,0,24.53,30.71A24,24,0,0,1,168,208Z"/></svg></div>
+          <p class="hz-state__title">هنوز حیوانی ثبت نکرده‌اید</p>
+          <p class="hz-state__body">ثبت در شش مرحله؛ هر مرحله ذخیره می‌شود و بعداً ادامه می‌دهید.</p>
+          <div class="hz-state__actions"><a href="#" class="hz-btn hz-btn--primary"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>ثبت حیوان</a></div>
+        </div>
+      </div>
+      <div class="hz-card hz-card--flush">
+        <span class="demo-name"><bdi dir="ltr">NetworkErrorState</bdi></span>
+        <div class="hz-state hz-state--error" role="alert">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.92,210.62a8,8,0,1,1-11.84,10.76l-52-57.15a60,60,0,0,0-57.41,7.24,8,8,0,1,1-9.42-12.93A75.43,75.43,0,0,1,128,144c1.28,0,2.55,0,3.82.1L104.9,114.49A108,108,0,0,0,61,135.31,8,8,0,0,1,49.73,134,8,8,0,0,1,51,122.77a124.27,124.27,0,0,1,41.71-21.66L69.37,75.4a155.43,155.43,0,0,0-40.29,24A8,8,0,0,1,18.92,87,171.87,171.87,0,0,1,58,62.86L42.08,45.38A8,8,0,1,1,53.92,34.62ZM128,192a12,12,0,1,0,12,12A12,12,0,0,0,128,192ZM237.08,87A172.3,172.3,0,0,0,106,49.4a8,8,0,1,0,2,15.87A158.33,158.33,0,0,1,128,64a156.25,156.25,0,0,1,98.92,35.37A8,8,0,0,0,237.08,87ZM195,135.31a8,8,0,0,0,11.24-1.3,8,8,0,0,0-1.3-11.24,124.25,124.25,0,0,0-51.73-24.2A8,8,0,1,0,150,114.24,108.12,108.12,0,0,1,195,135.31Z"/></svg></div>
+          <p class="hz-state__title">اطلاعات دریافت نشد</p>
+          <p class="hz-state__body">اتصال به همزیست برقرار نشد. اینترنت خود را بررسی کنید و دوباره تلاش کنید.</p>
+          <div class="hz-state__actions"><button type="button" class="hz-btn hz-btn--secondary"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg>تلاش دوباره</button></div>
+        </div>
+      </div>
+      <div class="hz-card hz-card--flush" style="grid-column: span 2">
+        <span class="demo-name"><bdi dir="ltr">NeedsCorrectionState</bdi> · متن بلند</span>
+        <div class="hz-state hz-state--warning">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></svg></div>
+          <p class="hz-state__title">پرونده شما نیازمند اصلاح است</p>
+          <p class="hz-state__body">تصویر کارت ملی ارسالی خوانا نیست و تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تصویر واضح‌تری بارگذاری کنید و تاریخ تولد را بررسی کنید. تا اصلاح پرونده، ثبت حیوان تازه امکان‌پذیر نیست.</p>
+          <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <b class="hz-owner__who">شما</b></span></div>
+          <div class="hz-state__actions"><a href="#" class="hz-btn hz-btn--primary">اصلاح احراز هویت</a></div>
+        </div>
+      </div>
+      <div class="hz-card hz-card--flush">
+        <span class="demo-name"><bdi dir="ltr">WaitingState</bdi></span>
+        <div class="hz-state hz-state--waiting" role="status">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,75.64V40a16,16,0,0,0-16-16H72A16,16,0,0,0,56,40V76a16.07,16.07,0,0,0,6.4,12.8L114.67,128,62.4,167.2A16.07,16.07,0,0,0,56,180v36a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V180.36a16.09,16.09,0,0,0-6.35-12.77L141.27,128l52.38-39.6A16.05,16.05,0,0,0,200,75.64ZM72,40H184V75.64L178.23,80H77.33L72,76Zm56,78L98.67,96h58.4Zm56,98H72V180l48-36v24a8,8,0,0,0,16,0V144.08l48,36.28Z"/></svg></div>
+          <p class="hz-state__title">نتیجه تست «تارا» هنوز آماده نیست</p>
+          <p class="hz-state__body">تست اصالت نسب در حال بررسی است و کاری از سمت شما لازم نیست. نتیجه را با اعلان خبر می‌دهیم.</p>
+          <div class="hz-owner"><span>اقدام بعدی با: <b class="hz-owner__who">مرکز ژنتیک</b></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">Skeleton ★ برای فهرست کارتی و فهرست کلید-مقدار (شکل همان الگو، <bdi dir="ltr">aria-busy</bdi> روی ظرف) · حالت خالی فشرده</p>
+    <div class="demo-cols">
+      <div aria-busy="true" aria-label="در حال بارگذاری حیوان‌های من">
+        <ul class="hz-cardlist" aria-hidden="true">
+          <li class="hz-cardlist__item"><div class="demo-sk-row"><span class="hz-skeleton hz-skeleton--thumb"></span><div class="demo-sk-body"><span class="hz-skeleton hz-skeleton--title" style="width: 40%"></span><span class="hz-skeleton hz-skeleton--text" style="width: 70%"></span></div><span class="hz-skeleton hz-skeleton--pill"></span></div></li>
+          <li class="hz-cardlist__item"><div class="demo-sk-row"><span class="hz-skeleton hz-skeleton--thumb"></span><div class="demo-sk-body"><span class="hz-skeleton hz-skeleton--title" style="width: 30%"></span><span class="hz-skeleton hz-skeleton--text" style="width: 60%"></span></div><span class="hz-skeleton hz-skeleton--pill"></span></div></li>
+          <li class="hz-cardlist__item"><div class="demo-sk-row"><span class="hz-skeleton hz-skeleton--thumb"></span><div class="demo-sk-body"><span class="hz-skeleton hz-skeleton--title" style="width: 45%"></span><span class="hz-skeleton hz-skeleton--text" style="width: 55%"></span></div><span class="hz-skeleton hz-skeleton--pill"></span></div></li>
+        </ul>
+      </div>
+      <div class="hz-card" aria-busy="true" aria-label="در حال بارگذاری پرونده حیوان">
+        <span class="hz-skeleton hz-skeleton--title" style="width: 35%; margin-block-end: 8px" aria-hidden="true"></span>
+        <dl class="hz-kv" aria-hidden="true">
+          <div class="hz-kv__row"><dt><span class="hz-skeleton hz-skeleton--text" style="width: 60%"></span></dt><dd style="margin: 0"><span class="hz-skeleton hz-skeleton--text" style="width: 50%"></span></dd></div>
+          <div class="hz-kv__row"><dt><span class="hz-skeleton hz-skeleton--text" style="width: 45%"></span></dt><dd style="margin: 0"><span class="hz-skeleton hz-skeleton--text" style="width: 70%"></span></dd></div>
+          <div class="hz-kv__row"><dt><span class="hz-skeleton hz-skeleton--text" style="width: 70%"></span></dt><dd style="margin: 0"><span class="hz-skeleton hz-skeleton--text" style="width: 40%"></span></dd></div>
+          <div class="hz-kv__row"><dt><span class="hz-skeleton hz-skeleton--text" style="width: 50%"></span></dt><dd style="margin: 0"><span class="hz-skeleton hz-skeleton--text" style="width: 60%"></span></dd></div>
+        </dl>
+      </div>
+      <div class="hz-card hz-card--flush">
+        <span class="demo-name"><bdi dir="ltr">EmptyState</bdi> · فشرده، فهرست فیلترشده</span>
+        <div class="hz-state hz-state--compact">
+          <div class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg></div>
+          <p class="hz-state__title">با این فیلترها نتیجه‌ای نیست</p>
+          <p class="hz-state__body">دامپزشک معتمدی با تخصص «دندان‌پزشکی» در رشت ثبت نشده است.</p>
+          <div class="hz-state__actions"><button type="button" class="hz-btn hz-btn--secondary hz-btn--sm">پاک کردن فیلترها</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

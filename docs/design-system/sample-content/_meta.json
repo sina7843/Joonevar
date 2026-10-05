@@ -1,0 +1,79 @@
+{
+  "synthetic": true,
+  "note": "Every value is synthetic. In production each field is entered by an admin or operator, or created by the system. Field names match the code (src/db/schema).",
+  "referenceDate": {
+    "iso": "2026-10-02T09:00:00+03:30",
+    "displayFa": "۱۴۰۵/۰۷/۱۰",
+    "longFa": "۱۰ مهر ۱۴۰۵"
+  },
+  "formatting": {
+    "money": "Stored as integer Toman (bigint, e.g. offer_sku.priceToman). Displayed with toLocaleString(\"fa-IR\") + \" تومان\" — Persian digits, Persian thousands separator (U+066C). Never Rial in the UI.",
+    "date": "Stored as ISO/UTC. Displayed in the Persian (Jalali) calendar via Intl fa-IR, Asia/Tehran.",
+    "identifiers": "Latin, left-to-right, isolated with <bdi>/.hz-ltr. Alphabet 23456789ABCDEFGHJKMNPQRSTUVWXYZ (no 0/O/1/I/L) so codes read aloud or typed from paper cannot collide.",
+    "phone": "Synthetic numbers use the reserved 0999 prefix so they can never reach a real person.",
+    "nationalId": "Synthetic national ids start at 9000000000, outside the issued range.",
+    "images": "One uploaded image per record (imageFileId + mandatory imageAltFa). The same image is shown in several frames, so every image needs a safe area. See images.json."
+  },
+  "idRegistry": [
+    {
+      "prefix": "PET-",
+      "length": 8,
+      "entity": "شناسه حیوان (petId)",
+      "source": "src/domain/ids.ts newPetId"
+    },
+    {
+      "prefix": "RS-",
+      "length": 8,
+      "entity": "برگه ثبتی",
+      "source": "newRegistrationSheetNo"
+    },
+    {
+      "prefix": "PD-",
+      "length": 8,
+      "entity": "شجره‌نامه",
+      "source": "src/documents/pedigree.ts"
+    },
+    {
+      "prefix": "MP-",
+      "length": 8,
+      "entity": "مجوز جفت‌گیری",
+      "source": "src/mating/permits.ts"
+    },
+    {
+      "prefix": "PC-",
+      "length": 8,
+      "entity": "کارت توله",
+      "source": "src/mating/allocation.ts"
+    },
+    {
+      "prefix": "PUP-",
+      "length": 8,
+      "entity": "کد موقت توله",
+      "source": "src/mating/birth.ts"
+    },
+    {
+      "prefix": "SM-",
+      "length": 10,
+      "entity": "کد رهگیری نمونه",
+      "source": "newSampleTrackingCode"
+    },
+    {
+      "prefix": "HZ-",
+      "length": 10,
+      "entity": "کد مراجعه",
+      "source": "newReferralCode"
+    },
+    {
+      "prefix": "HZP-",
+      "length": 16,
+      "entity": "شناسه پرداخت",
+      "source": "src/billing/payments.ts (base64url)"
+    },
+    {
+      "prefix": "HZR-",
+      "length": 12,
+      "entity": "شناسه درخواست استرداد",
+      "source": "src/marketplace/refunds.ts (base64url)"
+    }
+  ]
+}

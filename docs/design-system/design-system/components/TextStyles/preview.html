@@ -1,0 +1,77 @@
+<!-- @dsCard group="Base" height=912 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-scale { display: flex; flex-direction: column; }
+  .demo-style { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 32px; align-items: baseline; padding-block: 10px; border-block-end: 1px solid var(--border-subtle); }
+  .demo-spec { display: flex; align-items: baseline; gap: 12px; }
+  .demo-spec__name { min-width: 96px; font-size: 13px; line-height: 20px; font-weight: 700; color: var(--text-primary); direction: ltr; unicode-bidi: isolate; text-align: start; }
+  .demo-spec__val { font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-sample { min-width: 0; max-width: 820px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">مقیاس متن · IRANSansX · اندازه‌ها و ارتفاع خط دسکتاپ (۱۰۲۴ به بالا) و موبایل کنار هر سبک؛ عنوان‌ها Bold · منبع: tokens.json → type.groups</p>
+    <div class="demo-scale">
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-display</span><span class="demo-spec__val">۴۴/۶۴ · موبایل ۲۸/۴۴</span></div>
+        <div class="demo-sample"><h1 class="hz-display">ثبت رسمی و پیگیری سگ‌ها، در یک‌جا</h1></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-h1</span><span class="demo-spec__val">۳۲/۴۸ · موبایل ۲۴/۳۸</span></div>
+        <div class="demo-sample"><p class="hz-h1">شجره‌نامه سگ را چطور بخوانیم؟</p></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-h2</span><span class="demo-spec__val">۲۴/۳۸ · موبایل ۲۰/۳۲</span></div>
+        <div class="demo-sample"><p class="hz-h2">تازه‌های انجمن</p></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-h3</span><span class="demo-spec__val">۲۰/۳۲ · موبایل ۱۸/۳۰</span></div>
+        <div class="demo-sample"><p class="hz-h3">درخواست‌های فعال</p></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-h4</span><span class="demo-spec__val">۱۶/۲۶ · همه اندازه‌ها</span></div>
+        <div class="demo-sample"><p class="hz-h4">میکروچیپ چیست و چرا فقط یک بار کاشته می‌شود؟</p></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-body-lg</span><span class="demo-spec__val">۱۸/۳۲ · موبایل ۱۶/۲۸</span></div>
+        <div class="demo-sample"><p class="hz-body-lg" style="margin: 0;">آشنایی با کاشت میکروچیپ، شماره ۱۵ رقمی و نقش آن در شناسایی دائمی حیوان در سامانه همزیست.</p></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-body</span><span class="demo-spec__val">۱۶/۲۸ · موبایل ۱۵/۲۶</span></div>
+        <div class="demo-sample"><p class="hz-body" style="margin: 0;">گام‌به‌گام: مراجعه به دامپزشک معتمد، نمونه‌گیری خون، پرداخت و دریافت برگه ثبتی.</p></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-body-sm</span><span class="demo-spec__val">۱۴/۲۴ · همه اندازه‌ها</span></div>
+        <div class="demo-sample"><p class="hz-body-sm" style="margin: 0;">دامپزشک معتمد هویت حیوان را تأیید می‌کند، نمونه می‌گیرد و میکروچیپ را ثبت می‌کند؛ چطور پیدایش کنیم.</p></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">label · label-sm</span><span class="demo-spec__val">۱۵/۲۴ و ۱۳/۲۰ · فقط در دکمه</span></div>
+        <div class="demo-sample demo-row"><button class="hz-btn hz-btn--secondary" type="button">ثبت حیوان</button><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button">بارگذاری دوباره</button></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-caption</span><span class="demo-spec__val">۱۲/۲۰ · Regular</span></div>
+        <div class="demo-sample"><span class="hz-caption">۶ دقیقه مطالعه · ۶ مهر ۱۴۰۵ · نگار رستمی</span></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-overline</span><span class="demo-spec__val">۱۲/۲۰ · Bold · text-brand</span></div>
+        <div class="demo-sample"><span class="hz-overline">مجوز جفت‌گیری</span></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-numeric</span><span class="demo-spec__val">۳۶/۵۲ · موبایل ۲۶/۴۰</span></div>
+        <div class="demo-sample"><span class="hz-numeric">۴۶۸</span> <span class="hz-caption">عضو · کلاب سگ سرابی</span></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-id</span><span class="demo-spec__val">۱۳/۲۰ · لاتین، درون bdi</span></div>
+        <div class="demo-sample"><span class="hz-body-sm">شناسه پرداخت <bdi class="hz-id" dir="ltr">HZP-q3Xv9_Lk2Rt7mWbA</bdi> · میکروچیپ <bdi class="hz-id" dir="ltr">364416562451187</bdi></span></div>
+      </div>
+      <div class="demo-style">
+        <div class="demo-spec"><span class="demo-spec__name">.hz-h3</span><span class="demo-spec__val">متن بلند · حداکثر دو خط</span></div>
+        <div class="demo-sample" style="max-width: 560px;"><p class="hz-h3">تمدید مهلت ثبت‌نام آزمون اصالت نسب برای پرورش‌دهندگان عضو انجمن تا پایان آبان‌ماه ۱۴۰۵ و تغییر نحوه ارسال نمونه</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

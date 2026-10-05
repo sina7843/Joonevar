@@ -1,0 +1,62 @@
+[
+  {
+    "recipientAccountId": "acc-owner-1",
+    "titleFa": "برگه ثبتی «رکس» صادر شد",
+    "bodyFa": "برگه ثبتی را می‌توانید از پرونده حیوان دریافت کنید.",
+    "createdAt": {
+      "iso": "2026-09-30T10:00:00+03:30",
+      "displayFa": "۸ مهر ۱۴۰۵، ۱۰:۰۰"
+    },
+    "read": false
+  },
+  {
+    "recipientAccountId": "acc-owner-1",
+    "titleFa": "پرداخت شجره‌نامه در انتظار شماست",
+    "bodyFa": "برای صدور شجره‌نامه «تارا» پرداخت را کامل کنید.",
+    "createdAt": {
+      "iso": "2026-09-29T09:10:00+03:30",
+      "displayFa": "۷ مهر ۱۴۰۵، ۹:۱۰"
+    },
+    "read": false
+  },
+  {
+    "recipientAccountId": "acc-owner-2",
+    "titleFa": "احراز هویت نیازمند اصلاح است",
+    "bodyFa": "تصویر کارت ملی مات است؛ لطفاً دوباره بارگذاری کنید.",
+    "createdAt": {
+      "iso": "2026-09-27T16:45:00+03:30",
+      "displayFa": "۵ مهر ۱۴۰۵، ۱۶:۴۵"
+    },
+    "read": true
+  },
+  {
+    "recipientAccountId": "acc-breeder-1",
+    "titleFa": "درخواست مجوز جفت‌گیری تأیید شد",
+    "bodyFa": "مجوز آرا × تارا صادر شد.",
+    "createdAt": {
+      "iso": "2026-05-22T10:00:00+03:30",
+      "displayFa": "۱ خرداد ۱۴۰۵، ۱۰:۰۰"
+    },
+    "read": true
+  },
+  {
+    "recipientAccountId": "acc-vet-1",
+    "titleFa": "مراجعه تازه در صف شما",
+    "bodyFa": "مکس — کد مراجعه در انتظار پذیرش است.",
+    "createdAt": {
+      "iso": "2026-10-01T09:30:00+03:30",
+      "displayFa": "۹ مهر ۱۴۰۵، ۹:۳۰"
+    },
+    "read": false
+  },
+  {
+    "recipientAccountId": "acc-assoc-1",
+    "titleFa": "۴ پرونده احراز هویت در صف",
+    "bodyFa": "قدیمی‌ترین پرونده ۳ روز منتظر است.",
+    "createdAt": {
+      "iso": "2026-10-02T08:00:00+03:30",
+      "displayFa": "۱۰ مهر ۱۴۰۵، ۸:۰۰"
+    },
+    "read": false
+  }
+]

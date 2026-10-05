@@ -1,0 +1,94 @@
+<!-- @dsCard group="Inputs" height=872 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; align-items: start; }
+  .demo-cell { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">رسانه آگهی و محصول — کشیدن و رها کردن، پیشرفت، خطا، متن جایگزین برای هر تصویر</p>
+    <div class="demo-grid">
+      <div class="demo-cell">
+        <div>
+          <p class="demo-label">پیش‌فرض</p>
+          <div class="hz-dropzone">
+            <span class="hz-dropzone__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"/></svg></span>
+            <p class="hz-dropzone__title">تصویرها را اینجا رها کنید</p>
+            <p class="hz-dropzone__hint" id="mu-h"><bdi>JPG</bdi> یا <bdi>PNG</bdi>، هر تصویر حداکثر ۵ مگابایت، تا ۸ تصویر. تصویر اول، تصویر اصلی آگهی است.</p>
+            <input class="hz-visually-hidden" type="file" id="mu-1" multiple accept=".jpg,.jpeg,.png" aria-describedby="mu-h">
+            <label class="hz-btn hz-btn--secondary" for="mu-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>انتخاب از دستگاه</label>
+          </div>
+        </div>
+        <div>
+          <p class="demo-label">در حال کشیدن فایل روی ناحیه</p>
+          <div class="hz-dropzone hz-dropzone--compact hz-dropzone--over">
+            <span class="hz-dropzone__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"/></svg></span>
+            <p class="hz-dropzone__title">رها کنید تا ۳ فایل بارگذاری شود</p>
+          </div>
+        </div>
+        <div>
+          <p class="demo-label">خطا — فایل پذیرفته نشد</p>
+          <div class="hz-dropzone hz-dropzone--compact hz-dropzone--invalid">
+            <span class="hz-dropzone__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z"/></svg></span>
+            <p class="hz-dropzone__title">تصویر دیگری اضافه کنید</p>
+            <input class="hz-visually-hidden" type="file" id="mu-2" multiple accept=".jpg,.jpeg,.png" aria-describedby="mu-2-e" aria-invalid="true">
+            <label class="hz-btn hz-btn--secondary hz-btn--sm" for="mu-2">انتخاب</label>
+          </div>
+          <div class="hz-field__error" id="mu-2-e" role="alert" style="margin-block-start:6px"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>فایل <bdi>shenasnameh.docx</bdi> پذیرفته نشد؛ فقط تصویر <bdi>JPG</bdi> یا <bdi>PNG</bdi> بارگذاری کنید.</span></div>
+        </div>
+        <div>
+          <p class="demo-label">مدارک فروشنده و Claim — بدون متن جایگزین، خصوصی، غیرفعال در زمان بررسی</p>
+          <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="hz-dropzone hz-dropzone--compact hz-dropzone--disabled" aria-disabled="true">
+        <span class="hz-dropzone__icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></span>
+        <p class="hz-dropzone__hint">مدارک در حال بررسی است؛ اگر اصلاح لازم شود، دوباره باز می‌شود.</p>
+      </div>
+<ul class="hz-upload-list" aria-label="مدارک فروشنده">
+        <li class="hz-upload hz-upload--doc"><span class="hz-upload__file-icon"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,152a8,8,0,0,1-8,8H192v16h16a8,8,0,0,1,0,16H192v16a8,8,0,0,1-16,0V152a8,8,0,0,1,8-8h32A8,8,0,0,1,224,152ZM92,172a28,28,0,0,1-28,28H56v8a8,8,0,0,1-16,0V152a8,8,0,0,1,8-8H64A28,28,0,0,1,92,172Zm-16,0a12,12,0,0,0-12-12H56v24h8A12,12,0,0,0,76,172Zm88,8a36,36,0,0,1-36,36H112a8,8,0,0,1-8-8V152a8,8,0,0,1,8-8h16A36,36,0,0,1,164,180Zm-16,0a20,20,0,0,0-20-20h-8v40h8A20,20,0,0,0,148,180ZM40,112V40A16,16,0,0,1,56,24h96a8,8,0,0,1,5.66,2.34l56,56A8,8,0,0,1,216,88v24a8,8,0,0,1-16,0V96H152a8,8,0,0,1-8-8V40H56v72a8,8,0,0,1-16,0ZM160,80h28.69L160,51.31Z"/></svg></span><div class="hz-upload__body"><div class="hz-upload__head"><span class="hz-upload__name">پروانه کسب</span></div><span class="hz-upload__meta"><bdi>parvaneh-kasb-aria.pdf</bdi>، ۱٫۲ مگابایت</span></div><span class="hz-doc__private"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>خصوصی</span></li>
+      </ul>
+          </div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <div>
+          <div class="hz-upload-list__head"><b>تصویرهای آگهی</b><span>۴ از ۸ تصویر</span></div>
+          <ul class="hz-upload-list" aria-label="تصویرهای آگهی">
+            <li class="hz-upload">
+              <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/listings-german-shepherd-puppy-1.jpg" alt=""></div>
+              <div class="hz-upload__body"><div class="hz-upload__head"><bdi class="hz-upload__name" dir="auto">IMG_2481.jpg</bdi><span class="hz-tag">تصویر اصلی</span></div><span class="hz-upload__meta">۲٫۴ مگابایت، بارگذاری شد</span></div>
+              <div class="hz-upload__actions"><button class="hz-icon-btn" type="button" aria-label="جابه‌جایی تصویر ۱ از ۴"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M104,60A12,12,0,1,1,92,48,12,12,0,0,1,104,60Zm60,12a12,12,0,1,0-12-12A12,12,0,0,0,164,72ZM92,116a12,12,0,1,0,12,12A12,12,0,0,0,92,116Zm72,0a12,12,0,1,0,12,12A12,12,0,0,0,164,116ZM92,184a12,12,0,1,0,12,12A12,12,0,0,0,92,184Zm72,0a12,12,0,1,0,12,12A12,12,0,0,0,164,184Z"/></svg></button><button class="hz-icon-btn" type="button" aria-label="حذف تصویر ۱"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button></div>
+              <div class="hz-field hz-upload__alt"><label class="hz-field__label" for="alt-1">متن جایگزین تصویر ۱<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input" id="alt-1" type="text" value="ژرمن شپرد — تمام‌قد"></div>
+            </li>
+            <li class="hz-upload">
+              <div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/listings-german-shepherd-puppy-2.jpg" alt=""></div>
+              <div class="hz-upload__body"><div class="hz-upload__head"><bdi class="hz-upload__name" dir="auto">IMG_2482.jpg</bdi></div><span class="hz-upload__meta">۱٫۸ مگابایت، بارگذاری شد</span></div>
+              <div class="hz-upload__actions"><button class="hz-icon-btn" type="button" aria-label="جابه‌جایی تصویر ۲ از ۴"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M104,60A12,12,0,1,1,92,48,12,12,0,0,1,104,60Zm60,12a12,12,0,1,0-12-12A12,12,0,0,0,164,72ZM92,116a12,12,0,1,0,12,12A12,12,0,0,0,92,116Zm72,0a12,12,0,1,0,12,12A12,12,0,0,0,164,116ZM92,184a12,12,0,1,0,12,12A12,12,0,0,0,92,184Zm72,0a12,12,0,1,0,12,12A12,12,0,0,0,164,184Z"/></svg></button><button class="hz-icon-btn" type="button" aria-label="حذف تصویر ۲"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button></div>
+              <div class="hz-field hz-upload__alt"><label class="hz-field__label" for="alt-2">متن جایگزین تصویر ۲<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input" id="alt-2" type="text" aria-invalid="true" aria-describedby="alt-2-e"><div class="hz-field__error" id="alt-2-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>بنویسید در تصویر چه دیده می‌شود، مثلاً «ژرمن شپرد — چهره». آگهی بدون آن منتشر نمی‌شود.</span></div></div>
+            </li>
+            <li class="hz-upload">
+              <div class="hz-media hz-media--thumb-lg"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></div></div>
+              <div class="hz-upload__body"><div class="hz-upload__head"><bdi class="hz-upload__name" dir="auto">IMG_2490.jpg</bdi></div><span class="hz-upload__meta" role="status">در حال بارگذاری، ۶۴٪ از ۳٫۱ مگابایت</span><span class="hz-progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64" aria-label="پیشرفت بارگذاری تصویر ۳"><span class="hz-progress__fill" style="width:64%"></span></span></div>
+              <div class="hz-upload__actions"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button">لغو</button></div>
+              <div class="hz-field hz-upload__alt"><label class="hz-field__label" for="alt-3">متن جایگزین تصویر ۳<span class="hz-field__req" aria-hidden="true">*</span></label><input class="hz-input" id="alt-3" type="text"></div>
+            </li>
+            <li class="hz-upload hz-upload--error">
+              <span class="hz-upload__file-icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg></span>
+              <div class="hz-upload__body"><div class="hz-upload__head"><bdi class="hz-upload__name" dir="auto">تصویر-توله-ژرمن-شپرد-در-حیاط-کنل-آریا.jpg</bdi></div><span class="hz-upload__meta">بارگذاری نشد؛ اتصال قطع شد.</span></div>
+              <div class="hz-upload__actions"><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg>تلاش دوباره</button><button class="hz-icon-btn" type="button" aria-label="حذف تصویر ۴"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  (function () {
+    var dz = document.querySelector('.hz-dropzone:not(.hz-dropzone--over):not(.hz-dropzone--disabled)');
+    if (!dz) return;
+    ['dragenter', 'dragover'].forEach(function (t) { dz.addEventListener(t, function (e) { e.preventDefault(); dz.classList.add('hz-dropzone--over'); }); });
+    ['dragleave', 'drop'].forEach(function (t) { dz.addEventListener(t, function (e) { e.preventDefault(); dz.classList.remove('hz-dropzone--over'); }); });
+  })();
+</script>

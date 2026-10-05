@@ -1,0 +1,137 @@
+{
+  "purpose": "Hard cases every component and key screen must survive. Same field names as the other files; all values synthetic. Reference date ۱۴۰۵/۰۷/۱۰.",
+  "animals": [
+    {
+      "case": "No name, no photo, cat, draft at step 1",
+      "id": "edge-animal-1",
+      "name": null,
+      "species": "CAT",
+      "speciesFa": "گربه",
+      "breedId": null,
+      "breedFa": null,
+      "sex": null,
+      "sexFa": null,
+      "birthDate": null,
+      "birthDateApproximate": false,
+      "petId": null,
+      "microchipNumber": null,
+      "status": "DRAFT",
+      "draftStep": 1,
+      "draftStepsTotal": 6,
+      "photo": null,
+      "display": { "nameFallbackFa": "بدون نام", "petIdFallbackFa": "—" }
+    },
+    {
+      "case": "Long name, approximate birth date, admin-entered cat breed not in seed",
+      "id": "edge-animal-2",
+      "name": "شاهزاده کوچولوی باغ ارم شیراز",
+      "species": "CAT",
+      "speciesFa": "گربه",
+      "breedFa": "پرشین (اگزوتیک موکوتاه)",
+      "breedNote": "Code seeds the CAT species but no cat breeds; a superadmin adds them in /admin/breeds.",
+      "sex": "FEMALE",
+      "sexFa": "ماده",
+      "birthDate": "2023-04",
+      "birthDateApproximate": true,
+      "birthDateFa": "حدود ۱۴۰۲/۰۱",
+      "petId": "PET-W7KQ3MZP",
+      "microchipNumber": "364416562451187",
+      "status": "REGISTERED",
+      "photo": null
+    },
+    {
+      "case": "Very short name",
+      "id": "edge-animal-3",
+      "name": "تی",
+      "species": "DOG",
+      "speciesFa": "سگ",
+      "breedFa": "شیتزو",
+      "sexFa": "نر",
+      "petId": "PET-3HN8VXRT",
+      "status": "REGISTERED"
+    }
+  ],
+  "breeds": [
+    {
+      "case": "Long name with alternative in parentheses",
+      "nameFa": "سگ گله آناتولی (کانگال)",
+      "nameEn": "Anatolian Shepherd Dog (Kangal)",
+      "image": null
+    }
+  ],
+  "content": [
+    {
+      "case": "Long title, no image, long summary",
+      "kind": "ANNOUNCEMENT",
+      "kindFa": "اطلاعیه",
+      "titleFa": "تمدید مهلت ثبت‌نام آزمون اصالت نسب برای پرورش‌دهندگان عضو انجمن تا پایان آبان‌ماه ۱۴۰۵ و تغییر نحوه ارسال نمونه",
+      "summaryFa": "با توجه به درخواست‌های رسیده، مهلت ثبت‌نام آزمون اصالت نسب تمدید شد. نمونه‌ها از این پس فقط از طریق دامپزشک معتمد و با کد پیگیری نمونه پذیرفته می‌شوند و ارسال پستی مستقیم به مرکز ژنتیک امکان‌پذیر نیست.",
+      "readTimeFa": "۱۲ دقیقه مطالعه",
+      "image": null
+    }
+  ],
+  "directory": {
+    "centre": {
+      "case": "Three-line name, no image, expired licence",
+      "displayNameFa": "مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی",
+      "typeFa": "بیمارستان دامپزشکی",
+      "city": "اصفهان",
+      "licenceStatus": "EXPIRED",
+      "licenceStatusFa": "پروانه منقضی",
+      "image": null
+    },
+    "vet": {
+      "case": "Council code hidden by owner, no image, not trusted",
+      "displayNameFa": "دکتر نسرین فرهادی",
+      "trusted": false,
+      "councilCode": "د-۴۸۲۱۷",
+      "showCouncilCode": false,
+      "image": null
+    }
+  },
+  "money": [
+    { "case": "Large price", "amount": 450000000, "displayFa": "۴۵۰٬۰۰۰٬۰۰۰ تومان" },
+    { "case": "Fee not configured", "amount": null, "displayFa": "تعیین‌نشده", "rule": "Never show ۰ تومان; the payment path stays closed." },
+    { "case": "Negotiable listing price", "amount": 38000000, "priceModeFa": "قابل مذاکره", "displayFa": "۳۸٬۰۰۰٬۰۰۰ تومان" }
+  ],
+  "identifiers": [
+    { "case": "Longest identifier — must fit one line at 360px", "value": "HZP-q3Xv9_Lk2Rt7mWbA" },
+    { "case": "Sample id", "value": "SM-7KD2QWX9NM" }
+  ],
+  "requests": [
+    {
+      "case": "Deadline passed",
+      "code": "HZ-8MWQ2KD7RT",
+      "titleFa": "صدور شجره‌نامه",
+      "status": "NEEDS_CORRECTION",
+      "actionOwnerFa": "شما",
+      "deadlineFa": "۱۴۰۵/۰۷/۰۵",
+      "overdueFa": "۵ روز گذشته"
+    }
+  ],
+  "lists": [
+    { "case": "New user — nothing yet", "animals": [], "requests": [], "notifications": [], "accountComplete": false },
+    { "case": "Long navigation", "items": "MARKETPLACE_ADMIN/SUPERADMIN sidebar with 24 market items — see 02-product-and-roles.md" },
+    { "case": "Long settings list", "items": "146 keys in 14 groups — /admin/settings" }
+  ],
+  "ops": [
+    {
+      "case": "Old KYC case, stale decision",
+      "queue": "/assoc/kyc",
+      "ageFa": "۱۲ روز",
+      "version": 3,
+      "staleDecisionMessageFa": "این پرونده پس از باز کردن شما تغییر کرده است. صفحه را دوباره بار کنید و سپس تصمیم بگیرید."
+    }
+  ],
+  "shop": [
+    { "case": "Out of stock variant", "nameFa": "غذای خشک سگ بالغ نژاد بزرگ — ۱۵ کیلوگرم", "stockOnHand": 0, "displayFa": "ناموجود" }
+  ],
+  "notifications": [
+    {
+      "case": "Long body, unread",
+      "titleFa": "پرونده شما نیازمند اصلاح است",
+      "bodyFa": "تصویر کارت ملی ارسالی خوانا نیست و تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تصویر واضح‌تری بارگذاری کنید و تاریخ تولد را بررسی کنید. تا اصلاح پرونده، ثبت حیوان تازه امکان‌پذیر نیست.",
+      "read": false
+    }
+  ]
+}

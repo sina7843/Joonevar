@@ -1,0 +1,98 @@
+<!-- @dsCard group="Overlays" height=696 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .demo-stage { border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage .hz-scrim, .demo-stage .hz-drawer { position: absolute; }
+  .demo-stage .hz-topbar { position: static; }
+  .demo-page { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .demo-field-group { display: flex; flex-direction: column; gap: 8px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-cols">
+    <section>
+      <p class="demo-label">ناوبری محیط عملیاتی — از سمت شروع (راست)، با فاصله‌ای از صفحه برای بستن</p>
+      <div class="demo-stage" style="position: relative; overflow: hidden; height: 620px">
+        <div aria-hidden="true">
+          <div class="hz-topbar"><button type="button" class="hz-icon-btn" aria-label="باز کردن منو" aria-expanded="true" aria-controls="ops-nav"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg></button><span class="hz-h4">صف‌ها</span></div>
+          <div class="demo-page">
+            <div class="hz-queue-tile"><span class="hz-queue-tile__name">احراز هویت</span><span class="hz-queue-tile__count">۴</span><span class="hz-queue-tile__oldest">قدیمی‌ترین: ۱۲ روز</span></div>
+            <div class="hz-queue-tile"><span class="hz-queue-tile__name">عضویت</span><span class="hz-queue-tile__count">۶</span></div>
+          </div>
+        </div>
+        <div class="hz-scrim"></div>
+        <div class="hz-drawer hz-drawer--start hz-drawer--nav" id="ops-nav" role="dialog" aria-modal="true" aria-label="ناوبری محیط عملیاتی انجمن">
+          <div class="hz-drawer__head">
+            <span class="hz-logo hz-logo--ops"><img src="../../assets/imagery/hamzist-lockup-fa-horizontal.svg" alt="همزیست"></span>
+            <button type="button" class="hz-icon-btn" aria-label="بستن منو" data-close><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+          </div>
+          <nav class="hz-sidebar" aria-label="محیط عملیاتی انجمن">
+            <p class="hz-sidebar__env">محیط عملیاتی انجمن</p>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">صف‌ها</span><span class="hz-count">۱۸</span></a>
+            <p class="hz-sidebar__group">هویت و عضویت</p>
+            <a href="#" class="hz-side-item" aria-current="page"><span class="hz-side-item__label">احراز هویت</span><span class="hz-count">۴</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">عضویت</span><span class="hz-count">۶</span></a>
+            <p class="hz-sidebar__group">دامپزشکان</p>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">دانشجویان دامپزشکی</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">کد نظام دامپزشکان</span><span class="hz-count">۲</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">پروانه فعالیت</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">میز بررسی دامپزشکان</span><span class="hz-count">۳</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">دامپزشک معتمد</span></a>
+            <p class="hz-sidebar__group">پرورش</p>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">کلاب‌ها</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">کنل</span><span class="hz-count">۱</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">مجوز جفت‌گیری</span><span class="hz-count">۲</span></a>
+            <p class="hz-sidebar__group">اسناد و ارسال</p>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">درخواست‌های پستی</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">Export Pedigree</span></a>
+            <a href="#" class="hz-side-item"><span class="hz-side-item__label">صادرکنندگان</span></a>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="demo-label">فیلتر فهرست — از سمت پایان (چپ)، پیش‌فرض؛ زیر ۷۶۸ تمام‌صفحه</p>
+      <div class="demo-stage" style="position: relative; overflow: hidden; height: 620px">
+        <div class="demo-page" aria-hidden="true">
+          <h1 class="hz-h2">دامپزشکان</h1>
+          <div class="demo-row"><button type="button" class="hz-chip" aria-expanded="true" aria-controls="vet-filters"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg>فیلترها <span class="hz-chip__count">۲</span></button></div>
+          <div class="hz-card hz-card--compact"><div class="hz-vet"><div class="hz-vet__body"><span class="hz-vet__name">دکتر مریم صادقی</span><span class="hz-vet__meta">متخصص داخلی حیوانات کوچک · تهران</span></div></div></div>
+        </div>
+        <div class="hz-scrim"></div>
+        <div class="hz-drawer hz-drawer--full-mobile" id="vet-filters" role="dialog" aria-modal="true" aria-labelledby="vf-title">
+          <div class="hz-drawer__head">
+            <h2 class="hz-drawer__title" id="vf-title">فیلترها</h2>
+            <button type="button" class="hz-icon-btn" aria-label="بستن فیلترها" data-close><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+          </div>
+          <div class="hz-drawer__body">
+            <div class="hz-field">
+              <label class="hz-field__label" for="vf-city">شهر</label>
+              <span class="hz-select-wrap"><select class="hz-select" id="vf-city"><option>تهران</option><option>کرج</option><option>اصفهان</option><option>شیراز</option></select></span>
+            </div>
+            <fieldset class="demo-field-group" style="margin: 0; padding: 0; border: 0">
+              <legend class="hz-field__label" style="margin-block-end: 8px">تخصص</legend>
+              <div class="hz-filterbar">
+                <button type="button" class="hz-chip" aria-pressed="true">داخلی حیوانات کوچک</button>
+                <button type="button" class="hz-chip" aria-pressed="false">جراحی</button>
+                <button type="button" class="hz-chip" aria-pressed="false">پوست</button>
+                <button type="button" class="hz-chip" aria-pressed="false">دندان‌پزشکی</button>
+                <button type="button" class="hz-chip" aria-pressed="false">چشم‌پزشکی</button>
+                <button type="button" class="hz-chip" aria-pressed="false">اورژانس و مراقبت‌های ویژه</button>
+              </div>
+            </fieldset>
+            <label class="hz-check"><input type="checkbox" checked><span class="hz-check__text">فقط دامپزشک معتمد<span class="hz-check__desc">دامپزشکانی که انجمن برای پذیرش و نمونه‌گیری تأیید کرده است</span></span></label>
+          </div>
+          <div class="hz-drawer__foot">
+            <button type="button" class="hz-btn hz-btn--primary">نمایش نتیجه‌ها</button>
+            <button type="button" class="hz-btn hz-btn--secondary">پاک کردن همه</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

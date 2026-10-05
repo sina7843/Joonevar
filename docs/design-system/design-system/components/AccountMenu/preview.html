@@ -1,0 +1,77 @@
+<!-- @dsCard group="Shells & navigation" height=1144 width=1280 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-stage { position: relative; overflow: hidden; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-row { display: flex; align-items: flex-start; gap: 24px; }
+  .demo-side { width: 264px; height: 470px; display: flex; flex-direction: column; justify-content: flex-end; padding: 16px; background: var(--bg-chrome); border-inline-end: 1px solid var(--border-default); }
+  .demo-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+  .demo-menu { position: static; width: 300px; }
+  .demo-topbar { position: static; border-radius: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">نوار بالای OpsShell (≥۱۰۲۴) — دکمه حساب: نام و نقش؛ باز: سرآیند، پیوندهای حساب، نقش‌ها (RoleSwitcher)، خروج</p>
+    <div class="demo-stage" style="height:536px">
+      <header class="hz-topbar demo-topbar">
+        <nav class="hz-topbar__crumbs" aria-label="مسیر"><ol class="hz-breadcrumbs"><li><a href="#">بازار</a></li><li class="hz-breadcrumbs__sep" aria-hidden="true">/</li><li><span aria-current="page">مرور بازار</span></li></ol></nav>
+        <div class="hz-popover">
+          <button type="button" class="hz-topbar__account" aria-expanded="true" aria-controls="am-1" aria-label="حساب امیر حسینی، سوپرادمین"><span class="hz-avatar hz-avatar--sm"><img src="../../assets/imagery/people-acc-admin-1.jpg" alt="تصویر پروفایل امیر حسینی" width="32" height="32"></span><span class="hz-topbar__account-text"><span class="hz-topbar__account-name">امیر حسینی</span><span class="hz-topbar__account-role">سوپرادمین</span></span><span class="hz-account-caret"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></span></button>
+          <div class="hz-menu hz-menu--popover hz-account-menu" id="am-1">
+            <div class="hz-menu__head"><span class="hz-avatar"><img src="../../assets/imagery/people-acc-admin-1.jpg" alt="تصویر پروفایل امیر حسینی" width="40" height="40"></span><span class="hz-menu__head-text"><span class="hz-menu__head-name">امیر حسینی</span><span class="hz-menu__head-sub">سوپرادمین · <bdi class="hz-id" dir="ltr">09990000006</bdi></span></span></div>
+            <ul class="hz-menu__list"><li><a class="hz-menu__action" href="#"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg><span class="hz-menu__action-label">پروفایل</span></a></li><li><a class="hz-menu__action" href="#"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"/></svg><span class="hz-menu__action-label">اعلان‌ها</span></a></li></ul>
+            <div class="hz-menu__sep" role="separator"></div>
+            <p class="hz-menu__group-label" id="am-1p">حساب شخصی</p>
+            <ul class="hz-menu__list" aria-labelledby="am-1p"><li><a class="hz-menu__action" href="#"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg><span class="hz-menu__action-label">کاربر<span class="hz-menu__hint">پیشخوان، حیوان‌ها و درخواست‌های شما</span></span><span class="hz-menu__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></a></li></ul>
+            <p class="hz-menu__group-label" id="am-1o">محیط‌های عملیاتی</p>
+            <ul class="hz-menu__list" aria-labelledby="am-1o"><li><a class="hz-menu__action" href="#"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm109.94-52.79a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A112.1,112.1,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.62a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21Zm-15,34.91-28.57,16.25a8,8,0,0,0-3,3c-.58,1-1.19,2.06-1.81,3.06a7.94,7.94,0,0,0-1.22,4.21l-.15,32.25a95.89,95.89,0,0,1-25.37,14.3L134,199.13a8,8,0,0,0-3.91-1h-.19c-1.21,0-2.43,0-3.64,0a8.08,8.08,0,0,0-4.1,1l-28.84,16.1A96,96,0,0,1,67.88,201l-.11-32.2a8,8,0,0,0-1.22-4.22c-.62-1-1.23-2-1.8-3.06a8.09,8.09,0,0,0-3-3.06l-28.6-16.29a90.49,90.49,0,0,1,0-28.26L61.67,97.63a8,8,0,0,0,3-3c.58-1,1.19-2.06,1.81-3.06a7.94,7.94,0,0,0,1.22-4.21l.15-32.25a95.89,95.89,0,0,1,25.37-14.3L122,56.87a8,8,0,0,0,4.1,1c1.21,0,2.43,0,3.64,0a8.08,8.08,0,0,0,4.1-1l28.84-16.1A96,96,0,0,1,188.12,55l.11,32.2a8,8,0,0,0,1.22,4.22c.62,1,1.23,2,1.8,3.06a8.09,8.09,0,0,0,3,3.06l28.6,16.29A90.49,90.49,0,0,1,222.9,142.12Z"/></svg><span class="hz-menu__action-label">محیط عملیاتی مدیریت سامانه<span class="hz-menu__hint">سوپرادمین</span></span><span class="hz-menu__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></a></li><li><a class="hz-menu__action" href="#" aria-current="true"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg><span class="hz-menu__action-label">محیط عملیاتی بازار<span class="hz-menu__hint">سوپرادمین — همه ۲۴ بخش</span></span><span class="hz-menu__check"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span></a></li></ul>
+            <div class="hz-menu__sep" role="separator"></div>
+            <ul class="hz-menu__list"><li><button type="button" class="hz-menu__action"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg><span class="hz-menu__action-label">خروج</span></button></li></ul>
+          </div>
+        </div>
+      </header>
+    </div>
+  </section>
+  <div class="demo-row">
+    <section>
+      <p class="demo-label">PublicShell (≥۱۰۲۴) — جعبه کاربر پایین سایدبار، منو رو به بالا</p>
+      <div class="demo-stage">
+        <div class="demo-side">
+          <div class="hz-popover hz-popover--block">
+            <div class="hz-menu hz-menu--popover hz-menu--up hz-account-menu" id="am-2">
+              <div class="hz-menu__head"><span class="hz-avatar"><img src="../../assets/imagery/people-acc-owner-1.jpg" alt="تصویر پروفایل سارا احمدی" width="40" height="40"></span><span class="hz-menu__head-text"><span class="hz-menu__head-name">سارا احمدی</span><span class="hz-menu__head-sub">کاربر · <bdi class="hz-id" dir="ltr">09990000001</bdi></span></span></div>
+              <ul class="hz-menu__list"><li><a class="hz-menu__action" href="#"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg><span class="hz-menu__action-label">پروفایل</span></a></li><li><a class="hz-menu__action" href="#"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm40-80V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Zm-80.26-34a8,8,0,1,1-15.5,4c-2.63-10.26-13.06-18-24.25-18s-21.61,7.74-24.25,18a8,8,0,1,1-15.5-4,39.84,39.84,0,0,1,17.19-23.34,32,32,0,1,1,45.12,0A39.76,39.76,0,0,1,135.75,166ZM96,136a16,16,0,1,0-16-16A16,16,0,0,0,96,136Z"/></svg><span class="hz-menu__action-label">احراز هویت</span></a></li><li><a class="hz-menu__action" href="#"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"/></svg><span class="hz-menu__action-label">اعلان‌ها</span></a></li></ul>
+              <div class="hz-menu__sep" role="separator"></div>
+              <ul class="hz-menu__list"><li><button type="button" class="hz-menu__action"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg><span class="hz-menu__action-label">خروج</span></button></li></ul>
+            </div>
+            <button type="button" class="hz-sidebar__user hz-sidebar__user--button" aria-expanded="true" aria-controls="am-2"><span class="hz-avatar"><img src="../../assets/imagery/people-acc-owner-1.jpg" alt="تصویر پروفایل سارا احمدی" width="40" height="40"></span><span class="hz-sidebar__user-text"><span class="hz-sidebar__user-name">سارا احمدی</span><span class="hz-sidebar__user-role">کاربر · تهران</span></span><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="demo-col">
+      <section>
+        <p class="demo-label">بسته · فوکوس · نام و نقش بلند (نام با «…» در ۲۰۰px؛ نام کامل در <bdi dir="ltr">aria-label</bdi>)</p>
+        <header class="hz-topbar demo-topbar" style="border:1px solid var(--border-default);border-radius:var(--radius-lg)">
+          <span class="hz-topbar__spacer"></span>
+          <button type="button" class="hz-topbar__account" aria-expanded="false" aria-label="حساب لیلا موسوی، اپراتور مرکز ژنتیک" style="outline:2px solid var(--focus-ring);outline-offset:2px"><span class="hz-avatar hz-avatar--sm"><img src="../../assets/imagery/people-acc-genetics-1.jpg" alt="تصویر پروفایل لیلا موسوی" width="32" height="32"></span><span class="hz-topbar__account-text"><span class="hz-topbar__account-name">لیلا موسوی</span><span class="hz-topbar__account-role">اپراتور مرکز ژنتیک</span></span><span class="hz-account-caret"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></span></button>
+        </header>
+      </section>
+      <section>
+        <p class="demo-label">در حال خروج — ردیف غیرفعال با چرخنده؛ پس از خروج به «/» (خانه سایت)</p>
+        <div class="hz-menu demo-menu hz-account-menu">
+          <ul class="hz-menu__list"><li><button type="button" class="hz-menu__action" aria-busy="true" aria-disabled="true"><span class="hz-spinner"></span><span class="hz-menu__action-label">در حال خروج…</span></button></li></ul>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label">زیر ۷۶۸ — پاپ‌اور ندارد: همین ردیف‌ها در پای Drawer ناوبری (OpsShell) یا صفحه «پروفایل» (PublicShell)</p>
+        <div class="hz-menu demo-menu hz-account-menu">
+          <div class="hz-menu__head"><span class="hz-avatar"><img src="../../assets/imagery/people-acc-genetics-1.jpg" alt="تصویر پروفایل لیلا موسوی" width="40" height="40"></span><span class="hz-menu__head-text"><span class="hz-menu__head-name">لیلا موسوی</span><span class="hz-menu__head-sub">اپراتور مرکز ژنتیک · <bdi class="hz-id" dir="ltr">09990000005</bdi></span></span></div>
+          <ul class="hz-menu__list"><li><button type="button" class="hz-menu__action"><svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z"/></svg><span class="hz-menu__action-label">خروج</span></button></li></ul>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script>document.querySelectorAll('.hz-popover > [aria-controls]').forEach(function (b) { b.addEventListener('click', function () { var open = b.getAttribute('aria-expanded') === 'true'; b.setAttribute('aria-expanded', open ? 'false' : 'true'); document.getElementById(b.getAttribute('aria-controls')).hidden = open; }); });</script>

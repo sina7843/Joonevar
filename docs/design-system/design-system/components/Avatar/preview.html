@@ -1,0 +1,79 @@
+<!-- @dsCard group="Data display" height=640 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .demo-cap { font-size: 12px; line-height: 20px; color: var(--text-secondary); text-align: center; }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .demo-box { padding: 16px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-surface); display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .demo-chrome { padding: 12px; background: var(--bg-chrome); border: 1px solid var(--border-default); border-radius: var(--radius-xl); }
+  .demo-review { display: flex; flex-direction: column; gap: 6px; }
+  .demo-review p { margin: 0; font-size: 14px; line-height: 24px; }
+  .demo-btn { padding: 0; border: 0; background: none; border-radius: var(--radius-full); cursor: pointer; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>اندازه‌ها</b> — حروف اول «سارا احمدی» جدا با فاصله نشکن (U+00A0) تا دو حرف یک کلمه خوانده نشوند</p>
+    <div class="demo-row">
+      <div class="demo-item"><span class="hz-avatar hz-avatar--xl" role="img" aria-label="سارا احمدی">س ا</span><span class="demo-cap">xl ۸۰<br>سرصفحه حساب</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--lg" role="img" aria-label="سارا احمدی">س ا</span><span class="demo-cap">lg ۵۶<br>کارت فهرست</span></div>
+      <div class="demo-item"><span class="hz-avatar" role="img" aria-label="سارا احمدی">س ا</span><span class="demo-cap">md ۴۰<br>کاربر سایدبار، گفتگو</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--sm" role="img" aria-label="سارا احمدی">س ا</span><span class="demo-cap">sm ۳۲<br>نوار بالا، نظر</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--xs" role="img" aria-label="سارا احمدی">س ا</span><span class="demo-cap">xs ۲۴<br>سلول جدول</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label"><b>محتوا و حالت‌ها</b> — تصویر ← حروف اول (فقط آدم‌ها) ← نماد همزیست</p>
+    <div class="demo-row">
+      <div class="demo-item"><span class="hz-avatar hz-avatar--lg"><img width="56" height="56" src="../../assets/imagery/people-acc-breeder-1.jpg" alt="تصویر پروفایل رضا کریمی"></span><span class="demo-cap">با تصویر</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--lg" role="img" aria-label="رضا کریمی">ر ک</span><span class="demo-cap">حروف اول</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--lg hz-avatar--empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></span><span class="demo-cap">بی‌نام و بی‌تصویر<br>(کاربر تازه)</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--lg hz-avatar--empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></span><span class="demo-cap">دامپزشک بی‌تصویر<br>(هرگز حروف اول)</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--lg hz-avatar--logo hz-avatar--empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></span><span class="demo-cap">فروشگاه بی‌نشان</span></div>
+      <div class="demo-item"><span class="hz-avatar hz-avatar--lg hz-skeleton" aria-hidden="true"></span><span class="demo-cap">در حال بارگذاری</span></div>
+      <div class="demo-item"><button class="demo-btn" type="button" aria-label="منوی حساب سارا احمدی" style="outline:2px solid var(--focus-ring);outline-offset:2px"><span class="hz-avatar hz-avatar--lg" aria-hidden="true">س ا</span></button><span class="demo-cap">فوکوس<br>(وقتی دکمه است)</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label"><b>در بافت</b> — آواتار + نام + خط دوم (<code dir="ltr">.hz-person</code>)</p>
+    <div class="demo-grid">
+      <div class="demo-box">
+        <div class="demo-chrome">
+          <div class="hz-person">
+            <span class="hz-avatar"><img src="../../assets/imagery/people-acc-assoc-1.jpg" alt="تصویر پروفایل حمید نوروزی" width="40" height="40"></span>
+            <span class="hz-person__text"><span class="hz-person__name">حمید نوروزی</span><span class="hz-person__sub">اپراتور انجمن</span></span>
+          </div>
+        </div>
+        <div class="demo-review">
+          <div class="hz-person">
+            <span class="hz-avatar hz-avatar--sm" role="img" aria-label="سارا ا.">س</span>
+            <span class="hz-person__text"><span class="hz-person__name">سارا ا.</span><span class="hz-person__sub">۳ مهر ۱۴۰۵</span></span>
+          </div>
+          <p>بسته‌بندی مرتب بود و سگم با اشتها خورد.</p>
+        </div>
+      </div>
+      <div class="demo-box">
+        <div class="hz-person">
+          <span class="hz-avatar hz-avatar--lg hz-avatar--logo hz-avatar--empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></span>
+          <span class="hz-person__text"><span class="hz-person__name">پت‌شاپ آریا</span><span class="hz-person__sub">فروشگاه، کرج</span></span>
+        </div>
+        <div class="hz-person">
+          <span class="hz-avatar hz-avatar--lg hz-avatar--logo hz-avatar--empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></span>
+          <span class="hz-person__text"><span class="hz-person__name" title="مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</span><span class="hz-person__sub">بیمارستان دامپزشکی، اصفهان</span></span>
+        </div>
+        <div class="hz-person">
+          <span class="hz-avatar hz-avatar--empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></span>
+          <span class="hz-person__text"><span class="hz-person__name">بدون نام</span><span class="hz-person__sub"><bdi class="hz-id" dir="ltr">09990000021</bdi></span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

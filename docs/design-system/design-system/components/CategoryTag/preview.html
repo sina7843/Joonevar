@@ -1,0 +1,83 @@
+<!-- @dsCard group="Data display" height=616 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
+  .demo-split { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 32px; align-items: start; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-note { display: block; margin-block-start: 8px; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .demo code { white-space: nowrap; font-size: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label">روی تصویر — <code dir="ltr">.hz-tag--on-media</code> (گوشه آغاز، زمینه یکدست؛ هرگز متن خالی روی عکس)</p>
+    <div class="demo-grid">
+      <a class="hz-article" href="#">
+        <div class="hz-media hz-media--16x9">
+          <img src="../../assets/imagery/content-news-1195.jpg" alt="رینگ نمایشگاه سگ">
+          <span class="hz-tag hz-tag--on-media">خبر</span>
+        </div>
+        <div class="hz-article__body">
+          <h3 class="hz-article__title">برگزاری نخستین نمایشگاه سگ‌های اصیل انجمن</h3>
+          <span class="hz-meta"><span class="hz-meta__item">۸ مهر ۱۴۰۵</span><span class="hz-meta__item">۳ دقیقه مطالعه</span></span>
+        </div>
+      </a>
+      <a class="hz-article" href="#">
+        <div class="hz-media hz-media--16x9">
+          <img src="../../assets/imagery/content-article-6617.jpg" alt="دامپزشک در حال خواندن میکروچیپ سگ">
+          <span class="hz-tag hz-tag--on-media">آموزش</span>
+        </div>
+        <div class="hz-article__body">
+          <h3 class="hz-article__title">میکروچیپ چیست و چرا فقط یک بار کاشته می‌شود؟</h3>
+          <span class="hz-meta"><span class="hz-meta__item">۶ مهر ۱۴۰۵</span><span class="hz-meta__item">۶ دقیقه مطالعه</span></span>
+        </div>
+      </a>
+      <a class="hz-article" href="#">
+        <div class="hz-media hz-media--16x9">
+          <div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">تصویر ثبت نشده</span></div>
+          <span class="hz-tag hz-tag--on-media">اطلاعیه</span>
+        </div>
+        <div class="hz-article__body">
+          <h3 class="hz-article__title">به‌روزرسانی برنامه‌ریزی‌شده سامانه</h3>
+          <span class="hz-meta"><span class="hz-meta__item">۹ مهر ۱۴۰۵</span><span class="hz-meta__item">۱ دقیقه مطالعه</span></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <div class="demo-split">
+    <section>
+      <p class="demo-label">درون‌خطی — کنار عنوان (فهرست بدون تصویر)</p>
+      <div class="hz-article hz-article--compact">
+        <div class="demo-kicker"><a class="hz-tag" href="#">خبر</a><span class="hz-meta"><span class="hz-meta__item">۴ مهر ۱۴۰۵</span></span></div>
+        <h3 class="hz-h4">کلاب ژرمن شپرد ایران عضو تازه می‌پذیرد</h3>
+      </div>
+      <div class="hz-article hz-article--compact">
+        <h3 class="hz-h4"><span class="hz-tag hz-tag--inline">اطلاعیه</span>تمدید مهلت ثبت‌نام آزمون اصالت نسب برای پرورش‌دهندگان عضو انجمن تا پایان آبان‌ماه ۱۴۰۵ و تغییر نحوه ارسال نمونه</h3>
+        <span class="hz-meta"><span class="hz-meta__item">۱۲ دقیقه مطالعه</span></span>
+      </div>
+      <span class="demo-note">متن بلند: برچسب نمی‌شکند و کوچک نمی‌شود؛ عنوان زیر آن ادامه پیدا می‌کند.</span>
+    </section>
+
+    <section>
+      <p class="demo-label">خنثی — <code dir="ltr">.hz-tag--neutral</code> برای موضوع و برچسب‌های مقاله</p>
+      <ul class="hz-tag-list" aria-label="برچسب‌ها">
+        <li><a class="hz-tag hz-tag--neutral" href="#">میکروچیپ</a></li>
+        <li><a class="hz-tag hz-tag--neutral" href="#">ثبت حیوان</a></li>
+        <li><a class="hz-tag hz-tag--neutral" href="#">شجره‌نامه</a></li>
+      </ul>
+      <p class="demo-label" style="margin-block-start:24px">حالت‌ها</p>
+      <div class="demo-row">
+        <a class="hz-tag" href="#">آموزش</a>
+        <a class="hz-tag" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">آموزش</a>
+        <a class="hz-tag hz-tag--neutral" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">میکروچیپ</a>
+      </div>
+      <span class="demo-note">پیش‌فرض · فوکوس · فوکوس خنثی — hover (فقط اشاره‌گر): زیرخط</span>
+    </section>
+  </div>
+</div>
+<script></script>

@@ -1,0 +1,70 @@
+<!-- @dsCard group="Data display" height=1008 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cap { display: block; margin-block-start: 6px; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-cap b { color: var(--text-primary); }
+  .demo-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .demo-safe { position: absolute; inset: 20%; border: 2px dashed var(--bg-surface); border-radius: var(--radius-sm); pointer-events: none; }
+  .demo-list { margin: 0; padding-inline-start: 18px; font-size: 14px; line-height: 26px; }
+  .demo-list li + li { margin-block-start: 4px; }
+  .demo code { white-space: nowrap; font-size: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label">یک تصویر برای هر رکورد — ناحیه امن: سوژه در ۶۰٪ میانی</p>
+    <div class="demo-split">
+      <figure style="margin:0">
+        <div class="hz-media hz-media--16x9">
+          <img src="../../assets/imagery/home-hero-sarabi-courtyard.jpg" alt="مردی کنار سگ سرابی‌اش در حیاط باغ ایرانی">
+          <span class="demo-safe" aria-hidden="true"></span>
+        </div>
+        <figcaption class="demo-cap">کادر خط‌چین = ۶۰٪ میانی تصویر بارگذاری‌شده</figcaption>
+      </figure>
+      <ul class="demo-list">
+        <li>همه قاب‌ها با <code dir="ltr">object-fit: cover</code> و <code dir="ltr">object-position: 50% 40%</code> برش می‌خورند؛ کمی بالاتر از مرکز تا سر و صورت حفظ شود.</li>
+        <li>هر چه بیرون از ۶۰٪ میانی باشد ممکن است در یکی از قاب‌ها حذف شود. در این عکس مرد و سگش در ۶۰٪ میانی‌اند؛ برای همین در قاب ۱:۱ هم هر دو دیده می‌شوند.</li>
+        <li>رابط بارگذاری پیش‌نمایش همه قاب‌ها را نشان می‌دهد و متن جایگزین فارسی (<code dir="ltr">imageAltFa</code>) اجباری است.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">قاب‌ها — همان تصویر</p>
+    <div class="demo-grid">
+      <div><div class="hz-media hz-media--16x9"><img src="../../assets/imagery/home-hero-sarabi-courtyard.jpg" alt="مردی کنار سگ سرابی‌اش در حیاط باغ ایرانی"></div><span class="demo-cap"><b>۱۶:۹</b> · hero، سرصفحه مقاله و نژاد</span></div>
+      <div><div class="hz-media hz-media--4x3"><img src="../../assets/imagery/home-hero-sarabi-courtyard.jpg" alt="مردی کنار سگ سرابی‌اش در حیاط باغ ایرانی"></div><span class="demo-cap"><b>۴:۳ ★</b> · کارت حیوان، آگهی</span></div>
+      <div><div class="hz-media hz-media--3x2"><img src="../../assets/imagery/home-hero-sarabi-courtyard.jpg" alt="مردی کنار سگ سرابی‌اش در حیاط باغ ایرانی"></div><span class="demo-cap"><b>۳:۲ ★</b> · کارت مقاله و نژاد</span></div>
+      <div><div class="hz-media hz-media--1x1"><img src="../../assets/imagery/home-hero-sarabi-courtyard.jpg" alt="مردی کنار سگ سرابی‌اش در حیاط باغ ایرانی"></div><span class="demo-cap"><b>۱:۱</b> · محصول فروشگاه</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">بندانگشتی و آواتار</p>
+    <div class="demo-row">
+      <div class="demo-item"><div class="hz-media hz-media--thumb"><img src="../../assets/imagery/animals-animal-1.jpg" alt="سگ رکس"></div><span class="demo-cap">thumb · ۵۶</span></div>
+      <div class="demo-item"><div class="hz-media hz-media--thumb-lg"><img src="../../assets/imagery/animals-animal-1.jpg" alt="سگ رکس"></div><span class="demo-cap">thumb-lg · ۶۴</span></div>
+      <div class="demo-item"><div class="hz-media hz-media--avatar"><img src="../../assets/imagery/people-acc-owner-1.jpg" alt="تصویر پروفایل سارا احمدی"></div><span class="demo-cap">avatar · ۵۶</span></div>
+      <div class="demo-item"><div class="hz-media hz-media--thumb"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></div><span class="hz-visually-hidden">تصویر ثبت نشده: سگ رکس</span></div><span class="demo-cap">thumb خالی</span></div>
+      <div class="demo-item"><div class="hz-media hz-media--avatar"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""></div><span class="hz-visually-hidden">تصویر پروفایل ثبت نشده</span></div><span class="demo-cap">avatar خالی</span></div>
+      <div class="demo-item"><span class="hz-avatar-initials" role="img" aria-label="مریم صادقی">م</span><span class="demo-cap">حروف اول ۴۰ (شخص)</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">تصویر ثبت‌نشده یا خطای بارگذاری · در حال بارگذاری · متن جایگزین بلند</p>
+    <div class="demo-grid">
+      <div><div class="hz-media hz-media--4x3"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">سگ رکس</span></div></div><span class="demo-cap">۴:۳ خالی — نماد ۴۰٪ + alt</span></div>
+      <div><div class="hz-media hz-media--3x2"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">تصویر ثبت نشده</span></div></div><span class="demo-cap">بدون alt — متن پیش‌فرض</span></div>
+      <div><div class="hz-media hz-media--3x2"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</span></div></div><span class="demo-cap">alt بلند — می‌شکند، بیرون نمی‌زند</span></div>
+      <div><span class="hz-skeleton hz-skeleton--media" aria-hidden="true"></span><span class="demo-cap">در حال بارگذاری — skeleton ۴:۳</span></div>
+    </div>
+  </section>
+</div>
+<script></script>

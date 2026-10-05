@@ -1,0 +1,576 @@
+{
+  "codeVariants": {
+    "banner": "16:9, 1200×675 (src/ui/record-image.tsx)",
+    "thumb": "1:1, 56×56"
+  },
+  "ratiosUsedHere": [
+    "16:9 hero, card and banner",
+    "4:3 animal photo, listing media",
+    "1:1 product packshot, avatar, logo"
+  ],
+  "safeAreaRule": "Each record stores ONE image. Compose the subject inside the centre 60% so it survives 16:9, 4:3 and 1:1 crops.",
+  "styleFromMoodImage": "Warm natural light, real homes and gardens, people and pets together, shallow depth of field, no stock-photo gloss, no text in the image.",
+  "altTextRule": "imageAltFa is mandatory in the schema — every image needs a Persian description.",
+  "slots": [
+    {
+      "slot": "breeds/german-shepherd",
+      "ratio": "16:9",
+      "subject": "A healthy adult German Shepherd standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد ژرمن شپرد",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/labrador-retriever",
+      "ratio": "16:9",
+      "subject": "A healthy adult Labrador Retriever standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد لابرادور رتریور",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/golden-retriever",
+      "ratio": "16:9",
+      "subject": "A healthy adult Golden Retriever standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد گلدن رتریور",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/siberian-husky",
+      "ratio": "16:9",
+      "subject": "A healthy adult Siberian Husky standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد هاسکی سیبری",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/rottweiler",
+      "ratio": "16:9",
+      "subject": "A healthy adult Rottweiler standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد روتوایلر",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/doberman-pinscher",
+      "ratio": "16:9",
+      "subject": "A healthy adult Doberman Pinscher standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد دوبرمن پینشر",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/poodle",
+      "ratio": "16:9",
+      "subject": "A healthy adult Poodle standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد پودل",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/beagle",
+      "ratio": "16:9",
+      "subject": "A healthy adult Beagle standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد بیگل",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/shih-tzu",
+      "ratio": "16:9",
+      "subject": "A healthy adult Shih Tzu standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد شیتزو",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "breeds/sarabi-dog",
+      "ratio": "16:9",
+      "subject": "A healthy adult Sarabi Dog standing outdoors in warm daylight, three-quarter view",
+      "altFa": "سگ نژاد سگ سرابی",
+      "usedIn": "taxonomy.json"
+    },
+    {
+      "slot": "people/acc-owner-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل سارا احمدی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-breeder-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل رضا کریمی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-vet-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل مریم صادقی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-assoc-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل حمید نوروزی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-genetics-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل لیلا موسوی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-admin-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل امیر حسینی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-author-1",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل نگار رستمی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-owner-2",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل علی رضایی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-owner-3",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل مینا جعفری",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "people/acc-breeder-2",
+      "ratio": "1:1",
+      "subject": "Neutral portrait placeholder — never a real person",
+      "altFa": "تصویر پروفایل بهرام فراهانی",
+      "usedIn": "people.json"
+    },
+    {
+      "slot": "animals/animal-1",
+      "ratio": "4:3",
+      "subject": "German Shepherd, سیاه و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ رکس",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "animals/animal-2",
+      "ratio": "4:3",
+      "subject": "Golden Retriever, طلایی, natural light, eye level",
+      "altFa": "سگ لونا",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "animals/animal-3",
+      "ratio": "4:3",
+      "subject": "Sarabi Dog, کرم و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ آرا",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "animals/animal-4",
+      "ratio": "4:3",
+      "subject": "German Shepherd, سیاه و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ تارا",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "animals/animal-5",
+      "ratio": "4:3",
+      "subject": "Siberian Husky, خاکستری و سفید, natural light, eye level",
+      "altFa": "سگ مکس",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "animals/animal-6",
+      "ratio": "4:3",
+      "subject": "Beagle, سفید, natural light, eye level",
+      "altFa": "سگ بلا",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "animals/animal-7",
+      "ratio": "4:3",
+      "subject": "Rottweiler, سیاه و قهوه‌ای, natural light, eye level",
+      "altFa": "سگ رعد",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "animals/animal-8",
+      "ratio": "4:3",
+      "subject": "grey domestic cat, خاکستری, natural light, eye level",
+      "altFa": "گربه شیرین",
+      "usedIn": "animals.json"
+    },
+    {
+      "slot": "vets/vet-1",
+      "ratio": "1:1",
+      "subject": "Portrait placeholder of a veterinarian in a white coat — never a real person",
+      "altFa": "تصویر دکتر مریم صادقی",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "vets/vet-2",
+      "ratio": "1:1",
+      "subject": "Portrait placeholder of a veterinarian in a white coat — never a real person",
+      "altFa": "تصویر دکتر کیوان شریفی",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "vets/vet-3",
+      "ratio": "1:1",
+      "subject": "Portrait placeholder of a veterinarian in a white coat — never a real person",
+      "altFa": "تصویر دکتر الهام نادری",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "vets/vet-4",
+      "ratio": "1:1",
+      "subject": "Portrait placeholder of a veterinarian in a white coat — never a real person",
+      "altFa": "تصویر دکتر بابک امینی",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "vets/vet-5",
+      "ratio": "1:1",
+      "subject": "Portrait placeholder of a veterinarian in a white coat — never a real person",
+      "altFa": "تصویر دکتر نسرین طاهری",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "vets/vet-6",
+      "ratio": "1:1",
+      "subject": "Portrait placeholder of a veterinarian in a white coat — never a real person",
+      "altFa": "تصویر دکتر پویا مرادی",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "centres/centre-1",
+      "ratio": "16:9",
+      "subject": "Clean, bright clinic reception or exterior — no readable real signage",
+      "altFa": "نمای بیمارستان دامپزشکی مهرگان",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "centres/centre-2",
+      "ratio": "16:9",
+      "subject": "Clean, bright clinic reception or exterior — no readable real signage",
+      "altFa": "نمای کلینیک دامپزشکی آوا",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "centres/centre-3",
+      "ratio": "16:9",
+      "subject": "Clean, bright clinic reception or exterior — no readable real signage",
+      "altFa": "نمای درمانگاه دامپزشکی پارس",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "centres/centre-4",
+      "ratio": "16:9",
+      "subject": "Clean, bright clinic reception or exterior — no readable real signage",
+      "altFa": "نمای آزمایشگاه دامپزشکی نوین",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "centres/centre-5",
+      "ratio": "16:9",
+      "subject": "Clean, bright clinic reception or exterior — no readable real signage",
+      "altFa": "نمای مرکز ژنتیک همزیست",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "communities/community-1",
+      "ratio": "16:9",
+      "subject": "Group of owners with dogs at an outdoor gathering, faces not identifiable",
+      "altFa": "تصویر انجمن سگ‌های اصیل ایران",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "communities/community-2",
+      "ratio": "16:9",
+      "subject": "Group of owners with dogs at an outdoor gathering, faces not identifiable",
+      "altFa": "تصویر انجمن دوستداران حیوانات خانگی اصفهان",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "communities/community-3",
+      "ratio": "16:9",
+      "subject": "Group of owners with dogs at an outdoor gathering, faces not identifiable",
+      "altFa": "تصویر کلاب ژرمن شپرد ایران",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "communities/community-4",
+      "ratio": "16:9",
+      "subject": "Group of owners with dogs at an outdoor gathering, faces not identifiable",
+      "altFa": "تصویر کلاب رتریورهای تهران",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "communities/community-5",
+      "ratio": "16:9",
+      "subject": "Group of owners with dogs at an outdoor gathering, faces not identifiable",
+      "altFa": "تصویر کلاب سگ سرابی",
+      "usedIn": "directory.json"
+    },
+    {
+      "slot": "content/article-6617",
+      "ratio": "16:9",
+      "subject": "Veterinarian gently scanning a calm dog with a microchip reader",
+      "altFa": "دامپزشک در حال خواندن میکروچیپ سگ",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/article-4654",
+      "ratio": "16:9",
+      "subject": "Owner and dog at a clinic desk, paperwork in soft focus",
+      "altFa": "صاحب سگ در پذیرش کلینیک",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/article-5274",
+      "ratio": "16:9",
+      "subject": "Close-up of an official certificate next to a dog paw, warm light",
+      "altFa": "شجره‌نامه کنار پنجه سگ",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/article-5461",
+      "ratio": "16:9",
+      "subject": "Two adult dogs of the same breed resting side by side in a garden",
+      "altFa": "دو سگ هم‌نژاد در باغ",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/article-3492",
+      "ratio": "16:9",
+      "subject": "German Shepherd running across a green field",
+      "altFa": "ژرمن شپرد در حال دویدن",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/article-544",
+      "ratio": "16:9",
+      "subject": "Veterinarian smiling while examining a golden retriever",
+      "altFa": "دامپزشک در حال معاینه گلدن رتریور",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/news-1195",
+      "ratio": "16:9",
+      "subject": "Dog show ring with handlers and dogs, wide shot, faces not identifiable",
+      "altFa": "رینگ نمایشگاه سگ",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/news-3448",
+      "ratio": "16:9",
+      "subject": "Group walk with German Shepherds on a trail",
+      "altFa": "پیاده‌روی گروهی با ژرمن شپردها",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/news-8066",
+      "ratio": "16:9",
+      "subject": "Puppy receiving a vaccine, calm, gloved hands",
+      "altFa": "واکسیناسیون توله‌سگ",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/news-9641",
+      "ratio": "16:9",
+      "subject": "Sarabi dog standing on a hill at golden hour",
+      "altFa": "سگ سرابی روی تپه",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/announcement-7602",
+      "ratio": "16:9",
+      "subject": "No photo — announcement uses an icon or brand pattern",
+      "altFa": "اطلاعیه انجمن",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/announcement-3311",
+      "ratio": "16:9",
+      "subject": "No photo — announcement uses an icon or brand pattern",
+      "altFa": "اطلاعیه سامانه",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/announcement-4574",
+      "ratio": "16:9",
+      "subject": "No photo — announcement uses an icon or brand pattern",
+      "altFa": "اطلاعیه کلاب‌ها",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "content/club_post-7601",
+      "ratio": "16:9",
+      "subject": "Owners training German Shepherds in a park",
+      "altFa": "تمرین اطاعت‌پذیری در پارک",
+      "usedIn": "content.json"
+    },
+    {
+      "slot": "listings/توله ژرمن شپرد-1",
+      "ratio": "4:3",
+      "subject": "ژرمن شپرد — full body, plain background",
+      "altFa": "ژرمن شپرد — تمام‌قد",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/توله ژرمن شپرد-2",
+      "ratio": "4:3",
+      "subject": "ژرمن شپرد — face close-up",
+      "altFa": "ژرمن شپرد — چهره",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/توله گلدن رتریور-1",
+      "ratio": "4:3",
+      "subject": "گلدن رتریور — full body, plain background",
+      "altFa": "گلدن رتریور — تمام‌قد",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/توله گلدن رتریور-2",
+      "ratio": "4:3",
+      "subject": "گلدن رتریور — face close-up",
+      "altFa": "گلدن رتریور — چهره",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/هاسکی جوان-1",
+      "ratio": "4:3",
+      "subject": "هاسکی سیبری — full body, plain background",
+      "altFa": "هاسکی سیبری — تمام‌قد",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/هاسکی جوان-2",
+      "ratio": "4:3",
+      "subject": "هاسکی سیبری — face close-up",
+      "altFa": "هاسکی سیبری — چهره",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/بیگل بالغ-1",
+      "ratio": "4:3",
+      "subject": "بیگل — full body, plain background",
+      "altFa": "بیگل — تمام‌قد",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/بیگل بالغ-2",
+      "ratio": "4:3",
+      "subject": "بیگل — face close-up",
+      "altFa": "بیگل — چهره",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/توله شیتزو-1",
+      "ratio": "4:3",
+      "subject": "شیتزو — full body, plain background",
+      "altFa": "شیتزو — تمام‌قد",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/توله شیتزو-2",
+      "ratio": "4:3",
+      "subject": "شیتزو — face close-up",
+      "altFa": "شیتزو — چهره",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/توله سگ سرابی-1",
+      "ratio": "4:3",
+      "subject": "سگ سرابی — full body, plain background",
+      "altFa": "سگ سرابی — تمام‌قد",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "listings/توله سگ سرابی-2",
+      "ratio": "4:3",
+      "subject": "سگ سرابی — face close-up",
+      "altFa": "سگ سرابی — چهره",
+      "usedIn": "marketplace.json"
+    },
+    {
+      "slot": "sellers/aria",
+      "ratio": "1:1",
+      "subject": "Simple shop logo placeholder",
+      "altFa": "نشان پت‌شاپ آریا",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "sellers/sample",
+      "ratio": "1:1",
+      "subject": "Simple shop logo placeholder",
+      "altFa": "نشان فروشگاه نمونه",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/غذای خشک سگ بالغ نژاد بزرگ",
+      "ratio": "1:1",
+      "subject": "غذای خشک سگ بالغ نژاد بزرگ packshot on a white background",
+      "altFa": "غذای خشک سگ بالغ نژاد بزرگ",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/غذای خشک توله‌سگ",
+      "ratio": "1:1",
+      "subject": "غذای خشک توله‌سگ packshot on a white background",
+      "altFa": "غذای خشک توله‌سگ",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/تشویقی تمرینی مرغ",
+      "ratio": "1:1",
+      "subject": "تشویقی تمرینی مرغ packshot on a white background",
+      "altFa": "تشویقی تمرینی مرغ",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/قلاده چرمی قابل تنظیم",
+      "ratio": "1:1",
+      "subject": "قلاده چرمی قابل تنظیم packshot on a white background",
+      "altFa": "قلاده چرمی قابل تنظیم",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/افسار ۵ متری جمع‌شو",
+      "ratio": "1:1",
+      "subject": "افسار ۵ متری جمع‌شو packshot on a white background",
+      "altFa": "افسار ۵ متری جمع‌شو",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/اسباب‌بازی طناب گره‌دار",
+      "ratio": "1:1",
+      "subject": "اسباب‌بازی طناب گره‌دار packshot on a white background",
+      "altFa": "اسباب‌بازی طناب گره‌دار",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/شامپو ضدحساسیت",
+      "ratio": "1:1",
+      "subject": "شامپو ضدحساسیت packshot on a white background",
+      "altFa": "شامپو ضدحساسیت",
+      "usedIn": "shop.json"
+    },
+    {
+      "slot": "products/تشک ارتوپدی سگ",
+      "ratio": "1:1",
+      "subject": "تشک ارتوپدی سگ packshot on a white background",
+      "altFa": "تشک ارتوپدی سگ",
+      "usedIn": "shop.json"
+    }
+  ]
+}

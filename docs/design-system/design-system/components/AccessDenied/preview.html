@@ -1,0 +1,75 @@
+<!-- @dsCard group="Feedback" height=856 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  .demo-grid > section { display: flex; flex-direction: column; }
+  .demo-grid > section > .hz-card { flex: 1 1 auto; padding: 0; }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">ورود لازم است — کاربر وارد نشده (فوکوس روی کنش اصلی)</p>
+      <div class="hz-card">
+        <div class="hz-state">
+          <span class="hz-state__icon"><svg class="hz-icon hz-icon--lg hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M141.66,133.66l-40,40a8,8,0,0,1-11.32-11.32L116.69,136H24a8,8,0,0,1,0-16h92.69L90.34,93.66a8,8,0,0,1,11.32-11.32l40,40A8,8,0,0,1,141.66,133.66ZM200,32H136a8,8,0,0,0,0,16h56V208H136a8,8,0,0,0,0,16h64a8,8,0,0,0,8-8V40A8,8,0,0,0,200,32Z"/></svg></span>
+          <h1 class="hz-state__title" tabindex="-1">برای دیدن این صفحه وارد شوید</h1>
+          <p class="hz-state__body">این بخش فقط برای کاربران واردشده باز است. پس از ورود به همین صفحه برمی‌گردید.</p>
+          <p class="hz-state__missing">آنچه کم است: <b>ورود به حساب</b></p>
+          <div class="hz-state__actions">
+            <a class="hz-btn hz-btn--primary" href="#" style="outline: 2px solid var(--focus-ring); outline-offset: 2px">ورود با شماره موبایل</a>
+            <a class="hz-btn hz-btn--secondary" href="#">صفحه اصلی</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <p class="demo-label">نقش لازم است — واردشده، ولی نقش این محیط را ندارد</p>
+      <div class="hz-card">
+        <div class="hz-state">
+          <span class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></span>
+          <h1 class="hz-state__title" tabindex="-1">این بخش با نقش فعلی شما باز نیست</h1>
+          <p class="hz-state__body">پنل انجمن فقط با نقش «اپراتور انجمن» باز می‌شود. اگر این نقش به حساب شما داده شده، نقش را عوض کنید.</p>
+          <p class="hz-state__missing">نقش فعلی: <b>کاربر</b><span aria-hidden="true">،</span> نقش لازم: <b>اپراتور انجمن</b></p>
+          <div class="hz-state__actions">
+            <button class="hz-btn hz-btn--primary" type="button"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M253.66,133.66l-24,24a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L216,132.69V128A88,88,0,0,0,56.49,76.67a8,8,0,0,1-13-9.34A104,104,0,0,1,232,128v4.69l10.34-10.35a8,8,0,0,1,11.32,11.32Zm-41.18,55A104,104,0,0,1,24,128v-4.69L13.66,133.66A8,8,0,0,1,2.34,122.34l24-24a8,8,0,0,1,11.32,0l24,24a8,8,0,0,1-11.32,11.32L40,123.31V128a87.62,87.62,0,0,0,22.24,58.41A79.66,79.66,0,0,1,98.3,157.66a48,48,0,1,1,59.4,0,79.59,79.59,0,0,1,36.08,28.78,89.68,89.68,0,0,0,5.71-7.11,8,8,0,0,1,13,9.34ZM128,152a32,32,0,1,0-32-32A32,32,0,0,0,128,152Zm0,64a88.2,88.2,0,0,0,53.92-18.49,64,64,0,0,0-107.84,0A87.57,87.57,0,0,0,128,216Z"/></svg>تغییر نقش</button>
+            <a class="hz-btn hz-btn--secondary" href="#">بازگشت به داشبورد</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">پرونده دیگری یا نشانی نادرست — یک متن برای هر دو، وجود پرونده فاش نمی‌شود</p>
+      <div class="hz-card">
+        <div class="hz-state">
+          <span class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg></span>
+          <h1 class="hz-state__title" tabindex="-1">صفحه‌ای با این نشانی پیدا نشد</h1>
+          <p class="hz-state__body">ممکن است نشانی اشتباه باشد یا این صفحه با حساب شما دیده نشود. اگر پیوند را از کسی گرفته‌اید، از او بخواهید نشانی را بررسی کند.</p>
+          <div class="hz-state__actions">
+            <a class="hz-btn hz-btn--primary" href="#">درخواست‌های من</a>
+            <a class="hz-btn hz-btn--secondary" href="#">داشبورد</a>
+          </div>
+        </div>
+      </div>
+      <p class="demo-note">پاسخ سرور در هر دو حالت ۴۰۴ است؛ شناسه نشانی (مثلاً <bdi class="hz-id" dir="ltr">PET-W7KQ3MZP</bdi>) در صفحه تکرار نمی‌شود.</p>
+    </section>
+    <section>
+      <p class="demo-label">متن بلند — چند نقش لازم، ستون ۳۶۰px</p>
+      <div class="hz-card" style="max-width: 360px; flex: 0 0 auto">
+        <div class="hz-state hz-state--compact">
+          <span class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></span>
+          <h1 class="hz-state__title" tabindex="-1">این بخش با نقش فعلی شما باز نیست</h1>
+          <p class="hz-state__body">پرونده‌های اختلاف بازار فقط با یکی از نقش‌های «مدیر بازار»، «اپراتور مالی»، «داور اختلاف» یا «پشتیبانی» باز می‌شود.</p>
+          <p class="hz-state__missing">نقش فعلی: <b>ناظر آگهی</b></p>
+          <div class="hz-state__actions"><a class="hz-btn hz-btn--secondary" href="#">بازگشت به مرور بازار</a></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

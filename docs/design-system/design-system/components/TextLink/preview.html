@@ -1,0 +1,33 @@
+<!-- @dsCard group="Actions" height=376 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
+  .demo-text { margin: 0; max-width: 640px; }
+  .demo-chrome { padding: 4px 16px; background: var(--bg-chrome); border: 1px solid var(--border-default); border-radius: var(--radius-md); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">درون متن — text-brand، Bold، زیرخط همیشگی</p>
+    <p class="hz-body demo-text">احراز هویت شما تأیید شده است. برای ثبت حیوان، عضویت انجمن لازم نیست. مراحل نمونه‌گیری و صدور را در <a class="hz-link" href="#">راهنمای برگه ثبتی</a> بخوانید یا از <a class="hz-link" href="#">فهرست دامپزشکان معتمد</a> نزدیک‌ترین مرکز را پیدا کنید.</p>
+  </section>
+  <section>
+    <p class="demo-label">ایستاده — hz-link--standalone · بدون زیرخط، hover زیرخط (فقط اشاره‌گر) · ارتفاع ۴۴</p>
+    <div class="demo-row" style="gap: 32px; align-items: flex-start;">
+      <div class="demo-cell"><a class="hz-link hz-link--standalone" href="#">مشاهده همه<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a><span class="hz-caption">arrow-right آینه‌ای در پایان</span></div>
+      <div class="demo-cell"><a class="hz-link hz-link--standalone" href="#"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg>بازگشت به پرونده</a><span class="hz-caption">arrow-left آینه‌ای در شروع</span></div>
+      <div class="demo-cell"><a class="hz-link hz-link--standalone" href="#" target="_blank" rel="noopener">استعلام اصالت سند<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z"/></svg><span class="hz-visually-hidden">(در زبانه تازه)</span></a><span class="hz-caption">بیرونی</span></div>
+      <div class="demo-cell"><a class="hz-link hz-link--standalone" href="#" style="outline: 2px solid var(--focus-ring); outline-offset: 2px;">مشاهده همه<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a><span class="hz-caption">فوکوس</span></div>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">روی bg-chrome و متن بلند در ستون باریک</p>
+    <div class="demo-row" style="align-items: flex-start; gap: 24px;">
+      <div class="demo-chrome"><a class="hz-link hz-link--standalone" href="#">مشاهده همه<span class="hz-visually-hidden"> اطلاعیه‌ها</span><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a></div>
+      <p class="hz-body-sm demo-text" style="max-width: 320px;">این خبر را در <a class="hz-link" href="#">تمدید مهلت ثبت‌نام آزمون اصالت نسب برای پرورش‌دهندگان عضو انجمن تا پایان آبان‌ماه ۱۴۰۵</a> بخوانید.</p>
+    </div>
+  </section>
+</div>
+<script></script>

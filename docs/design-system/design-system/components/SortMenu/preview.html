@@ -1,0 +1,148 @@
+<!-- @dsCard group="Data display" height=1112 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .demo-box { padding: 16px; border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-surface); }
+  .demo-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .demo-head__text { display: flex; flex-direction: column; min-width: 0; }
+  .demo-state { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .demo-note { font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-stage { position: relative; overflow: hidden; width: 390px; height: 520px; border: 1px dashed var(--border-control); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage .hz-scrim, .demo-stage .hz-sheet { position: absolute; }
+  .demo-page { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .demo-tools { display: flex; gap: 8px; }
+  .demo-tools > * { flex: 1 1 0; }
+  .demo-narrow { width: 220px; }
+  .demo-col { display: flex; flex-direction: column; gap: 20px; flex: 1 1 300px; min-width: 0; }
+  .demo-options { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; }
+  .demo-options .hz-radio + .hz-radio { border-block-start: 1px solid var(--border-subtle); }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>نوار بالای فهرست</b> — بسته (درخواست‌های من) و باز (فروشگاه)؛ گزینه انتخاب‌شده با تیک و Bold</p>
+    <div class="demo-grid">
+      <div class="demo-box" style="min-height: 340px">
+        <div class="demo-head">
+          <div class="demo-head__text"><h3 class="hz-h4">درخواست‌های من</h3><span class="hz-caption">۵ درخواست</span></div>
+          <div class="hz-popover hz-sort">
+            <button class="hz-btn hz-btn--secondary hz-btn--sm hz-sort__trigger hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="sort-req"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span class="hz-sort__label">مرتب‌سازی:</span><span class="hz-sort__value">نزدیک‌ترین مهلت</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+            <div class="hz-menu hz-menu--popover" role="menu" id="sort-req" aria-label="مرتب‌سازی درخواست‌ها" hidden></div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-box" style="min-height: 340px">
+        <div class="demo-head">
+          <div class="demo-head__text"><h3 class="hz-h4">غذای خشک</h3><span class="hz-caption">۲ کالا</span></div>
+          <div class="hz-popover hz-sort">
+            <button class="hz-btn hz-btn--secondary hz-btn--sm hz-sort__trigger hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="true" aria-controls="sort-shop"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span class="hz-sort__label">مرتب‌سازی:</span><span class="hz-sort__value">بیشترین امتیاز</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+            <div class="hz-menu hz-menu--popover" role="menu" id="sort-shop" aria-label="مرتب‌سازی کالاها">
+              <p class="hz-menu__group-label" aria-hidden="true">مرتب‌سازی بر اساس</p>
+              <button class="hz-menu__action" type="button" role="menuitemradio" aria-checked="false" tabindex="-1"><span class="hz-menu__action-label">جدیدترین</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+              <button class="hz-menu__action" type="button" role="menuitemradio" aria-checked="false" tabindex="-1"><span class="hz-menu__action-label">ارزان‌ترین</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+              <button class="hz-menu__action" type="button" role="menuitemradio" aria-checked="false" tabindex="-1"><span class="hz-menu__action-label">گران‌ترین</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+              <button class="hz-menu__action" type="button" role="menuitemradio" aria-checked="true" tabindex="0" style="background: var(--bg-subtle)"><span class="hz-menu__action-label">بیشترین امتیاز</span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+              <button class="hz-menu__action" type="button" role="menuitemradio" aria-checked="false" aria-disabled="true" tabindex="-1"><span class="hz-menu__action-label">نزدیک‌ترین فروشنده<span class="hz-menu__hint">شهر شما ثبت نشده</span></span><svg class="hz-icon hz-icon--sm hz-menu__check" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label"><b>حالت‌ها</b></p>
+    <div class="demo-row" style="gap: 24px">
+      <div class="demo-state">
+        <button class="hz-btn hz-btn--secondary hz-btn--sm hz-sort__trigger hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="false"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span class="hz-sort__label">مرتب‌سازی:</span><span class="hz-sort__value">جدیدترین</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+        <span class="demo-note">پیش‌فرض</span>
+      </div>
+      <div class="demo-state">
+        <button class="hz-btn hz-btn--secondary hz-btn--sm hz-sort__trigger hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="false" style="outline:2px solid var(--focus-ring);outline-offset:2px"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span class="hz-sort__label">مرتب‌سازی:</span><span class="hz-sort__value">جدیدترین</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+        <span class="demo-note">فوکوس</span>
+      </div>
+      <div class="demo-state">
+        <button class="hz-btn hz-btn--secondary hz-btn--sm hz-sort__trigger hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-busy="true"><span class="hz-spinner" aria-hidden="true"></span><span class="hz-sort__label">مرتب‌سازی:</span><span class="hz-sort__value">جدیدترین</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+        <span class="demo-note" aria-live="polite">در حال مرتب‌سازی فهرست</span>
+      </div>
+      <div class="demo-state">
+        <button class="hz-btn hz-btn--secondary hz-btn--sm hz-sort__trigger hz-menu-trigger" type="button" aria-haspopup="menu" disabled><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span class="hz-sort__label">مرتب‌سازی:</span><span class="hz-sort__value">جدیدترین</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+        <span class="demo-note">غیرفعال — فهرست خالی است</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-row" style="gap: 24px">
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — همان گزینه‌ها در BottomSheet؛ انتخاب فوراً اعمال می‌شود و برگه بسته می‌شود</p>
+      <div class="demo-stage">
+        <div class="demo-page" aria-hidden="true">
+          <h2 class="hz-h3">فروشگاه</h2>
+          <div class="demo-tools">
+            <button class="hz-btn hz-btn--secondary" type="button" tabindex="-1"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M200,136a8,8,0,0,1-8,8H64a8,8,0,0,1,0-16H192A8,8,0,0,1,200,136Zm32-56H24a8,8,0,0,0,0,16H232a8,8,0,0,0,0-16Zm-80,96H104a8,8,0,0,0,0,16h48a8,8,0,0,0,0-16Z"/></svg>فیلترها</button>
+            <button class="hz-btn hz-btn--secondary hz-sort__trigger hz-menu-trigger" type="button" tabindex="-1" aria-expanded="true"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span class="hz-sort__value">بیشترین امتیاز</span></button>
+          </div>
+          <p class="hz-caption" style="margin: 0">۸ کالا</p>
+        </div>
+        <div class="hz-scrim"></div>
+        <div class="hz-sheet" role="dialog" aria-modal="true" aria-labelledby="sort-sheet-title">
+          <div class="hz-sheet__handle" aria-hidden="true"></div>
+          <div class="hz-sheet__head">
+            <h2 class="hz-sheet__title" id="sort-sheet-title">مرتب‌سازی</h2>
+            <button type="button" class="hz-icon-btn" aria-label="بستن"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+          </div>
+          <div class="hz-sheet__body">
+            <fieldset class="demo-options">
+              <legend class="hz-visually-hidden">مرتب‌سازی کالاها</legend>
+              <label class="hz-radio"><input type="radio" name="sort-m"><span class="hz-radio__text">جدیدترین</span></label>
+              <label class="hz-radio"><input type="radio" name="sort-m"><span class="hz-radio__text">ارزان‌ترین</span></label>
+              <label class="hz-radio"><input type="radio" name="sort-m"><span class="hz-radio__text">گران‌ترین</span></label>
+              <label class="hz-radio"><input type="radio" name="sort-m" checked><span class="hz-radio__text"><span class="hz-radio__label">بیشترین امتیاز</span></span></label>
+              <label class="hz-radio"><input type="radio" name="sort-m" disabled><span class="hz-radio__text">نزدیک‌ترین فروشنده<span class="hz-radio__desc">شهر شما ثبت نشده</span></span></label>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="demo-col">
+      <section>
+        <p class="demo-label"><b>برچسب بلند در جای تنگ</b> — مقدار با «…» کوتاه می‌شود؛ نام کامل در منو و در نام دسترس‌پذیر می‌ماند</p>
+        <div class="demo-narrow">
+          <div class="hz-popover hz-sort">
+            <button class="hz-btn hz-btn--secondary hz-btn--sm hz-sort__trigger hz-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="false"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg><span class="hz-sort__label">مرتب‌سازی:</span><span class="hz-sort__value">نزدیک‌ترین مهلت پاسخ فروشنده</span><svg class="hz-icon hz-icon--xs hz-menu-trigger__caret" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+          </div>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label"><b>فقط آیکن</b> — نوار متراکم OpsShell کنار جستجو؛ <code dir="ltr">aria-label</code> مقدار فعلی را می‌گوید</p>
+        <div class="demo-row" style="align-items: center">
+          <button class="hz-icon-btn hz-icon-btn--outline hz-icon-btn--sm" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="مرتب‌سازی: قدیمی‌ترین پرونده"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,128a8,8,0,0,1-8,8H48a8,8,0,0,1,0-16h72A8,8,0,0,1,128,128ZM48,72H184a8,8,0,0,0,0-16H48a8,8,0,0,0,0,16Zm56,112H48a8,8,0,0,0,0,16h56a8,8,0,0,0,0-16Zm125.66-21.66a8,8,0,0,0-11.32,0L192,188.69V112a8,8,0,0,0-16,0v76.69l-26.34-26.35a8,8,0,0,0-11.32,11.32l40,40a8,8,0,0,0,11.32,0l40-40A8,8,0,0,0,229.66,162.34Z"/></svg></button>
+          <span class="demo-note">«مرتب‌سازی: قدیمی‌ترین پرونده»</span>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label"><b>صفحه‌کلید</b></p>
+        <p class="demo-note" style="margin: 0"><kbd>Enter</kbd>، <kbd>Space</kbd> یا <kbd>↓</kbd> منو را باز می‌کند و فوکوس روی گزینه انتخاب‌شده می‌رود؛ <kbd>↑</kbd> و <kbd>↓</kbd> میان گزینه‌ها؛ <kbd>Home</kbd> و <kbd>End</kbd> اول و آخر؛ <kbd>Enter</kbd> انتخاب و بستن؛ <kbd>Esc</kbd> بستن و بازگشت فوکوس به دکمه.</p>
+      </section>
+    </div>
+  </div>
+</div>
+<script>
+  document.querySelectorAll('.hz-sort').forEach(function (wrap) {
+    var btn = wrap.querySelector('.hz-menu-trigger'), menu = wrap.querySelector('[role="menu"]');
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function () { var open = btn.getAttribute('aria-expanded') !== 'true'; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); menu.hidden = !open; });
+    menu.addEventListener('click', function (e) {
+      var item = e.target.closest('[role="menuitemradio"]');
+      if (!item || item.getAttribute('aria-disabled') === 'true') return;
+      menu.querySelectorAll('[role="menuitemradio"]').forEach(function (el) { el.setAttribute('aria-checked', el === item ? 'true' : 'false'); });
+      wrap.querySelector('.hz-sort__value').textContent = item.querySelector('.hz-menu__action-label').firstChild.textContent.trim();
+      btn.setAttribute('aria-expanded', 'false'); menu.hidden = true; btn.focus();
+    });
+  });
+</script>

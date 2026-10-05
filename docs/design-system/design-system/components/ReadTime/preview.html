@@ -1,0 +1,50 @@
+<!-- @dsCard group="Editorial" height=480 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 32px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-box { width: 160px; padding: 12px; border: 1px dashed var(--border-default); border-radius: var(--radius-md); }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">پیش‌فرض — زمان مطالعه با آیکن ساعت + تاریخ انتشار، درون <bdi dir="ltr">.hz-meta</bdi></p>
+    <div class="hz-meta"><span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۶ دقیقه مطالعه</span><time class="hz-meta__item" datetime="2026-09-28">۶ مهر ۱۴۰۵</time></div>
+  </section>
+
+  <section class="demo-row">
+    <div>
+      <p class="demo-label">فقط زمان مطالعه (فهرست منتخب)</p>
+      <div class="hz-meta"><span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۳ دقیقه مطالعه</span></div>
+    </div>
+    <div>
+      <p class="demo-label">با نویسنده (مطلب ویژه)</p>
+      <div class="hz-meta"><span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۳ دقیقه مطالعه</span><time class="hz-meta__item" datetime="2026-09-30">۸ مهر ۱۴۰۵</time><span class="hz-meta__item">تحریریه همزیست</span></div>
+    </div>
+    <div>
+      <p class="demo-label">با تاریخ بازبینی (صفحه مقاله)</p>
+      <div class="hz-meta"><span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۶ دقیقه مطالعه</span><time class="hz-meta__item" datetime="2026-09-28">۶ مهر ۱۴۰۵</time><span class="hz-meta__item">بازبینی: <time datetime="2026-09-20">۲۹ شهریور ۱۴۰۵</time></span></div>
+    </div>
+  </section>
+
+  <section class="demo-row">
+    <div>
+      <p class="demo-label">طولانی‌ترین مقدار (۱۲ دقیقه)</p>
+      <div class="hz-meta"><span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۱۲ دقیقه مطالعه</span><time class="hz-meta__item" datetime="2026-10-01">۹ مهر ۱۴۰۵</time></div>
+    </div>
+    <div>
+      <p class="demo-label">عرض باریک — آیتم‌ها به خط بعد می‌روند، هرگز درون خود نمی‌شکنند</p>
+      <div class="demo-box">
+        <div class="hz-meta"><span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۱۲ دقیقه مطالعه</span><time class="hz-meta__item" datetime="2026-10-01">۹ مهر ۱۴۰۵</time><span class="hz-meta__item">انجمن</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">در کارت مطلب و داستان اصلی (۱۲ / ۲۰، رنگ متن ثانویه، آیکن ۱۶)</p>
+    <a class="hz-article hz-article--compact" href="#" style="max-width: 520px">
+      <div class="hz-article__body"><span class="hz-tag">خبر</span><h3 class="hz-article__title">برگزاری نخستین نمایشگاه سگ‌های اصیل انجمن</h3><div class="hz-meta"><span class="hz-meta__item"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۳ دقیقه مطالعه</span><time class="hz-meta__item" datetime="2026-09-30">۸ مهر ۱۴۰۵</time></div></div>
+    </a>
+  </section>
+</div>
+<script></script>

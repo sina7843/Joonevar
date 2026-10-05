@@ -1,0 +1,130 @@
+<!-- @dsCard group="Data display" height=1032 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .demo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-note { display: block; margin-block-start: 8px; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-stack { display: flex; flex-direction: column; gap: 6px; }
+  .demo code { white-space: nowrap; font-size: 12px; }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label">واریانت‌ها</p>
+    <div class="demo-grid">
+      <div>
+        <article class="hz-card">
+          <header class="hz-card__header">
+            <h3 class="hz-card__title">پرونده رکس</h3>
+            <span class="hz-badge hz-badge--success"><span class="hz-badge__dot"></span>فعال</span>
+          </header>
+          <p class="hz-body-sm hz-muted" style="margin:0">ژرمن شپرد · نر · <bdi class="hz-id" dir="ltr">PET-8JDUN4GH</bdi></p>
+        </article>
+        <span class="demo-note">default — padding ۱۶ / ۲۴ در دسکتاپ</span>
+      </div>
+      <div>
+        <article class="hz-card hz-card--compact">
+          <header class="hz-card__header" style="margin-block-end:4px">
+            <h3 class="hz-card__title">عضویت انجمن</h3>
+            <span class="hz-badge hz-badge--sm hz-badge--success"><span class="hz-badge__dot"></span>فعال</span>
+          </header>
+          <p class="hz-caption" style="margin:0">مادام‌العمر · شماره <bdi class="hz-id" dir="ltr">A-14051</bdi></p>
+        </article>
+        <span class="demo-note">compact — همیشه ۱۶</span>
+      </div>
+      <div>
+        <div class="hz-card hz-card--subtle">
+          <div class="demo-stack">
+            <span class="hz-caption">کد مراجعه به دامپزشک</span>
+            <bdi class="hz-id" dir="ltr">HZ-SCMXFSFNPW</bdi>
+            <span class="hz-caption">معتبر تا ۲۸ مهر ۱۴۰۵</span>
+          </div>
+        </div>
+        <span class="demo-note">subtle — گروه‌بندی درون صفحه، بدون سایه</span>
+      </div>
+      <div>
+        <article class="hz-card hz-card--flush">
+          <div class="hz-media hz-media--3x2"><img src="../../assets/imagery/animals-animal-2.jpg" alt="سگ لونا"></div>
+          <div class="hz-card__section">
+            <h3 class="hz-card__title">لونا</h3>
+            <p class="hz-caption" style="margin:0">گلدن رتریور · ماده · <bdi class="hz-id" dir="ltr">PET-GSBH65DC</bdi></p>
+          </div>
+        </article>
+        <span class="demo-note">flush — تصویر/جدول لبه‌به‌لبه، متن در <code dir="ltr">__section</code></span>
+      </div>
+      <div>
+        <article class="hz-card hz-card--feature">
+          <h3 class="hz-card__title">استعلام اصالت سند</h3>
+          <p class="hz-body-sm hz-muted" style="margin:4px 0 12px">شناسه برگه ثبتی، شجره‌نامه یا مجوز را وارد کنید تا اعتبار آن را ببینید.</p>
+          <a class="hz-link hz-link--standalone" href="#">استعلام <svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a>
+        </article>
+        <span class="demo-note"><b>feature — فقط صفحه‌های فرود (SiteShell)</b>؛ هرگز در داشبورد، پرونده یا عملیات</span>
+      </div>
+      <div>
+        <a class="hz-card hz-card--interactive" href="#">
+          <div class="hz-service">
+            <p class="hz-service__title">صدور شجره‌نامه <svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></p>
+            <p class="hz-service__desc">برای حیوانی که برگه ثبتی دارد.</p>
+            <span class="hz-service__price">۴۰۰٬۰۰۰ تومان</span>
+          </div>
+        </a>
+        <span class="demo-note">interactive — کل کارت یک لینک؛ hover: ۲px بالا + border-control</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">CardHeader با عنوان و لینک کنش · پاورقی</p>
+    <article class="hz-card">
+      <header class="hz-card__header">
+        <h3 class="hz-card__title">درخواست‌های باز</h3>
+        <a class="hz-link hz-link--standalone" href="#">مشاهده همه <svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a>
+      </header>
+      <div class="hz-request" style="padding-block-start:0">
+        <div class="hz-request__head">
+          <div class="demo-stack" style="gap:2px">
+            <span class="hz-request__title">صدور شجره‌نامه · تارا</span>
+            <bdi class="hz-id hz-muted" dir="ltr">HZ-49UQ9KAEBE</bdi>
+          </div>
+          <span class="hz-badge hz-badge--warning"><span class="hz-badge__dot"></span>در انتظار پرداخت</span>
+        </div>
+        <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">شما</span></span><span class="hz-owner__extra">۴۰۰٬۰۰۰ تومان</span></div>
+      </div>
+      <footer class="hz-card__footer">
+        <span class="hz-caption">به‌روزرسانی: ۷ مهر ۱۴۰۵</span>
+        <a class="hz-btn hz-btn--primary hz-btn--sm" href="#">پرداخت ۴۰۰٬۰۰۰ تومان</a>
+      </footer>
+    </article>
+  </section>
+
+  <section>
+    <p class="demo-label">حالت‌ها</p>
+    <div class="demo-grid demo-grid--2">
+      <div>
+        <a class="hz-card hz-card--interactive" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">
+          <div class="hz-service">
+            <p class="hz-service__title">مجوز جفت‌گیری <svg class="hz-icon hz-icon--sm hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></p>
+            <p class="hz-service__desc">برای دو حیوان ثبت‌شده با تأیید هر دو مالک.</p>
+            <span class="hz-service__price">۳۰۰٬۰۰۰ تومان</span>
+          </div>
+        </a>
+        <span class="demo-note">فوکوس (کارت interactive)</span>
+      </div>
+      <div>
+        <article class="hz-card">
+          <header class="hz-card__header" style="align-items:flex-start">
+            <h3 class="hz-card__title">مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</h3>
+            <a class="hz-link hz-link--standalone" href="#">ویرایش</a>
+          </header>
+          <p class="hz-caption" style="margin:0">بیمارستان دامپزشکی · اصفهان</p>
+        </article>
+        <span class="demo-note">متن بلند فارسی — عنوان می‌شکند، لینک کنش ثابت می‌ماند</span>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

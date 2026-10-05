@@ -1,0 +1,169 @@
+<!-- @dsCard group="Inputs" height=1032 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .demo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 16px; }
+  .demo-cell { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .demo-note { margin: 8px 0 0; font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  .demo-span2 { grid-column: span 2; }
+  .demo-focus { border-color: var(--border-brand); outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">تک‌انتخابی — نژاد، شهر، دامپزشک · جستجو با تطبیق «ی/ي» و «ک/ك»</p>
+    <div class="demo-grid demo-grid--3">
+      <div class="demo-cell"><div><p class="demo-label">باز — جستجوی «رتریور»، گزینه فعال با صفحه‌کلید</p><div class="hz-field">
+            <label class="hz-field__label" for="cb-2">نژاد<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <div class="hz-combobox">
+              <div class="hz-combobox__control demo-focus">
+                <input class="hz-combobox__input" id="cb-2" type="text" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cb-2-list" aria-activedescendant="cb-2-o1" autocomplete="off" value="رتریور">
+                <span class="hz-combobox__end">
+                  <button class="hz-icon-btn" type="button" aria-label="پاک کردن جستجو"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+                  <button class="hz-icon-btn" type="button" tabindex="-1" aria-label="بستن فهرست نژادها" aria-expanded="true" aria-controls="cb-2-list"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button>
+                </span>
+              </div>
+              <ul class="hz-listbox" id="cb-2-list" role="listbox" aria-label="نژادها">
+                <li class="hz-listbox__option hz-listbox__option--active" id="cb-2-o1" role="option" aria-selected="false"><span class="hz-listbox__text"><span class="hz-listbox__primary">لابرادور <mark>رتریور</mark></span><span class="hz-listbox__meta"><bdi dir="ltr">Labrador Retriever</bdi>، گروه ۸</span></span></li>
+                <li class="hz-listbox__option" id="cb-2-o2" role="option" aria-selected="false"><span class="hz-listbox__text"><span class="hz-listbox__primary">گلدن <mark>رتریور</mark></span><span class="hz-listbox__meta"><bdi dir="ltr">Golden Retriever</bdi>، گروه ۸</span></span></li>
+              </ul>
+            </div>
+          </div></div></div>
+      <div class="demo-cell"><div><p class="demo-label">«ي» عربی تایپ شده ← «شیتزو»</p><div class="hz-field">
+            <label class="hz-field__label" for="cb-3">نژاد<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <div class="hz-combobox">
+              <div class="hz-combobox__control demo-focus">
+                <input class="hz-combobox__input" id="cb-3" type="text" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cb-3-list" aria-activedescendant="cb-3-o1" autocomplete="off" value="شيتزو">
+                <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" tabindex="-1" aria-label="بستن فهرست نژادها" aria-expanded="true" aria-controls="cb-3-list"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></span>
+              </div>
+              <ul class="hz-listbox" id="cb-3-list" role="listbox" aria-label="نژادها">
+                <li class="hz-listbox__option hz-listbox__option--active" id="cb-3-o1" role="option" aria-selected="false"><span class="hz-listbox__text"><span class="hz-listbox__primary"><mark>شیتزو</mark></span><span class="hz-listbox__meta"><bdi dir="ltr">Shih Tzu</bdi>، گروه ۹</span></span></li>
+              </ul>
+            </div>
+          </div></div></div>
+      <div class="demo-cell"><div><p class="demo-label">«ك» عربی تایپ شده ← «کرج»</p><div class="hz-field">
+            <label class="hz-field__label" for="cb-4">شهر<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <div class="hz-combobox">
+              <div class="hz-combobox__control demo-focus">
+                <input class="hz-combobox__input" id="cb-4" type="text" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cb-4-list" aria-activedescendant="cb-4-o1" autocomplete="off" value="كرج">
+                <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" tabindex="-1" aria-label="بستن فهرست شهرها" aria-expanded="true" aria-controls="cb-4-list"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></span>
+              </div>
+              <ul class="hz-listbox" id="cb-4-list" role="listbox" aria-label="شهرها">
+                <li class="hz-listbox__option hz-listbox__option--active" id="cb-4-o1" role="option" aria-selected="false"><span class="hz-listbox__text"><span class="hz-listbox__primary"><mark>کرج</mark></span><span class="hz-listbox__meta">استان البرز</span></span></li>
+              </ul>
+            </div>
+          </div><p class="demo-note">جستجو «ي/ی»، «ك/ک»، رقم‌های فارسی و لاتین و نیم‌فاصله و فاصله را یکی می‌داند؛ «توله سگ» همان «توله‌سگ» است.</p></div></div>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">حالت‌ها</p>
+    <div class="demo-grid demo-grid--3">
+      <div class="demo-cell"><div><p class="demo-label">در حال بارگذاری — جستجو از سرور</p><div class="hz-field">
+            <label class="hz-field__label" for="cb-6">دامپزشک معتمد<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <div class="hz-combobox">
+              <div class="hz-combobox__control demo-focus">
+                <input class="hz-combobox__input" id="cb-6" type="text" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cb-6-list" aria-busy="true" autocomplete="off" value="صادقی">
+                <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" aria-label="پاک کردن جستجو"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+              </div>
+              <div class="hz-listbox" id="cb-6-list" role="listbox" aria-label="دامپزشکان معتمد"><div class="hz-listbox__status" role="status"><span class="hz-spinner" aria-hidden="true"></span>در حال جستجوی دامپزشکان…</div></div>
+            </div>
+          </div></div></div>
+      <div class="demo-cell"><div><p class="demo-label">بدون نتیجه</p><div class="hz-field">
+            <label class="hz-field__label" for="cb-7">دامپزشک معتمد<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <div class="hz-combobox">
+              <div class="hz-combobox__control demo-focus">
+                <input class="hz-combobox__input" id="cb-7" type="text" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cb-7-list" autocomplete="off" value="رحیمی">
+                <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" aria-label="پاک کردن جستجو"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+              </div>
+              <div class="hz-listbox" id="cb-7-list" role="listbox" aria-label="دامپزشکان معتمد"><div class="hz-listbox__empty" role="status"><b>دامپزشکی با «رحیمی» پیدا نشد.</b><span class="hz-listbox__meta">فقط دامپزشکان معتمد ثبت‌شده در همزیست در این فهرست هستند. نام خانوادگی یا شهر را امتحان کنید.</span></div></div>
+            </div>
+          </div></div></div>
+      <div class="demo-cell"><div><p class="demo-label">خطا</p><div class="hz-field">
+        <label class="hz-field__label" for="cb-8">نژاد<span class="hz-field__req" aria-hidden="true">*</span></label>
+        <div class="hz-combobox"><div class="hz-combobox__control">
+          <input class="hz-combobox__input" id="cb-8" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-invalid="true" aria-describedby="cb-8-e" autocomplete="off" placeholder="جستجوی نژاد">
+          <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" tabindex="-1" aria-label="نمایش فهرست نژادها" aria-expanded="false"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></span>
+        </div></div>
+        <div class="hz-field__error" id="cb-8-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>نژاد را از فهرست انتخاب کنید.</span></div>
+      </div></div><div><p class="demo-label">غیرفعال — با دلیل</p><div class="hz-field">
+        <label class="hz-field__label" for="cb-9">نژاد<span class="hz-field__req" aria-hidden="true">*</span></label>
+        <div class="hz-combobox"><div class="hz-combobox__control">
+          <input class="hz-combobox__input" id="cb-9" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-describedby="cb-9-h" autocomplete="off" placeholder="جستجوی نژاد" disabled>
+          <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" tabindex="-1" aria-label="نمایش فهرست نژادها" aria-expanded="false" disabled><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></span>
+        </div></div>
+        <div class="hz-field__hint" id="cb-9-h">اول گونه را انتخاب کنید؛ فهرست نژادها به گونه بستگی دارد.</div>
+      </div></div></div>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">چندانتخابی — تراشه‌های حذف‌شدنی</p>
+    <div class="demo-grid demo-grid--3">
+      <div class="demo-cell demo-span2"><div class="hz-field">
+          <label class="hz-field__label" for="cb-5">خدمات مرکز<span class="hz-field__req" aria-hidden="true">*</span></label>
+          <div class="hz-combobox" id="cb-5-root">
+            <div class="hz-combobox__control hz-combobox__control--chips demo-focus" id="cb-5-chips">
+              <span class="hz-combobox__chip" data-value="ویزیت و معاینه"><span class="hz-combobox__chip-label">ویزیت و معاینه</span><button class="hz-combobox__chip-remove" type="button" aria-label="حذف ویزیت و معاینه"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+              <span class="hz-combobox__chip" data-value="واکسیناسیون"><span class="hz-combobox__chip-label">واکسیناسیون</span><button class="hz-combobox__chip-remove" type="button" aria-label="حذف واکسیناسیون"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+              <span class="hz-combobox__chip" data-value="کاشت میکروچیپ"><span class="hz-combobox__chip-label">کاشت میکروچیپ</span><button class="hz-combobox__chip-remove" type="button" aria-label="حذف کاشت میکروچیپ"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+              <input class="hz-combobox__input" id="cb-5" type="text" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cb-5-list" aria-activedescendant="cb-5-o4" aria-describedby="cb-5-hint" autocomplete="off" placeholder="افزودن خدمت">
+              <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" tabindex="-1" aria-label="بستن فهرست خدمات" aria-expanded="true" aria-controls="cb-5-list"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></span>
+            </div>
+            <ul class="hz-listbox hz-listbox--multi" id="cb-5-list" role="listbox" aria-multiselectable="true" aria-label="خدمات">
+              <li class="hz-listbox__option" role="option" id="cb-5-o1" aria-selected="true" data-value="ویزیت و معاینه"><span class="hz-listbox__box"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><span class="hz-listbox__text"><span class="hz-listbox__primary">ویزیت و معاینه</span></span></li>
+              <li class="hz-listbox__option" role="option" id="cb-5-o2" aria-selected="true" data-value="واکسیناسیون"><span class="hz-listbox__box"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><span class="hz-listbox__text"><span class="hz-listbox__primary">واکسیناسیون</span></span></li>
+              <li class="hz-listbox__option hz-listbox__option--active" role="option" id="cb-5-o4" aria-selected="false" data-value="دندان‌پزشکی"><span class="hz-listbox__box"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><span class="hz-listbox__text"><span class="hz-listbox__primary">دندان‌پزشکی</span></span></li>
+              <li class="hz-listbox__option" role="option" id="cb-5-o5" aria-selected="true" data-value="کاشت میکروچیپ"><span class="hz-listbox__box"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></svg></span><span class="hz-listbox__text"><span class="hz-listbox__primary">کاشت میکروچیپ</span></span></li>
+            </ul>
+          </div>
+          <div class="hz-field__hint" id="cb-5-hint"><span id="cb-5-count">۳ خدمت انتخاب شده</span>؛ فهرست همان خدمات تعریف‌شده انجمن است.</div>
+        </div></div>
+      <div class="demo-cell"><div><p class="demo-label">تراشه با متن بلند فارسی</p><div class="hz-field">
+        <label class="hz-field__label" for="cb-10">گروه نژاد — متن بلند</label>
+        <div class="hz-combobox"><div class="hz-combobox__control hz-combobox__control--chips">
+          <span class="hz-combobox__chip" title="پینشر و شناوزر، مولوسوئیدها و سگ‌های کوهستان و دام سوئیسی"><span class="hz-combobox__chip-label">پینشر و شناوزر، مولوسوئیدها و سگ‌های کوهستان و دام سوئیسی</span><button class="hz-combobox__chip-remove" type="button" aria-label="حذف پینشر و شناوزر، مولوسوئیدها و سگ‌های کوهستان و دام سوئیسی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+          <span class="hz-combobox__chip"><span class="hz-combobox__chip-label">تریرها</span><button class="hz-combobox__chip-remove" type="button" aria-label="حذف تریرها"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button></span>
+          <input class="hz-combobox__input" id="cb-10" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" autocomplete="off" placeholder="افزودن گروه">
+        </div></div>
+      </div></div><div><p class="demo-label">بسته — مقدار بلند</p><div class="hz-field">
+        <label class="hz-field__label" for="cb-11">نژاد — مقدار بلند</label>
+        <div class="hz-combobox"><div class="hz-combobox__control">
+          <input class="hz-combobox__input" id="cb-11" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" autocomplete="off" value="سگ گله آناتولی (کانگال)">
+          <span class="hz-combobox__end"><button class="hz-icon-btn" type="button" aria-label="پاک کردن نژاد"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button><button class="hz-icon-btn" type="button" tabindex="-1" aria-label="نمایش فهرست نژادها" aria-expanded="false"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></svg></button></span>
+        </div></div>
+      </div></div></div>
+    </div>
+  </section>
+</div>
+<script>
+  (function () {
+    var fa = function (n) { return n.toLocaleString('fa-IR'); };
+    var root = document.getElementById('cb-5-root');
+    if (!root) return;
+    var chips = document.getElementById('cb-5-chips'), input = document.getElementById('cb-5'), count = document.getElementById('cb-5-count');
+    var tpl = chips.querySelector('.hz-combobox__chip').cloneNode(true);
+    function sync() { count.textContent = fa(root.querySelectorAll('.hz-listbox__option[aria-selected="true"]').length) + ' خدمت انتخاب شده'; }
+    function addChip(v) {
+      var c = tpl.cloneNode(true);
+      c.dataset.value = v; c.querySelector('.hz-combobox__chip-label').textContent = v;
+      c.querySelector('button').setAttribute('aria-label', 'حذف ' + v);
+      chips.insertBefore(c, input);
+    }
+    root.addEventListener('click', function (e) {
+      var rm = e.target.closest('.hz-combobox__chip-remove');
+      if (rm) {
+        var chip = rm.closest('.hz-combobox__chip'), v = chip.dataset.value;
+        var opt = root.querySelector('.hz-listbox__option[data-value="' + v + '"]');
+        if (opt) opt.setAttribute('aria-selected', 'false');
+        chip.remove(); input.focus(); sync(); return;
+      }
+      var o = e.target.closest('.hz-listbox__option');
+      if (o) {
+        var on = o.getAttribute('aria-selected') !== 'true', val = o.dataset.value;
+        o.setAttribute('aria-selected', on ? 'true' : 'false');
+        if (on) addChip(val); else { var ch = chips.querySelector('.hz-combobox__chip[data-value="' + val + '"]'); if (ch) ch.remove(); }
+        sync();
+      }
+    });
+  })();
+</script>

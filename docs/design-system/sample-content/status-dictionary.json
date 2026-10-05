@@ -1,0 +1,992 @@
+{
+  "rule": "Every status belongs to one family; every family has exactly one tone. The tone says who must act, not how good or bad the outcome is.",
+  "families": {
+    "draft": {
+      "tone": "neutral",
+      "meaningFa": "ناقص یا هنوز ارسال‌نشده"
+    },
+    "waiting": {
+      "tone": "info",
+      "meaningFa": "منتظر دیگری — کاری از شما برنمی‌آید"
+    },
+    "action": {
+      "tone": "warning",
+      "meaningFa": "نیازمند اقدام شما"
+    },
+    "done": {
+      "tone": "success",
+      "meaningFa": "کامل، معتبر یا فعال"
+    },
+    "blocked": {
+      "tone": "error",
+      "meaningFa": "رد، ناموفق یا مسدود"
+    },
+    "closed": {
+      "tone": "neutral",
+      "meaningFa": "پایان‌یافته بدون خطا"
+    }
+  },
+  "actionOwnerNote": "Who acts is shown separately by ActionOwner («اقدام بعدی با: …»), not by changing the status label — e.g. «در حال بررسی» + «مرکز ژنتیک», not «در حال بررسی مرکز ژنتیک».",
+  "statuses": [
+    {
+      "key": "DRAFT",
+      "family": "draft",
+      "tone": "neutral",
+      "labelFa": "پیش‌نویس",
+      "codeTone": "neutral",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "تکمیل مدارک",
+        "آماده پرداخت",
+        "برگرداندن به پیش‌نویس",
+        "تکمیل اطلاعات"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "READY_TO_SUBMIT",
+      "family": "draft",
+      "tone": "neutral",
+      "labelFa": "آماده ارسال",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "INACTIVE",
+      "family": "draft",
+      "tone": "neutral",
+      "labelFa": "غیرفعال",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "NONE",
+      "family": "draft",
+      "tone": "neutral",
+      "labelFa": "ثبت‌نشده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "بدون عضویت",
+        "بدون دوره فعالیت"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "SUBMITTED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در انتظار بررسی",
+      "codeTone": "info",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "ارسال‌شده برای بررسی",
+        "ثبت‌شده",
+        "ارسال‌شده"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "UNDER_REVIEW",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در حال بررسی",
+      "codeTone": "info",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "در حال بررسی مرکز ژنتیک",
+        "در حال بررسی مرکز",
+        "در حال بررسی انجمن"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PENDING_REVIEW",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در انتظار بررسی انجمن",
+      "codeTone": "info",
+      "codeToneConflict": true,
+      "labelVariantsInCode": [
+        "در انتظار تصمیم",
+        "در انتظار بررسی"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "WAITING_REVIEW",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "درخواست ارسال‌شده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "در انتظار بررسی"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PENDING_VERIFICATION",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در انتظار بررسی",
+      "codeTone": "warning",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": true
+    },
+    {
+      "key": "AWAITING_COUNTERPARTY",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در انتظار تأیید طرف مقابل",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PROCESSING",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در حال پردازش",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "در حال اجرا"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "SCHEDULED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "زمان‌بندی‌شده",
+      "codeTone": "info",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "زمان و محل تعیین شد"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PREPARING",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در حال آماده‌سازی",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "ACCEPTED_BY_SELLER",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "پذیرفته‌شده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "SHIPPED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "ارسال‌شده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "ارسال ثبت شد"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "TECHNICAL_REVIEW",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در مرحله تأیید فنی",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "WAITING_PARENT_RESULTS",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در انتظار تکمیل نتایج والدین",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "NEGOTIATING",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در حال مذاکره",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "CONTRACT_DRAFTING",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "ورود به قرارداد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "در حال تنظیم قرارداد"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PENDING",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در جریان",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "در انتظار تصمیم انجمن",
+        "در انتظار اجرا",
+        "صادرنشده"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "OPEN",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در انتظار بررسی",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "باز",
+        "در انتظار پاسخ فروشنده",
+        "در حال بررسی"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "NEEDS_CORRECTION",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "نیازمند اصلاح",
+      "codeTone": "warning",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "Export Pedigree شما نیازمند اصلاح است",
+        "احراز هویت شما نیازمند اصلاح است"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "AWAITING_PAYMENT",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "در انتظار پرداخت",
+      "codeTone": "info",
+      "codeToneConflict": true,
+      "labelVariantsInCode": [
+        "در انتظار پرداخت صدور"
+      ],
+      "changesCodeTone": true
+    },
+    {
+      "key": "PENDING_PAYMENT",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "در انتظار پرداخت",
+      "codeTone": "warning",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "EXPIRED",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "منقضی",
+      "codeTone": "warning",
+      "codeToneConflict": true,
+      "labelVariantsInCode": [
+        "منقضی‌شده",
+        "مهلت کد تحویل گذشت",
+        "مهلت پرداخت گذشت"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PAUSED",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "موقتاً متوقف",
+      "codeTone": "warning",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "متوقف‌شده توسط فروشنده",
+        "توقف موقت آگهی"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "RETURN_REQUESTED",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "درخواست مرجوعی",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "TEMPORARILY_UNAVAILABLE",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "موقتاً غیرفعال",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "APPROVED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "تأییدشده",
+      "codeTone": "success",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "تأیید شده",
+        "Export Pedigree شما تأیید شد",
+        "پذیرفته‌شده — در انتظار ارسال به فروشگاه",
+        "تأییدشده، در انتظار فعال‌سازی"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "ACTIVE",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "فعال",
+      "codeTone": "success",
+      "codeToneConflict": true,
+      "labelVariantsInCode": [
+        "عضو فعال",
+        "فعال و تأییدشده",
+        "در حال فروش",
+        "در انتظار مراجعه"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PUBLISHED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "منتشرشده",
+      "codeTone": "success",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "انتشار",
+        "انتشار آگهی"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "ISSUED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "صادر شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "مجوز صادر شد",
+        "صادرشده"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PAID",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "پرداخت‌شده",
+      "codeTone": "success",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "پرداخت تأییدشده",
+        "واریزشده — در انتظار مغایرت‌گیری",
+        "در انتظار پذیرش فروشنده",
+        "پرداخت شد"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "VERIFIED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "تأییدشده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "COMPLETED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "تحویل انجام و مالکیت منتقل شد",
+      "codeTone": "success",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "انجام‌شده"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "DELIVERED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "تحویل‌شده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "FINAL",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "نتیجه نهایی",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "نهایی‌شده با تأیید دوطرفه"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "VALID",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "معتبر",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "REGISTERED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": null,
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "CONFIRMED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "وجود توافق تأیید شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "تأییدشده دوطرفه"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "READY",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "آماده واریز",
+      "codeTone": "info",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "آماده ارسال"
+      ],
+      "changesCodeTone": true
+    },
+    {
+      "key": "RESOLVED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "تعیین تکلیف شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "ALIVE",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "زنده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "REJECTED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "ردشده",
+      "codeTone": "error",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "رد شده",
+        "Export Pedigree شما رد شد",
+        "طرف مقابل وجود توافق را رد کرد",
+        "احراز هویت شما رد شد"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "FAILED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "ناموفق",
+      "codeTone": "error",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "پرداخت ناموفق",
+        "واریز ناموفق",
+        "اجرا ناموفق بود"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "SUSPENDED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "تعلیق‌شده",
+      "codeTone": "error",
+      "codeToneConflict": true,
+      "labelVariantsInCode": [
+        "معلق",
+        "متوقف‌شده توسط ناظر"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "REVOKED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "باطل‌شده",
+      "codeTone": "error",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "لغوشده"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "DISPUTED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "در حال بررسی اختلاف",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "DELETED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "حذف‌شده",
+      "codeTone": "error",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "حذف (قابل بازگردانی)"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "TERMINATED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "خاتمه‌یافته",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PAYMENT_FAILED",
+      "family": "blocked",
+      "tone": "error",
+      "labelFa": "پرداخت ناموفق",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "CANCELLED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "لغوشده",
+      "codeTone": "neutral",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "پرداخت لغوشده",
+        "پس‌گرفته‌شده",
+        "لغوشده توسط آغازکننده",
+        "لغو شد"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "WITHDRAWN",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "پس گرفته شد",
+      "codeTone": "neutral",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "پس‌گرفته‌شده",
+        "توسط خریدار پس گرفته شد",
+        "حذف‌شده با اصلاح گزارش اولیه",
+        "بایگانی‌شده با انصراف"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "ARCHIVED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "بایگانی‌شده",
+      "codeTone": "neutral",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "بایگانی",
+        "بایگانی؛ نشانی باز است"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "REMOVED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "برداشته‌شده",
+      "codeTone": "neutral",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "حذف‌شده",
+        "حذف آگهی"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "SUPERSEDED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "جایگزین‌شده",
+      "codeTone": "info",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "جایگزین‌شده با نسخه جدید",
+        "با پیشنهاد تازه جایگزین شد",
+        "جایگزین‌شده با خرید تازه‌تر"
+      ],
+      "changesCodeTone": true
+    },
+    {
+      "key": "SOLD",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "فروخته‌شده",
+      "codeTone": "info",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": true
+    },
+    {
+      "key": "RESERVED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "رزروشده",
+      "codeTone": "info",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": true
+    },
+    {
+      "key": "REFUNDED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "بازپرداخت‌شده",
+      "codeTone": "neutral",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "RETURNED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "مرجوع‌شده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "HIDDEN",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "پنهان",
+      "codeTone": "warning",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "پنهان‌شده توسط ادمین محتوا",
+        "پنهان‌کردن"
+      ],
+      "changesCodeTone": true
+    },
+    {
+      "key": "DECEASED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "فوت",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [
+        "فوت‌شده",
+        "فوت‌شده پس از تولد"
+      ],
+      "changesCodeTone": false
+    },
+    {
+      "key": "MERGED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "ادغام‌شده در محصول پایه",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "LEFT",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "خارج‌شده",
+      "codeTone": "neutral",
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false
+    },
+    {
+      "key": "PROPOSED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "در انتظار پاسخ",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "CODE_ISSUED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "کد تحویل صادر شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "FINDER_INVITE_ONLY",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "فقط با دعوت",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "FINDER_UNAVAILABLE",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "موقتاً در دسترس نیست",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "COLLECTED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "نمونه‌گیری انجام شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "SEND_INSTRUCTED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "دستور ارسال صادر شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "SAMPLE_RECEIVED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "دریافت‌شده در مرکز",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "RESAMPLED",
+      "family": "waiting",
+      "tone": "info",
+      "labelFa": "نمونه‌گیری مجدد در همین درخواست",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "MARKED_UNUSABLE",
+      "family": "action",
+      "tone": "warning",
+      "labelFa": "نمونه غیرقابل‌استفاده ثبت شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "ACCEPTED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "پذیرفته‌شده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "IN_STOCK",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "موجود",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "LOW_STOCK",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "فقط {n} عدد موجود",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "FINDER_READY",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "آماده دریافت درخواست",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "OVERTURNED",
+      "family": "done",
+      "tone": "success",
+      "labelFa": "اعتراض پذیرفته شد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "DECLINED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "پذیرفته نشد",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "CLOSED",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "بسته‌شده",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    },
+    {
+      "key": "OUT_OF_STOCK",
+      "family": "closed",
+      "tone": "neutral",
+      "labelFa": "ناموجود",
+      "codeTone": null,
+      "codeToneConflict": false,
+      "labelVariantsInCode": [],
+      "changesCodeTone": false,
+      "addedOn": "1405-07-11"
+    }
+  ],
+  "sourceNote": "labelFa = most frequent Persian label in the code. codeTone = most frequent tone in the code. See status-labels-extracted.json for all 435 keys.",
+  "trustMark": {
+    "key": "TRUSTED",
+    "labelFa": "معتمد",
+    "tone": "success",
+    "icon": "shield-check",
+    "note": "Not a status. Shown on trusted vets, shops and kennels; no opposite label."
+  },
+  "sampleKinds": {
+    "BLOOD_SAMPLE": "نمونه‌گیری خون",
+    "DNA": "نمونه‌گیری DNA",
+    "DNA_RESAMPLING": "نمونه‌گیری مجدد DNA"
+  }
+}

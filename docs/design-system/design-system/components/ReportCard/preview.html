@@ -1,0 +1,142 @@
+<!-- @dsCard group="Operations" height=1280 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+  .demo-focus { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-grid">
+
+    <section>
+      <p class="demo-label">آگهی — گزارش‌های پرتکرار، در انتظار بررسی</p>
+      <article class="hz-card hz-report" aria-labelledby="rp1">
+        <div class="hz-report__head">
+          <span class="hz-report__kind"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,96a7.89,7.89,0,0,0-.3-2.2L217.35,43.6A16.07,16.07,0,0,0,202,32H54A16.07,16.07,0,0,0,38.65,43.6L24.31,93.8A7.89,7.89,0,0,0,24,96h0v16a40,40,0,0,0,16,32v72a8,8,0,0,0,8,8H208a8,8,0,0,0,8-8V144a40,40,0,0,0,16-32V96ZM54,48H202l11.42,40H42.61Zm50,56h48v8a24,24,0,0,1-48,0Zm-16,0v8a24,24,0,0,1-35.12,21.26,7.88,7.88,0,0,0-1.82-1.06A24,24,0,0,1,40,112v-8ZM200,208H56V151.2a40.57,40.57,0,0,0,8,.8,40,40,0,0,0,32-16,40,40,0,0,0,64,0,40,40,0,0,0,32,16,40.57,40.57,0,0,0,8-.8Zm4.93-75.8a8.08,8.08,0,0,0-1.8,1.05A24,24,0,0,1,168,112v-8h48v8A24,24,0,0,1,204.93,132.2Z"/></svg>گزارش آگهی</span>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی</span>
+        </div>
+        <div>
+          <h3 class="hz-report__target" id="rp1"><a href="#">توله ژرمن شپرد</a></h3>
+          <span class="hz-report__target-meta">کنل آریا، کرج، منتشرشده ۱ مهر ۱۴۰۵</span>
+        </div>
+        <div class="hz-report__reason"><span class="hz-tag hz-tag--neutral">فروش توله بدون مجوز جفت‌گیری</span><span class="hz-muted">+ ۱ دلیل دیگر</span></div>
+        <div class="hz-report__stats">
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"/></svg><span class="hz-report__count hz-report__count--high">۵ گزارش</span></span>
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"/></svg>سارا احمدی و ۴ نفر دیگر</span>
+          <span class="hz-report__stat">آخرین: ۱۰ مهر، ۰۸:۳۰</span>
+        </div>
+        <div class="hz-report__foot">
+          <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">ناظر آگهی</span></span><span class="hz-age hz-age--late"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۱ روز</span></div>
+          <a class="hz-btn hz-btn--secondary" href="#">بررسی گزارش</a>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <p class="demo-label">پیام — با متن گزارش‌شده، در حال بررسی</p>
+      <article class="hz-card hz-report" aria-labelledby="rp2">
+        <div class="hz-report__head">
+          <span class="hz-report__kind"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.06-11.81,8,8,0,0,0-6.54-.67L40,216,52.47,178.6a8,8,0,0,0-.66-6.54A88,88,0,1,1,128,216Z"/></svg>گزارش پیام</span>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در حال بررسی</span>
+        </div>
+        <div>
+          <h3 class="hz-report__target" id="rp2"><a href="#">گفتگوی آگهی توله گلدن رتریور</a></h3>
+          <span class="hz-report__target-meta">پیام فروشنده به علی رضایی، ۹ مهر ۱۴۰۵</span>
+        </div>
+        <div class="hz-report__reason"><span class="hz-tag hz-tag--neutral">درخواست پرداخت خارج از همزیست</span></div>
+        <blockquote class="hz-report__excerpt">برای رزرو، بیعانه را به کارت شخصی من واریز کنید؛ شماره کارت را در پیام بعد می‌فرستم.</blockquote>
+        <div class="hz-report__stats">
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"/></svg><span class="hz-report__count">۱ گزارش</span></span>
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>علی رضایی</span>
+        </div>
+        <div class="hz-report__foot">
+          <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">ناظر آگهی</span></span><span class="hz-owner__extra">مسئول: شما</span></div>
+          <a class="hz-btn hz-btn--secondary demo-focus" href="#">ادامه بررسی</a>
+        </div>
+      </article>
+      <p class="demo-label" style="margin: 8px 0 0">فوکوس روی «ادامه بررسی»</p>
+    </section>
+
+    <section>
+      <p class="demo-label">جفت‌یابی — هویت گزارش‌دهنده برای مالک پنهان است</p>
+      <article class="hz-card hz-report" aria-labelledby="rp3">
+        <div class="hz-report__head">
+          <span class="hz-report__kind"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M212,80a28,28,0,1,0,28,28A28,28,0,0,0,212,80Zm0,40a12,12,0,1,1,12-12A12,12,0,0,1,212,120ZM72,108a28,28,0,1,0-28,28A28,28,0,0,0,72,108ZM44,120a12,12,0,1,1,12-12A12,12,0,0,1,44,120ZM92,88A28,28,0,1,0,64,60,28,28,0,0,0,92,88Zm0-40A12,12,0,1,1,80,60,12,12,0,0,1,92,48Zm72,40a28,28,0,1,0-28-28A28,28,0,0,0,164,88Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,164,48Zm23.12,100.86a35.3,35.3,0,0,1-16.87-21.14,44,44,0,0,0-84.5,0A35.25,35.25,0,0,1,69,148.82,40,40,0,0,0,88,224a39.48,39.48,0,0,0,15.52-3.13,64.09,64.09,0,0,1,48.87,0,40,40,0,0,0,34.73-72ZM168,208a24,24,0,0,1-9.45-1.93,80.14,80.14,0,0,0-61.19,0,24,24,0,0,1-20.71-43.26,51.22,51.22,0,0,0,24.46-30.67,28,28,0,0,1,53.78,0,51.27,51.27,0,0,0,24.53,30.71A24,24,0,0,1,168,208Z"/></svg>گزارش جفت‌یابی</span>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی</span>
+        </div>
+        <div>
+          <h3 class="hz-report__target" id="rp3"><a href="#">رعد، روتوایلر نر</a></h3>
+          <span class="hz-report__target-meta">نمایه جفت‌یابی، مالک: بهرام فراهانی، تبریز</span>
+        </div>
+        <div class="hz-report__reason"><span class="hz-tag hz-tag--neutral">اطلاعات سلامت نادرست</span></div>
+        <p class="hz-report__note"><b>توضیح گزارش‌دهنده:</b> در نمایه آمده که آزمایش دیسپلازی لگن انجام شده، ولی مالک در گفتگو گفت هنوز انجام نشده است.</p>
+        <div class="hz-report__stats">
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"/></svg><span class="hz-report__count">۱ گزارش</span></span>
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>سارا احمدی (محرمانه)</span>
+        </div>
+        <div class="hz-report__foot">
+          <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">عملیات جفت‌یابی</span></span><span class="hz-age"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۳ ساعت</span></div>
+          <a class="hz-btn hz-btn--secondary" href="#">بررسی گزارش</a>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <p class="demo-label">محتوا — تعیین تکلیف شد (بسته؛ بدون «اقدام بعدی»)</p>
+      <article class="hz-card hz-report" aria-labelledby="rp4">
+        <div class="hz-report__head">
+          <span class="hz-report__kind"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg>گزارش محتوا</span>
+          <span class="hz-badge hz-badge--success"><span class="hz-badge__dot"></span>تعیین تکلیف شد</span>
+        </div>
+        <div>
+          <h3 class="hz-report__target" id="rp4"><a href="#">ژرمن شپرد؛ همراه وفادار برای خانواده‌های فعال</a></h3>
+          <span class="hz-report__target-meta">آموزش، نگار رستمی</span>
+        </div>
+        <div class="hz-report__reason"><span class="hz-tag hz-tag--neutral">اطلاعات نادرست</span></div>
+        <div class="hz-report__stats">
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"/></svg><span class="hz-report__count">۲ گزارش</span></span>
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"/></svg>مینا جعفری و ۱ نفر دیگر</span>
+        </div>
+        <div class="hz-report__outcome"><span class="hz-badge hz-badge--neutral hz-badge--sm"><span class="hz-badge__dot"></span>پنهان</span><span>تا اصلاح جدول واکسیناسیون پنهان شد؛ ادمین محتوا، ۹ مهر ۱۴۰۵.</span></div>
+      </article>
+    </section>
+
+    <section>
+      <p class="demo-label">متن بلند — عنوان سه‌خطی و توضیح طولانی</p>
+      <article class="hz-card hz-report" aria-labelledby="rp5">
+        <div class="hz-report__head">
+          <span class="hz-report__kind"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg>گزارش محتوا</span>
+          <span class="hz-badge hz-badge--info"><span class="hz-badge__dot"></span>در انتظار بررسی</span>
+        </div>
+        <div>
+          <h3 class="hz-report__target" id="rp5"><a href="#">تمدید مهلت ثبت‌نام آزمون اصالت نسب برای پرورش‌دهندگان عضو انجمن تا پایان آبان‌ماه ۱۴۰۵ و تغییر نحوه ارسال نمونه</a></h3>
+          <span class="hz-report__target-meta">اطلاعیه، انجمن</span>
+        </div>
+        <div class="hz-report__reason"><span class="hz-tag hz-tag--neutral">اطلاعات قدیمی یا متناقض</span></div>
+        <p class="hz-report__note"><b>توضیح گزارش‌دهنده:</b> در این اطلاعیه نوشته شده ارسال پستی مستقیم ممکن نیست، ولی متن راهنمای صفحه ارسال نمونه هنوز پست مستقیم را پیشنهاد می‌کند و چند پرورش‌دهنده نمونه را با پست فرستاده‌اند.</p>
+        <div class="hz-report__stats">
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M42.76,50A8,8,0,0,0,40,56V224a8,8,0,0,0,16,0V179.77c26.79-21.16,49.87-9.75,76.45,3.41,16.4,8.11,34.06,16.85,53,16.85,13.93,0,28.54-4.75,43.82-18a8,8,0,0,0,2.76-6V56A8,8,0,0,0,218.76,50c-28,24.23-51.72,12.49-79.21-1.12C111.07,34.76,78.78,18.79,42.76,50ZM216,172.25c-26.79,21.16-49.87,9.74-76.45-3.41-25-12.35-52.81-26.13-83.55-8.4V59.79c26.79-21.16,49.87-9.75,76.45,3.4,25,12.35,52.82,26.13,83.55,8.4Z"/></svg><span class="hz-report__count">۱ گزارش</span></span>
+          <span class="hz-report__stat"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>رضا کریمی</span>
+        </div>
+        <div class="hz-report__foot">
+          <div class="hz-owner hz-owner--you"><span>اقدام بعدی با: <span class="hz-owner__who">ادمین محتوا</span></span><span class="hz-age"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z"/></svg>۲ روز</span></div>
+          <a class="hz-btn hz-btn--secondary" href="#">بررسی گزارش</a>
+        </div>
+      </article>
+    </section>
+
+    <section>
+      <p class="demo-label">در حال بارگذاری</p>
+      <div class="hz-card hz-report" aria-busy="true">
+        <div class="hz-report__head"><span class="hz-skeleton hz-skeleton--text" style="width: 96px"></span><span class="hz-skeleton hz-skeleton--pill"></span></div>
+        <span class="hz-skeleton hz-skeleton--title"></span>
+        <span class="hz-skeleton hz-skeleton--text" style="width: 40%"></span>
+        <span class="hz-skeleton hz-skeleton--pill" style="width: 160px"></span>
+        <span class="hz-skeleton hz-skeleton--text" style="width: 70%"></span>
+      </div>
+    </section>
+  </div>
+</div>
+<script></script>

@@ -1,0 +1,76 @@
+{
+  "profiles": [
+    {
+      "animalName": "آرا",
+      "breedFa": "سگ سرابی",
+      "sexFa": "نر",
+      "state": "FINDER_READY",
+      "stateFa": "آماده دریافت درخواست",
+      "city": "کرج",
+      "lastMating": {
+        "iso": "2026-05-22",
+        "displayFa": "۱۴۰۵/۰۳/۰۱",
+        "longFa": "۱ خرداد ۱۴۰۵"
+      },
+      "compatibility": {
+        "scoreFa": "سازگاری بالا",
+        "reasonsFa": [
+          "هم‌نژاد",
+          "هر دو برگه ثبتی دارند",
+          "فاصله سنی مناسب"
+        ]
+      }
+    },
+    {
+      "animalName": "لونا",
+      "breedFa": "گلدن رتریور",
+      "sexFa": "ماده",
+      "state": "FINDER_INVITE_ONLY",
+      "stateFa": "فقط با دعوت",
+      "city": "تهران",
+      "lastMating": null
+    },
+    {
+      "animalName": "رعد",
+      "breedFa": "روتوایلر",
+      "sexFa": "نر",
+      "state": "FINDER_UNAVAILABLE",
+      "stateFa": "موقتاً در دسترس نیست",
+      "city": "تبریز",
+      "lastMating": {
+        "iso": "2026-03-02",
+        "displayFa": "۱۴۰۴/۱۲/۱۱",
+        "longFa": "۱۱ اسفند ۱۴۰۴"
+      }
+    }
+  ],
+  "request": {
+    "status": "NEGOTIATING",
+    "financialCategory": "OFFSPRING_SHARE",
+    "financialFa": "سهم توله",
+    "placeFa": "محل صاحب ماده"
+  },
+  "contract": {
+    "status": "DRAFTING",
+    "note": "Confirmed by OTP from both parties."
+  },
+  "plans": [
+    {
+      "audienceFa": "مالک",
+      "periodFa": "۳ ماهه",
+      "price": {
+        "toman": 450000,
+        "displayFa": "۴۵۰٬۰۰۰ تومان"
+      }
+    },
+    {
+      "audienceFa": "کنل",
+      "periodFa": "۱۲ ماهه",
+      "price": {
+        "toman": 2400000,
+        "displayFa": "۲٬۴۰۰٬۰۰۰ تومان"
+      }
+    }
+  ],
+  "plansNote": "Finder plan prices are versioned plan data managed by the superadmin; these values are placeholders."
+}

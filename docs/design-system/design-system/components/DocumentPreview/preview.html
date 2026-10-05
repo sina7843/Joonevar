@@ -1,0 +1,184 @@
+<!-- @dsCard group="Operations" height=1256 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+  .demo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  /* stand-ins for the uploaded private images (never a real ID or licence) */
+  .demo-idcard { width: 72%; aspect-ratio: 1.586; display: flex; gap: 12px; padding: 14px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-sm); }
+  .demo-idcard__photo { width: 30%; border-radius: var(--radius-xs); background: var(--bg-subtle); }
+  .demo-idcard__lines { flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; padding-block-start: 6px; }
+  .demo-idcard__lines span, .demo-page__lines span { height: 8px; border-radius: var(--radius-xs); background: var(--bg-subtle); }
+  .demo-idcard--zoomed { width: 150%; flex-shrink: 0; }
+  .demo-idcard--rotated { width: 50%; transform: rotate(90deg); }
+  .demo-page { height: 88%; aspect-ratio: 0.707; display: flex; flex-direction: column; gap: 10px; padding: 14px 12px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-xs); }
+  .demo-page__lines { display: flex; flex-direction: column; gap: 6px; }
+  .demo-page__seal { width: 28px; height: 28px; margin-block-start: auto; border-radius: 50%; border: 2px solid var(--border-default); align-self: flex-end; }
+  .demo-focus { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <div class="demo-grid">
+    <section>
+      <p class="demo-label">پیش‌فرض — کارت ملی، دو صفحه، اندازه صفحه</p>
+      <figure class="hz-docview" style="margin: 0" aria-labelledby="dv1-t">
+        <div class="hz-docview__head">
+          <h3 class="hz-docview__title" id="dv1-t">کارت ملی · علی رضایی</h3>
+          <span class="hz-docview__pager">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه قبلی" disabled><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></button>
+            <span aria-live="polite">۱ از ۲</span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه بعدی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button>
+          </span>
+        </div>
+        <div class="hz-docview__frame">
+          <div class="hz-doc">
+            <div class="demo-idcard" role="img" aria-label="روی کارت ملی علی رضایی"><span class="demo-idcard__photo"></span><span class="demo-idcard__lines"><span style="width: 80%"></span><span style="width: 60%"></span><span style="width: 70%"></span><span style="width: 40%"></span></span></div>
+          </div>
+          <div class="hz-doc__tools" role="toolbar" aria-label="ابزار مدرک">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="کوچک‌نمایی" disabled><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h64A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <button class="hz-docview__zoom" type="button" aria-label="بزرگ‌نمایی فعلی؛ بازگشت به اندازه صفحه">۱۰۰٪</button>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <span class="hz-docview__sep" aria-hidden="true"></span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="چرخش ۹۰ درجه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="تمام‌صفحه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM88,40H48a8,8,0,0,0-8,8V88a8,8,0,0,0,16,0V56H88a8,8,0,0,0,0-16Z"/></svg></button>
+          </div>
+        </div>
+        <ul class="hz-docview__thumbs" aria-label="صفحه‌های مدرک">
+          <li><button class="hz-docview__thumb" type="button" aria-current="true"><span class="hz-docview__thumb-img"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg></span>روی کارت</button></li>
+          <li><button class="hz-docview__thumb" type="button"><span class="hz-docview__thumb-img"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg></span>پشت کارت</button></li>
+        </ul>
+        <figcaption class="hz-docview__meta">
+          <span class="hz-doc__private"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>مدرک خصوصی — فقط در میز تصمیم، بدون دانلود</span>
+          <span>بارگذاری ۷ مهر ۱۴۰۵، ۱٫۲ مگابایت</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <p class="demo-label">بزرگ‌نمایی ۲۰۰٪ — کشیدن یا کلیدهای جهت برای جابه‌جایی · فوکوس روی «بزرگ‌نمایی»</p>
+      <figure class="hz-docview" style="margin: 0" aria-labelledby="dv2-t">
+        <div class="hz-docview__head">
+          <h3 class="hz-docview__title" id="dv2-t">کارت ملی · علی رضایی</h3>
+          <span class="hz-docview__pager">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه قبلی" disabled><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></button>
+            <span>۱ از ۲</span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه بعدی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button>
+          </span>
+        </div>
+        <div class="hz-docview__frame">
+          <div class="hz-doc hz-doc--zoomed" tabindex="0" aria-label="روی کارت ملی، بزرگ‌نمایی ۲۰۰٪؛ برای جابه‌جایی از کلیدهای جهت استفاده کنید">
+            <div class="demo-idcard demo-idcard--zoomed" role="img" aria-label="روی کارت ملی علی رضایی"><span class="demo-idcard__photo"></span><span class="demo-idcard__lines"><span style="width: 80%"></span><span style="width: 60%"></span><span style="width: 70%"></span><span style="width: 40%"></span></span></div>
+          </div>
+          <div class="hz-doc__tools" role="toolbar" aria-label="ابزار مدرک">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="کوچک‌نمایی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h64A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <button class="hz-docview__zoom" type="button" aria-label="بزرگ‌نمایی فعلی؛ بازگشت به اندازه صفحه">۲۰۰٪</button>
+            <button class="hz-icon-btn hz-icon-btn--sm demo-focus" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <span class="hz-docview__sep" aria-hidden="true"></span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="چرخش ۹۰ درجه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="تمام‌صفحه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM88,40H48a8,8,0,0,0-8,8V88a8,8,0,0,0,16,0V56H88a8,8,0,0,0,0-16Z"/></svg></button>
+          </div>
+        </div>
+        <figcaption class="hz-docview__meta">
+          <span class="hz-doc__private"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>مدرک خصوصی — فقط در میز تصمیم، بدون دانلود</span>
+          <span>گام‌ها: ۱۰۰، ۱۵۰، ۲۰۰ و ۳۰۰ درصد</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <p class="demo-label">چرخش ۹۰° — عکسی که کج بارگذاری شده؛ چرخش فقط در نمایش است و فایل تغییر نمی‌کند</p>
+      <figure class="hz-docview" style="margin: 0" aria-labelledby="dv3-t">
+        <div class="hz-docview__head">
+          <h3 class="hz-docview__title" id="dv3-t">کارت ملی · علی رضایی</h3>
+          <span class="hz-docview__pager">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه قبلی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></button>
+            <span>۲ از ۲</span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه بعدی" disabled><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button>
+          </span>
+        </div>
+        <div class="hz-docview__frame">
+          <div class="hz-doc">
+            <div class="demo-idcard demo-idcard--rotated" role="img" aria-label="پشت کارت ملی علی رضایی، ۹۰ درجه چرخانده‌شده"><span class="demo-idcard__photo"></span><span class="demo-idcard__lines"><span style="width: 80%"></span><span style="width: 60%"></span><span style="width: 70%"></span></span></div>
+          </div>
+          <div class="hz-doc__tools" role="toolbar" aria-label="ابزار مدرک">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="کوچک‌نمایی" disabled><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h64A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <button class="hz-docview__zoom" type="button" aria-label="بزرگ‌نمایی فعلی؛ بازگشت به اندازه صفحه">۱۰۰٪</button>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <span class="hz-docview__sep" aria-hidden="true"></span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="چرخش ۹۰ درجه؛ اکنون ۹۰ درجه" aria-pressed="true" style="background: var(--bg-subtle)"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="تمام‌صفحه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM88,40H48a8,8,0,0,0-8,8V88a8,8,0,0,0,16,0V56H88a8,8,0,0,0,0-16Z"/></svg></button>
+          </div>
+        </div>
+        <figcaption class="hz-docview__meta">
+          <span class="hz-doc__private"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>مدرک خصوصی — فقط در میز تصمیم، بدون دانلود</span>
+          <span>چرخانده‌شده ۹۰°، ۹۸۰ کیلوبایت</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <p class="demo-label">پروانه فعالیت (PDF، سه صفحه) — نام بلند مرکز</p>
+      <figure class="hz-docview" style="margin: 0" aria-labelledby="dv4-t">
+        <div class="hz-docview__head">
+          <h3 class="hz-docview__title" id="dv4-t">پروانه فعالیت · مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</h3>
+          <span class="hz-docview__pager">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه قبلی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></svg></button>
+            <span>۲ از ۳</span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="صفحه بعدی"><svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></button>
+          </span>
+        </div>
+        <div class="hz-docview__frame">
+          <div class="hz-doc">
+            <div class="demo-page" role="img" aria-label="صفحه ۲ پروانه فعالیت"><span class="demo-page__lines"><span style="width: 60%"></span><span></span><span style="width: 90%"></span><span style="width: 75%"></span><span></span><span style="width: 40%"></span></span><span class="demo-page__seal"></span></div>
+          </div>
+          <div class="hz-doc__tools" role="toolbar" aria-label="ابزار مدرک">
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="کوچک‌نمایی" disabled><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h64A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <button class="hz-docview__zoom" type="button" aria-label="بزرگ‌نمایی فعلی؛ بازگشت به اندازه صفحه">۱۰۰٪</button>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M152,112a8,8,0,0,1-8,8H120v24a8,8,0,0,1-16,0V120H80a8,8,0,0,1,0-16h24V80a8,8,0,0,1,16,0v24h24A8,8,0,0,1,152,112Zm77.66,117.66a8,8,0,0,1-11.32,0l-50.06-50.07a88.11,88.11,0,1,1,11.31-11.31l50.07,50.06A8,8,0,0,1,229.66,229.66ZM112,184a72,72,0,1,0-72-72A72.08,72.08,0,0,0,112,184Z"/></svg></button>
+            <span class="hz-docview__sep" aria-hidden="true"></span>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="چرخش ۹۰ درجه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg></button>
+            <button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="تمام‌صفحه"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM88,40H48a8,8,0,0,0-8,8V88a8,8,0,0,0,16,0V56H88a8,8,0,0,0,0-16Z"/></svg></button>
+          </div>
+        </div>
+        <figcaption class="hz-docview__meta">
+          <span class="hz-doc__private"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg>مدرک خصوصی — فقط در میز تصمیم، بدون دانلود</span>
+          <span><bdi dir="ltr">PDF</bdi>، ۳ صفحه، ۲٫۴ مگابایت</span>
+        </figcaption>
+      </figure>
+    </section>
+  </div>
+
+  <section>
+    <p class="demo-label">حالت‌ها</p>
+    <div class="demo-grid demo-grid--3">
+      <div class="hz-docview">
+        <h3 class="hz-docview__title">در حال بارگذاری</h3>
+        <div class="hz-doc" aria-busy="true"><div class="hz-doc__status"><span class="hz-spinner hz-spinner--lg" aria-hidden="true"></span>مدرک در حال بارگذاری است</div></div>
+      </div>
+      <div class="hz-docview">
+        <h3 class="hz-docview__title">خطا</h3>
+        <div class="hz-doc"><div class="hz-doc__status hz-doc__status--error" role="alert"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16h64a8,8,0,0,0,7.59-5.47l14.83-44.48L163,151.43a8.07,8.07,0,0,0,4.46-4.46l14.62-36.55,44.48-14.83A8,8,0,0,0,232,88V56A16,16,0,0,0,216,40ZM112.41,157.47,98.23,200H40V172l52-52,30.42,30.42L117,152.57A8,8,0,0,0,112.41,157.47ZM216,82.23,173.47,96.41a8,8,0,0,0-4.9,4.62l-14.72,36.82L138.58,144l-35.27-35.27a16,16,0,0,0-22.62,0L40,149.37V56H216Zm12.68,33a8,8,0,0,0-7.21-1.1l-23.8,7.94a8,8,0,0,0-4.9,4.61l-14.31,35.77-35.77,14.31a8,8,0,0,0-4.61,4.9l-7.94,23.8A8,8,0,0,0,137.73,216H216a16,16,0,0,0,16-16V121.73A8,8,0,0,0,228.68,115.24ZM216,200H148.83l3.25-9.75,35.51-14.2a8.07,8.07,0,0,0,4.46-4.46l14.2-35.51,9.75-3.25Z"/></svg><b>مدرک باز نشد</b><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg>تلاش دوباره</button></div></div>
+      </div>
+      <div class="hz-docview">
+        <h3 class="hz-docview__title">خالی — مدرک بارگذاری نشده</h3>
+        <div class="hz-doc hz-doc--missing"><div class="hz-doc__status"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M213.66,82.34l-56-56A8,8,0,0,0,152,24H56A16,16,0,0,0,40,40V216a16,16,0,0,0,16,16H200a16,16,0,0,0,16-16V88A8,8,0,0,0,213.66,82.34ZM160,51.31,188.69,80H160ZM200,216H56V40h88V88a8,8,0,0,0,8,8h48V216Zm-32-80a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,136Zm0,32a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,168Z"/></svg><b>پشت کارت ملی بارگذاری نشده است</b>اگر لازم است، پرونده را «نیازمند اصلاح» کنید.</div></div>
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  // small demo: zoom steps on the first viewer
+  (function () {
+    var steps = [100, 150, 200, 300], i = 0;
+    var fig = document.querySelector('.hz-docview');
+    var out = fig.querySelector('.hz-docview__zoom');
+    var btns = fig.querySelectorAll('.hz-doc__tools .hz-icon-btn');
+    var fa = function (n) { return String(n).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }); };
+    function set(n) { i = n; out.textContent = fa(steps[i]) + '٪'; btns[0].disabled = i === 0; btns[1].disabled = i === steps.length - 1; }
+    btns[0].addEventListener('click', function () { if (i > 0) set(i - 1); });
+    btns[1].addEventListener('click', function () { if (i < steps.length - 1) set(i + 1); });
+    out.addEventListener("click", function () { set(0); });
+  })();
+</script>

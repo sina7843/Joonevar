@@ -1,0 +1,98 @@
+<!-- @dsCard group="Domain cards" height=952 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-16); align-items: start; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">کارت نژاد (فهرست و «نژادهای سگ» صفحه اصلی): با تصویر · بدون تصویر · فوکوس · نام بلند بدون گروه و تصویر</p>
+    <div class="demo-grid">
+      <a class="hz-animal-tile hz-card--interactive" href="#">
+        <div class="hz-media hz-media--4x3"><img src="../../assets/imagery/breeds-german-shepherd.jpg" alt="سگ نژاد ژرمن شپرد"></div>
+        <div class="hz-animal-tile__body">
+          <span class="hz-breed__name">ژرمن شپرد</span>
+          <bdi class="hz-breed__en" dir="ltr">German Shepherd</bdi>
+          <span class="hz-breed__meta">گروه ۱، بزرگ</span>
+        </div>
+      </a>
+      <a class="hz-animal-tile hz-card--interactive" href="#">
+        <div class="hz-media hz-media--4x3"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">تصویر ثبت نشده</span></div></div>
+        <div class="hz-animal-tile__body">
+          <span class="hz-breed__name">سگ سرابی</span>
+          <bdi class="hz-breed__en" dir="ltr">Sarabi Dog</bdi>
+          <span class="hz-breed__meta">گروه ۲، خیلی بزرگ</span>
+        </div>
+      </a>
+      <a class="hz-animal-tile hz-card--interactive" href="#" style="outline:2px solid var(--focus-ring);outline-offset:2px">
+        <div class="hz-media hz-media--4x3"><img src="../../assets/imagery/breeds-shih-tzu.jpg" alt="سگ نژاد شیتزو"></div>
+        <div class="hz-animal-tile__body">
+          <span class="hz-breed__name">شیتزو</span>
+          <bdi class="hz-breed__en" dir="ltr">Shih Tzu</bdi>
+          <span class="hz-breed__meta">گروه ۹، خیلی کوچک</span>
+        </div>
+      </a>
+      <a class="hz-animal-tile hz-card--interactive" href="#">
+        <div class="hz-media hz-media--4x3"><div class="hz-media__empty"><img src="../../assets/imagery/hamzist-symbol.svg" alt=""><span class="hz-media__alt">تصویر ثبت نشده</span></div></div>
+        <div class="hz-animal-tile__body">
+          <span class="hz-breed__name">سگ گله آناتولی (کانگال)</span>
+          <bdi class="hz-breed__en" dir="ltr">Anatolian Shepherd Dog (Kangal)</bdi>
+          <span class="hz-breed__meta">گروه —</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">مشخصات نژاد (صفحه <bdi dir="ltr">/breeds/german-shepherd</bdi>): شناسنامه + ۵ ویژگی سه‌سطحی — سنجه سه‌پله‌ای همیشه با متن سطح</p>
+    <div class="hz-card">
+      <div class="hz-breed-profile">
+        <div>
+          <h3 class="hz-breed-profile__title">شناسنامه نژاد</h3>
+          <dl class="hz-kv">
+            <div class="hz-kv__row"><dt class="hz-kv__key">نام انگلیسی</dt><dd class="hz-kv__value"><bdi dir="ltr">German Shepherd</bdi></dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">گروه FCI</dt><dd class="hz-kv__value">گروه ۱ — سگ‌های گله و دام (به‌جز سگ‌های دام سوئیسی)</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">اندازه</dt><dd class="hz-kv__value">بزرگ</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">پوشش (طول مو)</dt><dd class="hz-kv__value">متوسط</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">خاستگاه</dt><dd class="hz-kv__value">آلمان</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">نام‌های دیگر</dt><dd class="hz-kv__value">شپرد آلمانی، <bdi dir="ltr">Alsatian</bdi></dd></div>
+          </dl>
+        </div>
+        <div>
+          <h3 class="hz-breed-profile__title">ویژگی‌ها</h3>
+          <dl class="hz-traits">
+            <div class="hz-trait"><dt class="hz-trait__name">انرژی</dt><dd class="hz-trait__value"><span class="hz-meter3" aria-hidden="true"><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span></span><span class="hz-trait__label">زیاد</span></dd></div>
+            <div class="hz-trait"><dt class="hz-trait__name">آموزش‌پذیری</dt><dd class="hz-trait__value"><span class="hz-meter3" aria-hidden="true"><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span></span><span class="hz-trait__label">زیاد</span></dd></div>
+            <div class="hz-trait"><dt class="hz-trait__name">نیاز به مراقبت</dt><dd class="hz-trait__value"><span class="hz-meter3" aria-hidden="true"><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step"></span></span><span class="hz-trait__label">متوسط</span></dd></div>
+            <div class="hz-trait"><dt class="hz-trait__name">سازگاری با کودکان</dt><dd class="hz-trait__value"><span class="hz-meter3" aria-hidden="true"><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span></span><span class="hz-trait__label">زیاد</span></dd></div>
+            <div class="hz-trait"><dt class="hz-trait__name">سازگاری با حیوانات دیگر</dt><dd class="hz-trait__value"><span class="hz-meter3" aria-hidden="true"><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step"></span></span><span class="hz-trait__label">متوسط</span></dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="demo-label">داده ناقص (لابرادور: ویژگی‌ها هنوز وارد نشده) · یک ویژگی «کم» از سگ سرابی برای مقایسه</p>
+    <div class="hz-card">
+      <div class="hz-breed-profile">
+        <div>
+          <h3 class="hz-breed-profile__title">شناسنامه نژاد</h3>
+          <dl class="hz-kv">
+            <div class="hz-kv__row"><dt class="hz-kv__key">گروه FCI</dt><dd class="hz-kv__value">گروه ۸ — رتریورها، سگ‌های بیرون‌ران و سگ‌های آبی</dd></div>
+            <div class="hz-kv__row"><dt class="hz-kv__key">پوشش (طول مو)</dt><dd class="hz-kv__value hz-kv__value--empty">—</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h3 class="hz-breed-profile__title">ویژگی‌ها</h3>
+          <dl class="hz-traits">
+            <div class="hz-trait hz-trait--unset"><dt class="hz-trait__name">انرژی</dt><dd class="hz-trait__value"><span class="hz-meter3" aria-hidden="true"><span class="hz-meter3__step"></span><span class="hz-meter3__step"></span><span class="hz-meter3__step"></span></span><span class="hz-trait__label">—</span></dd></div>
+            <div class="hz-trait"><dt class="hz-trait__name">سازگاری با حیوانات دیگر <span class="hz-caption">(سگ سرابی)</span></dt><dd class="hz-trait__value"><span class="hz-meter3" aria-hidden="true"><span class="hz-meter3__step hz-meter3__step--on"></span><span class="hz-meter3__step"></span><span class="hz-meter3__step"></span></span><span class="hz-trait__label">کم</span></dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

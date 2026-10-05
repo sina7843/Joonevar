@@ -1,0 +1,160 @@
+{
+  "requests": [
+    {
+      "code": "HZ-32AHW6V6PC",
+      "titleFa": "ثبت و احراز حیوان",
+      "animalName": "مکس",
+      "status": "UNDER_REVIEW",
+      "actionOwner": "VET",
+      "actionOwnerFa": "دامپزشک معتمد",
+      "deadline": {
+        "iso": "2026-10-20T23:59:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۲۸",
+        "longFa": "۲۸ مهر ۱۴۰۵"
+      },
+      "updatedAt": {
+        "iso": "2026-09-30T14:30:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۰۸",
+        "longFa": "۸ مهر ۱۴۰۵"
+      }
+    },
+    {
+      "code": "HZ-49UQ9KAEBE",
+      "titleFa": "صدور شجره‌نامه",
+      "animalName": "تارا",
+      "status": "AWAITING_PAYMENT",
+      "actionOwner": "USER",
+      "actionOwnerFa": "شما",
+      "amount": {
+        "toman": 400000,
+        "displayFa": "۴۰۰٬۰۰۰ تومان"
+      },
+      "updatedAt": {
+        "iso": "2026-09-29T09:10:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۰۷",
+        "longFa": "۷ مهر ۱۴۰۵"
+      }
+    },
+    {
+      "code": "HZ-767PEG578Z",
+      "titleFa": "مجوز جفت‌گیری",
+      "animalName": "رعد × لونا",
+      "status": "AWAITING_COUNTERPARTY",
+      "actionOwner": "COUNTERPARTY",
+      "actionOwnerFa": "طرف مقابل",
+      "updatedAt": {
+        "iso": "2026-09-25T10:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۰۳",
+        "longFa": "۳ مهر ۱۴۰۵"
+      }
+    },
+    {
+      "code": "HZ-MYUKV79KBC",
+      "titleFa": "ثبت کنل",
+      "animalName": null,
+      "status": "NEEDS_CORRECTION",
+      "actionOwner": "USER",
+      "actionOwnerFa": "شما",
+      "correctionFa": "تصویر پروانه کسب خوانا نیست؛ نسخه واضح‌تری بارگذاری کنید.",
+      "updatedAt": {
+        "iso": "2026-09-27T16:45:00+03:30",
+        "displayFa": "۱۴۰۵/۰۷/۰۵",
+        "longFa": "۵ مهر ۱۴۰۵"
+      }
+    },
+    {
+      "code": "HZ-V9P4HGPVY6",
+      "titleFa": "تست اصالت نسب",
+      "animalName": "تارا",
+      "status": "UNDER_REVIEW",
+      "actionOwner": "GENETICS_CENTRE",
+      "actionOwnerFa": "مرکز ژنتیک",
+      "updatedAt": {
+        "iso": "2026-09-21T11:00:00+03:30",
+        "displayFa": "۱۴۰۵/۰۶/۳۰",
+        "longFa": "۳۰ شهریور ۱۴۰۵"
+      }
+    }
+  ],
+  "payments": [
+    {
+      "reference": "HZP-EMN2VJ25FJFFN7SA",
+      "serviceFa": "عضویت انجمن (مادام‌العمر)",
+      "service": "MEMBERSHIP",
+      "amount": {
+        "toman": 300000,
+        "displayFa": "۳۰۰٬۰۰۰ تومان"
+      },
+      "status": "PAID",
+      "paidAt": {
+        "iso": "2026-03-14T10:12:00+03:30",
+        "displayFa": "۲۳ اسفند ۱۴۰۴، ۱۰:۱۲"
+      }
+    },
+    {
+      "reference": "HZP-K9ZQXFYDGX5PJUSB",
+      "serviceFa": "صدور برگه ثبتی — ۲ حیوان",
+      "service": "REGISTRATION_SHEET",
+      "amount": {
+        "toman": 500000,
+        "displayFa": "۵۰۰٬۰۰۰ تومان"
+      },
+      "status": "PAID",
+      "paidAt": {
+        "iso": "2026-04-02T18:40:00+03:30",
+        "displayFa": "۱۳ فروردین ۱۴۰۵، ۱۸:۴۰"
+      }
+    },
+    {
+      "reference": "HZP-GTGB8MQFU5DTR62Z",
+      "serviceFa": "صدور شجره‌نامه",
+      "service": "PEDIGREE",
+      "amount": {
+        "toman": 400000,
+        "displayFa": "۴۰۰٬۰۰۰ تومان"
+      },
+      "status": "PENDING",
+      "createdAt": {
+        "iso": "2026-09-29T09:10:00+03:30",
+        "displayFa": "۷ مهر ۱۴۰۵، ۹:۱۰"
+      }
+    },
+    {
+      "reference": "HZP-TEQUAKE8YGA7CDQP",
+      "serviceFa": "مجوز جفت‌گیری",
+      "service": "MATING_PERMIT",
+      "amount": {
+        "toman": 300000,
+        "displayFa": "۳۰۰٬۰۰۰ تومان"
+      },
+      "status": "FAILED",
+      "createdAt": {
+        "iso": "2026-09-18T20:05:00+03:30",
+        "displayFa": "۲۷ شهریور ۱۴۰۵، ۲۰:۰۵"
+      }
+    }
+  ],
+  "membership": {
+    "accountId": "acc-owner-1",
+    "status": "ACTIVE",
+    "lifetime": true,
+    "membershipNo": "A-14051",
+    "activatedAt": {
+      "iso": "2026-03-14T10:12:00+03:30",
+      "displayFa": "۱۴۰۴/۱۲/۲۳",
+      "longFa": "۲۳ اسفند ۱۴۰۴"
+    },
+    "note": "membershipNo is entered by the association; free text, no generated format."
+  },
+  "kyc": [
+    {
+      "accountId": "acc-owner-2",
+      "status": "NEEDS_CORRECTION",
+      "reasonFa": "تصویر کارت ملی مات است."
+    },
+    {
+      "accountId": "acc-owner-3",
+      "status": "APPROVED"
+    }
+  ]
+}

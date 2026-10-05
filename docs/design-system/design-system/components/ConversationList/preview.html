@@ -1,0 +1,88 @@
+<!-- @dsCard group="Messaging" height=512 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-main { flex: 1 1 440px; min-width: 0; }
+  .demo-side { flex: 0 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .demo-skel { display: flex; gap: 12px; padding: 12px 16px; border-block-end: 1px solid var(--border-subtle); }
+  .demo-skel:last-child { border-block-end: 0; }
+  .demo-skel > div { flex: 1 1 auto; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <div class="demo-row">
+    <section class="demo-main">
+      <p class="demo-label">پر — گفتگوی باز، خوانده‌نشده، متن بلند، گفتگوی بسته</p>
+      <nav class="hz-convos" aria-label="گفتگوها">
+        <div class="hz-convos__head">
+          <h2 class="hz-convos__title">پیام‌ها</h2>
+          <span class="hz-section-header__count">۴ گفتگو، ۳ پیام خوانده‌نشده</span>
+        </div>
+        <ul class="hz-convos__list">
+          <li>
+            <a class="hz-convo" href="#" aria-current="true">
+              <span class="hz-avatar" aria-hidden="true"><img src="../../assets/imagery/people-acc-owner-1.jpg" alt="تصویر پروفایل سارا احمدی" width="40" height="40"></span>
+              <span class="hz-convo__body">
+                <span class="hz-convo__top"><span class="hz-convo__name">سارا احمدی</span><time class="hz-convo__time" datetime="2026-09-30T10:15:00+03:30">۸ مهر</time></span>
+                <span class="hz-convo__context">توله ژرمن شپرد، خریدار</span>
+                <span class="hz-convo__bottom"><span class="hz-convo__last"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M243.31,136,144,36.69A15.86,15.86,0,0,0,132.69,32H40a8,8,0,0,0-8,8v92.69A15.86,15.86,0,0,0,36.69,144L136,243.31a16,16,0,0,0,22.63,0l84.68-84.68a16,16,0,0,0,0-22.63Zm-96,96L48,132.69V48h84.69L232,147.31ZM96,84A12,12,0,1,1,84,72,12,12,0,0,1,96,84Z"/></svg><span>پیشنهاد قیمت: ۴۱٬۰۰۰٬۰۰۰ تومان</span></span></span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="hz-convo hz-convo--unread" href="#">
+              <span class="hz-avatar" aria-hidden="true"><img src="../../assets/imagery/people-acc-owner-2.jpg" alt="تصویر پروفایل علی رضایی" width="40" height="40"></span>
+              <span class="hz-convo__body">
+                <span class="hz-convo__top"><span class="hz-convo__name">علی رضایی</span><time class="hz-convo__time" datetime="2026-10-02T09:40:00+03:30">۰۹:۴۰</time></span>
+                <span class="hz-convo__context">توله ژرمن شپرد، خریدار</span>
+                <span class="hz-convo__bottom"><span class="hz-convo__last"><span>واکسن‌های توله کامل است؟ کارت واکسن را می‌فرستید؟</span></span><span class="hz-count hz-count--alert" aria-label="۲ پیام خوانده‌نشده">۲</span></span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="hz-convo hz-convo--unread" href="#" style="outline:2px solid var(--focus-ring);outline-offset:-2px">
+              <span class="hz-avatar" aria-hidden="true"><img src="../../assets/imagery/people-acc-owner-3.jpg" alt="تصویر پروفایل مینا جعفری" width="40" height="40"></span>
+              <span class="hz-convo__body">
+                <span class="hz-convo__top"><span class="hz-convo__name">مینا جعفری</span><time class="hz-convo__time" datetime="2026-10-01T21:10:00+03:30">دیروز</time></span>
+                <span class="hz-convo__context">توله ژرمن شپرد، خریدار (فوکوس)</span>
+                <span class="hz-convo__bottom"><span class="hz-convo__last"><span>سلام، من در شیراز هستم و امکان مراجعه حضوری ندارم؛ آیا امکان ارسال توله با پرواز و تحویل در فرودگاه شیراز وجود دارد؟</span></span><span class="hz-count hz-count--alert" aria-label="۱ پیام خوانده‌نشده">۱</span></span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class="hz-convo hz-convo--closed" href="#">
+              <span class="hz-avatar" aria-hidden="true">ک</span>
+              <span class="hz-convo__body">
+                <span class="hz-convo__top"><span class="hz-convo__name">کنل البرز</span><time class="hz-convo__time" datetime="2026-09-25T12:00:00+03:30">۳ مهر</time></span>
+                <span class="hz-convo__context">هاسکی جوان، فروشنده</span>
+                <span class="hz-convo__bottom"><span class="hz-convo__last"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg><span>آگهی رزرو شد و گفتگو بسته شد.</span></span><span class="hz-badge hz-badge--neutral hz-badge--sm"><span class="hz-badge__dot"></span>رزروشده</span></span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </section>
+    <div class="demo-side">
+      <section>
+        <p class="demo-label">خالی</p>
+        <div class="hz-convos">
+          <div class="hz-state hz-state--compact">
+            <div class="hz-state__icon"><svg class="hz-icon hz-icon--lg" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,24A104,104,0,0,0,36.18,176.88L24.83,210.93a16,16,0,0,0,20.24,20.24l34.05-11.35A104,104,0,1,0,128,24Zm0,192a87.87,87.87,0,0,1-44.06-11.81,8,8,0,0,0-6.54-.67L40,216,52.47,178.6a8,8,0,0,0-.66-6.54A88,88,0,1,1,128,216Z"/></svg></div>
+            <p class="hz-state__title">هنوز گفتگویی ندارید</p>
+            <p class="hz-state__body">وقتی درباره آگهی‌ای پیام بدهید یا خریداری به آگهی شما پیام بدهد، گفتگو اینجا نمایش داده می‌شود.</p>
+            <div class="hz-state__actions"><a class="hz-btn hz-btn--secondary hz-btn--sm" href="#">مشاهده بازار</a></div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <p class="demo-label">در حال بارگذاری</p>
+        <div class="hz-convos" aria-busy="true">
+          <div class="demo-skel"><span class="hz-skeleton" style="width:40px;height:40px;border-radius:var(--radius-full)"></span><div><span class="hz-skeleton hz-skeleton--title" style="width:45%"></span><span class="hz-skeleton hz-skeleton--text" style="width:80%"></span></div></div>
+          <div class="demo-skel"><span class="hz-skeleton" style="width:40px;height:40px;border-radius:var(--radius-full)"></span><div><span class="hz-skeleton hz-skeleton--title" style="width:35%"></span><span class="hz-skeleton hz-skeleton--text" style="width:70%"></span></div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script></script>

@@ -1,0 +1,104 @@
+<!-- @dsCard group="Data display" height=1176 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-label b { color: var(--text-primary); }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+  .demo-col { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+  .demo-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .demo-phone { width: 390px; padding: 16px; border: 1px dashed var(--border-control); border-radius: var(--radius-xl); display: flex; flex-direction: column; gap: 12px; }
+  .demo-phone .hz-map { height: 360px; }
+  .demo-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .demo-cardhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .demo-note { font-size: 12px; line-height: 20px; color: var(--text-secondary); }
+  /* demo scaffolding only — tokens, logical properties, never component styling */
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+
+  <section>
+    <p class="demo-label"><b>فهرست کنار نقشه (≥۷۶۸)</b> — مراکز تهران؛ شماره پین = شماره فهرست؛ انتخاب در هر دو هم‌زمان</p>
+    <div class="hz-map-split">
+      <ol class="hz-place-list" aria-label="مراکز دامپزشکی تهران">
+        <li><a class="hz-place" href="#" aria-current="true"><span class="hz-place__num" aria-hidden="true">۱</span><span class="hz-place__body"><span class="hz-place__name">بیمارستان دامپزشکی مهرگان</span><span class="hz-place__meta">بیمارستان دامپزشکی، تهران</span><span class="hz-place__meta">شنبه تا چهارشنبه ۹ تا ۲۱</span></span><span class="hz-badge hz-badge--success hz-badge--sm"><span class="hz-badge__dot"></span>معتبر</span></a></li>
+        <li><a class="hz-place" href="#"><span class="hz-place__num" aria-hidden="true">۲</span><span class="hz-place__body"><span class="hz-place__name">کلینیک دامپزشکی آوا</span><span class="hz-place__meta">کلینیک دامپزشکی، تهران</span><span class="hz-place__meta">شنبه تا چهارشنبه ۹ تا ۲۱</span></span><span class="hz-badge hz-badge--success hz-badge--sm"><span class="hz-badge__dot"></span>معتبر</span></a></li>
+        <li><a class="hz-place" href="#"><span class="hz-place__num" aria-hidden="true">۳</span><span class="hz-place__body"><span class="hz-place__name">مرکز ژنتیک همزیست</span><span class="hz-place__meta">مرکز ژنتیک، تهران</span><span class="hz-place__meta">شنبه تا چهارشنبه ۹ تا ۲۱</span></span><span class="hz-badge hz-badge--success hz-badge--sm"><span class="hz-badge__dot"></span>معتبر</span></a></li>
+      </ol>
+      <div class="hz-map" role="region" aria-label="نقشه مراکز دامپزشکی تهران">
+        <svg class="hz-map__canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="hz-map__street" stroke-width="3" d="M-160 -40L-90 540M-104 -40L-34 540M-48 -40L22 540M8 -40L78 540M64 -40L134 540M120 -40L190 540M176 -40L246 540M232 -40L302 540M288 -40L358 540M344 -40L414 540M400 -40L470 540M456 -40L526 540M512 -40L582 540M568 -40L638 540M624 -40L694 540M680 -40L750 540M736 -40L806 540M792 -40L862 540M848 -40L918 540M904 -40L974 540M-40 -40L840 -90M-40 6L840 -44M-40 52L840 2M-40 98L840 48M-40 144L840 94M-40 190L840 140M-40 236L840 186M-40 282L840 232M-40 328L840 278M-40 374L840 324M-40 420L840 370M-40 466L840 416M-40 512L840 462M-40 558L840 508"/><path class="hz-map__area" d="M520 60C600 40 690 80 700 150C710 220 640 250 580 230C520 210 480 120 520 60Z"/><path class="hz-map__area" d="M60 420C110 400 170 430 160 470C150 510 70 510 50 480C35 455 40 430 60 420Z"/><path class="hz-map__water" stroke-width="22" d="M-20 380C120 340 220 420 360 390S600 300 820 340"/><path class="hz-map__road-casing" stroke-width="15" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/><path class="hz-map__road" stroke-width="10" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/></svg>
+        <button class="hz-map__pin" type="button" aria-pressed="true" aria-label="۱، بیمارستان دامپزشکی مهرگان" style="inset-inline-start: 58%; inset-block-start: 38%"><span class="hz-map__pin-head" aria-hidden="true">۱</span></button>
+        <button class="hz-map__pin" type="button" aria-pressed="false" aria-label="۲، کلینیک دامپزشکی آوا" style="inset-inline-start: 30%; inset-block-start: 62%"><span class="hz-map__pin-head" aria-hidden="true">۲</span></button>
+        <button class="hz-map__pin" type="button" aria-pressed="false" aria-label="۳، مرکز ژنتیک همزیست" style="inset-inline-start: 76%; inset-block-start: 74%"><span class="hz-map__pin-head" aria-hidden="true">۳</span></button>
+        <div class="hz-map__controls"><button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></button><button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="کوچک‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg></button></div>
+        <span class="hz-map__attrib">نقشه نمایشی</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="demo-row">
+    <section>
+      <p class="demo-label"><b>موبایل &lt;۷۶۸</b> — «فهرست / نقشه»؛ پین انتخاب‌شده کارت پایین را باز می‌کند</p>
+      <div class="demo-phone">
+        <div class="demo-head">
+          <h2 class="hz-h3">مراکز دامپزشکی</h2>
+          <div class="hz-segmented" role="tablist" aria-label="نمایش مراکز">
+            <button class="hz-segmented__item" type="button" role="tab" aria-selected="false" tabindex="-1"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"/></svg>فهرست</button>
+            <button class="hz-segmented__item" type="button" role="tab" aria-selected="true" tabindex="0"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M228.92,49.69a8,8,0,0,0-6.86-1.45L160.93,63.52,99.58,32.84a8,8,0,0,0-5.52-.6l-64,16A8,8,0,0,0,24,56V200a8,8,0,0,0,9.94,7.76l61.13-15.28,61.35,30.68A8.15,8.15,0,0,0,160,224a8,8,0,0,0,1.94-.24l64-16A8,8,0,0,0,232,200V56A8,8,0,0,0,228.92,49.69ZM104,52.94l48,24V203.06l-48-24ZM40,62.25l48-12v127.5l-48,12Zm176,131.5-48,12V78.25l48-12Z"/></svg>نقشه</button>
+          </div>
+        </div>
+        <div class="hz-map hz-map--fill" role="region" aria-label="نقشه مراکز دامپزشکی تهران">
+          <svg class="hz-map__canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="hz-map__street" stroke-width="3" d="M-160 -40L-90 540M-104 -40L-34 540M-48 -40L22 540M8 -40L78 540M64 -40L134 540M120 -40L190 540M176 -40L246 540M232 -40L302 540M288 -40L358 540M344 -40L414 540M400 -40L470 540M456 -40L526 540M512 -40L582 540M568 -40L638 540M624 -40L694 540M680 -40L750 540M736 -40L806 540M792 -40L862 540M848 -40L918 540M904 -40L974 540M-40 -40L840 -90M-40 6L840 -44M-40 52L840 2M-40 98L840 48M-40 144L840 94M-40 190L840 140M-40 236L840 186M-40 282L840 232M-40 328L840 278M-40 374L840 324M-40 420L840 370M-40 466L840 416M-40 512L840 462M-40 558L840 508"/><path class="hz-map__area" d="M520 60C600 40 690 80 700 150C710 220 640 250 580 230C520 210 480 120 520 60Z"/><path class="hz-map__area" d="M60 420C110 400 170 430 160 470C150 510 70 510 50 480C35 455 40 430 60 420Z"/><path class="hz-map__water" stroke-width="22" d="M-20 380C120 340 220 420 360 390S600 300 820 340"/><path class="hz-map__road-casing" stroke-width="15" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/><path class="hz-map__road" stroke-width="10" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/></svg>
+          <button class="hz-map__pin" type="button" aria-pressed="false" aria-label="۱، بیمارستان دامپزشکی مهرگان" style="inset-inline-start: 62%; inset-block-start: 30%"><span class="hz-map__pin-head" aria-hidden="true">۱</span></button>
+          <button class="hz-map__pin" type="button" aria-pressed="true" aria-label="۲، کلینیک دامپزشکی آوا" style="inset-inline-start: 34%; inset-block-start: 46%"><span class="hz-map__pin-head" aria-hidden="true">۲</span></button>
+          <button class="hz-map__pin" type="button" aria-pressed="false" aria-label="۳، مرکز ژنتیک همزیست" style="inset-inline-start: 74%; inset-block-start: 52%"><span class="hz-map__pin-head" aria-hidden="true">۳</span></button>
+          <div class="hz-map__controls"><button class="hz-icon-btn" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></button><button class="hz-icon-btn" type="button" aria-label="کوچک‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg></button></div>
+          <div class="hz-map__card" aria-live="polite">
+            <div class="demo-cardhead"><span class="hz-place__name">کلینیک دامپزشکی آوا</span><span class="hz-badge hz-badge--success hz-badge--sm"><span class="hz-badge__dot"></span>معتبر</span></div>
+            <span class="hz-place__meta">کلینیک دامپزشکی، تهران؛ ویزیت و معاینه، واکسیناسیون</span>
+            <a class="hz-link hz-link--standalone" href="#" style="min-height: 32px">مشاهده مرکز<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="demo-col">
+      <p class="demo-label"><b>یک مکان</b> — صفحه مرکز؛ پین نارنجی، بدون شماره؛ پیوند بیرونی به برنامه نقشه</p>
+      <div class="hz-map hz-map--wide" role="region" aria-label="موقعیت بیمارستان دامپزشکی مهرگان">
+        <svg class="hz-map__canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="hz-map__street" stroke-width="3" d="M-160 -40L-90 540M-104 -40L-34 540M-48 -40L22 540M8 -40L78 540M64 -40L134 540M120 -40L190 540M176 -40L246 540M232 -40L302 540M288 -40L358 540M344 -40L414 540M400 -40L470 540M456 -40L526 540M512 -40L582 540M568 -40L638 540M624 -40L694 540M680 -40L750 540M736 -40L806 540M792 -40L862 540M848 -40L918 540M904 -40L974 540M-40 -40L840 -90M-40 6L840 -44M-40 52L840 2M-40 98L840 48M-40 144L840 94M-40 190L840 140M-40 236L840 186M-40 282L840 232M-40 328L840 278M-40 374L840 324M-40 420L840 370M-40 466L840 416M-40 512L840 462M-40 558L840 508"/><path class="hz-map__area" d="M520 60C600 40 690 80 700 150C710 220 640 250 580 230C520 210 480 120 520 60Z"/><path class="hz-map__area" d="M60 420C110 400 170 430 160 470C150 510 70 510 50 480C35 455 40 430 60 420Z"/><path class="hz-map__water" stroke-width="22" d="M-20 380C120 340 220 420 360 390S600 300 820 340"/><path class="hz-map__road-casing" stroke-width="15" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/><path class="hz-map__road" stroke-width="10" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/></svg>
+        <span class="hz-map__pin hz-map__pin--place" role="img" aria-label="بیمارستان دامپزشکی مهرگان" style="inset-inline-start: 50%; inset-block-start: 52%"><span class="hz-map__pin-head" aria-hidden="true"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,56H176V48a24,24,0,0,0-24-24H104A24,24,0,0,0,80,48v8H40A16,16,0,0,0,24,72V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V72A16,16,0,0,0,216,56ZM96,48a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM216,200H40V72H216V200Zm-56-64a8,8,0,0,1-8,8H136v16a8,8,0,0,1-16,0V144H104a8,8,0,0,1,0-16h16V112a8,8,0,0,1,16,0v16h16A8,8,0,0,1,160,136Z"/></svg></span></span>
+        <div class="hz-map__controls"><button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="بزرگ‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg></button><button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="کوچک‌نمایی"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></svg></button></div>
+        <span class="hz-map__attrib">نقشه نمایشی</span>
+      </div>
+      <dl class="hz-kv">
+        <div class="hz-kv__row"><dt class="hz-kv__key">شهر</dt><dd class="hz-kv__value">تهران</dd></div>
+        <div class="hz-kv__row"><dt class="hz-kv__key">ساعت کار</dt><dd class="hz-kv__value">شنبه تا چهارشنبه ۹ تا ۲۱، پنجشنبه ۹ تا ۱۴</dd></div>
+      </dl>
+      <a class="hz-link hz-link--standalone" href="#">باز کردن در برنامه نقشه<svg class="hz-icon hz-icon--xs hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z"/></svg></a>
+    </section>
+  </div>
+
+  <section>
+    <p class="demo-label"><b>حالت‌ها</b> — نقشه هرگز تنها راه نیست: نشانی متنی و فهرست همیشه کامل‌اند</p>
+    <div class="demo-grid3">
+      <div class="hz-map" aria-busy="true">
+        <svg class="hz-map__canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="hz-map__street" stroke-width="3" d="M-160 -40L-90 540M-104 -40L-34 540M-48 -40L22 540M8 -40L78 540M64 -40L134 540M120 -40L190 540M176 -40L246 540M232 -40L302 540M288 -40L358 540M344 -40L414 540M400 -40L470 540M456 -40L526 540M512 -40L582 540M568 -40L638 540M624 -40L694 540M680 -40L750 540M736 -40L806 540M792 -40L862 540M848 -40L918 540M904 -40L974 540M-40 -40L840 -90M-40 6L840 -44M-40 52L840 2M-40 98L840 48M-40 144L840 94M-40 190L840 140M-40 236L840 186M-40 282L840 232M-40 328L840 278M-40 374L840 324M-40 420L840 370M-40 466L840 416M-40 512L840 462M-40 558L840 508"/><path class="hz-map__area" d="M520 60C600 40 690 80 700 150C710 220 640 250 580 230C520 210 480 120 520 60Z"/><path class="hz-map__area" d="M60 420C110 400 170 430 160 470C150 510 70 510 50 480C35 455 40 430 60 420Z"/><path class="hz-map__water" stroke-width="22" d="M-20 380C120 340 220 420 360 390S600 300 820 340"/><path class="hz-map__road-casing" stroke-width="15" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/><path class="hz-map__road" stroke-width="10" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/></svg>
+        <div class="hz-map__state"><span class="hz-spinner hz-spinner--lg" aria-hidden="true"></span><p class="hz-map__state-title">در حال بارگذاری نقشه</p></div>
+      </div>
+      <div class="hz-map" role="alert">
+        <div class="hz-map__state hz-state--error"><span class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg></span><p class="hz-map__state-title">نقشه بارگذاری نشد</p><p class="hz-map__state-body">فهرست مراکز کامل است و از آن استفاده کنید.</p><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg>تلاش دوباره</button></div>
+      </div>
+      <div class="hz-map">
+        <div class="hz-map__state"><span class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/></svg></span><p class="hz-map__state-title">موقعیت روی نقشه ثبت نشده</p><p class="hz-map__state-body">آزمایشگاه دامپزشکی نوین فقط نشانی متنی دارد.</p><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button">افزودن موقعیت</button></div>
+      </div>
+    </div>
+    <p class="demo-note" style="margin: 8px 0 0">سوم فقط برای مالک مرکز در فرم ویرایش؛ در صفحه عمومی، مرکز بدون مختصات اصلاً قاب نقشه نمی‌گیرد.</p>
+  </section>
+</div>
+<script>
+  document.querySelectorAll('.hz-map').forEach(function (map) {
+    map.addEventListener('click', function (e) {
+      var pin = e.target.closest('button.hz-map__pin');
+      if (!pin) return;
+      map.querySelectorAll('button.hz-map__pin').forEach(function (p) { p.setAttribute('aria-pressed', p === pin ? 'true' : 'false'); });
+    });
+  });
+</script>

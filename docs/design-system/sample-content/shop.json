@@ -1,0 +1,534 @@
+{
+  "sellers": [
+    {
+      "displayNameFa": "پت‌شاپ آریا",
+      "kind": "PET_SHOP",
+      "status": "ACTIVE",
+      "city": "کرج",
+      "shippingFee": {
+        "toman": 85000,
+        "displayFa": "۸۵٬۰۰۰ تومان"
+      },
+      "freeShippingThreshold": {
+        "toman": 1500000,
+        "displayFa": "۱٬۵۰۰٬۰۰۰ تومان"
+      },
+      "logo": {
+        "slot": "sellers/aria",
+        "ratio": "1:1",
+        "subject": "Simple shop logo placeholder",
+        "altFa": "نشان پت‌شاپ آریا"
+      }
+    },
+    {
+      "displayNameFa": "فروشگاه نمونه همزیست",
+      "kind": "VERIFIED_BUSINESS",
+      "status": "UNDER_REVIEW",
+      "city": "تهران",
+      "shippingFee": {
+        "toman": 95000,
+        "displayFa": "۹۵٬۰۰۰ تومان"
+      },
+      "freeShippingThreshold": {
+        "toman": 2000000,
+        "displayFa": "۲٬۰۰۰٬۰۰۰ تومان"
+      },
+      "logo": {
+        "slot": "sellers/sample",
+        "ratio": "1:1",
+        "subject": "Simple shop logo placeholder",
+        "altFa": "نشان فروشگاه نمونه"
+      }
+    }
+  ],
+  "products": [
+    {
+      "slug": "p-258281",
+      "nameFa": "غذای خشک سگ بالغ نژاد بزرگ",
+      "brandFa": "نوتری‌پت",
+      "categoryFa": "غذای خشک",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "پت‌شاپ آریا",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-6HA8HN",
+              "labelFa": "۳ کیلوگرم",
+              "price": {
+                "toman": 2850000,
+                "displayFa": "۲٬۸۵۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 24,
+              "stockReserved": 0
+            },
+            {
+              "sku": "SKU-P72YM6",
+              "labelFa": "۱۰ کیلوگرم",
+              "price": {
+                "toman": 3847000,
+                "displayFa": "۳٬۸۴۷٬۰۰۰ تومان"
+              },
+              "stockOnHand": 20,
+              "stockReserved": 1
+            },
+            {
+              "sku": "SKU-EJYCMV",
+              "labelFa": "۱۵ کیلوگرم",
+              "price": {
+                "toman": 4844000,
+                "displayFa": "۴٬۸۴۴٬۰۰۰ تومان"
+              },
+              "stockOnHand": 16,
+              "stockReserved": 2
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.6,
+      "ratingCount": 93,
+      "media": [
+        {
+          "slot": "products/غذای خشک سگ بالغ نژاد بزرگ",
+          "ratio": "1:1",
+          "subject": "غذای خشک سگ بالغ نژاد بزرگ packshot on a white background",
+          "altFa": "غذای خشک سگ بالغ نژاد بزرگ"
+        }
+      ]
+    },
+    {
+      "slug": "p-970073",
+      "nameFa": "غذای خشک توله‌سگ",
+      "brandFa": "نوتری‌پت",
+      "categoryFa": "غذای خشک",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "فروشگاه نمونه همزیست",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-DEERZX",
+              "labelFa": "۲ کیلوگرم",
+              "price": {
+                "toman": 1950000,
+                "displayFa": "۱٬۹۵۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 18,
+              "stockReserved": 0
+            },
+            {
+              "sku": "SKU-WJB3W9",
+              "labelFa": "۷ کیلوگرم",
+              "price": {
+                "toman": 2633000,
+                "displayFa": "۲٬۶۳۳٬۰۰۰ تومان"
+              },
+              "stockOnHand": 14,
+              "stockReserved": 1
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.4,
+      "ratingCount": 32,
+      "media": [
+        {
+          "slot": "products/غذای خشک توله‌سگ",
+          "ratio": "1:1",
+          "subject": "غذای خشک توله‌سگ packshot on a white background",
+          "altFa": "غذای خشک توله‌سگ"
+        }
+      ]
+    },
+    {
+      "slug": "p-439142",
+      "nameFa": "تشویقی تمرینی مرغ",
+      "brandFa": "بایت‌لند",
+      "categoryFa": "تشویقی و مکمل",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "پت‌شاپ آریا",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-7E8H2U",
+              "labelFa": "۱۰۰ گرم",
+              "price": {
+                "toman": 380000,
+                "displayFa": "۳۸۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 60,
+              "stockReserved": 0
+            },
+            {
+              "sku": "SKU-RHKP4E",
+              "labelFa": "۲۵۰ گرم",
+              "price": {
+                "toman": 513000,
+                "displayFa": "۵۱۳٬۰۰۰ تومان"
+              },
+              "stockOnHand": 56,
+              "stockReserved": 1
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.8,
+      "ratingCount": 97,
+      "media": [
+        {
+          "slot": "products/تشویقی تمرینی مرغ",
+          "ratio": "1:1",
+          "subject": "تشویقی تمرینی مرغ packshot on a white background",
+          "altFa": "تشویقی تمرینی مرغ"
+        }
+      ]
+    },
+    {
+      "slug": "p-479593",
+      "nameFa": "قلاده چرمی قابل تنظیم",
+      "brandFa": "لیدر",
+      "categoryFa": "قلاده و افسار",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "پت‌شاپ آریا",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-X7U3UY",
+              "labelFa": "S",
+              "price": {
+                "toman": 640000,
+                "displayFa": "۶۴۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 15,
+              "stockReserved": 0
+            },
+            {
+              "sku": "SKU-R7MVCF",
+              "labelFa": "M",
+              "price": {
+                "toman": 864000,
+                "displayFa": "۸۶۴٬۰۰۰ تومان"
+              },
+              "stockOnHand": 11,
+              "stockReserved": 1
+            },
+            {
+              "sku": "SKU-JA89PQ",
+              "labelFa": "L",
+              "price": {
+                "toman": 1088000,
+                "displayFa": "۱٬۰۸۸٬۰۰۰ تومان"
+              },
+              "stockOnHand": 7,
+              "stockReserved": 2
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.2,
+      "ratingCount": 104,
+      "media": [
+        {
+          "slot": "products/قلاده چرمی قابل تنظیم",
+          "ratio": "1:1",
+          "subject": "قلاده چرمی قابل تنظیم packshot on a white background",
+          "altFa": "قلاده چرمی قابل تنظیم"
+        }
+      ]
+    },
+    {
+      "slug": "p-273515",
+      "nameFa": "افسار ۵ متری جمع‌شو",
+      "brandFa": "لیدر",
+      "categoryFa": "قلاده و افسار",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "پت‌شاپ آریا",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-W33MUP",
+              "labelFa": "تا ۲۵ کیلوگرم",
+              "price": {
+                "toman": 1150000,
+                "displayFa": "۱٬۱۵۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 9,
+              "stockReserved": 0
+            },
+            {
+              "sku": "SKU-WVNMMP",
+              "labelFa": "تا ۵۰ کیلوگرم",
+              "price": {
+                "toman": 1553000,
+                "displayFa": "۱٬۵۵۳٬۰۰۰ تومان"
+              },
+              "stockOnHand": 5,
+              "stockReserved": 1
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.5,
+      "ratingCount": 35,
+      "media": [
+        {
+          "slot": "products/افسار ۵ متری جمع‌شو",
+          "ratio": "1:1",
+          "subject": "افسار ۵ متری جمع‌شو packshot on a white background",
+          "altFa": "افسار ۵ متری جمع‌شو"
+        }
+      ]
+    },
+    {
+      "slug": "p-346770",
+      "nameFa": "اسباب‌بازی طناب گره‌دار",
+      "brandFa": "پلی‌داگ",
+      "categoryFa": "اسباب‌بازی",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "فروشگاه نمونه همزیست",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-TMER6B",
+              "labelFa": "کوچک",
+              "price": {
+                "toman": 210000,
+                "displayFa": "۲۱۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 40,
+              "stockReserved": 0
+            },
+            {
+              "sku": "SKU-XYAMYS",
+              "labelFa": "بزرگ",
+              "price": {
+                "toman": 284000,
+                "displayFa": "۲۸۴٬۰۰۰ تومان"
+              },
+              "stockOnHand": 36,
+              "stockReserved": 1
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.1,
+      "ratingCount": 48,
+      "media": [
+        {
+          "slot": "products/اسباب‌بازی طناب گره‌دار",
+          "ratio": "1:1",
+          "subject": "اسباب‌بازی طناب گره‌دار packshot on a white background",
+          "altFa": "اسباب‌بازی طناب گره‌دار"
+        }
+      ]
+    },
+    {
+      "slug": "p-659958",
+      "nameFa": "شامپو ضدحساسیت",
+      "brandFa": "کلین‌پت",
+      "categoryFa": "بهداشت و آرایش",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "فروشگاه نمونه همزیست",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-P7E8X7",
+              "labelFa": "۲۵۰ میلی‌لیتر",
+              "price": {
+                "toman": 470000,
+                "displayFa": "۴۷۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 0,
+              "stockReserved": 0
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.3,
+      "ratingCount": 111,
+      "media": [
+        {
+          "slot": "products/شامپو ضدحساسیت",
+          "ratio": "1:1",
+          "subject": "شامپو ضدحساسیت packshot on a white background",
+          "altFa": "شامپو ضدحساسیت"
+        }
+      ]
+    },
+    {
+      "slug": "p-532892",
+      "nameFa": "تشک ارتوپدی سگ",
+      "brandFa": "سافت‌بد",
+      "categoryFa": "لوازم خواب و حمل",
+      "status": "PUBLISHED",
+      "offers": [
+        {
+          "sellerFa": "فروشگاه نمونه همزیست",
+          "condition": "NEW",
+          "conditionFa": "نو",
+          "skus": [
+            {
+              "sku": "SKU-BYQC7R",
+              "labelFa": "M",
+              "price": {
+                "toman": 3400000,
+                "displayFa": "۳٬۴۰۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 6,
+              "stockReserved": 0
+            },
+            {
+              "sku": "SKU-D6YS3K",
+              "labelFa": "L",
+              "price": {
+                "toman": 4590000,
+                "displayFa": "۴٬۵۹۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 2,
+              "stockReserved": 1
+            },
+            {
+              "sku": "SKU-GZ29X4",
+              "labelFa": "XL",
+              "price": {
+                "toman": 5780000,
+                "displayFa": "۵٬۷۸۰٬۰۰۰ تومان"
+              },
+              "stockOnHand": 2,
+              "stockReserved": 2
+            }
+          ]
+        }
+      ],
+      "ratingAvg": 4.7,
+      "ratingCount": 100,
+      "media": [
+        {
+          "slot": "products/تشک ارتوپدی سگ",
+          "ratio": "1:1",
+          "subject": "تشک ارتوپدی سگ packshot on a white background",
+          "altFa": "تشک ارتوپدی سگ"
+        }
+      ]
+    }
+  ],
+  "cart": {
+    "lines": 3,
+    "subtotal": {
+      "toman": 4120000,
+      "displayFa": "۴٬۱۲۰٬۰۰۰ تومان"
+    },
+    "shipping": {
+      "toman": 85000,
+      "displayFa": "۸۵٬۰۰۰ تومان"
+    },
+    "discount": {
+      "toman": 200000,
+      "displayFa": "۲۰۰٬۰۰۰ تومان"
+    },
+    "total": {
+      "toman": 4005000,
+      "displayFa": "۴٬۰۰۵٬۰۰۰ تومان"
+    },
+    "shippingBySeller": [
+      {
+        "sellerFa": "پت‌شاپ آریا",
+        "fee": {
+          "toman": 85000,
+          "displayFa": "۸۵٬۰۰۰ تومان"
+        },
+        "free": false
+      },
+      {
+        "sellerFa": "فروشگاه نمونه همزیست",
+        "fee": {
+          "toman": 0,
+          "displayFa": "رایگان"
+        },
+        "free": true,
+        "noteFa": "بالای ۲٬۰۰۰٬۰۰۰ تومان"
+      }
+    ],
+    "shippingRule": "Each shop ships its own sub-order. Cart shipping = sum of each shop's fee; each shop's freeShippingThreshold applies to that shop's items only. Reserved stock never exceeds stockOnHand."
+  },
+  "orders": [
+    {
+      "number": "سفارش 854Q6KUX",
+      "status": "PAID",
+      "placedAt": {
+        "iso": "2026-09-27T21:10:00+03:30",
+        "displayFa": "۵ مهر ۱۴۰۵، ۲۱:۱۰"
+      },
+      "total": {
+        "toman": 4005000,
+        "displayFa": "۴٬۰۰۵٬۰۰۰ تومان"
+      },
+      "subOrders": [
+        {
+          "sellerFa": "پت‌شاپ آریا",
+          "status": "SHIPPED",
+          "items": 2
+        },
+        {
+          "sellerFa": "فروشگاه نمونه همزیست",
+          "status": "PREPARING",
+          "items": 1
+        }
+      ]
+    },
+    {
+      "number": "سفارش Z8WWR5J4",
+      "status": "PAID",
+      "placedAt": {
+        "iso": "2026-09-12T13:40:00+03:30",
+        "displayFa": "۲۱ شهریور ۱۴۰۵، ۱۳:۴۰"
+      },
+      "total": {
+        "toman": 1150000,
+        "displayFa": "۱٬۱۵۰٬۰۰۰ تومان"
+      },
+      "subOrders": [
+        {
+          "sellerFa": "پت‌شاپ آریا",
+          "status": "RETURN_REQUESTED",
+          "items": 1
+        }
+      ]
+    }
+  ],
+  "review": {
+    "rating": 5,
+    "textFa": "بسته‌بندی مرتب بود و سگم با اشتها خورد.",
+    "authorFa": "سارا ا.",
+    "at": {
+      "iso": "2026-09-25T10:00:00+03:30",
+      "displayFa": "۱۴۰۵/۰۷/۰۳",
+      "longFa": "۳ مهر ۱۴۰۵"
+    }
+  },
+  "question": {
+    "textFa": "برای سگ ۸ ساله هم مناسب است؟",
+    "answerFa": "بله؛ برای سگ‌های مسن نسخه «سنیور» را پیشنهاد می‌کنیم.",
+    "status": "ANSWERED"
+  },
+  "note": "Brand names are invented. Product categories are admin-managed."
+}

@@ -1,0 +1,562 @@
+[
+ {
+  "file": "animals-animal-1.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ رکس",
+  "ds_blob": "ff67e933157d15136f141ac0ce6b95a5",
+  "canvas_blob": "5a15e1e244a38791d365ef809ab257cb"
+ },
+ {
+  "file": "animals-animal-2.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ لونا",
+  "ds_blob": "49d9b5c8d9e8feef40eb8f47f11e9759",
+  "canvas_blob": "660d45c5e59a6266e8591c460fdf4714"
+ },
+ {
+  "file": "animals-animal-3.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ آرا",
+  "ds_blob": "5bb8a2b6a8545704e178adc0f74cc8f1",
+  "canvas_blob": "ce531220026197e6776ea356c75e50e4"
+ },
+ {
+  "file": "animals-animal-4.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ تارا",
+  "ds_blob": "579ce11793fb8bd7d2f22dd5ba170ac0",
+  "canvas_blob": "fb9f43de7592896e8fc2d9e282fb432f"
+ },
+ {
+  "file": "animals-animal-5.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ مکس",
+  "ds_blob": "8ff3f9852c5129a01b72d59a2b013d1a",
+  "canvas_blob": "cde1680c7a0613974bfb6cf10664039a"
+ },
+ {
+  "file": "animals-animal-6.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ بلا",
+  "ds_blob": "a35f4f539730bc996b87162e13be35db",
+  "canvas_blob": "96e109f3d874a87e19e619b244d54585"
+ },
+ {
+  "file": "animals-animal-7.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ رعد",
+  "ds_blob": "827405d8a970908e584f542835387b1a",
+  "canvas_blob": "b733be662ad3076b5149afdd7bba3f3a"
+ },
+ {
+  "file": "animals-animal-8.jpg",
+  "ratio": "4:3",
+  "altFa": "گربه شیرین",
+  "ds_blob": "5bcb0307aee229d9435cf6e881570e9e",
+  "canvas_blob": "82187a75494b6f83640739e72250ceaa"
+ },
+ {
+  "file": "breeds-beagle.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد بیگل",
+  "ds_blob": "c7810b741c33b05b4ed2c9cfeca73197",
+  "canvas_blob": "0889ba2c8b78d438e011d444b31c96dd"
+ },
+ {
+  "file": "breeds-doberman-pinscher.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد دوبرمن پینشر",
+  "ds_blob": "c3ab7dadb1ffd603af7aeca10453b262",
+  "canvas_blob": "ed6db729ba1538bdfa39f73cc3f8fb0b"
+ },
+ {
+  "file": "breeds-german-shepherd.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد ژرمن شپرد",
+  "ds_blob": "ad9f4d0f480006d3e885551f62f46392",
+  "canvas_blob": "c8bb2909b9c7b271cd5b84c3d179635d"
+ },
+ {
+  "file": "breeds-golden-retriever.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد گلدن رتریور",
+  "ds_blob": "ed2b82d053d92764a13305f1c6db9baa",
+  "canvas_blob": "c1189e062f60ea132a28ce14bd040b2d"
+ },
+ {
+  "file": "breeds-labrador-retriever.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد لابرادور رتریور",
+  "ds_blob": "a694690e57e7f5172c84fd1e3eca17d0",
+  "canvas_blob": "3db65ee8e9e60d19d3792707a6d80963"
+ },
+ {
+  "file": "breeds-poodle.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد پودل",
+  "ds_blob": "768dd7e97bb0943bbf8dd6b24e0967f1",
+  "canvas_blob": "6fc688b26308b2b7ddc9348dbe55db5f"
+ },
+ {
+  "file": "breeds-rottweiler.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد روتوایلر",
+  "ds_blob": "dabe1a24d274be787d4db13078dbec1c",
+  "canvas_blob": "9be014a76909cda026c8a1cae1af5aae"
+ },
+ {
+  "file": "breeds-sarabi-dog.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد سگ سرابی",
+  "ds_blob": "e33ac8346004c2f81f36c11a21f00470",
+  "canvas_blob": "b7fea67587551e1bd4cc5a4bbfe748c2"
+ },
+ {
+  "file": "breeds-shih-tzu.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد شیتزو",
+  "ds_blob": "6de6fa3229debe23631996ffe4c5b5d0",
+  "canvas_blob": "526aba7ca254249b4a653afaefd5eb2b"
+ },
+ {
+  "file": "breeds-siberian-husky.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ نژاد هاسکی سیبری",
+  "ds_blob": "c45985e5c06ac305e7513c06bf14201f",
+  "canvas_blob": "14af32a582fac9c6072467026372d679"
+ },
+ {
+  "file": "centres-centre-1.jpg",
+  "ratio": "16:9",
+  "altFa": "نمای بیمارستان دامپزشکی مهرگان",
+  "ds_blob": "a136e84c5b615b40aba88dace883bde4",
+  "canvas_blob": "1f21f56ae8f27af5e719897712df856d"
+ },
+ {
+  "file": "centres-centre-2.jpg",
+  "ratio": "16:9",
+  "altFa": "نمای کلینیک دامپزشکی آوا",
+  "ds_blob": "903105ca857cb35612c561bd387571fb",
+  "canvas_blob": "9001eaef41550f72720701f213d7a42f"
+ },
+ {
+  "file": "centres-centre-3.jpg",
+  "ratio": "16:9",
+  "altFa": "نمای درمانگاه دامپزشکی پارس",
+  "ds_blob": "3a236d8fcafe2b943b2aefca35b8fce7",
+  "canvas_blob": "ac58f1ef83421f0363d9315258a59740"
+ },
+ {
+  "file": "centres-centre-4.jpg",
+  "ratio": "16:9",
+  "altFa": "نمای آزمایشگاه دامپزشکی نوین",
+  "ds_blob": "96669cd639b68847a4cc2af04c6d1198",
+  "canvas_blob": "2d8515255702b214e0c8129fb9580f5d"
+ },
+ {
+  "file": "centres-centre-5.jpg",
+  "ratio": "16:9",
+  "altFa": "نمای مرکز ژنتیک همزیست",
+  "ds_blob": "47cc43ed094dab22de0af50fd0fc8dc2",
+  "canvas_blob": "5d62fabf95e1a7c7aaaa7a3f3eaa5f63"
+ },
+ {
+  "file": "communities-community-1.jpg",
+  "ratio": "16:9",
+  "altFa": "تصویر انجمن سگ‌های اصیل ایران",
+  "ds_blob": "4c083f8dfeaec89aad80332099f527c8",
+  "canvas_blob": "5ac33ec8a5f1c236aeb7e75e565f54c6"
+ },
+ {
+  "file": "communities-community-2.jpg",
+  "ratio": "16:9",
+  "altFa": "تصویر انجمن دوستداران حیوانات خانگی اصفهان",
+  "ds_blob": "30ccb07449c6f0d61763a6f49869410f",
+  "canvas_blob": "8d34d4d383a4781623fc09b108f596e7"
+ },
+ {
+  "file": "communities-community-3.jpg",
+  "ratio": "16:9",
+  "altFa": "تصویر کلاب ژرمن شپرد ایران",
+  "ds_blob": "9aa10a5808132bd373b0ede59f6dbbe0",
+  "canvas_blob": "377001bee53c547f75bedfaa34f11db4"
+ },
+ {
+  "file": "communities-community-4.jpg",
+  "ratio": "16:9",
+  "altFa": "تصویر کلاب رتریورهای تهران",
+  "ds_blob": "ce09af0677667ad1dd1471add924cdfc",
+  "canvas_blob": "9f8d2ed317879ad8ef8fc8c66ae284a2"
+ },
+ {
+  "file": "communities-community-5.jpg",
+  "ratio": "16:9",
+  "altFa": "تصویر کلاب سگ سرابی",
+  "ds_blob": "93559d35dfea9741a67c77a2b6b63bac",
+  "canvas_blob": "fa3ecae76108e27710a6edf8a1640b4e"
+ },
+ {
+  "file": "content-article-3492.jpg",
+  "ratio": "16:9",
+  "altFa": "ژرمن شپرد در حال دویدن",
+  "ds_blob": "70e2d380e0e06dd9f973b1efd133fdb2",
+  "canvas_blob": "a21620d6c2612be9253b9f4a6ee0b695"
+ },
+ {
+  "file": "content-article-4654.jpg",
+  "ratio": "16:9",
+  "altFa": "صاحب سگ در پذیرش کلینیک",
+  "ds_blob": "867a70aa8b3409c65c06122335a965f0",
+  "canvas_blob": "83587c85d8dfd487b43cf1ac9a2d8084"
+ },
+ {
+  "file": "content-article-5274.jpg",
+  "ratio": "16:9",
+  "altFa": "شجره‌نامه کنار پنجه سگ",
+  "ds_blob": "13243c0ccd530c629ff87c5408536e43",
+  "canvas_blob": "fcc0995341cda801c48053e393ef1f68"
+ },
+ {
+  "file": "content-article-544.jpg",
+  "ratio": "16:9",
+  "altFa": "دامپزشک در حال معاینه گلدن رتریور",
+  "ds_blob": "f27cc8aba8441c9a863f3217c64abe25",
+  "canvas_blob": "5f7330c77cae7c52d51b8b8a598c889a"
+ },
+ {
+  "file": "content-article-5461.jpg",
+  "ratio": "16:9",
+  "altFa": "دو سگ هم‌نژاد در باغ",
+  "ds_blob": "d2c50d425c2044fb8667f1d3371d757e",
+  "canvas_blob": "eee8b243b7029793f470137d9b2a1205"
+ },
+ {
+  "file": "content-article-6617.jpg",
+  "ratio": "16:9",
+  "altFa": "دامپزشک در حال خواندن میکروچیپ سگ",
+  "ds_blob": "f4b2ce164c594c55105c6f07b290df61",
+  "canvas_blob": "001256ce544b0b702abe878fbf44d05c"
+ },
+ {
+  "file": "content-club_post-7601.jpg",
+  "ratio": "16:9",
+  "altFa": "تمرین اطاعت‌پذیری در پارک",
+  "ds_blob": "a9593c8624ac5e57e33e890f32ff6cf3",
+  "canvas_blob": "06eeea748b69a18667022087928f1d6f"
+ },
+ {
+  "file": "content-news-1195.jpg",
+  "ratio": "16:9",
+  "altFa": "رینگ نمایشگاه سگ",
+  "ds_blob": "f4f6ec4e91899beb1caa181ceb82c5ec",
+  "canvas_blob": "d8fdbeb2881b0e6ee841b9acf511434e"
+ },
+ {
+  "file": "content-news-3448.jpg",
+  "ratio": "16:9",
+  "altFa": "پیاده‌روی گروهی با ژرمن شپردها",
+  "ds_blob": "a9e0f87f157ce499e14cb3f7fe91f856",
+  "canvas_blob": "b60e9bd2b86f64867acf0ce212bb4107"
+ },
+ {
+  "file": "content-news-8066.jpg",
+  "ratio": "16:9",
+  "altFa": "واکسیناسیون توله‌سگ",
+  "ds_blob": "3a315ce92c9b13459405b140905bed5e",
+  "canvas_blob": "50fe9059d6c0b55e93da41166f8e3294"
+ },
+ {
+  "file": "content-news-9641.jpg",
+  "ratio": "16:9",
+  "altFa": "سگ سرابی روی تپه",
+  "ds_blob": "fc4688d19c37ec877fbf18958ca581c5",
+  "canvas_blob": "087aa3fbd6e23743450e11680ed63fac"
+ },
+ {
+  "file": "hamzist-lockup-fa-horizontal.svg",
+  "ratio": "",
+  "altFa": "همزیست",
+  "ds_blob": "4a86ff18362a556060070f550904a7de",
+  "canvas_blob": "25399b32fbd55275483206a1d7fe3b76"
+ },
+ {
+  "file": "hamzist-symbol.svg",
+  "ratio": "",
+  "altFa": "",
+  "ds_blob": "391cfce1e4110f5ae05658b45da1a74d",
+  "canvas_blob": "5f79dfc386626cfec6de6f1a954fadae"
+ },
+ {
+  "file": "home-hero-cat-owner.jpg",
+  "ratio": "16:9",
+  "altFa": "زنی با گربه خاکستری‌اش کنار پنجره آفتابی خانه",
+  "ds_blob": "d44e1b7c4294e0393be609f220f580bf",
+  "canvas_blob": "cb31b43f1d32cc7851268baf9c8f7e2a"
+ },
+ {
+  "file": "home-hero-sarabi-courtyard.jpg",
+  "ratio": "16:9",
+  "altFa": "مردی کنار سگ سرابی‌اش در حیاط باغ ایرانی",
+  "ds_blob": "bf715178474b120058174b82c195dd14",
+  "canvas_blob": "2f19a2c5ae427979aad527c152b03190"
+ },
+ {
+  "file": "listings-adult-beagle-1.jpg",
+  "ratio": "4:3",
+  "altFa": "بیگل — تمام‌قد",
+  "ds_blob": "e760a93f769edd36374da6cf9afca13e",
+  "canvas_blob": "d75213bedd9c72c53b1e1f77b180bcfb"
+ },
+ {
+  "file": "listings-adult-beagle-2.jpg",
+  "ratio": "4:3",
+  "altFa": "بیگل — چهره",
+  "ds_blob": "de7e0b9b6fd8b0919a09b1643568743d",
+  "canvas_blob": "4a90ae2a9ce5dac888e9cb1926d6d583"
+ },
+ {
+  "file": "listings-german-shepherd-puppy-1.jpg",
+  "ratio": "4:3",
+  "altFa": "ژرمن شپرد — تمام‌قد",
+  "ds_blob": "863ed31d509e8eb0dfdd55c8f6c4448e",
+  "canvas_blob": "889a59ad09a23871fd6d7ed8b983c66e"
+ },
+ {
+  "file": "listings-german-shepherd-puppy-2.jpg",
+  "ratio": "4:3",
+  "altFa": "ژرمن شپرد — چهره",
+  "ds_blob": "b188b816994ae94d13a525e42bdc1df1",
+  "canvas_blob": "b7f4a6cab7d3b2a342d0c68eee7e2705"
+ },
+ {
+  "file": "listings-golden-retriever-puppy-1.jpg",
+  "ratio": "4:3",
+  "altFa": "گلدن رتریور — تمام‌قد",
+  "ds_blob": "c4856ee31818ba5c87a9026f20d1ff6b",
+  "canvas_blob": "6153470a142e99a444c5c5f95945d712"
+ },
+ {
+  "file": "listings-golden-retriever-puppy-2.jpg",
+  "ratio": "4:3",
+  "altFa": "گلدن رتریور — چهره",
+  "ds_blob": "460291e96225f400f197ebea73d7c01c",
+  "canvas_blob": "cfe7bb67671eb81b0e62fd37de9a300c"
+ },
+ {
+  "file": "listings-sarabi-puppy-1.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ سرابی — تمام‌قد",
+  "ds_blob": "59477c5b0b9797f1499a30e28b9f9b3e",
+  "canvas_blob": "68ef2cdddba781eacdb7df414a8171dc"
+ },
+ {
+  "file": "listings-sarabi-puppy-2.jpg",
+  "ratio": "4:3",
+  "altFa": "سگ سرابی — چهره",
+  "ds_blob": "a7bbed512a68be4d772189b53b2de83b",
+  "canvas_blob": "fd139cfb034abf0fb9e8ad239bfe0d74"
+ },
+ {
+  "file": "listings-shih-tzu-puppy-1.jpg",
+  "ratio": "4:3",
+  "altFa": "شیتزو — تمام‌قد",
+  "ds_blob": "06ab770bcb6bb69772ba2919d04aeda4",
+  "canvas_blob": "410b82d9d1966b62b0a69a70c4ce2825"
+ },
+ {
+  "file": "listings-shih-tzu-puppy-2.jpg",
+  "ratio": "4:3",
+  "altFa": "شیتزو — چهره",
+  "ds_blob": "43f88391d79a7eca10cd9b7a699f71c0",
+  "canvas_blob": "bf9dec5785b521903ba8939621112c3b"
+ },
+ {
+  "file": "listings-young-husky-1.jpg",
+  "ratio": "4:3",
+  "altFa": "هاسکی سیبری — تمام‌قد",
+  "ds_blob": "9d36ed5348169c350a887c2aab159d1f",
+  "canvas_blob": "17ce73ba152dc60527916a65ce3e9736"
+ },
+ {
+  "file": "listings-young-husky-2.jpg",
+  "ratio": "4:3",
+  "altFa": "هاسکی سیبری — چهره",
+  "ds_blob": "a54414abad523f74e6a53641c5f4e8e1",
+  "canvas_blob": "b8780ffc240b9137ec21c4a43e93241d"
+ },
+ {
+  "file": "people-acc-admin-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل امیر حسینی",
+  "ds_blob": "4611c16c205f1af7aa5485639e57450c",
+  "canvas_blob": "4b70b57632af6b85d825cec41f4e4f56"
+ },
+ {
+  "file": "people-acc-assoc-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل حمید نوروزی",
+  "ds_blob": "d30be0f0f23bd3b08ae65563e10c6aa2",
+  "canvas_blob": "60309648cd2d4a43616a0840e86f55ec"
+ },
+ {
+  "file": "people-acc-author-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل نگار رستمی",
+  "ds_blob": "ef0525ea6abd8132128ec6310f8b2df2",
+  "canvas_blob": "6d05bebd933f5cae072bc9150574a591"
+ },
+ {
+  "file": "people-acc-breeder-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل رضا کریمی",
+  "ds_blob": "3cdf8aa8541f7c0118fa4f9e06971149",
+  "canvas_blob": "cdd039816e01a4037b467455e68129db"
+ },
+ {
+  "file": "people-acc-breeder-2.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل بهرام فراهانی",
+  "ds_blob": "86694f6d5407e2309178a64583f0f25f",
+  "canvas_blob": "bbe3deccadfc20f6ea6453b02453edcc"
+ },
+ {
+  "file": "people-acc-genetics-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل لیلا موسوی",
+  "ds_blob": "d1061f5e6dd1ddff74b5c672dfc8cca8",
+  "canvas_blob": "798815add0b7ddae1a9e6674b70b036d"
+ },
+ {
+  "file": "people-acc-owner-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل سارا احمدی",
+  "ds_blob": "543bda6cd3f1946f88896f43a9822b4f",
+  "canvas_blob": "d4ddc45424c20b69ccf8be2bc1b2217d"
+ },
+ {
+  "file": "people-acc-owner-2.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل علی رضایی",
+  "ds_blob": "13e98458a4d646d430a42d4812e5e7ea",
+  "canvas_blob": "3145049ab08d4abb426531761281ab36"
+ },
+ {
+  "file": "people-acc-owner-3.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل مینا جعفری",
+  "ds_blob": "9abc9b27cbe37ac899fadd7f35d67ac0",
+  "canvas_blob": "681cf34cb2ae1598e4e89474a0560125"
+ },
+ {
+  "file": "people-acc-vet-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر پروفایل مریم صادقی",
+  "ds_blob": "4d810cf983787f5ee7b54afd1e428ac4",
+  "canvas_blob": "9941c8c551dbc47840a4ee34b7441071"
+ },
+ {
+  "file": "products-chicken-training-treats.jpg",
+  "ratio": "1:1",
+  "altFa": "تشویقی تمرینی مرغ",
+  "ds_blob": "4378d5c1e1092f7cd157d8dab849dba0",
+  "canvas_blob": "109a98c2d93b7cfd5ba24704fab8a836"
+ },
+ {
+  "file": "products-dry-food-large-adult.jpg",
+  "ratio": "1:1",
+  "altFa": "غذای خشک سگ بالغ نژاد بزرگ",
+  "ds_blob": "a6bd8a2ec566a2d6388ea90b69172031",
+  "canvas_blob": "60ff3acaa20652d7befbd148300dcbe1"
+ },
+ {
+  "file": "products-dry-food-puppy.jpg",
+  "ratio": "1:1",
+  "altFa": "غذای خشک توله‌سگ",
+  "ds_blob": "d6b85ea3bf2b6695def0dbdde5b0becc",
+  "canvas_blob": "368bb0d0eb84a10a2ada85b2871c9293"
+ },
+ {
+  "file": "products-hypoallergenic-shampoo.jpg",
+  "ratio": "1:1",
+  "altFa": "شامپو ضدحساسیت",
+  "ds_blob": "611291d8a6e66f2c1f547fdb25b149b9",
+  "canvas_blob": "1b9551ce2bc43a9ac3676a55bcc01b10"
+ },
+ {
+  "file": "products-knotted-rope-toy.jpg",
+  "ratio": "1:1",
+  "altFa": "اسباب‌بازی طناب گره‌دار",
+  "ds_blob": "79298d317d339bd4c916e83e98ed2dd5",
+  "canvas_blob": "6220d738cedc5ab00b2163c9476c4f5c"
+ },
+ {
+  "file": "products-leather-collar.jpg",
+  "ratio": "1:1",
+  "altFa": "قلاده چرمی قابل تنظیم",
+  "ds_blob": "0a3f0d95e16a6e9f30528c900e55f3aa",
+  "canvas_blob": "a1acaec29358a4c944d0000048fa6d31"
+ },
+ {
+  "file": "products-orthopedic-bed.jpg",
+  "ratio": "1:1",
+  "altFa": "تشک ارتوپدی سگ",
+  "ds_blob": "4352a0c95d1723417bbbc599c0e68ca0",
+  "canvas_blob": "b8c3fc4f5c57ecbebb94da52e487636c"
+ },
+ {
+  "file": "products-retractable-leash-5m.jpg",
+  "ratio": "1:1",
+  "altFa": "افسار ۵ متری جمع‌شو",
+  "ds_blob": "680db9d87ba3d0181a61943027ba409b",
+  "canvas_blob": "abe26112422d9d58163ba05e72a384bf"
+ },
+ {
+  "file": "sample-hero-dog.jpg",
+  "ratio": "16:9",
+  "altFa": "زنی با گربه و سگ ژرمن شپرد روی مبل خانه",
+  "ds_blob": "77f21a9fa12787cc663f8eae329db80d",
+  "canvas_blob": "e743e43c4a063dd0c435a663fe67d158"
+ },
+ {
+  "file": "vets-vet-1.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر دکتر مریم صادقی",
+  "ds_blob": "661b27409654d85500b71a31ac46b28c",
+  "canvas_blob": "d62cfc2f904b807692b1ddd48c50e6a0"
+ },
+ {
+  "file": "vets-vet-2.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر دکتر کیوان شریفی",
+  "ds_blob": "61d96f1239365b1b4a09406f90d97356",
+  "canvas_blob": "87a4cd67d9e2f084df173912a6298594"
+ },
+ {
+  "file": "vets-vet-3.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر دکتر الهام نادری",
+  "ds_blob": "7ca257f35caf960851946a18a3bb510c",
+  "canvas_blob": "80fb2d5f12a6e8f2cd3a7091c5b82771"
+ },
+ {
+  "file": "vets-vet-4.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر دکتر بابک امینی",
+  "ds_blob": "09ae425b40b8d526e22959aca3235278",
+  "canvas_blob": "5fb9a7e622cd8fff22b9d1000518cc8a"
+ },
+ {
+  "file": "vets-vet-5.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر دکتر نسرین طاهری",
+  "ds_blob": "64c7b8867f5f9ba3f2c885968c454d5e",
+  "canvas_blob": "d9bb4ce5687665daec2f5a8c14b226be"
+ },
+ {
+  "file": "vets-vet-6.jpg",
+  "ratio": "1:1",
+  "altFa": "تصویر دکتر پویا مرادی",
+  "ds_blob": "e7396bc4a58d559262239cf716726272",
+  "canvas_blob": "d2d94ba01b7d2fa1132c97f8371de329"
+ }
+]

@@ -1,0 +1,74 @@
+<!-- @dsCard group="Inputs" height=960 width=900 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .demo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px; }
+  .demo-cell { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <div class="demo-grid">
+      <div class="demo-cell">
+        <p class="demo-label">بدون نقشه — ورود دستی همیشه کامل است</p>
+        <fieldset class="hz-fieldset hz-location">
+          <legend class="hz-field__label" style="margin-block-end:8px">نشانی کنل</legend>
+          <div class="hz-location__row">
+            <div class="hz-field"><label class="hz-field__label" for="l-1">استان<span class="hz-field__req" aria-hidden="true">*</span></label><span class="hz-select-wrap"><select class="hz-select" id="l-1" required><option>البرز</option><option>تهران</option><option>اصفهان</option></select></span></div>
+            <div class="hz-field"><label class="hz-field__label" for="l-2">شهر<span class="hz-field__req" aria-hidden="true">*</span></label><span class="hz-select-wrap"><select class="hz-select" id="l-2" required><option>کرج</option></select></span></div>
+          </div>
+          <div class="hz-field"><label class="hz-field__label" for="l-3">نشانی<span class="hz-field__req" aria-hidden="true">*</span></label><textarea class="hz-textarea" id="l-3" rows="3" aria-describedby="l-3-h">عظیمیه، میدان مهران، خیابان ارغوان، کوچه سوم، پلاک ۱۲</textarea><div class="hz-field__hint" id="l-3-h">همین نشانی در صفحه عمومی کنل نمایش داده می‌شود.</div></div>
+          <div><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button" style="margin-inline-start:-14px"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/></svg>افزودن موقعیت روی نقشه (اختیاری)</button></div>
+        </fieldset>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">با نقشه — نشانگر گذاشته شده · فوکوس روی «جابه‌جایی نشانگر»</p>
+        <div class="hz-location__map">
+          <span class="hz-field__label" id="l-map-l">موقعیت روی نقشه <span class="hz-field__opt">(اختیاری)</span></span>
+          <div class="hz-map hz-map--wide" role="region" aria-labelledby="l-map-l">
+            <svg class="hz-map__canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="hz-map__street" stroke-width="3" d="M-160 -40L-90 540M-104 -40L-34 540M-48 -40L22 540M8 -40L78 540M64 -40L134 540M120 -40L190 540M176 -40L246 540M232 -40L302 540M288 -40L358 540M344 -40L414 540M400 -40L470 540M456 -40L526 540M512 -40L582 540M568 -40L638 540M624 -40L694 540M680 -40L750 540M736 -40L806 540M792 -40L862 540M848 -40L918 540M904 -40L974 540M-40 -40L840 -90M-40 6L840 -44M-40 52L840 2M-40 98L840 48M-40 144L840 94M-40 190L840 140M-40 236L840 186M-40 282L840 232M-40 328L840 278M-40 374L840 324M-40 420L840 370M-40 466L840 416M-40 512L840 462M-40 558L840 508"/><path class="hz-map__area" d="M520 60C600 40 690 80 700 150C710 220 640 250 580 230C520 210 480 120 520 60Z"/><path class="hz-map__area" d="M60 420C110 400 170 430 160 470C150 510 70 510 50 480C35 455 40 430 60 420Z"/><path class="hz-map__water" stroke-width="22" d="M-20 380C120 340 220 420 360 390S600 300 820 340"/><path class="hz-map__road-casing" stroke-width="15" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/><path class="hz-map__road" stroke-width="10" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/></svg>
+            <span class="hz-map__pin hz-map__pin--place" role="img" aria-label="موقعیت کنل" style="inset-inline-start: 50%; inset-block-start: 54%"><span class="hz-map__pin-head" aria-hidden="true"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg></span></span>
+            <span class="hz-map__attrib">نقشه نمایشی</span>
+          </div>
+          <div class="hz-location__bar">
+            <span class="hz-location__coords" id="l-map-c"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M232,120h-8.34A96.14,96.14,0,0,0,136,32.34V24a8,8,0,0,0-16,0v8.34A96.14,96.14,0,0,0,32.34,120H24a8,8,0,0,0,0,16h8.34A96.14,96.14,0,0,0,120,223.66V232a8,8,0,0,0,16,0v-8.34A96.14,96.14,0,0,0,223.66,136H232a8,8,0,0,0,0-16Zm-96,87.6V200a8,8,0,0,0-16,0v7.6A80.15,80.15,0,0,1,48.4,136H56a8,8,0,0,0,0-16H48.4A80.15,80.15,0,0,1,120,48.4V56a8,8,0,0,0,16,0V48.4A80.15,80.15,0,0,1,207.6,120H200a8,8,0,0,0,0,16h7.6A80.15,80.15,0,0,1,136,207.6ZM128,88a40,40,0,1,0,40,40A40,40,0,0,0,128,88Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,152Z"/></svg><bdi class="hz-id" dir="ltr">35.8411, 50.9391</bdi></span>
+            <span class="hz-location__actions"><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button" aria-describedby="l-map-c" style="outline:2px solid var(--focus-ring);outline-offset:2px">جابه‌جایی نشانگر</button><button class="hz-icon-btn hz-icon-btn--sm" type="button" aria-label="حذف موقعیت از نقشه"><svg class="hz-icon hz-icon--sm" viewBox="0 0 256 256" aria-hidden="true"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></button></span>
+          </div>
+          <div class="hz-field__hint">نقشه فقط کمک است؛ اگر حذفش کنید، نشانی دستی بالا کافی است. مختصات را خودتان نمی‌نویسید.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <p class="demo-label">حالت‌ها</p>
+    <div class="demo-grid demo-grid--3">
+      <div class="demo-cell">
+        <p class="demo-label">نقشه خالی</p>
+        <div class="hz-map hz-map--wide">
+          <svg class="hz-map__canvas" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path class="hz-map__street" stroke-width="3" d="M-160 -40L-90 540M-104 -40L-34 540M-48 -40L22 540M8 -40L78 540M64 -40L134 540M120 -40L190 540M176 -40L246 540M232 -40L302 540M288 -40L358 540M344 -40L414 540M400 -40L470 540M456 -40L526 540M512 -40L582 540M568 -40L638 540M624 -40L694 540M680 -40L750 540M736 -40L806 540M792 -40L862 540M848 -40L918 540M904 -40L974 540M-40 -40L840 -90M-40 6L840 -44M-40 52L840 2M-40 98L840 48M-40 144L840 94M-40 190L840 140M-40 236L840 186M-40 282L840 232M-40 328L840 278M-40 374L840 324M-40 420L840 370M-40 466L840 416M-40 512L840 462M-40 558L840 508"/><path class="hz-map__area" d="M520 60C600 40 690 80 700 150C710 220 640 250 580 230C520 210 480 120 520 60Z"/><path class="hz-map__area" d="M60 420C110 400 170 430 160 470C150 510 70 510 50 480C35 455 40 430 60 420Z"/><path class="hz-map__water" stroke-width="22" d="M-20 380C120 340 220 420 360 390S600 300 820 340"/><path class="hz-map__road-casing" stroke-width="15" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/><path class="hz-map__road" stroke-width="10" d="M-20 140L260 170L520 300L820 280M300 -20L330 160L300 520M120 -20C180 160 140 320 220 520"/></svg>
+          <div class="hz-map__state hz-state--compact"><p class="hz-map__state-title">موقعیتی روی نقشه انتخاب نشده</p><p class="hz-map__state-body">اختیاری است؛ نشانی دستی کافی است.</p><button class="hz-btn hz-btn--secondary hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/></svg>انتخاب روی نقشه</button></div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">نقشه بارگذاری نشد</p>
+        <div class="hz-map hz-map--wide" role="alert">
+          <div class="hz-map__state hz-state--compact hz-state--error"><span class="hz-state__icon"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M228.92,49.69a8,8,0,0,0-6.86-1.45L160.93,63.52,99.58,32.84a8,8,0,0,0-5.52-.6l-64,16A8,8,0,0,0,24,56V200a8,8,0,0,0,9.94,7.76l61.13-15.28,61.35,30.68A8.15,8.15,0,0,0,160,224a8,8,0,0,0,1.94-.24l64-16A8,8,0,0,0,232,200V56A8,8,0,0,0,228.92,49.69ZM104,52.94l48,24V203.06l-48-24ZM40,62.25l48-12v127.5l-48,12Zm176,131.5-48,12V78.25l48-12Z"/></svg></span><p class="hz-map__state-title">نقشه بارگذاری نشد</p><p class="hz-map__state-body">نشانی دستی برای ثبت کافی است.</p><button class="hz-btn hz-btn--ghost hz-btn--sm" type="button"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M240,56v48a8,8,0,0,1-8,8H184a8,8,0,0,1,0-16H211.4L184.81,71.64l-.25-.24a80,80,0,1,0-1.67,114.78,8,8,0,0,1,11,11.63A95.44,95.44,0,0,1,128,224h-1.32A96,96,0,1,1,195.75,60L224,85.8V56a8,8,0,1,1,16,0Z"/></svg>تلاش دوباره</button></div>
+        </div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">خطا — نشانی ناقص</p>
+        <div class="hz-field"><label class="hz-field__label" for="l-4">نشانی<span class="hz-field__req" aria-hidden="true">*</span></label><textarea class="hz-textarea" id="l-4" rows="3" aria-invalid="true" aria-describedby="l-4-e">کرج</textarea><div class="hz-field__error" id="l-4-e"><svg class="hz-icon hz-icon--xs" viewBox="0 0 256 256" aria-hidden="true"><path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,144V104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,180Z"/></svg><span>نشانی کامل را بنویسید: محله، خیابان و پلاک.</span></div></div>
+      </div>
+      <div class="demo-cell">
+        <p class="demo-label">غیرفعال — پس از تأیید</p>
+        <div class="hz-field"><label class="hz-field__label" for="l-5">شهر</label><span class="hz-select-wrap"><select class="hz-select" id="l-5" disabled aria-describedby="l-5-h"><option>کرج</option></select></span><div class="hz-field__hint" id="l-5-h">شهر کنل پس از تأیید انجمن فقط با درخواست اصلاح تغییر می‌کند.</div></div>
+      </div>
+      <div class="demo-cell" style="grid-column:span 2">
+        <p class="demo-label">متن بلند فارسی</p>
+        <div class="hz-field"><label class="hz-field__label" for="l-6">نشانی<span class="hz-field__req" aria-hidden="true">*</span></label><textarea class="hz-textarea" id="l-6" rows="4">اصفهان، خیابان چهارباغ بالا، روبه‌روی مجتمع تجاری، کوچه شهید محمدحسین رضایی‌نژاد، بن‌بست دوم سمت چپ، ساختمان پزشکان، طبقه همکف، واحد ۳ — مرکز جامع درمانی، جراحی و تصویربرداری حیوانات خانگی و پرندگان زینتی دکتر صالحی</textarea></div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>

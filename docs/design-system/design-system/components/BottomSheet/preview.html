@@ -1,0 +1,58 @@
+<!-- @dsCard group="Overlays" height=840 width=390 -->
+<style>
+  body { margin: 0; background: var(--bg-page); }
+  .demo { padding: 16px; display: flex; flex-direction: column; gap: 24px; }
+  .demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .demo-label { margin: 0 0 8px; font-size: 12px; line-height: 20px; font-weight: 600; color: var(--text-secondary); }
+  .demo-stage { border: 1px solid var(--border-default); border-radius: var(--radius-xl); background: var(--bg-page); }
+  .demo-stage .hz-scrim, .demo-stage .hz-sheet { position: absolute; }
+  .demo-stage .hz-topbar { position: static; }
+  .demo-page { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .demo-options { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px; }
+</style>
+<div class="hz demo" dir="rtl" lang="fa">
+  <section>
+    <p class="demo-label">پیش‌فرض موبایل — تصمیم میز KYC در BottomSheet (دستگیره، عنوان، گزینه‌ها، کنش‌ها)</p>
+    <div class="demo-stage" style="position: relative; overflow: hidden; height: 760px">
+      <div aria-hidden="true">
+        <div class="hz-topbar"><button type="button" class="hz-icon-btn" aria-label="بازگشت"><svg class="hz-icon hz-icon--md hz-icon--mirror" viewBox="0 0 256 256" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"/></svg></button><span class="hz-h4">احراز هویت</span></div>
+        <div class="demo-page">
+          <div class="demo-row"><h1 class="hz-h2">علی رضایی</h1><span class="hz-badge hz-badge--info hz-badge--sm"><span class="hz-badge__dot"></span>در انتظار بررسی انجمن</span></div>
+          <div class="hz-owner"><span>اقدام بعدی با: <b class="hz-owner__who">انجمن</b></span><span class="hz-owner__extra">۱۲ روز در صف</span></div>
+          <div class="hz-doc"><span class="hz-caption">روی کارت ملی</span></div>
+        </div>
+      </div>
+      <div class="hz-scrim"></div>
+      <div class="hz-sheet" role="dialog" aria-modal="true" aria-labelledby="dec-title">
+        <div class="hz-sheet__handle" aria-hidden="true"></div>
+        <div class="hz-sheet__head">
+          <h2 class="hz-sheet__title" id="dec-title">ثبت تصمیم<span class="hz-sheet__sub">علی رضایی، نسخه ۳ پرونده</span></h2>
+          <button type="button" class="hz-icon-btn" aria-label="بستن"><svg class="hz-icon hz-icon--md" viewBox="0 0 256 256" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+        </div>
+        <div class="hz-sheet__body">
+          <fieldset class="demo-options">
+            <legend class="hz-visually-hidden">نتیجه بررسی</legend>
+            <label class="hz-option"><input type="radio" name="dec"><span class="hz-radio__text"><b>تأیید</b><span class="hz-radio__desc">هویت تأیید می‌شود و خدمات وابسته برای کاربر باز می‌شود.</span></span></label>
+            <label class="hz-option"><input type="radio" name="dec" checked><span class="hz-radio__text"><b>نیازمند اصلاح</b><span class="hz-radio__desc">پرونده با دلیل به کاربر برمی‌گردد.</span></span></label>
+            <label class="hz-option"><input type="radio" name="dec"><span class="hz-radio__text"><b>رد</b><span class="hz-radio__desc">درخواست بسته می‌شود؛ کاربر می‌تواند درخواست تازه بدهد.</span></span></label>
+          </fieldset>
+          <div class="hz-field">
+            <label class="hz-field__label" for="dec-reason">دلیل<span class="hz-field__req" aria-hidden="true">*</span></label>
+            <div class="hz-filterbar hz-filterbar--scroll" role="group" aria-label="دلیل‌های آماده">
+              <button type="button" class="hz-chip" aria-pressed="false">تصویر خوانا نیست</button>
+              <button type="button" class="hz-chip" aria-pressed="true">تاریخ تولد مطابقت ندارد</button>
+              <button type="button" class="hz-chip" aria-pressed="false">مدرک ناقص است</button>
+            </div>
+            <textarea class="hz-textarea" id="dec-reason" required aria-describedby="dec-hint" style="min-height: 88px">تاریخ تولد واردشده با کارت ملی مطابقت ندارد. لطفاً تاریخ تولد را مطابق کارت ملی اصلاح کنید.</textarea>
+            <div class="demo-row" style="justify-content: space-between"><span class="hz-field__hint" id="dec-hint">به کاربر نمایش داده می‌شود</span><span class="hz-field__counter">۸۵ از ۵۰۰ نویسه</span></div>
+          </div>
+        </div>
+        <div class="hz-sheet__foot">
+          <button type="button" class="hz-btn hz-btn--primary hz-btn--block">ثبت تصمیم: نیازمند اصلاح</button>
+          <button type="button" class="hz-btn hz-btn--secondary hz-btn--block">انصراف</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<script></script>
