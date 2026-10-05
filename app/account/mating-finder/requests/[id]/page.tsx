@@ -39,6 +39,12 @@ import {
   MessageForm,
   ProposeTermsForm,
 } from '../../../../../src/finder/request-forms.tsx';
+import { ActionOwner } from '../../../../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../../../src/ui/page-crumbs.tsx';
+import { KeyValueList } from '../../../../../src/ui/key-value.tsx';
+import { CaseHistory } from '../../../../../src/ui/desk.tsx';
+import { Icon } from '../../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,70 +84,86 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
     specialConditionsFa: request.specialConditionsFa ?? '',
   };
   const fa = (n: number) => n.toLocaleString('fa-IR');
+  const title = (snap.sender.nameFa ?? 'بدون نام') + ' ← ' + snap.receiver.nameFa;
+  // Only the first answer has a single owner in the command table; later steps are open to either side.
+  const owner = status === 'WAITING_REVIEW' && !request.pausedAt ? (can('ACCEPT') ? ('USER' as const) : ('COUNTERPARTY' as const)) : null;
 
   return (
-    <PublicShell actor={guard.actor} title="درخواست جفت‌گیری" pathname="/account/mating-finder">
-      <div className="space-y-lg">
+    <PublicShell
+      actor={guard.actor}
+      title={title}
+      pathname="/account/mating-finder"
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { name: 'جفت‌یابی', href: '/account/mating-finder' },
+              { name: 'درخواست‌ها', href: '/account/mating-finder/requests' },
+              { name: title },
+            ]}
+          />
+          <PageHeader
+            title={title}
+            back={{ href: '/account/mating-finder/requests' }}
+            aside={
+              <span data-testid="finder-request-status">
+                <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'}>{REQUEST_STATUS_FA[status]}</StatusBadge>
+              </span>
+            }
+            meta={[ROUTE_FA[request.route], 'اعتبار تا ' + formatInstantFa(request.expiresAt)]}
+          />
+        </div>
+      }
+    >
+      {request.pausedAt ? (
+        <Alert tone="warning" title="این درخواست متوقف است">
+          یکی از دو حیوان در تنظیم قرارداد با درخواست دیگری است. اگر آن لغو شود، این درخواست ادامه می‌یابد.
+        </Alert>
+      ) : null}
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+      <div className="min-w-0 space-y-xl lg:col-span-8">
         <Card>
-          <p className="text-caption">
-            <Link href="/account/mating-finder/requests" className="text-text-brand underline underline-offset-4">
-              درخواست‌های جفت‌گیری
-            </Link>
-          </p>
-          <div className="mt-xs flex flex-wrap items-center justify-between gap-sm">
-            <h2 className="text-h3">{(snap.sender.nameFa ?? 'بدون نام') + ' ← ' + snap.receiver.nameFa}</h2>
-            <span data-testid="finder-request-status">
-              <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'}>{REQUEST_STATUS_FA[status]}</StatusBadge>
-            </span>
-          </div>
-          {request.pausedAt ? (
-            <div className="mt-sm">
-              <Alert tone="warning" title="این درخواست متوقف است">
-                یکی از دو حیوان در تنظیم قرارداد با درخواست دیگری است. اگر آن لغو شود، این درخواست ادامه می‌یابد.
+          <SectionHeader title="شرایط درخواست" size="sm" />
+          {request.closedReasonFa ? (
+            <div className="mb-md">
+              <Alert tone="info" title="دلیل بسته‌شدن">
+                <span data-testid="finder-request-reason">{'دلیل: ' + request.closedReasonFa}</span>
               </Alert>
             </div>
           ) : null}
-          {request.closedReasonFa ? <p className="mt-sm text-body-sm" data-testid="finder-request-reason">{'دلیل: ' + request.closedReasonFa}</p> : null}
-          <dl className="mt-md grid gap-sm text-body-sm sm:grid-cols-2">
-            <div><dt className="text-caption text-text-secondary">مسیر</dt><dd>{ROUTE_FA[request.route]}</dd></div>
-            <div><dt className="text-caption text-text-secondary">بازه</dt><dd>{formatCivilDateFa(request.windowFrom) + ' تا ' + formatCivilDateFa(request.windowTo)}</dd></div>
-            <div><dt className="text-caption text-text-secondary">محل</dt><dd>{request.cityFa + ' — ' + PLACE_FA[request.placeCategory]}</dd></div>
-            <div><dt className="text-caption text-text-secondary">توافق مالی</dt><dd>{FINANCIAL_FA[request.financialCategory]}</dd></div>
-            <div><dt className="text-caption text-text-secondary">اعتبار تا</dt><dd>{formatInstantFa(request.expiresAt)}</dd></div>
-            <div><dt className="text-caption text-text-secondary">امتیاز سازگاری هنگام ارسال</dt><dd>{fa(snap.evaluation.score) + ' از ۱۰۰'}</dd></div>
-          </dl>
-          {request.messageFa ? <p className="mt-sm whitespace-pre-line text-body-sm">{request.messageFa}</p> : null}
-          {request.specialConditionsFa ? <p className="mt-xs text-body-sm">{'شرایط ویژه: ' + request.specialConditionsFa}</p> : null}
+          <KeyValueList
+            twoCol
+            rows={[
+              { key: 'مسیر', value: ROUTE_FA[request.route] },
+              { key: 'بازه', value: formatCivilDateFa(request.windowFrom) + ' تا ' + formatCivilDateFa(request.windowTo) },
+              { key: 'محل', value: request.cityFa + ' — ' + PLACE_FA[request.placeCategory] },
+              { key: 'توافق مالی', value: FINANCIAL_FA[request.financialCategory] },
+              { key: 'اعتبار تا', value: formatInstantFa(request.expiresAt) },
+              { key: 'امتیاز سازگاری هنگام ارسال', value: fa(snap.evaluation.score) + ' از ۱۰۰' },
+              ...(request.specialConditionsFa ? [{ key: 'شرایط ویژه', value: request.specialConditionsFa }] : []),
+            ]}
+          />
+          {request.messageFa ? <p className="hz-body-sm mt-md whitespace-pre-line">{request.messageFa}</p> : null}
           {snap.evaluation.warnings.length > 0 ? (
-            <ul className="mt-sm list-inside list-disc text-caption">{snap.evaluation.warnings.map((w) => <li key={w}>{w}</li>)}</ul>
+            <div className="hz-fit">
+              <p className="hz-fit__title">هشدارهای سازگاری</p>
+              <ul className="hz-fit__list" aria-label="هشدارهای سازگاری">
+                {snap.evaluation.warnings.map((w) => (
+                  <li key={w} className="hz-fit__item">
+                    <Icon name="warning" size="xs" />
+                    {w}
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : null}
-          <p className="mt-sm text-caption text-text-secondary">{NO_PAYMENT_THROUGH_HAMZIST_FA}</p>
-        </Card>
-
-        <Card>
-          <h2 className="hz-card__title">اقدام‌ها</h2>
-          <div className="mt-md space-y-md">
-            {can('ACCEPT') ? <CommandForm action="respond-accept" requestId={id} version={request.version} label="پذیرش اولیه" tone="primary" testId="finder-accept" /> : null}
-            {can('REJECT') ? <CommandForm action="respond-reject" requestId={id} version={request.version} label="رد درخواست" reason testId="finder-reject" /> : null}
-            {can('ACCEPT_TERMS') && request.termsProposedByAccountId !== guard.actor.accountId ? (
-              <CommandForm action="accept-terms" requestId={id} version={request.version} label="پذیرش شرایط پیشنهادی" testId="finder-accept-terms" />
-            ) : null}
-            {can('START_CONTRACT') ? <CommandForm action="start-contract" requestId={id} version={request.version} label="تنظیم قرارداد" tone="primary" testId="finder-start-contract" /> : null}
-            {can('PROPOSE_TERMS') ? (
-              <details>
-                <summary className="cursor-pointer text-label-md text-text-brand">پیشنهاد شرایط تازه</summary>
-                <ProposeTermsForm requestId={id} version={request.version} defaults={defaults} />
-              </details>
-            ) : null}
-            {can('CANCEL') && status !== 'CONTRACT_DRAFTING' ? <CommandForm action="cancel" requestId={id} version={request.version} label="لغو درخواست" reason tone="ghost" testId="finder-cancel" /> : null}
-            {can('MARK_NOT_COMPLETED') ? <CommandForm action="not-completed" requestId={id} version={request.version} label="جفت‌گیری انجام نشد" reason tone="ghost" testId="finder-not-completed" /> : null}
-          </div>
+          <p className="hz-caption mt-md">{NO_PAYMENT_THROUGH_HAMZIST_FA}</p>
         </Card>
 
         {contract ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>قرارداد</span></h2></div>
-            <p className="mt-xs text-caption text-text-secondary">{CONFIRMATION_NAME_FA + '. ' + NOT_A_LEGAL_SIGNATURE_FA}</p>
+            <SectionHeader title="قرارداد" size="sm" />
+            <p className="hz-caption">{CONFIRMATION_NAME_FA + '. ' + NOT_A_LEGAL_SIGNATURE_FA}</p>
             <div className="mt-sm flex flex-wrap items-center gap-sm">
               <span data-testid="finder-contract-state">
                 <StatusBadge tone={contract.contract.status === 'CONFIRMED' ? 'success' : contract.contract.status === 'CANCELLED' ? 'neutral' : 'info'}>
@@ -151,7 +173,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
               <span className="text-caption">{'نسخه ' + fa(contract.current.number) + ' · تأیید شما: ' + (contract.approvedByMe ? 'بله' : 'نه') + ' · تأیید طرف مقابل: ' + (contract.approvedByOther ? 'بله' : 'نه')}</span>
             </div>
             <p className="mt-xs text-caption">
-              <bdi className="hz-ltr font-mono" data-testid="finder-contract-hash">{contract.current.contentHash}</bdi>
+              <bdi dir="ltr" className="hz-id break-all" data-testid="finder-contract-hash">{contract.current.contentHash}</bdi>
             </p>
             <ol className="mt-md list-inside list-decimal space-y-xs text-body-sm" data-testid="finder-contract-clauses">
               {contract.content.clauses.map((c) => (
@@ -201,7 +223,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
         {downstream ? (
           <Card>
             <div data-testid="finder-downstream">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مسیر پس از قرارداد: {ROUTE_FA[downstream.route]}</span></h2></div>
+              <SectionHeader title={'مسیر پس از قرارداد: ' + ROUTE_FA[downstream.route]} size="sm" />
               {downstream.link === null ? (
                 <>
                   <ul className="mt-sm list-inside list-disc space-y-xs text-body-sm" data-testid="finder-consequences">
@@ -267,7 +289,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
 
         {['CONTRACT_CONFIRMED', 'MATING_COMPLETED', 'MATING_NOT_COMPLETED'].includes(status) ? (
           <Card>
-            <h2 className="hz-card__title">اطلاعات تماس</h2>
+            <SectionHeader title="اطلاعات تماس" size="sm" />
             <p className="mt-xs text-caption text-text-secondary">شماره تماس و نشانی فقط وقتی نمایش داده می‌شود که هر دو طرف موافقت کنند.</p>
             {contact ? (
               <p className="mt-sm text-body-sm" data-testid="finder-contact">
@@ -286,18 +308,21 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
 
         {chat.conversation ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گفت‌وگو</span></h2></div>
-            <p className="mt-xs text-caption text-text-secondary">تا پیش از قرارداد و موافقت دو طرف، شماره تماس و نشانی در پیام‌ها پنهان می‌شود.</p>
-            <ul className="mt-md space-y-sm" data-testid="finder-messages">
+            <SectionHeader title="گفت‌وگو" size="sm" />
+            <p className="hz-caption">تا پیش از قرارداد و موافقت دو طرف، شماره تماس و نشانی در پیام‌ها پنهان می‌شود.</p>
+            <ul className="hz-thread mt-md" data-testid="finder-messages">
               {chat.messages.map((m) => (
-                <li key={m.id} className={'rounded-lg border border-border-default p-sm ' + (m.senderAccountId === guard.actor.accountId ? 'ms-lg' : 'me-lg')}>
-                  <p className="whitespace-pre-line text-body-sm">{m.hiddenAt ? 'این پیام پنهان شد.' : (m.bodyFa ?? '')}</p>
-                  {m.fileId ? (
-                    <a href={'/api/finder/messages/' + m.id + '/file'} className="text-caption text-text-brand underline underline-offset-4">
-                      پیوست
-                    </a>
-                  ) : null}
-                  <p className="text-caption text-text-secondary">{formatInstantFa(m.createdAt)}</p>
+                <li key={m.id} className={m.senderAccountId === guard.actor.accountId ? 'hz-msg hz-msg--mine' : 'hz-msg'}>
+                  <div className="hz-msg__bubble">
+                    <p className="hz-msg__text">{m.hiddenAt ? 'این پیام پنهان شد.' : (m.bodyFa ?? '')}</p>
+                    {m.fileId ? (
+                      <a href={'/api/finder/messages/' + m.id + '/file'} className="hz-link inline-flex items-center gap-xs text-caption">
+                        <Icon name="paperclip" size="xs" />
+                        پیوست
+                      </a>
+                    ) : null}
+                    <span className="hz-msg__meta">{formatInstantFa(m.createdAt)}</span>
+                  </div>
                   {m.senderAccountId !== guard.actor.accountId && !m.hiddenAt ? <FinderReportForm target="MESSAGE" id={m.id} testId={'finder-report-message-' + m.id} /> : null}
                 </li>
               ))}
@@ -315,7 +340,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
 
         {['MATING_COMPLETED', 'MATING_NOT_COMPLETED'].includes(status) ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بازخورد محرمانه</span></h2></div>
+            <SectionHeader title="بازخورد محرمانه" size="sm" />
             <p className="mt-xs text-caption text-text-secondary">
               فقط مدیریت همزیست این بازخورد را می‌بیند؛ به طرف مقابل نشان داده نمی‌شود و امتیاز عمومی نمی‌سازد.
             </p>
@@ -328,7 +353,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
         ) : null}
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>گزارش و مسدودکردن</span></h2></div>
+          <SectionHeader title="گزارش و مسدودکردن" size="sm" />
           <p className="mt-xs text-caption text-text-secondary">
             گزارش را مدیریت بررسی می‌کند و مدرک شما خصوصی می‌ماند. با مسدودکردن، درخواست‌های باز میان شما بسته می‌شود و
             دیگر پروفایل‌ها و پیام‌های یکدیگر را نمی‌بینید؛ به طرف مقابل گفته نمی‌شود چه کسی مسدود کرده است.
@@ -347,13 +372,51 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه</span></h2></div>
-          <ol className="mt-sm space-y-xs text-caption" data-testid="finder-request-history">
-            {events.map((e) => (
-              <li key={e.id}>{formatInstantFa(e.createdAt) + ' — ' + REQUEST_STATUS_FA[e.toStatus as RequestStatus] + (e.reasonFa ? ' — ' + e.reasonFa : '')}</li>
-            ))}
-          </ol>
+          <SectionHeader title="تاریخچه پرونده" size="sm" />
+          <div data-testid="finder-request-history">
+            <CaseHistory
+              entries={events.map((e, index) => ({
+                id: e.id,
+                title: REQUEST_STATUS_FA[e.toStatus as RequestStatus],
+                whenFa: formatInstantFa(e.createdAt),
+                body: e.reasonFa ?? undefined,
+                current: index === events.length - 1,
+              }))}
+            />
+          </div>
         </Card>
+      </div>
+
+      <aside className="min-w-0 space-y-xl lg:sticky lg:top-[calc(var(--header-app)+16px)] lg:col-span-4" aria-label="وضعیت و اقدام">
+        <Card>
+          <SectionHeader title="وضعیت و اقدام" size="sm" />
+          <div className="space-y-md">
+            <KeyValueList
+              rows={[
+                { key: 'وضعیت', value: <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'} size="sm">{REQUEST_STATUS_FA[status]}</StatusBadge> },
+                { key: 'اعتبار تا', value: formatInstantFa(request.expiresAt) },
+              ]}
+            />
+            {owner ? <ActionOwner owner={owner} stack /> : null}
+            <div className="space-y-md">
+            {can('ACCEPT') ? <CommandForm action="respond-accept" requestId={id} version={request.version} label="پذیرش اولیه" tone="primary" testId="finder-accept" /> : null}
+            {can('REJECT') ? <CommandForm action="respond-reject" requestId={id} version={request.version} label="رد درخواست" reason testId="finder-reject" /> : null}
+            {can('ACCEPT_TERMS') && request.termsProposedByAccountId !== guard.actor.accountId ? (
+              <CommandForm action="accept-terms" requestId={id} version={request.version} label="پذیرش شرایط پیشنهادی" testId="finder-accept-terms" />
+            ) : null}
+            {can('START_CONTRACT') ? <CommandForm action="start-contract" requestId={id} version={request.version} label="تنظیم قرارداد" tone="primary" testId="finder-start-contract" /> : null}
+            {can('PROPOSE_TERMS') ? (
+              <details>
+                <summary className="cursor-pointer text-label-md text-text-brand">پیشنهاد شرایط تازه</summary>
+                <ProposeTermsForm requestId={id} version={request.version} defaults={defaults} />
+              </details>
+            ) : null}
+            {can('CANCEL') && status !== 'CONTRACT_DRAFTING' ? <CommandForm action="cancel" requestId={id} version={request.version} label="لغو درخواست" reason tone="ghost" testId="finder-cancel" /> : null}
+            {can('MARK_NOT_COMPLETED') ? <CommandForm action="not-completed" requestId={id} version={request.version} label="جفت‌گیری انجام نشد" reason tone="ghost" testId="finder-not-completed" /> : null}
+          </div>
+          </div>
+        </Card>
+      </aside>
       </div>
     </PublicShell>
   );

@@ -5,6 +5,8 @@ import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { loyaltyFor } from '../../../src/commerce/loyalty.ts';
 import { LOYALTY_KIND_FA } from '../../../src/commerce/trust-model.ts';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,14 +25,19 @@ export default async function RewardsPage() {
   const view = await loyaltyFor(db(), guard.actor);
 
   return (
-    <PublicShell actor={guard.actor} title="امتیاز خرید" pathname="/account/rewards">
-      <div className="space-y-lg p-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مانده امتیاز</span></h2></div>
-          <p className="mt-sm text-h2" data-testid="loyalty-balance">
+    <PublicShell
+      actor={guard.actor}
+      title="امتیاز خرید"
+      pathname="/account/rewards"
+      header={<PageHeader title="امتیاز خرید" back={{ href: '/dashboard' }} meta={['امتیاز فقط در سبد خرید فروشگاه خرج می‌شود.']} />}
+    >
+      <div className="space-y-xl">
+        <Card className="space-y-sm">
+          <SectionHeader title="مانده امتیاز" size="sm" />
+          <p className="text-h1" data-testid="loyalty-balance">
             {fa(view.balance)}
           </p>
-          <p className="mt-2xs text-caption text-text-secondary" data-testid="loyalty-value">
+          <p className="hz-caption" data-testid="loyalty-value">
             {view.pointValueToman === null
               ? 'ارزش هر امتیاز هنوز ثبت نشده است؛ تا ثبت آن، امتیاز جمع می‌شود ولی خرج نمی‌شود.'
               : 'هر امتیاز ' + fa(view.pointValueToman) + ' تومان در سبد خرید.'}
@@ -43,30 +50,36 @@ export default async function RewardsPage() {
         </Card>
 
         {view.expiringSoon.length > 0 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>امتیازهایی که به‌زودی منقضی می‌شوند</span></h2></div>
-            <ul className="mt-md space-y-2xs text-body-sm" data-testid="loyalty-expiring">
+          <Card className="space-y-md">
+            <SectionHeader title="امتیازهایی که به‌زودی منقضی می‌شوند" size="sm" />
+            <ul className="space-y-xs" data-testid="loyalty-expiring">
               {view.expiringSoon.map((lot, index) => (
-                <li key={index}>
-                  {fa(lot.points)} امتیاز تا {lot.expiresAt.toLocaleDateString('fa-IR')}
+                <li key={index} className="hz-inline-msg hz-inline-msg--warning">
+                  <Icon name="hourglassMedium" size="xs" />
+                  <span className="hz-inline-msg__text">
+                    {fa(lot.points)} امتیاز تا {lot.expiresAt.toLocaleDateString('fa-IR')}
+                  </span>
                 </li>
               ))}
             </ul>
           </Card>
         ) : null}
 
-        <Card>
-          <h2 className="hz-card__title">دفتر امتیاز</h2>
+        <Card className="space-y-md">
+          <SectionHeader title="دفتر امتیاز" size="sm" />
           {view.entries.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="loyalty-empty">
+            <p className="hz-body-sm text-text-secondary" data-testid="loyalty-empty">
               هنوز امتیازی ثبت نشده است.
             </p>
           ) : (
-            <ul className="mt-md space-y-2xs text-body-sm" data-testid="loyalty-entries">
+            <ul className="divide-y divide-border-subtle" data-testid="loyalty-entries">
               {view.entries.map((entry) => (
-                <li key={entry.id} data-testid={'loyalty-entry-' + entry.id}>
-                  {entry.createdAt.toLocaleDateString('fa-IR')} — {LOYALTY_KIND_FA[entry.kind]} — {fa(entry.points)} —{' '}
-                  {entry.descriptionFa}
+                <li key={entry.id} className="flex flex-wrap items-baseline justify-between gap-sm py-sm" data-testid={'loyalty-entry-' + entry.id}>
+                  <span className="min-w-0">
+                    <span className="block text-label-md">{LOYALTY_KIND_FA[entry.kind] + ' — ' + entry.descriptionFa}</span>
+                    <span className="hz-caption">{entry.createdAt.toLocaleDateString('fa-IR')}</span>
+                  </span>
+                  <span className="text-label-lg">{fa(entry.points)}</span>
                 </li>
               ))}
             </ul>

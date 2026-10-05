@@ -1,6 +1,5 @@
 import { notFound as pageNotFound } from 'next/navigation';
 import { isUuid } from '../../../../../src/domain/ids.ts';
-import Link from 'next/link';
 import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
@@ -15,6 +14,10 @@ import { personalMatingView } from '../../../../../src/finder/downstream.ts';
 import { PERSONAL_CONSEQUENCES_FA } from '../../../../../src/finder/request-model.ts';
 import { DeclareDateForm, RespondToDateForm } from '../../../../mating/dates-forms.tsx';
 import { DateHistory } from '../../../../mating/date-history.tsx';
+import { ActionOwner } from '../../../../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../../../src/ui/page-crumbs.tsx';
+import { Icon } from '../../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,28 +55,44 @@ export default async function PersonalMatingPage({ params }: { params: Promise<{
   const mineIsPending = active && pending !== null && pending.declaredByAccountId === guard.actor.accountId;
 
   return (
-    <PublicShell actor={guard.actor} title="جفت‌گیری شخصی" pathname="/account/mating-finder">
-      <div className="space-y-lg">
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{content.animals.sire.nameFa + ' × ' + content.animals.dam.nameFa}</span></h2></div>
-              <p className="mt-2xs text-caption text-text-secondary">
-                {'قرارداد جفت‌یابی · '}
-                <Link href={'/account/mating-finder/requests/' + mating.requestId} className="text-text-brand underline underline-offset-4">
-                  بازگشت به درخواست
-                </Link>
-              </p>
-            </div>
-            <StatusBadge tone={active ? (basis ? 'success' : 'info') : 'neutral'}>
-              <span data-testid="personal-basis">
-                {!active ? 'لغوشده' : basis ? 'جفت‌گیری تأییدشده: ' + formatCivilDateFa(basis) : 'هنوز تاریخ تأییدشده‌ای نیست'}
-              </span>
-            </StatusBadge>
-          </div>
-          <ul className="mt-md list-inside list-disc space-y-xs text-body-sm" data-testid="personal-consequences">
+    <PublicShell
+      actor={guard.actor}
+      title="جفت‌گیری شخصی"
+      pathname="/account/mating-finder"
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { name: 'جفت‌یابی', href: '/account/mating-finder' },
+              { name: 'درخواست', href: '/account/mating-finder/requests/' + mating.requestId },
+              { name: 'جفت‌گیری شخصی' },
+            ]}
+          />
+          <PageHeader
+            title={content.animals.sire.nameFa + ' × ' + content.animals.dam.nameFa}
+            back={{ href: '/account/mating-finder/requests/' + mating.requestId, label: 'بازگشت به درخواست' }}
+            aside={
+              <StatusBadge tone={active ? (basis ? 'success' : 'info') : 'neutral'}>
+                <span data-testid="personal-basis">
+                  {!active ? 'لغوشده' : basis ? 'جفت‌گیری تأییدشده: ' + formatCivilDateFa(basis) : 'هنوز تاریخ تأییدشده‌ای نیست'}
+                </span>
+              </StatusBadge>
+            }
+            meta={['جفت‌گیری شخصی · قرارداد جفت‌یابی']}
+          />
+        </div>
+      }
+    >
+      <div className="space-y-xl">
+        {awaitingMe ? <ActionOwner owner="USER" extra="تاریخ اعلام‌شده طرف مقابل را تأیید یا رد کنید." /> : mineIsPending ? <ActionOwner owner="COUNTERPARTY" /> : null}
+        <Card className="space-y-md">
+          <SectionHeader title="پیامد این مسیر" size="sm" />
+          <ul className="space-y-xs" data-testid="personal-consequences">
             {PERSONAL_CONSEQUENCES_FA.map((line) => (
-              <li key={line}>{line}</li>
+              <li key={line} className="hz-inline-msg">
+                <Icon name="info" size="xs" className="text-text-secondary" />
+                <span className="hz-inline-msg__text hz-body-sm">{line}</span>
+              </li>
             ))}
           </ul>
           {!active ? (
@@ -81,9 +100,12 @@ export default async function PersonalMatingPage({ params }: { params: Promise<{
               {(mating.cancelReasonFa ?? '') + ' تاریخ‌های تأییدشده در سابقه می‌مانند؛ تاریخ تازه‌ای ثبت نمی‌شود.'}
             </Alert>
           ) : null}
-          <ul className="mt-md space-y-xs text-caption text-text-secondary" data-testid="personal-cooldown">
+          <ul className="space-y-xs border-t border-border-subtle pt-md" data-testid="personal-cooldown">
             {cooldown.map((c) => (
-              <li key={c.animalId}>{(c.sex === 'MALE' ? 'نر' : 'ماده') + ' «' + c.nameFa + '»: ' + c.cooldown.fa}</li>
+              <li key={c.animalId} className="hz-caption inline-flex w-full items-start gap-xs">
+                <Icon name="hourglassMedium" size="xs" />
+                {(c.sex === 'MALE' ? 'نر' : 'ماده') + ' «' + c.nameFa + '»: ' + c.cooldown.fa}
+              </li>
             ))}
           </ul>
         </Card>

@@ -20,6 +20,10 @@ import {
 } from '../../../src/finder/subscriptions.ts';
 import { FINDER_AUDIENCE_FA, FINDER_DURATION_FA, SUSPENSION_POLICY_FA, type FinderDuration } from '../../../src/finder/model.ts';
 import { BuyPlanForm } from '../../../src/finder/forms.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
+import { ButtonLink } from '../../../src/ui/button.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,51 +63,59 @@ export default async function MatingFinderAccountPage() {
   const sellable = slots.filter((slot) => slot.current !== null && audiences.includes(slot.audience));
 
   return (
-    <PublicShell actor={actor} title="اشتراک جفت‌یابی" pathname="/account/mating-finder">
+    <PublicShell
+      actor={actor}
+      title="اشتراک جفت‌یابی"
+      pathname="/account/mating-finder"
+      header={
+        <PageHeader
+          title="اشتراک جفت‌یابی"
+          back={{ href: '/dashboard' }}
+          meta={[
+            'اشتراک فقط دسترسی می‌دهد: حیوانات فعال مالک مشترک برای همه دیده می‌شوند و مشترک، حیوانات آماده مالکان بدون اشتراک را هم می‌بیند. برای شکل‌گرفتن درخواست کافی است یکی از دو مالک اشتراک فعال داشته باشد. اشتراک رتبه حیوان را در نتایج بالا نمی‌برد.',
+          ]}
+          actions={
+            <ButtonLink tone="secondary" href="/account/mating-finder/profiles" iconStart="pawPrint">
+              پروفایل‌های من
+            </ButtonLink>
+          }
+        />
+      }
+    >
       <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">اشتراک جفت‌یابی</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            اشتراک فقط دسترسی می‌دهد: حیوانات فعال مالک مشترک برای همه دیده می‌شوند و مشترک، حیوانات آماده مالکان بدون
-            اشتراک را هم می‌بیند. برای شکل‌گرفتن درخواست کافی است یکی از دو مالک اشتراک فعال داشته باشد. اشتراک رتبه حیوان
-            را در نتایج بالا نمی‌برد.
-          </p>
-          <p className="mt-sm text-caption text-text-secondary">
-            پرداخت توافق جفت‌گیری بیرون از همزیست انجام می‌شود؛ همزیست فقط هزینه اشتراک را دریافت می‌کند.
-          </p>
-        </Card>
+        <p className="hz-inline-msg hz-inline-msg--info">
+          <Icon name="info" size="xs" />
+          <span className="hz-inline-msg__text">پرداخت توافق جفت‌گیری بیرون از همزیست انجام می‌شود؛ همزیست فقط هزینه اشتراک را دریافت می‌کند.</span>
+        </p>
 
         <Card>
           <div className="flex flex-wrap items-start justify-between gap-md">
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت فعلی</span></h2></div>
+            <SectionHeader title="وضعیت فعلی" size="sm" />
             <span data-testid="finder-standing">
               <StatusBadge tone={standing.state === 'ACTIVE' ? 'success' : standing.state === 'EXPIRED' ? 'warning' : 'neutral'}>
                 {standing.state === 'ACTIVE' ? 'اشتراک فعال' : standing.state === 'EXPIRED' ? 'اشتراک منقضی شده' : 'بدون اشتراک'}
               </StatusBadge>
             </span>
           </div>
-          <dl className="mt-md grid gap-sm text-body-sm sm:grid-cols-2">
-            {standing.current ? (
-              <div>
-                <dt className="text-caption text-text-secondary">پایان دوره فعلی</dt>
-                <dd data-testid="finder-current-ends">{formatInstantFa(standing.current.endsAt)}</dd>
-              </div>
-            ) : null}
-            {standing.chainEndsAt && standing.chainEndsAt.getTime() > now.getTime() && standing.chainEndsAt.getTime() !== standing.current?.endsAt.getTime() ? (
-              <div>
-                <dt className="text-caption text-text-secondary">پایان همه دوره‌های پرداخت‌شده</dt>
-                <dd>{formatInstantFa(standing.chainEndsAt)}</dd>
-              </div>
-            ) : null}
-            <div>
-              <dt className="text-caption text-text-secondary">ظرفیت حیوان فعال</dt>
-              <dd data-testid="finder-capacity">
-                {capacity.limit === null
-                  ? 'هنوز توسط مدیریت تعیین نشده'
-                  : fa(capacity.limit) + (capacity.source === 'PLAN' ? ' (طرح ' + FINDER_AUDIENCE_FA[capacity.audience!] + ')' : ' (حساب بدون اشتراک)')}
-              </dd>
-            </div>
-          </dl>
+          <KeyValueList
+            twoCol
+            rows={[
+              ...(standing.current
+                ? [{ key: 'پایان دوره فعلی', value: formatInstantFa(standing.current.endsAt), testId: 'finder-current-ends' }]
+                : []),
+              ...(standing.chainEndsAt && standing.chainEndsAt.getTime() > now.getTime() && standing.chainEndsAt.getTime() !== standing.current?.endsAt.getTime()
+                ? [{ key: 'پایان همه دوره‌های پرداخت‌شده', value: formatInstantFa(standing.chainEndsAt) }]
+                : []),
+              {
+                key: 'ظرفیت حیوان فعال',
+                testId: 'finder-capacity',
+                value:
+                  capacity.limit === null
+                    ? 'هنوز توسط مدیریت تعیین نشده'
+                    : fa(capacity.limit) + (capacity.source === 'PLAN' ? ' (طرح ' + FINDER_AUDIENCE_FA[capacity.audience!] + ')' : ' (حساب بدون اشتراک)'),
+              },
+            ]}
+          />
           {standing.state === 'EXPIRED' ? (
             <div className="mt-md">
               <Alert tone="warning" title="اشتراک منقضی شده است">
@@ -115,7 +127,7 @@ export default async function MatingFinderAccountPage() {
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{standing.state === 'ACTIVE' ? 'تمدید' : 'خرید اشتراک'}</span></h2></div>
+          <SectionHeader title={standing.state === 'ACTIVE' ? 'تمدید' : 'خرید اشتراک'} size="sm" />
           {standing.state === 'ACTIVE' ? (
             <p className="mt-xs text-caption text-text-secondary">تمدید زودهنگام روزهای باقی‌مانده را حفظ می‌کند: دوره تازه از پایان دوره فعلی شروع می‌شود.</p>
           ) : null}
@@ -135,12 +147,12 @@ export default async function MatingFinderAccountPage() {
                 const planRow = slot.current!;
                 const testId = slot.audience + '-' + slot.durationMonths;
                 return (
-                  <li key={planRow.id} className="rounded-xl border border-border-default p-lg" data-testid={'finder-plan-' + testId}>
+                  <li key={planRow.id} className="hz-card hz-card--compact flex flex-col gap-xs" data-testid={'finder-plan-' + testId}>
                     <p className="text-caption text-text-secondary">
                       {'طرح ' + FINDER_AUDIENCE_FA[slot.audience] + ' — ' + FINDER_DURATION_FA[slot.durationMonths as FinderDuration]}
                     </p>
-                    <p className="mt-2xs text-label-lg">{planRow.titleFa}</p>
-                    <p className="mt-xs text-label-md" data-testid={'finder-plan-price-' + testId}>
+                    <p className="text-label-lg">{planRow.titleFa}</p>
+                    <p className={planRow.priceToman === null ? 'hz-unset text-label-md' : 'text-h4'} data-testid={'finder-plan-price-' + testId}>
                       {price(planRow.priceToman)}
                     </p>
                     <p className="mt-xs text-caption text-text-secondary">{'ظرفیت: ' + fa(planRow.activeAnimalCapacity) + ' حیوان فعال'}</p>
@@ -164,9 +176,10 @@ export default async function MatingFinderAccountPage() {
 
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-sm">
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>حیوانات شما برای جفت‌یابی</span></h2></div>
-            <Link href="/account/mating-finder/profiles" className="text-label-md text-text-brand underline underline-offset-4" data-testid="finder-profiles-link">
+            <SectionHeader title="حیوانات شما برای جفت‌یابی" size="sm" />
+            <Link href="/account/mating-finder/profiles" className="hz-link hz-link--standalone" data-testid="finder-profiles-link">
               مدیریت پروفایل‌ها
+              <Icon name="arrowRight" size="xs" mirror />
             </Link>
           </div>
           <p className="mt-xs text-caption text-text-secondary">
@@ -178,14 +191,14 @@ export default async function MatingFinderAccountPage() {
               <EmptyState title="حیوان ثبت‌شده‌ای ندارید" description="جفت‌یابی فقط برای حیوان ثبت‌شده در همزیست است." />
             </div>
           ) : (
-            <ul className="mt-md space-y-sm" data-testid="finder-animals">
+            <ul className="hz-cardlist mt-md" data-testid="finder-animals">
               {animals.map((animal) => (
                 <li
                   key={animal.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm"
+                  className="hz-cardlist__item flex-row flex-wrap items-center justify-between"
                   data-testid={'finder-animal-' + animal.id}
                 >
-                  <span className="text-body-sm">
+                  <span className="hz-cardlist__title min-w-0">
                     {(animal.name ?? 'بدون نام') + ' · ' + (animal.breedNameFa ?? 'نژاد نامشخص') + ' · ' + (animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : 'جنس نامشخص')}
                   </span>
                   <StatusBadge tone={animal.hasOfficialChip ? 'success' : 'warning'}>
@@ -198,18 +211,18 @@ export default async function MatingFinderAccountPage() {
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه اشتراک</span></h2></div>
+          <SectionHeader title="تاریخچه اشتراک" size="sm" />
           {history.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-secondary">هنوز خریدی ثبت نشده است.</p>
+            <p className="hz-body-sm text-text-secondary">هنوز خریدی ثبت نشده است.</p>
           ) : (
-            <ul className="mt-md space-y-sm" data-testid="finder-history">
+            <ul className="hz-cardlist" data-testid="finder-history">
               {history.map((row) => (
                 <li
                   key={row.id}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm"
+                  className="hz-cardlist__item flex-row flex-wrap items-center justify-between"
                   data-testid={'finder-history-' + row.id}
                 >
-                  <span className="text-body-sm">
+                  <span className="hz-body-sm min-w-0">
                     {'طرح ' + FINDER_AUDIENCE_FA[row.audience] + ' ' + FINDER_DURATION_FA[row.durationMonths as FinderDuration] +
                       ' · نسخه ' + fa(row.planVersion) + ' · ' + price(row.priceToman) +
                       (row.startsAt && row.endsAt ? ' · از ' + formatInstantFa(row.startsAt) + ' تا ' + formatInstantFa(row.endsAt) : '')}

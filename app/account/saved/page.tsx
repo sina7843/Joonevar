@@ -13,6 +13,8 @@ import {
 import { suggestionsFor } from '../../../src/commerce/suggestions.ts';
 import { PreferencesForm, SaveForm, FollowForm } from '../../../src/commerce/trust-forms.tsx';
 import { setPreferencesAction, toggleFollowAction, toggleSavedAction } from '../orders/trust-actions.ts';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,29 +41,40 @@ export default async function SavedPage() {
   ]);
 
   return (
-    <PublicShell actor={guard.actor} title="فهرست من" pathname="/account/saved">
-      <div className="space-y-lg p-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نگه‌داشته‌ها</span></h2></div>
+    <PublicShell
+      actor={guard.actor}
+      title="فهرست من"
+      pathname="/account/saved"
+      header={
+        <PageHeader
+          title="فهرست من"
+          back={{ href: '/dashboard' }}
+          meta={[...(saved.length > 0 ? [fa(saved.length) + ' نگه‌داشته'] : []), ...(following.length > 0 ? [fa(following.length) + ' دنبال‌شده'] : [])]}
+        />
+      }
+    >
+      <div className="space-y-xl">
+        <Card className="space-y-md">
+          <SectionHeader title="نگه‌داشته‌ها" size="sm" />
           {saved.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="saved-empty">
+            <p className="hz-body-sm text-text-secondary" data-testid="saved-empty">
               هنوز چیزی نگه نداشته‌اید.
             </p>
           ) : (
-            <ul className="mt-md space-y-sm" data-testid="saved-items">
+            <ul className="hz-cardlist" data-testid="saved-items">
               {saved.map((item) => (
                 <li
                   key={item.id}
-                  className="flex flex-wrap items-center justify-between gap-sm"
+                  className="hz-cardlist__item flex-row flex-wrap items-center justify-between"
                   data-testid={'saved-' + (item.productId ?? item.listingId)}
                 >
-                  <div className="space-y-2xs">
-                    <Link href={item.path} className="text-text-brand text-body-sm">
+                  <div className="min-w-0 space-y-2xs">
+                    <Link href={item.path} className="hz-cardlist__title block text-text-primary">
                       {item.labelFa}
                     </Link>
                     {item.savedPriceToman !== null && item.currentPriceToman !== null ? (
                       <p
-                        className="text-caption text-text-secondary"
+                        className="hz-cardlist__meta"
                         data-testid={'saved-price-' + (item.productId ?? item.listingId)}
                       >
                         {item.currentPriceToman < item.savedPriceToman
@@ -82,21 +95,24 @@ export default async function SavedPage() {
           )}
         </Card>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دنبال‌شده‌ها</span></h2></div>
+        <Card className="space-y-md">
+          <SectionHeader title="دنبال‌شده‌ها" size="sm" />
           {following.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="following-empty">
+            <p className="hz-body-sm text-text-secondary" data-testid="following-empty">
               هنوز فروشگاه یا کنلی را دنبال نکرده‌اید.
             </p>
           ) : (
-            <ul className="mt-md space-y-sm" data-testid="following">
+            <ul className="hz-cardlist" data-testid="following">
               {following.map((row) => (
                 <li
                   key={row.id}
-                  className="flex flex-wrap items-center justify-between gap-sm text-body-sm"
+                  className="hz-cardlist__item flex-row flex-wrap items-center justify-between"
                   data-testid={'following-' + (row.sellerId ?? row.kennelId)}
                 >
-                  <span>{row.sellerNameFa ?? 'کنل'}</span>
+                  <span className="hz-cardlist__title inline-flex items-center gap-xs">
+                    <Icon name="storefront" size="sm" className="text-text-secondary" />
+                    {row.sellerNameFa ?? 'کنل'}
+                  </span>
                   {row.sellerId ? (
                     <FollowForm action={toggleFollowAction} sellerId={row.sellerId} following />
                   ) : null}
@@ -106,56 +122,64 @@ export default async function SavedPage() {
           )}
         </Card>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیشنهادها</span></h2></div>
-          <p className="mt-2xs text-caption text-text-secondary" data-testid="suggestions-note">
+        <Card className="space-y-md">
+          <SectionHeader title="پیشنهادها" size="sm" />
+          <p className="hz-caption" data-testid="suggestions-note">
             هر پیشنهاد دلیل خودش را همراه دارد. هیچ پیشنهادی از روی حدس درباره شما ساخته نمی‌شود و جایگاه تبلیغی
             جداگانه و برچسب‌دار است.
           </p>
           {suggestions.length === 0 ? (
-            <p className="mt-sm text-caption text-text-secondary" data-testid="suggestions-empty">
+            <p className="hz-body-sm text-text-secondary" data-testid="suggestions-empty">
               فعلاً پیشنهادی نیست.
             </p>
           ) : (
-            <ul className="mt-md space-y-2xs" data-testid="suggestions">
+            <ul className="hz-cardlist md:grid md:grid-cols-2" data-testid="suggestions">
               {suggestions.map((suggestion) => (
-                <li key={suggestion.productId} className="text-body-sm" data-testid={'suggestion-' + suggestion.productId}>
-                  <Link href={'/shop/' + suggestion.slug} className="text-text-brand">
+                <li key={suggestion.productId} className="hz-cardlist__item" data-testid={'suggestion-' + suggestion.productId}>
+                  <Link href={'/shop/' + suggestion.slug} className="hz-cardlist__title text-text-primary">
                     {suggestion.nameFa}
-                  </Link>{' '}
-                  — <span data-testid={'suggestion-reason-' + suggestion.productId}>{suggestion.reasonFa}</span>
+                  </Link>
+                  <span className="hz-cardlist__meta inline-flex items-start gap-xs">
+                    <Icon name="info" size="xs" />
+                    <span data-testid={'suggestion-reason-' + suggestion.productId}>{suggestion.reasonFa}</span>
+                  </span>
                 </li>
               ))}
             </ul>
           )}
         </Card>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بازدیدهای اخیر</span></h2></div>
+        <Card className="space-y-md">
+          <SectionHeader title="بازدیدهای اخیر" size="sm" />
           {viewed.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="viewed-empty">
+            <p className="hz-body-sm text-text-secondary" data-testid="viewed-empty">
               تاریخچه بازدیدی نگه داشته نشده است.
             </p>
           ) : (
-            <ul className="mt-md space-y-2xs text-body-sm" data-testid="viewed">
+            <ul className="divide-y divide-border-subtle" data-testid="viewed">
               {viewed.map((row) => (
-                <li key={(row.productId ?? row.listingId)!} data-testid={'viewed-' + (row.productId ?? row.listingId)}>
-                  {row.productNameFa ?? 'آگهی حیوان'} — {row.viewedAt.toLocaleDateString('fa-IR')}
+                <li
+                  key={(row.productId ?? row.listingId)!}
+                  className="flex flex-wrap items-baseline justify-between gap-sm py-sm"
+                  data-testid={'viewed-' + (row.productId ?? row.listingId)}
+                >
+                  <span className="text-label-md">{row.productNameFa ?? 'آگهی حیوان'}</span>
+                  <span className="hz-caption">{row.viewedAt.toLocaleDateString('fa-IR')}</span>
                 </li>
               ))}
             </ul>
           )}
         </Card>
 
-        <Card>
-          <h2 className="hz-card__title">تنظیمات حریم خصوصی</h2>
+        <Card className="space-y-md">
+          <SectionHeader title="تنظیمات حریم خصوصی" size="sm" />
           <Alert tone="info" title="این سه کلید مال شماست">
             <span data-testid="privacy-note">
               خاموش‌کردن تاریخچه، آنچه تا امروز نگه داشته شده را هم پاک می‌کند؛ وگرنه کلید فقط درباره آینده وعده
               می‌داد.
             </span>
           </Alert>
-          <div className="mt-lg">
+          <div>
             <PreferencesForm
               action={setPreferencesAction}
               recommendationsOff={preferences.recommendationsOff}

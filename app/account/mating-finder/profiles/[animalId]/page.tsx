@@ -27,6 +27,12 @@ import {
   PreferencesForm,
   StateForm,
 } from '../../../../../src/finder/profile-forms.tsx';
+import { PageHeader, SectionHeader } from '../../../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../../../src/ui/page-crumbs.tsx';
+import { Icon } from '../../../../../src/ui/icon.tsx';
+import { statusOf } from '../../../../../src/ui/status-dictionary.ts';
+
+const FINDER_KEY: Partial<Record<string, string>> = { READY: 'FINDER_READY', INVITE_ONLY: 'FINDER_INVITE_ONLY', TEMPORARILY_UNAVAILABLE: 'FINDER_UNAVAILABLE' };
 
 export const dynamic = 'force-dynamic';
 
@@ -56,48 +62,66 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
   }));
 
   return (
-    <PublicShell actor={guard.actor} title="پروفایل جفت‌یابی" pathname="/account/mating-finder">
-      <div className="space-y-lg">
-        <Card>
-          <p className="text-caption">
-            <Link href="/account/mating-finder/profiles" className="text-text-brand underline underline-offset-4">
-              پروفایل‌های جفت‌یابی
-            </Link>
-          </p>
-          <div className="mt-xs flex flex-wrap items-center justify-between gap-sm">
-            <h2 className="text-h3">{animal.name ?? 'بدون نام'}</h2>
-            <span data-testid="finder-profile-state">
-              <StatusBadge tone={state === 'INACTIVE' ? 'neutral' : 'success'}>{PROFILE_STATE_FA[state]}</StatusBadge>
-            </span>
-          </div>
-          {profile?.deactivationReason && state === 'INACTIVE' ? (
-            <p className="mt-xs text-caption text-text-secondary" data-testid="finder-deactivation-reason">
-              {DEACTIVATION_FA[profile.deactivationReason]}
-            </p>
-          ) : null}
-          {profile && state !== 'INACTIVE' ? (
-            <p className="mt-xs text-caption">
-              <Link href={'/mating-finder/' + profile.id} className="text-text-brand underline underline-offset-4" data-testid="finder-public-link">
-                صفحه عمومی این پروفایل
-              </Link>
-            </p>
-          ) : null}
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شرایط ورود</span></h2></div>
+    <PublicShell
+      actor={guard.actor}
+      title={'پروفایل جفت‌یابی ' + (animal.name ?? 'بدون نام')}
+      pathname="/account/mating-finder"
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { name: 'جفت‌یابی', href: '/account/mating-finder' },
+              { name: 'پروفایل‌ها', href: '/account/mating-finder/profiles' },
+              { name: animal.name ?? 'بدون نام' },
+            ]}
+          />
+          <PageHeader
+            title={animal.name ?? 'بدون نام'}
+            back={{ href: '/account/mating-finder/profiles' }}
+            aside={
+              <span data-testid="finder-profile-state">
+                <StatusBadge tone={(FINDER_KEY[state] ? statusOf(FINDER_KEY[state]!)?.tone : null) ?? (state === 'INACTIVE' ? 'neutral' : 'info')}>
+                  {PROFILE_STATE_FA[state]}
+                </StatusBadge>
+              </span>
+            }
+            meta={[
+              profile?.deactivationReason && state === 'INACTIVE' ? (
+                <span key="reason" data-testid="finder-deactivation-reason">
+                  {DEACTIVATION_FA[profile.deactivationReason]}
+                </span>
+              ) : (
+                'پروفایل جفت‌یابی'
+              ),
+              ...(profile && state !== 'INACTIVE'
+                ? [
+                    <Link key="public" href={'/mating-finder/' + profile.id} className="hz-link" data-testid="finder-public-link">
+                      صفحه عمومی این پروفایل
+                    </Link>,
+                  ]
+                : []),
+            ]}
+          />
+        </div>
+      }
+    >
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+      <aside className="min-w-0 space-y-xl lg:sticky lg:top-[calc(var(--header-app)+16px)] lg:order-last lg:col-span-4" aria-label="وضعیت و اقدام">
+        <Card className="space-y-sm">
+          <SectionHeader title="شرایط ورود" size="sm" />
           {eligibility.problems.length === 0 ? (
-            <p className="mt-sm text-body-sm" data-testid="finder-eligible">همه شرایط ورود برقرار است.</p>
+            <p className="hz-inline-msg hz-inline-msg--success" data-testid="finder-eligible"><Icon name="checkCircle" size="xs" /><span className="hz-inline-msg__text">همه شرایط ورود برقرار است.</span></p>
           ) : (
-            <ul className="mt-sm list-inside list-disc space-y-2xs text-body-sm" data-testid="finder-problems">
+            <ul className="space-y-xs" data-testid="finder-problems">
               {eligibility.problems.map((problem) => (
-                <li key={problem.code} data-testid={'finder-problem-' + problem.code}>
-                  {problem.fa}
+                <li key={problem.code} className="hz-inline-msg hz-inline-msg--warning" data-testid={'finder-problem-' + problem.code}>
+                  <Icon name="warning" size="xs" />
+                  <span className="hz-inline-msg__text">{problem.fa}</span>
                 </li>
               ))}
             </ul>
           )}
-          <p className="mt-sm text-caption text-text-secondary">شجره‌نامه شرط ورود نیست و فقط کامل‌بودن پروفایل را بالا می‌برد.</p>
+          <p className="hz-caption mt-sm">شجره‌نامه شرط ورود نیست و فقط کامل‌بودن پروفایل را بالا می‌برد.</p>
           {state === 'INACTIVE' ? (
             <ActivateForm animalId={animal.id} disabledReasonFa={eligibility.problems.length > 0 ? 'پیش از فعال‌سازی، شرط‌های بالا را کامل کنید.' : null} />
           ) : profile ? (
@@ -109,24 +133,34 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
             />
           ) : null}
         </Card>
+        {card ? (
+          <Card>
+            <SectionHeader title="پیش‌نمایش کارت" size="sm" />
+            <div>
+              <MatingProfileCardView card={card} />
+            </div>
+          </Card>
+        ) : null}
+      </aside>
+      <div className="min-w-0 space-y-xl lg:col-span-8">
 
         <Card>
-          <h2 className="hz-card__title">وضعیت باروری</h2>
-          <p className="mt-xs text-caption text-text-secondary">این اظهار شماست و در سابقه می‌ماند؛ همزیست آن را تأیید دامپزشکی معرفی نمی‌کند.</p>
+          <SectionHeader title="وضعیت باروری" size="sm" />
+          <p className="hz-caption">این اظهار شماست و در سابقه می‌ماند؛ همزیست آن را تأیید دامپزشکی معرفی نمی‌کند.</p>
           <FertilityForm animalId={animal.id} current={eligibility.fertility} />
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصویرها و ویدئو</span></h2></div>
-          <p className="mt-xs text-caption text-text-secondary">
+          <SectionHeader title="تصویرها و ویدئو" size="sm" />
+          <p className="hz-caption">
             یک تصویر تمام‌بدن و یک تصویر صورت لازم است. فایل اصلی خصوصی می‌ماند و فقط نسخه بدون اطلاعات جانبی (مانند موقعیت
             مکانی عکس) عمومی می‌شود. ویدئو فعلاً فقط برای خود شما نمایش داده می‌شود.
           </p>
           {media.length > 0 ? (
             <ul className="mt-md grid gap-sm sm:grid-cols-2" data-testid="finder-media-list">
               {media.map((item) => (
-                <li key={item.id} className="rounded-lg border border-border-default p-sm" data-testid={'finder-media-' + item.id}>
-                  <p className="text-body-sm">
+                <li key={item.id} className="hz-cardlist__item" data-testid={'finder-media-' + item.id}>
+                  <p className="hz-body-sm">
                     {(item.kind === 'VIDEO' ? 'ویدئو' : ROLE_FA[item.role]) + ' · ' + item.altFa}
                     {profile?.primaryMediaId === item.id ? ' · تصویر اصلی' : ''}
                   </p>
@@ -140,13 +174,13 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ترجیحات</span></h2></div>
+          <SectionHeader title="ترجیحات" size="sm" />
           <PreferencesForm animalId={animal.id} current={profile?.preferencesFa ?? null} />
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>رویدادهای زندگی حیوان</span></h2></div>
-          <p className="mt-xs text-caption text-text-secondary">
+          <SectionHeader title="رویدادهای زندگی حیوان" size="sm" />
+          <p className="hz-caption mb-md">
             ثبت فوت، مفقودی یا بایگانی حیوان را فوراً از جفت‌یابی خارج می‌کند. هیچ سابقه‌ای حذف نمی‌شود و پس از پیدا شدن یا خروج از
             بایگانی، فعال‌سازی دوباره با خود شماست.
           </p>
@@ -158,15 +192,7 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
             <LifeEventForm animalId={animal.id} options={lifeOptions} />
           )}
         </Card>
-
-        {card ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیش‌نمایش کارت</span></h2></div>
-            <div className="mt-md">
-              <MatingProfileCardView card={card} />
-            </div>
-          </Card>
-        ) : null}
+      </div>
       </div>
     </PublicShell>
   );

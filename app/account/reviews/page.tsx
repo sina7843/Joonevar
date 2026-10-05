@@ -6,6 +6,8 @@ import { myReviews, reviewablePurchases } from '../../../src/commerce/reviews.ts
 import { REVIEW_DIMENSIONS } from '../../../src/commerce/trust-model.ts';
 import { ReviewForm } from '../../../src/commerce/trust-forms.tsx';
 import { leaveReviewAction } from '../orders/trust-actions.ts';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,27 +30,44 @@ export default async function MyReviewsPage() {
   ]);
 
   return (
-    <PublicShell actor={guard.actor} title="نظرهای من" pathname="/account/reviews">
-      <div className="space-y-lg p-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>خریدهایی که می‌توانید درباره‌شان بنویسید</span></h2></div>
-          <p className="mt-2xs text-caption text-text-secondary" data-testid="reviewable-note">
+    <PublicShell
+      actor={guard.actor}
+      title="نظرهای من"
+      pathname="/account/reviews"
+      header={
+        <PageHeader
+          title="نظرهای من"
+          back={{ href: '/dashboard' }}
+          meta={[
+            ...(pending.length > 0 ? [fa(pending.length) + ' خرید در انتظار نظر'] : []),
+            ...(mine.length > 0 ? [fa(mine.length) + ' نظر ثبت‌شده'] : []),
+          ]}
+        />
+      }
+    >
+      <div className="space-y-xl">
+        <Card className="space-y-md">
+          <SectionHeader title="خریدهایی که می‌توانید درباره‌شان بنویسید" size="sm" />
+          <p className="hz-caption" data-testid="reviewable-note">
             نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد؛ همین است که آن را قابل اتکا می‌کند.
           </p>
           {pending.length === 0 ? (
-            <p className="mt-sm text-body-sm text-text-secondary" data-testid="reviewable-empty">
+            <p className="hz-body-sm text-text-secondary" data-testid="reviewable-empty">
               در حال حاضر خریدی برای ثبت نظر ندارید.
             </p>
           ) : (
-            <ul className="mt-md space-y-lg" data-testid="reviewable">
+            <ul className="hz-cardlist" data-testid="reviewable">
               {pending.map((purchase) => (
                 <li
                   key={purchase.subOrderId}
-                  className="space-y-sm rounded-lg border border-border-default p-lg"
+                  className="hz-cardlist__item"
                   data-testid={'reviewable-' + purchase.subOrderId}
                 >
-                  <p className="text-label-sm">
-                    {purchase.reference} — {purchase.sellerNameFa}
+                  <p className="hz-cardlist__row">
+                    <span className="hz-cardlist__title">{purchase.sellerNameFa}</span>
+                    <bdi dir="ltr" className="hz-id">
+                      {purchase.reference}
+                    </bdi>
                   </p>
                   <ReviewForm
                     action={leaveReviewAction}
@@ -62,20 +81,31 @@ export default async function MyReviewsPage() {
           )}
         </Card>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نظرهای ثبت‌شده شما</span></h2></div>
+        <Card className="space-y-md">
+          <SectionHeader title="نظرهای ثبت‌شده شما" size="sm" />
           {mine.length === 0 ? (
-            <p className="mt-2xs text-caption text-text-secondary" data-testid="my-reviews-empty">
+            <p className="hz-body-sm text-text-secondary" data-testid="my-reviews-empty">
               هنوز نظری ثبت نکرده‌اید.
             </p>
           ) : (
-            <ul className="mt-md space-y-sm" data-testid="my-reviews">
+            <ul className="hz-cardlist" data-testid="my-reviews">
               {mine.map((view) => (
-                <li key={view.row.id} className="text-body-sm" data-testid={'my-review-' + view.row.id}>
-                  {view.dimensionsFa[0]}: {fa(view.row.scoreOne)} — {view.dimensionsFa[1]}: {fa(view.row.scoreTwo)} —{' '}
-                  {view.dimensionsFa[2]}: {fa(view.row.scoreThree)}
-                  {view.row.bodyFa ? ' — ' + view.row.bodyFa : ''}
-                  {view.row.replyFa ? ' — پاسخ فروشنده: ' + view.row.replyFa : ''}
+                <li key={view.row.id} className="hz-cardlist__item" data-testid={'my-review-' + view.row.id}>
+                  <span className="flex flex-wrap gap-x-lg gap-y-xs">
+                    {[view.row.scoreOne, view.row.scoreTwo, view.row.scoreThree].map((score, index) => (
+                      <span key={index} className="inline-flex items-center gap-xs hz-body-sm">
+                        <Icon name="star" size="xs" className="text-text-brand" />
+                        {view.dimensionsFa[index] + ': ' + fa(score)}
+                      </span>
+                    ))}
+                  </span>
+                  {view.row.bodyFa ? <p className="hz-body-sm">{view.row.bodyFa}</p> : null}
+                  {view.row.replyFa ? (
+                    <p className="hz-body-sm border-t border-border-subtle pt-sm">
+                      <span className="text-text-secondary">پاسخ فروشنده: </span>
+                      {view.row.replyFa}
+                    </p>
+                  ) : null}
                 </li>
               ))}
             </ul>

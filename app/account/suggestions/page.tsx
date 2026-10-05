@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 import { db } from '../../../src/db/client.ts';
 import { directoryReferenceData } from '../../../src/vets/directory.ts';
 import { mySuggestions } from '../../../src/suggestions/service.ts';
@@ -38,8 +39,23 @@ export default async function AccountSuggestionsPage() {
   const open = suggestions.filter((row) => row.status === 'SUBMITTED' || row.status === 'NEEDS_CORRECTION');
 
   return (
-    <PublicShell actor={guard.actor} title="پیشنهادهای من" pathname="/account/suggestions">
-      <div className="space-y-lg">
+    <PublicShell
+      actor={guard.actor}
+      title="پیشنهادهای من"
+      pathname="/account/suggestions"
+      header={
+        <PageHeader
+          title="پیشنهادهای من"
+          back={{ href: '/dashboard' }}
+          meta={[
+            ...(suggestions.length > 0 ? [suggestions.length.toLocaleString('fa-IR') + ' پیشنهاد'] : []),
+            ...(open.length > 0 ? [open.length.toLocaleString('fa-IR') + ' باز'] : []),
+            'پیشنهاددهنده مالک رکورد نمی‌شود؛ پس از تأیید، خود صاحب رکورد آن را تحویل می‌گیرد.',
+          ]}
+        />
+      }
+    >
+      <div className="space-y-xl">
         {open.length >= 3 ? (
           <Alert tone="info" title="سه پیشنهاد باز دارید">
             تا تعیین تکلیف آن‌ها، پیشنهاد تازه ثبت نمی‌شود.
@@ -48,24 +64,25 @@ export default async function AccountSuggestionsPage() {
           <SuggestionForm provinces={reference.provinces} cities={reference.cities} />
         )}
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پیشنهادهای شما</span></h2></div>
+        <section className="space-y-md" aria-labelledby="my-suggestions-title">
+          <SectionHeader id="my-suggestions-title" title="پیشنهادهای شما" />
           {suggestions.length === 0 ? (
-            <div className="mt-lg">
+            <div>
               <EmptyState
+                icon="userPlus"
                 title="هنوز پیشنهادی ثبت نکرده‌اید"
                 description="اگر دامپزشک یا مرکزی را در همزیست پیدا نکردید، با فرم بالا معرفی‌اش کنید."
               />
             </div>
           ) : (
-            <ul className="mt-lg space-y-md" data-testid="my-suggestions">
+            <ul className="hz-cardlist" data-testid="my-suggestions">
               {suggestions.map((row) => (
-                <li key={row.id} className="rounded-xl border border-border-default p-lg" data-testid={'suggestion-' + row.id}>
+                <li key={row.id} className="hz-cardlist__item" data-testid={'suggestion-' + row.id}>
                   <div className="flex flex-wrap items-start justify-between gap-sm">
                     <div className="min-w-0">
-                      <p className="text-caption text-text-secondary">{SUGGESTION_KIND_FA[row.kind as SuggestionKind]}</p>
-                      <p className="text-label-lg">{row.displayNameFa}</p>
-                      <p className="mt-2xs text-caption text-text-secondary">
+                      <p className="hz-caption">{SUGGESTION_KIND_FA[row.kind as SuggestionKind]}</p>
+                      <p className="hz-cardlist__title">{row.displayNameFa}</p>
+                      <p className="hz-cardlist__meta">
                         {[row.cityNameFa, 'ثبت: ' + formatInstantFa(row.createdAt)].filter(Boolean).join(' · ')}
                       </p>
                     </div>
@@ -76,8 +93,9 @@ export default async function AccountSuggestionsPage() {
                     </span>
                   </div>
 
+                  {row.status === 'NEEDS_CORRECTION' ? <ActionOwner owner="USER" extra="اطلاعات را مطابق نتیجه بررسی اصلاح کنید." /> : null}
                   {row.reviewNoteFa && row.status !== 'SUBMITTED' ? (
-                    <div className="mt-md" data-testid={'suggestion-note-' + row.id}>
+                    <div data-testid={'suggestion-note-' + row.id}>
                       <Alert tone={row.status === 'APPROVED' ? 'success' : 'warning'} title="نتیجه بررسی">
                         {row.reviewNoteFa}
                       </Alert>
@@ -85,15 +103,14 @@ export default async function AccountSuggestionsPage() {
                   ) : null}
 
                   {row.status === 'APPROVED' && row.publicSlug ? (
-                    <p className="mt-sm text-body-sm">
-                      <Link
-                        href={(row.kind === 'VET' ? '/veterinarians/' : '/centers/') + row.publicSlug}
-                        className="text-text-brand underline underline-offset-4"
-                        data-testid={'suggestion-record-' + row.id}
-                      >
-                        مشاهده رکورد منتشرشده
-                      </Link>
-                    </p>
+                    <Link
+                      href={(row.kind === 'VET' ? '/veterinarians/' : '/centers/') + row.publicSlug}
+                      className="hz-link hz-link--standalone"
+                      data-testid={'suggestion-record-' + row.id}
+                    >
+                      مشاهده رکورد منتشرشده
+                      <Icon name="arrowRight" size="xs" mirror />
+                    </Link>
                   ) : null}
 
                   {row.status === 'NEEDS_CORRECTION' ? (
@@ -120,7 +137,7 @@ export default async function AccountSuggestionsPage() {
               ))}
             </ul>
           )}
-        </Card>
+        </section>
       </div>
     </PublicShell>
   );

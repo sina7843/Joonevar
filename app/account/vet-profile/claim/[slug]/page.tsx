@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
@@ -11,6 +10,9 @@ import { claimableProfile, myVetApplications } from '../../../../../src/vets/onb
 import { isOpenApplication } from '../../../../../src/vets/onboarding-model.ts';
 import { openProfessionalCaseOf } from '../../../../../src/vets/doctor-application.ts';
 import { DoctorApplicationForm } from '../../../../../src/vets/doctor-forms.tsx';
+import { PageHeader } from '../../../../../src/ui/section-header.tsx';
+import { ButtonLink } from '../../../../../src/ui/button.tsx';
+import { Icon } from '../../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,31 +42,43 @@ export default async function ClaimVetProfilePage({ params }: { params: Promise<
     (openApplication !== null && openApplication.kind === 'CLAIM' && openApplication.vetProfileId === profile.id);
 
   return (
-    <PublicShell actor={guard.actor} title="Claim پروفایل دامپزشک" pathname="/account/vet-profile">
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">{profile.displayNameFa}</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">{(profile.cityNameFa ? profile.cityNameFa + ' · ' : '') + 'پروفایل بدون مالک'}</p>
-          <p className="mt-md text-body-sm">
-            با تأیید Claim توسط ادمین انجمن، ویرایش و انتشار این پروفایل به حساب شما سپرده می‌شود و کد نظام آن تأیید می‌شود. تاریخچه ثبت‌شده
-            پروفایل همان‌طور می‌ماند.
+    <PublicShell
+      actor={guard.actor}
+      title="Claim پروفایل دامپزشک"
+      pathname="/account/vet-profile"
+      header={
+        <PageHeader
+          title={profile.displayNameFa}
+          back={{ href: '/account/vet-profile' }}
+          meta={[...(profile.cityNameFa ? [profile.cityNameFa] : []), 'پروفایل بدون مالک', 'Claim پروفایل دامپزشک']}
+        />
+      }
+    >
+      <div className="space-y-xl">
+        <Card variant="subtle">
+          <p className="hz-inline-msg">
+            <Icon name="identificationBadge" size="xs" className="text-text-brand" />
+            <span className="hz-inline-msg__text hz-body-sm">
+              با تأیید Claim توسط ادمین انجمن، ویرایش و انتشار این پروفایل به حساب شما سپرده می‌شود و کد نظام آن تأیید می‌شود. تاریخچه ثبت‌شده
+              پروفایل همان‌طور می‌ماند.
+            </span>
           </p>
         </Card>
 
         {own ? (
           <div data-testid="claim-already-owner">
             <Alert tone="warning" title="این حساب همین حالا پروفایل دامپزشک دارد">
-              <Link href="/account/vet-profile" className="text-text-brand underline underline-offset-4">
+              <ButtonLink tone="secondary" size="sm" href="/account/vet-profile">
                 رفتن به پروفایل خودتان
-              </Link>
+              </ButtonLink>
             </Alert>
           </div>
         ) : openCase || openApplication ? (
           <div data-testid={claimingThis ? 'claim-in-review' : 'claim-other-open'}>
             <Alert tone="info" title={claimingThis ? 'درخواست Claim شما برای این پروفایل در حال بررسی است' : 'درخواست دیگری از شما در حال بررسی است'}>
-              <Link href="/account/vet-profile" className="text-text-brand underline underline-offset-4">
+              <ButtonLink tone="secondary" size="sm" href="/account/vet-profile">
                 پیگیری درخواست
-              </Link>
+              </ButtonLink>
             </Alert>
           </div>
         ) : (

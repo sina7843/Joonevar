@@ -4,7 +4,6 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { ButtonLink } from '../../../src/ui/button.tsx';
 import { StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { directoryReferenceData, ownVetDirectory } from '../../../src/vets/directory.ts';
@@ -40,6 +39,11 @@ import { StudentApplicationForm } from '../../../src/vets/student-forms.tsx';
 import { DoctorApplicationForm } from '../../../src/vets/doctor-forms.tsx';
 import { LicenceApplicationForm } from '../../../src/vets/licence-forms.tsx';
 
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { CaseHistory as Timeline, whenFa } from '../../../src/ui/desk.tsx';
+import { ActionOwner } from '../../../src/ui/status.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
+
 export const dynamic = 'force-dynamic';
 
 const TONE: Record<VetApplicationStatus, StatusTone> = {
@@ -66,15 +70,19 @@ const SCOPE_FA: Record<string, string> = { GENERAL: 'عمومی', SPECIALIST: '�
 
 function CaseHistory({ events, testId }: { events: readonly CaseHistoryEvent[]; testId: string }) {
   return (
-    <ol className="mt-md space-y-2xs text-caption text-text-secondary" data-testid={testId}>
-      {events.map((event, index) => (
-        <li key={index}>
-          {formatInstantFa(new Date(event.at)) + ' · ' + (event.toStatusFa ?? event.action)}
-          {event.submissionVersion && event.toStatus === 'SUBMITTED' ? ' (نسخه ' + event.submissionVersion.toLocaleString('fa-IR') + ')' : ''}
-          {event.reasonFa ? ' — ' + event.reasonFa : ''}
-        </li>
-      ))}
-    </ol>
+    <div className="border-t border-border-subtle pt-md" data-testid={testId}>
+      <Timeline
+        entries={events.map((event, index) => ({
+          id: String(index),
+          title:
+            (event.toStatusFa ?? event.action) +
+            (event.submissionVersion && event.toStatus === 'SUBMITTED' ? ' (نسخه ' + event.submissionVersion.toLocaleString('fa-IR') + ')' : ''),
+          whenFa: whenFa(new Date(event.at)),
+          body: event.reasonFa ?? undefined,
+          current: index === events.length - 1,
+        }))}
+      />
+    </div>
   );
 }
 
@@ -133,17 +141,28 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
   const serviceOptions = services.map((service) => ({ code: service.code, nameFa: service.nameFa }));
 
   return (
-    <PublicShell actor={actor} title="پروفایل دامپزشکی" pathname="/account/vet-profile">
-      <div className="space-y-lg">
+    <PublicShell
+      actor={actor}
+      title="پروفایل دامپزشکی"
+      pathname="/account/vet-profile"
+      header={
+        <PageHeader
+          title="پروفایل دامپزشکی"
+          back={{ href: '/dashboard' }}
+          meta={[professional.currentTag ? professional.currentTag.labelFa : 'مسیر حرفه‌ای اختیاری']}
+        />
+      }
+    >
+      <div className="space-y-xl">
         {trusted.isActiveLicensedVet || trustedCase ? (
-          <Card>
-            <h2 className="hz-card__title">دامپزشک معتمد</h2>
-            <p className="mt-xs text-caption text-text-secondary">
+          <Card className="space-y-md">
+            <SectionHeader title="دامپزشک معتمد" size="sm" />
+            <p className="hz-caption">
               معتمد شدن دو شرط دارد: دوره فعال پروانه فعالیت و عضویت معتبر انجمن. برای دستگاه میکروچیپ‌ریدر مدرکی لازم نیست و همه‌جا «تجهیزات اعلام‌شده» نوشته می‌شود.
             </p>
 
             {trustedCase ? (
-              <div className="mt-md space-y-sm">
+              <div className="space-y-sm">
                 <p className="text-body-sm">
                   {'وضعیت درخواست: '}
                   <span data-testid="trusted-case-status">{trustedCase.statusFa}</span>
@@ -194,7 +213,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 ) : null}
 
                 {trustedPeriod.canPay ? (
-                  <div className="mt-md">
+                  <div>
                     <PayTrustedPeriodForm kind={trustedPeriod.kind} pendingBatchId={trustedPeriod.pendingBatchId} />
                   </div>
                 ) : null}
@@ -202,14 +221,15 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             ) : null}
 
             {trusted.unmet.length > 0 ? (
-              <ul className="mt-md space-y-2xs text-body-sm" data-testid="trusted-unmet">
+              <ul className="space-y-xs" data-testid="trusted-unmet">
                 {trusted.unmet.map((requirement: (typeof trusted.unmet)[number]) => (
-                  <li key={requirement.code}>
+                  <li key={requirement.code} className="hz-inline-msg hz-inline-msg--warning">
+                    <Icon name="warning" size="xs" />
                     {requirement.reasonFa}
                     {requirement.href ? (
                       <>
                         {' '}
-                        <Link href={requirement.href} className="text-text-brand underline underline-offset-4" data-testid={'trusted-link-' + requirement.code}>
+                        <Link href={requirement.href} className="hz-link" data-testid={'trusted-link-' + requirement.code}>
                           رفتن به همان صفحه
                         </Link>
                       </>
@@ -220,7 +240,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             ) : null}
 
             {trusted.allowed && trusted.terms.configured ? (
-              <div className="mt-lg">
+              <div>
                 <TrustedApplicationForm
                   mode="NEW"
                   termsFa={trusted.terms.textFa!}
@@ -232,7 +252,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
             ) : null}
 
             {trustedCase && trustedCase.status === 'NEEDS_CORRECTION' && trusted.terms.configured ? (
-              <div className="mt-lg">
+              <div>
                 <TrustedApplicationForm
                   mode="REVISION"
                   caseId={trustedCase.id}
@@ -248,18 +268,18 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         ) : null}
 
         {professional.currentTag || professional.cases.length > 0 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>هویت حرفه‌ای</span></h2></div>
+          <Card className="space-y-md">
+            <SectionHeader title="هویت حرفه‌ای" size="sm" />
             {professional.currentTag ? (
-              <p className="mt-xs text-body" data-testid="vet-current-tag">
+              <p className="text-body-lg" data-testid="vet-current-tag">
                 {professional.currentTag.labelFa}
-                <span className="text-caption text-text-secondary">{' · از ' + formatInstantFa(new Date(professional.currentTag.since))}</span>
+                <span className="hz-caption">{' · از ' + formatInstantFa(new Date(professional.currentTag.since))}</span>
               </p>
             ) : (
-              <p className="mt-xs text-body-sm text-text-secondary">هنوز Tag حرفه‌ای ندارید.</p>
+              <p className="text-body-sm text-text-secondary">هنوز Tag حرفه‌ای ندارید.</p>
             )}
             {professional.cases.length > 0 ? (
-              <ul className="mt-md space-y-2xs text-body-sm" data-testid="vet-professional-cases">
+              <ul className="space-y-2xs text-body-sm" data-testid="vet-professional-cases">
                 {professional.cases.map((item) => (
                   <li key={item.id}>{item.caseTypeFa + ': ' + item.statusFa}</li>
                 ))}
@@ -269,31 +289,32 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         ) : null}
 
         {studentCase ? (
-          <Card>
+          <Card className="space-y-md">
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
-                <p className="text-caption text-text-secondary">پرونده دانشجوی دامپزشکی</p>
-                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{studentCase.fields?.displayNameFa ?? '—'}</span></h2></div>
+                <p className="hz-caption">پرونده دانشجوی دامپزشکی</p>
+                <SectionHeader title={studentCase.fields?.displayNameFa ?? '—'} size="sm" />
               </div>
               <span data-testid="student-case-status">
                 <StatusBadge tone={CASE_TONE[studentCase.status] ?? 'neutral'}>{studentCase.statusFa}</StatusBadge>
               </span>
             </div>
             {studentCase.fields ? (
-              <p className="mt-xs text-caption text-text-secondary">
+              <p className="hz-caption">
                 {studentCase.fields.universityFa + ' · شماره دانشجویی '}
-                <span dir="ltr">{studentCase.fields.studentNumber}</span>
+                <bdi dir="ltr">{studentCase.fields.studentNumber}</bdi>
               </p>
             ) : null}
             {studentCase.reviewNoteFa && studentCase.status !== 'SUBMITTED' ? (
-              <div className="mt-md" data-testid="student-review-note">
+              <div data-testid="student-review-note">
                 <Alert tone={studentCase.status === 'VERIFIED_STUDENT' ? 'success' : 'warning'} title="نتیجه بررسی انجمن">
                   {studentCase.reviewNoteFa}
                 </Alert>
               </div>
             ) : studentCase.status === 'SUBMITTED' ? (
-              <p className="mt-md text-body-sm">در انتظار بررسی ادمین انجمن. نتیجه در اعلان‌های شما هم می‌آید.</p>
+              <p className="text-body-sm">در انتظار بررسی ادمین انجمن. نتیجه در اعلان‌های شما هم می‌آید.</p>
             ) : null}
+            {studentCase.status === 'NEEDS_CORRECTION' ? <ActionOwner owner="USER" /> : OPEN.includes(studentCase.status) ? <ActionOwner owner="ASSOCIATION" /> : null}
             <CaseHistory events={studentCase.history} testId="student-history" />
           </Card>
         ) : null}
@@ -303,36 +324,38 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         ) : null}
 
         {doctorCase ? (
-          <Card>
+          <Card className="space-y-md">
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
-                <p className="text-caption text-text-secondary">{doctorCase.claimProfileId ? 'Claim پروفایل بدون مالک' : 'درخواست دکتر دامپزشک'}</p>
-                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{doctorCase.fields?.displayNameFa ?? '—'}</span></h2></div>
+                <p className="hz-caption">{doctorCase.claimProfileId ? 'Claim پروفایل بدون مالک' : 'درخواست دکتر دامپزشک'}</p>
+                <SectionHeader title={doctorCase.fields?.displayNameFa ?? '—'} size="sm" />
               </div>
               <span data-testid="doctor-case-status">
                 <StatusBadge tone={CASE_TONE[doctorCase.status] ?? 'neutral'}>{doctorCase.statusFa}</StatusBadge>
               </span>
             </div>
             {doctorCase.fields ? (
-              <p className="mt-xs text-caption text-text-secondary">
+              <p className="hz-caption">
                 {(SCOPE_FA[doctorCase.fields.practiceScope] ?? '') + ' · کد نظام '}
-                <span dir="ltr">{doctorCase.fields.councilCode}</span>
+                <bdi dir="ltr">{doctorCase.fields.councilCode}</bdi>
               </p>
             ) : null}
             {doctorCase.reviewNoteFa && doctorCase.status !== 'SUBMITTED' ? (
-              <div className="mt-md" data-testid="doctor-review-note">
+              <div data-testid="doctor-review-note">
                 <Alert tone={doctorCase.status === 'VERIFIED_NO_LICENSE' ? 'success' : 'warning'} title="نتیجه بررسی انجمن">
                   {doctorCase.reviewNoteFa}
                 </Alert>
               </div>
             ) : doctorCase.status === 'SUBMITTED' ? (
-              <p className="mt-md text-body-sm">در انتظار بررسی ادمین انجمن. نتیجه در اعلان‌های شما هم می‌آید.</p>
+              <p className="text-body-sm">در انتظار بررسی ادمین انجمن. نتیجه در اعلان‌های شما هم می‌آید.</p>
             ) : null}
+            {doctorCase.status === 'NEEDS_CORRECTION' ? <ActionOwner owner="USER" /> : OPEN.includes(doctorCase.status) ? <ActionOwner owner="ASSOCIATION" /> : null}
             {doctorCase.documents.length > 0 ? (
-              <ul className="mt-md space-y-2xs text-body-sm">
+              <ul className="space-y-xs">
                 {doctorCase.documents.map((document) => (
                   <li key={document.id}>
-                    <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="text-text-brand underline underline-offset-4">
+                    <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="hz-link inline-flex items-center gap-xs hz-body-sm">
+                      <Icon name="paperclip" size="xs" />
                       {PROFESSIONAL_DOCUMENT_FA[document.kind as ProfessionalDocumentKind] + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
                     </a>
                   </li>
@@ -353,33 +376,43 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         ) : null}
 
         {licenceCase ? (
-          <Card>
+          <Card className="space-y-md">
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
-                <p className="text-caption text-text-secondary">پرونده پروانه فعالیت</p>
-                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>
-                  {'کد پروانه '}
-                  <span dir="ltr">{licenceCase.fields?.licenceCode ?? '—'}</span>
-                </span></h2></div>
+                <p className="hz-caption">پرونده پروانه فعالیت</p>
+                <SectionHeader
+                  size="sm"
+                  title={
+                    <>
+                      {'کد پروانه '}
+                      <bdi dir="ltr">{licenceCase.fields?.licenceCode ?? '—'}</bdi>
+                    </>
+                  }
+                />
               </div>
               <span data-testid="licence-case-status">
                 <StatusBadge tone={CASE_TONE[licenceCase.status] ?? 'neutral'}>{licenceCase.statusFa}</StatusBadge>
               </span>
             </div>
             {licenceCase.fields ? (
-              <p className="mt-xs text-caption text-text-secondary">
+              <p className="hz-caption">
                 {(SCOPE_FA[licenceCase.fields.practiceScope] ?? '') + ' · تاریخ پروانه ' + formatCivilDateFa(licenceCase.fields.licenceDate) + ' · نسخه ' + licenceCase.submissionVersion.toLocaleString('fa-IR')}
               </p>
             ) : null}
+            {licenceCase.status === 'NEEDS_CORRECTION' || licenceCase.status === 'LICENSE_APPROVED_AWAITING_PAYMENT' ? (
+              <ActionOwner owner="USER" />
+            ) : OPEN.includes(licenceCase.status) ? (
+              <ActionOwner owner="ASSOCIATION" />
+            ) : null}
             {licenceCase.status === 'LICENSE_APPROVED_AWAITING_PAYMENT' ? (
-              <div className="mt-md" data-testid="licence-awaiting-payment">
+              <div data-testid="licence-awaiting-payment">
                 <Alert tone="info" title="مدارک پروانه تأیید شد؛ در انتظار پرداخت">
                   Tag «دارای پروانه فعالیت» فقط پس از پرداخت موفق و تأییدشده دوره فعالیت فعال می‌شود. انتظار پرداخت مهلت ندارد.
                 </Alert>
               </div>
             ) : null}
             {licence.canPay ? (
-              <div className="mt-md space-y-sm" data-testid="licence-period">
+              <div className="space-y-sm" data-testid="licence-period">
                 <p className="text-body-sm">
                   {'وضعیت دوره فعالیت: '}
                   <span data-testid="licence-period-standing">{LICENCE_STANDING_FA[licence.standing]}</span>
@@ -400,17 +433,18 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
               </div>
             ) : null}
             {licenceCase.reviewNoteFa && licenceCase.status !== 'SUBMITTED' ? (
-              <div className="mt-md" data-testid="licence-review-note">
+              <div data-testid="licence-review-note">
                 <Alert tone={licenceCase.status === 'NEEDS_CORRECTION' || licenceCase.status === 'REJECTED' ? 'warning' : 'success'} title="نتیجه بررسی انجمن">
                   {licenceCase.reviewNoteFa}
                 </Alert>
               </div>
             ) : null}
             {licenceCase.documents.length > 0 ? (
-              <ul className="mt-md space-y-2xs text-body-sm">
+              <ul className="space-y-xs">
                 {licenceCase.documents.map((document) => (
                   <li key={document.id}>
-                    <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="text-text-brand underline underline-offset-4">
+                    <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="hz-link inline-flex items-center gap-xs hz-body-sm">
+                      <Icon name="paperclip" size="xs" />
                       {PROFESSIONAL_DOCUMENT_FA[document.kind as ProfessionalDocumentKind] + (document.titleFa ? ' «' + document.titleFa + '»' : '') + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
                     </a>
                   </li>
@@ -445,9 +479,9 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         {own ? (
           <VetDirectoryEditor data={own} surface="owner" />
         ) : !verifiedStudent ? (
-          <Card>
-            <h2 className="text-h3">مسیر دامپزشکی در همزیست</h2>
-            <p className="mt-xs text-body-sm text-text-secondary">
+          <Card className="space-y-md">
+            <SectionHeader title="مسیر دامپزشکی در همزیست" size="sm" />
+            <p className="text-body-sm text-text-secondary">
               حساب کاربری عادی شما همان می‌ماند و این مسیر اختیاری است. دانشجوی دامپزشکی با شماره دانشجویی و دانشگاه، دکتر دامپزشک با کد نظام و
               کارت نظام، و دکتر دارای پروانه با کد، تاریخ و فایل پروانه نیز اقدام می‌کند. اگر پروفایلی «بدون مالک» از شما منتشر شده است، از صفحه
               همان پروفایل درخواست Claim بدهید.
@@ -456,12 +490,12 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         ) : null}
 
         {invitations.length > 0 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دعوت‌های مراکز</span></h2></div>
-            <p className="mt-xs text-body-sm text-text-secondary">
+          <Card className="space-y-md">
+            <SectionHeader title="دعوت‌های مراکز" size="sm" />
+            <p className="text-body-sm text-text-secondary">
               مرکزی شما را به تیم حرفه‌ای خود دعوت کرده است. نام شما فقط پس از پذیرش در صفحه آن مرکز نمایش داده می‌شود.
             </p>
-            <div className="mt-lg space-y-md" data-testid="centre-invitations">
+            <div className="space-y-md" data-testid="centre-invitations">
               {invitations.map((invitation) => (
                 <CentreInvitationForm
                   key={invitation.id}
@@ -478,31 +512,32 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         ) : null}
 
         {latest && (!own || isOpenApplication(latest.status)) ? (
-          <Card>
+          <Card className="space-y-md">
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <div>
-                <p className="text-caption text-text-secondary">{APPLICATION_KIND_FA[latest.kind]}</p>
-                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{latest.displayNameFa}</span></h2></div>
+                <p className="hz-caption">{APPLICATION_KIND_FA[latest.kind]}</p>
+                <SectionHeader title={latest.displayNameFa} size="sm" />
               </div>
               <span data-testid="vet-application-status">
                 <StatusBadge tone={TONE[latest.status]}>{APPLICATION_STATUS_FA[latest.status]}</StatusBadge>
               </span>
             </div>
-            <p className="mt-xs text-caption text-text-secondary">{'کد نظام ' + latest.councilCode + ' · ارسال: ' + formatInstantFa(latest.submittedAt)}</p>
+            <p className="hz-caption">{'کد نظام ' + latest.councilCode + ' · ارسال: ' + formatInstantFa(latest.submittedAt)}</p>
             {latest.reviewNoteFa && latest.status !== 'SUBMITTED' ? (
-              <div className="mt-md" data-testid="vet-application-note">
+              <div data-testid="vet-application-note">
                 <Alert tone={latest.status === 'APPROVED' ? 'success' : 'warning'} title="نتیجه بررسی">
                   {latest.reviewNoteFa}
                 </Alert>
               </div>
             ) : latest.status === 'SUBMITTED' ? (
-              <p className="mt-md text-body-sm">در انتظار بررسی اپراتور همزیست. نتیجه در اعلان‌های شما هم می‌آید.</p>
+              <p className="text-body-sm">در انتظار بررسی اپراتور همزیست. نتیجه در اعلان‌های شما هم می‌آید.</p>
             ) : null}
             {latest.documents.length > 0 ? (
-              <ul className="mt-md space-y-2xs text-body-sm">
+              <ul className="space-y-xs">
                 {latest.documents.map((document) => (
                   <li key={document.fileId}>
-                    <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="text-text-brand underline underline-offset-4">
+                    <a href={'/api/files/' + document.fileId} target="_blank" rel="noopener noreferrer" className="hz-link inline-flex items-center gap-xs hz-body-sm">
+                      <Icon name="paperclip" size="xs" />
                       {DOCUMENT_KIND_FA[document.kind]}
                     </a>
                   </li>
@@ -518,9 +553,9 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
         ) : null}
 
         {canChoosePath ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کدام مسیر؟</span></h2></div>
-            <div className="mt-md flex flex-wrap gap-md" data-testid="vet-path-choice">
+          <Card className="space-y-md">
+            <SectionHeader title="کدام مسیر؟" size="sm" />
+            <div className="grid gap-sm md:grid-cols-3" data-testid="vet-path-choice">
               {(
                 [
                   ['student', 'دانشجوی دامپزشکی'],
@@ -532,10 +567,11 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                   key={value}
                   href={'/account/vet-profile?path=' + value}
                   aria-current={path === value ? 'page' : undefined}
-                  className={path === value ? 'text-label-md text-text-brand underline underline-offset-4' : 'text-label-md text-text-secondary'}
+                  className={'hz-option text-text-primary no-underline' + (path === value ? ' border-border-brand bg-bg-brand-subtle' : '')}
                   data-testid={'path-' + value}
                 >
-                  {label}
+                  <Icon name={path === value ? 'checkCircle' : value === 'student' ? 'student' : 'stethoscope'} size="sm" className="text-text-brand" />
+                  <span className="text-label-md">{label}</span>
                 </Link>
               ))}
             </div>
@@ -556,9 +592,12 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
           <LicenceApplicationForm mode="NEW_DOCTOR" defaults={{}} services={serviceOptions} provinces={reference.provinces} cities={reference.cities} />
         ) : null}
         {canChoosePath && path !== 'student' && path !== 'doctor' && path !== 'licensed' ? (
-          <p className="text-body-sm text-text-secondary">
-            برای ادامه یکی از مسیرهای بالا را انتخاب کنید، یا <ButtonLink href="/dashboard">به داشبورد برگردید</ButtonLink>؛ حساب شما بدون این انتخاب
-            هم کامل است.
+          <p className="hz-body-sm text-text-secondary">
+            برای ادامه یکی از مسیرهای بالا را انتخاب کنید، یا{' '}
+            <Link href="/dashboard" className="hz-link">
+              به داشبورد برگردید
+            </Link>
+            ؛ حساب شما بدون این انتخاب هم کامل است.
           </p>
         ) : null}
       </div>

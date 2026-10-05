@@ -19,6 +19,8 @@ import {
 } from '../../../../src/advertising/model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 import { BuyPackageForm, CancelPackageForm } from '../../../../src/advertising/forms.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,22 +51,33 @@ export default async function AccountPackagesPage() {
   const sellable = plans.filter((entry) => entry.plan.isActive === 1);
 
   return (
-    <PublicShell actor={guard.actor} title="بسته‌های تبلیغاتی" pathname="/account/packages">
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">بسته‌های تبلیغاتی</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            پروفایل پایه رایگان است و بسته لازم ندارد. بسته تبلیغاتی فقط جای نمایش را با برچسب «تبلیغ» تغییر می‌دهد؛
-            تأیید حرفه‌ای، معتمدبودن و کامل‌بودن پرونده را نمی‌سازد و جای آن‌ها را هم نمی‌گیرد.
-          </p>
-          <p className="mt-sm text-caption text-text-secondary">
-            بسته پس از تأیید پرداخت روی سرور فعال می‌شود و در پایان همان بازه، خودبه‌خود از نمایش می‌افتد. تمدید زودهنگام
-            روزهای باقی‌مانده را از بین نمی‌برد: بازه تازه از پایان بازه فعلی شروع می‌شود.
-          </p>
-        </Card>
+    <PublicShell
+      actor={guard.actor}
+      title="بسته‌های تبلیغاتی"
+      pathname="/account/packages"
+      header={
+        <PageHeader
+          title="بسته‌های تبلیغاتی"
+          back={{ href: '/dashboard' }}
+          meta={[
+            ...(rows.length > 0 ? [fa(rows.length) + ' پرونده'] : []),
+            'پروفایل پایه رایگان است و بسته لازم ندارد. بسته تبلیغاتی فقط جای نمایش را با برچسب «تبلیغ» تغییر می‌دهد؛ تأیید حرفه‌ای، معتمدبودن و کامل‌بودن پرونده را نمی‌سازد و جای آن‌ها را هم نمی‌گیرد.',
+          ]}
+        />
+      }
+    >
+      <div className="space-y-xl">
+        <p className="hz-inline-msg hz-inline-msg--info">
+          <Icon name="info" size="xs" />
+          <span className="hz-inline-msg__text">
+            بسته پس از تأیید پرداخت روی سرور فعال می‌شود و در پایان همان بازه، خودبه‌خود از نمایش می‌افتد. تمدید زودهنگام روزهای
+            باقی‌مانده را از بین نمی‌برد: بازه تازه از پایان بازه فعلی شروع می‌شود.
+          </span>
+        </p>
 
         {rows.length === 0 ? (
           <EmptyState
+            icon="megaphoneSimple"
             title="پرونده‌ای برای تبلیغ ندارید"
             description="بسته تبلیغاتی برای پروفایل دامپزشک، مرکز یا انجمن و کلابی خریداری می‌شود که مدیریتش با شماست."
           />
@@ -72,11 +85,11 @@ export default async function AccountPackagesPage() {
           rows.map(({ target, live, history }) => {
             const liveState = live ? adState(live, now) : null;
             return (
-              <Card key={target.type + target.id}>
+              <Card key={target.type + target.id} className="space-y-lg">
                 <div className="flex flex-wrap items-start justify-between gap-md">
                   <div className="min-w-0">
-                    <h2 className="hz-card__title">{target.nameFa}</h2>
-                    <p className="mt-2xs text-caption text-text-secondary">{target.kindFa}</p>
+                    <SectionHeader title={target.nameFa} size="sm" />
+                    <p className="hz-caption">{target.kindFa}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-xs">
                     <span data-testid={'package-state-' + target.id}>
@@ -84,14 +97,15 @@ export default async function AccountPackagesPage() {
                         {liveState === 'ACTIVE' ? 'بسته فعال' : 'بسته فعالی ندارد'}
                       </StatusBadge>
                     </span>
-                    <Link href={target.manageRoute} className="text-label-md text-text-brand underline underline-offset-4">
+                    <Link href={target.manageRoute} className="hz-link hz-link--standalone">
                       مدیریت پرونده
+                      <Icon name="arrowRight" size="xs" mirror />
                     </Link>
                   </div>
                 </div>
 
                 {live ? (
-                  <div className="mt-lg rounded-xl border border-border-default p-lg" data-testid={'live-package-' + target.id}>
+                  <div className="hz-card hz-card--subtle" data-testid={'live-package-' + target.id}>
                     <p className="text-label-md">
                       {'بسته فعال: ' +
                         AD_TIER_FA[history.find((row) => row.id === live.id)?.tier as AdTier] +
@@ -109,8 +123,8 @@ export default async function AccountPackagesPage() {
                   </div>
                 ) : null}
 
-                <div className="mt-lg">
-                  <h3 className="text-label-md">خرید یا تمدید</h3>
+                <div>
+                  <h3 className="text-label-lg">خرید یا تمدید</h3>
                   {sellable.length === 0 ? (
                     <div className="mt-md">
                       <Alert tone="info" title="بسته‌ای برای فروش نیست">
@@ -127,9 +141,9 @@ export default async function AccountPackagesPage() {
                             ? 'ظرفیت این بسته تکمیل است.'
                             : null;
                         return (
-                          <li key={entry.plan.id} className="rounded-xl border border-border-default p-lg" data-testid={'plan-card-' + testId}>
+                          <li key={entry.plan.id} className="hz-card hz-card--compact flex flex-col gap-xs" data-testid={'plan-card-' + testId}>
                             <p className="text-label-lg">{entry.tierFa + ' ' + entry.periodFa}</p>
-                            <p className="mt-2xs text-label-md" data-testid={'plan-price-' + testId}>
+                            <p className={entry.priceFa ? 'text-h4' : 'hz-unset text-label-md'} data-testid={'plan-price-' + testId}>
                               {entry.priceFa ?? 'قیمت ثبت‌نشده'}
                             </p>
                             {entry.plan.featuresFa ? (
@@ -156,18 +170,18 @@ export default async function AccountPackagesPage() {
                 </div>
 
                 {history.length === 0 ? null : (
-                  <div className="mt-lg border-t border-border-subtle pt-lg">
-                    <h3 className="text-label-md">تاریخچه</h3>
-                    <ul className="mt-md space-y-sm" data-testid={'history-' + target.id}>
+                  <div className="border-t border-border-subtle pt-lg">
+                    <h3 className="text-label-lg">تاریخچه</h3>
+                    <ul className="hz-cardlist mt-md" data-testid={'history-' + target.id}>
                       {history.map((row) => {
                         const state = adState(row, now);
                         return (
                           <li
                             key={row.id}
-                            className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm"
+                            className="hz-cardlist__item flex-row flex-wrap items-center justify-between"
                             data-testid={'history-row-' + row.id}
                           >
-                            <span className="text-body-sm">
+                            <span className="hz-body-sm min-w-0">
                               {AD_TIER_FA[row.tier as AdTier] + ' ' + AD_PERIOD_FA[row.period as AdPeriod]}
                               {row.startsAt ? ' · از ' + formatInstantFa(row.startsAt) : ''}
                               {row.endsAt ? ' تا ' + formatInstantFa(row.endsAt) : ''}
