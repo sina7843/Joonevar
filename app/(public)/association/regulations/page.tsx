@@ -75,7 +75,7 @@ export default async function AssociationRegulationsPage() {
         <h2 id="regulations-enforced-title" className="text-h4">
           قواعدی که سامانه اجرا می‌کند
         </h2>
-        <ul className="list-disc space-y-xs pr-lg text-body-md" data-testid="regulations-enforced">
+        <ul className="list-disc space-y-xs ps-lg text-body-md" data-testid="regulations-enforced">
           {ENFORCED.map((rule) => (
             <li key={rule}>{rule}</li>
           ))}

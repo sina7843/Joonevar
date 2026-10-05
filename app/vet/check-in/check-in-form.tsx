@@ -10,27 +10,16 @@ import { checkInAction, type VetFormState } from '../actions.ts';
 
 const EMPTY: VetFormState = {};
 
-export function CheckInForm({
-  locations,
-}: {
-  locations: ReadonlyArray<{ id: string; nameFa: string }>;
-}) {
+export function CheckInForm({ locations }: { locations: ReadonlyArray<{ id: string; nameFa: string }> }) {
   const [state, submit, pending] = useActionState(checkInAction, EMPTY);
 
   return (
     <Card>
       <form action={submit} className="space-y-lg" data-testid="check-in-form">
         {state.message ? (
-          <Alert
-            tone={state.ok ? 'success' : 'error'}
-            title={state.message}
-          >
+          <Alert tone={state.ok ? 'success' : 'error'} title={state.message}>
             {state.ok && state.requestId ? (
-              <Link
-                href={'/vet/requests/' + state.requestId}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="open-checked-in-request"
-              >
+              <Link href={'/vet/requests/' + state.requestId} className="hz-link" data-testid="open-checked-in-request">
                 ادامه پرونده این حیوان
               </Link>
             ) : null}

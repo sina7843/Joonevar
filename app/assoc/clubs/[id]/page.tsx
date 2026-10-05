@@ -1,7 +1,8 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Card, CardHeader } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, Panel } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { clubForAuthority } from '../../../../src/clubs/service.ts';
@@ -30,85 +31,75 @@ export default async function AssocClubPage({ params }: { params: Promise<{ id: 
   const club = detail.club;
   const lifecycle = club.lifecycle as ClubLifecycle;
 
+  const decision =
+    lifecycle === 'PENDING_VERIFICATION' ? (
+      <>
+        <p className="text-caption text-text-secondary">تأیید، درخواست اصلاح یا رد — با دلیلی که برای مالک کلاب فرستاده می‌شود.</p>
+        <ClubVerificationDecisionForm clubId={club.id} version={club.version} />
+      </>
+    ) : lifecycle === 'ACTIVE' ? (
+      <>
+        <p className="text-caption text-text-secondary">تعلیق کلاب: کلاب از دسترس عمومی خارج می‌شود؛ پرونده و تاریخچه می‌مانند.</p>
+        <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="SUSPENDED" />
+      </>
+    ) : lifecycle === 'SUSPENDED' ? (
+      <div className="space-y-lg">
+        <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="ACTIVE" />
+        <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="ARCHIVED" />
+      </div>
+    ) : lifecycle === 'REJECTED' ? (
+      <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="ARCHIVED" />
+    ) : null;
+
   return (
     <OpsShell actor={guard.actor} title={club.displayNameFa} pathname="/assoc/clubs" nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <CardHeader
-            title={club.displayNameFa}
-            subtitle={'حوزه ' + (COMMUNITY_SCOPE_FA[club.scope as never] ?? club.scope)}
-            badge={{ tone: lifecycle === 'ACTIVE' ? 'success' : lifecycle === 'SUSPENDED' || lifecycle === 'REJECTED' ? 'error' : 'warning', label: CLUB_LIFECYCLE_FA[lifecycle] }}
-          />
-          <dl className="mt-lg grid gap-sm text-body-sm sm:grid-cols-2" data-testid="club-facts">
-            <div>
-              <dt className="text-caption text-text-secondary">مالک</dt>
-              <dd>{detail.ownerNameFa ?? (club.ownerAccountId ? 'کاربر همزیست' : 'بدون مالک')}</dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">راه ارتباطی</dt>
-              <dd dir="ltr">{club.contactPhone ?? club.websiteUrl ?? '—'}</dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">آخرین تغییر</dt>
-              <dd>{formatInstantFa(club.updatedAt)}</dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">تأیید</dt>
-              <dd>{club.verifiedAt ? formatInstantFa(club.verifiedAt) : 'تأیید نشده'}</dd>
-            </div>
-          </dl>
-          {club.aboutFa ? <p className="mt-lg whitespace-pre-line text-body-md">{club.aboutFa}</p> : null}
-          {club.lifecycleReasonFa ? <p className="mt-md text-body-sm text-text-secondary">{'آخرین دلیل ثبت‌شده: ' + club.lifecycleReasonFa}</p> : null}
-        </Card>
+      <DeskHead
+        title={'کلاب · ' + club.displayNameFa}
+        status={{
+          tone: lifecycle === 'ACTIVE' ? 'success' : lifecycle === 'SUSPENDED' || lifecycle === 'REJECTED' ? 'error' : lifecycle === 'PENDING_VERIFICATION' ? 'info' : 'warning',
+          label: CLUB_LIFECYCLE_FA[lifecycle],
+        }}
+        meta={['حوزه ' + (COMMUNITY_SCOPE_FA[club.scope as never] ?? club.scope), 'آخرین تغییر: ' + formatInstantFa(club.updatedAt), 'نسخه ' + club.version.toLocaleString('fa-IR')]}
+        owner={lifecycle === 'PENDING_VERIFICATION' ? 'ASSOCIATION' : null}
+      />
+      <Desk
+        decision={decision}
+        decisionTitle={
+          lifecycle === 'PENDING_VERIFICATION'
+            ? 'تصمیم تأیید'
+            : lifecycle === 'ACTIVE'
+              ? 'تعلیق کلاب'
+              : lifecycle === 'SUSPENDED'
+                ? 'برداشتن تعلیق'
+                : 'بایگانی پرونده'
+        }
+      >
+        <Panel title="اطلاعات کلاب">
+          <div data-testid="club-facts">
+            <KeyValueList
+              twoCol
+              rows={[
+                { key: 'مالک', value: detail.ownerNameFa ?? (club.ownerAccountId ? 'کاربر همزیست' : 'بدون مالک') },
+                { key: 'راه ارتباطی', value: club.contactPhone ?? club.websiteUrl ? <bdi dir="ltr">{club.contactPhone ?? club.websiteUrl}</bdi> : null },
+                { key: 'آخرین تغییر', value: formatInstantFa(club.updatedAt) },
+                { key: 'تأیید', value: club.verifiedAt ? formatInstantFa(club.verifiedAt) : 'تأیید نشده' },
+              ]}
+            />
+          </div>
+          {club.aboutFa ? <p className="whitespace-pre-line text-body-md">{club.aboutFa}</p> : null}
+          {club.lifecycleReasonFa ? <p className="text-body-sm text-text-secondary">{'آخرین دلیل ثبت‌شده: ' + club.lifecycleReasonFa}</p> : null}
+        </Panel>
 
         {detail.members.length > 0 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نقش‌های این کلاب</span></h2></div>
-            <ul className="mt-md space-y-xs text-body-sm" data-testid="club-authority-members">
+          <Panel title="نقش‌های این کلاب" count={detail.members.length.toLocaleString('fa-IR')}>
+            <ul className="space-y-xs text-body-sm" data-testid="club-authority-members">
               {detail.members.map((member) => (
                 <li key={member.membershipId}>{(member.nameFa ?? 'کاربر همزیست') + ' — ' + CLUB_ROLE_FA[member.role]}</li>
               ))}
             </ul>
-          </Card>
+          </Panel>
         ) : null}
-
-        {lifecycle === 'PENDING_VERIFICATION' ? (
-          <Card>
-            <CardHeader title="تصمیم تأیید" subtitle="تأیید، درخواست اصلاح یا رد — با دلیلی که برای مالک کلاب فرستاده می‌شود." />
-            <div className="mt-md">
-              <ClubVerificationDecisionForm clubId={club.id} version={club.version} />
-            </div>
-          </Card>
-        ) : null}
-
-        {lifecycle === 'ACTIVE' ? (
-          <Card>
-            <CardHeader title="تعلیق کلاب" subtitle="کلاب از دسترس عمومی خارج می‌شود؛ پرونده و تاریخچه می‌مانند." />
-            <div className="mt-md">
-              <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="SUSPENDED" />
-            </div>
-          </Card>
-        ) : null}
-
-        {lifecycle === 'SUSPENDED' ? (
-          <Card>
-            <CardHeader title="برداشتن تعلیق" />
-            <div className="mt-md space-y-lg">
-              <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="ACTIVE" />
-              <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="ARCHIVED" />
-            </div>
-          </Card>
-        ) : null}
-
-        {lifecycle === 'REJECTED' ? (
-          <Card>
-            <CardHeader title="بایگانی پرونده" />
-            <div className="mt-md">
-              <ClubStandingForm clubId={club.id} version={club.version} surface="assoc" to="ARCHIVED" />
-            </div>
-          </Card>
-        ) : null}
-      </div>
+      </Desk>
     </OpsShell>
   );
 }

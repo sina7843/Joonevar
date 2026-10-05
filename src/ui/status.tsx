@@ -24,6 +24,7 @@ export function StatusBadge({
 }) {
   if (status !== undefined) {
     const entry = statusOf(status);
+    if (entry !== null && entry.labelFa === null) return null;
     // Unknown key (data drift): neutral with the raw key, never a guessed tone.
     tone = entry?.tone ?? 'neutral';
     children = entry?.labelFa ?? <bdi dir="ltr">{status}</bdi>;

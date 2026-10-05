@@ -7,6 +7,7 @@ import { Card } from '../../../../src/ui/card.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { publicListing } from '../../../../src/marketplace/public-listings.ts';
 import { MarketReportForm } from '../../../../src/marketplace/moderation-forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,12 @@ export default async function ReportListingPage({ params }: { params: Promise<{ 
   if (listing === null) notFound();
 
   return (
-    <PublicShell actor={guard.actor} title="گزارش آگهی" pathname={path}>
+    <PublicShell
+      actor={guard.actor}
+      title="گزارش آگهی"
+      pathname={path}
+      header={<PageHeader title={'گزارش آگهی'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg p-lg">
         <Card>
           <p className="text-caption text-text-secondary">آگهی</p>
@@ -37,8 +43,8 @@ export default async function ReportListingPage({ params }: { params: Promise<{ 
             </Link>
           </h2>
           <p className="mt-xs text-body-sm text-text-secondary">
-            گزارش شما به ناظر آگهی می‌رسد و با دلیل بررسی می‌شود. هر حساب برای هر موضوع تا بسته‌شدن بررسی،
-            یک گزارش باز دارد. نام شما به فروشنده گفته نمی‌شود.
+            گزارش شما به ناظر آگهی می‌رسد و با دلیل بررسی می‌شود. هر حساب برای هر موضوع تا بسته‌شدن بررسی، یک گزارش باز
+            دارد. نام شما به فروشنده گفته نمی‌شود.
           </p>
         </Card>
         <Card>

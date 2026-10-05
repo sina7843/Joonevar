@@ -1,7 +1,8 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -28,35 +29,34 @@ export default async function AssocPostalPage() {
   const rows = await postalRequestQueue(db(), guard.actor);
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — انجمن" pathname="/assoc/postal" nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Alert tone="info" title="این فهرست فقط ثبت درخواست است">
-          <span data-testid="postal-scope-note">
-            چرخه ارسال، کد رهگیری پستی و وضعیت تحویل در این فاز وجود ندارد و ساخته نشده است.
-          </span>
-        </Alert>
+    <OpsShell actor={guard.actor} title="درخواست‌های پستی" pathname="/assoc/postal" nav={ASSOC_NAV}>
+      <Alert tone="info" title="این فهرست فقط ثبت درخواست است">
+        <span data-testid="postal-scope-note">
+          چرخه ارسال، کد رهگیری پستی و وضعیت تحویل در این فاز وجود ندارد و ساخته نشده است.
+        </span>
+      </Alert>
 
-        {rows.length === 0 ? (
-          <EmptyState
-            title="درخواست پستی ثبت نشده است"
-            description="پس از ثبت درخواست پستی توسط مالک سند، در همین فهرست دیده می‌شود."
-          />
-        ) : (
-          <ul className="space-y-md" data-testid="postal-list">
+      {rows.length === 0 ? (
+        <EmptyState
+          title="درخواست پستی ثبت نشده است"
+          description="پس از ثبت درخواست پستی توسط مالک سند، در همین فهرست دیده می‌شود."
+        />
+      ) : (
+        <>
+          <QueueMeta total={rows.length} noun="درخواست ثبت‌شده" />
+          <CaseList label="درخواست‌های پستی" testId="postal-list">
             {rows.map((row) => (
-              <li key={row.id}>
-                <Card>
-                  <h2 className="text-label-md">{DOCUMENT_FA[row.documentType] ?? row.documentType}</h2>
-                  <p className="mt-2xs text-caption text-text-secondary">
-                    {row.recipientNameFa} · {row.cityFa ?? '—'} ·{' '}
-                    {formatCivilDateFa(row.createdAt.toISOString().slice(0, 10))}
-                  </p>
-                </Card>
-              </li>
+              <CaseItem
+                key={row.id}
+                type={DOCUMENT_FA[row.documentType] ?? row.documentType}
+                name={row.recipientNameFa}
+                sub={(row.cityFa ?? '—') + ' · ' + formatCivilDateFa(row.createdAt.toISOString().slice(0, 10))}
+                ageDays={ageInDays(row.createdAt)}
+              />
             ))}
-          </ul>
-        )}
-      </div>
+          </CaseList>
+        </>
+      )}
     </OpsShell>
   );
 }

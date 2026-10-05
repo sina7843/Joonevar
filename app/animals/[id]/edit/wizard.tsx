@@ -6,7 +6,9 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { ActionRow, Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Field, FileField, SelectField, TextField } from '../../../../src/ui/field.tsx';
-import { Icon } from '../../../../src/ui/icon.tsx';
+import { Stepper } from '../../../../src/ui/stepper.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
+import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { BreedPicker } from '../../../../src/ui/breed-picker.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import {
@@ -21,14 +23,7 @@ import {
 const EMPTY: FormState = {};
 
 /** The six steps of the approved PET-004…PET-008 form. */
-const STEPS = [
-  'گونه و نژاد',
-  'جنسیت و تولد',
-  'مشخصات ظاهری',
-  'تصویر',
-  'میکروچیپ',
-  'منبع شناسایی و مرور',
-] as const;
+const STEPS = ['گونه و نژاد', 'جنسیت و تولد', 'مشخصات ظاهری', 'تصویر', 'میکروچیپ', 'منبع شناسایی و مرور'] as const;
 
 export interface WizardAnimal {
   readonly id: string;
@@ -60,31 +55,13 @@ function Result({ state }: { state: FormState }) {
   );
 }
 
-function Stepper({ current }: { current: number }) {
+/** P07: the step heading inside the step card (the eye goes here, not to the Stepper). */
+function StepHead({ step }: { step: number }) {
   return (
-    <ol className="hz-rail flex gap-sm" aria-label="مراحل ثبت">
-      {STEPS.map((label, index) => {
-        const step = index + 1;
-        const done = step < current;
-        return (
-          <li key={label} className="shrink-0">
-            <span
-              aria-current={step === current ? 'step' : undefined}
-              className={[
-                'flex size-8 items-center justify-center rounded-full border text-label-sm',
-                step === current
-                  ? 'border-border-brand bg-action-primary-default text-action-primary-on'
-                  : done
-                    ? 'border-status-success-border text-status-success-text'
-                    : 'border-border-subtle text-text-secondary',
-              ].join(' ')}
-            >
-              {done ? <Icon name="check" size="xs" label="انجام‌شده" /> : step}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
+    <div className="mb-lg">
+      <p className="text-caption text-text-secondary">مرحله {step.toLocaleString('fa-IR')} از ۶</p>
+      <h2 className="text-h3">{STEPS[step - 1]}</h2>
+    </div>
   );
 }
 
@@ -134,399 +111,482 @@ export function AnimalWizard({
     <div className="space-y-lg" data-testid="animal-wizard">
       {parentOf ? (
         <Alert tone="info" title="ثبت والد گمشده">
-          پس از ثبت این حیوان، به پرونده قبلی برمی‌گردید و نسب دوباره بررسی می‌شود؛ پیش‌نویس و کدهای واردشده
-          شما حفظ شده است.{' '}
-          <Link href={'/animals/' + parentOf + '/edit?step=6'} className="text-text-brand underline underline-offset-4">
+          پس از ثبت این حیوان، به پرونده قبلی برمی‌گردید و نسب دوباره بررسی می‌شود؛ پیش‌نویس و کدهای واردشده شما حفظ شده
+          است.{' '}
+          <Link href={'/animals/' + parentOf + '/edit?step=6'} className="hz-link">
             بازگشت به پرونده قبلی
           </Link>
         </Alert>
       ) : null}
 
-      <Stepper current={step} />
-      <p className="text-caption text-text-secondary">
-        مرحله {step} از ۶ · {STEPS[step - 1]}
-      </p>
+      <Card>
+        <Stepper
+          label="مراحل ثبت"
+          steps={STEPS.map((label) => ({ label }))}
+          current={step}
+          onSelect={(target) => setStep(target)}
+        />
+      </Card>
 
-      <Result state={saveState} />
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+        <div className="min-w-0 space-y-lg lg:col-span-7">
+          <Result state={saveState} />
 
-      {step === 1 ? (
-        <Card>
-          <form action={save} className="space-y-lg" data-testid="step-1">
-            <input type="hidden" name="animalId" value={animal.id} />
-            <input type="hidden" name="step" value="2" />
-            <TextField
-              label="نام حیوان"
-              name="name"
-              required
-              defaultValue={animal.name ?? ''}
-              data-testid="animal-name"
-            />
-            <Field label="گونه" required hint="در حال حاضر فقط ثبت سگ پشتیبانی می‌شود.">
-              {({ inputId, describedBy }) => (
-                <input
-                  id={inputId}
-                  aria-describedby={describedBy}
-                  value="سگ"
-                  readOnly
-                  className="w-full rounded-md border border-border-disabled bg-bg-disabled px-md py-sm text-body-sm text-text-disabled"
-                />
-              )}
-            </Field>
-            <BreedPicker breeds={breeds} defaultValue={animal.breedId} required testId="animal-breed" />
-            <Button type="submit" block disabled={savePending} data-testid="step-1-continue">
-              ادامه
-            </Button>
-          </form>
-        </Card>
-      ) : null}
-
-      {step === 2 ? (
-        <Card>
-          <form action={save} className="space-y-lg" data-testid="step-2">
-            <input type="hidden" name="animalId" value={animal.id} />
-            <input type="hidden" name="step" value="3" />
-            <fieldset className="space-y-sm">
-              <legend className="text-label-md">
-                جنسیت <span className="text-status-error-text">*</span>
-              </legend>
-              {(
-                [
-                  ['MALE', 'نر'],
-                  ['FEMALE', 'ماده'],
-                ] as const
-              ).map(([value, label]) => (
-                <label key={value} className="flex items-center gap-sm text-body-sm">
-                  <input
-                    type="radio"
-                    name="sex"
-                    value={value}
-                    defaultChecked={animal.sex === value}
-                    className="size-[var(--size-selection-md)]"
-                    data-testid={'sex-' + value}
-                  />
-                  {label}
-                </label>
-              ))}
-            </fieldset>
-            <TextField
-              label="تاریخ تولد"
-              name="birthDate"
-              type="date"
-              required
-              ltr
-              defaultValue={animal.birthDate ?? ''}
-              data-testid="animal-birth-date"
-            />
-            <label className="flex items-center gap-sm text-label-md">
-              <input
-                type="checkbox"
-                name="birthDateApproximate"
-                defaultChecked={animal.birthDateApproximate}
-                className="size-[var(--size-selection-md)]"
-                data-testid="birth-approximate"
-              />
-              تاریخ تولد تقریبی است
-            </label>
-            <ActionRow
-              primary={
-                <Button type="submit" disabled={savePending} data-testid="step-2-continue">
-                  ادامه
-                </Button>
-              }
-              secondary={
-                <Button tone="secondary" type="button" onClick={back}>
-                  بازگشت
-                </Button>
-              }
-            />
-          </form>
-        </Card>
-      ) : null}
-
-      {step === 3 ? (
-        <Card>
-          <form action={save} className="space-y-lg" data-testid="step-3">
-            <input type="hidden" name="animalId" value={animal.id} />
-            <input type="hidden" name="step" value="4" />
-            <TextField label="رنگ" name="color" defaultValue={animal.color ?? ''} data-testid="animal-color" />
-            <TextField
-              label="نشانه‌های ظاهری"
-              name="markings"
-              hint="مواردی را بنویسید که در تشخیص حیوان کمک می‌کنند."
-              defaultValue={animal.markings ?? ''}
-              data-testid="animal-markings"
-            />
-            <Alert tone="info" title="این اطلاعات اعلامی است">
-              رنگ و نشانه‌های ظاهری اینجا اختیاری است و اظهار شما ثبت می‌شود. در مراجعه، دامپزشک معتمد
-              همین‌ها را با دیدن حیوان تکمیل یا اصلاح می‌کند و از آن پس رسمی و غیرقابل‌تغییر می‌شوند.
-            </Alert>
-            <ActionRow
-              primary={
-                <Button type="submit" disabled={savePending} data-testid="step-3-continue">
-                  ادامه
-                </Button>
-              }
-              secondary={
-                <Button tone="secondary" type="button" onClick={back}>
-                  بازگشت
-                </Button>
-              }
-            />
-          </form>
-        </Card>
-      ) : null}
-
-      {step === 4 ? (
-        <Card>
-          <Result state={photoState} />
-          <form action={uploadPhoto} className="space-y-lg" data-testid="step-4">
-            <input type="hidden" name="animalId" value={animal.id} />
-            <FileField
-              label="تصویر حیوان"
-              name="photo"
-              accept="image/jpeg,image/png"
-              maxBytes={5 * 1024 * 1024}
-              hint="JPG یا PNG تا ۵ مگابایت. این تصویر خصوصی است."
-              testId="animal-photo"
-            />
-            {animal.hasPhoto ? <StatusBadge tone="success">تصویر ذخیره شده است</StatusBadge> : null}
-            <Button tone="secondary" type="submit" block disabled={photoPending} data-testid="upload-photo">
-              {photoPending ? 'در حال بارگذاری…' : 'بارگذاری تصویر'}
-            </Button>
-          </form>
-          <div className="mt-lg">
-            <ActionRow
-              primary={
-                <Button type="button" onClick={next} data-testid="step-4-continue">
-                  ادامه
-                </Button>
-              }
-              secondary={
-                <Button tone="secondary" type="button" onClick={back}>
-                  بازگشت
-                </Button>
-              }
-            />
-          </div>
-        </Card>
-      ) : null}
-
-      {step === 5 ? (
-        <Card>
-          <form action={save} className="space-y-lg" data-testid="step-5">
-            <input type="hidden" name="animalId" value={animal.id} />
-            <input type="hidden" name="step" value="6" />
-            <fieldset className="space-y-sm">
-              <legend className="text-label-md">آیا حیوان در حال حاضر میکروچیپ دارد؟</legend>
-              {(
-                [
-                  ['yes', 'بله'],
-                  ['no', 'خیر'],
-                ] as const
-              ).map(([value, label]) => (
-                <label key={value} className="flex items-center gap-sm text-body-sm">
-                  <input
-                    type="radio"
-                    name="hasMicrochip"
-                    value={value}
-                    checked={hasMicrochip === (value === 'yes')}
-                    onChange={() => setHasMicrochip(value === 'yes')}
-                    className="size-[var(--size-selection-md)]"
-                    data-testid={'has-microchip-' + value}
-                  />
-                  {label}
-                </label>
-              ))}
-            </fieldset>
-            {hasMicrochip ? (
-              <TextField
-                label="شماره میکروچیپ"
-                name="declaredMicrochipNumber"
-                ltr
-                inputMode="numeric"
-                defaultValue={animal.declaredMicrochipNumber ?? ''}
-                data-testid="declared-microchip"
-              />
-            ) : null}
-            <Alert tone="warning" title="این شماره هنوز رسمی نیست">
-              شماره میکروچیپ فقط پس از اسکن و تأیید دامپزشک معتمد رسمی می‌شود.
-            </Alert>
-            <ActionRow
-              primary={
-                <Button type="submit" disabled={savePending} data-testid="step-5-continue">
-                  ادامه
-                </Button>
-              }
-              secondary={
-                <Button tone="secondary" type="button" onClick={back}>
-                  بازگشت
-                </Button>
-              }
-            />
-          </form>
-        </Card>
-      ) : null}
-
-      {step === 6 ? (
-        <div className="space-y-lg">
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نوع ثبت حیوان هم‌زیست</span></h2></div>
-            {/*
-              * Choosing the kind of record is the whole of this step, so the
-              * choice saves itself. A separate "save" button asked the person to
-              * confirm a radio they had already pressed.
-              */}
-            <form ref={originForm} action={save} className="mt-lg space-y-md" data-testid="origin-form">
-              <input type="hidden" name="animalId" value={animal.id} />
-              <input type="hidden" name="step" value="6" />
-              <label className="flex items-start gap-sm text-body-sm">
-                <input
-                  type="radio"
-                  name="origin"
-                  value="G0"
-                  checked={origin === 'G0'}
-                  onChange={() => {
-                    setOrigin('G0');
-                    originForm.current?.requestSubmit();
-                  }}
-                  className="mt-1 size-[var(--size-selection-md)]"
-                  data-testid="origin-G0"
-                />
-                <span>
-                  <span className="block text-label-md">حیوان G0 بدون اسناد هویتی</span>
-                  <span className="text-caption text-text-secondary">
-                    برای حیوانی که سند هویتی، شجره‌نامه یا سابقه نسل قابل‌ارائه ندارد.
-                  </span>
-                </span>
-              </label>
-              <label className="flex items-start gap-sm text-body-sm">
-                <input
-                  type="radio"
-                  name="origin"
-                  value="INTERNAL_G1PLUS"
-                  checked={origin === 'INTERNAL_G1PLUS'}
-                  onChange={() => {
-                    setOrigin('INTERNAL_G1PLUS');
-                    originForm.current?.requestSubmit();
-                  }}
-                  className="mt-1 size-[var(--size-selection-md)]"
-                  data-testid="origin-INTERNAL_G1PLUS"
-                />
-                <span>
-                  <span className="block text-label-md">حیوان G1+ با نسب ثبت‌شده در هم‌زیست</span>
-                  <span className="text-caption text-text-secondary">
-                    کد شجره‌نامه پدر و مادر در هم‌زیست Resolve می‌شود و نسل از همان رکوردها محاسبه می‌شود.
-                  </span>
-                </span>
-              </label>
-              <label className="flex items-start gap-sm text-body-sm">
-                <input
-                  type="radio"
-                  name="origin"
-                  value="FOREIGN_PEDIGREE"
-                  checked={origin === 'FOREIGN_PEDIGREE'}
-                  onChange={() => {
-                    setOrigin('FOREIGN_PEDIGREE');
-                    originForm.current?.requestSubmit();
-                  }}
-                  className="mt-1 size-[var(--size-selection-md)]"
-                  data-testid="origin-FOREIGN_PEDIGREE"
-                />
-                <span>
-                  <span className="block text-label-md">Export Pedigree — شجره‌نامه صادرشده خارج از هم‌زیست</span>
-                  <span className="text-caption text-text-secondary">
-                    هر دو روی برگه و پشت برگه لازم است و پس از بارگذاری هر دو، پرونده برای بررسی به انجمن
-                    می‌رود.
-                  </span>
-                </span>
-              </label>
-            </form>
-          </Card>
-
-          {origin === 'INTERNAL_G1PLUS' ? (
+          {step === 1 ? (
             <Card>
-              <h3 className="text-label-lg">کدهای شجره‌نامه</h3>
-              <Result state={lineageState} />
-              <form action={resolveLineage} className="mt-lg space-y-lg" data-testid="lineage-form">
+              <StepHead step={1} />
+              <form action={save} className="space-y-lg" data-testid="step-1">
                 <input type="hidden" name="animalId" value={animal.id} />
+                <input type="hidden" name="step" value="2" />
                 <TextField
-                  label="کد شجره‌نامه خود حیوان"
-                  name="ownPedigreeCode"
-                  ltr
-                  defaultValue={animal.ownPedigreeCode ?? ''}
-                  data-testid="own-pedigree-code"
+                  label="نام حیوان"
+                  name="name"
+                  required
+                  defaultValue={animal.name ?? ''}
+                  data-testid="animal-name"
                 />
-                <TextField
-                  label="کد شجره‌نامه پدر"
-                  name="sirePedigreeCode"
-                  ltr
-                  defaultValue={animal.sirePedigreeCode ?? ''}
-                  data-testid="sire-pedigree-code"
-                />
-                <TextField
-                  label="کد شجره‌نامه مادر"
-                  name="damPedigreeCode"
-                  ltr
-                  defaultValue={animal.damPedigreeCode ?? ''}
-                  data-testid="dam-pedigree-code"
-                />
-                <Button tone="secondary" type="submit" block disabled={lineagePending} data-testid="resolve-lineage">
-                  {lineagePending ? 'در حال بررسی…' : 'بررسی نسب'}
+                <Field label="گونه" required hint="در حال حاضر فقط ثبت سگ پشتیبانی می‌شود.">
+                  {({ inputId, describedBy }) => (
+                    <input
+                      id={inputId}
+                      aria-describedby={describedBy}
+                      value="سگ"
+                      readOnly
+                      disabled
+                      className="hz-input"
+                    />
+                  )}
+                </Field>
+                <BreedPicker breeds={breeds} defaultValue={animal.breedId} required testId="animal-breed" />
+                <Button type="submit" block disabled={savePending} data-testid="step-1-continue">
+                  ادامه
                 </Button>
               </form>
-
-              <p className="mt-lg text-body-sm">
-                نسل محاسبه‌شده: <span data-testid="computed-generation">G{animal.generation}</span>
-              </p>
-              <p className="mt-2xs text-caption text-text-secondary">
-                نسل فقط‌خواندنی است و از رکورد والدین محاسبه می‌شود؛ امکان انتخاب یا افزایش دستی وجود ندارد.
-              </p>
-
-              {animal.lastLineageState === 'PARENT_MISSING' ? (
-                <form action={registerMissingParentAction} className="mt-lg">
-                  <input type="hidden" name="animalId" value={animal.id} />
-                  <Button tone="secondary" type="submit" block data-testid="register-missing-parent">
-                    ثبت والد گمشده
-                  </Button>
-                </form>
-              ) : null}
             </Card>
           ) : null}
 
-          {origin === 'FOREIGN_PEDIGREE' ? (
+          {step === 2 ? (
             <Card>
-              <h3 className="text-label-lg">Export Pedigree</h3>
-              <p className="mt-sm text-body-sm text-text-secondary">
-                پس از ثبت حیوان، مدرک را در همان پرونده بارگذاری و برای بررسی انجمن ارسال کنید.
-              </p>
+              <StepHead step={2} />
+              <form action={save} className="space-y-lg" data-testid="step-2">
+                <input type="hidden" name="animalId" value={animal.id} />
+                <input type="hidden" name="step" value="3" />
+                <fieldset className="hz-fieldset">
+                  <legend className="hz-field__label">
+                    جنسیت
+                    <span className="hz-field__req" aria-hidden="true">
+                      *
+                    </span>
+                  </legend>
+                  <div className="hz-choice-group hz-choice-group--inline">
+                    {(
+                      [
+                        ['MALE', 'نر'],
+                        ['FEMALE', 'ماده'],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <label key={value} className="hz-radio">
+                        <input
+                          type="radio"
+                          name="sex"
+                          value={value}
+                          defaultChecked={animal.sex === value}
+                          data-testid={'sex-' + value}
+                        />
+                        <span className="hz-radio__text">
+                          <span>{label}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+                <TextField
+                  label="تاریخ تولد"
+                  name="birthDate"
+                  type="date"
+                  required
+                  ltr
+                  defaultValue={animal.birthDate ?? ''}
+                  data-testid="animal-birth-date"
+                />
+                <label className="hz-check">
+                  <input
+                    type="checkbox"
+                    name="birthDateApproximate"
+                    defaultChecked={animal.birthDateApproximate}
+                    data-testid="birth-approximate"
+                  />
+                  <span className="hz-check__text">
+                    <span className="hz-check__label">تاریخ تولد تقریبی است</span>
+                  </span>
+                </label>
+                <ActionRow
+                  primary={
+                    <Button type="submit" disabled={savePending} data-testid="step-2-continue">
+                      ادامه
+                    </Button>
+                  }
+                  secondary={
+                    <Button tone="secondary" type="button" onClick={back}>
+                      مرحله قبل
+                    </Button>
+                  }
+                />
+              </form>
+            </Card>
+          ) : null}
+
+          {step === 3 ? (
+            <Card>
+              <StepHead step={3} />
+              <form action={save} className="space-y-lg" data-testid="step-3">
+                <input type="hidden" name="animalId" value={animal.id} />
+                <input type="hidden" name="step" value="4" />
+                <TextField label="رنگ" name="color" defaultValue={animal.color ?? ''} data-testid="animal-color" />
+                <TextField
+                  label="نشانه‌های ظاهری"
+                  name="markings"
+                  hint="مواردی را بنویسید که در تشخیص حیوان کمک می‌کنند."
+                  defaultValue={animal.markings ?? ''}
+                  data-testid="animal-markings"
+                />
+                <Alert tone="info" title="این اطلاعات اعلامی است">
+                  رنگ و نشانه‌های ظاهری اینجا اختیاری است و اظهار شما ثبت می‌شود. در مراجعه، دامپزشک معتمد همین‌ها را با
+                  دیدن حیوان تکمیل یا اصلاح می‌کند و از آن پس رسمی و غیرقابل‌تغییر می‌شوند.
+                </Alert>
+                <ActionRow
+                  primary={
+                    <Button type="submit" disabled={savePending} data-testid="step-3-continue">
+                      ادامه
+                    </Button>
+                  }
+                  secondary={
+                    <Button tone="secondary" type="button" onClick={back}>
+                      مرحله قبل
+                    </Button>
+                  }
+                />
+              </form>
+            </Card>
+          ) : null}
+
+          {step === 4 ? (
+            <Card>
+              <StepHead step={4} />
+              <Result state={photoState} />
+              <form action={uploadPhoto} className="space-y-lg" data-testid="step-4">
+                <input type="hidden" name="animalId" value={animal.id} />
+                <FileField
+                  label="تصویر حیوان"
+                  name="photo"
+                  accept="image/jpeg,image/png"
+                  maxBytes={5 * 1024 * 1024}
+                  hint="JPG یا PNG تا ۵ مگابایت. این تصویر خصوصی است."
+                  testId="animal-photo"
+                />
+                {animal.hasPhoto ? <StatusBadge tone="success">تصویر ذخیره شده است</StatusBadge> : null}
+                <Button tone="secondary" type="submit" block disabled={photoPending} data-testid="upload-photo">
+                  {photoPending ? 'در حال بارگذاری…' : 'بارگذاری تصویر'}
+                </Button>
+              </form>
               <div className="mt-lg">
-                <ButtonLink tone="secondary" href={'/animals/' + animal.id + '/foreign-pedigree'} block>
-                  رفتن به بارگذاری مدرک
-                </ButtonLink>
+                <ActionRow
+                  primary={
+                    <Button type="button" onClick={next} data-testid="step-4-continue">
+                      ادامه
+                    </Button>
+                  }
+                  secondary={
+                    <Button tone="secondary" type="button" onClick={back}>
+                      مرحله قبل
+                    </Button>
+                  }
+                />
               </div>
             </Card>
           ) : null}
 
+          {step === 5 ? (
+            <Card>
+              <StepHead step={5} />
+              <form action={save} className="space-y-lg" data-testid="step-5">
+                <input type="hidden" name="animalId" value={animal.id} />
+                <input type="hidden" name="step" value="6" />
+                <fieldset className="hz-fieldset">
+                  <legend className="hz-field__label">آیا حیوان در حال حاضر میکروچیپ دارد؟</legend>
+                  <div className="hz-choice-group hz-choice-group--inline">
+                    {(
+                      [
+                        ['yes', 'بله'],
+                        ['no', 'خیر'],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <label key={value} className="hz-radio">
+                        <input
+                          type="radio"
+                          name="hasMicrochip"
+                          value={value}
+                          checked={hasMicrochip === (value === 'yes')}
+                          onChange={() => setHasMicrochip(value === 'yes')}
+                          data-testid={'has-microchip-' + value}
+                        />
+                        <span className="hz-radio__text">
+                          <span>{label}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+                {hasMicrochip ? (
+                  <TextField
+                    label="شماره میکروچیپ"
+                    name="declaredMicrochipNumber"
+                    ltr
+                    inputMode="numeric"
+                    defaultValue={animal.declaredMicrochipNumber ?? ''}
+                    data-testid="declared-microchip"
+                  />
+                ) : null}
+                <Alert tone="warning" title="این شماره هنوز رسمی نیست">
+                  شماره میکروچیپ فقط پس از اسکن و تأیید دامپزشک معتمد رسمی می‌شود.
+                </Alert>
+                <ActionRow
+                  primary={
+                    <Button type="submit" disabled={savePending} data-testid="step-5-continue">
+                      ادامه
+                    </Button>
+                  }
+                  secondary={
+                    <Button tone="secondary" type="button" onClick={back}>
+                      مرحله قبل
+                    </Button>
+                  }
+                />
+              </form>
+            </Card>
+          ) : null}
+
+          {step === 6 ? (
+            <div className="space-y-lg">
+              <Card>
+                <StepHead step={6} />
+                <SectionHeader size="sm" title="نوع ثبت حیوان هم‌زیست" />
+                {/*
+                 * Choosing the kind of record is the whole of this step, so the
+                 * choice saves itself. A separate "save" button asked the person to
+                 * confirm a radio they had already pressed.
+                 */}
+                <form
+                  ref={originForm}
+                  action={save}
+                  className="hz-choice-group hz-choice-group--stack mt-lg"
+                  data-testid="origin-form"
+                >
+                  <input type="hidden" name="animalId" value={animal.id} />
+                  <input type="hidden" name="step" value="6" />
+                  <label className="hz-option hz-option--card">
+                    <input
+                      type="radio"
+                      name="origin"
+                      value="G0"
+                      checked={origin === 'G0'}
+                      onChange={() => {
+                        setOrigin('G0');
+                        originForm.current?.requestSubmit();
+                      }}
+                      data-testid="origin-G0"
+                    />
+                    <span className="hz-option__text">
+                      <span className="hz-option__label">حیوان G0 بدون اسناد هویتی</span>
+                      <span className="hz-option__desc">
+                        برای حیوانی که سند هویتی، شجره‌نامه یا سابقه نسل قابل‌ارائه ندارد.
+                      </span>
+                    </span>
+                  </label>
+                  <label className="hz-option hz-option--card">
+                    <input
+                      type="radio"
+                      name="origin"
+                      value="INTERNAL_G1PLUS"
+                      checked={origin === 'INTERNAL_G1PLUS'}
+                      onChange={() => {
+                        setOrigin('INTERNAL_G1PLUS');
+                        originForm.current?.requestSubmit();
+                      }}
+                      data-testid="origin-INTERNAL_G1PLUS"
+                    />
+                    <span className="hz-option__text">
+                      <span className="hz-option__label">حیوان G1+ با نسب ثبت‌شده در هم‌زیست</span>
+                      <span className="hz-option__desc">
+                        کد شجره‌نامه پدر و مادر در هم‌زیست Resolve می‌شود و نسل از همان رکوردها محاسبه می‌شود.
+                      </span>
+                    </span>
+                  </label>
+                  <label className="hz-option hz-option--card">
+                    <input
+                      type="radio"
+                      name="origin"
+                      value="FOREIGN_PEDIGREE"
+                      checked={origin === 'FOREIGN_PEDIGREE'}
+                      onChange={() => {
+                        setOrigin('FOREIGN_PEDIGREE');
+                        originForm.current?.requestSubmit();
+                      }}
+                      data-testid="origin-FOREIGN_PEDIGREE"
+                    />
+                    <span className="hz-option__text">
+                      <span className="hz-option__label">Export Pedigree — شجره‌نامه صادرشده خارج از هم‌زیست</span>
+                      <span className="hz-option__desc">
+                        هر دو روی برگه و پشت برگه لازم است و پس از بارگذاری هر دو، پرونده برای بررسی به انجمن می‌رود.
+                      </span>
+                    </span>
+                  </label>
+                </form>
+              </Card>
+
+              {origin === 'INTERNAL_G1PLUS' ? (
+                <Card>
+                  <SectionHeader size="sm" title="کدهای شجره‌نامه" />
+                  <Result state={lineageState} />
+                  <form action={resolveLineage} className="mt-lg space-y-lg" data-testid="lineage-form">
+                    <input type="hidden" name="animalId" value={animal.id} />
+                    <TextField
+                      label="کد شجره‌نامه خود حیوان"
+                      name="ownPedigreeCode"
+                      ltr
+                      defaultValue={animal.ownPedigreeCode ?? ''}
+                      data-testid="own-pedigree-code"
+                    />
+                    <TextField
+                      label="کد شجره‌نامه پدر"
+                      name="sirePedigreeCode"
+                      ltr
+                      defaultValue={animal.sirePedigreeCode ?? ''}
+                      data-testid="sire-pedigree-code"
+                    />
+                    <TextField
+                      label="کد شجره‌نامه مادر"
+                      name="damPedigreeCode"
+                      ltr
+                      defaultValue={animal.damPedigreeCode ?? ''}
+                      data-testid="dam-pedigree-code"
+                    />
+                    <Button
+                      tone="secondary"
+                      type="submit"
+                      block
+                      disabled={lineagePending}
+                      data-testid="resolve-lineage"
+                    >
+                      {lineagePending ? 'در حال بررسی…' : 'بررسی نسب'}
+                    </Button>
+                  </form>
+
+                  <p className="mt-lg text-body-sm">
+                    نسل محاسبه‌شده: <span data-testid="computed-generation">G{animal.generation}</span>
+                  </p>
+                  <p className="mt-2xs text-caption text-text-secondary">
+                    نسل فقط‌خواندنی است و از رکورد والدین محاسبه می‌شود؛ امکان انتخاب یا افزایش دستی وجود ندارد.
+                  </p>
+
+                  {animal.lastLineageState === 'PARENT_MISSING' ? (
+                    <form action={registerMissingParentAction} className="mt-lg">
+                      <input type="hidden" name="animalId" value={animal.id} />
+                      <Button tone="secondary" type="submit" block data-testid="register-missing-parent">
+                        ثبت والد گمشده
+                      </Button>
+                    </form>
+                  ) : null}
+                </Card>
+              ) : null}
+
+              {origin === 'FOREIGN_PEDIGREE' ? (
+                <Card>
+                  <SectionHeader size="sm" title="Export Pedigree" />
+                  <p className="mt-sm text-body-sm text-text-secondary">
+                    پس از ثبت حیوان، مدرک را در همان پرونده بارگذاری و برای بررسی انجمن ارسال کنید.
+                  </p>
+                  <div className="mt-lg">
+                    <ButtonLink tone="secondary" href={'/animals/' + animal.id + '/foreign-pedigree'} block>
+                      رفتن به بارگذاری مدرک
+                    </ButtonLink>
+                  </div>
+                </Card>
+              ) : null}
+
+              <Card>
+                <SectionHeader size="sm" title="مرور و ثبت" />
+                <p className="mt-sm text-caption text-text-secondary">
+                  ثبت اولیه حیوان با صدور برگه ثبتی، شناسه رسمی یا شجره‌نامه یکی نیست.
+                </p>
+                <Result state={registerState} />
+                <form action={register} className="mt-lg">
+                  <input type="hidden" name="animalId" value={animal.id} />
+                  <Button type="submit" block disabled={registerPending} data-testid="register-animal">
+                    {registerPending ? 'در حال ثبت…' : 'ثبت حیوان هم‌زیست'}
+                  </Button>
+                </form>
+                <div className="mt-md">
+                  <Button tone="secondary" type="button" block onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          ) : null}
+        </div>
+
+        <aside className="min-w-0 space-y-xl lg:col-span-5" aria-label="خلاصه پیش‌نویس">
           <Card>
-            <h3 className="text-label-lg">مرور و ثبت</h3>
-            <p className="mt-sm text-caption text-text-secondary">
-              ثبت اولیه حیوان با صدور برگه ثبتی، شناسه رسمی یا شجره‌نامه یکی نیست.
-            </p>
-            <Result state={registerState} />
-            <form action={register} className="mt-lg">
-              <input type="hidden" name="animalId" value={animal.id} />
-              <Button type="submit" block disabled={registerPending} data-testid="register-animal">
-                {registerPending ? 'در حال ثبت…' : 'ثبت حیوان هم‌زیست'}
-              </Button>
-            </form>
+            <SectionHeader size="sm" title="خلاصه پیش‌نویس" />
             <div className="mt-md">
-              <Button tone="secondary" type="button" block onClick={back}>
-                بازگشت
-              </Button>
+              <KeyValueList
+                rows={[
+                  { key: 'گونه', value: 'سگ' },
+                  {
+                    key: 'نژاد',
+                    value: breeds.find((breed) => breed.id === animal.breedId)?.nameFa,
+                  },
+                  { key: 'نام', value: animal.name },
+                  {
+                    key: 'جنس',
+                    value: animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : null,
+                  },
+                  {
+                    key: 'تاریخ تولد',
+                    value: animal.birthDate ? (
+                      <bdi dir="ltr">{animal.birthDate + (animal.birthDateApproximate ? ' ~' : '')}</bdi>
+                    ) : null,
+                  },
+                  { key: 'رنگ', value: animal.color },
+                  { key: 'تصویر', value: animal.hasPhoto ? 'ذخیره شده' : null },
+                  {
+                    key: 'میکروچیپ اعلامی',
+                    value: animal.declaredMicrochipNumber ? (
+                      <bdi dir="ltr">{animal.declaredMicrochipNumber}</bdi>
+                    ) : null,
+                  },
+                ]}
+              />
+            </div>
+            <p className="mt-md text-caption text-text-secondary">
+              هر مرحله جدا ذخیره می‌شود؛ هر وقت برگردید از همین مرحله ادامه می‌دهید.
+            </p>
+          </Card>
+          <Card>
+            <SectionHeader size="sm" title="پس از ثبت" />
+            <ol className="mt-md list-decimal space-y-sm ps-xl text-body-sm text-text-secondary">
+              <li>حیوان را برای کاشت یا تأیید میکروچیپ و نمونه‌گیری نزد دامپزشک معتمد ببرید.</li>
+              <li>پس از تأیید دامپزشک، مشخصات رسمی ثبت می‌شود و برگه ثبتی قابل درخواست است.</li>
+            </ol>
+            <div className="hz-card__footer">
+              <Link href="/vets" className="hz-link hz-link--standalone">
+                فهرست دامپزشکان معتمد
+              </Link>
             </div>
           </Card>
-        </div>
-      ) : null}
+        </aside>
+      </div>
     </div>
   );
 }

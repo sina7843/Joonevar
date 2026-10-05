@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { RichText } from './rich-text.tsx';
 import { RelatedColumn } from '../public/related-column.tsx';
-import { relatedContent, similarCentres, similarVets } from '../public/related.ts';
+import { relatedContent, similarCentres } from '../public/related.ts';
 import Link from 'next/link';
 import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { db } from '../db/client.ts';
 import { publicContentBySlug, publicContentList } from './service.ts';
-import { KIND_PATH, KIND_PLURAL_FA, TEAM_BYLINE } from './model.ts';
+import { KIND_FA, KIND_PATH, KIND_PLURAL_FA, TEAM_BYLINE } from './model.ts';
 import { EXTERNAL_BODY_NOTICE_FA, isExternalBodyCategory } from './taxonomy.ts';
 import { formatCivilDateFa } from '../domain/calendar.ts';
 import { buildMetadata } from '../seo/metadata.ts';
@@ -18,6 +18,12 @@ import { Breadcrumbs } from '../ui/breadcrumbs.tsx';
 import { EmptyState } from '../ui/states.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { Button, ButtonLink } from '../ui/button.tsx';
+import { Icon } from '../ui/icon.tsx';
+import { PageHeader } from '../ui/section-header.tsx';
+import { RecordImage } from '../ui/record-image.tsx';
+import { SearchField } from '../ui/search-field.tsx';
+import { FilterChips } from '../ui/filter-bar.tsx';
+import { Pagination } from '../ui/pagination.tsx';
 
 /**
  * Public pages of the CMS — Requirements-Phase-2 §12, §19 (PROMPT-004).
@@ -69,14 +75,6 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
   const result = await publicContentList(db(), { kind, categorySlug, term, page });
   const { origin } = site();
   const base = pathOf(kind);
-  // The column beside a list offers what the list does not: the other kind of
-  // reading, and the directories.
-  const otherKind = kind === 'ARTICLE' ? 'NEWS' : 'ARTICLE';
-  const [otherReading, listVets, listCentres] = await Promise.all([
-    relatedContent(db(), { kind: otherKind, limit: 3 }),
-    similarVets(db(), { limit: 3 }),
-    similarCentres(db(), { limit: 3 }),
-  ]);
   const crumbs = [
     { name: 'خانه', path: '/' },
     { name: KIND_PLURAL_FA[kind], path: base },
@@ -89,120 +87,125 @@ export async function ContentList({ kind, searchParams }: { kind: PublicKind; se
     const encoded = params.toString();
     return base + (encoded ? '?' + encoded : '');
   };
+  // P01 landing: the newest item leads as the feature card on the unfiltered first page.
+  const leadFirst = result.page === 1 && !term && categorySlug === null;
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
-    <div className="min-w-0 space-y-xl">
-      <Breadcrumbs items={crumbs} origin={origin} />
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{KIND_PLURAL_FA[kind]}</h1>
-        <p className="max-w-2xl text-body-md text-text-secondary">{LIST_DESCRIPTION[kind]}</p>
-      </header>
+    <div className="space-y-s48 lg:space-y-s64">
+      <div className="space-y-xl">
+        <div className="space-y-md">
+          <Breadcrumbs items={crumbs} origin={origin} />
+          <PageHeader
+            title={KIND_PLURAL_FA[kind]}
+            meta={[
+              LIST_DESCRIPTION[kind],
+              ...(result.visibleTotal > 0 ? [fa(result.visibleTotal) + ' مطلب منتشرشده'] : []),
+            ]}
+          />
+        </div>
 
-      <form method="get" action={base} role="search" className="flex flex-wrap gap-sm" data-testid="content-search">
-        {categorySlug ? <input type="hidden" name="category" value={categorySlug} /> : null}
-        <label htmlFor="content-q" className="sr-only">
-          {'جست‌وجو در ' + KIND_PLURAL_FA[kind]}
-        </label>
-        <input
-          id="content-q"
-          name="q"
-          type="search"
-          defaultValue={term}
-          placeholder={'جست‌وجو در ' + KIND_PLURAL_FA[kind]}
-          className="min-h-[var(--size-control-md)] w-full max-w-md rounded-md border border-border-control bg-bg-surface px-md py-sm text-body-sm focus:border-border-brand"
-          data-testid="content-search-input"
-        />
-        <Button type="submit" data-testid="content-search-submit">
-          جست‌وجو
-        </Button>
-      </form>
+        <form method="get" action={base} role="search" className="flex gap-sm" data-testid="content-search">
+          {categorySlug ? <input type="hidden" name="category" value={categorySlug} /> : null}
+          <SearchField
+            id="content-q"
+            name="q"
+            label={'جست‌وجو در ' + KIND_PLURAL_FA[kind]}
+            defaultValue={term}
+            className="min-w-0 flex-1 md:max-w-[36rem]"
+            data-testid="content-search-input"
+          />
+          <Button type="submit" tone="secondary" data-testid="content-search-submit">
+            جست‌وجو
+          </Button>
+        </form>
 
-      {result.categories.length > 0 ? (
-        <nav aria-label="دسته‌ها" className="hz-rail flex gap-sm overflow-x-auto pb-xs" data-testid="content-categories">
-          {[{ slug: null as string | null, nameFa: 'همه' }, ...result.categories].map((category) => {
-            const current = category.slug === (result.category?.slug ?? null);
-            return (
-              <Link
-                key={category.slug ?? 'all'}
-                href={hrefFor(1, category.slug)}
-                aria-current={current ? 'page' : undefined}
-                className={[
-                  'shrink-0 rounded-full border px-lg py-xs text-label-md whitespace-nowrap',
-                  current ? 'border-border-brand bg-bg-brand-subtle text-text-brand' : 'border-border-subtle bg-bg-surface text-text-secondary',
-                ].join(' ')}
-              >
-                {category.nameFa}
-              </Link>
-            );
-          })}
-        </nav>
-      ) : null}
+        {result.categories.length > 0 ? (
+          <FilterChips
+            label="دسته‌ها"
+            testId="content-categories"
+            chips={[{ slug: null as string | null, nameFa: 'همه' }, ...result.categories].map((category) => ({
+              key: category.slug ?? 'all',
+              href: hrefFor(1, category.slug),
+              label: category.nameFa,
+              current: category.slug === (result.category?.slug ?? null),
+            }))}
+          />
+        ) : null}
 
-      {categorySlug !== null && result.category === null ? (
-        <EmptyState
-          title="این دسته پیدا نشد"
-          description="ممکن است دسته کنار گذاشته شده باشد."
-          action={<ButtonLink tone="secondary" href={base}>{'همه ' + KIND_PLURAL_FA[kind]}</ButtonLink>}
-        />
-      ) : result.visibleTotal === 0 ? (
-        <EmptyState title={EMPTY_TITLE[kind]} description="مطالب پس از انتشار اینجا دیده می‌شوند." />
-      ) : result.items.length === 0 ? (
-        <EmptyState
-          title={term ? 'چیزی با «' + term + '» پیدا نشد' : 'اینجا هنوز مطلبی منتشر نشده است'}
-          description={term ? 'واژه دیگری را امتحان کنید یا فیلتر دسته را بردارید.' : 'دسته دیگری را ببینید.'}
-          action={<ButtonLink tone="secondary" href={base}>{'همه ' + KIND_PLURAL_FA[kind]}</ButtonLink>}
-        />
-      ) : (
-        <section aria-labelledby="content-results-title">
-          <h2 id="content-results-title" className="text-body-sm text-text-secondary">
-            {fa(result.total) + ' مطلب'}
+        {categorySlug !== null && result.category === null ? (
+          <EmptyState
+            title="این دسته پیدا نشد"
+            description="ممکن است دسته کنار گذاشته شده باشد."
+            action={<ButtonLink tone="secondary" href={base}>{'همه ' + KIND_PLURAL_FA[kind]}</ButtonLink>}
+          />
+        ) : result.visibleTotal === 0 ? (
+          <EmptyState title={EMPTY_TITLE[kind]} description="مطالب پس از انتشار اینجا دیده می‌شوند." />
+        ) : result.items.length === 0 ? (
+          <EmptyState
+            title={term ? 'چیزی با «' + term + '» پیدا نشد' : 'اینجا هنوز مطلبی منتشر نشده است'}
+            description={term ? 'واژه دیگری را امتحان کنید یا فیلتر دسته را بردارید.' : 'دسته دیگری را ببینید.'}
+            action={<ButtonLink tone="secondary" href={base}>{'همه ' + KIND_PLURAL_FA[kind]}</ButtonLink>}
+          />
+        ) : (
+          <section aria-labelledby="content-results-title" className="space-y-xl">
+            <h2 id="content-results-title" className="hz-visually-hidden">
+              {fa(result.total) + ' مطلب'}
+            </h2>
+            <ul className="grid gap-s20 md:grid-cols-2 lg:grid-cols-3" data-testid="content-results">
+              {result.items.map((item, index) => {
+                const lead = leadFirst && index === 0;
+                return (
+                  <li key={item.slug} className={lead ? 'md:col-span-2 lg:row-span-2' : undefined}>
+                    <Link
+                      href={base + '/' + item.slug}
+                      className={(lead ? 'hz-article hz-article--feature' : 'hz-article') + ' hz-card--interactive h-full'}
+                      title={item.titleFa}
+                      data-testid={'content-card-' + item.slug}
+                    >
+                      <RecordImage variant={lead ? 'banner' : '3x2'} fileId={item.imageFileId} altFa={item.imageAltFa} priority={index === 0} />
+                      <div className="hz-article__body">
+                        <span className="hz-tag">{item.categoryNameFa ?? KIND_FA[kind]}</span>
+                        <h3 className="hz-article__title">{item.titleFa}</h3>
+                        <p className="hz-article__summary">{item.summaryFa}</p>
+                        <div className="hz-meta">
+                          <time className="hz-meta__item" dateTime={item.publishAt.toISOString()}>
+                            {DATE_FA.format(item.publishAt)}
+                          </time>
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <Pagination
+              page={result.page}
+              pageSize={result.pageSize}
+              total={result.total}
+              totalPages={result.totalPages}
+              hrefFor={(target) => hrefFor(target)}
+              label={'صفحه‌بندی ' + KIND_PLURAL_FA[kind]}
+            />
+          </section>
+        )}
+      </div>
+
+      <section className="hz-cta" aria-labelledby="content-cta-title">
+        <div className="hz-cta__text">
+          <h2 className="hz-cta__title" id="content-cta-title">
+            هویت حیوانت را ثبت کن
           </h2>
-          <ul className="mt-md grid gap-md sm:grid-cols-2 lg:grid-cols-3" data-testid="content-results">
-            {result.items.map((item) => (
-              <li key={item.slug}>
-                <Link
-                  href={base + '/' + item.slug}
-                  className="flex h-full flex-col overflow-hidden rounded-lg border border-border-default bg-bg-surface transition-colors hover:border-border-control"
-                  data-testid={'content-card-' + item.slug}
-                >
-                  {item.imageFileId ? (
-                    <img
-                      src={'/media/' + item.imageFileId}
-                      alt={item.imageAltFa ?? ''}
-                      loading="lazy"
-                      decoding="async"
-                      className="aspect-[16/9] w-full object-cover"
-                    />
-                  ) : null}
-                  <span className="flex flex-1 flex-col gap-xs p-lg">
-                    {item.categoryNameFa ? <span className="text-caption text-text-brand">{item.categoryNameFa}</span> : null}
-                    <span className="text-label-lg text-text-primary">{item.titleFa}</span>
-                    <span className="line-clamp-3 text-body-sm text-text-secondary">{item.summaryFa}</span>
-                    <span className="mt-auto pt-sm text-caption text-text-secondary">{DATE_FA.format(item.publishAt)}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          {result.totalPages > 1 ? (
-            <nav aria-label="صفحه‌بندی" className="mt-lg flex items-center justify-between gap-md">
-              {result.page > 1 ? <ButtonLink tone="secondary" href={hrefFor(result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
-              <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-              {result.page < result.totalPages ? <ButtonLink tone="secondary" href={hrefFor(result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
-            </nav>
-          ) : null}
-        </section>
-      )}
-    </div>
-
-      <RelatedColumn
-        groups={[
-          { titleFa: otherKind === 'NEWS' ? 'اخبار تازه' : 'آموزش‌ها', items: otherReading },
-          { titleFa: 'دامپزشکان', items: listVets },
-          { titleFa: 'مراکز دامپزشکی', items: listCentres },
-        ]}
-      />
+          <p className="hz-cta__body">ثبت در شش مرحله؛ هر مرحله ذخیره می‌شود و بعداً ادامه می‌دهید.</p>
+        </div>
+        <div className="hz-cta__actions">
+          <ButtonLink href="/animals/new" size="lg" iconStart="plus">
+            ثبت حیوان
+          </ButtonLink>
+          <ButtonLink tone="secondary" size="lg" href="/verify" iconStart="shieldCheck">
+            استعلام اصالت سند
+          </ButtonLink>
+        </div>
+      </section>
     </div>
   );
 }
@@ -250,132 +253,158 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
     { name: KIND_PLURAL_FA[kind], path: pathOf(kind) },
     { name: item.titleFa, path },
   ];
+  const tagLabel = KIND_FA[kind] + (categoryNameFa ? ' · ' + categoryNameFa : '');
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
-    <article className="min-w-0 space-y-xl" data-testid="content-page">
-      <Breadcrumbs items={crumbs} origin={origin} />
-      <JsonLdScript
-        data={articleLd(
-          {
-            type: kind === 'ARTICLE' ? 'Article' : 'NewsArticle',
-            headline: item.titleFa,
-            description: item.summaryFa,
-            path,
-            datePublished: item.publishAt!,
-            dateModified: item.updatedAt,
-            authorName: byline,
-            authorIsPerson: byline !== TEAM_BYLINE,
-            imagePath: item.imageFileId ? '/media/' + item.imageFileId : null,
-          },
-          origin,
-        )}
-      />
+    <div className="hz-reading">
+      <article className="hz-reading__main hz-content-detail space-y-xl" aria-labelledby="content-title" data-testid="content-page">
+        <JsonLdScript
+          data={articleLd(
+            {
+              type: kind === 'ARTICLE' ? 'Article' : 'NewsArticle',
+              headline: item.titleFa,
+              description: item.summaryFa,
+              path,
+              datePublished: item.publishAt!,
+              dateModified: item.updatedAt,
+              authorName: byline,
+              authorIsPerson: byline !== TEAM_BYLINE,
+              imagePath: item.imageFileId ? '/media/' + item.imageFileId : null,
+            },
+            origin,
+          )}
+        />
 
-      {isExternalBodyCategory(categorySlug) ? (
-        <Alert tone="info" title="مطلب آموزشی درباره یک سازمان دیگر">
-          <span data-testid="content-external-body-notice">{EXTERNAL_BODY_NOTICE_FA}</span>
-        </Alert>
-      ) : null}
+        <header className="hz-content-detail__head">
+          <Breadcrumbs items={crumbs} origin={origin} />
+          {isExternalBodyCategory(categorySlug) ? (
+            <Alert tone="info" title="مطلب آموزشی درباره یک سازمان دیگر">
+              <span data-testid="content-external-body-notice">{EXTERNAL_BODY_NOTICE_FA}</span>
+            </Alert>
+          ) : null}
+          {state === 'ARCHIVED' ? (
+            <Alert tone="warning" title="این مطلب بایگانی شده است">
+              <span data-testid="content-archived-notice">مطالب آن دیگر به‌روز نمی‌شود و ممکن است قدیمی باشد.</span>
+            </Alert>
+          ) : null}
+          {categorySlug ? (
+            <Link className="hz-tag" href={pathOf(kind) + '?category=' + encodeURIComponent(categorySlug)}>
+              {tagLabel}
+            </Link>
+          ) : (
+            <span className="hz-tag">{tagLabel}</span>
+          )}
+          <h1 className="hz-content-detail__title" id="content-title">
+            {item.titleFa}
+          </h1>
+          <p className="hz-content-detail__lead">{item.summaryFa}</p>
+          <div className="hz-content-detail__byline" data-testid="content-meta">
+            <span className="hz-content-detail__author">
+              <span className="hz-avatar-initials" aria-hidden="true">
+                {byline.trim().charAt(0)}
+              </span>
+              <span>
+                {byline}
+                <span className="hz-content-detail__author-role">{byline === TEAM_BYLINE ? 'ناشر' : 'نویسنده'}</span>
+              </span>
+            </span>
+            <div className="hz-meta">
+              <time className="hz-meta__item" dateTime={item.publishAt!.toISOString()}>
+                <Icon name="calendarBlank" size="xs" />
+                {'انتشار: ' + DATE_FA.format(item.publishAt!)}
+              </time>
+            </div>
+          </div>
+        </header>
 
-      {state === 'ARCHIVED' ? (
-        <Alert tone="warning" title="این مطلب بایگانی شده است">
-          <span data-testid="content-archived-notice">مطالب آن دیگر به‌روز نمی‌شود و ممکن است قدیمی باشد.</span>
-        </Alert>
-      ) : null}
+        {item.imageFileId ? (
+          <figure className="hz-figure">
+            {/*
+              The stored file carries no dimensions, so the space is reserved by
+              aspect ratio instead (CLS). It is the largest element above the
+              fold, so it is fetched eagerly rather than lazily (PROMPT-018).
+            */}
+            <div className="hz-media hz-media--16x9">
+              <img
+                src={'/media/' + item.imageFileId}
+                alt={item.imageAltFa ?? ''}
+                decoding="async"
+                fetchPriority="high"
+                width={1200}
+                height={675}
+                data-testid="content-image"
+              />
+            </div>
+          </figure>
+        ) : null}
 
-      <header>
-        {categoryNameFa ? <p className="text-label-md text-text-brand">{categoryNameFa}</p> : null}
-        <h1 className="mt-xs text-h2 md:text-h1">{item.titleFa}</h1>
-        <p className="mt-sm text-body-sm text-text-secondary" data-testid="content-meta">
-          {['نوشته: ' + byline, 'انتشار: ' + DATE_FA.format(item.publishAt!), item.reviewedOn ? 'بازبینی: ' + formatCivilDateFa(item.reviewedOn) : null]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
-      </header>
+        <div data-testid="content-body">
+          <RichText source={item.bodyFa} />
+          {item.sources.length > 0 ? (
+            <div className="hz-prose__source mt-s32 border-t border-border-subtle pt-lg" data-testid="content-sources">
+              <h2 id="content-sources-title" className="text-label-md text-text-secondary">
+                منابع
+              </h2>
+              <ol className="mt-xs list-decimal space-y-2xs ps-xl" aria-labelledby="content-sources-title">
+                {item.sources.map((source) => (
+                  <li key={source.title + (source.url ?? '')}>
+                    {source.url ? (
+                      <a href={source.url} target="_blank" rel="nofollow noopener noreferrer" className="hz-link">
+                        {source.title}
+                      </a>
+                    ) : (
+                      source.title
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
+        </div>
 
-      {item.imageFileId ? (
-        <figure>
-          {/*
-            The stored file carries no dimensions, so the space is reserved by
-            aspect ratio instead: without it this image arrives after the text
-            and pushes the article down (CLS). It is the largest element above
-            the fold, so it is fetched eagerly rather than lazily (PROMPT-018).
-          */}
-          <img
-            src={'/media/' + item.imageFileId}
-            alt={item.imageAltFa ?? ''}
-            decoding="async"
-            fetchPriority="high"
-            className="aspect-[16/9] max-h-[480px] w-full rounded-lg object-cover"
-            data-testid="content-image"
-          />
-        </figure>
-      ) : null}
+        <footer className="hz-content-detail__foot">
+          {item.tags.length > 0 ? (
+            <ul aria-label="برچسب‌ها" className="hz-tag-list">
+              {item.tags.map((tag) => (
+                <li key={tag} className="hz-tag hz-tag--neutral">
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {item.reviewedOn ? (
+            <p className="hz-content-detail__reviewed">{'بازبینی محتوا: ' + formatCivilDateFa(item.reviewedOn)}</p>
+          ) : null}
+          {breed ? (
+            <p className="hz-body-sm" data-testid="content-breed">
+              {'نژاد مرتبط: '}
+              <Link href={'/breeds/' + breed.slug} className="hz-link">
+                {breed.nameFa}
+              </Link>
+            </p>
+          ) : null}
+          <p className="hz-body-sm text-text-secondary">
+            {'مطلب نادرست یا نامناسبی می‌بینید؟ '}
+            <Link href={'/report/content/' + item.id} className="hz-link" data-testid="report-content-link">
+              گزارش این مطلب
+            </Link>
+          </p>
+        </footer>
+      </article>
 
-      <p className="text-body-md text-text-secondary">{item.summaryFa}</p>
-      <div className="text-body-md" data-testid="content-body">
-        <RichText source={item.bodyFa} />
+      <div className="hz-reading__aside">
+        <RelatedColumn
+          groups={[
+            {
+              titleFa: 'مطالب مرتبط',
+              items: moreReading,
+              noteAsTag: true,
+              link: { href: pathOf(kind), label: 'همه ' + KIND_PLURAL_FA[kind] },
+            },
+            { titleFa: 'مراکز دامپزشکی', items: centres, link: { href: '/centers', label: 'همه مراکز' } },
+          ]}
+        />
       </div>
-
-      {item.tags.length > 0 ? (
-        <ul aria-label="برچسب‌ها" className="flex flex-wrap gap-xs">
-          {item.tags.map((tag) => (
-            <li key={tag} className="rounded-full bg-bg-subtle px-md py-2xs text-caption text-text-secondary">
-              {tag}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {item.sources.length > 0 ? (
-        <section aria-labelledby="content-sources-title" data-testid="content-sources">
-          <h2 id="content-sources-title" className="text-h3">
-            منابع
-          </h2>
-          <ol className="mt-md list-decimal space-y-xs ps-xl text-body-sm">
-            {item.sources.map((source) => (
-              <li key={source.title + (source.url ?? '')}>
-                {source.url ? (
-                  <a href={source.url} target="_blank" rel="nofollow noopener noreferrer" className="text-text-brand underline underline-offset-4">
-                    {source.title}
-                  </a>
-                ) : (
-                  source.title
-                )}
-              </li>
-            ))}
-          </ol>
-        </section>
-      ) : null}
-
-      <p className="border-t border-border-subtle pt-lg text-body-sm text-text-secondary">
-        {'مطلب نادرست یا نامناسبی می‌بینید؟ '}
-        <Link
-          href={'/report/content/' + item.id}
-          className="text-text-brand underline underline-offset-4"
-          data-testid="report-content-link"
-        >
-          گزارش این مطلب
-        </Link>
-      </p>
-
-      {breed ? (
-        <p className="text-body-sm" data-testid="content-breed">
-          {'نژاد مرتبط: '}
-          <Link href={'/breeds/' + breed.slug} className="text-text-brand underline underline-offset-4">
-            {breed.nameFa}
-          </Link>
-        </p>
-      ) : null}
-    </article>
-
-      <RelatedColumn
-        groups={[
-          { titleFa: 'خواندنی‌های دیگر', items: moreReading },
-          { titleFa: 'مراکز دامپزشکی', items: centres },
-        ]}
-      />
     </div>
   );
 }

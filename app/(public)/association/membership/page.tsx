@@ -78,7 +78,7 @@ export default async function AssociationMembershipPage() {
         <h2 id="membership-steps-title" className="text-h4">
           مسیر عضویت
         </h2>
-        <ol className="list-decimal space-y-sm pr-lg text-body-md" data-testid="membership-steps">
+        <ol className="list-decimal space-y-sm ps-lg text-body-md" data-testid="membership-steps">
           {STEPS.map((step) => (
             <li key={step}>{step}</li>
           ))}

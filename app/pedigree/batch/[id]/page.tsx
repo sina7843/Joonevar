@@ -16,6 +16,7 @@ import { batchItems, batchTotalToman, findBatch } from '../../../../src/billing/
 import { itemsOfBatch } from '../../../../src/documents/pedigree.ts';
 import { configuredMoney, formatTomanFa, tomanFromColumn } from '../../../../src/domain/money.ts';
 import { PayIssuanceForm, RetryPedigreeIssuanceForm } from '../../forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,27 +63,45 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
     ? await db()
         .select({ id: animals.id, name: animals.name })
         .from(animals)
-        .where(inArray(animals.id, items.map((i) => i.animalId)))
+        .where(
+          inArray(
+            animals.id,
+            items.map((i) => i.animalId),
+          ),
+        )
     : [];
   const documents = items.length
     ? await db()
         .select()
         .from(pedigrees)
-        .where(inArray(pedigrees.animalId, items.map((i) => i.animalId)))
+        .where(
+          inArray(
+            pedigrees.animalId,
+            items.map((i) => i.animalId),
+          ),
+        )
     : [];
 
   const blocked = items.filter((i) => i.state === 'BLOCKED');
   const payable = batch.status !== 'PAID';
 
   return (
-    <PublicShell actor={guard.actor} title="درخواست صدور شجره‌نامه" pathname={'/pedigree/batch/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="درخواست صدور شجره‌نامه"
+      pathname={'/pedigree/batch/' + id}
+      header={<PageHeader title={'درخواست صدور شجره‌نامه'} back={{ href: '/pedigree' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرور هزینه صدور</span></h2></div>
-            <StatusBadge
-              tone={batch.status === 'PAID' ? 'success' : batch.status === 'FAILED' ? 'warning' : 'info'}
-            >
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>مرور هزینه صدور</span>
+              </h2>
+            </div>
+            <StatusBadge tone={batch.status === 'PAID' ? 'success' : batch.status === 'FAILED' ? 'warning' : 'info'}>
               <span data-testid="pedigree-batch-status">{BATCH_FA[batch.status]}</span>
             </StatusBadge>
           </div>
@@ -110,13 +129,18 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت صدور هر حیوان</span></h2></div>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>وضعیت صدور هر حیوان</span>
+            </h2>
+          </div>
           <ul className="mt-lg space-y-lg" data-testid="pedigree-items">
             {items.map((item) => {
               const name = animalRows.find((a) => a.id === item.animalId)?.name ?? 'بدون نام';
               const document = documents.find((d) => d.animalId === item.animalId);
               return (
-                <li key={item.id} className="rounded-xl border border-border-default p-lg">
+                <li key={item.id} className="rounded-lg border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <span className="text-body-sm">{name}</span>
                     <StatusBadge
@@ -137,7 +161,7 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
                     <p className="mt-sm text-body-sm">
                       <Link
                         href={'/documents/pedigree/' + document.id}
-                        className="text-text-brand underline underline-offset-4"
+                        className="hz-link"
                         data-testid={'open-pedigree-' + item.animalId}
                       >
                         مشاهده شجره‌نامه
@@ -149,9 +173,7 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
               );
             })}
           </ul>
-          {batch.status === 'PAID' && blocked.length > 0 ? (
-            <RetryPedigreeIssuanceForm batchId={batch.id} />
-          ) : null}
+          {batch.status === 'PAID' && blocked.length > 0 ? <RetryPedigreeIssuanceForm batchId={batch.id} /> : null}
         </Card>
 
         {batch.status === 'FAILED' || batch.status === 'CANCELLED' ? (

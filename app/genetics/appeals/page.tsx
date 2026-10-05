@@ -1,12 +1,11 @@
-import Link from 'next/link';
 import { inArray } from 'drizzle-orm';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { APPEAL_STATUS_FA, appealQueue } from '../../../src/genetics/appeals.ts';
@@ -33,49 +32,39 @@ export default async function GeneticsAppealsPage() {
     : [];
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — مرکز ژنتیک" pathname="/genetics/appeals" nav={GENETICS_NAV}>
-      <div className="space-y-lg">
-        <Alert tone="info" title="اعتراض، اجازه ویرایش نتیجه نیست">
-          نتیجه مورد اعتراض حفظ می‌شود؛ اگر اصلاح لازم باشد، نتیجه اصلاحی نسخه جدید است و سند صادرشده قبلی
-          بازنویسی نمی‌شود.
-        </Alert>
+    <OpsShell actor={guard.actor} title="اعتراض‌ها" pathname="/genetics/appeals" nav={GENETICS_NAV}>
+      <Alert tone="info" title="اعتراض، اجازه ویرایش نتیجه نیست">
+        نتیجه مورد اعتراض حفظ می‌شود؛ اگر اصلاح لازم باشد، نتیجه اصلاحی نسخه جدید است و سند صادرشده قبلی
+        بازنویسی نمی‌شود.
+      </Alert>
 
-        {rows.length === 0 ? (
-          <EmptyState
-            title="اعتراضی در صف نیست"
-            description="اعتراض‌های ثبت‌شده کاربران روی نتیجه Parentage در همین صف دیده می‌شوند."
-          />
-        ) : (
-          <ul className="space-y-lg" data-testid="appeal-queue">
+      {rows.length === 0 ? (
+        <EmptyState
+          title="اعتراضی در صف نیست"
+          description="اعتراض‌های ثبت‌شده کاربران روی نتیجه Parentage در همین صف دیده می‌شوند."
+        />
+      ) : (
+        <>
+          <QueueMeta total={rows.length} noun="اعتراض در صف" oldestDays={Math.max(...rows.map((appeal) => ageInDays(appeal.createdAt) ?? 0))} />
+          <CaseList label="صف اعتراض‌ها" testId="appeal-queue">
             {rows.map((appeal) => (
-              <li key={appeal.id}>
-                <Card>
-                  <div className="flex items-start justify-between gap-md">
-                    <div className="min-w-0">
-                      <p className="text-body-sm">
-                        {animalRows.find((a) => a.id === appeal.animalId)?.name ?? 'بدون نام'}
-                      </p>
-                      <p className="mt-2xs text-caption text-text-secondary">
-                        {formatCivilDateFa(appeal.createdAt.toISOString().slice(0, 10))}
-                      </p>
-                    </div>
-                    <StatusBadge tone="info">{APPEAL_STATUS_FA[appeal.status]}</StatusBadge>
-                  </div>
-                  <p className="mt-lg text-body-sm">
-                    <Link
-                      href={'/genetics/appeals/' + appeal.id}
-                      className="text-text-brand underline underline-offset-4"
-                      data-testid="open-appeal"
-                    >
-                      بررسی اعتراض
-                    </Link>
-                  </p>
-                </Card>
-              </li>
+              <CaseItem
+                key={appeal.id}
+                type="اعتراض به نتیجه"
+                name={animalRows.find((a) => a.id === appeal.animalId)?.name ?? 'بدون نام'}
+                href={'/genetics/appeals/' + appeal.id}
+                linkLabel="بررسی اعتراض"
+                linkTestId="open-appeal"
+                sub={'ثبت: ' + formatCivilDateFa(appeal.createdAt.toISOString().slice(0, 10))}
+                ageDays={ageInDays(appeal.createdAt)}
+                status={{ tone: 'info', label: APPEAL_STATUS_FA[appeal.status] }}
+                owner="GENETICS_CENTRE"
+                ownerIsUs
+              />
             ))}
-          </ul>
-        )}
-      </div>
+          </CaseList>
+        </>
+      )}
     </OpsShell>
   );
 }

@@ -15,6 +15,7 @@ import { samples } from '../../../../src/db/schema/clinical.ts';
 import { ownerReceipt, receiptItems, RECEIPT_STATUS_FA } from '../../../../src/genetics/service.ts';
 import { SAMPLE_STATUS_FA, type SampleStatusName } from '../../../../src/domain/microchip.ts';
 import { ReceiptForms } from '../../forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,19 +45,34 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     ? await db()
         .select({ id: animals.id, name: animals.name })
         .from(animals)
-        .where(inArray(animals.id, items.map((i) => i.animalId)))
+        .where(
+          inArray(
+            animals.id,
+            items.map((i) => i.animalId),
+          ),
+        )
     : [];
   const sampleRows = items.length
     ? await db()
         .select()
         .from(samples)
-        .where(inArray(samples.id, items.map((i) => i.sampleId)))
+        .where(
+          inArray(
+            samples.id,
+            items.map((i) => i.sampleId),
+          ),
+        )
     : [];
 
   const editable = receipt.status === 'DRAFT' || receipt.status === 'NEEDS_CORRECTION';
 
   return (
-    <PublicShell actor={guard.actor} title="فیش مرکز ژنتیک" pathname={'/pedigree/receipts/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="فیش مرکز ژنتیک"
+      pathname={'/pedigree/receipts/' + id}
+      header={<PageHeader title={'فیش مرکز ژنتیک'} back={{ href: '/pedigree' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
@@ -86,15 +102,19 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           {receipt.status === 'APPROVED' ? (
             <Alert tone="info" title="پرداخت صدور سند جداست">
               <span data-testid="receipt-approved-note">
-                تأیید فیش مرکز، پرداخت صدور شجره‌نامه در هم‌زیست نیست. پردازش نمونه مستقل از آن پرداخت انجام
-                می‌شود.
+                تأیید فیش مرکز، پرداخت صدور شجره‌نامه در هم‌زیست نیست. پردازش نمونه مستقل از آن پرداخت انجام می‌شود.
               </span>
             </Alert>
           ) : null}
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">نمونه‌های این فیش</h3>
+          <div className="hz-section-header hz-section-header--sm">
+            <h3 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>نمونه‌های این فیش</span>
+            </h3>
+          </div>
           <ul className="mt-md space-y-sm text-body-sm" data-testid="receipt-samples">
             {items.map((item) => {
               const sample = sampleRows.find((s) => s.id === item.sampleId);
@@ -121,11 +141,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
         {receipt.fileId ? (
           <Card>
             <p className="text-body-sm">
-              <Link
-                href={'/api/files/' + receipt.fileId}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="receipt-file-link"
-              >
+              <Link href={'/api/files/' + receipt.fileId} className="hz-link" data-testid="receipt-file-link">
                 مشاهده فیش بارگذاری‌شده
               </Link>
             </p>

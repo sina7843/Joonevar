@@ -78,11 +78,7 @@ export default async function VetPage() {
                     </StatusBadge>
                   </div>
                   <p className="mt-lg text-body-sm">
-                    <Link
-                      href={'/vet/requests/' + row.request.id}
-                      className="text-text-brand underline underline-offset-4"
-                      data-testid="open-vet-request"
-                    >
+                    <Link href={'/vet/requests/' + row.request.id} className="hz-link" data-testid="open-vet-request">
                       مشاهده پرونده
                     </Link>
                   </p>
@@ -94,14 +90,16 @@ export default async function VetPage() {
 
         {completed.length === 0 ? null : (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده‌های تکمیل‌شده اخیر</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>پرونده‌های تکمیل‌شده اخیر</span>
+              </h2>
+            </div>
             <ul className="mt-md space-y-sm text-body-sm" data-testid="vet-completed">
               {completed.map((row) => (
                 <li key={row.request.id}>
-                  <Link
-                    href={'/vet/requests/' + row.request.id}
-                    className="text-text-brand underline underline-offset-4"
-                  >
+                  <Link href={'/vet/requests/' + row.request.id} className="hz-link">
                     {SERVICE_TYPE_FA[row.request.serviceType]} — مشاهده مرور نهایی
                   </Link>
                 </li>

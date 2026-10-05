@@ -68,7 +68,7 @@ export function ClubSubmitForm({ clubId, version, blockers }: { clubId: string; 
       <input type="hidden" name="expectedVersion" value={version} />
       <TextField label="توضیح برای انجمن" name="noteFa" maxLength={500} data-testid="club-submit-note" />
       {blockers.length > 0 ? (
-        <ul className="list-disc space-y-2xs pr-md text-body-sm text-text-secondary" data-testid="club-submit-blockers">
+        <ul className="list-disc space-y-2xs pe-md text-body-sm text-text-secondary" data-testid="club-submit-blockers">
           {blockers.map((blocker) => (
             <li key={blocker}>{blocker}</li>
           ))}

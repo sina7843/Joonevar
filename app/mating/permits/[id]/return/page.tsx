@@ -2,13 +2,14 @@ import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { currentPaymentGateway } from '../../../../../src/adapters/current.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
-import { Card } from '../../../../../src/ui/card.tsx';
-import { Alert } from '../../../../../src/ui/alert.tsx';
+import { PaymentResult } from '../../../../../src/ui/payment-result.tsx';
+import { Identifier } from '../../../../../src/ui/status.tsx';
 import { ButtonLink } from '../../../../../src/ui/button.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { env } from '../../../../../src/config/env.ts';
 import { verifyAttempt } from '../../../../../src/billing/payments.ts';
 import { paidEffects } from '../../../../../src/billing/effects.ts';
+import { PageHeader } from '../../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,39 +45,39 @@ export default async function PermitReturnPage({
       actor={guard.actor}
       title="نتیجه پرداخت مجوز جفت‌گیری"
       pathname={'/mating/permits/' + id + '/return'}
+      header={<PageHeader title={'نتیجه پرداخت مجوز جفت‌گیری'} back={{ href: '/mating/permits/' + id }} />}
     >
-      <div className="space-y-lg">
-        {outcome.state === 'PAID' ? (
-          <Alert tone="success" title="پرداخت تأیید شد">
-            حالا می‌توانید پرونده را برای بررسی عملیاتی ارسال کنید؛ صدور مجوز پس از بررسی انجام می‌شود.
-          </Alert>
-        ) : null}
-        {outcome.state === 'FAILED' ? (
-          <Alert tone="error" title="پرداخت تأیید نشد">
-            {outcome.reasonFa} اطلاعات پرونده و توافق تقسیم حفظ شده است.
-          </Alert>
-        ) : null}
-        {outcome.state === 'CANCELLED' ? (
-          <Alert tone="warning" title="پرداخت لغو شد">
-            پرونده و توافق تقسیم حفظ شده است و می‌توانید دوباره تلاش کنید.
-          </Alert>
-        ) : null}
-        {outcome.state === 'UNKNOWN_REFERENCE' ? (
-          <Alert tone="error" title="این بازگشت پرداخت شناسایی نشد">
-            هیچ پرداختی با این شناسه پیدا نشد.
-          </Alert>
-        ) : null}
-
-        <Card>
-          <p className="text-body-sm text-text-secondary">
-            وضعیت پرداخت فقط با تأیید سرور اعلام می‌شود؛ رسیدن به این صفحه به‌تنهایی سند پرداخت نیست.
-          </p>
-          <div className="mt-lg">
-            <ButtonLink href={'/mating/permits/' + id} block data-testid="back-to-permit">
-              بازگشت به پرونده مجوز
-            </ButtonLink>
-          </div>
-        </Card>
+      <div className="mx-auto w-full max-w-[560px]">
+        <PaymentResult
+          state={outcome.state === 'UNKNOWN_REFERENCE' ? 'UNKNOWN' : outcome.state}
+          title={
+            outcome.state === 'PAID'
+              ? 'پرداخت تأیید شد'
+              : outcome.state === 'FAILED'
+                ? 'پرداخت تأیید نشد'
+                : outcome.state === 'CANCELLED'
+                  ? 'پرداخت لغو شد'
+                  : 'این بازگشت پرداخت شناسایی نشد'
+          }
+          facts={reference ? [{ key: 'شناسه پرداخت', value: <Identifier value={reference} /> }] : []}
+          actions={
+            <>
+              <ButtonLink tone="secondary" href={'/mating/permits/' + id} data-testid="back-to-permit">
+                بازگشت به پرونده مجوز
+              </ButtonLink>
+            </>
+          }
+        >
+          {outcome.state === 'PAID' ? (
+            <>حالا می‌توانید پرونده را برای بررسی عملیاتی ارسال کنید؛ صدور مجوز پس از بررسی انجام می‌شود.</>
+          ) : outcome.state === 'FAILED' ? (
+            <>{outcome.reasonFa} اطلاعات پرونده و توافق تقسیم حفظ شده است.</>
+          ) : outcome.state === 'CANCELLED' ? (
+            <>پرونده و توافق تقسیم حفظ شده است و می‌توانید دوباره تلاش کنید.</>
+          ) : (
+            <>هیچ پرداختی با این شناسه پیدا نشد.</>
+          )}
+        </PaymentResult>
       </div>
     </PublicShell>
   );

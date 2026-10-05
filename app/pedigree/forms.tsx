@@ -49,7 +49,12 @@ export function SelectPedigreeAnimals({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب حیوان‌ها</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>انتخاب حیوان‌ها</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
         نمونه ثبت‌شده همین حیوان استفاده می‌شود؛ انتخاب دامپزشک یا نمونه‌گیری دوباره لازم نیست.
       </p>
@@ -57,22 +62,18 @@ export function SelectPedigreeAnimals({
         <Result state={state} />
         <ul className="space-y-md" data-testid="pedigree-animal-list">
           {animals.map((animal) => (
-            <li key={animal.animalId} className="rounded-xl border border-border-default p-lg">
-              <label className="flex items-start gap-sm text-body-sm">
+            <li key={animal.animalId} className="rounded-lg border border-border-default p-lg">
+              <label className="hz-check">
                 <input
                   type="checkbox"
                   name="animalId"
                   value={animal.animalId}
                   disabled={!animal.ready}
-                  className="mt-1 size-[var(--size-selection-md)]"
                   data-testid={'pedigree-pick-' + animal.animalId}
                 />
-                <span>
-                  <span className="block">{animal.name ?? 'بدون نام'}</span>
-                  <span
-                    className="text-caption text-text-secondary"
-                    data-testid={'pedigree-note-' + animal.animalId}
-                  >
+                <span className="hz-check__text">
+                  <span className="hz-check__label">{animal.name ?? 'بدون نام'}</span>
+                  <span className="text-caption text-text-secondary" data-testid={'pedigree-note-' + animal.animalId}>
                     {animal.ready ? 'کد رهگیری نمونه: ' + animal.sampleTrackingCode : animal.reasonFa}
                   </span>
                 </span>
@@ -109,7 +110,12 @@ export function ReceiptForms({
   return (
     <>
       <Card>
-        <h3 className="text-label-lg">تصویر فیش</h3>
+        <div className="hz-section-header hz-section-header--sm">
+          <h3 className="hz-section-header__title">
+            <span className="hz-section-header__bar" aria-hidden="true" />
+            <span>تصویر فیش</span>
+          </h3>
+        </div>
         <form action={upload} className="mt-lg space-y-lg" data-testid="receipt-upload-form">
           <input type="hidden" name="receiptId" value={receiptId} />
           <Result state={uploadState} />
@@ -129,7 +135,12 @@ export function ReceiptForms({
       </Card>
 
       <Card>
-        <h3 className="text-label-lg">ارسال برای بررسی مرکز</h3>
+        <div className="hz-section-header hz-section-header--sm">
+          <h3 className="hz-section-header__title">
+            <span className="hz-section-header__bar" aria-hidden="true" />
+            <span>ارسال برای بررسی مرکز</span>
+          </h3>
+        </div>
         <form action={submitReceipt} className="mt-lg space-y-lg" data-testid="receipt-submit-form">
           <input type="hidden" name="receiptId" value={receiptId} />
           <Result state={submitState} />
@@ -156,31 +167,31 @@ export function SelectIssuanceAnimals({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>صدور شجره‌نامه</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>صدور شجره‌نامه</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        صدور سند به دو شرط نیاز دارد: نتیجه Parentage نهایی و پرداخت صدور در هم‌زیست. تأیید فیش مرکز، این
-        پرداخت نیست.
+        صدور سند به دو شرط نیاز دارد: نتیجه Parentage نهایی و پرداخت صدور در هم‌زیست. تأیید فیش مرکز، این پرداخت نیست.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="issuance-select-form">
         <Result state={state} />
         <ul className="space-y-md" data-testid="issuance-animal-list">
           {animals.map((animal) => (
-            <li key={animal.animalId} className="rounded-xl border border-border-default p-lg">
-              <label className="flex items-start gap-sm text-body-sm">
+            <li key={animal.animalId} className="rounded-lg border border-border-default p-lg">
+              <label className="hz-check">
                 <input
                   type="checkbox"
                   name="animalId"
                   value={animal.animalId}
                   disabled={!animal.ready}
-                  className="mt-1 size-[var(--size-selection-md)]"
                   data-testid={'issuance-pick-' + animal.animalId}
                 />
-                <span>
-                  <span className="block">{animal.name ?? 'بدون نام'}</span>
-                  <span
-                    className="text-caption text-text-secondary"
-                    data-testid={'issuance-note-' + animal.animalId}
-                  >
+                <span className="hz-check__text">
+                  <span className="hz-check__label">{animal.name ?? 'بدون نام'}</span>
+                  <span className="text-caption text-text-secondary" data-testid={'issuance-note-' + animal.animalId}>
                     {animal.ready ? (feeLabel ? 'هزینه صدور: ' + feeLabel : '') : animal.reasonFa}
                   </span>
                 </span>
@@ -237,10 +248,15 @@ export function AppealForm({ animalId, resultId }: { animalId: string; resultId:
   const [state, submit, pending] = useActionState(submitAppealAction, EMPTY);
   return (
     <Card>
-      <h3 className="text-label-lg">اعتراض به این نتیجه</h3>
+      <div className="hz-section-header hz-section-header--sm">
+        <h3 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>اعتراض به این نتیجه</span>
+        </h3>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        اعتراض به همان مرکز ژنتیک ارجاع می‌شود و پاسخ در همین پرونده دیده می‌شود. ثبت اعتراض، اجازه ویرایش
-        نتیجه رسمی نیست و به‌تنهایی نمونه یا نتیجه قبلی را پاک نمی‌کند.
+        اعتراض به همان مرکز ژنتیک ارجاع می‌شود و پاسخ در همین پرونده دیده می‌شود. ثبت اعتراض، اجازه ویرایش نتیجه رسمی
+        نیست و به‌تنهایی نمونه یا نتیجه قبلی را پاک نمی‌کند.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="appeal-form">
         <input type="hidden" name="animalId" value={animalId} />
@@ -273,10 +289,15 @@ export function PostalRequestForm({
   const [state, submit, pending] = useActionState(createPostalRequestAction, EMPTY);
   return (
     <Card>
-      <h3 className="text-label-lg">درخواست ارسال پستی</h3>
+      <div className="hz-section-header hz-section-header--sm">
+        <h3 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>درخواست ارسال پستی</span>
+        </h3>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        در این فاز فقط درخواست ثبت می‌شود. اتصال به شرکت پستی، تعرفه حمل، برچسب، کد رهگیری و وضعیت تحویل جزو
-        این فاز نیست و ثبت درخواست به معنی ارسال واقعی سند نیست.
+        در این فاز فقط درخواست ثبت می‌شود. اتصال به شرکت پستی، تعرفه حمل، برچسب، کد رهگیری و وضعیت تحویل جزو این فاز
+        نیست و ثبت درخواست به معنی ارسال واقعی سند نیست.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="postal-form">
         <input type="hidden" name="documentType" value={documentType} />

@@ -17,6 +17,7 @@ import {
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { SelectPedigreeAnimals } from './forms.tsx';
+import { PageHeader } from '../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +36,12 @@ export default async function PedigreePage() {
   const eligibility = await eligibilityFor(db(), actor.accountId, 'PEDIGREE');
   if (!eligibility.allowed) {
     return (
-      <PublicShell actor={actor} title="شجره‌نامه" pathname="/pedigree">
+      <PublicShell
+        actor={actor}
+        title="شجره‌نامه"
+        pathname="/pedigree"
+        header={<PageHeader title={'شجره‌نامه'} back={{ href: '/dashboard' }} />}
+      >
         <LockedServiceCard serviceLabel="صدور شجره‌نامه" lock={eligibility.lock} />
       </PublicShell>
     );
@@ -48,29 +54,51 @@ export default async function PedigreePage() {
   ]);
 
   return (
-    <PublicShell actor={actor} title="شجره‌نامه" pathname="/pedigree">
+    <PublicShell
+      actor={actor}
+      title="شجره‌نامه"
+      pathname="/pedigree"
+      header={<PageHeader title={'شجره‌نامه'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg">
         <ButtonLink href="/pedigree/issue" block data-testid="open-issuance">
           صدور شجره‌نامه برای نتایج نهایی
         </ButtonLink>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرکز ژنتیک مقصد</span></h2></div>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>مرکز ژنتیک مقصد</span>
+            </h2>
+          </div>
           <p className="mt-md text-caption text-text-secondary">
             یک مرکز ثابت وجود دارد و انتخاب مرکز در محصول نیست؛ این اطلاعات فقط برای واریز مستقیم است.
           </p>
           {centre.configured ? (
-            <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="centre-details">
-              <dt className="text-text-secondary">نام مرکز</dt>
-              <dd>{centre.nameFa}</dd>
-              <dt className="text-text-secondary">تلفن</dt>
-              <dd>{centre.phone ?? '—'}</dd>
-              <dt className="text-text-secondary">نشانی</dt>
-              <dd>{centre.addressFa ?? '—'}</dd>
-              <dt className="text-text-secondary">شماره حساب</dt>
-              <dd>{centre.paymentAccount ? <Identifier value={centre.paymentAccount} /> : '—'}</dd>
-              <dt className="text-text-secondary">شماره کارت</dt>
-              <dd>{centre.paymentCard ? <Identifier value={centre.paymentCard} /> : '—'}</dd>
+            <dl className="hz-kv mt-lg" data-testid="centre-details">
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">نام مرکز</dt>
+                <dd className="hz-kv__value">{centre.nameFa}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">تلفن</dt>
+                <dd className="hz-kv__value">{centre.phone ?? '—'}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">نشانی</dt>
+                <dd className="hz-kv__value">{centre.addressFa ?? '—'}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">شماره حساب</dt>
+                <dd className="hz-kv__value">
+                  {centre.paymentAccount ? <Identifier value={centre.paymentAccount} /> : '—'}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">شماره کارت</dt>
+                <dd className="hz-kv__value">{centre.paymentCard ? <Identifier value={centre.paymentCard} /> : '—'}</dd>
+              </div>
             </dl>
           ) : (
             <Alert tone="warning" title="اطلاعات پرداخت مرکز هنوز ثبت نشده است">
@@ -83,17 +111,27 @@ export default async function PedigreePage() {
 
         {receipts.length === 0 ? null : (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فیش‌های من</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>فیش‌های من</span>
+              </h2>
+            </div>
             <ul className="mt-md space-y-sm text-body-sm" data-testid="receipt-list">
               {receipts.map((receipt) => (
                 <li key={receipt.id} className="flex items-center justify-between gap-md">
-                  <Link
-                    href={'/pedigree/receipts/' + receipt.id}
-                    className="text-text-brand underline underline-offset-4"
-                  >
+                  <Link href={'/pedigree/receipts/' + receipt.id} className="hz-link">
                     فیش {formatCivilDateFa(receipt.createdAt.toISOString().slice(0, 10))}
                   </Link>
-                  <StatusBadge tone={receipt.status === 'APPROVED' ? 'success' : receipt.status === 'NEEDS_CORRECTION' ? 'warning' : 'info'}>
+                  <StatusBadge
+                    tone={
+                      receipt.status === 'APPROVED'
+                        ? 'success'
+                        : receipt.status === 'NEEDS_CORRECTION'
+                          ? 'warning'
+                          : 'info'
+                    }
+                  >
                     {RECEIPT_STATUS_FA[receipt.status]}
                   </StatusBadge>
                 </li>

@@ -10,15 +10,12 @@ import { Alert } from '../../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../../src/ui/status.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { permitForParty, PERMIT_STATUS_FA } from '../../../../../src/mating/permits.ts';
-import {
-  datesOfPermit,
-  declarerNames,
-  pendingDate,
-} from '../../../../../src/mating/dates.ts';
+import { datesOfPermit, declarerNames, pendingDate } from '../../../../../src/mating/dates.ts';
 import { cooldownAdvisoryForAnimals, NO_BASIS_NOTE_FA } from '../../../../../src/mating/cooldown.ts';
 import { formatCivilDateFa } from '../../../../../src/domain/calendar.ts';
 import { DeclareDateForm, RespondToDateForm } from '../../../dates-forms.tsx';
 import { DateHistory } from '../../../date-history.tsx';
+import { PageHeader } from '../../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,16 +43,20 @@ export default async function PermitDatesPage({ params }: { params: Promise<{ id
 
   if (permit.status !== 'ISSUED') {
     return (
-      <PublicShell actor={guard.actor} title="تاریخ‌های جفت‌گیری" pathname={'/mating/permits/' + id + '/dates'}>
+      <PublicShell
+        actor={guard.actor}
+        title="تاریخ‌های جفت‌گیری"
+        pathname={'/mating/permits/' + id + '/dates'}
+        header={<PageHeader title={'تاریخ‌های جفت‌گیری'} back={{ href: '/mating/permits/' + id }} />}
+      >
         <Card>
           <Alert tone="info" title="این پرونده هنوز مجوز صادرشده ندارد">
             <span data-testid="dates-locked">
-              اعلام تاریخ رسمی فقط پس از صدور مجوز ممکن است. وضعیت فعلی پرونده:{' '}
-              {PERMIT_STATUS_FA[permit.status]}.
+              اعلام تاریخ رسمی فقط پس از صدور مجوز ممکن است. وضعیت فعلی پرونده: {PERMIT_STATUS_FA[permit.status]}.
             </span>
           </Alert>
           <p className="mt-lg text-body-sm">
-            <Link href={'/mating/permits/' + id} className="text-text-brand underline underline-offset-4">
+            <Link href={'/mating/permits/' + id} className="hz-link">
               بازگشت به پرونده مجوز
             </Link>
           </p>
@@ -79,15 +80,25 @@ export default async function PermitDatesPage({ params }: { params: Promise<{ id
   const mineIsPending = pending !== null && pending.declaredByAccountId === guard.actor.accountId;
 
   return (
-    <PublicShell actor={guard.actor} title="تاریخ‌های جفت‌گیری" pathname={'/mating/permits/' + id + '/dates'}>
+    <PublicShell
+      actor={guard.actor}
+      title="تاریخ‌های جفت‌گیری"
+      pathname={'/mating/permits/' + id + '/dates'}
+      header={<PageHeader title={'تاریخ‌های جفت‌گیری'} back={{ href: '/mating/permits/' + id }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخ‌های رسمی این پرونده</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>تاریخ‌های رسمی این پرونده</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {permit.permitNo ?? '—'} ·{' '}
-                <Link href={'/mating/permits/' + id} className="text-text-brand underline underline-offset-4">
+                <Link href={'/mating/permits/' + id} className="hz-link">
                   بازگشت به پرونده
                 </Link>
               </p>

@@ -1,14 +1,14 @@
 import { notFound as pageNotFound } from 'next/navigation';
 import { isUuid } from '../../../../src/domain/ids.ts';
-import Link from 'next/link';
 import { inArray } from 'drizzle-orm';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { GENETICS_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, whenFa } from '../../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { Identifier, StatusBadge } from '../../../../src/ui/status.tsx';
+import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { animals } from '../../../../src/db/schema/animals.ts';
 import { samples } from '../../../../src/db/schema/clinical.ts';
@@ -45,64 +45,72 @@ export default async function GeneticsReceiptPage({ params }: { params: Promise<
     ? await db().select().from(samples).where(inArray(samples.id, items.map((i) => i.sampleId)))
     : [];
 
+  const open = receipt.status === 'UNDER_REVIEW';
+  const age = ageInDays(receipt.submittedAt);
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — مرکز ژنتیک" pathname={'/genetics/receipts/' + id} nav={GENETICS_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <h2 className="hz-card__title">فیش پرداخت مستقیم</h2>
-            <StatusBadge tone="info">
-              <span data-testid="centre-receipt-status">{RECEIPT_STATUS_FA[receipt.status]}</span>
-            </StatusBadge>
-          </div>
-          {receipt.payerNoteFa ? <p className="mt-md text-body-sm">{receipt.payerNoteFa}</p> : null}
-          {receipt.fileId ? (
-            <p className="mt-md text-body-sm">
-              <Link
-                href={'/api/files/' + receipt.fileId}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="centre-receipt-file"
-              >
-                مشاهده تصویر فیش
-              </Link>
-            </p>
+    <OpsShell actor={guard.actor} title="بررسی فیش" pathname={'/genetics/receipts/' + id} nav={GENETICS_NAV}>
+      <DeskHead
+        title="فیش پرداخت مستقیم"
+        status={{
+          tone: open ? 'info' : receipt.status === 'APPROVED' ? 'success' : receipt.status === 'REJECTED' ? 'error' : 'warning',
+          label: RECEIPT_STATUS_FA[receipt.status],
+          testId: 'centre-receipt-status',
+        }}
+        meta={[
+          'ارسال: ' + (whenFa(receipt.submittedAt) ?? '—'),
+          open && age !== null ? <span className="hz-age">{age.toLocaleString('fa-IR') + ' روز در صف'}</span> : null,
+          'نسخه ' + receipt.version.toLocaleString('fa-IR'),
+        ]}
+        owner={open ? 'GENETICS_CENTRE' : receipt.status === 'NEEDS_CORRECTION' ? 'USER' : null}
+      />
+      <Desk
+        decisionTitle={open ? 'تصمیم مرکز' : 'نتیجه'}
+        decision={
+          open ? (
+            <>
+              <p className="text-caption text-text-secondary">
+                تأیید فیش، از دامپزشک نگهدارنده هر نمونه می‌خواهد آن را ارسال کند. این تأیید پرداخت صدور سند در
+                هم‌زیست نیست.
+              </p>
+              <ReceiptReviewForm receiptId={receipt.id} version={receipt.version} />
+              <DeskVersionNote version={receipt.version} />
+            </>
           ) : (
-            <p className="mt-md text-caption text-text-secondary">تصویری بارگذاری نشده است.</p>
-          )}
-        </Card>
+            <Alert tone="info" title="این فیش در انتظار بررسی نیست">
+              وضعیت فعلی: {RECEIPT_STATUS_FA[receipt.status]}
+              {receipt.reasonFa ? ' — ' + receipt.reasonFa : ''}
+            </Alert>
+          )
+        }
+      >
+        <Panel title="مدارک" aside={<PrivateNote />}>
+          <div className="hz-desk__docs">
+            <DocFrame
+              href={receipt.fileId ? '/api/files/' + receipt.fileId : null}
+              label="تصویر فیش"
+              linkLabel="مشاهده تصویر فیش"
+              testId="centre-receipt-file"
+              icon="receipt"
+            />
+          </div>
+          {receipt.payerNoteFa ? <p className="text-body-sm">{'توضیح پرداخت‌کننده: ' + receipt.payerNoteFa}</p> : null}
+        </Panel>
 
-        <Card>
-          <h3 className="text-label-lg">کدهای نمونه این فیش</h3>
-          <ul className="mt-md space-y-sm text-body-sm" data-testid="centre-receipt-samples">
+        <Panel title="کدهای نمونه این فیش" count={items.length.toLocaleString('fa-IR')}>
+          <ul className="hz-kv" data-testid="centre-receipt-samples">
             {items.map((item) => {
               const sample = sampleRows.find((s) => s.id === item.sampleId);
               const animal = animalRows.find((a) => a.id === item.animalId);
               return (
-                <li key={item.id} className="flex items-center justify-between gap-md">
-                  <span>{animal?.name ?? 'بدون نام'} · G{animal?.generation ?? 0}</span>
-                  <span>{sample ? <Identifier value={sample.trackingCode} /> : '—'}</span>
+                <li key={item.id} className="hz-kv__row">
+                  <span className="hz-kv__key">{(animal?.name ?? 'بدون نام') + ' · '}<bdi dir="ltr">{'G' + (animal?.generation ?? 0)}</bdi></span>
+                  <span className="hz-kv__value">{sample ? <Identifier value={sample.trackingCode} /> : '—'}</span>
                 </li>
               );
             })}
           </ul>
-        </Card>
-
-        {receipt.status === 'UNDER_REVIEW' ? (
-          <Card>
-            <h3 className="text-label-lg">تصمیم مرکز</h3>
-            <p className="mt-md text-caption text-text-secondary">
-              تأیید فیش، از دامپزشک نگهدارنده هر نمونه می‌خواهد آن را ارسال کند. این تأیید پرداخت صدور سند در
-              هم‌زیست نیست.
-            </p>
-            <ReceiptReviewForm receiptId={receipt.id} version={receipt.version} />
-          </Card>
-        ) : (
-          <Alert tone="info" title="این فیش در انتظار بررسی نیست">
-            وضعیت فعلی: {RECEIPT_STATUS_FA[receipt.status]}
-            {receipt.reasonFa ? ' — ' + receipt.reasonFa : ''}
-          </Alert>
-        )}
-      </div>
+        </Panel>
+      </Desk>
     </OpsShell>
   );
 }

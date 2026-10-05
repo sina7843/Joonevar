@@ -28,7 +28,7 @@ export function ConfirmVisitForm({
         <input type="hidden" name="vet" value={vetAccountId} />
         <input type="hidden" name="loc" value={locationId} />
         {state.message ? <Alert tone={state.tone === 'success' ? 'success' : 'error'} title={state.message} /> : null}
-        <Button type="submit" block disabled={pending} data-testid="create-visit">
+        <Button type="submit" size="lg" block disabled={pending} data-testid="create-visit">
           {pending ? 'در حال ثبت…' : 'ثبت درخواست و صدور کد مراجعه'}
         </Button>
       </form>

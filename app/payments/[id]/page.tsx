@@ -3,7 +3,11 @@ import { notFound } from 'next/navigation';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
-import { Card, CardHeader } from '../../../src/ui/card.tsx';
+import { Card } from '../../../src/ui/card.tsx';
+import { StatusBadge } from '../../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { ButtonLink } from '../../../src/ui/button.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -43,88 +47,122 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     throw error;
   }
 
+  const tone = receipt.status === 'PAID' ? 'success' : receipt.status === 'FAILED' ? 'error' : 'warning';
+
   return (
-    <PublicShell actor={guard.actor} title="رسید پرداخت" pathname="/payments">
-      <div className="space-y-lg">
-        <Card>
-          <CardHeader
-            title={receipt.serviceFa}
-            subtitle={'ثبت: ' + formatInstantFa(receipt.createdAt)}
-            badge={{
-              tone: receipt.status === 'PAID' ? 'success' : receipt.status === 'FAILED' ? 'error' : 'warning',
-              label: receipt.statusFa,
-            }}
+    <PublicShell
+      actor={guard.actor}
+      title="رسید پرداخت"
+      pathname="/payments"
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { name: 'خانه', href: '/dashboard' },
+              { name: 'پرداخت‌ها', href: '/payments' },
+              { name: receipt.serviceFa },
+            ]}
           />
-          <dl className="mt-lg grid gap-md text-body-sm sm:grid-cols-2" data-testid="receipt-facts">
-            <div>
-              <dt className="text-caption text-text-secondary">مبلغ کل</dt>
-              <dd className="text-body-md">{fa(receipt.totalToman) + ' تومان'}</dd>
-            </div>
-            <div>
-              <dt className="text-caption text-text-secondary">تعداد قلم</dt>
-              <dd className="text-body-md">{fa(receipt.items)}</dd>
-            </div>
-            {receipt.paidAt ? (
-              <div>
-                <dt className="text-caption text-text-secondary">تأیید سرور</dt>
-                <dd className="text-body-md">{formatInstantFa(receipt.paidAt)}</dd>
-              </div>
-            ) : null}
-            {receipt.providerRef ? (
-              <div>
-                <dt className="text-caption text-text-secondary">کد پیگیری درگاه</dt>
-                <dd dir="ltr" className="text-body-md">
-                  {receipt.providerRef}
-                </dd>
-              </div>
-            ) : null}
-          </dl>
-          {receipt.status !== 'PAID' ? (
-            <div className="mt-lg">
-              <Alert tone="info" title="این پرداخت هنوز تأیید نشده است">
-                تا وقتی سرور پرداخت را با درگاه تأیید نکند، هیچ سند یا دوره‌ای بر پایه آن ساخته نمی‌شود.
-              </Alert>
-            </div>
-          ) : null}
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اقلام</span></h2></div>
-          <ul className="mt-md space-y-sm text-body-sm" data-testid="receipt-lines">
-            {receipt.lines.map((line) => (
-              <li key={line.targetType + line.targetId} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md">
-                <span>{line.targetType}</span>
-                <span>{fa(line.amountToman) + ' تومان'}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-md text-caption text-text-secondary">
-            مبلغ هر قلم در لحظه شروع پرداخت از داده مدیریت‌شده خوانده و روی همین رسید قفل شده است؛ تغییر بعدی تعرفه این رقم را عوض نمی‌کند.
-          </p>
-        </Card>
-
-        {receipt.attempts.length > 0 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تلاش‌های پرداخت</span></h2></div>
-            <ul className="mt-md space-y-xs text-body-sm" data-testid="receipt-attempts">
-              {receipt.attempts.map((attempt, index) => (
-                <li key={index}>
-                  {formatInstantFa(attempt.startedAt) + ' — ' + (ATTEMPT_FA[attempt.status] ?? attempt.status)}
-                  {attempt.failureReason ? ' · ' + attempt.failureReason : ''}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ) : null}
-
-        <div className="flex flex-wrap gap-md">
-          <ButtonLink href="/payments" tone="secondary">
-            همه پرداخت‌ها
-          </ButtonLink>
-          <Link href={receipt.originRoute} className="self-center text-body-sm text-text-brand" data-testid="receipt-continue">
-            بازگشت به پرونده این پرداخت
-          </Link>
+          <PageHeader
+            title={receipt.serviceFa}
+            back={{ href: '/payments' }}
+            aside={<StatusBadge tone={tone}>{receipt.statusFa}</StatusBadge>}
+            meta={['ثبت: ' + formatInstantFa(receipt.createdAt), 'رسید پرداخت']}
+          />
         </div>
+      }
+    >
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+        <div className="min-w-0 space-y-xl lg:col-span-8">
+          <Card>
+            <SectionHeader size="sm" title="اقلام" />
+            <dl className="hz-kv mt-md" data-testid="receipt-lines">
+              {receipt.lines.map((line) => (
+                <div key={line.targetType + line.targetId} className="hz-kv__row">
+                  <dt className="hz-kv__key">
+                    <bdi dir="ltr">{line.targetType}</bdi>
+                  </dt>
+                  <dd className="hz-kv__value hz-num">{fa(line.amountToman) + ' تومان'}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-md text-caption text-text-secondary">
+              مبلغ هر قلم در لحظه شروع پرداخت از داده مدیریت‌شده خوانده و روی همین رسید قفل شده است؛ تغییر بعدی تعرفه
+              این رقم را عوض نمی‌کند.
+            </p>
+          </Card>
+
+          {receipt.attempts.length > 0 ? (
+            <Card>
+              <SectionHeader size="sm" title="تلاش‌های پرداخت" />
+              <ol className="hz-timeline mt-lg" data-testid="receipt-attempts">
+                {receipt.attempts.map((attempt, index) => (
+                  <li
+                    key={index}
+                    className={
+                      'hz-timeline__item ' +
+                      (attempt.status === 'VERIFIED'
+                        ? 'hz-timeline__item--done'
+                        : attempt.status === 'PENDING'
+                          ? 'hz-timeline__item--current'
+                          : 'hz-timeline__item--attention')
+                    }
+                  >
+                    <span className="hz-timeline__marker" aria-hidden="true" />
+                    <div className="hz-timeline__content">
+                      <div className="hz-timeline__head">
+                        <span className="hz-timeline__title">{ATTEMPT_FA[attempt.status] ?? attempt.status}</span>
+                      </div>
+                      <div className="hz-timeline__meta">{formatInstantFa(attempt.startedAt)}</div>
+                      {attempt.failureReason ? <p className="hz-timeline__body">{attempt.failureReason}</p> : null}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </Card>
+          ) : null}
+        </div>
+
+        <aside className="min-w-0 space-y-xl lg:col-span-4" aria-label="وضعیت پرداخت">
+          <Card>
+            <SectionHeader size="sm" title="وضعیت پرداخت" />
+            <div className="mt-md space-y-md" data-testid="receipt-facts">
+              <div className="hz-price hz-price--lg">
+                <span className="hz-price__amount">{fa(receipt.totalToman)}</span>
+                <span className="hz-price__unit">تومان</span>
+              </div>
+              <KeyValueList
+                rows={[
+                  { key: 'تعداد قلم', value: fa(receipt.items) },
+                  {
+                    key: 'تأیید سرور',
+                    value: receipt.paidAt ? formatInstantFa(receipt.paidAt) : null,
+                    empty: 'تأیید نشده',
+                  },
+                  {
+                    key: 'کد پیگیری درگاه',
+                    value: receipt.providerRef ? (
+                      <bdi dir="ltr" className="hz-id">
+                        {receipt.providerRef}
+                      </bdi>
+                    ) : null,
+                  },
+                ]}
+              />
+              {receipt.status !== 'PAID' ? (
+                <Alert tone="info" title="این پرداخت هنوز تأیید نشده است">
+                  تا وقتی سرور پرداخت را با درگاه تأیید نکند، هیچ سند یا دوره‌ای بر پایه آن ساخته نمی‌شود.
+                </Alert>
+              ) : null}
+              <ButtonLink href={receipt.originRoute} tone="secondary" block data-testid="receipt-continue">
+                بازگشت به پرونده این پرداخت
+              </ButtonLink>
+              <Link href="/payments" className="hz-link hz-link--standalone">
+                همه پرداخت‌ها
+              </Link>
+            </div>
+          </Card>
+        </aside>
       </div>
     </PublicShell>
   );

@@ -8,6 +8,7 @@ import { StatusBadge } from '../../src/ui/status.tsx';
 import { db } from '../../src/db/client.ts';
 import { kennelEntry, KENNEL_STATUS_FA } from '../../src/kennels/service.ts';
 import { StartKennelForm } from './forms.tsx';
+import { PageHeader } from '../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,11 +20,7 @@ export const dynamic = 'force-dynamic';
  * is never a condition here, because the role is what an approved kennel
  * produces, not what it needs.
  */
-export default async function KennelsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
+export default async function KennelsPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const guard = await guardRoute('/kennels');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
@@ -31,7 +28,12 @@ export default async function KennelsPage({
   const { error } = await searchParams;
 
   return (
-    <PublicShell actor={guard.actor} title="کنل" pathname="/kennels">
+    <PublicShell
+      actor={guard.actor}
+      title="کنل"
+      pathname="/kennels"
+      header={<PageHeader title={'کنل'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg">
         {error ? <Alert tone="error" title={error} /> : null}
 
@@ -41,7 +43,12 @@ export default async function KennelsPage({
           <Card>
             <div className="flex items-start justify-between gap-md">
               <div className="min-w-0">
-                <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{kennel.nameFa ?? 'کنل بدون نام'}</span></h2></div>
+                <div className="hz-section-header hz-section-header--sm">
+                  <h2 className="hz-section-header__title">
+                    <span className="hz-section-header__bar" aria-hidden="true" />
+                    <span>{kennel.nameFa ?? 'کنل بدون نام'}</span>
+                  </h2>
+                </div>
                 <p className="mt-2xs text-caption text-text-secondary">
                   {[kennel.provinceFa, kennel.cityFa].filter(Boolean).join(' · ') || 'نشانی ثبت نشده'}
                 </p>
@@ -59,21 +66,22 @@ export default async function KennelsPage({
               </StatusBadge>
             </div>
             <p className="mt-lg text-body-sm">
-              <Link
-                href={'/kennels/' + kennel.id}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="open-kennel"
-              >
+              <Link href={'/kennels/' + kennel.id} className="hz-link" data-testid="open-kennel">
                 ادامه پرونده کنل
               </Link>
             </p>
           </Card>
         ) : eligibility.allowed ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت کنل</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>ثبت کنل</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
-              مسیر: تکمیل فرم و انتخاب نژادها → مرور → پرداخت → ارسال → بررسی انجمن. مدرک اضافه‌ای خواسته
-              نمی‌شود و پرداخت جداگانه‌ای برای «فعال‌سازی نقش» وجود ندارد.
+              مسیر: تکمیل فرم و انتخاب نژادها → مرور → پرداخت → ارسال → بررسی انجمن. مدرک اضافه‌ای خواسته نمی‌شود و
+              پرداخت جداگانه‌ای برای «فعال‌سازی نقش» وجود ندارد.
             </p>
             <div className="mt-lg">
               <StartKennelForm label="شروع ثبت کنل" />

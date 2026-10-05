@@ -3,6 +3,8 @@ import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../../src/ui/page-crumbs.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { eq } from 'drizzle-orm';
 import { accounts } from '../../../../src/db/schema/core.ts';
@@ -10,7 +12,7 @@ import { MobileChangeForm } from '../../profile-forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
-/** Mobile change (§6.4). */
+/** Mobile change (§6.4) — P11 edit page (the mobile form of a settings row). */
 export default async function MobileChangePage() {
   const guard = await guardRoute('/account/profile/mobile');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
@@ -21,8 +23,18 @@ export default async function MobileChangePage() {
     .where(eq(accounts.id, guard.actor.accountId));
 
   return (
-    <PublicShell actor={guard.actor} title="تغییر شماره موبایل" pathname="/account/profile/mobile">
-      <div className="space-y-lg">
+    <PublicShell
+      actor={guard.actor}
+      title="تغییر شماره موبایل"
+      pathname="/account/profile/mobile"
+      header={
+        <div>
+          <PageCrumbs items={[{ href: '/dashboard', name: 'خانه' }, { href: '/account/profile', name: 'پروفایل' }, { name: 'تغییر شماره موبایل' }]} />
+          <PageHeader title="تغییر شماره موبایل" back={{ href: '/account/profile', label: 'پروفایل' }} />
+        </div>
+      }
+    >
+      <div className="max-w-(--size-container-reading) space-y-lg">
         <Alert tone="info" title="شماره فعلی تا تأیید موفق معتبر می‌ماند">
           اگر این مسیر را نیمه‌کاره رها کنید یا کد اشتباه باشد، شماره حساب شما تغییر نمی‌کند.
         </Alert>

@@ -328,7 +328,7 @@ export function CommunityStatusForm({
           {blockers.length > 0 && community.publicStatus !== 'PUBLISHED' ? (
             <div className="mt-md" data-testid="community-blockers">
               <Alert tone="warning" title="پیش از انتشار">
-                <ul className="list-disc space-y-2xs pr-lg">
+                <ul className="list-disc space-y-2xs pe-lg">
                   {blockers.map((item) => (
                     <li key={item}>{item}</li>
                   ))}

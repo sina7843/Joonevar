@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { DeskHead, DocFrame, Panel, PrivateNote } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
+import { ageInDays } from '../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { suggestionForReview } from '../../../../src/suggestions/service.ts';
 import { SUGGESTION_KIND_FA, type SuggestionKind } from '../../../../src/suggestions/model.ts';
@@ -14,16 +15,6 @@ import { formatInstantFa } from '../../../../src/content/model.ts';
 import { SuggestionDecisionForm } from '../../../../src/suggestions/forms.tsx';
 
 export const dynamic = 'force-dynamic';
-
-function Fact({ label, value }: { label: string; value: string | null }) {
-  if (!value) return null;
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-md border-b border-border-subtle py-sm last:border-b-0">
-      <dt className="text-body-sm text-text-secondary">{label}</dt>
-      <dd className="text-label-md">{value}</dd>
-    </div>
-  );
-}
 
 /** One suggestion and the records that already look like it — §10, §22 (PROMPT-009). */
 export default async function ReviewSuggestionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,70 +25,81 @@ export default async function ReviewSuggestionPage({ params }: { params: Promise
   if (data === null) notFound();
   const { suggestion, similar } = data;
 
+  const open = suggestion.status === 'SUBMITTED';
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/suggestions" nav={REVIEW_NAV}>
-      <div className="space-y-lg">
-        <Link href="/review/suggestions" className="text-label-md text-text-brand underline underline-offset-4">
-          بازگشت به پیشنهادها
-        </Link>
-
-        <Card>
-          <div className="flex flex-wrap items-start justify-between gap-md">
-            <div>
-              <p className="text-caption text-text-secondary">{SUGGESTION_KIND_FA[suggestion.kind as SuggestionKind]}</p>
-              <h2 className="text-h3">{suggestion.displayNameFa}</h2>
-            </div>
-            <span data-testid="suggestion-review-status">
-              <StatusBadge tone={suggestion.status === 'SUBMITTED' ? 'warning' : suggestion.status === 'APPROVED' ? 'success' : 'neutral'}>
-                {APPLICATION_STATUS_FA[suggestion.status as VetApplicationStatus]}
-              </StatusBadge>
-            </span>
-          </div>
-          <dl className="mt-lg">
-            <Fact label="شهر" value={[data.provinceNameFa, data.cityNameFa].filter(Boolean).join(' · ') || null} />
-            <Fact label="تماس یا نشانی عمومی" value={suggestion.contactFa} />
-            <Fact label="منبع اطلاعات" value={suggestion.sourceFa} />
-            <Fact label="ثبت" value={formatInstantFa(suggestion.createdAt)} />
-          </dl>
-          {suggestion.noteFa ? <p className="mt-md whitespace-pre-line text-body-sm">{suggestion.noteFa}</p> : null}
-          {suggestion.reviewNoteFa ? (
-            <p className="mt-md text-caption text-text-secondary" data-testid="suggestion-last-note">
-              {'آخرین تصمیم: ' + suggestion.reviewNoteFa + (suggestion.reviewedAt ? ' · ' + formatInstantFa(suggestion.reviewedAt) : '')}
-            </p>
-          ) : null}
+    <OpsShell actor={guard.actor} title="بررسی پیشنهاد" pathname="/review/suggestions" nav={REVIEW_NAV}>
+      <DeskHead
+        title={SUGGESTION_KIND_FA[suggestion.kind as SuggestionKind] + ' · ' + suggestion.displayNameFa}
+        status={{
+          tone: open ? 'info' : suggestion.status === 'APPROVED' ? 'success' : 'neutral',
+          label: <span data-testid="suggestion-review-status">{APPLICATION_STATUS_FA[suggestion.status as VetApplicationStatus]}</span>,
+        }}
+        meta={[
+          'ثبت: ' + formatInstantFa(suggestion.createdAt),
+          open && ageInDays(suggestion.createdAt) !== null ? (
+            <span className="hz-age">{ageInDays(suggestion.createdAt)!.toLocaleString('fa-IR') + ' روز در صف'}</span>
+          ) : null,
+        ]}
+        owner={open ? 'SYSTEM' : null}
+        ownerExtra={open ? 'اپراتور بررسی' : undefined}
+      >
+        <p className="flex flex-wrap gap-lg">
+          <Link href="/review/suggestions" className="hz-link hz-link--standalone">
+            بازگشت به پیشنهادها
+          </Link>
           {data.createdSlug ? (
-            <p className="mt-sm text-body-sm">
-              <Link
-                href={(suggestion.kind === 'VET' ? '/veterinarians/' : '/centers/') + data.createdSlug}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="suggestion-created-record"
-              >
-                رکورد منتشرشده از این پیشنهاد
-              </Link>
-            </p>
+            <Link
+              href={(suggestion.kind === 'VET' ? '/veterinarians/' : '/centers/') + data.createdSlug}
+              className="hz-link hz-link--standalone"
+              data-testid="suggestion-created-record"
+            >
+              رکورد منتشرشده از این پیشنهاد
+            </Link>
           ) : null}
-        </Card>
+        </p>
+      </DeskHead>
 
-        {similar.length > 0 ? (
-          <div data-testid="suggestion-duplicates">
-            <Alert tone="warning" title="رکورد مشابه با همین نام">
-              <ul className="list-disc space-y-2xs pr-lg">
-                {similar.map((row) => (
-                  <li key={row.kind + row.nameFa + (row.slug ?? '')}>
-                    {row.nameFa +
-                      ' · ' +
-                      SUGGESTION_KIND_FA[row.kind] +
-                      ' · ' +
-                      (row.owned ? 'دارای مالک' : 'بدون مالک') +
-                      (row.published ? '' : ' · منتشرنشده')}
-                  </li>
-                ))}
-              </ul>
-            </Alert>
-          </div>
-        ) : null}
+      <div className="hz-desk">
+        <div className="min-w-0 space-y-lg">
+          {similar.length > 0 ? (
+            <div data-testid="suggestion-duplicates">
+              <Alert tone="warning" title="رکورد مشابه با همین نام">
+                <ul className="list-disc space-y-2xs ps-lg">
+                  {similar.map((row) => (
+                    <li key={row.kind + row.nameFa + (row.slug ?? '')}>
+                      {row.nameFa +
+                        ' · ' +
+                        SUGGESTION_KIND_FA[row.kind] +
+                        ' · ' +
+                        (row.owned ? 'دارای مالک' : 'بدون مالک') +
+                        (row.published ? '' : ' · منتشرنشده')}
+                    </li>
+                  ))}
+                </ul>
+              </Alert>
+            </div>
+          ) : null}
 
-        <SuggestionDecisionForm suggestionId={suggestion.id} version={suggestion.version} open={suggestion.status === 'SUBMITTED'} />
+          <Panel title="اطلاعات پیشنهادشده">
+            <KeyValueList
+              rows={[
+                { key: 'شهر', value: [data.provinceNameFa, data.cityNameFa].filter(Boolean).join(' · ') || null },
+                { key: 'تماس یا نشانی عمومی', value: suggestion.contactFa },
+                { key: 'منبع اطلاعات', value: suggestion.sourceFa },
+                { key: 'ثبت', value: formatInstantFa(suggestion.createdAt) },
+              ].filter((row) => row.value)}
+            />
+            {suggestion.noteFa ? <p className="whitespace-pre-line text-body-sm">{suggestion.noteFa}</p> : null}
+            {suggestion.reviewNoteFa ? (
+              <p className="text-caption text-text-secondary" data-testid="suggestion-last-note">
+                {'آخرین تصمیم: ' + suggestion.reviewNoteFa + (suggestion.reviewedAt ? ' · ' + formatInstantFa(suggestion.reviewedAt) : '')}
+              </p>
+            ) : null}
+          </Panel>
+        </div>
+        <div className="hz-desk__decision">
+          <SuggestionDecisionForm suggestionId={suggestion.id} version={suggestion.version} open={suggestion.status === 'SUBMITTED'} />
+        </div>
       </div>
     </OpsShell>
   );

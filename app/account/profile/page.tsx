@@ -3,7 +3,9 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 import { db } from '../../../src/db/client.ts';
 import { eq } from 'drizzle-orm';
 import { accounts } from '../../../src/db/schema/core.ts';
@@ -17,7 +19,8 @@ import { Button } from '../../../src/ui/button.tsx';
 export const dynamic = 'force-dynamic';
 
 /**
- * Profile editing (§6.4).
+ * Profile editing (§6.4) — P11 settings in PublicShell: account rows (mobile,
+ * KYC) with their one action each, then the identity and residence groups.
  *
  * Account, KYC and membership stay visibly separate here: the KYC badge reports
  * the review state and never implies membership or a role.
@@ -39,70 +42,97 @@ export default async function ProfilePage() {
   const kycApproved = kyc?.status === 'APPROVED';
 
   return (
-    <PublicShell actor={actor} title="پروفایل" pathname="/account/profile">
-      <div className="space-y-xl">
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <div>
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شماره موبایل حساب</span></h2></div>
-              <p className="mt-sm">
-                <bdi className="hz-ltr font-mono" data-testid="account-mobile">{account?.mobile}</bdi>
-              </p>
+    <PublicShell
+      actor={actor}
+      title="پروفایل"
+      pathname="/account/profile"
+      header={
+        <PageHeader
+          title="پروفایل"
+          back={{ href: '/dashboard' }}
+          meta={['حساب، احراز هویت و عضویت سه چیز جدا هستند؛ هر تغییر همین‌جا ذخیره می‌شود.']}
+        />
+      }
+    >
+      <Card>
+        <SectionHeader size="sm" title="حساب" />
+        <div className="mt-sm">
+          <div className="hz-setting max-md:grid-cols-1">
+            <div className="hz-setting__label">
+              <span className="hz-setting__name">شماره موبایل حساب</span>
+              <span className="hz-setting__hint">کد ورود به همین شماره فرستاده می‌شود.</span>
             </div>
-            <StatusBadge tone={kycApproved ? 'success' : kyc ? 'info' : 'neutral'}>
-              {kycApproved ? 'احراز هویت تأییدشده' : kyc ? 'احراز هویت در جریان' : 'احراز هویت انجام نشده'}
-            </StatusBadge>
+            <div className="hz-setting__end flex-wrap max-md:justify-start">
+              <bdi className="hz-setting__value" dir="ltr" data-testid="account-mobile">
+                {account?.mobile}
+              </bdi>
+              <Link href="/account/profile/mobile" className="hz-btn hz-btn--ghost hz-btn--sm">
+                <Icon name="pencilSimple" size="xs" />
+                تغییر شماره موبایل
+              </Link>
+            </div>
           </div>
-          <p className="mt-md text-caption text-text-secondary">
-            <Link href="/account/profile/mobile" className="text-text-brand underline underline-offset-4">
-              تغییر شماره موبایل
-            </Link>
-          </p>
-        </Card>
+          <div className="hz-setting max-md:grid-cols-1">
+            <div className="hz-setting__label">
+              <span className="hz-setting__name">احراز هویت</span>
+              <span className="hz-setting__hint">احراز هویت با عضویت انجمن یکی نیست و هیچ‌کدام دیگری را فعال نمی‌کند.</span>
+            </div>
+            <div className="hz-setting__end flex-wrap max-md:justify-start">
+              <StatusBadge tone={kycApproved ? 'success' : kyc ? 'info' : 'neutral'}>
+                {kycApproved ? 'احراز هویت تأییدشده' : kyc ? 'احراز هویت در جریان' : 'احراز هویت انجام نشده'}
+              </StatusBadge>
+              {kycApproved ? null : (
+                <Link href="/account/kyc" className="hz-btn hz-btn--ghost hz-btn--sm">
+                  {kyc ? 'پیگیری' : 'شروع'}
+                  <span className="hz-visually-hidden"> احراز هویت</span>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
 
-        <section className="space-y-md">
-          <h2 className="text-h3">اطلاعات هویتی</h2>
-          <Card>
-            <IdentityForm
-              values={{
-                firstName: profile?.firstName ?? '',
-                lastName: profile?.lastName ?? '',
-                nationalId: profile?.nationalId ?? '',
-                birthDate: profile?.birthDate ?? '',
-                displayName: profile?.displayName ?? '',
-                displayNameVisible: profile?.displayNameVisible ?? false,
-              }}
-              nationalIdLocked={kycApproved}
-              mode="edit"
-            />
-          </Card>
-        </section>
+      <Card>
+        <SectionHeader size="sm" title="اطلاعات هویتی" />
+        <div className="mt-lg">
+          <IdentityForm
+            values={{
+              firstName: profile?.firstName ?? '',
+              lastName: profile?.lastName ?? '',
+              nationalId: profile?.nationalId ?? '',
+              birthDate: profile?.birthDate ?? '',
+              displayName: profile?.displayName ?? '',
+              displayNameVisible: profile?.displayNameVisible ?? false,
+            }}
+            nationalIdLocked={kycApproved}
+            mode="edit"
+          />
+        </div>
+      </Card>
 
-        <section className="space-y-md">
-          <h2 className="text-h3">سکونت</h2>
-          <Card>
-            <ResidenceForm
-              mapAvailable={mapKeyConfigured}
-              values={{
-                province: residence?.province ?? '',
-                city: residence?.city ?? '',
-                address: residence?.address ?? '',
-                postalCode: residence?.postalCode ?? '',
-              }}
-            />
-          </Card>
-        </section>
-        <section className="space-y-md">
-          <h2 className="text-h3">نشست</h2>
-          <Card>
-            <form action={signOutAction}>
-              <Button tone="secondary" type="submit" block data-testid="sign-out">
-                خروج از حساب
-              </Button>
-            </form>
-          </Card>
-        </section>
-      </div>
+      <Card>
+        <SectionHeader size="sm" title="سکونت" />
+        <div className="mt-lg">
+          <ResidenceForm
+            mapAvailable={mapKeyConfigured}
+            values={{
+              province: residence?.province ?? '',
+              city: residence?.city ?? '',
+              address: residence?.address ?? '',
+              postalCode: residence?.postalCode ?? '',
+            }}
+          />
+        </div>
+      </Card>
+
+      <Card>
+        <SectionHeader size="sm" title="نشست" />
+        <form action={signOutAction} className="mt-md">
+          <Button tone="destructive-outline" type="submit" iconStart="signOut" mirrorIcon data-testid="sign-out">
+            خروج از حساب
+          </Button>
+        </form>
+      </Card>
     </PublicShell>
   );
 }

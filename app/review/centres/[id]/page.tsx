@@ -19,9 +19,9 @@ export default async function ReviewCentrePage({ params }: { params: Promise<{ i
   if (data === null) notFound();
 
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/centres" nav={REVIEW_NAV}>
+    <OpsShell actor={guard.actor} title="مرکز دامپزشکی" pathname="/review/centres" nav={REVIEW_NAV}>
       <div className="space-y-lg">
-        <Link href="/review/centres" className="text-label-md text-text-brand underline underline-offset-4">
+        <Link href="/review/centres" className="hz-link hz-link--standalone">
           بازگشت به مراکز
         </Link>
         <CentreEditor data={data} surface="review" />

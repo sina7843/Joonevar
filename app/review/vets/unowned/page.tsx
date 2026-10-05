@@ -2,8 +2,7 @@ import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { CaseItem, CaseList, Panel } from '../../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { directoryReferenceData } from '../../../../src/vets/directory.ts';
@@ -21,53 +20,43 @@ export default async function ReviewUnownedVetsPage() {
   const [profiles, reference] = await Promise.all([unownedVetProfiles(db(), guard.actor), directoryReferenceData(db())]);
 
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/vets/unowned" nav={REVIEW_NAV}>
-      <div className="space-y-lg">
-        <UnownedVetForm provinces={reference.provinces} cities={reference.cities} />
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پروفایل‌های بدون مالک</span></h2></div>
+    <OpsShell actor={guard.actor} title="پروفایل‌های بدون مالک" pathname="/review/vets/unowned" nav={REVIEW_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{profiles.length.toLocaleString('fa-IR') + ' پروفایل بدون مالک'}</span>
+      </p>
+      <div className="grid items-start gap-lg lg:grid-cols-2">
+        <Panel title="پروفایل‌های بدون مالک" count={profiles.length.toLocaleString('fa-IR')}>
           {profiles.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="پروفایل بدون مالکی ثبت نشده است" description="پروفایل‌هایی که با فرم بالا منتشر شوند اینجا می‌آیند تا Claim شوند." />
-            </div>
+            <EmptyState title="پروفایل بدون مالکی ثبت نشده است" description="پروفایل‌هایی که با فرم انتشار منتشر شوند اینجا می‌آیند تا Claim شوند." />
           ) : (
-            <ul className="mt-lg space-y-md" data-testid="unowned-list">
+            <CaseList label="پروفایل‌های بدون مالک" testId="unowned-list">
               {profiles.map((profile) => (
-                <li key={profile.id} className="rounded-xl border border-border-default p-lg" data-testid={'unowned-item-' + profile.id}>
-                  <div className="flex flex-wrap items-start justify-between gap-sm">
-                    <div className="min-w-0">
-                      <p className="text-label-lg">{profile.displayNameFa}</p>
-                      <p className="mt-2xs text-caption text-text-secondary">
-                        {[profile.cityNameFa, profile.councilCode ? 'کد نظام ' + profile.councilCode : null, 'منبع: ' + (profile.sourceFa ?? '—')]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-xs">
-                      <StatusBadge tone={profile.publicStatus === 'PUBLISHED' ? 'success' : 'warning'}>{VET_PUBLIC_STATUS_FA[profile.publicStatus]}</StatusBadge>
-                      {profile.claimInReview ? <StatusBadge tone="info">Claim در حال بررسی</StatusBadge> : null}
-                    </div>
-                  </div>
+                <CaseItem
+                  key={profile.id}
+                  testId={'unowned-item-' + profile.id}
+                  type={profile.claimInReview ? 'Claim در حال بررسی' : undefined}
+                  name={profile.displayNameFa}
+                  code={profile.councilCode}
+                  sub={[profile.cityNameFa, 'منبع: ' + (profile.sourceFa ?? '—')].filter(Boolean).join(' · ')}
+                  status={{ tone: profile.publicStatus === 'PUBLISHED' ? 'success' : 'warning', label: VET_PUBLIC_STATUS_FA[profile.publicStatus] }}
+                >
                   {profile.publicStatus === 'PUBLISHED' && profile.publicSlug ? (
-                    <Link
-                      href={'/veterinarians/' + profile.publicSlug}
-                      className="mt-xs inline-block text-label-md text-text-brand underline underline-offset-4"
-                      data-testid={'unowned-link-' + profile.id}
-                    >
+                    <Link href={'/veterinarians/' + profile.publicSlug} className="hz-link hz-link--standalone" data-testid={'unowned-link-' + profile.id}>
                       صفحه عمومی
                     </Link>
                   ) : null}
                   {profile.publicStatus === 'DRAFT' ? null : (
                     <ReviewStatusForm profileId={profile.id} version={profile.version} publicStatus={profile.publicStatus} />
                   )}
-                </li>
+                </CaseItem>
               ))}
-            </ul>
+            </CaseList>
           )}
-        </Card>
-
-        <AddCityForm surface="review" provinces={reference.provinces} />
+        </Panel>
+        <div className="space-y-lg">
+          <UnownedVetForm provinces={reference.provinces} cities={reference.cities} />
+          <AddCityForm surface="review" provinces={reference.provinces} />
+        </div>
       </div>
     </OpsShell>
   );

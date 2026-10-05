@@ -9,10 +9,14 @@ import { eligibilityFor } from '../../../src/domain/eligibility/service.ts';
 import { selectableAnimals } from '../../../src/vets/visits.ts';
 import { CONTEXT_FA, SERVICES_BY_CONTEXT, type VisitContextName } from '../../../src/domain/referral.ts';
 import { SelectAnimalsForm } from './select-form.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
+import { Stepper } from '../../../src/ui/stepper.tsx';
 
 export const dynamic = 'force-dynamic';
 
 const CONTEXTS: readonly VisitContextName[] = ['MICROCHIP', 'DNA', 'PREGNANCY'];
+const STEPS = [{ label: 'انتخاب حیوان و خدمت' }, { label: 'انتخاب دامپزشک و مرکز' }, { label: 'مرور و ثبت' }];
 
 /**
  * Step one of §11.2: choose the animals and the service for each one.
@@ -21,11 +25,7 @@ const CONTEXTS: readonly VisitContextName[] = ['MICROCHIP', 'DNA', 'PREGNANCY'];
  * a re-sampling: the ordinary pedigree route reuses the sample and custodian
  * already on record and never asks for a veterinarian again (§11.1).
  */
-export default async function NewRequestPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ context?: string }>;
-}) {
+export default async function NewRequestPage({ searchParams }: { searchParams: Promise<{ context?: string }> }) {
   const guard = await guardRoute('/requests/new');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
@@ -47,7 +47,26 @@ export default async function NewRequestPage({
   const animals = await selectableAnimals(db(), actor, context);
 
   return (
-    <PublicShell actor={actor} title={'درخواست مراجعه · ' + CONTEXT_FA[context]} pathname="/requests/new">
+    <PublicShell
+      actor={actor}
+      title={'درخواست مراجعه · ' + CONTEXT_FA[context]}
+      pathname="/requests/new"
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { name: 'خانه', href: '/dashboard' },
+              { name: 'درخواست‌ها', href: '/requests' },
+              { name: 'درخواست مراجعه' },
+            ]}
+          />
+          <PageHeader title={'درخواست مراجعه · ' + CONTEXT_FA[context]} back={{ href: '/requests' }} />
+        </div>
+      }
+    >
+      <div className="hz-card">
+        <Stepper label="مراحل درخواست مراجعه" steps={STEPS} current={1} />
+      </div>
       <div className="space-y-lg">
         {context === 'DNA' ? (
           <Alert tone="info" title="این مسیر فقط برای نمونه‌گیری مجدد است">

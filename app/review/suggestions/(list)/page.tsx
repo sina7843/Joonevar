@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { CaseItem, CaseList, ViewChips } from '../../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { suggestionQueue } from '../../../../src/suggestions/service.ts';
@@ -38,68 +37,56 @@ export default async function ReviewSuggestionsPage({ searchParams }: { searchPa
     '/review/suggestions' + (target === 'OPEN' && targetPage === 1 ? '' : '?view=' + target + (targetPage > 1 ? '&page=' + targetPage : ''));
 
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/suggestions" nav={REVIEW_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">پیشنهادهای کاربران</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            رکورد پیشنهادی تا تأیید منتشر نمی‌شود و پس از تأیید، بدون مالک منتشر می‌شود. نام پیشنهاددهنده در این صف نمی‌آید.
-          </p>
-          <nav aria-label="نمای پیشنهادها" className="mt-lg flex flex-wrap gap-sm">
-            {VIEWS.map((entry) => (
-              <Link
-                key={entry.view}
-                href={href(entry.view)}
-                aria-current={entry.view === view ? 'page' : undefined}
-                data-testid={'suggestion-view-' + entry.view}
-                className={[
-                  'rounded-full border px-lg py-xs text-label-md',
-                  entry.view === view ? 'border-border-brand bg-bg-brand-subtle text-text-brand' : 'border-border-subtle text-text-secondary',
-                ].join(' ')}
-              >
-                {entry.label}
-              </Link>
-            ))}
-          </nav>
-        </Card>
+    <OpsShell actor={guard.actor} title="پیشنهادهای کاربران" pathname="/review/suggestions" nav={REVIEW_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{fa(result.total) + ' پیشنهاد'}</span>
+        <span className="hz-page-header__meta-item">
+          رکورد پیشنهادی تا تأیید منتشر نمی‌شود و پس از تأیید، بدون مالک منتشر می‌شود. نام پیشنهاددهنده در این صف نمی‌آید.
+        </span>
+      </p>
+      <ViewChips
+        label="نمای پیشنهادها"
+        chips={VIEWS.map((entry) => ({
+          key: entry.view,
+          href: href(entry.view),
+          label: entry.label,
+          current: entry.view === view,
+          testId: 'suggestion-view-' + entry.view,
+        }))}
+      />
 
-        {result.items.length === 0 ? (
-          <EmptyState title={VIEWS.find((entry) => entry.view === view)!.empty} description="پیشنهادهای تازه کاربران اینجا نشان داده می‌شوند." />
-        ) : (
-          <ul className="space-y-sm" data-testid="suggestion-queue">
-            {result.items.map((item) => (
-              <li key={item.id}>
-                <Link
-                  href={'/review/suggestions/' + item.id}
-                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
-                  data-testid={'suggestion-item-' + item.id}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-sm">
-                    <div className="min-w-0">
-                      <p className="text-caption text-text-secondary">{SUGGESTION_KIND_FA[item.kind as SuggestionKind]}</p>
-                      <p className="text-label-lg text-text-primary">{item.displayNameFa}</p>
-                    </div>
-                    <StatusBadge tone={item.status === 'SUBMITTED' ? 'warning' : item.status === 'APPROVED' ? 'success' : 'neutral'}>
-                      {APPLICATION_STATUS_FA[item.status as VetApplicationStatus]}
-                    </StatusBadge>
-                  </div>
-                  <p className="mt-sm text-caption text-text-secondary">
-                    {[item.cityNameFa, 'منبع: ' + item.sourceFa, 'ثبت: ' + formatInstantFa(item.createdAt)].filter(Boolean).join(' · ')}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+      {result.items.length === 0 ? (
+        <EmptyState title={VIEWS.find((entry) => entry.view === view)!.empty} description="پیشنهادهای تازه کاربران اینجا نشان داده می‌شوند." />
+      ) : (
+        <CaseList label="پیشنهادهای کاربران" testId="suggestion-queue">
+          {result.items.map((item) => (
+            <CaseItem
+              key={item.id}
+              type={SUGGESTION_KIND_FA[item.kind as SuggestionKind]}
+              name={item.displayNameFa}
+              href={'/review/suggestions/' + item.id}
+              linkTestId={'suggestion-item-' + item.id}
+              sub={[item.cityNameFa, 'منبع: ' + item.sourceFa, 'ثبت: ' + formatInstantFa(item.createdAt)].filter(Boolean).join(' · ')}
+              ageDays={item.status === 'SUBMITTED' ? ageInDays(item.createdAt) : undefined}
+              status={{
+                tone: item.status === 'SUBMITTED' ? 'info' : item.status === 'APPROVED' ? 'success' : 'neutral',
+                label: APPLICATION_STATUS_FA[item.status as VetApplicationStatus],
+              }}
+              owner={item.status === 'SUBMITTED' ? 'SYSTEM' : null}
+              ownerLabel="اپراتور بررسی"
+              ownerIsUs
+            />
+          ))}
+        </CaseList>
+      )}
 
-        {result.totalPages > 1 ? (
-          <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
-            {result.page > 1 ? <ButtonLink tone="secondary" href={href(view, result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
-            <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-            {result.page < result.totalPages ? <ButtonLink tone="secondary" href={href(view, result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
-          </nav>
-        ) : null}
-      </div>
+      {result.totalPages > 1 ? (
+        <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
+          {result.page > 1 ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
+          <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
+          {result.page < result.totalPages ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
+        </nav>
+      ) : null}
     </OpsShell>
   );
 }

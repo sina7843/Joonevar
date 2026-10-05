@@ -20,9 +20,7 @@ const EMPTY: KennelFormState = {};
 
 function Result({ state }: { state: KennelFormState }) {
   if (!state.message) return null;
-  return (
-    <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />
-  );
+  return <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />;
 }
 
 /** The entry the source names by label: «شروع ثبت کنل» (§15.2). */
@@ -61,22 +59,56 @@ export function KennelForm({
   const [state, submit, pending] = useActionState(saveKennelAction, EMPTY);
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مشخصات کنل</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>مشخصات کنل</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        نشانی کنل برای ارسال پرونده لازم است. نشانی محل سکونت شما جدا و اختیاری است و خالی‌بودن آن مانع ثبت
-        کنل نیست.
+        نشانی کنل برای ارسال پرونده لازم است. نشانی محل سکونت شما جدا و اختیاری است و خالی‌بودن آن مانع ثبت کنل نیست.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="kennel-form">
         <input type="hidden" name="kennelId" value={kennel.id} />
         <Result state={state} />
-        <TextField label="نام کنل" name="nameFa" required defaultValue={kennel.nameFa ?? ''} data-testid="kennel-name" />
-        <TextField label="نام لاتین (اختیاری)" name="nameEn" ltr defaultValue={kennel.nameEn ?? ''} data-testid="kennel-name-en" />
+        <TextField
+          label="نام کنل"
+          name="nameFa"
+          required
+          defaultValue={kennel.nameFa ?? ''}
+          data-testid="kennel-name"
+        />
+        <TextField
+          label="نام لاتین (اختیاری)"
+          name="nameEn"
+          ltr
+          defaultValue={kennel.nameEn ?? ''}
+          data-testid="kennel-name-en"
+        />
         <TextField label="تلفن کنل" name="phone" ltr defaultValue={kennel.phone ?? ''} data-testid="kennel-phone" />
         <TextField label="استان" name="province" defaultValue={kennel.provinceFa ?? ''} data-testid="kennel-province" />
         <TextField label="شهر" name="city" required defaultValue={kennel.cityFa ?? ''} data-testid="kennel-city" />
-        <TextField label="نشانی کنل" name="address" required defaultValue={kennel.addressFa ?? ''} data-testid="kennel-address" />
-        <TextField label="عرض جغرافیایی (اختیاری)" name="latitude" ltr defaultValue={kennel.latitude ?? ''} data-testid="kennel-lat" />
-        <TextField label="طول جغرافیایی (اختیاری)" name="longitude" ltr defaultValue={kennel.longitude ?? ''} data-testid="kennel-lng" />
+        <TextField
+          label="نشانی کنل"
+          name="address"
+          required
+          defaultValue={kennel.addressFa ?? ''}
+          data-testid="kennel-address"
+        />
+        <TextField
+          label="عرض جغرافیایی (اختیاری)"
+          name="latitude"
+          ltr
+          defaultValue={kennel.latitude ?? ''}
+          data-testid="kennel-lat"
+        />
+        <TextField
+          label="طول جغرافیایی (اختیاری)"
+          name="longitude"
+          ltr
+          defaultValue={kennel.longitude ?? ''}
+          data-testid="kennel-lng"
+        />
         <TextField label="توضیح (اختیاری)" name="note" defaultValue={kennel.noteFa ?? ''} data-testid="kennel-note" />
         <Button tone="secondary" type="submit" block disabled={pending} data-testid="save-kennel">
           {pending ? 'در حال ذخیره…' : 'ذخیره مشخصات'}
@@ -113,19 +145,20 @@ export function KennelBreeds({
   const matches = options
     .filter((row) => !chosen.has(row.id))
     .filter(
-      (row) =>
-        needle === '' ||
-        row.nameFa.toLowerCase().includes(needle) ||
-        row.nameEn.toLowerCase().includes(needle),
+      (row) => needle === '' || row.nameFa.toLowerCase().includes(needle) || row.nameEn.toLowerCase().includes(needle),
     )
     .slice(0, 8);
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نژادهای پرورشی</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>نژادهای پرورشی</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary" data-testid="breed-count">
-        {selected.length} نژاد انتخاب شده است. حداقل یک نژاد لازم است و کنل تک‌نژادی همین مسیر با یک انتخاب
-        است.
+        {selected.length} نژاد انتخاب شده است. حداقل یک نژاد لازم است و کنل تک‌نژادی همین مسیر با یک انتخاب است.
       </p>
 
       <Result state={addState} />
@@ -141,12 +174,7 @@ export function KennelBreeds({
               <form action={remove} data-testid={'remove-breed-form-' + row.breedId}>
                 <input type="hidden" name="kennelId" value={kennelId} />
                 <input type="hidden" name="breedId" value={row.breedId} />
-                <Button
-                  tone="ghost"
-                  type="submit"
-                  disabled={removing}
-                  data-testid={'remove-breed-' + row.breedId}
-                >
+                <Button tone="ghost" type="submit" disabled={removing} data-testid={'remove-breed-' + row.breedId}>
                   حذف
                 </Button>
               </form>

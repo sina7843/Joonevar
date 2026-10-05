@@ -16,6 +16,7 @@ import { batchItems, batchTotalToman, findBatch, latestAttempt } from '../../../
 import { itemsOfBatch, SAMPLE_TAKEN_NOTE_FA } from '../../../src/documents/registration-sheet.ts';
 import { configuredMoney, formatTomanFa, tomanFromColumn } from '../../../src/domain/money.ts';
 import { CancelSheetPaymentForm, PaySheetBatchForm, RetryIssuanceForm } from './batch-forms.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,37 +71,54 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
     ? await db()
         .select()
         .from(registrationSheets)
-        .where(inArray(registrationSheets.animalId, items.map((i) => i.animalId)))
+        .where(
+          inArray(
+            registrationSheets.animalId,
+            items.map((i) => i.animalId),
+          ),
+        )
     : [];
 
   const blocked = items.filter((i) => i.state === 'BLOCKED');
-  const payable = batch.status === 'DRAFT' || batch.status === 'AWAITING_PAYMENT' || batch.status === 'FAILED' || batch.status === 'CANCELLED';
+  const payable =
+    batch.status === 'DRAFT' ||
+    batch.status === 'AWAITING_PAYMENT' ||
+    batch.status === 'FAILED' ||
+    batch.status === 'CANCELLED';
 
   return (
-    <PublicShell actor={guard.actor} title="درخواست برگه ثبتی" pathname={'/registration/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="درخواست برگه ثبتی"
+      pathname={'/registration/' + id}
+      header={<PageHeader title={'درخواست برگه ثبتی'} back={{ href: '/registration' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرور هزینه</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>مرور هزینه</span>
+              </h2>
+            </div>
             <StatusBadge tone={batch.status === 'PAID' ? 'success' : batch.status === 'FAILED' ? 'warning' : 'info'}>
               <span data-testid="batch-status">{BATCH_FA[batch.status]}</span>
             </StatusBadge>
           </div>
 
           {/*
-            * The breakdown is built from the priced money lines, because before
-            * the payment those are the only record of what was selected
-            * (DEC-0141) — the document records come into being with the payment.
-            */}
+           * The breakdown is built from the priced money lines, because before
+           * the payment those are the only record of what was selected
+           * (DEC-0141) — the document records come into being with the payment.
+           */}
           <ul className="mt-lg space-y-sm text-body-sm" data-testid="sheet-breakdown">
             {lines.map((line) => {
               const name = animalRows.find((a) => a.id === line.targetId)?.name ?? 'بدون نام';
               return (
                 <li key={line.id} className="flex items-center justify-between gap-md">
                   <span>{name}</span>
-                  <span className="text-text-secondary">
-                    {formatTomanFa(tomanFromColumn(line.amountToman))}
-                  </span>
+                  <span className="text-text-secondary">{formatTomanFa(tomanFromColumn(line.amountToman))}</span>
                 </li>
               );
             })}
@@ -108,9 +126,7 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
           <p className="mt-lg text-body-sm">
             جمع کل: <span data-testid="sheet-total">{formatTomanFa(configuredMoney(total))}</span>
           </p>
-          <p className="mt-2xs text-caption text-text-secondary">
-            مبلغ خدمت دامپزشک جدا است و در این پرداخت نیست.
-          </p>
+          <p className="mt-2xs text-caption text-text-secondary">مبلغ خدمت دامپزشک جدا است و در این پرداخت نیست.</p>
 
           {payable ? (
             <>
@@ -127,14 +143,18 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
         ) : null}
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت صدور هر حیوان</span></h2></div>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>وضعیت صدور هر حیوان</span>
+            </h2>
+          </div>
           <p className="mt-md text-caption text-text-secondary">
             وضعیت هر حیوان مستقل است؛ توقف یکی، صدور بقیه را متوقف نمی‌کند.
           </p>
           {items.length === 0 ? (
             <p className="mt-lg text-body-sm text-text-secondary" data-testid="sheet-items-pending">
-              تا تأیید پرداخت روی سرور، هیچ رکورد سندی ساخته نمی‌شود. پس از تأیید، وضعیت هر حیوان همین‌جا
-              می‌آید.
+              تا تأیید پرداخت روی سرور، هیچ رکورد سندی ساخته نمی‌شود. پس از تأیید، وضعیت هر حیوان همین‌جا می‌آید.
             </p>
           ) : null}
           <ul className="mt-lg space-y-lg" data-testid="sheet-items">
@@ -142,7 +162,7 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
               const name = animalRows.find((a) => a.id === item.animalId)?.name ?? 'بدون نام';
               const sheet = sheets.find((s) => s.animalId === item.animalId);
               return (
-                <li key={item.id} className="rounded-xl border border-border-default p-lg">
+                <li key={item.id} className="rounded-lg border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <span className="text-body-sm">{name}</span>
                     <StatusBadge
@@ -160,7 +180,7 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
                     <p className="mt-sm text-body-sm">
                       <Link
                         href={'/documents/' + sheet.id}
-                        className="text-text-brand underline underline-offset-4"
+                        className="hz-link"
                         data-testid={'open-sheet-' + item.animalId}
                       >
                         مشاهده برگه ثبتی

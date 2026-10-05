@@ -1,4 +1,5 @@
 import { PublicShell } from '../../../../src/ui/shell.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { Card } from '../../../../src/ui/card.tsx';
@@ -35,8 +36,8 @@ export default async function SellerPromotionsPage({
   const store = stores.find((row) => row.id === requested) ?? stores[0] ?? null;
   if (store === null) {
     return (
-      <PublicShell actor={guard.actor} title="تخفیف‌های فروشگاه" pathname="/account/seller">
-        <div className="space-y-lg p-lg">
+      <PublicShell actor={guard.actor} title="تخفیف‌های فروشگاه" pathname="/account/seller" header={<PageHeader title="تخفیف‌های فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+        <div className="space-y-xl">
           <p className="text-body-sm text-text-secondary" data-testid="promotions-no-store">
             هنوز فروشگاهی ندارید.
           </p>
@@ -52,8 +53,8 @@ export default async function SellerPromotionsPage({
   ]);
 
   return (
-    <PublicShell actor={guard.actor} title="تخفیف‌های فروشگاه" pathname="/account/seller">
-      <div className="space-y-lg p-lg">
+    <PublicShell actor={guard.actor} title="تخفیف‌های فروشگاه" pathname="/account/seller" header={<PageHeader title="تخفیف‌های فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+      <div className="space-y-xl">
         {stacking.row === null ? (
           <Alert tone="info" title="تا انتشار سیاست هم‌زمانی، هیچ دو تخفیفی با هم جمع نمی‌شوند">
             <span data-testid="stacking-missing">
@@ -64,7 +65,7 @@ export default async function SellerPromotionsPage({
         ) : null}
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تخفیف‌های این فروشگاه</span></h2></div>
+          <SectionHeader size="sm" title="تخفیف‌های این فروشگاه" />
           {rules.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="seller-rules-empty">
               هنوز تخفیفی تعریف نکرده‌اید.
@@ -113,7 +114,7 @@ export default async function SellerPromotionsPage({
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تخفیف تازه</span></h2></div>
+          <SectionHeader size="sm" title="تخفیف تازه" />
           <p className="mt-2xs text-caption text-text-secondary" data-testid="seller-discount-note">
             هزینه این تخفیف‌ها از سهم خود فروشگاه کم می‌شود.
           </p>

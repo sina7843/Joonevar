@@ -7,7 +7,10 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { ActionOwner, Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { db } from '../../../src/db/client.ts';
 import { ownerRequest } from '../../../src/vets/visits.ts';
 import { ownerSamples } from '../../../src/clinical/samples.ts';
@@ -60,113 +63,187 @@ export default async function RequestPage({
   const sampleRows = await ownerSamples(db(), guard.actor, request.id);
   const usable = referral !== null && referral.status === 'ACTIVE' && !expired;
 
+  const title = SERVICE_TYPE_FA[request.serviceType] + ' · ' + (view.animalName ?? 'بدون نام');
+  const referralState = referral
+    ? expired && referral.status === 'ACTIVE'
+      ? { tone: 'warning' as const, label: 'منقضی' }
+      : {
+          tone: REFERRAL_STATUS_TONE[referral.status]!,
+          label: REFERRAL_STATUS_FA[referral.status],
+        }
+    : null;
+  const expiryFa = referral ? formatCivilDateFa(referral.expiresAt.toISOString().slice(0, 10)) : null;
+
   return (
-    <PublicShell actor={guard.actor} title="پرونده مراجعه" pathname={'/requests/' + id}>
-      <div className="space-y-lg">
-        {renewed === '1' ? (
-          <Alert tone="success" title="کد مراجعه جدید صادر شد">
-            مهلت تازه روی همین پرونده ثبت شد و سابقه کد قبلی حفظ شده است.
-          </Alert>
-        ) : null}
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{SERVICE_TYPE_FA[request.serviceType]}</span></h2></div>
-              <p className="mt-2xs text-caption text-text-secondary">
-                {CONTEXT_FA[request.context]} · {view.animalName ?? 'بدون نام'}
+    <PublicShell
+      actor={guard.actor}
+      title={title}
+      pathname={'/requests/' + id}
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { name: 'خانه', href: '/dashboard' },
+              { name: 'درخواست‌ها', href: '/requests' },
+              { name: referral?.code ?? SERVICE_TYPE_FA[request.serviceType] },
+            ]}
+          />
+          <PageHeader
+            title={title}
+            back={{ href: '/requests' }}
+            aside={
+              <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!}>
+                <span data-testid="request-status">{REQUEST_STATUS_FA[request.status]}</span>
+              </StatusBadge>
+            }
+            meta={[
+              CONTEXT_FA[request.context],
+              view.vetNameFa + ' · ' + view.locationNameFa,
+              expiryFa ? 'مهلت مراجعه تا ' + expiryFa : null,
+            ].filter(Boolean)}
+          />
+        </div>
+      }
+    >
+      {renewed === '1' ? (
+        <Alert tone="success" title="کد مراجعه جدید صادر شد">
+          مهلت تازه روی همین پرونده ثبت شد و سابقه کد قبلی حفظ شده است.
+        </Alert>
+      ) : null}
+
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+        <div className="min-w-0 space-y-xl lg:col-span-8">
+          {referral === null ? null : (
+            <Card>
+              <SectionHeader size="sm" title="کد مراجعه" />
+              <p className="mt-md text-h3" data-testid="referral-code">
+                <Identifier value={referral.code} />
               </p>
-            </div>
-            <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!}>
-              <span data-testid="request-status">{REQUEST_STATUS_FA[request.status]}</span>
-            </StatusBadge>
-          </div>
-          <p className="mt-md text-body-sm">
-            {view.vetNameFa} · {view.locationNameFa}
-          </p>
-          <p className="mt-2xs text-caption text-text-secondary">{CONTACT_FOR_PRICE_FA}</p>
-        </Card>
-
-        {referral === null ? null : (
-          <Card>
-            <h3 className="text-label-lg">کد مراجعه</h3>
-            <p className="mt-md text-h3" data-testid="referral-code">
-              <Identifier value={referral.code} />
-            </p>
-            <p className="mt-sm text-caption text-text-secondary">
-              QR و ورود دستی دو نمایش از همین یک کد هستند؛ کد دومی وجود ندارد.
-            </p>
-            <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm">
-              <dt className="text-text-secondary">وضعیت کد</dt>
-              <dd data-testid="referral-status">
-                <StatusBadge
-                  tone={
-                    expired && referral.status === 'ACTIVE'
-                      ? 'warning'
-                      : REFERRAL_STATUS_TONE[referral.status]!
-                  }
-                >
-                  {expired && referral.status === 'ACTIVE' ? 'منقضی' : REFERRAL_STATUS_FA[referral.status]}
-                </StatusBadge>
-              </dd>
-              <dt className="text-text-secondary">مهلت مراجعه تا</dt>
-              <dd data-testid="referral-expiry">
-                {formatCivilDateFa(referral.expiresAt.toISOString().slice(0, 10))}
-              </dd>
-              <dt className="text-text-secondary">مدت اعتبار این کد</dt>
-              <dd>{referral.validityDays} روز</dd>
-            </dl>
-
-            {usable ? null : (
-              <div className="mt-lg space-y-lg">
-                <Alert
-                  tone="warning"
-                  title={
-                    expired
-                      ? 'مهلت این کد گذشته است'
-                      : 'این کد دیگر قابل استفاده نیست'
-                  }
-                >
-                  {referral.endedReasonFa ??
-                    'سابقه کد قبلی حفظ می‌شود؛ در صورت نیاز می‌توانید کد جدید بگیرید و صلاحیت دامپزشک و مرکز دوباره بررسی می‌شود.'}
-                </Alert>
-                {expired && request.status === 'ACTIVE' ? <RenewReferralForm requestId={request.id} /> : null}
+              <p className="mt-sm text-caption text-text-secondary">
+                QR و ورود دستی دو نمایش از همین یک کد هستند؛ کد دومی وجود ندارد.
+              </p>
+              <div className="mt-md">
+                <KeyValueList
+                  rows={[
+                    {
+                      key: 'وضعیت کد',
+                      testId: 'referral-status',
+                      value: <StatusBadge tone={referralState!.tone}>{referralState!.label}</StatusBadge>,
+                    },
+                    {
+                      key: 'مهلت مراجعه تا',
+                      testId: 'referral-expiry',
+                      value: expiryFa,
+                    },
+                    {
+                      key: 'مدت اعتبار این کد',
+                      value: referral.validityDays.toLocaleString('fa-IR') + ' روز',
+                    },
+                  ]}
+                />
               </div>
-            )}
-          </Card>
-        )}
+            </Card>
+          )}
 
-        {sampleRows.length > 0 ? (
-          <Card>
-            <h3 className="text-label-lg">نمونه</h3>
-            <ul className="mt-md space-y-sm text-body-sm" data-testid="owner-samples">
-              {sampleRows.map((sample) => (
-                <li key={sample.id} className="flex items-center justify-between gap-md">
-                  <Identifier label="کد رهگیری:" value={sample.trackingCode} />
-                  <span className="text-text-secondary">{SAMPLE_STATUS_FA[sample.status]}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-md text-caption text-text-secondary">
-              کد رهگیری نمونه با کد مراجعه یکی نیست؛ یکی اجازه پذیرش است و دیگری شناسه خود نمونه.
-            </p>
-          </Card>
-        ) : null}
+          {sampleRows.length > 0 ? (
+            <Card>
+              <SectionHeader size="sm" title="نمونه" />
+              <dl className="hz-kv mt-md" data-testid="owner-samples">
+                {sampleRows.map((sample) => (
+                  <div key={sample.id} className="hz-kv__row">
+                    <dt className="hz-kv__key">
+                      <Identifier label="کد رهگیری:" value={sample.trackingCode} />
+                    </dt>
+                    <dd className="hz-kv__value">{SAMPLE_STATUS_FA[sample.status]}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-md text-caption text-text-secondary">
+                کد رهگیری نمونه با کد مراجعه یکی نیست؛ یکی اجازه پذیرش است و دیگری شناسه خود نمونه.
+              </p>
+            </Card>
+          ) : null}
 
-        {request.status === 'SUPERSEDED' && request.supersededByRequestId ? (
+          {request.status === 'SUPERSEDED' && request.supersededByRequestId ? (
+            <Card>
+              <SectionHeader size="sm" title="این درخواست جایگزین شده است" />
+              <p className="mt-md text-body-sm">{request.supersedeReasonFa}</p>
+              <p className="mt-md text-body-sm">
+                <Link
+                  href={'/requests/' + request.supersededByRequestId}
+                  className="hz-link"
+                  data-testid="replacement-link"
+                >
+                  مشاهده درخواست جدید همین حیوان
+                </Link>
+              </p>
+            </Card>
+          ) : null}
+
           <Card>
-            <h3 className="text-label-lg">این درخواست جایگزین شده است</h3>
-            <p className="mt-md text-body-sm">{request.supersedeReasonFa}</p>
-            <p className="mt-md text-body-sm">
-              <Link
-                href={'/requests/' + request.supersededByRequestId}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="replacement-link"
-              >
-                مشاهده درخواست جدید همین حیوان
-              </Link>
-            </p>
+            <SectionHeader size="sm" title="جزئیات درخواست" />
+            <div className="mt-md">
+              <KeyValueList
+                rows={[
+                  { key: 'خدمت', value: SERVICE_TYPE_FA[request.serviceType] },
+                  { key: 'زمینه', value: CONTEXT_FA[request.context] },
+                  { key: 'حیوان', value: view.animalName ?? 'بدون نام' },
+                  { key: 'دامپزشک معتمد', value: view.vetNameFa },
+                  { key: 'مرکز', value: view.locationNameFa },
+                  { key: 'هزینه', value: CONTACT_FOR_PRICE_FA },
+                ]}
+              />
+            </div>
           </Card>
-        ) : null}
+        </div>
+
+        <aside className="min-w-0 space-y-xl lg:col-span-4" aria-label="وضعیت و اقدام">
+          <Card>
+            <SectionHeader size="sm" title="وضعیت و اقدام" />
+            <div className="mt-md space-y-md">
+              <KeyValueList
+                rows={[
+                  {
+                    key: 'وضعیت',
+                    value: (
+                      <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!} size="sm">
+                        {REQUEST_STATUS_FA[request.status]}
+                      </StatusBadge>
+                    ),
+                  },
+                  {
+                    key: 'کد مراجعه',
+                    value: referralState ? (
+                      <StatusBadge tone={referralState.tone} size="sm">
+                        {referralState.label}
+                      </StatusBadge>
+                    ) : null,
+                  },
+                ]}
+              />
+              {request.status === 'ACTIVE' ? (
+                <ActionOwner
+                  owner="USER"
+                  stack
+                  extra={
+                    usable && expiryFa
+                      ? 'حیوان را تا ' + expiryFa + ' با همین کد نزد دامپزشک معتمد ببرید.'
+                      : 'برای مراجعه، کد مراجعه جدید بگیرید.'
+                  }
+                />
+              ) : null}
+              {referral !== null && !usable ? (
+                <>
+                  <Alert tone="warning" title={expired ? 'مهلت این کد گذشته است' : 'این کد دیگر قابل استفاده نیست'}>
+                    {referral.endedReasonFa ??
+                      'سابقه کد قبلی حفظ می‌شود؛ در صورت نیاز می‌توانید کد جدید بگیرید و صلاحیت دامپزشک و مرکز دوباره بررسی می‌شود.'}
+                  </Alert>
+                  {expired && request.status === 'ACTIVE' ? <RenewReferralForm requestId={request.id} /> : null}
+                </>
+              ) : null}
+            </div>
+          </Card>
+        </aside>
       </div>
     </PublicShell>
   );

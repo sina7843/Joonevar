@@ -17,10 +17,15 @@ import {
 } from '../../../../src/domain/referral.ts';
 import { parseSelection } from '../../selection.ts';
 import { ConfirmVisitForm } from './confirm-form.tsx';
+import { PageCrumbs } from '../../../../src/ui/page-crumbs.tsx';
+import { Stepper } from '../../../../src/ui/stepper.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 
 export const dynamic = 'force-dynamic';
 
 const CONTEXTS: readonly VisitContextName[] = ['MICROCHIP', 'DNA', 'PREGNANCY'];
+const STEPS = [{ label: 'انتخاب حیوان و خدمت' }, { label: 'انتخاب دامپزشک و مرکز' }, { label: 'مرور و ثبت' }];
 
 /** Review before anything is written — §11.2. */
 export default async function ReviewVisitPage({
@@ -55,44 +60,82 @@ export default async function ReviewVisitPage({
   const names = await db()
     .select({ id: animals.id, name: animals.name })
     .from(animals)
-    .where(inArray(animals.id, items.map((i) => i.animalId)));
+    .where(
+      inArray(
+        animals.id,
+        items.map((i) => i.animalId),
+      ),
+    );
+
+  const header = (
+    <div>
+      <PageCrumbs
+        items={[
+          { name: 'خانه', href: '/dashboard' },
+          { name: 'درخواست‌ها', href: '/requests' },
+          { name: 'مرور درخواست مراجعه' },
+        ]}
+      />
+      <PageHeader title="مرور درخواست مراجعه" back={{ href: '/requests/new?context=' + context }} />
+    </div>
+  );
 
   return (
-    <PublicShell actor={actor} title="مرور درخواست مراجعه" pathname="/requests/new/review">
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="hz-card__title">{CONTEXT_FA[context]}</h2>
-          <p className="mt-md text-body-sm">
-            {vet.displayNameFa} · کد نظام دامپزشکی {vet.councilCode}
-          </p>
-          <p className="mt-2xs text-body-sm">{location.nameFa}</p>
-          <p className="mt-2xs text-caption text-text-secondary">
-            {[location.cityFa, location.neighborhoodFa].filter(Boolean).join(' · ')} — {location.addressFa}
-          </p>
-          <p className="mt-md text-caption text-text-secondary">{CONTACT_FOR_PRICE_FA}</p>
-        </Card>
-
-        <Card>
-          <h3 className="text-label-lg">حیوان‌ها و خدمت هرکدام</h3>
-          <ul className="mt-md space-y-sm text-body-sm" data-testid="review-items">
-            {items.map((item) => (
-              <li key={item.animalId} className="flex items-center justify-between gap-md">
-                <span>{names.find((n) => n.id === item.animalId)?.name ?? 'بدون نام'}</span>
-                <span className="text-text-secondary">{SERVICE_TYPE_FA[item.serviceType]}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-lg text-caption text-text-secondary">
-            برای هر حیوان یک درخواست و یک کد مراجعه جداگانه صادر می‌شود. نوبت و ساعت رزرو نمی‌شود.
-          </p>
-        </Card>
-
-        <ConfirmVisitForm
-          context={context}
-          selection={params.sel ?? ''}
-          vetAccountId={vet.accountId}
-          locationId={location.id}
+    <PublicShell actor={actor} title="مرور درخواست مراجعه" pathname="/requests/new/review" header={header}>
+      <div className="hz-card">
+        <Stepper
+          label="مراحل درخواست مراجعه"
+          steps={[{ label: STEPS[0]!.label, href: '/requests/new?context=' + context }, STEPS[1]!, STEPS[2]!]}
+          current={3}
         />
+      </div>
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+        <div className="min-w-0 space-y-xl lg:col-span-7">
+          <Card>
+            <SectionHeader size="sm" title="حیوان‌ها و خدمت هرکدام" />
+            <dl className="hz-kv mt-md" data-testid="review-items">
+              {items.map((item) => (
+                <div key={item.animalId} className="hz-kv__row">
+                  <dt className="hz-kv__key">{names.find((n) => n.id === item.animalId)?.name ?? 'بدون نام'}</dt>
+                  <dd className="hz-kv__value">{SERVICE_TYPE_FA[item.serviceType]}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="mt-lg text-caption text-text-secondary">
+              برای هر حیوان یک درخواست و یک کد مراجعه جداگانه صادر می‌شود. نوبت و ساعت رزرو نمی‌شود.
+            </p>
+          </Card>
+
+          <ConfirmVisitForm
+            context={context}
+            selection={params.sel ?? ''}
+            vetAccountId={vet.accountId}
+            locationId={location.id}
+          />
+        </div>
+
+        <aside className="min-w-0 lg:col-span-5" aria-label="دامپزشک و مرکز">
+          <Card>
+            <SectionHeader size="sm" title={CONTEXT_FA[context]} />
+            <div className="mt-md">
+              <KeyValueList
+                rows={[
+                  { key: 'دامپزشک معتمد', value: vet.displayNameFa },
+                  { key: 'کد نظام دامپزشکی', value: <bdi dir="ltr">{vet.councilCode}</bdi> },
+                  { key: 'مرکز', value: location.nameFa },
+                  {
+                    key: 'نشانی',
+                    value:
+                      [location.cityFa, location.neighborhoodFa].filter(Boolean).join(' · ') +
+                      ' — ' +
+                      location.addressFa,
+                  },
+                  { key: 'هزینه', value: CONTACT_FOR_PRICE_FA },
+                ]}
+              />
+            </div>
+          </Card>
+        </aside>
       </div>
     </PublicShell>
   );

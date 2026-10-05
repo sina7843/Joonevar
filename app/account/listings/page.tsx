@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -31,8 +32,10 @@ const TONE: Record<ListingStatus, 'success' | 'warning' | 'neutral' | 'info'> = 
   REMOVED: 'neutral',
 };
 
+const fa = (value: number): string => value.toLocaleString('fa-IR');
+
 /**
- * The seller's adverts — PROMPT-003.
+ * The seller's adverts — PROMPT-003. P05 list.
  *
  * Two lists, deliberately. The adverts that exist, and the animals that cannot
  * be advertised with the reason for each one: a short list with no explanation
@@ -59,99 +62,108 @@ export default async function MyListingsPage() {
       .filter((row) => LIVE_LISTING_STATUSES.includes(row.status))
       .map((row) => row.animalId),
   );
+  const drafts = listings.filter((row) => row.status === 'DRAFT').length;
 
   return (
-    <PublicShell actor={actor} title="آگهی‌های فروش من" pathname="/account/listings">
-      <div className="space-y-lg p-lg">
-        {!marketOpen ? (
-          <Alert tone="warning" title="بازار فروش حیوان در حال حاضر بسته است">
-            <span data-testid="market-closed">
-              آگهی‌های ثبت‌شده حذف نمی‌شوند. تا باز شدن بازار، ثبت و انتشار آگهی تازه ممکن نیست.
-            </span>
-          </Alert>
-        ) : !creationOpen ? (
-          <Alert tone="warning" title="ثبت آگهی تازه موقتاً بسته است">
-            <span data-testid="creation-closed">آگهی‌های موجود شما دست‌نخورده‌اند.</span>
-          </Alert>
-        ) : null}
+    <PublicShell
+      actor={actor}
+      title="آگهی‌های فروش من"
+      pathname="/account/listings"
+      header={
+        <PageHeader
+          title="آگهی‌های فروش من"
+          back={{ href: '/dashboard' }}
+          meta={[
+            ...(listings.length > 0 ? [fa(listings.length) + ' آگهی'] : []),
+            ...(drafts > 0 ? [fa(drafts) + ' پیش‌نویس'] : []),
+          ]}
+        />
+      }
+    >
+      {!marketOpen ? (
+        <Alert tone="warning" title="بازار فروش حیوان در حال حاضر بسته است">
+          <span data-testid="market-closed">
+            آگهی‌های ثبت‌شده حذف نمی‌شوند. تا باز شدن بازار، ثبت و انتشار آگهی تازه ممکن نیست.
+          </span>
+        </Alert>
+      ) : !creationOpen ? (
+        <Alert tone="warning" title="ثبت آگهی تازه موقتاً بسته است">
+          <span data-testid="creation-closed">آگهی‌های موجود شما دست‌نخورده‌اند.</span>
+        </Alert>
+      ) : null}
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>آگهی‌های من</span></h2></div>
-          {listings.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState
-                title="هنوز آگهی‌ای ندارید"
-                description="از فهرست پایین، حیوانی را که می‌خواهید بفروشید انتخاب کنید."
-              />
-            </div>
-          ) : (
-            <ul className="mt-lg space-y-sm" data-testid="my-listings">
-              {listings.map((row) => (
-                <li key={row.id} data-testid={'listing-row-' + row.id}>
-                  <Link
-                    href={'/account/listings/' + row.id}
-                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-sm">
-                      <div className="min-w-0">
-                        <p className="text-label-md">{row.animalNameFa ?? 'بدون نام'}</p>
-                        <p className="mt-2xs text-caption text-text-secondary">
-                          {row.priceMode
-                            ? PRICE_MODE_FA[row.priceMode as 'EXACT' | 'NEGOTIABLE']
-                            : 'قیمت ثبت نشده'}
-                          {row.priceToman !== null ? ' — ' + row.priceToman.toLocaleString('fa-IR') + ' تومان' : ''}
-                          <span className="mx-sm text-text-disabled">|</span>
-                          {row.imageCount.toLocaleString('fa-IR')} تصویر
-                        </p>
-                      </div>
-                      <StatusBadge tone={TONE[row.status]}>{LISTING_STATUS_FA[row.status]}</StatusBadge>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+      <section className="space-y-md" aria-labelledby="my-listings-title">
+        <SectionHeader id="my-listings-title" title="آگهی‌های من" />
+        {listings.length === 0 ? (
+          <EmptyState
+            icon="megaphoneSimple"
+            title="هنوز آگهی‌ای ندارید"
+            description="از فهرست پایین، حیوانی را که می‌خواهید بفروشید انتخاب کنید."
+          />
+        ) : (
+          <ul className="hz-cardlist" data-testid="my-listings">
+            {listings.map((row) => (
+              <li key={row.id} data-testid={'listing-row-' + row.id}>
+                {/* The whole card opens the advert: it carries no other action. */}
+                <Link href={'/account/listings/' + row.id} className="hz-cardlist__item hz-card--interactive text-text-primary no-underline">
+                  <span className="hz-cardlist__row">
+                    <span className="hz-cardlist__title min-w-0">{row.animalNameFa ?? 'بدون نام'}</span>
+                    <StatusBadge tone={TONE[row.status]}>{LISTING_STATUS_FA[row.status]}</StatusBadge>
+                  </span>
+                  <span className="hz-cardlist__row">
+                    <span className="hz-cardlist__meta">
+                      {row.priceMode ? PRICE_MODE_FA[row.priceMode as 'EXACT' | 'NEGOTIABLE'] : 'قیمت ثبت نشده'}
+                      {row.priceToman !== null ? ' — ' + row.priceToman.toLocaleString('fa-IR') + ' تومان' : ''}
+                      {' · '}
+                      {fa(row.imageCount)} تصویر
+                    </span>
+                    <span className="inline-flex items-center gap-xs text-label-md text-text-brand">
+                      {row.status === 'DRAFT' ? 'ادامه ویرایش' : 'مشاهده آگهی'}
+                      <Icon name="caretRight" size="sm" mirror />
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-        {ready.length > 0 && marketOpen && creationOpen ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>آماده برای آگهی</span></h2></div>
-            <ul className="mt-lg space-y-sm" data-testid="sellable-animals">
-              {ready.map((row) => (
-                <li
-                  key={row.animalId}
-                  className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md"
-                >
+      {ready.length > 0 && marketOpen && creationOpen ? (
+        <section className="space-y-md" aria-labelledby="sellable-title">
+          <SectionHeader id="sellable-title" title="آماده برای آگهی" count={fa(ready.length)} />
+          <ul className="hz-cardlist" data-testid="sellable-animals">
+            {ready.map((row) => (
+              <li key={row.animalId} className="hz-cardlist__item">
+                <div className="hz-cardlist__row">
                   <div className="min-w-0">
-                    <p className="text-label-md">{row.name ?? 'بدون نام'}</p>
-                    <p className="text-caption text-text-secondary">
+                    <p className="hz-cardlist__title">{row.name ?? 'بدون نام'}</p>
+                    <p className="hz-cardlist__meta">
                       به‌عنوان {row.eligibility.sellerKind === 'KENNEL' ? 'کنل تأییدشده' : 'مالک حیوان'}
                     </p>
                   </div>
                   {listed.has(row.animalId) ? (
-                    <p className="text-caption text-text-secondary">آگهی فعال دارد</p>
+                    <span className="text-caption text-text-secondary">آگهی فعال دارد</span>
                   ) : (
                     <StartListingForm animalId={row.animalId} label="ساخت آگهی" />
                   )}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
-        {blocked.length > 0 ? (
-          <div className="space-y-sm">
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>حیوان‌هایی که هنوز قابل آگهی نیستند</span></h2></div>
+      {blocked.length > 0 ? (
+        <section className="space-y-md" aria-labelledby="blocked-title">
+          <SectionHeader id="blocked-title" title="حیوان‌هایی که هنوز قابل آگهی نیستند" count={fa(blocked.length)} />
+          <div className="grid gap-md md:grid-cols-2">
             {blocked.map((row) => (
-              <BlockedAnimalCard
-                key={row.animalId}
-                title={row.name ?? 'بدون نام'}
-                blockers={row.eligibility.blockers}
-              />
+              <BlockedAnimalCard key={row.animalId} title={row.name ?? 'بدون نام'} blockers={row.eligibility.blockers} />
             ))}
           </div>
-        ) : null}
-      </div>
+        </section>
+      ) : null}
     </PublicShell>
   );
 }

@@ -1,11 +1,11 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
-import { Card, CardHeader } from '../../../../../src/ui/card.tsx';
-import { Alert } from '../../../../../src/ui/alert.tsx';
+import { ButtonLink } from '../../../../../src/ui/button.tsx';
+import { PageHeader, SectionHeader } from '../../../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../../../src/ui/page-crumbs.tsx';
 import { EmptyState } from '../../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge } from '../../../../../src/ui/status.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { clubMemberQueue } from '../../../../../src/clubs/enrollment.ts';
 import { clubManagement } from '../../../../../src/clubs/service.ts';
@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 
 /**
- * The club's members and applicants — Phase 2.5 §9 (PROMPT-013).
+ * The club's members and applicants — Phase 2.5 §9 (PROMPT-013). P05 list.
  *
  * What the club sees is whether its own conditions are met and how many are not.
  * The reasons belong to the applicant and are not shown here (§20).
@@ -37,7 +37,7 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
   if (view === null) {
     return (
       <PublicShell actor={guard.actor} title="اعضای کلاب" pathname="/account/clubs">
-        <Alert tone="error" title="این کلاب پیدا نشد یا در آن نقشی ندارید" />
+        <EmptyState icon="prohibit" title="این کلاب پیدا نشد یا در آن نقشی ندارید" description="نقش در یک کلاب هیچ دسترسی‌ای در کلاب دیگر نمی‌دهد." />
       </PublicShell>
     );
   }
@@ -48,82 +48,109 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
   } catch {
     return (
       <PublicShell actor={guard.actor} title="اعضای کلاب" pathname="/account/clubs">
-        <Alert tone="error" title="دیدن فهرست اعضای این کلاب از اختیار نقش شما بیرون است" />
+        <EmptyState
+          icon="lockSimple"
+          title="دیدن فهرست اعضای این کلاب از اختیار نقش شما بیرون است"
+          description="فهرست اعضا را مالک یا مدیر همین کلاب می‌بیند."
+          action={
+            <ButtonLink tone="secondary" href={'/account/clubs/' + id}>
+              بازگشت به کلاب
+            </ButtonLink>
+          }
+        />
       </PublicShell>
     );
   }
 
   const waiting = entries.filter((entry) => entry.membership.status === 'PENDING_REVIEW');
   const others = entries.filter((entry) => entry.membership.status !== 'PENDING_REVIEW');
+  const title = 'اعضای ' + view.club.displayNameFa;
 
   return (
-    <PublicShell actor={guard.actor} title={'اعضای ' + view.club.displayNameFa} pathname="/account/clubs">
-      <div className="space-y-lg">
-        <Card>
-          <CardHeader
-            title="اعضا و درخواست‌ها"
-            subtitle="کلاب می‌بیند که شرط‌هایش برقرار است یا نه، و چند شرط برقرار نیست؛ دلیل‌ها نزد خود متقاضی می‌ماند."
+    <PublicShell
+      actor={guard.actor}
+      title={title}
+      pathname="/account/clubs"
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { href: '/dashboard', name: 'خانه' },
+              { href: '/account/clubs', name: 'کلاب من' },
+              { href: '/account/clubs/' + id, name: view.club.displayNameFa },
+              { name: 'اعضا و درخواست‌ها' },
+            ]}
           />
-          <Link href={'/account/clubs/' + id + '/rules'} className="mt-md inline-block text-body-sm text-text-brand" data-testid="club-rules-link">
-            نوشتن شرایط عضویت
-          </Link>
-        </Card>
+          <PageHeader
+            title={title}
+            back={{ href: '/account/clubs/' + id, label: view.club.displayNameFa }}
+            meta={[
+              ...(waiting.length > 0 ? [fa(waiting.length) + ' در انتظار تصمیم'] : []),
+              ...(others.length > 0 ? [fa(others.length) + ' عضو'] : []),
+              'کلاب می‌بیند که شرط‌هایش برقرار است یا نه، و چند شرط برقرار نیست؛ دلیل‌ها نزد خود متقاضی می‌ماند.',
+            ]}
+            actions={
+              <ButtonLink tone="secondary" href={'/account/clubs/' + id + '/rules'} iconStart="listChecks" data-testid="club-rules-link">
+                نوشتن شرایط عضویت
+              </ButtonLink>
+            }
+          />
+        </div>
+      }
+    >
+      <section className="space-y-md" aria-labelledby="club-waiting-title">
+        <SectionHeader id="club-waiting-title" title="در انتظار تصمیم" count={waiting.length > 0 ? fa(waiting.length) : undefined} />
+        {waiting.length === 0 ? (
+          <EmptyState title="درخواستی در انتظار تصمیم نیست" description="درخواست‌هایی که شرط تأیید دستی دارند اینجا می‌آیند." />
+        ) : (
+          <ul className="hz-cardlist" data-testid="club-membership-queue">
+            {waiting.map((entry) => (
+              <li key={entry.membership.id} className="hz-cardlist__item">
+                <div className="hz-cardlist__row">
+                  <span className="hz-cardlist__title">{entry.nameFa ?? 'کاربر همزیست'}</span>
+                  <StatusBadge tone="warning">{'درخواست ' + (entry.membership.appliedAt ? formatInstantFa(entry.membership.appliedAt) : '')}</StatusBadge>
+                </div>
+                <ActionOwner owner="USER" />
+                <ClubMembershipDecisionForm clubId={id} membershipId={entry.membership.id} version={entry.membership.version} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>در انتظار تصمیم</span></h2></div>
-          {waiting.length === 0 ? (
-            <div className="mt-md">
-              <EmptyState title="درخواستی در انتظار تصمیم نیست" description="درخواست‌هایی که شرط تأیید دستی دارند اینجا می‌آیند." />
-            </div>
-          ) : (
-            <ul className="mt-md space-y-md" data-testid="club-membership-queue">
-              {waiting.map((entry) => (
-                <li key={entry.membership.id} className="space-y-sm rounded-xl border border-border-default p-lg">
-                  <div className="flex flex-wrap items-center justify-between gap-sm">
-                    <p className="text-label-lg">{entry.nameFa ?? 'کاربر همزیست'}</p>
-                    <StatusBadge tone="warning">{'درخواست ' + (entry.membership.appliedAt ? formatInstantFa(entry.membership.appliedAt) : '')}</StatusBadge>
+      <section className="space-y-md" aria-labelledby="club-all-title">
+        <SectionHeader id="club-all-title" title="همه اعضا" count={others.length > 0 ? fa(others.length) : undefined} />
+        {others.length === 0 ? (
+          <EmptyState title="هنوز کسی در این کلاب عضو نشده است" description="پس از انتشار شرایط عضویت، درخواست‌های پذیرفته‌شده اینجا می‌آیند." />
+        ) : (
+          <ul className="hz-cardlist" data-testid="club-members-list">
+            {others.map((entry) => {
+              const status = entry.membership.status as ClubMembershipStatus;
+              return (
+                <li key={entry.membership.id} className="hz-cardlist__item">
+                  <div className="hz-cardlist__row">
+                    <span className="hz-cardlist__title">{entry.nameFa ?? 'کاربر همزیست'}</span>
+                    <span className="flex flex-wrap gap-xs">
+                      <StatusBadge tone={CLUB_MEMBERSHIP_TONE[status]}>{CLUB_MEMBERSHIP_STATUS_SHORT_FA[status]}</StatusBadge>
+                      {entry.unmetCount > 0 ? <StatusBadge tone="neutral">{fa(entry.unmetCount) + ' شرط برقرار نیست'}</StatusBadge> : null}
+                      {entry.staleRules ? <StatusBadge tone="info">پذیرفته‌شده با نسخه پیشین</StatusBadge> : null}
+                    </span>
                   </div>
-                  <ClubMembershipDecisionForm clubId={id} membershipId={entry.membership.id} version={entry.membership.version} />
+                  {entry.admittedVersionNumber !== null ? (
+                    <span className="hz-cardlist__meta">{'پذیرش با نسخه ' + fa(entry.admittedVersionNumber)}</span>
+                  ) : null}
+                  {status === 'ACTIVE' ? (
+                    <ClubMemberStandingForm clubId={id} membershipId={entry.membership.id} version={entry.membership.version} to="SUSPENDED" />
+                  ) : null}
+                  {status === 'SUSPENDED' ? (
+                    <ClubMemberStandingForm clubId={id} membershipId={entry.membership.id} version={entry.membership.version} to="ACTIVE" />
+                  ) : null}
                 </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>همه اعضا</span></h2></div>
-          {others.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-secondary">هنوز کسی در این کلاب عضو نشده است.</p>
-          ) : (
-            <ul className="mt-md space-y-md" data-testid="club-members-list">
-              {others.map((entry) => {
-                const status = entry.membership.status as ClubMembershipStatus;
-                return (
-                  <li key={entry.membership.id} className="space-y-sm rounded-xl border border-border-default p-lg">
-                    <div className="flex flex-wrap items-center justify-between gap-sm">
-                      <p className="text-label-lg">{entry.nameFa ?? 'کاربر همزیست'}</p>
-                      <div className="flex flex-wrap gap-xs">
-                        <StatusBadge tone={CLUB_MEMBERSHIP_TONE[status]}>{CLUB_MEMBERSHIP_STATUS_SHORT_FA[status]}</StatusBadge>
-                        {entry.unmetCount > 0 ? <StatusBadge tone="neutral">{fa(entry.unmetCount) + ' شرط برقرار نیست'}</StatusBadge> : null}
-                        {entry.staleRules ? <StatusBadge tone="info">پذیرفته‌شده با نسخه پیشین</StatusBadge> : null}
-                      </div>
-                    </div>
-                    {entry.admittedVersionNumber !== null ? (
-                      <p className="text-caption text-text-secondary">{'پذیرش با نسخه ' + fa(entry.admittedVersionNumber)}</p>
-                    ) : null}
-                    {status === 'ACTIVE' ? (
-                      <ClubMemberStandingForm clubId={id} membershipId={entry.membership.id} version={entry.membership.version} to="SUSPENDED" />
-                    ) : null}
-                    {status === 'SUSPENDED' ? (
-                      <ClubMemberStandingForm clubId={id} membershipId={entry.membership.id} version={entry.membership.version} to="ACTIVE" />
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Card>
-      </div>
+              );
+            })}
+          </ul>
+        )}
+      </section>
     </PublicShell>
   );
 }

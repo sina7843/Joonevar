@@ -16,7 +16,10 @@ const EMPTY: FormState = {};
 function Result({ state }: { state: FormState }) {
   if (!state.message) return null;
   return (
-    <Alert tone={state.tone === 'success' ? 'success' : state.tone === 'error' ? 'error' : 'info'} title={state.message} />
+    <Alert
+      tone={state.tone === 'success' ? 'success' : state.tone === 'error' ? 'error' : 'info'}
+      title={state.message}
+    />
   );
 }
 

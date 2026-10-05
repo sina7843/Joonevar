@@ -6,13 +6,17 @@ import { Card } from '../../src/ui/card.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
 import { Identifier } from '../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../src/ui/section-header.tsx';
+import { Icon } from '../../src/ui/icon.tsx';
 import { db } from '../../src/db/client.ts';
 import { sheetBatchesOfOwner, sheetsOfOwner } from '../../src/documents/registration-sheet.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
 
-/** Registration sheets: the requests in flight and the documents already issued. */
+const dateFa = (at: Date) => formatCivilDateFa(at.toISOString().slice(0, 10));
+
+/** Registration sheets (P05): the requests in flight and the documents already issued. */
 export default async function RegistrationPage() {
   const guard = await guardRoute('/registration');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
@@ -23,56 +27,71 @@ export default async function RegistrationPage() {
   ]);
 
   return (
-    <PublicShell actor={guard.actor} title="برگه ثبتی" pathname="/registration">
-      <div className="space-y-lg">
-        <ButtonLink href="/registration/new" block data-testid="start-sheet-request">
-          درخواست صدور برگه ثبتی
-        </ButtonLink>
-
-        {sheets.length === 0 ? null : (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>برگه‌های صادرشده</span></h2></div>
-            <ul className="mt-md space-y-sm text-body-sm" data-testid="issued-sheets">
-              {sheets.map((sheet) => (
-                <li key={sheet.id} className="flex items-center justify-between gap-md">
-                  <Link
-                    href={'/documents/' + sheet.id}
-                    className="text-text-brand underline underline-offset-4"
-                  >
+    <PublicShell
+      actor={guard.actor}
+      title="برگه ثبتی"
+      pathname="/registration"
+      header={
+        <PageHeader
+          title="برگه ثبتی"
+          meta={[
+            sheets.length.toLocaleString('fa-IR') + ' برگه صادرشده',
+            batches.length.toLocaleString('fa-IR') + ' درخواست',
+          ]}
+          actions={
+            <ButtonLink href="/registration/new" iconStart="plus" data-testid="start-sheet-request">
+              درخواست صدور برگه ثبتی
+            </ButtonLink>
+          }
+        />
+      }
+    >
+      {sheets.length === 0 ? null : (
+        <section aria-labelledby="issued-heading" className="space-y-lg">
+          <SectionHeader id="issued-heading" title="برگه‌های صادرشده" />
+          <ul className="grid gap-lg md:grid-cols-2 lg:grid-cols-3" data-testid="issued-sheets">
+            {sheets.map((sheet) => (
+              <li key={sheet.id} className="hz-card hz-document">
+                <div className="hz-document__head">
+                  <span className="hz-document__icon">
+                    <Icon name="fileText" size="md" />
+                  </span>
+                  <div className="hz-document__titles">
+                    <h3 className="hz-document__type">برگه ثبتی</h3>
+                    <span className="hz-document__subject">صادرشده در {dateFa(sheet.issuedAt)}</span>
+                  </div>
+                </div>
+                <div className="hz-card__footer">
+                  <Link href={'/documents/' + sheet.id} className="hz-link hz-link--standalone">
                     <Identifier value={sheet.sheetNo} />
                   </Link>
-                  <span className="text-text-secondary">
-                    {formatCivilDateFa(sheet.issuedAt.toISOString().slice(0, 10))}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-        {batches.length === 0 ? (
-          <EmptyState
-            title="درخواستی ثبت نشده است"
-            description="پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری، می‌توانید برای یک یا چند حیوان برگه ثبتی بگیرید."
-          />
-        ) : (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌های صدور</span></h2></div>
-            <ul className="mt-md space-y-sm text-body-sm" data-testid="sheet-batches">
-              {batches.map((batch) => (
-                <li key={batch.id}>
-                  <Link
-                    href={'/registration/' + batch.id}
-                    className="text-text-brand underline underline-offset-4"
-                  >
-                    درخواست {formatCivilDateFa(batch.createdAt.toISOString().slice(0, 10))}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
-      </div>
+      {batches.length === 0 ? (
+        <EmptyState
+          title="درخواستی ثبت نشده است"
+          description="پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری، می‌توانید برای یک یا چند حیوان برگه ثبتی بگیرید."
+        />
+      ) : (
+        <Card>
+          <SectionHeader size="sm" title="درخواست‌های صدور" />
+          <ul className="mt-md divide-y divide-border-subtle" data-testid="sheet-batches">
+            {batches.map((batch) => (
+              <li key={batch.id} className="flex items-center justify-between gap-md py-md">
+                <Link href={'/registration/' + batch.id} className="hz-link">
+                  درخواست {dateFa(batch.createdAt)}
+                </Link>
+                <Icon name="caretRight" size="sm" mirror />
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
     </PublicShell>
   );
 }

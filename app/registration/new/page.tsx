@@ -9,11 +9,9 @@ import { db } from '../../../src/db/client.ts';
 import { eligibilityFor } from '../../../src/domain/eligibility/service.ts';
 import { readMoney } from '../../../src/settings/service.ts';
 import { formatTomanFa } from '../../../src/domain/money.ts';
-import {
-  REGISTRATION_SHEET_FEE_KEY,
-  selectableAnimals,
-} from '../../../src/documents/registration-sheet.ts';
+import { REGISTRATION_SHEET_FEE_KEY, selectableAnimals } from '../../../src/documents/registration-sheet.ts';
 import { SelectSheetAnimals } from './select-form.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +36,12 @@ export default async function NewSheetRequestPage() {
   const eligibility = await eligibilityFor(db(), actor.accountId, 'REGISTRATION_SHEET');
   if (!eligibility.allowed) {
     return (
-      <PublicShell actor={actor} title="درخواست برگه ثبتی" pathname="/registration/new">
+      <PublicShell
+        actor={actor}
+        title="درخواست برگه ثبتی"
+        pathname="/registration/new"
+        header={<PageHeader title={'درخواست برگه ثبتی'} back={{ href: '/registration' }} />}
+      >
         <LockedServiceCard serviceLabel="صدور برگه ثبتی" lock={eligibility.lock} />
       </PublicShell>
     );
@@ -51,14 +54,18 @@ export default async function NewSheetRequestPage() {
   const feeLabel = formatTomanFa(fee);
 
   return (
-    <PublicShell actor={actor} title="درخواست برگه ثبتی" pathname="/registration/new">
+    <PublicShell
+      actor={actor}
+      title="درخواست برگه ثبتی"
+      pathname="/registration/new"
+      header={<PageHeader title={'درخواست برگه ثبتی'} back={{ href: '/registration' }} />}
+    >
       <div className="space-y-lg">
         <Alert tone="info" title="مراحل این مسیر">
           <span data-testid="sheet-flow-steps">
-            انتخاب حیوان‌ها ← یک پرداخت گروهی ← انتخاب کاشت یا تأیید میکروچیپ برای هر حیوان و انتخاب دامپزشک
-            معتمد ← مراجعه: تأیید رسمی مشخصات حیوان، کاشت یا تأیید میکروچیپ و نمونه‌گیری ← صدور مستقل برگه ثبتی
-            هر حیوان. این یک سرویس است، نه چند کار جدا؛ هدف مراجعه، تأیید رسمی مشخصات حیوان توسط دامپزشک معتمد
-            است.
+            انتخاب حیوان‌ها ← یک پرداخت گروهی ← انتخاب کاشت یا تأیید میکروچیپ برای هر حیوان و انتخاب دامپزشک معتمد ←
+            مراجعه: تأیید رسمی مشخصات حیوان، کاشت یا تأیید میکروچیپ و نمونه‌گیری ← صدور مستقل برگه ثبتی هر حیوان. این یک
+            سرویس است، نه چند کار جدا؛ هدف مراجعه، تأیید رسمی مشخصات حیوان توسط دامپزشک معتمد است.
           </span>
         </Alert>
 

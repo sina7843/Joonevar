@@ -30,6 +30,7 @@ import {
 } from '../../../../src/domain/allocation.ts';
 import { NO_BASIS_NOTE_FA } from '../../../../src/mating/cooldown.ts';
 import { AllocationRuleForm, ConfirmPartyForm, PayPermitForm, SubmitPermitForm } from '../../forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,15 +76,27 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
   const canEditRule = isInitiator && EDITABLE.includes(permit.status) && permit.counterpartyConfirmedAt !== null;
   const needsPayment = isInitiator && batch?.status !== 'PAID' && permit.status !== 'ISSUED';
   const canSubmit =
-    isInitiator && batch?.status === 'PAID' && (permit.status === 'READY_TO_SUBMIT' || permit.status === 'NEEDS_CORRECTION');
+    isInitiator &&
+    batch?.status === 'PAID' &&
+    (permit.status === 'READY_TO_SUBMIT' || permit.status === 'NEEDS_CORRECTION');
 
   return (
-    <PublicShell actor={guard.actor} title="پرونده مجوز جفت‌گیری" pathname={'/mating/permits/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="پرونده مجوز جفت‌گیری"
+      pathname={'/mating/permits/' + id}
+      header={<PageHeader title={'پرونده مجوز جفت‌گیری'} back={{ href: '/mating/permits' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مجوز رسمی جفت‌گیری</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>مجوز رسمی جفت‌گیری</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary" data-testid="permit-route-note">
                 مسیر رسمی هم‌زیست؛ این پرونده با «اعلام توافق شخصی» یکی نیست و شناسه و وضعیت جداگانه دارد.
               </p>
@@ -124,58 +137,79 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {/* §16 step 6: both parties, both animals and the agreed rule in one review. */}
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مرور طرفین و حیوان‌ها</span></h2></div>
-          <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="permit-parties">
-            <dt className="text-text-secondary">آغازکننده</dt>
-            <dd data-testid="permit-initiator">{view.initiatorName}</dd>
-            <dt className="text-text-secondary">طرف مقابل</dt>
-            <dd data-testid="permit-counterparty">{view.counterpartyName}</dd>
-            <dt className="text-text-secondary">حیوان نر</dt>
-            <dd data-testid="permit-sire">
-              <Link href={'/animals/' + view.sire.id} className="text-text-brand underline underline-offset-4">
-                {view.sire.name ?? 'بدون نام'}
-              </Link>
-              {view.sire.pedigreeCode ? (
-                <span dir="ltr" className="ms-sm font-mono text-caption">
-                  {view.sire.pedigreeCode}
-                </span>
-              ) : null}
-              <span className="ms-sm text-caption text-text-secondary">{view.sire.ownerName}</span>
-            </dd>
-            <dt className="text-text-secondary">حیوان ماده</dt>
-            <dd data-testid="permit-dam">
-              <Link href={'/animals/' + view.dam.id} className="text-text-brand underline underline-offset-4">
-                {view.dam.name ?? 'بدون نام'}
-              </Link>
-              {view.dam.pedigreeCode ? (
-                <span dir="ltr" className="ms-sm font-mono text-caption">
-                  {view.dam.pedigreeCode}
-                </span>
-              ) : null}
-              <span className="ms-sm text-caption text-text-secondary">{view.dam.ownerName}</span>
-            </dd>
-            <dt className="text-text-secondary">تأیید طرف مقابل</dt>
-            <dd data-testid="counterparty-confirmed">
-              {permit.counterpartyConfirmedAt
-                ? formatCivilDateFa(permit.counterpartyConfirmedAt.toISOString().slice(0, 10))
-                : 'ثبت نشده'}
-            </dd>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>مرور طرفین و حیوان‌ها</span>
+            </h2>
+          </div>
+          <dl className="hz-kv mt-lg" data-testid="permit-parties">
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">آغازکننده</dt>
+              <dd className="hz-kv__value" data-testid="permit-initiator">
+                {view.initiatorName}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">طرف مقابل</dt>
+              <dd className="hz-kv__value" data-testid="permit-counterparty">
+                {view.counterpartyName}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">حیوان نر</dt>
+              <dd className="hz-kv__value" data-testid="permit-sire">
+                <Link href={'/animals/' + view.sire.id} className="hz-link">
+                  {view.sire.name ?? 'بدون نام'}
+                </Link>
+                {view.sire.pedigreeCode ? (
+                  <span dir="ltr" className="ms-sm font-mono text-caption">
+                    {view.sire.pedigreeCode}
+                  </span>
+                ) : null}
+                <span className="ms-sm text-caption text-text-secondary">{view.sire.ownerName}</span>
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">حیوان ماده</dt>
+              <dd className="hz-kv__value" data-testid="permit-dam">
+                <Link href={'/animals/' + view.dam.id} className="hz-link">
+                  {view.dam.name ?? 'بدون نام'}
+                </Link>
+                {view.dam.pedigreeCode ? (
+                  <span dir="ltr" className="ms-sm font-mono text-caption">
+                    {view.dam.pedigreeCode}
+                  </span>
+                ) : null}
+                <span className="ms-sm text-caption text-text-secondary">{view.dam.ownerName}</span>
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">تأیید طرف مقابل</dt>
+              <dd className="hz-kv__value" data-testid="counterparty-confirmed">
+                {permit.counterpartyConfirmedAt
+                  ? formatCivilDateFa(permit.counterpartyConfirmedAt.toISOString().slice(0, 10))
+                  : 'ثبت نشده'}
+              </dd>
+            </div>
           </dl>
 
           {permit.ruleType ? (
             <div className="mt-lg" data-testid="permit-rule-summary">
               <h3 className="text-label-md">{'توافق تقسیم: ' + RULE_TYPE_FA[permit.ruleType]}</h3>
-              <dl className="mt-sm grid grid-cols-2 gap-sm text-body-sm">
+              <dl className="hz-kv mt-sm">
                 {(['SIRE_SIDE', 'DAM_SIDE'] as const).map((side) => (
                   <div key={side} className="contents">
-                    <dt className="text-text-secondary">{SIDE_FA[side]}</dt>
-                    <dd data-testid={'share-' + side}>
-                      {describeShare(permit.ruleType!, {
-                        side,
-                        fixedCount: shareOf(side)?.fixedCount ?? null,
-                        percent: shareOf(side)?.percent ?? null,
-                      })}
-                    </dd>
+                    <div className="hz-kv__row">
+                      <dt className="hz-kv__key">{SIDE_FA[side]}</dt>
+                      <dd className="hz-kv__value" data-testid={'share-' + side}>
+                        {describeShare(permit.ruleType!, {
+                          side,
+                          fixedCount: shareOf(side)?.fixedCount ?? null,
+                          percent: shareOf(side)?.percent ?? null,
+                        })}
+                      </dd>
+                    </div>
                   </div>
                 ))}
               </dl>
@@ -189,7 +223,12 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {awaitingMyConfirmation ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تأیید مشارکت شما</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>تأیید مشارکت شما</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
               این پرونده برای حیوان شما باز شده است. تأیید یا رد آن فقط از حساب خود شما ثبت می‌شود.
             </p>
@@ -215,7 +254,12 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {needsPayment ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرداخت هزینه مجوز</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>پرداخت هزینه مجوز</span>
+              </h2>
+            </div>
             <p className="mt-md text-body-sm">
               هزینه مجوز جفت‌گیری: <span data-testid="permit-fee">{feeLabel ?? 'تعیین‌نشده'}</span>
             </p>
@@ -240,7 +284,12 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {canSubmit ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ارسال برای بررسی عملیاتی</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>ارسال برای بررسی عملیاتی</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
               پرداخت این پرونده روی سرور تأیید شده است. تصمیم نهایی و صدور مجوز با بررسی انجمن/هم‌زیست است.
             </p>
@@ -250,20 +299,21 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
         {permit.status === 'ISSUED' ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده رسمی جفت‌گیری</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>پرونده رسمی جفت‌گیری</span>
+              </h2>
+            </div>
             <p className="mt-md text-body-sm">
-              <Link
-                href={'/mating/permits/' + permit.id + '/dates'}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="open-dates"
-              >
+              <Link href={'/mating/permits/' + permit.id + '/dates'} className="hz-link" data-testid="open-dates">
                 ثبت و تأیید تاریخ‌های جفت‌گیری
               </Link>
             </p>
             <p className="mt-md text-body-sm">
               <Link
                 href={'/mating/permits/' + permit.id + '/pregnancy'}
-                className="text-text-brand underline underline-offset-4"
+                className="hz-link"
                 data-testid="open-pregnancy"
               >
                 اعلام بارداری و تأیید اختیاری دامپزشک
@@ -272,15 +322,15 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
             <p className="mt-md text-body-sm">
               <Link
                 href={'/mating/permits/' + permit.id + '/birth'}
-                className="text-text-brand underline underline-offset-4"
+                className="hz-link"
                 data-testid="open-birth-from-permit"
               >
                 ثبت نتیجه زایمان و توله‌ها
               </Link>
             </p>
             <p className="mt-md text-body-sm" data-testid="mating-case-context">
-              این مجوز، پرونده رسمی جفت‌گیری بین دو حیوان بالا را ایجاد کرده است و در سوابق هر دو حیوان ثبت
-              شده است. ادامه مسیر (تاریخ جفت‌گیری، بارداری، زایمان و تخصیص) در همین پرونده رسمی دنبال می‌شود.
+              این مجوز، پرونده رسمی جفت‌گیری بین دو حیوان بالا را ایجاد کرده است و در سوابق هر دو حیوان ثبت شده است.
+              ادامه مسیر (تاریخ جفت‌گیری، بارداری، زایمان و تخصیص) در همین پرونده رسمی دنبال می‌شود.
             </p>
             <p className="mt-sm text-caption text-text-secondary">{PRE_BIRTH_RULE_NOTE_FA}</p>
           </Card>

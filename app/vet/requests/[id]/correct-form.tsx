@@ -28,21 +28,21 @@ export function CorrectServiceForm({
 
   return (
     <Card>
-      <h3 className="text-label-lg">وضعیت مشاهده‌شده با درخواست فرق دارد</h3>
+      <div className="hz-section-header hz-section-header--sm">
+        <h3 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>وضعیت مشاهده‌شده با درخواست فرق دارد</span>
+        </h3>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        درخواست فعلی همین حیوان جایگزین می‌شود و کد جدید صادر می‌شود. درخواست سایر حیوان‌های همین گروه تغییر
-        نمی‌کند.
+        درخواست فعلی همین حیوان جایگزین می‌شود و کد جدید صادر می‌شود. درخواست سایر حیوان‌های همین گروه تغییر نمی‌کند.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="correct-service-form">
         <input type="hidden" name="requestId" value={requestId} />
         {state.message ? (
           <Alert tone={state.ok ? 'success' : 'error'} title={state.message}>
             {state.ok && state.requestId ? (
-              <Link
-                href={'/vet/requests/' + state.requestId}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="open-corrected-request"
-              >
+              <Link href={'/vet/requests/' + state.requestId} className="hz-link" data-testid="open-corrected-request">
                 رفتن به درخواست جدید برای پذیرش
               </Link>
             ) : null}

@@ -5,9 +5,13 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { RecordImage } from '../../../../src/ui/record-image.tsx';
+import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { SearchField } from '../../../../src/ui/search-field.tsx';
+import { Pagination } from '../../../../src/ui/pagination.tsx';
+import { FilterInput, FilterPanel, FilterSelect } from '../../public-ui.tsx';
+import { ListingCard } from '../listing-card.tsx';
 import { listingFilterOptions, publicListings } from '../../../../src/marketplace/public-listings.ts';
 import {
   isCanonicalListingIndex,
@@ -64,67 +68,9 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   );
 }
 
-const CONTROL =
-  'w-full rounded-lg border border-border-default bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
-  'min-h-[var(--size-control-md)] focus:border-border-brand';
-
-function Select({
-  name,
-  label,
-  value,
-  all,
-  options,
-}: {
-  name: string;
-  label: string;
-  value: string | null;
-  all: string;
-  options: ReadonlyArray<{ value: string; label: string }>;
-}) {
-  return (
-    <div className="space-y-xs">
-      <label htmlFor={'market-' + name} className="block text-label-md">
-        {label}
-      </label>
-      <select
-        id={'market-' + name}
-        name={name}
-        defaultValue={value ?? ''}
-        className={CONTROL}
-        data-testid={'market-filter-' + name}
-      >
-        <option value="">{all}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function Number_({ name, label, value }: { name: string; label: string; value: number | bigint | null }) {
-  return (
-    <div className="space-y-xs">
-      <label htmlFor={'market-' + name} className="block text-label-md">
-        {label}
-      </label>
-      <input
-        id={'market-' + name}
-        name={name}
-        inputMode="numeric"
-        dir="ltr"
-        defaultValue={value === null ? '' : String(value)}
-        className={CONTROL}
-        data-testid={'market-filter-' + name}
-      />
-    </div>
-  );
-}
-
 /**
- * The public animal marketplace — Phase 3, PROMPT-004.
+ * The public animal marketplace — Phase 3, PROMPT-004, drawn as DS P02: the
+ * filter column at the start (from 1024), search, sort and the ListingCard grid.
  *
  * Every advert here is published, of a species the market is open for, and by a
  * seller under no restriction. Nothing else is served, and a visitor cannot
@@ -134,18 +80,19 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
   const raw = await searchParams;
   const filter = parseListingFilter(raw);
   const [page, options] = await Promise.all([publicListings(db(), filter), listingFilterOptions(db())]);
+  const FORM = 'market-filter-form';
+  const active = listingQueryString({ ...filter, page: 1, sort: 'NEWEST' }) !== '';
 
   const cities = filter.provinceCode
     ? options.cities.filter((city) => city.provinceCode === filter.provinceCode)
     : options.cities;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-lg px-lg py-lg">
-      <Breadcrumbs items={CRUMBS} origin={site().origin} />
-      <header className="space-y-xs">
-        <h1 className="text-h2">{TITLE}</h1>
-        <p className="text-body-sm text-text-secondary">{DESCRIPTION}</p>
-      </header>
+    <div className="space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={site().origin} />
+        <PageHeader title={TITLE} meta={[DESCRIPTION]} />
+      </div>
 
       {!page.marketOpen ? (
         <Alert tone="warning" title="بازار فروش حیوان در حال حاضر بسته است">
@@ -155,211 +102,130 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
         </Alert>
       ) : null}
 
-      <form method="get" className="space-y-lg rounded-xl border border-border-default p-lg" data-testid="market-filters">
-        <div className="grid gap-lg md:grid-cols-3">
-          <div className="space-y-xs">
-            <label htmlFor="market-q" className="block text-label-md">
-              جست‌وجو
+      <div className="grid gap-xl lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+        <aside aria-label="فیلترهای آگهی‌ها" className="min-w-0 lg:col-start-1 lg:row-start-1">
+          <FilterPanel
+            clearHref="/animals-market"
+            active={active}
+            clearTestId="market-clear-filters"
+            footer={
+              <Button type="submit" tone="secondary" size="sm" form={FORM} data-testid="market-apply-filters">
+                اعمال فیلترها
+              </Button>
+            }
+          >
+            <FilterSelect id="market-breed" form={FORM} name="breed" label="نژاد" value={filter.breedId} all="همه نژادها" testId="market-filter-breed"
+              options={options.breeds.map((row) => ({ value: row.id, label: row.nameFa }))} />
+            <FilterSelect id="market-province" form={FORM} name="province" label="استان" value={filter.provinceCode} all="همه استان‌ها" testId="market-filter-province"
+              options={options.provinces.map((row) => ({ value: row.code, label: row.nameFa }))} />
+            <FilterSelect id="market-city" form={FORM} name="city" label="شهر" value={filter.cityId} all="همه شهرها" testId="market-filter-city"
+              options={cities.map((row) => ({ value: row.id, label: row.nameFa }))} />
+            <FilterSelect id="market-priceMode" form={FORM} name="priceMode" label="نوع قیمت" value={filter.priceMode} all="هر نوع قیمت" testId="market-filter-priceMode"
+              options={PRICE_MODES.map((mode) => ({ value: mode, label: PRICE_MODE_FA[mode] }))} />
+            <FilterSelect id="market-sex" form={FORM} name="sex" label="جنسیت" value={filter.sex} all="هر دو" testId="market-filter-sex"
+              options={[
+                { value: 'MALE', label: 'نر' },
+                { value: 'FEMALE', label: 'ماده' },
+              ]} />
+            <div className="grid grid-cols-2 gap-sm">
+              <FilterInput id="market-minPrice" form={FORM} name="minPrice" label="کمترین قیمت (تومان)" ltr inputMode="numeric" testId="market-filter-minPrice"
+                value={filter.minPriceToman === null ? '' : String(filter.minPriceToman)} />
+              <FilterInput id="market-maxPrice" form={FORM} name="maxPrice" label="بیشترین قیمت (تومان)" ltr inputMode="numeric" testId="market-filter-maxPrice"
+                value={filter.maxPriceToman === null ? '' : String(filter.maxPriceToman)} />
+              <FilterInput id="market-minAge" form={FORM} name="minAge" label="کمترین سن (ماه)" ltr inputMode="numeric" testId="market-filter-minAge"
+                value={filter.minAgeMonths === null ? '' : String(filter.minAgeMonths)} />
+              <FilterInput id="market-maxAge" form={FORM} name="maxAge" label="بیشترین سن (ماه)" ltr inputMode="numeric" testId="market-filter-maxAge"
+                value={filter.maxAgeMonths === null ? '' : String(filter.maxAgeMonths)} />
+            </div>
+            <FilterSelect id="market-seller" form={FORM} name="seller" label="نوع فروشنده" value={filter.sellerKind} all="همه فروشندگان" testId="market-filter-seller"
+              options={SELLER_KIND_FILTERS.map((kind) => ({ value: kind, label: SELLER_KIND_FA[kind] }))} />
+            <FilterSelect id="market-pedigree" form={FORM} name="pedigree" label="شجره‌نامه" all="مهم نیست" testId="market-filter-pedigree"
+              value={filter.pedigree === null ? null : filter.pedigree ? 'YES' : 'NO'}
+              options={[
+                { value: 'YES', label: 'دارد' },
+                { value: 'NO', label: 'ندارد' },
+              ]} />
+            <FilterSelect id="market-parentage" form={FORM} name="parentage" label="تست اصالت والدین" all="مهم نیست" testId="market-filter-parentage"
+              value={filter.parentage === null ? null : filter.parentage ? 'YES' : 'NO'}
+              options={[
+                { value: 'YES', label: 'دارد' },
+                { value: 'NO', label: 'ندارد' },
+              ]} />
+            <FilterSelect id="market-vaccination" form={FORM} name="vaccination" label="واکسیناسیون (اظهار فروشنده)" value={filter.vaccination} all="مهم نیست" testId="market-filter-vaccination"
+              options={DISCLOSURES.map((value) => ({ value, label: VACCINATION_FA[value] }))} />
+            <FilterSelect id="market-neuter" form={FORM} name="neuter" label="عقیم‌سازی (اظهار فروشنده)" value={filter.neuter} all="مهم نیست" testId="market-filter-neuter"
+              options={DISCLOSURES.map((value) => ({ value, label: NEUTER_FA[value] }))} />
+            <FilterSelect id="market-delivery" form={FORM} name="delivery" label="روش تحویل" value={filter.delivery} all="همه روش‌ها" testId="market-filter-delivery"
+              options={DELIVERY_METHODS.map((value) => ({ value, label: DELIVERY_METHOD_FA[value] }))} />
+          </FilterPanel>
+        </aside>
+
+        <div className="min-w-0 space-y-lg lg:col-start-2 lg:row-start-1">
+          <form id={FORM} method="get" action="/animals-market" role="search" className="flex flex-wrap gap-sm" data-testid="market-filters">
+            <SearchField id="market-q" name="q" label="جست‌وجو در آگهی‌ها" defaultValue={filter.term ?? ''} className="min-w-0 flex-1" data-testid="market-filter-q" />
+            <label className="hz-select-wrap hz-filterbar__sort">
+              <span className="hz-visually-hidden">ترتیب</span>
+              <select name="sort" defaultValue={filter.sort} className="hz-select" data-testid="market-filter-sort">
+                {LISTING_SORTS.map((value) => (
+                  <option key={value} value={value}>
+                    {'مرتب‌سازی: ' + LISTING_SORT_FA[value]}
+                  </option>
+                ))}
+              </select>
             </label>
-            <input
-              id="market-q"
-              name="q"
-              defaultValue={filter.term ?? ''}
-              className={CONTROL}
-              data-testid="market-filter-q"
+            <Button type="submit" tone="secondary">
+              جست‌وجو
+            </Button>
+          </form>
+
+          <p className="hz-body-sm text-text-secondary" aria-live="polite" data-testid="market-total">
+            {fa(page.total)} آگهی
+          </p>
+
+          {page.items.length === 0 ? (
+            <EmptyState
+              title="آگهی‌ای با این فیلترها پیدا نشد"
+              description="فیلترها را ساده‌تر کنید یا جست‌وجو را خالی بگذارید."
+              action={
+                active ? (
+                  <ButtonLink tone="secondary" href="/animals-market">
+                    پاک کردن همه
+                  </ButtonLink>
+                ) : undefined
+              }
+            />
+          ) : (
+            <section aria-labelledby="market-results-title">
+              <h2 id="market-results-title" className="hz-visually-hidden">
+                آگهی‌ها
+              </h2>
+              <ul className="grid grid-cols-2 gap-md md:gap-s20 xl:grid-cols-3" data-testid="market-results">
+                {page.items.map((card) => (
+                  <li key={card.id} data-testid={'market-card-' + card.id}>
+                    <ListingCard card={card} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <div data-testid="market-pagination">
+            <Pagination
+              page={page.page}
+              pageSize={page.pageSize}
+              total={page.total}
+              totalPages={page.totalPages}
+              hrefFor={(number) => '/animals-market' + listingQueryString({ ...filter, page: number })}
+              label="صفحه‌بندی آگهی‌ها"
             />
           </div>
-          <Select
-            name="breed"
-            label="نژاد"
-            value={filter.breedId}
-            all="همه نژادها"
-            options={options.breeds.map((row) => ({ value: row.id, label: row.nameFa }))}
-          />
-          <Select
-            name="province"
-            label="استان"
-            value={filter.provinceCode}
-            all="همه استان‌ها"
-            options={options.provinces.map((row) => ({ value: row.code, label: row.nameFa }))}
-          />
-          <Select
-            name="city"
-            label="شهر"
-            value={filter.cityId}
-            all="همه شهرها"
-            options={cities.map((row) => ({ value: row.id, label: row.nameFa }))}
-          />
-          <Select
-            name="priceMode"
-            label="نوع قیمت"
-            value={filter.priceMode}
-            all="هر نوع قیمت"
-            options={PRICE_MODES.map((mode) => ({ value: mode, label: PRICE_MODE_FA[mode] }))}
-          />
-          <Select
-            name="sex"
-            label="جنسیت"
-            value={filter.sex}
-            all="هر دو"
-            options={[
-              { value: 'MALE', label: 'نر' },
-              { value: 'FEMALE', label: 'ماده' },
-            ]}
-          />
-          <Number_ name="minPrice" label="کمترین قیمت (تومان)" value={filter.minPriceToman} />
-          <Number_ name="maxPrice" label="بیشترین قیمت (تومان)" value={filter.maxPriceToman} />
-          <Number_ name="minAge" label="کمترین سن (ماه)" value={filter.minAgeMonths} />
-          <Number_ name="maxAge" label="بیشترین سن (ماه)" value={filter.maxAgeMonths} />
-          <Select
-            name="seller"
-            label="نوع فروشنده"
-            value={filter.sellerKind}
-            all="همه فروشندگان"
-            options={SELLER_KIND_FILTERS.map((kind) => ({ value: kind, label: SELLER_KIND_FA[kind] }))}
-          />
-          <Select
-            name="pedigree"
-            label="شجره‌نامه"
-            value={filter.pedigree === null ? null : filter.pedigree ? 'YES' : 'NO'}
-            all="مهم نیست"
-            options={[
-              { value: 'YES', label: 'دارد' },
-              { value: 'NO', label: 'ندارد' },
-            ]}
-          />
-          <Select
-            name="parentage"
-            label="تست اصالت والدین"
-            value={filter.parentage === null ? null : filter.parentage ? 'YES' : 'NO'}
-            all="مهم نیست"
-            options={[
-              { value: 'YES', label: 'دارد' },
-              { value: 'NO', label: 'ندارد' },
-            ]}
-          />
-          <Select
-            name="vaccination"
-            label="واکسیناسیون (اظهار فروشنده)"
-            value={filter.vaccination}
-            all="مهم نیست"
-            options={DISCLOSURES.map((value) => ({ value, label: VACCINATION_FA[value] }))}
-          />
-          <Select
-            name="neuter"
-            label="عقیم‌سازی (اظهار فروشنده)"
-            value={filter.neuter}
-            all="مهم نیست"
-            options={DISCLOSURES.map((value) => ({ value, label: NEUTER_FA[value] }))}
-          />
-          <Select
-            name="delivery"
-            label="روش تحویل"
-            value={filter.delivery}
-            all="همه روش‌ها"
-            options={DELIVERY_METHODS.map((value) => ({ value, label: DELIVERY_METHOD_FA[value] }))}
-          />
-          <Select
-            name="sort"
-            label="ترتیب"
-            value={filter.sort}
-            all={LISTING_SORT_FA.NEWEST}
-            options={LISTING_SORTS.map((value) => ({ value, label: LISTING_SORT_FA[value] }))}
-          />
+
+          <p className="hz-caption" data-testid="market-ad-note">
+            آگهی‌های دارای برچسب «{PROMOTED_LABEL_FA}» بسته نمایش ویژه خریده‌اند. این برچسب فقط جایگاه نمایش را
+            تغییر می‌دهد و هیچ ارتباطی با اعتبار، تأیید یا امتیاز فروشنده ندارد.
+          </p>
         </div>
-        <div className="flex flex-wrap gap-sm">
-          <button
-            type="submit"
-            className="rounded-md bg-action-primary-default px-lg py-sm text-label-md text-action-primary-on"
-            data-testid="market-apply-filters"
-          >
-            اعمال فیلترها
-          </button>
-          <Link
-            href="/animals-market"
-            className="rounded-lg border border-border-default px-lg py-sm text-label-md"
-            data-testid="market-clear-filters"
-          >
-            پاک کردن
-          </Link>
-        </div>
-      </form>
-
-      <p className="text-caption text-text-secondary" data-testid="market-total">
-        {fa(page.total)} آگهی
-      </p>
-
-      {page.items.length === 0 ? (
-        <EmptyState
-          title="آگهی‌ای با این فیلترها پیدا نشد"
-          description="فیلترها را ساده‌تر کنید یا جست‌وجو را خالی بگذارید."
-        />
-      ) : (
-        <ul className="grid gap-lg md:grid-cols-2 lg:grid-cols-3" data-testid="market-results">
-          {page.items.map((card) => (
-            <li key={card.id} data-testid={'market-card-' + card.id}>
-              <Link
-                href={card.path}
-                className="flex h-full flex-col gap-sm rounded-xl border border-border-default p-lg hover:border-border-control"
-              >
-                <RecordImage fileId={card.coverFileId} altFa={card.coverAltFa} variant="thumb" />
-                <div className="flex flex-wrap items-start justify-between gap-xs">
-                  <h2 className="hz-card__title">{card.titleFa}</h2>
-                  <div className="flex flex-wrap gap-xs">
-                    {card.promoted ? (
-                      <StatusBadge tone="warning">
-                        <span data-testid={'market-ad-label-' + card.id}>{PROMOTED_LABEL_FA}</span>
-                      </StatusBadge>
-                    ) : null}
-                    {card.reserved ? <StatusBadge tone="info">رزروشده</StatusBadge> : null}
-                  </div>
-                </div>
-                <p className="text-caption text-text-secondary">
-                  {[card.breedFa, card.sex === 'MALE' ? 'نر' : card.sex === 'FEMALE' ? 'ماده' : null, card.placeFa]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </p>
-                <p className="mt-auto text-label-md">
-                  {card.priceMode === 'NEGOTIABLE'
-                    ? 'توافقی'
-                    : card.priceToman !== null
-                      ? fa(card.priceToman) + ' تومان'
-                      : 'قیمت اعلام نشده'}
-                </p>
-                <p className="text-caption text-text-secondary">
-                  {SELLER_KIND_FA[card.sellerKind as 'OWNER' | 'KENNEL']}
-                  {card.pedigreeIssued ? ' · شجره‌نامه دارد' : ''}
-                  {card.parentageFinal ? ' · تست اصالت دارد' : ''}
-                </p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {page.totalPages > 1 ? (
-        <nav aria-label="صفحه‌بندی" className="flex flex-wrap gap-sm" data-testid="market-pagination">
-          {Array.from({ length: page.totalPages }, (_, index) => index + 1).map((number) => (
-            <Link
-              key={number}
-              href={'/animals-market' + listingQueryString({ ...filter, page: number })}
-              aria-current={number === page.page ? 'page' : undefined}
-              className={[
-                'rounded-md border px-md py-2xs text-caption',
-                number === page.page ? 'border-border-brand text-text-brand' : 'border-border-subtle',
-              ].join(' ')}
-              data-testid={'market-page-' + number}
-            >
-              {fa(number)}
-            </Link>
-          ))}
-        </nav>
-      ) : null}
-
-      <p className="text-caption text-text-disabled" data-testid="market-ad-note">
-        آگهی‌های دارای برچسب «{PROMOTED_LABEL_FA}» بسته نمایش ویژه خریده‌اند. این برچسب فقط جایگاه نمایش را
-        تغییر می‌دهد و هیچ ارتباطی با اعتبار، تأیید یا امتیاز فروشنده ندارد.
-      </p>
+      </div>
     </div>
   );
 }

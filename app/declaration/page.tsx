@@ -14,6 +14,7 @@ import {
   NO_OFFICIAL_EFFECT_NOTE_FA,
   SCOPE_NOTE_FA,
 } from '../../src/mating/declaration.ts';
+import { PageHeader } from '../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,11 +34,21 @@ export default async function DeclarationsPage() {
   ]);
 
   return (
-    <PublicShell actor={guard.actor} title="اعلام توافق شخصی" pathname="/declaration">
+    <PublicShell
+      actor={guard.actor}
+      title="اعلام توافق شخصی"
+      pathname="/declaration"
+      header={<PageHeader title={'اعلام توافق شخصی'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg">
         {eligibility.allowed ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام توافق شخصی جفت‌گیری</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>اعلام توافق شخصی جفت‌گیری</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary" data-testid="scope-note">
               {SCOPE_NOTE_FA}
             </p>
@@ -86,11 +97,7 @@ export default async function DeclarationsPage() {
                     </StatusBadge>
                   </div>
                   <p className="mt-lg text-body-sm">
-                    <Link
-                      href={'/declaration/' + row.id}
-                      className="text-text-brand underline underline-offset-4"
-                      data-testid="open-declaration"
-                    >
+                    <Link href={'/declaration/' + row.id} className="hz-link" data-testid="open-declaration">
                       مشاهده اعلام
                     </Link>
                   </p>

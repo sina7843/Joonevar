@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../../src/ui/shell.tsx';
-import { Card } from '../../../../../src/ui/card.tsx';
+import { DeskHead, DocFrame, Panel, PrivateNote } from '../../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../../src/ui/key-value.tsx';
+import { ageInDays } from '../../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../../../src/ui/status.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { centreClaimForReview } from '../../../../../src/centres/claims.ts';
 import { CLAIM_DOCUMENT_KIND_FA, type ClaimDocumentKind } from '../../../../../src/suggestions/model.ts';
@@ -14,18 +15,6 @@ import { formatInstantFa } from '../../../../../src/content/model.ts';
 import { CentreClaimDecisionForm } from '../../../../../src/suggestions/forms.tsx';
 
 export const dynamic = 'force-dynamic';
-
-function Fact({ label, value, ltr = false }: { label: string; value: string | null; ltr?: boolean }) {
-  if (!value) return null;
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-md border-b border-border-subtle py-sm last:border-b-0">
-      <dt className="text-body-sm text-text-secondary">{label}</dt>
-      <dd className="text-label-md" dir={ltr ? 'ltr' : undefined}>
-        {value}
-      </dd>
-    </div>
-  );
-}
 
 /** One centre claim, its documents and the centre it is about — §10, §22 (PROMPT-009). */
 export default async function ReviewCentreClaimPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,85 +26,95 @@ export default async function ReviewCentreClaimPage({ params }: { params: Promis
   const { claim, documents } = data;
   const ownClaim = claim.accountId === guard.actor.accountId;
 
+  const open = claim.status === 'SUBMITTED';
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/centres/claims" nav={REVIEW_NAV}>
-      <div className="space-y-lg">
-        <Link href="/review/centres/claims" className="text-label-md text-text-brand underline underline-offset-4">
-          بازگشت به درخواست‌ها
-        </Link>
-
-        <Card>
-          <div className="flex flex-wrap items-start justify-between gap-md">
-            <div>
-              <p className="text-caption text-text-secondary">{data.centreNameFa}</p>
-              <h2 className="text-h3">{claim.claimantNameFa}</h2>
-            </div>
-            <span data-testid="claim-review-status">
-              <StatusBadge tone={claim.status === 'SUBMITTED' ? 'warning' : claim.status === 'APPROVED' ? 'success' : 'neutral'}>
-                {APPLICATION_STATUS_FA[claim.status as VetApplicationStatus]}
-              </StatusBadge>
-            </span>
-          </div>
-          <dl className="mt-lg">
-            <Fact label="سمت در مرکز" value={claim.roleFa} />
-            <Fact label="نام روی پرونده هویتی حساب" value={data.accountNameFa} />
-            <Fact label="تلفن" value={claim.phone} ltr />
-            <Fact label="ارسال" value={formatInstantFa(claim.submittedAt)} />
-          </dl>
-          {claim.statementFa ? <p className="mt-md whitespace-pre-line text-body-sm">{claim.statementFa}</p> : null}
-          {claim.appealFa ? (
-            <div className="mt-md" data-testid="claim-appeal">
-              <Alert tone="info" title="تجدیدنظر درخواست‌دهنده">
-                {claim.appealFa}
-              </Alert>
-            </div>
-          ) : null}
-          {claim.reviewNoteFa ? (
-            <p className="mt-md text-caption text-text-secondary" data-testid="claim-last-note">
-              {'آخرین تصمیم: ' + claim.reviewNoteFa + (claim.reviewedAt ? ' · ' + formatInstantFa(claim.reviewedAt) : '')}
-            </p>
-          ) : null}
+    <OpsShell actor={guard.actor} title="بررسی Claim مرکز" pathname="/review/centres/claims" nav={REVIEW_NAV}>
+      <DeskHead
+        title={'Claim مرکز · ' + claim.claimantNameFa}
+        status={{
+          tone: open ? 'info' : claim.status === 'APPROVED' ? 'success' : 'neutral',
+          label: <span data-testid="claim-review-status">{APPLICATION_STATUS_FA[claim.status as VetApplicationStatus]}</span>,
+        }}
+        meta={[
+          'مرکز: ' + data.centreNameFa,
+          'ارسال: ' + formatInstantFa(claim.submittedAt),
+          open && ageInDays(claim.submittedAt) !== null ? (
+            <span className="hz-age">{ageInDays(claim.submittedAt)!.toLocaleString('fa-IR') + ' روز در صف'}</span>
+          ) : null,
+        ]}
+        owner={open ? 'SYSTEM' : null}
+        ownerExtra={open ? 'اپراتور بررسی' : undefined}
+      >
+        <p className="flex flex-wrap gap-lg">
+          <Link href="/review/centres/claims" className="hz-link hz-link--standalone">
+            بازگشت به درخواست‌ها
+          </Link>
           {data.centreSlug ? (
-            <p className="mt-sm text-body-sm">
-              <Link href={'/centers/' + data.centreSlug} className="text-text-brand underline underline-offset-4" data-testid="claim-centre-link">
-                صفحه عمومی مرکز
-              </Link>
-            </p>
+            <Link href={'/centers/' + data.centreSlug} className="hz-link hz-link--standalone" data-testid="claim-centre-link">
+              صفحه عمومی مرکز
+            </Link>
           ) : null}
+        </p>
+      </DeskHead>
+
+      <div className="hz-desk">
+        <div className="min-w-0 space-y-lg">
           {data.centreOwned ? (
-            <div className="mt-md" data-testid="claim-centre-owned">
+            <div data-testid="claim-centre-owned">
               <Alert tone="warning" title="این مرکز هم‌اکنون مدیر دارد">
                 تأیید این درخواست دیگر ممکن نیست.
               </Alert>
             </div>
           ) : null}
-        </Card>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدارک</span></h2></div>
-          <ul className="mt-md space-y-sm" data-testid="claim-documents">
-            {documents.map((document) => (
-              <li key={document.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default px-md py-sm">
-                <span className="text-body-sm">{CLAIM_DOCUMENT_KIND_FA[document.kind as ClaimDocumentKind] + ' · ' + document.mime}</span>
-                <a
-                  href={'/api/files/' + document.fileId}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-label-md text-text-brand underline underline-offset-4"
-                  data-testid={'claim-document-' + document.kind}
-                >
-                  مشاهده فایل
-                </a>
-              </li>
-            ))}
-          </ul>
-        </Card>
+          <Panel title="مدارک" aside={<PrivateNote />}>
+            <ul className="hz-desk__docs" data-testid="claim-documents">
+              {documents.map((document) => (
+                <li key={document.id}>
+                  <DocFrame
+                    href={'/api/files/' + document.fileId}
+                    label={CLAIM_DOCUMENT_KIND_FA[document.kind as ClaimDocumentKind]}
+                    linkLabel="مشاهده فایل"
+                    meta={document.mime}
+                    testId={'claim-document-' + document.kind}
+                  />
+                </li>
+              ))}
+            </ul>
+          </Panel>
 
-        {ownClaim ? (
-          claim.status === 'SUBMITTED' ? <Alert tone="warning" title="درخواست خودتان را نمی‌توانید بررسی کنید." /> : null
-        ) : (
-          <CentreClaimDecisionForm claimId={claim.id} version={claim.version} open={claim.status === 'SUBMITTED'} />
-        )}
+          <Panel title="اطلاعات اعلام‌شده">
+            <KeyValueList
+              twoCol
+              rows={[
+                { key: 'سمت در مرکز', value: claim.roleFa },
+                { key: 'نام روی پرونده هویتی حساب', value: data.accountNameFa },
+                { key: 'تلفن', value: claim.phone ? <bdi dir="ltr">{claim.phone}</bdi> : null },
+                { key: 'ارسال', value: formatInstantFa(claim.submittedAt) },
+              ].filter((row) => row.value)}
+            />
+            {claim.statementFa ? <p className="whitespace-pre-line text-body-sm">{claim.statementFa}</p> : null}
+            {claim.appealFa ? (
+              <div data-testid="claim-appeal">
+                <Alert tone="info" title="تجدیدنظر درخواست‌دهنده">
+                  {claim.appealFa}
+                </Alert>
+              </div>
+            ) : null}
+            {claim.reviewNoteFa ? (
+              <p className="text-caption text-text-secondary" data-testid="claim-last-note">
+                {'آخرین تصمیم: ' + claim.reviewNoteFa + (claim.reviewedAt ? ' · ' + formatInstantFa(claim.reviewedAt) : '')}
+              </p>
+            ) : null}
+          </Panel>
+        </div>
+        <div className="hz-desk__decision">
+          {ownClaim ? (
+            claim.status === 'SUBMITTED' ? <Alert tone="warning" title="درخواست خودتان را نمی‌توانید بررسی کنید." /> : null
+          ) : (
+            <CentreClaimDecisionForm claimId={claim.id} version={claim.version} open={claim.status === 'SUBMITTED'} />
+          )}
+        </div>
       </div>
     </OpsShell>
   );

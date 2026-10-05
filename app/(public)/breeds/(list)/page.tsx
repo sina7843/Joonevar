@@ -8,7 +8,10 @@ import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
-import { Icon } from '../../../../src/ui/icon.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { SearchField } from '../../../../src/ui/search-field.tsx';
+import { FilterChips } from '../../../../src/ui/filter-bar.tsx';
+import { Pagination } from '../../../../src/ui/pagination.tsx';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
 
 const TITLE = 'نژادهای سگ';
@@ -41,20 +44,16 @@ export function generateMetadata(): Metadata {
   return buildMetadata({ title: TITLE, description: DESCRIPTION, path: '/breeds' }, site());
 }
 
-const CONTROL =
-  'w-full rounded-lg border border-border-default bg-bg-surface px-md text-body-sm text-text-primary ' +
-  'min-h-[var(--size-control-md)] focus:border-border-brand';
-
-/** Breed bank list — Requirements-Phase-2 §6 (PROMPT-003). */
+/** Breed bank list — Requirements-Phase-2 §6 (PROMPT-003), drawn as DS P02 with BreedCard tiles. */
 export default async function BreedsPage({ searchParams }: { searchParams: Promise<Search> }) {
   const query = parseQuery(await searchParams);
   const [result, groups] = await Promise.all([publishedBreeds(db(), query), breedGroupOptions(db())]);
   const { origin } = site();
 
-  const hrefFor = (page: number): string => {
+  const hrefFor = (page: number, group: number | null = query.fciGroup): string => {
     const params = new URLSearchParams();
     if (query.term !== '') params.set('q', query.term);
-    if (query.fciGroup !== null) params.set('group', String(query.fciGroup));
+    if (group !== null) params.set('group', String(group));
     if (page > 1) params.set('page', String(page));
     const encoded = params.toString();
     return '/breeds' + (encoded === '' ? '' : '?' + encoded);
@@ -62,59 +61,46 @@ export default async function BreedsPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={origin} />
+        <PageHeader
+          title={TITLE}
+          meta={['مشخصات، گروه FCI، تاریخچه و استاندارد هر نژاد. هر مطلب سلامت منبع و تاریخ بازبینی خودش را دارد.']}
+        />
+      </div>
 
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="max-w-2xl text-body-md text-text-secondary">
-          مشخصات، گروه FCI، تاریخچه و استاندارد هر نژاد. هر مطلب سلامت منبع و تاریخ بازبینی خودش را دارد.
-        </p>
-      </header>
-
-      <form
-        method="get"
-        action="/breeds"
-        role="search"
-        className="grid gap-md rounded-xl border border-border-default bg-bg-surface p-lg md:grid-cols-[1fr_1fr_auto] md:items-end"
-        data-testid="breed-search"
-      >
-        <div className="space-y-xs">
-          <label htmlFor="breed-q" className="block text-label-md">
-            نام نژاد
-          </label>
-          <input
-            id="breed-q"
-            name="q"
-            type="search"
-            defaultValue={query.term}
-            placeholder="مثلاً ژرمن شپرد یا retriever"
-            className={CONTROL}
-            data-testid="breed-q"
-          />
-        </div>
-        <div className="space-y-xs">
-          <label htmlFor="breed-group" className="block text-label-md">
-            گروه FCI
-          </label>
-          <select
-            id="breed-group"
-            name="group"
-            defaultValue={query.fciGroup === null ? '' : String(query.fciGroup)}
-            className={CONTROL + ' py-sm'}
-            data-testid="breed-group"
-          >
-            <option value="">همه گروه‌ها</option>
+      <form method="get" action="/breeds" role="search" className="grid gap-sm md:grid-cols-[minmax(0,1fr)_280px_auto]" data-testid="breed-search">
+        <SearchField id="breed-q" name="q" label="نام نژاد، مثلاً ژرمن شپرد یا retriever" defaultValue={query.term} data-testid="breed-q" />
+        <label className="hz-select-wrap">
+          <span className="hz-visually-hidden">گروه FCI</span>
+          <select name="group" defaultValue={query.fciGroup === null ? '' : String(query.fciGroup)} className="hz-select" data-testid="breed-group">
+            <option value="">همه گروه‌های FCI</option>
             {groups.map((group) => (
               <option key={group.id} value={group.fciGroup}>
                 {'گروه ' + fa(group.fciGroup) + ' — ' + group.nameFa}
               </option>
             ))}
           </select>
-        </div>
-        <Button type="submit" data-testid="breed-search-submit">
+        </label>
+        <Button type="submit" tone="secondary" data-testid="breed-search-submit">
           جست‌وجو
         </Button>
       </form>
+
+      {groups.length > 0 ? (
+        <FilterChips
+          label="گروه‌های FCI"
+          chips={[
+            { key: 'all', href: hrefFor(1, null), label: 'همه', current: query.fciGroup === null },
+            ...groups.map((group) => ({
+              key: group.id,
+              href: hrefFor(1, group.fciGroup),
+              label: 'گروه ' + fa(group.fciGroup),
+              current: query.fciGroup === group.fciGroup,
+            })),
+          ]}
+        />
+      ) : null}
 
       {result.publishedTotal === 0 ? (
         <EmptyState
@@ -132,66 +118,40 @@ export default async function BreedsPage({ searchParams }: { searchParams: Promi
           }
         />
       ) : (
-        <section aria-labelledby="breed-results-title">
-          <h2 id="breed-results-title" className="text-body-sm text-text-secondary" data-testid="breed-count">
+        <section aria-labelledby="breed-results-title" className="space-y-lg">
+          <h2 id="breed-results-title" className="hz-body-sm text-text-secondary" aria-live="polite" data-testid="breed-count">
             {fa(result.total) + ' نژاد'}
           </h2>
-          <ul className="mt-md grid gap-md sm:grid-cols-2 lg:grid-cols-3" data-testid="breed-results">
+          <ul className="grid grid-cols-2 gap-md md:grid-cols-3 md:gap-s20 lg:grid-cols-4" data-testid="breed-results">
             {result.items.map((breed) => (
               <li key={breed.slug}>
-                <Link
-                  href={'/breeds/' + breed.slug}
-                  className="flex h-full flex-col gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
-                  data-testid={'breed-card-' + breed.slug}
-                >
-                  <RecordImage fileId={breed.imageFileId} altFa={breed.imageAltFa} />
-                  <span className="flex items-start gap-md">
-                  <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">
-                    <Icon name="dog" size="md" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-label-lg text-text-primary">{breed.nameFa}</span>
-                    <span className="block text-caption text-text-secondary">
-                      <bdi>{breed.nameEn}</bdi>
-                    </span>
+                <Link href={'/breeds/' + breed.slug} className="hz-animal-tile hz-card--interactive h-full" data-testid={'breed-card-' + breed.slug}>
+                  <RecordImage variant="3x2" fileId={breed.imageFileId} altFa={breed.imageAltFa} />
+                  <div className="hz-animal-tile__body">
+                    <h3 className="hz-breed__name">{breed.nameFa}</h3>
+                    <bdi className="hz-breed__en" dir="ltr">
+                      {breed.nameEn}
+                    </bdi>
                     {breed.fciGroup !== null || breed.size !== null ? (
-                      <span className="mt-xs block text-caption text-text-secondary">
-                        {[
-                          breed.fciGroup !== null ? 'گروه FCI ' + fa(breed.fciGroup) : null,
-                          breed.size !== null ? 'اندازه ' + SIZE_FA[breed.size] : null,
-                        ]
+                      <span className="hz-breed__meta">
+                        {[breed.fciGroup !== null ? 'گروه FCI ' + fa(breed.fciGroup) : null, breed.size !== null ? SIZE_FA[breed.size] : null]
                           .filter(Boolean)
-                          .join(' · ')}
+                          .join('، ')}
                       </span>
                     ) : null}
-                  </span>
-                  </span>
+                  </div>
                 </Link>
               </li>
             ))}
           </ul>
-
-          {result.totalPages > 1 ? (
-            <nav aria-label="صفحه‌بندی نژادها" className="mt-lg flex items-center justify-between gap-md">
-              {result.page > 1 ? (
-                <ButtonLink tone="secondary" href={hrefFor(result.page - 1)}>
-                  صفحه قبل
-                </ButtonLink>
-              ) : (
-                <span />
-              )}
-              <span className="text-body-sm text-text-secondary">
-                {'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}
-              </span>
-              {result.page < result.totalPages ? (
-                <ButtonLink tone="secondary" href={hrefFor(result.page + 1)}>
-                  صفحه بعد
-                </ButtonLink>
-              ) : (
-                <span />
-              )}
-            </nav>
-          ) : null}
+          <Pagination
+            page={result.page}
+            pageSize={result.pageSize}
+            total={result.total}
+            totalPages={result.totalPages}
+            hrefFor={(page) => hrefFor(page)}
+            label="صفحه‌بندی نژادها"
+          />
         </section>
       )}
     </div>

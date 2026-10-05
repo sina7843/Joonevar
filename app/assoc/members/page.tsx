@@ -1,10 +1,10 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, Panel } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import {
   MEMBER_PAGE_SIZE,
@@ -66,46 +66,61 @@ export default async function AssocMembersPage({
   const hidden = Math.max(0, total - rows.length);
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — انجمن" pathname="/assoc/members" nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Alert tone="info" title="عضویت پس از بررسی و پرداخت تأییدشده فعال می‌شود">
-          <span data-testid="members-note">
-            تأیید درخواست فقط پرداخت دوره را باز می‌کند؛ فعال‌سازی با تأیید سروری پرداخت انجام می‌شود. عضویت‌های
-            فعال پیش از دوره‌ای شدن، مادام‌العمر می‌مانند و تاریخ پایان نمی‌گیرند.
-          </span>
-        </Alert>
+    <OpsShell actor={guard.actor} title="عضویت" pathname="/assoc/members" nav={ASSOC_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">
+          {(waiting.items.length + corrections.items.length).toLocaleString('fa-IR') + ' درخواست در صف'}
+        </span>
+        <span className="hz-page-header__meta-item">{total.toLocaleString('fa-IR') + ' رکورد عضویت'}</span>
+      </p>
+      <Alert tone="info" title="عضویت پس از بررسی و پرداخت تأییدشده فعال می‌شود">
+        <span data-testid="members-note">
+          تأیید درخواست فقط پرداخت دوره را باز می‌کند؛ فعال‌سازی با تأیید سروری پرداخت انجام می‌شود. عضویت‌های
+          فعال پیش از دوره‌ای شدن، مادام‌العمر می‌مانند و تاریخ پایان نمی‌گیرند.
+        </span>
+      </Alert>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست‌های در انتظار بررسی</span></h2></div>
-          {waiting.items.length === 0 && corrections.items.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-disabled" data-testid="membership-queue-empty">
-              درخواست بازی در صف نیست.
-            </p>
-          ) : (
-            <ul className="mt-md space-y-lg" data-testid="membership-queue">
-              {waiting.items.map((item) => (
-                <li key={item.id}>
-                  <p className="text-body-sm">
-                    {formatInstantFa(new Date(item.updatedAt))}
-                    {item.statementFa ? ' — ' + item.statementFa : ''}
-                  </p>
-                  <DecideMembershipForm applicationId={item.id} version={item.version} />
-                </li>
-              ))}
-              {corrections.items.map((item) => (
-                <li key={item.id} className="text-body-sm text-text-secondary" data-testid="membership-awaiting-correction">
-                  {'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+      <Panel title="درخواست‌های در انتظار بررسی" count={waiting.items.length.toLocaleString('fa-IR')}>
+        {waiting.items.length === 0 && corrections.items.length === 0 ? (
+          <p className="text-body-sm text-text-secondary" data-testid="membership-queue-empty">
+            درخواست بازی در صف نیست.
+          </p>
+        ) : (
+          <CaseList label="صف درخواست عضویت" testId="membership-queue">
+            {waiting.items.map((item) => (
+              <CaseItem
+                key={item.id}
+                type="درخواست عضویت"
+                name={item.statementFa || 'درخواست عضویت'}
+                sub={'آخرین تغییر: ' + formatInstantFa(new Date(item.updatedAt))}
+                ageDays={ageInDays(new Date(item.updatedAt))}
+                status={{ tone: 'info', label: 'در انتظار بررسی انجمن' }}
+                owner="ASSOCIATION"
+                ownerIsUs
+              >
+                <DecideMembershipForm applicationId={item.id} version={item.version} />
+              </CaseItem>
+            ))}
+            {corrections.items.map((item) => (
+              <CaseItem
+                key={item.id}
+                testId="membership-awaiting-correction"
+                type="درخواست عضویت"
+                name={'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
+                status={{ tone: 'warning', label: 'نیازمند اصلاح' }}
+                owner="USER"
+              />
+            ))}
+          </CaseList>
+        )}
+      </Panel>
 
+      <Panel title="سوابق عضویت" count={total.toLocaleString('fa-IR')}>
         <MemberSearch term={term} />
 
         {hidden > 0 ? (
           <p className="text-caption text-text-secondary" data-testid="members-truncated">
-            {MEMBER_PAGE_SIZE} رکورد تازه‌ترین نمایش داده شده است؛ {hidden} رکورد دیگر با این جست‌وجو
+            {MEMBER_PAGE_SIZE.toLocaleString('fa-IR')} رکورد تازه‌ترین نمایش داده شده است؛ {hidden.toLocaleString('fa-IR')} رکورد دیگر با این جست‌وجو
             هم‌خوان است و در این فهرست نیست. برای رسیدن به یک عضو مشخص، از جست‌وجو استفاده کنید.
           </p>
         ) : null}
@@ -115,49 +130,40 @@ export default async function AssocMembersPage({
             title={term === '' ? 'هنوز عضویتی ثبت نشده است' : 'با این جست‌وجو عضوی پیدا نشد'}
             description={
               term === ''
-                ? withoutMembership + ' حساب بدون رکورد عضویت وجود دارد.'
+                ? withoutMembership.toLocaleString('fa-IR') + ' حساب بدون رکورد عضویت وجود دارد.'
                 : 'نام، شماره عضویت یا چهار رقم آخر موبایل را دوباره بررسی کنید.'
             }
           />
         ) : (
-          <ul className="space-y-lg" data-testid="member-list">
+          <CaseList label="سوابق عضویت" testId="member-list">
             {rows.map((row) => (
-              <li key={row.accountId}>
-                <Card>
-                  <div className="flex items-start justify-between gap-md">
-                    <div className="min-w-0">
-                      <h2 className="text-label-md">{row.nameFa}</h2>
-                      <p className="mt-2xs text-caption text-text-secondary" dir="ltr">
-                        {row.mobileTail}
-                      </p>
-                      <p className="mt-2xs text-caption text-text-secondary">
-                        {row.membershipNo
-                          ? 'شماره عضویت: ' + row.membershipNo
-                          : NUMBER_FA[row.numberStatus] ?? row.numberStatus}
-                        {row.activatedAt
-                          ? ' · فعال از ' + formatCivilDateFa(row.activatedAt.toISOString().slice(0, 10))
-                          : ''}
-                      </p>
-                    </div>
-                    <StatusBadge tone={STATUS_TONE[row.status as MembershipStatus] ?? 'neutral'}>
-                      <span data-testid={'member-status-' + row.accountId}>
-                        {STATUS_FA[row.status] ?? row.status}
-                      </span>
-                    </StatusBadge>
-                  </div>
-
-                  {row.membershipNo === null ? (
-                    <IssueNumberForm accountId={row.accountId} suffix={row.accountId} />
-                  ) : null}
-                  {row.status === 'ACTIVE' || row.status === 'SUSPENDED' || row.status === 'EXPIRED' ? (
-                    <MembershipStateForm accountId={row.accountId} suspended={row.status === 'SUSPENDED'} suffix={row.accountId} />
-                  ) : null}
-                </Card>
-              </li>
+              <CaseItem
+                key={row.accountId}
+                name={row.nameFa}
+                code={row.membershipNo}
+                sub={
+                  <>
+                    <bdi dir="ltr">{row.mobileTail}</bdi>
+                    {' · '}
+                    {row.membershipNo ? 'شماره عضویت صادرشده' : NUMBER_FA[row.numberStatus] ?? row.numberStatus}
+                    {row.activatedAt ? ' · فعال از ' + formatCivilDateFa(row.activatedAt.toISOString().slice(0, 10)) : ''}
+                  </>
+                }
+                status={{
+                  tone: STATUS_TONE[row.status as MembershipStatus] ?? 'neutral',
+                  label: STATUS_FA[row.status] ?? row.status,
+                  testId: 'member-status-' + row.accountId,
+                }}
+              >
+                {row.membershipNo === null ? <IssueNumberForm accountId={row.accountId} suffix={row.accountId} /> : null}
+                {row.status === 'ACTIVE' || row.status === 'SUSPENDED' || row.status === 'EXPIRED' ? (
+                  <MembershipStateForm accountId={row.accountId} suspended={row.status === 'SUSPENDED'} suffix={row.accountId} />
+                ) : null}
+              </CaseItem>
             ))}
-          </ul>
+          </CaseList>
         )}
-      </div>
+      </Panel>
     </OpsShell>
   );
 }

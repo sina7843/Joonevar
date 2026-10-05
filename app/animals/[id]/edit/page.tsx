@@ -5,6 +5,9 @@ import { PublicShell } from '../../../../src/ui/shell.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { breedOptions, draftOf, requireOwnedAnimal } from '../../../../src/animals/service.ts';
 import { AnimalWizard } from './wizard.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../../src/ui/page-crumbs.tsx';
+import { StatusBadge } from '../../../../src/ui/status.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,10 +41,35 @@ export default async function EditAnimalPage({
   const { parentOf } = await searchParams;
 
   return (
-    <PublicShell actor={guard.actor} title="ثبت حیوان هم‌زیست" pathname={'/animals/' + id + '/edit'}>
+    <PublicShell
+      actor={guard.actor}
+      title="ثبت حیوان هم‌زیست"
+      pathname={'/animals/' + id + '/edit'}
+      header={
+        <div>
+          <PageCrumbs
+            items={[
+              { name: 'خانه', href: '/dashboard' },
+              { name: 'حیوان‌های من', href: '/animals' },
+              { name: 'ثبت حیوان هم‌زیست' },
+            ]}
+          />
+          <PageHeader
+            title={'ثبت حیوان هم‌زیست' + (animal.name ? ' · ' + animal.name : '')}
+            back={{ href: '/animals' }}
+            aside={animal.status === 'REGISTERED' ? null : <StatusBadge tone="neutral">پیش‌نویس</StatusBadge>}
+            meta={['هر مرحله جدا ذخیره می‌شود؛ هر وقت برگردید از همان مرحله ادامه می‌دهید.']}
+          />
+        </div>
+      }
+    >
       <AnimalWizard
         parentOf={parentOf ?? null}
-        breeds={breeds.map((breed) => ({ id: breed.id, nameFa: breed.nameFa, nameEn: breed.nameEn }))}
+        breeds={breeds.map((breed) => ({
+          id: breed.id,
+          nameFa: breed.nameFa,
+          nameEn: breed.nameEn,
+        }))}
         animal={{
           id: animal.id,
           name: animal.name,

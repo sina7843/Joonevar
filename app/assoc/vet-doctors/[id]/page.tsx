@@ -1,7 +1,8 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, DocFrame, Panel, PrivateNote, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -40,43 +41,33 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
 
   return (
     <OpsShell actor={guard.actor} title="بررسی کد نظام دامپزشک" pathname="/assoc/vet-doctors" nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات متقاضی</span></h2></div>
-          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
-            <dt className="text-text-secondary">نام در حساب</dt>
-            <dd>{detail.applicantNameFa ?? '—'}</dd>
-            <dt className="text-text-secondary">کد ملی</dt>
-            <dd>{detail.applicantNationalId ? <Identifier value={detail.applicantNationalId} /> : '—'}</dd>
-            <dt className="text-text-secondary">نام اعلام‌شده</dt>
-            <dd>{latest?.displayNameFa ?? '—'}</dd>
-            <dt className="text-text-secondary">عمومی یا متخصص</dt>
-            <dd data-testid="review-doctor-scope">{latest ? SCOPE_FA[latest.practiceScope] ?? '—' : '—'}</dd>
-            <dt className="text-text-secondary">کد نظام</dt>
-            <dd dir="ltr" data-testid="review-doctor-council-code">
-              {latest?.councilCode ?? '—'}
-            </dd>
-            <dt className="text-text-secondary">وضعیت</dt>
-            <dd data-testid="doctor-case-status">{detail.case.statusFa}</dd>
-          </dl>
-          {latest?.statementFa ? <p className="mt-md text-body-sm">{latest.statementFa}</p> : null}
-        </Card>
-
-        {detail.claimTarget ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پروفایل موردِ Claim</span></h2></div>
-            <p className="mt-md text-body-sm" data-testid="doctor-claim-target">
-              {detail.claimTarget.displayNameFa + (detail.claimTarget.cityNameFa ? ' · ' + detail.claimTarget.cityNameFa : '')}
-              {detail.claimTarget.accountId ? ' — این پروفایل اکنون مالک دارد و Claim دیگر تأیید نمی‌شود.' : ' — بدون مالک'}
-            </p>
-            {detail.claimTarget.publicSlug ? (
-              <a href={'/veterinarians/' + detail.claimTarget.publicSlug} target="_blank" rel="noreferrer" className="mt-xs inline-block text-label-md text-text-brand underline underline-offset-4">
-                صفحه عمومی
-              </a>
-            ) : null}
-          </Card>
-        ) : null}
-
+      <DeskHead
+        title={'کد نظام دامپزشک · ' + (detail.applicantNameFa ?? latest?.displayNameFa ?? '—')}
+        status={{ tone: waiting ? 'info' : detail.case.status === 'NEEDS_CORRECTION' ? 'warning' : detail.case.status === 'REJECTED' ? 'error' : 'success', label: detail.case.statusFa }}
+        meta={[
+          latest?.councilCode ? <Identifier label="کد نظام" value={latest.councilCode} /> : null,
+          detail.applicantNationalId ? <Identifier label="کد ملی" value={detail.applicantNationalId} /> : null,
+          'نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR'),
+        ]}
+        owner={waiting ? 'ASSOCIATION' : detail.case.status === 'NEEDS_CORRECTION' ? 'USER' : null}
+        ownerExtra={review?.claimedByOther ? 'در دست ' + (review.claimerNameFa ?? 'بررسی‌کننده دیگر') : undefined}
+      />
+      <Desk
+        decisionTitle={waiting ? 'تصمیم' : 'نتیجه'}
+        decision={
+          <>
+            {review && waiting ? <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} /> : null}
+            {waiting && !review?.claimedByOther ? (
+              <DecideDoctorCaseForm caseId={detail.case.id} version={detail.case.version} />
+            ) : waiting ? null : (
+              <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
+                {'وضعیت فعلی: ' + detail.case.statusFa}
+                {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}
+              </Alert>
+            )}
+          </>
+        }
+      >
         {duplicates > 0 ? (
           <div data-testid="doctor-duplicates">
             <Alert tone="warning" title="همین کد نظام در جای دیگری هم آمده است">
@@ -85,77 +76,86 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
           </div>
         ) : null}
 
-        <Card>
-          <h2 className="hz-card__title">مدارک</h2>
-          <ul className="mt-md space-y-2xs text-body-sm">
-            {detail.documents.map((document) => (
-              <li key={document.id}>
-                <a
-                  href={'/api/files/' + document.fileId}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-text-brand underline underline-offset-4"
-                  data-testid={'doctor-document-link-' + document.kind}
-                >
-                  {DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind] + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
-                </a>
-                {document.submissionVersion === detail.case.currentSubmissionVersion ? (
-                  <DocumentPreview fileId={document.fileId} labelFa={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind]} testId={'doctor-document-preview-' + document.kind} />
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <Panel title="مدارک" aside={<PrivateNote />}>
+          {detail.documents.length === 0 ? (
+            <p className="text-body-sm text-text-secondary">—</p>
+          ) : (
+            <ul className="hz-desk__docs">
+              {detail.documents.map((document) => (
+                <li key={document.id}>
+                  <DocFrame
+                    href={'/api/files/' + document.fileId}
+                    label={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind] + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
+                    linkLabel={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind] + ' — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
+                    testId={'doctor-document-link-' + document.kind}
+                    icon="identificationBadge"
+                  >
+                    {document.submissionVersion === detail.case.currentSubmissionVersion ? (
+                      <DocumentPreview fileId={document.fileId} labelFa={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind]} testId={'doctor-document-preview-' + document.kind} />
+                    ) : null}
+                  </DocFrame>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+
+        <Panel title="اطلاعات اعلام‌شده">
+          <KeyValueList
+            twoCol
+            rows={[
+              { key: 'نام در حساب', value: detail.applicantNameFa },
+              { key: 'کد ملی', value: detail.applicantNationalId ? <Identifier value={detail.applicantNationalId} /> : null },
+              { key: 'نام اعلام‌شده', value: latest?.displayNameFa },
+              { key: 'عمومی یا متخصص', value: latest ? SCOPE_FA[latest.practiceScope] ?? '—' : '—', testId: 'review-doctor-scope' },
+              { key: 'کد نظام', value: latest?.councilCode ? <bdi dir="ltr">{latest.councilCode}</bdi> : '—', testId: 'review-doctor-council-code' },
+              { key: 'وضعیت', value: detail.case.statusFa, testId: 'doctor-case-status' },
+            ]}
+          />
+          {latest?.statementFa ? <p className="text-body-sm">{latest.statementFa}</p> : null}
+        </Panel>
+
+        {detail.claimTarget ? (
+          <Panel title="پروفایل موردِ Claim">
+            <p className="text-body-sm" data-testid="doctor-claim-target">
+              {detail.claimTarget.displayNameFa + (detail.claimTarget.cityNameFa ? ' · ' + detail.claimTarget.cityNameFa : '')}
+              {detail.claimTarget.accountId ? ' — این پروفایل اکنون مالک دارد و Claim دیگر تأیید نمی‌شود.' : ' — بدون مالک'}
+            </p>
+            {detail.claimTarget.publicSlug ? (
+              <a href={'/veterinarians/' + detail.claimTarget.publicSlug} target="_blank" rel="noreferrer" className="hz-link hz-link--standalone">
+                صفحه عمومی
+              </a>
+            ) : null}
+          </Panel>
+        ) : null}
 
         {detail.submissions.length > 1 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نسخه‌های ارسال</span></h2></div>
-            <ol className="mt-md space-y-sm text-body-sm" data-testid="doctor-submissions">
+          <Panel title="نسخه‌های ارسال">
+            <ol className="space-y-sm text-body-sm" data-testid="doctor-submissions">
               {detail.submissions.map((submission) => (
                 <li key={submission.version}>
                   {'نسخه ' + submission.version.toLocaleString('fa-IR') + ' · ' + formatInstantFa(submission.submittedAt) + ' · ' + (SCOPE_FA[submission.fields.practiceScope] ?? '') + ' · '}
-                  <span dir="ltr">{submission.fields.councilCode}</span>
+                  <bdi dir="ltr">{submission.fields.councilCode}</bdi>
                 </li>
               ))}
             </ol>
-          </Card>
+          </Panel>
         ) : null}
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه</span></h2></div>
-          <ol className="mt-md space-y-sm text-body-sm" data-testid="doctor-case-history">
-            {detail.history.map((event, index) => (
-              <li key={index}>
-                {formatInstantFa(new Date(event.at)) + ' · ' + (event.toStatusFa ?? event.action)}
-                {event.reasonFa ? ' — ' + event.reasonFa : ''}
-              </li>
-            ))}
-          </ol>
-        </Card>
-
-        {review && waiting ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بررسی</span></h2></div>
-            <div className="mt-md">
-              <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
-            </div>
-          </Card>
-        ) : null}
-
-        {waiting && !review?.claimedByOther ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
-            <div className="mt-lg">
-              <DecideDoctorCaseForm caseId={detail.case.id} version={detail.case.version} />
-            </div>
-          </Card>
-        ) : waiting ? null : (
-          <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
-            {'وضعیت فعلی: ' + detail.case.statusFa}
-            {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}
-          </Alert>
-        )}
-      </div>
+        <Panel title="سابقه پرونده">
+          <div data-testid="doctor-case-history">
+            <CaseHistory
+              entries={[...detail.history].reverse().map((event, index) => ({
+                id: String(index),
+                title: event.toStatusFa ?? event.action,
+                whenFa: formatInstantFa(new Date(event.at)),
+                body: event.reasonFa ?? undefined,
+                current: index === 0,
+              }))}
+            />
+          </div>
+        </Panel>
+      </Desk>
     </OpsShell>
   );
 }

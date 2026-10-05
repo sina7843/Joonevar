@@ -61,12 +61,12 @@ export function NewProductForm({
         data-testid="product-barcode"
       />
       <TextAreaField label="توضیح کالا" name="description" rows={3} data-testid="product-description" />
-      <fieldset className="space-y-2xs">
-        <legend className="text-label-sm">مناسب برای</legend>
+      <fieldset className="hz-fieldset">
+        <legend className="hz-field__label">مناسب برای</legend>
         {speciesOptions.map((option) => (
-          <label key={option.code} className="flex items-center gap-sm text-body-sm">
+          <label key={option.code} className="hz-check">
             <input type="checkbox" name="species" value={option.code} data-testid={'product-species-' + option.code} />
-            {option.nameFa}
+            <span className="hz-check__text"><span className="hz-check__label">{option.nameFa}</span></span>
           </label>
         ))}
       </fieldset>

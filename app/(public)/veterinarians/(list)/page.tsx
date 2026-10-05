@@ -9,6 +9,11 @@ import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
+import { SearchField } from '../../../../src/ui/search-field.tsx';
+import { FilterChips } from '../../../../src/ui/filter-bar.tsx';
+import { Pagination } from '../../../../src/ui/pagination.tsx';
+import { FilterPanel, FilterSelect } from '../../public-ui.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
 
@@ -50,40 +55,6 @@ export function generateMetadata(): Metadata {
   return buildMetadata({ title: TITLE, description: DESCRIPTION, path: '/veterinarians' }, site());
 }
 
-const CONTROL =
-  'w-full rounded-lg border border-border-default bg-bg-surface px-md py-sm text-body-sm text-text-primary ' +
-  'min-h-[var(--size-control-md)] focus:border-border-brand';
-
-function Filter({
-  id,
-  label,
-  value,
-  all,
-  options,
-}: {
-  id: Key;
-  label: string;
-  value: string | null;
-  all: string;
-  options: ReadonlyArray<{ value: string; label: string }>;
-}) {
-  return (
-    <div className="space-y-xs">
-      <label htmlFor={'vet-' + id} className="block text-label-md">
-        {label}
-      </label>
-      <select id={'vet-' + id} name={id} defaultValue={value ?? ''} className={CONTROL} data-testid={'vet-filter-' + id}>
-        <option value="">{all}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
 /** Veterinary directory — Requirements-Phase-2 §7 (PROMPT-006). */
 export default async function VeterinariansPage({ searchParams }: { searchParams: Promise<Search> }) {
   const query = parseQuery(await searchParams);
@@ -109,183 +80,218 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
     return '/veterinarians' + (encoded === '' ? '' : '?' + encoded);
   };
 
+  const FORM = 'vet-search-form';
+  const statusHref = (status: string | null): string => {
+    const target = new URL('http://x' + hrefFor(1));
+    if (status) target.searchParams.set('status', status);
+    else target.searchParams.delete('status');
+    return target.pathname + target.search;
+  };
+
   return (
     <div className="space-y-xl">
-      <Breadcrumbs items={CRUMBS} origin={origin} />
-
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{TITLE}</h1>
-        <p className="max-w-2xl text-body-md text-text-secondary">
-          دامپزشک را با تخصص، گونه و شهر محل کار پیدا کنید. این فهرست معرفی است؛ نوبت‌دهی و درخواست خدمت از اینجا انجام
-          نمی‌شود.
-        </p>
-        <p className="text-body-sm text-text-secondary">
+      <div className="space-y-md">
+        <Breadcrumbs items={CRUMBS} origin={origin} />
+        <PageHeader
+          title={TITLE}
+          meta={['دامپزشک را با تخصص، گونه و شهر محل کار پیدا کنید. این فهرست معرفی است؛ نوبت‌دهی و درخواست خدمت از اینجا انجام نمی‌شود.']}
+        />
+        <p className="hz-body-sm text-text-secondary">
           دامپزشکی را اینجا پیدا نکردید؟{' '}
-          <Link href="/account/suggestions" className="text-text-brand underline underline-offset-4" data-testid="suggest-vet-link">
+          <Link href="/account/suggestions" className="hz-link" data-testid="suggest-vet-link">
             او را به همزیست معرفی کنید
           </Link>
           .
         </p>
-      </header>
+      </div>
 
-      <form
-        method="get"
-        action="/veterinarians"
-        role="search"
-        className="grid gap-md rounded-xl border border-border-default bg-bg-surface p-lg sm:grid-cols-2 lg:grid-cols-4 lg:items-end"
-        data-testid="vet-search"
-      >
-        <div className="space-y-xs">
-          <label htmlFor="vet-q" className="block text-label-md">
-            نام دامپزشک یا محل کار
-          </label>
-          <input
-            id="vet-q"
-            name="q"
-            type="search"
-            defaultValue={query.term}
-            className={CONTROL}
-            data-testid="vet-filter-q"
+      <div className="grid gap-xl lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+        <div className="min-w-0 space-y-lg lg:col-start-2 lg:row-start-1">
+          <form id={FORM} method="get" action="/veterinarians" role="search" className="flex gap-sm" data-testid="vet-search">
+            <SearchField
+              id="vet-q"
+              name="q"
+              label="نام دامپزشک یا محل کار"
+              defaultValue={query.term}
+              className="min-w-0 flex-1"
+              data-testid="vet-filter-q"
+            />
+            <Button type="submit" tone="secondary" data-testid="vet-search-submit">
+              جست‌وجو
+            </Button>
+          </form>
+
+          <FilterChips
+            label="فیلترهای سریع"
+            chips={[
+              { key: 'all', href: statusHref(null), label: 'همه', current: query.status === null },
+              { key: 'TRUSTED', href: statusHref('TRUSTED'), label: 'معتمد همزیست', current: query.status === 'TRUSTED' },
+              { key: 'VERIFIED', href: statusHref('VERIFIED'), label: 'کد نظام تأییدشده', current: query.status === 'VERIFIED' },
+            ]}
           />
+
+          {result.publishedTotal === 0 ? (
+            <EmptyState
+              title="هنوز پروفایل دامپزشکی منتشر نشده است"
+              description="پروفایل هر دامپزشک پس از بررسی اطلاعات و محل کارش در این فهرست منتشر می‌شود."
+            />
+          ) : result.items.length === 0 ? (
+            <EmptyState
+              title="دامپزشکی با این جست‌وجو پیدا نشد"
+              description="فیلتری را بردارید یا شهر و تخصص دیگری امتحان کنید."
+              action={
+                <ButtonLink tone="secondary" href="/veterinarians">
+                  نمایش همه دامپزشکان
+                </ButtonLink>
+              }
+            />
+          ) : (
+            <section aria-labelledby="vet-results-title" className="space-y-lg">
+              <h2 id="vet-results-title" className="hz-body-sm text-text-secondary" aria-live="polite" data-testid="vet-count">
+                {fa(result.total) + ' دامپزشک' + (filtered ? ' با این فیلترها' : '')}
+              </h2>
+              <ul className="grid gap-s20 md:grid-cols-2" data-testid="vet-results">
+                {result.items.map((vet) => (
+                  <li key={vet.slug}>
+                    <Link href={'/veterinarians/' + vet.slug} className="hz-card hz-card--interactive block h-full" data-testid={'vet-card-' + vet.slug}>
+                      <div className="hz-vet">
+                        <RecordImage variant="avatar" fileId={vet.imageFileId} altFa={vet.imageAltFa} />
+                        <div className="hz-vet__body">
+                          <h3 className="hz-vet__name">
+                            {vet.nameFa}
+                            {vet.trusted ? (
+                              <span className="hz-badge hz-badge--success">
+                                <Icon name="shieldCheck" size="xs" />
+                                معتمد همزیست
+                              </span>
+                            ) : null}
+                          </h3>
+                          {vet.headlineFa ? <span className="hz-vet__meta">{vet.headlineFa}</span> : null}
+                          {vet.specialtiesFa.length > 0 ? <span className="hz-vet__meta">{'تخصص: ' + vet.specialtiesFa.join('، ')}</span> : null}
+                          {vet.placesFa.length > 0 ? (
+                            <span className="hz-vet__meta hz-meta__item">
+                              <Icon name="mapPin" size="xs" />
+                              {vet.placesFa.join('، ')}
+                            </span>
+                          ) : null}
+                          {vet.promoted || !vet.owned || vet.verified ? (
+                            <span className="mt-xs flex flex-wrap gap-xs">
+                              {vet.promoted ? (
+                                <span data-testid={'promoted-' + vet.slug}>
+                                  <StatusBadge tone="info" size="sm">
+                                    تبلیغ
+                                  </StatusBadge>
+                                </span>
+                              ) : null}
+                              {vet.owned ? null : (
+                                <StatusBadge tone="warning" size="sm">
+                                  بدون مالک
+                                </StatusBadge>
+                              )}
+                              {vet.verified ? (
+                                <StatusBadge tone="info" size="sm">
+                                  کد نظام تأییدشده
+                                </StatusBadge>
+                              ) : null}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <Pagination
+                page={result.page}
+                pageSize={result.pageSize}
+                total={result.total}
+                totalPages={result.totalPages}
+                hrefFor={hrefFor}
+                label="صفحه‌بندی دامپزشکان"
+              />
+            </section>
+          )}
         </div>
-        <Filter
-          id="specialty"
-          label="تخصص"
-          all="همه تخصص‌ها"
-          value={query.specialty}
-          options={reference.specialties.map((s) => ({ value: s.code, label: s.nameFa }))}
-        />
-        <Filter
-          id="species"
-          label="گونه"
-          all="همه گونه‌ها"
-          value={query.species}
-          options={reference.species.map((s) => ({ value: s.code, label: s.nameFa }))}
-        />
-        <Filter
-          id="province"
-          label="استان"
-          all="همه استان‌ها"
-          value={query.province}
-          options={reference.provinces.map((p) => ({ value: p.code, label: p.nameFa }))}
-        />
-        <Filter
-          id="city"
-          label="شهر"
-          all="همه شهرها"
-          value={query.cityId}
-          options={reference.cities
-            .filter((c) => !query.province || c.provinceCode === query.province)
-            .map((c) => ({ value: c.id, label: c.nameFa + ' — ' + (provinceName.get(c.provinceCode) ?? '') }))}
-        />
-        <Filter
-          id="kind"
-          label="نوع محل کار"
-          all="همه انواع"
-          value={query.kind}
-          options={KINDS.map((kind) => ({ value: kind, label: LOCATION_KIND_FA[kind] }))}
-        />
-        <Filter
-          id="status"
-          label="وضعیت تأیید"
-          all="همه"
-          value={query.status}
-          options={[
-            { value: 'VERIFIED', label: 'کد نظام تأییدشده' },
-            { value: 'TRUSTED', label: 'دامپزشک معتمد همزیست' },
-          ]}
-        />
-        <Button type="submit" data-testid="vet-search-submit">
-          جست‌وجو
-        </Button>
-      </form>
 
-      {result.publishedTotal === 0 ? (
-        <EmptyState
-          title="هنوز پروفایل دامپزشکی منتشر نشده است"
-          description="پروفایل هر دامپزشک پس از بررسی اطلاعات و محل کارش در این فهرست منتشر می‌شود."
-        />
-      ) : result.items.length === 0 ? (
-        <EmptyState
-          title="دامپزشکی با این جست‌وجو پیدا نشد"
-          description="فیلتری را بردارید یا شهر و تخصص دیگری امتحان کنید."
-          action={
-            <ButtonLink tone="secondary" href="/veterinarians">
-              نمایش همه دامپزشکان
-            </ButtonLink>
-          }
-        />
-      ) : (
-        <section aria-labelledby="vet-results-title">
-          <h2 id="vet-results-title" className="text-body-sm text-text-secondary" data-testid="vet-count">
-            {fa(result.total) + ' دامپزشک' + (filtered ? ' با این فیلترها' : '')}
-          </h2>
-          <ul className="mt-md grid gap-md sm:grid-cols-2 lg:grid-cols-3" data-testid="vet-results">
-            {result.items.map((vet) => (
-              <li key={vet.slug}>
-                <Link
-                  href={'/veterinarians/' + vet.slug}
-                  className="flex h-full items-start gap-md rounded-xl border border-border-default bg-bg-surface p-lg transition-colors hover:border-border-control"
-                  data-testid={'vet-card-' + vet.slug}
-                >
-                  {vet.imageFileId !== null ? (
-                    <RecordImage variant="thumb" fileId={vet.imageFileId} altFa={vet.imageAltFa} />
-                  ) : (
-                    <span className="flex size-[40px] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand">
-                      <Icon name="firstAidKit" size="md" />
-                    </span>
-                  )}
-                  <span className="min-w-0 space-y-xs">
-                    <span className="block text-label-lg text-text-primary">{vet.nameFa}</span>
-                    {vet.headlineFa ? <span className="block text-body-sm text-text-secondary">{vet.headlineFa}</span> : null}
-                    {vet.specialtiesFa.length > 0 ? (
-                      <span className="block text-caption text-text-secondary">{vet.specialtiesFa.join('، ')}</span>
-                    ) : null}
-                    {vet.placesFa.length > 0 ? (
-                      <span className="flex items-center gap-2xs text-caption text-text-secondary">
-                        <Icon name="mapPin" size="xs" />
-                        {vet.placesFa.join('، ')}
-                      </span>
-                    ) : null}
-                    <span className="flex flex-wrap gap-xs pt-2xs">
-                      {vet.promoted ? (
-                        <span data-testid={'promoted-' + vet.slug}>
-                          <StatusBadge tone="info">تبلیغ</StatusBadge>
-                        </span>
-                      ) : null}
-                      {vet.owned ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
-                      {vet.verified ? <StatusBadge tone="info">کد نظام تأییدشده</StatusBadge> : null}
-                      {vet.trusted ? <StatusBadge tone="success">معتمد همزیست</StatusBadge> : null}
-                    </span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {result.totalPages > 1 ? (
-            <nav aria-label="صفحه‌بندی دامپزشکان" className="mt-lg flex items-center justify-between gap-md">
-              {result.page > 1 ? (
-                <ButtonLink tone="secondary" href={hrefFor(result.page - 1)}>
-                  صفحه قبل
-                </ButtonLink>
-              ) : (
-                <span />
-              )}
-              <span className="text-body-sm text-text-secondary">
-                {'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}
-              </span>
-              {result.page < result.totalPages ? (
-                <ButtonLink tone="secondary" href={hrefFor(result.page + 1)}>
-                  صفحه بعد
-                </ButtonLink>
-              ) : (
-                <span />
-              )}
-            </nav>
-          ) : null}
-        </section>
-      )}
+        <aside aria-label="فیلترهای دامپزشکان" className="order-first min-w-0 lg:order-none lg:col-start-1 lg:row-start-1">
+          <FilterPanel
+            clearHref="/veterinarians"
+            active={filtered}
+            footer={
+              <Button type="submit" tone="secondary" size="sm" form={FORM}>
+                اعمال فیلترها
+              </Button>
+            }
+          >
+            <FilterSelect
+              id="vet-specialty"
+              form={FORM}
+              name="specialty"
+              label="تخصص"
+              all="همه تخصص‌ها"
+              value={query.specialty}
+              testId="vet-filter-specialty"
+              options={reference.specialties.map((s) => ({ value: s.code, label: s.nameFa }))}
+            />
+            <FilterSelect
+              id="vet-species"
+              form={FORM}
+              name="species"
+              label="گونه"
+              all="همه گونه‌ها"
+              value={query.species}
+              testId="vet-filter-species"
+              options={reference.species.map((s) => ({ value: s.code, label: s.nameFa }))}
+            />
+            <FilterSelect
+              id="vet-province"
+              form={FORM}
+              name="province"
+              label="استان"
+              all="همه استان‌ها"
+              value={query.province}
+              testId="vet-filter-province"
+              options={reference.provinces.map((p) => ({ value: p.code, label: p.nameFa }))}
+            />
+            <FilterSelect
+              id="vet-city"
+              form={FORM}
+              name="city"
+              label="شهر"
+              all="همه شهرها"
+              value={query.cityId}
+              testId="vet-filter-city"
+              options={reference.cities
+                .filter((c) => !query.province || c.provinceCode === query.province)
+                .map((c) => ({ value: c.id, label: c.nameFa + ' — ' + (provinceName.get(c.provinceCode) ?? '') }))}
+            />
+            <FilterSelect
+              id="vet-kind"
+              form={FORM}
+              name="kind"
+              label="نوع محل کار"
+              all="همه انواع"
+              value={query.kind}
+              testId="vet-filter-kind"
+              options={KINDS.map((kind) => ({ value: kind, label: LOCATION_KIND_FA[kind] }))}
+            />
+            <FilterSelect
+              id="vet-status"
+              form={FORM}
+              name="status"
+              label="وضعیت تأیید"
+              all="همه"
+              value={query.status}
+              testId="vet-filter-status"
+              options={[
+                { value: 'VERIFIED', label: 'کد نظام تأییدشده' },
+                { value: 'TRUSTED', label: 'دامپزشک معتمد همزیست' },
+              ]}
+            />
+          </FilterPanel>
+        </aside>
+      </div>
     </div>
   );
 }

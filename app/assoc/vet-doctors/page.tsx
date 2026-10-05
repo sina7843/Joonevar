@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, ViewChips } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { doctorCaseQueue } from '../../../src/vets/doctor-application.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
@@ -35,46 +34,34 @@ export default async function AssocVetDoctorsPage({ searchParams }: { searchPara
 
   return (
     <OpsShell actor={guard.actor} title="کد نظام دامپزشکان" pathname="/assoc/vet-doctors" nav={ASSOC_NAV}>
-      <nav className="mb-lg flex flex-wrap gap-md" aria-label="نمای صف">
-        {VIEWS.map((item) => (
-          <Link
-            key={item.key}
-            href={'/assoc/vet-doctors?view=' + item.key}
-            aria-current={item.key === view ? 'page' : undefined}
-            className={item.key === view ? 'text-label-md text-text-brand underline underline-offset-4' : 'text-label-md text-text-secondary'}
-            data-testid={'doctor-view-' + item.key}
-          >
-            {item.labelFa}
-          </Link>
-        ))}
-      </nav>
+      <ViewChips
+        chips={VIEWS.map((item) => ({
+          key: item.key,
+          href: '/assoc/vet-doctors?view=' + item.key,
+          label: item.labelFa,
+          current: item.key === view,
+          testId: 'doctor-view-' + item.key,
+        }))}
+      />
       {page.items.length === 0 ? (
         <EmptyState title="پرونده‌ای در این نما نیست" description="درخواست‌های دکتر دامپزشک در همین صف دیده می‌شوند." />
       ) : (
-        <ul className="space-y-md" data-testid="doctor-queue">
+        <CaseList label="صف پرونده‌ها" testId="doctor-queue">
           {page.items.map((item) => (
-            <li key={item.id}>
-              <Card>
-                <div className="flex items-start justify-between gap-md">
-                  <div className="min-w-0">
-                    <h2 className="hz-card__title">{item.displayNameFa ?? '—'}</h2>
-                    <p className="mt-2xs text-caption text-text-secondary">
-                      {(item.claim ? 'Claim پروفایل بدون مالک · ' : 'پروفایل تازه · ') + (item.practiceScope ? SCOPE_FA[item.practiceScope] + ' · ' : '') + 'کد نظام '}
-                      <span dir="ltr">{item.councilCode ?? '—'}</span>
-                      {' · نسخه ' + item.submissionVersion.toLocaleString('fa-IR') + ' · ' + formatInstantFa(new Date(item.updatedAt))}
-                    </p>
-                  </div>
-                  <StatusBadge tone={view === 'OPEN' ? 'info' : view === 'CORRECTION' ? 'warning' : 'neutral'}>{item.statusFa}</StatusBadge>
-                </div>
-                <p className="mt-lg">
-                  <Link href={'/assoc/vet-doctors/' + item.id} className="text-label-md text-text-brand underline underline-offset-4" data-testid="open-doctor-case">
-                    بررسی پرونده
-                  </Link>
-                </p>
-              </Card>
-            </li>
+            <CaseItem
+              key={item.id}
+              name={item.displayNameFa ?? '—'}
+              href={'/assoc/vet-doctors/' + item.id}
+              linkLabel="بررسی پرونده"
+              linkTestId="open-doctor-case"
+              sub={<>{(item.claim ? 'Claim پروفایل بدون مالک · ' : 'پروفایل تازه · ') + (item.practiceScope ? SCOPE_FA[item.practiceScope] + ' · ' : '') + 'کد نظام '}<bdi dir="ltr">{item.councilCode ?? '—'}</bdi>{' · نسخه ' + item.submissionVersion.toLocaleString('fa-IR') + ' · ' + formatInstantFa(new Date(item.updatedAt))}</>}
+              ageDays={ageInDays(new Date(item.updatedAt))}
+              status={{ tone: view === 'OPEN' ? 'info' : view === 'CORRECTION' ? 'warning' : 'neutral', label: item.statusFa }}
+              owner={view === 'OPEN' ? 'ASSOCIATION' : view === 'CORRECTION' ? 'USER' : null}
+              ownerIsUs
+            />
           ))}
-        </ul>
+        </CaseList>
       )}
     </OpsShell>
   );

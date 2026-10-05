@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { Alert } from '../../../../src/ui/alert.tsx';
@@ -49,8 +50,8 @@ export default async function SellerOrdersPage({
   const orders = await sellerOrders(db(), guard.actor, store.id);
 
   return (
-    <PublicShell actor={guard.actor} title="سفارش‌های فروشگاه" pathname="/account/seller">
-      <div className="space-y-lg p-lg">
+    <PublicShell actor={guard.actor} title="سفارش‌های فروشگاه" pathname="/account/seller" header={<PageHeader title="سفارش‌های فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+      <div className="space-y-xl">
       <h2 className="text-h2">سفارش‌های {store.displayNameFa ?? 'فروشگاه'}</h2>
 
       {stores.length > 1 ? (
@@ -79,11 +80,11 @@ export default async function SellerOrdersPage({
           هنوز سفارشی برای این فروشگاه ثبت نشده است.
         </p>
       ) : (
-        <ul className="space-y-lg" data-testid="seller-orders">
+        <ul className="hz-cardlist" data-testid="seller-orders">
           {orders.map((row) => (
             <li
               key={row.subOrder.id}
-              className="space-y-md rounded-xl border border-border-default p-lg"
+              className="hz-cardlist__item"
               data-testid={'seller-suborder-' + row.subOrder.id}
             >
               <header className="flex flex-wrap items-center justify-between gap-sm">
@@ -135,7 +136,7 @@ export default async function SellerOrdersPage({
               </section>
 
               {row.subOrder.acceptanceDueAt && row.subOrder.status === 'PAID' ? (
-                <p className="text-caption text-text-danger" data-testid={'seller-due-' + row.subOrder.id}>
+                <p className="text-caption text-status-error-text" data-testid={'seller-due-' + row.subOrder.id}>
                   مهلت پذیرش: {row.subOrder.acceptanceDueAt.toLocaleString('fa-IR')} — پس از آن این زیرسفارش
                   به‌صورت خودکار لغو و مبلغش بازگردانده می‌شود.
                 </p>

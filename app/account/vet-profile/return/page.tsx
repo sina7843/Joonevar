@@ -2,9 +2,8 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { currentPaymentGateway } from '../../../../src/adapters/current.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
-import { Alert } from '../../../../src/ui/alert.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { PaymentResult } from '../../../../src/ui/payment-result.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { verifyAttempt } from '../../../../src/billing/payments.ts';
 import { paidEffects } from '../../../../src/billing/effects.ts';
@@ -12,7 +11,7 @@ import { paidEffects } from '../../../../src/billing/effects.ts';
 export const dynamic = 'force-dynamic';
 
 /**
- * Return from the gateway for a licence period — Phase 2.5 PROMPT-008.
+ * Return from the gateway for a licence period — Phase 2.5 PROMPT-008 (P08).
  *
  * Landing here proves nothing: the page runs the server-side verification and
  * reports what that call actually found. The licensed tag and the active period
@@ -27,46 +26,37 @@ export default async function VetLicencePeriodReturnPage({ searchParams }: { sea
     ? await verifyAttempt(db(), { reference, providerRef: providerRef ?? null }, await currentPaymentGateway(), paidEffects)
     : ({ state: 'UNKNOWN_REFERENCE' } as const);
 
+  const facts = [{ key: 'خدمت', value: 'دوره فعالیت پروانه' }];
+  const back = (
+    <ButtonLink href="/account/vet-profile" block tone={outcome.state === 'PAID' ? 'primary' : 'secondary'}>
+      بازگشت به پروفایل دامپزشکی
+    </ButtonLink>
+  );
+
   return (
     <PublicShell actor={guard.actor} title="نتیجه پرداخت دوره فعالیت" pathname="/account/vet-profile/return">
-      <div className="space-y-lg">
-        {outcome.state === 'PAID' ? (
-          <div data-testid="licence-period-paid">
-            <Alert tone="success" title="پرداخت تأیید شد">
-              دوره فعالیت پروانه شما ثبت شد و Tag «دارای پروانه فعالیت» فعال است.
-            </Alert>
-          </div>
-        ) : null}
-
-        {outcome.state === 'FAILED' ? (
-          <div data-testid="licence-period-failed">
-            <Alert tone="error" title="پرداخت تأیید نشد">
-              {outcome.reasonFa + ' مدارک و تأیید پروانه شما حفظ شده است و می‌توانید دوباره تلاش کنید.'}
-            </Alert>
-          </div>
-        ) : null}
-
-        {outcome.state === 'CANCELLED' ? (
-          <Alert tone="warning" title="پرداخت لغو شد">
-            مبلغ ثبت‌شده همان است و می‌توانید دوباره از پروفایل دامپزشکی اقدام کنید.
-          </Alert>
-        ) : null}
-
-        {outcome.state === 'UNKNOWN_REFERENCE' ? (
-          <Alert tone="error" title="این بازگشت پرداخت شناسایی نشد">
-            هیچ پرداختی با این شناسه پیدا نشد. اگر مبلغی از حساب شما کسر شده، از پشتیبانی پیگیری کنید.
-          </Alert>
-        ) : null}
-
-        <Card>
-          <p className="text-body-sm text-text-secondary">وضعیت پرداخت فقط بر اساس تأیید سرور اعلام می‌شود؛ رسیدن به این صفحه به‌تنهایی سند پرداخت نیست.</p>
-          <div className="mt-lg">
-            <ButtonLink href="/account/vet-profile" block>
-              بازگشت به پروفایل دامپزشکی
-            </ButtonLink>
-          </div>
-        </Card>
-      </div>
+      {outcome.state === 'PAID' ? (
+        <PaymentResult
+          state="PAID"
+          testId="licence-period-paid"
+          title="پرداخت تأیید شد"
+          facts={facts}
+          next={['دوره فعالیت پروانه شما ثبت شد و Tag «دارای پروانه فعالیت» فعال است.']}
+          actions={back}
+        />
+      ) : outcome.state === 'FAILED' ? (
+        <PaymentResult state="FAILED" testId="licence-period-failed" title="پرداخت تأیید نشد" facts={facts} actions={back}>
+          {outcome.reasonFa + ' مدارک و تأیید پروانه شما حفظ شده است و می‌توانید دوباره تلاش کنید.'}
+        </PaymentResult>
+      ) : outcome.state === 'CANCELLED' ? (
+        <PaymentResult state="CANCELLED" title="پرداخت لغو شد" facts={facts} actions={back}>
+          مبلغ ثبت‌شده همان است و می‌توانید دوباره از پروفایل دامپزشکی اقدام کنید.
+        </PaymentResult>
+      ) : (
+        <PaymentResult state="UNKNOWN" title="این بازگشت پرداخت شناسایی نشد" actions={back}>
+          هیچ پرداختی با این شناسه پیدا نشد. اگر مبلغی از حساب شما کسر شده، از پشتیبانی پیگیری کنید.
+        </PaymentResult>
+      )}
     </PublicShell>
   );
 }

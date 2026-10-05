@@ -6,7 +6,7 @@ import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
 import { Card, CardHeader } from '../../../../../src/ui/card.tsx';
 import { Alert } from '../../../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge } from '../../../../../src/ui/status.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { communities } from '../../../../../src/db/schema/communities.ts';
 import { clubJoinView } from '../../../../../src/clubs/enrollment.ts';
@@ -54,7 +54,7 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
             subtitle="عضویت در کلاب با خود کلاب است؛ همزیست فقط شرط‌های اعلام‌شده کلاب را روی پرونده شما بررسی می‌کند."
             badge={status ? { tone: CLUB_MEMBERSHIP_TONE[status], label: CLUB_MEMBERSHIP_STATUS_SHORT_FA[status] } : undefined}
           />
-          <Link href={'/clubs/' + slug} className="mt-md inline-block text-body-sm text-text-brand">
+          <Link href={'/clubs/' + slug} className="hz-link hz-link--standalone mt-md hz-body-sm">
             بازگشت به صفحه کلاب
           </Link>
         </Card>
@@ -86,6 +86,15 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
               <p className="mt-sm text-body-md" data-testid="club-join-status">
                 {status ? CLUB_MEMBERSHIP_STATUS_FA[status] : 'هنوز درخواستی نداده‌اید.'}
               </p>
+              {status === 'PENDING_REVIEW' ? (
+                <div className="mt-sm">
+                  <ActionOwner owner="COUNTERPARTY" extra="کلاب درخواست را بررسی می‌کند" />
+                </div>
+              ) : status === 'AWAITING_PAYMENT' ? (
+                <div className="mt-sm">
+                  <ActionOwner owner="USER" extra="پرداخت حق عضویت" />
+                </div>
+              ) : null}
               {view.membership?.decisionReasonFa ? (
                 <p className="mt-xs text-body-sm text-text-secondary">{'پیام کلاب: ' + view.membership.decisionReasonFa}</p>
               ) : null}
@@ -95,7 +104,7 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
               {unmet.length > 0 ? (
                 <>
                   <p className="mt-md text-body-sm">آنچه هنوز برقرار نیست:</p>
-                  <ul className="mt-xs list-disc space-y-2xs pr-md text-body-sm text-text-secondary" data-testid="club-join-unmet">
+                  <ul className="mt-xs list-disc space-y-2xs ps-md text-body-sm text-text-secondary" data-testid="club-join-unmet">
                     {unmet.map((reason) => (
                       <li key={reason}>{reason}</li>
                     ))}

@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { AccessDenied } from '../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../src/ui/shell.tsx';
-import { Card } from '../../src/ui/card.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
 import { StatusBadge } from '../../src/ui/status.tsx';
+import { PageHeader } from '../../src/ui/section-header.tsx';
+import { Pagination } from '../../src/ui/pagination.tsx';
 import { db } from '../../src/db/client.ts';
 import { myPayments } from '../../src/billing/receipts.ts';
 import { formatInstantFa } from '../../src/content/model.ts';
@@ -22,12 +23,11 @@ const TONE: Record<string, 'success' | 'warning' | 'neutral' | 'error'> = {
 };
 
 /**
- * Everything this account has paid for — Phase 2.5 §9 (PROMPT-015).
+ * Everything this account has paid for — Phase 2.5 §9 (PROMPT-015), P05
+ * DataTable with PaymentRow cells, restacked as cards below 768.
  *
- * Until now a payment could only be read one batch at a time, from inside the
- * flow that made it, so there was nowhere to answer "what did I pay, and did it
- * go through". Only the account's own payments are listed; the filter is the
- * account id, not a parameter.
+ * Only the account's own payments are listed; the filter is the account id,
+ * not a parameter.
  */
 export default async function PaymentsPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
   const guard = await guardRoute('/payments');
@@ -38,62 +38,85 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
   const result = await myPayments(db(), guard.actor, { page, pageSize: 20 });
 
   return (
-    <PublicShell actor={guard.actor} title="پرداخت‌ها و رسیدها" pathname="/payments">
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">پرداخت‌ها و رسیدها</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            هر پرداخت با مبلغی که در لحظه شروع آن قفل شده ثبت می‌شود. پرداخت وقتی «پرداخت‌شده» است که سرور آن را با درگاه تأیید کرده باشد، نه وقتی مرورگر از درگاه برگشته باشد.
-          </p>
-        </Card>
+    <PublicShell
+      actor={guard.actor}
+      title="پرداخت‌ها و رسیدها"
+      pathname="/payments"
+      header={
+        <PageHeader title="پرداخت‌ها و رسیدها" meta={result.total > 0 ? [fa(result.total) + ' پرداخت'] : undefined} />
+      }
+    >
+      <p className="text-body-sm text-text-secondary">
+        هر پرداخت با مبلغی که در لحظه شروع آن قفل شده ثبت می‌شود. پرداخت وقتی «پرداخت‌شده» است که سرور آن را با درگاه
+        تأیید کرده باشد، نه وقتی مرورگر از درگاه برگشته باشد.
+      </p>
 
-        {result.items.length === 0 ? (
-          <EmptyState title="هنوز پرداختی ثبت نشده است" description="پرداخت‌های شما پس از شروع، همین‌جا با وضعیت و رسیدشان دیده می‌شوند." />
-        ) : (
-          <ul className="space-y-sm" data-testid="payment-list">
-            {result.items.map((line) => (
-              <li key={line.batchId}>
-                <Link
-                  href={'/payments/' + line.batchId}
-                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
-                  data-testid={'payment-' + line.batchId}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-sm">
-                    <div className="min-w-0">
-                      <p className="text-label-lg">{line.serviceFa}</p>
-                      <p className="mt-2xs text-caption text-text-secondary">{formatInstantFa(line.createdAt)}</p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-xs">
-                      <span className="text-body-sm">{fa(line.totalToman) + ' تومان'}</span>
-                      <StatusBadge tone={TONE[line.status] ?? 'neutral'}>{line.statusFa}</StatusBadge>
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+      {result.items.length === 0 ? (
+        <EmptyState
+          title="هنوز پرداختی ثبت نشده است"
+          description="پرداخت‌های شما پس از شروع، همین‌جا با وضعیت و رسیدشان دیده می‌شوند."
+        />
+      ) : (
+        <div className="hz-table-wrap" data-testid="payment-list">
+          <table className="hz-table hz-table--stack">
+            <caption className="hz-visually-hidden">پرداخت‌های من</caption>
+            <thead>
+              <tr>
+                <th scope="col">خدمت</th>
+                <th scope="col">کد پیگیری درگاه</th>
+                <th scope="col" className="hz-num">
+                  مبلغ
+                </th>
+                <th scope="col">وضعیت</th>
+              </tr>
+            </thead>
+            <tbody>
+              {result.items.map((line) => (
+                <tr key={line.batchId}>
+                  <td className="hz-table__lead">
+                    <span className="hz-payment">
+                      <Link
+                        href={'/payments/' + line.batchId}
+                        className="hz-case__name hz-payment__service"
+                        data-testid={'payment-' + line.batchId}
+                      >
+                        {line.serviceFa}
+                      </Link>
+                      <span className="hz-payment__date">{formatInstantFa(line.createdAt)}</span>
+                    </span>
+                  </td>
+                  <td data-label="کد پیگیری درگاه">
+                    {line.providerRef ? (
+                      <bdi className="hz-id hz-payment__id" dir="ltr">
+                        {line.providerRef}
+                      </bdi>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
+                  <td data-label="مبلغ" className="hz-num hz-payment__amount">
+                    {fa(line.totalToman) + ' تومان'}
+                  </td>
+                  <td data-label="وضعیت">
+                    <StatusBadge size="sm" tone={TONE[line.status] ?? 'neutral'}>
+                      {line.statusFa}
+                    </StatusBadge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-        {result.totalPages > 1 ? (
-          <nav aria-label="صفحه‌بندی پرداخت‌ها" className="flex items-center justify-between gap-md">
-            {result.page > 1 ? (
-              <Link href={'/payments?page=' + (result.page - 1)} className="text-body-sm text-text-brand">
-                صفحه قبل
-              </Link>
-            ) : (
-              <span />
-            )}
-            <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-            {result.page < result.totalPages ? (
-              <Link href={'/payments?page=' + (result.page + 1)} className="text-body-sm text-text-brand">
-                صفحه بعد
-              </Link>
-            ) : (
-              <span />
-            )}
-          </nav>
-        ) : null}
-      </div>
+      <Pagination
+        page={result.page}
+        pageSize={result.pageSize}
+        total={result.total}
+        totalPages={result.totalPages}
+        hrefFor={(n) => '/payments?page=' + n}
+        label="صفحه‌بندی پرداخت‌ها"
+      />
     </PublicShell>
   );
 }

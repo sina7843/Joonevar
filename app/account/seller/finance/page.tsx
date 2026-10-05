@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { Card } from '../../../../src/ui/card.tsx';
@@ -46,8 +47,8 @@ export default async function SellerFinancePage({
   const store = stores.find((row) => row.id === requested) ?? stores[0] ?? null;
   if (store === null) {
     return (
-      <PublicShell actor={guard.actor} title="مالی فروشگاه" pathname="/account/seller">
-        <div className="space-y-lg p-lg">
+      <PublicShell actor={guard.actor} title="مالی فروشگاه" pathname="/account/seller" header={<PageHeader title="مالی فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+        <div className="space-y-xl">
           <p className="text-body-sm text-text-secondary" data-testid="finance-no-store">
             هنوز فروشگاهی ندارید.
           </p>
@@ -59,24 +60,24 @@ export default async function SellerFinancePage({
   const view = await financeFor(db(), guard.actor, store.id);
 
   return (
-    <PublicShell actor={guard.actor} title="مالی فروشگاه" pathname="/account/seller">
-      <div className="space-y-lg p-lg">
-        <p className="text-caption">
-          <Link href="/account/seller" className="text-text-brand" data-testid="back-to-store">
+    <PublicShell actor={guard.actor} title="مالی فروشگاه" pathname="/account/seller" header={<PageHeader title="مالی فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+      <div className="space-y-xl">
+        <p>
+          <Link href="/account/seller" className="hz-link hz-link--standalone" data-testid="back-to-store">
             بازگشت به فروشگاه من
           </Link>
         </p>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>موجودی‌ها</span></h2></div>
+          <SectionHeader size="sm" title="موجودی‌ها" />
           <p className="mt-2xs text-caption text-text-secondary" data-testid="balances-note">
             هیچ‌کدام از این عددها جایی نوشته نشده‌اند؛ هرکدام جمع ردیف‌های دفتر زیر است.
           </p>
-          <dl className="mt-md grid gap-sm md:grid-cols-4" data-testid="balances">
+          <dl className="mt-md grid grid-cols-2 gap-sm md:grid-cols-4" data-testid="balances">
             {(['PENDING', 'HELD', 'AVAILABLE', 'DEBT'] as LedgerBucket[]).map((bucket) => (
-              <div key={bucket} className="rounded-lg border border-border-default p-md">
-                <dt className="text-caption text-text-secondary">{LEDGER_BUCKET_FA[bucket]}</dt>
-                <dd className="text-label-lg" data-testid={'balance-' + bucket}>
+              <div key={bucket} className="hz-stat-tile">
+                <dt className="hz-stat-tile__label">{LEDGER_BUCKET_FA[bucket]}</dt>
+                <dd className="hz-stat-tile__value hz-stat-tile__value--long" data-testid={'balance-' + bucket}>
                   {fa(view.balances[bucket])} تومان
                 </dd>
               </div>
@@ -85,7 +86,7 @@ export default async function SellerFinancePage({
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تسویه</span></h2></div>
+          <SectionHeader size="sm" title="تسویه" />
           <p className="mt-2xs text-body-sm" data-testid="settlement-preview">
             دوره فعلی: {CADENCE_FA[view.preview.cadence as Cadence]} — پایان دوره جاری{' '}
             {view.preview.periodEnd.toLocaleDateString('fa-IR')} — قابل واریز {fa(view.preview.payoutToman)} تومان
@@ -118,17 +119,17 @@ export default async function SellerFinancePage({
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دسته‌های تسویه</span></h2></div>
+          <SectionHeader size="sm" title="دسته‌های تسویه" />
           {view.batches.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="batches-empty">
               هنوز دسته تسویه‌ای ساخته نشده است.
             </p>
           ) : (
-            <ul className="mt-md space-y-sm" data-testid="batches">
+            <ul className="hz-cardlist mt-md" data-testid="batches">
               {view.batches.map((batch) => (
                 <li
                   key={batch.id}
-                  className="flex flex-wrap items-center justify-between gap-sm text-body-sm"
+                  className="hz-cardlist__item hz-cardlist__row text-body-sm"
                   data-testid={'batch-' + batch.id}
                 >
                   <span>
@@ -147,7 +148,7 @@ export default async function SellerFinancePage({
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دفتر مالی</span></h2></div>
+          <SectionHeader size="sm" title="دفتر مالی" />
           {view.entries.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="ledger-empty">
               هنوز ردیفی در دفتر مالی این فروشگاه ثبت نشده است.

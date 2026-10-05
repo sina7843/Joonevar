@@ -7,9 +7,13 @@ import { site } from '../../../../src/public/request.ts';
 import { JsonLdScript } from '../../../../src/seo/json-ld.tsx';
 import { breadcrumbLd } from '../../../../src/seo/structured-data.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
+import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { ProductCard, StockBadge } from '../product-card.tsx';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
-import { publicProduct } from '../../../../src/commerce/shop-discovery.ts';
+import { parseShopFilter, publicProduct, shopPage } from '../../../../src/commerce/shop-discovery.ts';
+
 import { OFFER_CONDITION_FA, type OfferCondition } from '../../../../src/commerce/catalog-model.ts';
 import { AddToCartForm } from '../../../../src/commerce/order-forms.tsx';
 import { setCartLineAction } from '../cart/actions.ts';
@@ -85,152 +89,217 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
     { name: 'فروشگاه', path: '/shop' },
     { name: product.nameFa, path: product.path },
   ];
+  // «کالاهای مرتبط»: the newest public products, this one left out. Hidden when there are none.
+  const related = (await shopPage(db(), { ...parseShopFilter({}), page: 1 })).items.filter((item) => item.id !== product.id).slice(0, 4);
 
   return (
-    <div className="space-y-lg">
-      <JsonLdScript data={breadcrumbLd(crumbs, origin)} />
-      <Breadcrumbs items={crumbs} origin={origin} />
+    <div className="space-y-s48 lg:space-y-s64">
+      <div className="space-y-xl">
+        <JsonLdScript data={breadcrumbLd(crumbs, origin)} />
+        <Breadcrumbs items={crumbs} origin={origin} />
 
-      <header className="space-y-sm">
-        <h1 className="text-h2">{product.nameFa}</h1>
-        <p className="text-caption text-text-secondary">
-          {[product.brandFa, product.categoryNameFa].filter(Boolean).join(' · ')}
-        </p>
-        <p className="text-label-lg" data-testid="product-price">
-          {cheapest === null ? 'قیمتی ثبت نشده' : 'از ' + fa(cheapest.priceToman) + ' تومان'}
-        </p>
-      </header>
+        <div className="grid gap-xl lg:grid-cols-2 lg:items-start">
+          {/* Gallery: 1:1, the first photo large, the rest below it. */}
+          <div className="min-w-0 lg:sticky lg:top-[calc(var(--header-site)+24px)]">
+            {product.media.length > 0 ? (
+              <ul className="grid grid-cols-4 gap-sm" data-testid="product-images">
+                {product.media.map((image, index) => (
+                  <li key={index + image.fileId} className={index === 0 ? 'col-span-4' : undefined}>
+                    <RecordImage fileId={image.fileId} altFa={image.altFa} variant="1x1" priority={index === 0} className="rounded-xl border border-border-default" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <RecordImage fileId={null} altFa={product.nameFa} variant="1x1" className="rounded-xl border border-border-default" />
+            )}
+          </div>
 
-      {product.media.length > 0 ? (
-        <ul className="grid gap-md md:grid-cols-2" data-testid="product-images">
-          {product.media.map((image, index) => (
-            <li key={image.fileId}>
-              <RecordImage fileId={image.fileId} altFa={image.altFa} variant="banner" priority={index === 0} />
-            </li>
-          ))}
-        </ul>
-      ) : null}
+          <div className="min-w-0 space-y-lg">
+            <header className="space-y-sm border-b border-border-subtle pb-lg">
+              <ul className="hz-tag-list">
+                {product.brandFa ? <li className="hz-tag">{product.brandFa}</li> : null}
+                <li className="hz-tag hz-tag--neutral">{product.categoryNameFa}</li>
+              </ul>
+              <h1 className="hz-h2">{product.nameFa}</h1>
+              {rating.count > 0 ? (
+                <span className="hz-rating" role="img" aria-label={'امتیاز ' + fa(rating.overall) + ' از ۵، ' + fa(rating.count) + ' نظر'}>
+                  <Icon name="star" size="xs" weight="fill" />
+                  {fa(rating.overall)}
+                  <span className="hz-rating__count">{'(' + fa(rating.count) + ' نظر)'}</span>
+                </span>
+              ) : (
+                <span className="hz-caption">هنوز نظری ثبت نشده است</span>
+              )}
+            </header>
 
-      {product.descriptionFa ? (
-        <section className="space-y-sm rounded-xl border border-border-default p-lg">
-          <h2 className="hz-card__title">درباره این کالا</h2>
-          <p className="text-body-sm" data-testid="product-description">
-            {product.descriptionFa}
-          </p>
+            <div className="flex flex-wrap items-center gap-md">
+              <div className={cheapest === null ? 'hz-price hz-price--lg hz-price--unset' : 'hz-price hz-price--lg'} data-testid="product-price">
+                {cheapest === null ? (
+                  <span className="hz-price__amount">قیمتی ثبت نشده</span>
+                ) : (
+                  <>
+                    <span className="hz-price__from">از</span> <span className="hz-price__amount">{fa(cheapest.priceToman)}</span>{' '}
+                    <span className="hz-price__unit">تومان</span>
+                  </>
+                )}
+              </div>
+              {cheapest ? <StockBadge available={product.offers.reduce((sum, offer) => sum + offer.available, 0)} /> : null}
+            </div>
+
+            <section aria-labelledby="offers-title" className="space-y-md">
+              <SectionHeader size="sm" id="offers-title" title="فروشندگان این کالا" count={fa(product.offers.length)} />
+              <ul className="space-y-md" data-testid="product-offers">
+                {product.offers.map((offer) => (
+                  <li key={offer.offerId} className="hz-card hz-seller space-y-md" data-testid={'offer-' + offer.offerId}>
+                    <div className="flex flex-wrap items-start justify-between gap-sm">
+                      <div className="hz-entity">
+                        <RecordImage variant="thumb" fileId={null} altFa={null} />
+                        <div className="hz-entity__body">
+                          <h3 className="hz-entity__name">{offer.sellerNameFa}</h3>
+                          <span className="hz-entity__meta">
+                            {[OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? offer.condition, product.variantLabels[offer.offerId]]
+                              .filter(Boolean)
+                              .join('، ')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-xs">
+                        <div className="hz-price">
+                          <span className="hz-price__amount">{fa(offer.priceToman)}</span> <span className="hz-price__unit">تومان</span>
+                        </div>
+                        <StockBadge available={offer.available} size="sm">
+                          {offer.available > 0 ? 'موجود: ' + fa(offer.available) : 'ناموجود'}
+                        </StockBadge>
+                      </div>
+                    </div>
+                    {signedIn ? (
+                      <AddToCartForm action={setCartLineAction} skuId={offer.skuId} available={offer.available} labelFa={offer.sellerNameFa} />
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+              {signedIn ? (
+                <p className="hz-body-sm">
+                  <Link href="/shop/cart" className="hz-link hz-link--standalone" data-testid="product-go-to-cart">
+                    <Icon name="shoppingCart" size="xs" />
+                    رفتن به سبد خرید
+                  </Link>
+                </p>
+              ) : (
+                <div className="hz-card hz-card--subtle flex flex-wrap items-center justify-between gap-sm">
+                  <p className="hz-body-sm" data-testid="product-order-note">
+                    برای افزودن به سبد خرید وارد حساب خود شوید.
+                  </p>
+                  <ButtonLink href={'/login?returnTo=' + encodeURIComponent(product.path)} tone="secondary" size="sm" iconStart="signIn">
+                    ورود / ثبت‌نام
+                  </ButtonLink>
+                </div>
+              )}
+              {signedIn ? <SaveForm action={toggleSavedAction} productId={product.id} saved={saved} /> : null}
+            </section>
+          </div>
+        </div>
+
+        <div className="grid gap-xl lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
+          <section aria-labelledby="specs-title" className="space-y-lg">
+            <SectionHeader id="specs-title" title="توضیحات و مشخصات" />
+            <div className="hz-card space-y-lg">
+              {product.descriptionFa ? (
+                <div className="space-y-xs">
+                  <h3 className="hz-card__title">درباره این کالا</h3>
+                  <p className="hz-body" data-testid="product-description">
+                    {product.descriptionFa}
+                  </p>
+                </div>
+              ) : null}
+              <div className="space-y-xs">
+                <h3 className="hz-card__title">مشخصات</h3>
+                {Object.keys(product.specifications).length === 0 ? (
+                  <p className="hz-caption">مشخصه‌ای ثبت نشده است.</p>
+                ) : (
+                  <dl className="hz-kv" data-testid="product-specifications">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="hz-kv__row">
+                        <dt className="hz-kv__key">{key}</dt>
+                        <dd className="hz-kv__value">{String(value)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                <p className="hz-caption" data-testid="product-species">
+                  مناسب برای: {product.speciesCodes.join('، ') || 'اعلام نشده'}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div className="space-y-xl">
+            <section aria-labelledby="rating-title" className="space-y-lg">
+              <SectionHeader id="rating-title" title="نظر خریداران" />
+              <div className="hz-card space-y-md">
+                <p className="hz-h3" data-testid="product-rating">
+                  {rating.count === 0
+                    ? 'هنوز نظری ثبت نشده است.'
+                    : fa(rating.overall) + ' از ۵ — بر پایه ' + fa(rating.count) + ' نظر'}
+                </p>
+                <p className="hz-caption" data-testid="product-rating-note">
+                  نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد، و امتیاز تنها از همین نظرها ساخته می‌شود.
+                </p>
+                {reviews.length > 0 ? (
+                  <ul className="divide-y divide-border-subtle" data-testid="product-reviews">
+                    {reviews.map((view) => (
+                      <li key={view.row.id} className="hz-body-sm py-sm" data-testid={'product-review-' + view.row.id}>
+                        {view.dimensionsFa[0]}: {fa(view.row.scoreOne)} — {view.dimensionsFa[1]}: {fa(view.row.scoreTwo)} —{' '}
+                        {view.dimensionsFa[2]}: {fa(view.row.scoreThree)}
+                        {view.row.bodyFa ? ' — ' + view.row.bodyFa : ''}
+                        {view.row.replyFa ? ' — پاسخ فروشنده: ' + view.row.replyFa : ''}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </section>
+
+            <section aria-labelledby="questions-title" className="space-y-lg">
+              <SectionHeader id="questions-title" title="پرسش و پاسخ" />
+              <div className="hz-card space-y-md">
+                {questions.length === 0 ? (
+                  <p className="hz-caption" data-testid="product-questions-empty">
+                    هنوز پرسشی درباره این کالا منتشر نشده است.
+                  </p>
+                ) : (
+                  <ul className="divide-y divide-border-subtle" data-testid="product-questions">
+                    {questions.map((question) => (
+                      <li key={question.id} className="hz-body-sm py-sm" data-testid={'product-question-' + question.id}>
+                        {question.bodyFa}
+                        {question.answerFa ? ' — پاسخ: ' + question.answerFa : ''}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {signedIn ? <AskQuestionForm action={askQuestionAction} productId={product.id} /> : null}
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      {related.length > 0 ? (
+        <section aria-labelledby="related-title">
+          <SectionHeader id="related-title" title="کالاهای مرتبط" link={{ href: '/shop' }} />
+          <ul className="grid grid-cols-2 gap-md md:gap-s20 lg:grid-cols-4">
+            {related.map((item) => (
+              <li key={item.id}>
+                <ProductCard item={item} />
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مشخصات</span></h2></div>
-        {Object.keys(product.specifications).length === 0 ? (
-          <p className="text-caption text-text-secondary">مشخصه‌ای ثبت نشده است.</p>
-        ) : (
-          <dl className="grid gap-sm text-body-sm md:grid-cols-2" data-testid="product-specifications">
-            {Object.entries(product.specifications).map(([key, value]) => (
-              <div key={key}>
-                <dt className="text-caption text-text-secondary">{key}</dt>
-                <dd>{String(value)}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-        <p className="text-caption text-text-secondary" data-testid="product-species">
-          مناسب برای: {product.speciesCodes.join('، ') || 'اعلام نشده'}
-        </p>
-      </section>
-
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>امتیاز خریداران</span></h2></div>
-        <p className="text-body-sm" data-testid="product-rating">
-          {rating.count === 0
-            ? 'هنوز نظری ثبت نشده است.'
-            : fa(rating.overall) + ' از ۵ — بر پایه ' + fa(rating.count) + ' نظر'}
-        </p>
-        <p className="text-caption text-text-secondary" data-testid="product-rating-note">
-          نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد، و امتیاز تنها از همین نظرها ساخته می‌شود.
-        </p>
-        {reviews.length > 0 ? (
-          <ul className="space-y-2xs text-body-sm" data-testid="product-reviews">
-            {reviews.map((view) => (
-              <li key={view.row.id} data-testid={'product-review-' + view.row.id}>
-                {view.dimensionsFa[0]}: {fa(view.row.scoreOne)} — {view.dimensionsFa[1]}: {fa(view.row.scoreTwo)} —{' '}
-                {view.dimensionsFa[2]}: {fa(view.row.scoreThree)}
-                {view.row.bodyFa ? ' — ' + view.row.bodyFa : ''}
-                {view.row.replyFa ? ' — پاسخ فروشنده: ' + view.row.replyFa : ''}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        {signedIn ? (
-          <SaveForm action={toggleSavedAction} productId={product.id} saved={saved} />
-        ) : null}
-      </section>
-
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرسش و پاسخ</span></h2></div>
-        {questions.length === 0 ? (
-          <p className="text-caption text-text-secondary" data-testid="product-questions-empty">
-            هنوز پرسشی درباره این کالا منتشر نشده است.
-          </p>
-        ) : (
-          <ul className="space-y-sm text-body-sm" data-testid="product-questions">
-            {questions.map((question) => (
-              <li key={question.id} data-testid={'product-question-' + question.id}>
-                {question.bodyFa}
-                {question.answerFa ? ' — پاسخ: ' + question.answerFa : ''}
-              </li>
-            ))}
-          </ul>
-        )}
-        {signedIn ? <AskQuestionForm action={askQuestionAction} productId={product.id} /> : null}
-      </section>
-
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>فروشندگان این کالا</span></h2></div>
-        <ul className="mt-md space-y-sm" data-testid="product-offers">
-          {product.offers.map((offer) => (
-            <li
-              key={offer.offerId}
-              className="flex flex-wrap items-center gap-sm text-body-sm"
-              data-testid={'offer-' + offer.offerId}
-            >
-              <span>{offer.sellerNameFa}</span>
-              <span className="text-caption text-text-secondary">
-                {OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? offer.condition}
-              </span>
-              {product.variantLabels[offer.offerId] ? (
-                <span className="text-caption text-text-secondary">{product.variantLabels[offer.offerId]}</span>
-              ) : null}
-              <span>{fa(offer.priceToman)} تومان</span>
-              <StatusBadge tone={offer.available > 0 ? 'success' : 'neutral'}>
-                {offer.available > 0 ? 'موجود: ' + fa(offer.available) : 'ناموجود'}
-              </StatusBadge>
-              {signedIn ? (
-                <AddToCartForm
-                  action={setCartLineAction}
-                  skuId={offer.skuId}
-                  available={offer.available}
-                  labelFa={offer.sellerNameFa}
-                />
-              ) : null}
-            </li>
-          ))}
-        </ul>
-        {signedIn ? (
-          <p className="text-caption">
-            <Link href="/shop/cart" className="text-text-brand" data-testid="product-go-to-cart">
-              رفتن به سبد خرید
-            </Link>
-          </p>
-        ) : (
-          <p className="text-caption text-text-secondary" data-testid="product-order-note">
-            برای افزودن به سبد خرید وارد حساب خود شوید.
-          </p>
-        )}
-      </section>
-
-      <p className="text-caption">
-        <Link href="/shop" className="text-text-brand" data-testid="back-to-shop">
+      <p className="hz-body-sm">
+        <Link href="/shop" className="hz-link hz-link--standalone" data-testid="back-to-shop">
+          <Icon name="arrowRight" size="xs" />
           بازگشت به فروشگاه
         </Link>
       </p>

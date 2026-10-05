@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Card } from '../../../src/ui/card.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 import { FileField, SelectField, TextAreaField, TextField } from '../../../src/ui/field.tsx';
 import { REASON_FA, REPORT_REASONS } from '../../../src/moderation/model.ts';
 import { DELIVERY_METHODS, DELIVERY_METHOD_FA } from '../../../src/marketplace/listing-model.ts';
@@ -177,30 +178,67 @@ export function PayDepositForm({ inquiryId, amountFa }: { inquiryId: string; amo
     <form action={submit} className="space-y-sm" data-testid="pay-deposit">
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <Result state={state} />
-      <Button type="submit" disabled={pending} data-testid="pay-deposit-button">
-        {pending ? 'در حال انتقال به درگاه…' : 'پرداخت بیعانه ' + amountFa + ' تومان'}
+      <Button
+        type="submit"
+        size="lg"
+        block
+        iconStart="lockSimple"
+        loading={pending}
+        loadingLabel="در حال انتقال به درگاه…"
+        disabled={pending}
+        data-testid="pay-deposit-button"
+      >
+        {'پرداخت بیعانه ' + amountFa + ' تومان'}
       </Button>
+      <p className="text-caption text-text-secondary">به درگاه بانک منتقل می‌شوید. پس از پرداخت به همزیست برمی‌گردید.</p>
     </form>
   );
 }
 
+/**
+ * The thread's composer — DS *MessageComposer* (hz-composer, K17): attach,
+ * text, send. One image or PDF per message; the server checks the file.
+ */
 export function MessageForm({ inquiryId }: { inquiryId: string }) {
   const [state, submit, pending] = useActionState(postMessageAction, EMPTY);
+  const [fileName, setFileName] = useState<string | null>(null);
   return (
-    <form action={submit} className="space-y-sm" data-testid="message-form">
+    <form action={submit} className="hz-composer" data-testid="message-form">
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <Result state={state} />
-      <TextAreaField label="پیام تازه" name="body" rows={3} data-testid="message-body" />
-      <FileField
-        label="پیوست (تصویر یا PDF)"
-        name="attachment"
-        accept="image/jpeg,image/png,application/pdf"
-        maxBytes={10 * 1024 * 1024}
-        testId="message-attachment"
-      />
-      <Button type="submit" disabled={pending} data-testid="message-submit">
-        {pending ? 'در حال ارسال…' : 'ارسال پیام'}
-      </Button>
+      {fileName ? (
+        <div className="hz-composer__attachments">
+          <span className="hz-attach-chip pe-sm">
+            <Icon name="paperclip" size="sm" />
+            <span className="hz-attach-chip__name">{fileName}</span>
+          </span>
+        </div>
+      ) : null}
+      <div className="hz-composer__row">
+        <label className="hz-icon-btn cursor-pointer" aria-label="پیوست (تصویر یا PDF)">
+          <Icon name="paperclip" size="md" />
+          <input
+            type="file"
+            name="attachment"
+            accept="image/jpeg,image/png,application/pdf"
+            className="hz-visually-hidden"
+            onChange={(event) => setFileName(event.target.files?.[0]?.name ?? null)}
+            data-testid="message-attachment"
+          />
+        </label>
+        <div className="hz-composer__field">
+          <label htmlFor="message-body" className="hz-visually-hidden">
+            پیام تازه
+          </label>
+          <textarea id="message-body" name="body" rows={1} className="hz-composer__input" placeholder="پیام خود را بنویسید" data-testid="message-body" />
+        </div>
+        <button type="submit" className="hz-composer__send" disabled={pending} aria-busy={pending || undefined} aria-label="ارسال پیام" data-testid="message-submit">
+          {pending ? <span className="hz-spinner" aria-hidden="true" /> : <Icon name="paperPlaneRight" size="md" mirror />}
+        </button>
+      </div>
+      <div className="hz-composer__meta">
+        <span>فقط تصویر و PDF، حداکثر ۱۰ مگابایت</span>
+      </div>
     </form>
   );
 }
@@ -507,7 +545,7 @@ export function ConfirmHandoverForm({
       <input type="hidden" name="version" value={version} />
       <Result state={state} />
       <pre
-        className="hz-rail whitespace-pre-wrap rounded-lg border border-border-default p-md text-body-sm"
+        className="hz-rail whitespace-pre-wrap rounded-lg border border-border-default bg-bg-subtle p-md text-body-sm"
         data-testid="handover-statement"
       >
         {statementFa}

@@ -14,6 +14,7 @@ import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
+import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -52,7 +53,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 function Prose({ text }: { text: string }) {
   return (
-    <div className="mt-md space-y-md text-body-md">
+    <div className="hz-prose">
       {text.split(/\n{2,}/).map((paragraph, index) => (
         <p key={index}>{paragraph}</p>
       ))}
@@ -60,7 +61,12 @@ function Prose({ text }: { text: string }) {
   );
 }
 
-/** One association or club — §11, §19 (PROMPT-010). Draft, hidden and unknown addresses are 404. */
+/**
+ * One association or club — §11, §19 (PROMPT-010), drawn as a DS P01 section
+ * landing: the community header with its image, the facts and membership in
+ * white cards, events, then its posts as ArticleCards. Draft, hidden and
+ * unknown addresses are 404.
+ */
 export default async function CommunityPage({ params }: Params) {
   const page = await load((await params).slug);
   if (page === null) notFound();
@@ -77,189 +83,200 @@ export default async function CommunityPage({ params }: Params) {
   const past = page.events.filter((event) => !event.upcoming);
 
   return (
-    <article className="mx-auto max-w-3xl space-y-xl" data-testid="community-page">
-      <Breadcrumbs items={crumbs} origin={origin} />
-
-      <header className="space-y-sm">
-        <RecordImage priority fileId={page.imageFileId} altFa={page.imageAltFa} className="mb-lg" />
-        <h1 className="text-h2 md:text-h1">{page.nameFa}</h1>
-        <p className="text-body-md text-text-secondary">{kindFa + ' · حوزه ' + COMMUNITY_SCOPE_FA[page.scope]}</p>
-        {/* Each axis is its own badge; a registration does not verify content and a badge never sells (P2-D05). */}
-        <div className="flex flex-wrap gap-xs" data-testid="community-badges">
-          {page.registration ? (
-            <span data-testid="community-registration">
-              <StatusBadge tone="info">{page.registration.statusFa + (page.registration.number ? ' · ' + page.registration.number : '')}</StatusBadge>
-            </span>
-          ) : null}
-          {page.placeFa ? <StatusBadge tone="neutral">{page.placeFa}</StatusBadge> : null}
+    <article className="space-y-s48 lg:space-y-s64" data-testid="community-page">
+      <div className="space-y-xl">
+        <div className="space-y-md">
+          <Breadcrumbs items={crumbs} origin={origin} />
+          <header className="hz-entity items-center">
+            <RecordImage priority variant="avatar" fileId={page.imageFileId} altFa={page.imageAltFa} className="size-[88px]" />
+            <div className="hz-entity__body gap-xs">
+              <h1 className="hz-h2">{page.nameFa}</h1>
+              <p className="hz-body text-text-secondary">{kindFa + '، حوزه ' + COMMUNITY_SCOPE_FA[page.scope]}</p>
+              {/* Each axis is its own badge; a registration does not verify content and a badge never sells (P2-D05). */}
+              <div className="flex flex-wrap gap-xs" data-testid="community-badges">
+                {page.registration ? (
+                  <span data-testid="community-registration">
+                    <StatusBadge tone="info">{page.registration.statusFa + (page.registration.number ? '، ' + page.registration.number : '')}</StatusBadge>
+                  </span>
+                ) : null}
+                {page.placeFa ? <StatusBadge tone="neutral">{page.placeFa}</StatusBadge> : null}
+              </div>
+            </div>
+          </header>
         </div>
-      </header>
 
-      {page.primary ? (
-        <div data-testid="community-merged">
-          <Alert tone="warning" title="این رکورد تکراری بوده است">
-            {DUPLICATE_NOTICE_FA}{' '}
-            <Link href={'/associations/' + page.primary.slug} className="text-text-brand underline underline-offset-4">
-              {page.primary.nameFa}
-            </Link>
-          </Alert>
-        </div>
-      ) : null}
-
-      {page.owned ? null : (
-        <div data-testid="community-unowned">
-          <Alert tone="info" title={'این ' + kindFa + ' بدون مالک است'}>
-            اطلاعات این صفحه از منبع عمومی ثبت و بررسی شده است و هنوز هیچ مدیری آن را به عهده نگرفته است. برای واگذاری مدیریت با پشتیبانی همزیست تماس بگیرید.
-          </Alert>
-        </div>
-      )}
-
-      <dl className="grid gap-sm sm:grid-cols-2" data-testid="community-facts">
-        {page.contactPhone ? (
-          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
-            <dt className="text-body-sm text-text-secondary">تلفن</dt>
-            <dd className="text-label-md" dir="ltr" data-testid="community-phone">
-              <a href={'tel:' + page.contactPhone}>{page.contactPhone}</a>
-            </dd>
+        {page.primary ? (
+          <div data-testid="community-merged">
+            <Alert tone="warning" title="این رکورد تکراری بوده است">
+              {DUPLICATE_NOTICE_FA}{' '}
+              <Link href={'/associations/' + page.primary.slug} className="hz-link">
+                {page.primary.nameFa}
+              </Link>
+            </Alert>
           </div>
         ) : null}
-        {page.websiteUrl ? (
-          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
-            <dt className="text-body-sm text-text-secondary">وب‌سایت</dt>
-            <dd className="truncate text-label-md" dir="ltr">
-              <a href={page.websiteUrl} target="_blank" rel="nofollow noopener noreferrer" className="text-text-brand underline underline-offset-4">
-                {page.websiteUrl}
-              </a>
-            </dd>
+
+        {page.owned ? null : (
+          <div data-testid="community-unowned">
+            <Alert tone="info" title={'این ' + kindFa + ' بدون مالک است'}>
+              اطلاعات این صفحه از منبع عمومی ثبت و بررسی شده است و هنوز هیچ مدیری آن را به عهده نگرفته است. برای واگذاری مدیریت با پشتیبانی همزیست تماس بگیرید.
+            </Alert>
           </div>
-        ) : null}
-        {page.speciesFa.length > 0 ? (
-          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
-            <dt className="text-body-sm text-text-secondary">گونه‌ها</dt>
-            <dd className="mt-2xs text-label-md" data-testid="community-species">
-              {page.speciesFa.join('، ')}
-            </dd>
+        )}
+
+        <div className="grid gap-xl lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+          <div className="min-w-0 space-y-xl">
+            {page.aboutFa ? (
+              <section aria-labelledby="community-about-title" className="hz-card">
+                <SectionHeader size="sm" id="community-about-title" title="معرفی" />
+                <Prose text={page.aboutFa} />
+              </section>
+            ) : null}
+
+            {page.events.length > 0 ? (
+              <section aria-labelledby="community-events-title" className="space-y-md">
+                <SectionHeader id="community-events-title" title="رویدادها" />
+                <ul className="space-y-md" data-testid="community-events">
+                  {[...upcoming, ...past].map((event) => (
+                    <li key={event.id} className="hz-card space-y-xs" data-testid="community-event">
+                      <div className="flex flex-wrap items-start justify-between gap-sm">
+                        <h3 className="hz-card__title">{event.titleFa}</h3>
+                        {event.cancelled ? (
+                          <StatusBadge tone="warning">لغو شد</StatusBadge>
+                        ) : event.upcoming ? (
+                          <StatusBadge tone="success">پیش‌رو</StatusBadge>
+                        ) : (
+                          <StatusBadge tone="neutral">برگزارشده</StatusBadge>
+                        )}
+                      </div>
+                      <p className="hz-entity__line hz-body-sm text-text-secondary">
+                        <Icon name="calendarDots" size="xs" />
+                        {dateFa(event.startsOn) + (event.endsOn ? ' تا ' + dateFa(event.endsOn) : '')}
+                        {event.cityNameFa || event.placeFa ? '، ' + [event.cityNameFa, event.placeFa].filter(Boolean).join('، ') : ''}
+                      </p>
+                      {event.descriptionFa ? <p className="hz-body-sm">{event.descriptionFa}</p> : null}
+                      {event.cancelled && event.cancelReasonFa ? (
+                        <p className="hz-body-sm text-text-secondary" data-testid="community-event-cancelled">
+                          {'دلیل لغو: ' + event.cancelReasonFa}
+                        </p>
+                      ) : null}
+                      {!event.cancelled && event.registrationUrl ? (
+                        <p className="hz-body-sm">
+                          <a href={event.registrationUrl} target="_blank" rel="nofollow noopener noreferrer" className="hz-link">
+                            ثبت‌نام رویداد
+                          </a>
+                        </p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+                <p className="hz-caption">تاریخ، مکان و ثبت‌نام رویداد را همین {kindFa} اعلام کرده است؛ همزیست برگزاری آن را تضمین نمی‌کند.</p>
+              </section>
+            ) : null}
           </div>
-        ) : null}
-        {page.breedNamesFa.length > 0 ? (
-          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
-            <dt className="text-body-sm text-text-secondary">نژادها</dt>
-            <dd className="mt-2xs text-label-md" data-testid="community-breeds">
-              {page.breedNamesFa.join('، ')}
-            </dd>
-          </div>
-        ) : null}
-      </dl>
 
-      {page.aboutFa ? (
-        <section aria-labelledby="community-about-title">
-          <h2 id="community-about-title" className="text-h3">
-            معرفی
-          </h2>
-          <Prose text={page.aboutFa} />
-        </section>
-      ) : null}
-
-      <section aria-labelledby="community-membership-title">
-        <h2 id="community-membership-title" className="text-h3">
-          عضویت
-        </h2>
-        {page.membershipInfoFa ? <Prose text={page.membershipInfoFa} /> : null}
-        {page.membershipUrl ? (
-          <p className="mt-md text-body-md">
-            <a
-              href={page.membershipUrl}
-              target="_blank"
-              rel="nofollow noopener noreferrer"
-              className="text-text-brand underline underline-offset-4"
-              data-testid="community-membership-link"
-            >
-              صفحه عضویت {kindFa}
-            </a>
-          </p>
-        ) : null}
-        {/* Membership is the community's own register; Hamzist neither takes the request nor confirms it (DEC-0170). */}
-        <p className="mt-sm text-caption text-text-secondary" data-testid="community-membership-note">
-          عضویت را خودِ {kindFa} ثبت و تأیید می‌کند. همزیست عضویت نمی‌گیرد، عضویت کسی را تأیید نمی‌کند و هزینه‌ای در این باره دریافت نمی‌کند.
-        </p>
-      </section>
-
-      {page.managers.length > 0 ? (
-        <section aria-labelledby="community-managers-title">
-          <h2 id="community-managers-title" className="text-h3">
-            مدیران
-          </h2>
-          <ul className="mt-md space-y-sm" data-testid="community-managers">
-            {page.managers.map((manager) => (
-              <li key={manager.nameFa + (manager.roleFa ?? '')} className="rounded-lg border border-border-default bg-bg-surface px-md py-sm">
-                <span className="text-label-md">{manager.nameFa}</span>
-                {manager.roleFa ? <span className="text-caption text-text-secondary">{' · ' + manager.roleFa}</span> : null}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {page.events.length > 0 ? (
-        <section aria-labelledby="community-events-title">
-          <h2 id="community-events-title" className="text-h3">
-            رویدادها
-          </h2>
-          <ul className="mt-md space-y-sm" data-testid="community-events">
-            {[...upcoming, ...past].map((event) => (
-              <li key={event.id} className="rounded-lg border border-border-default bg-bg-surface p-md" data-testid="community-event">
-                <div className="flex flex-wrap items-start justify-between gap-sm">
-                  <p className="text-label-lg">{event.titleFa}</p>
-                  {event.cancelled ? (
-                    <StatusBadge tone="warning">لغو شد</StatusBadge>
-                  ) : event.upcoming ? (
-                    <StatusBadge tone="success">پیش‌رو</StatusBadge>
+          <aside className="min-w-0 space-y-xl" aria-label={'درباره ' + kindFa}>
+            <section aria-labelledby="community-facts-title" className="hz-card">
+              <SectionHeader size="sm" id="community-facts-title" title="مشخصات و تماس" />
+              <dl className="hz-kv" data-testid="community-facts">
+                {page.contactPhone ? (
+                  <div className="hz-kv__row">
+                    <dt className="hz-kv__key">تلفن</dt>
+                    <dd className="hz-kv__value" dir="ltr" data-testid="community-phone">
+                      <a href={'tel:' + page.contactPhone} className="hz-link">
+                        {page.contactPhone}
+                      </a>
+                    </dd>
+                  </div>
+                ) : null}
+                {page.websiteUrl ? (
+                  <div className="hz-kv__row">
+                    <dt className="hz-kv__key">وب‌سایت</dt>
+                    <dd className="hz-kv__value truncate" dir="ltr">
+                      <a href={page.websiteUrl} target="_blank" rel="nofollow noopener noreferrer" className="hz-link">
+                        {page.websiteUrl}
+                      </a>
+                    </dd>
+                  </div>
+                ) : null}
+                <div className="hz-kv__row">
+                  <dt className="hz-kv__key">گونه‌ها</dt>
+                  {page.speciesFa.length > 0 ? (
+                    <dd className="hz-kv__value" data-testid="community-species">
+                      {page.speciesFa.join('، ')}
+                    </dd>
                   ) : (
-                    <StatusBadge tone="neutral">برگزارشده</StatusBadge>
+                    <dd className="hz-kv__value hz-kv__value--empty">تعیین‌نشده</dd>
                   )}
                 </div>
-                <p className="mt-2xs flex flex-wrap items-center gap-2xs text-body-sm text-text-secondary">
-                  <Icon name="calendarDots" size="xs" />
-                  {dateFa(event.startsOn) + (event.endsOn ? ' تا ' + dateFa(event.endsOn) : '')}
-                  {event.cityNameFa || event.placeFa ? ' · ' + [event.cityNameFa, event.placeFa].filter(Boolean).join('، ') : ''}
-                </p>
-                {event.descriptionFa ? <p className="mt-xs text-body-sm">{event.descriptionFa}</p> : null}
-                {event.cancelled && event.cancelReasonFa ? (
-                  <p className="mt-xs text-body-sm text-text-secondary" data-testid="community-event-cancelled">
-                    {'دلیل لغو: ' + event.cancelReasonFa}
-                  </p>
+                {page.breedNamesFa.length > 0 ? (
+                  <div className="hz-kv__row">
+                    <dt className="hz-kv__key">نژادها</dt>
+                    <dd className="hz-kv__value" data-testid="community-breeds">
+                      {page.breedNamesFa.join('، ')}
+                    </dd>
+                  </div>
                 ) : null}
-                {!event.cancelled && event.registrationUrl ? (
-                  <p className="mt-xs text-body-sm">
-                    <a href={event.registrationUrl} target="_blank" rel="nofollow noopener noreferrer" className="text-text-brand underline underline-offset-4">
-                      ثبت‌نام رویداد
-                    </a>
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-sm text-caption text-text-secondary">
-            تاریخ، مکان و ثبت‌نام رویداد را همین {kindFa} اعلام کرده است؛ همزیست برگزاری آن را تضمین نمی‌کند.
-          </p>
-        </section>
-      ) : null}
+              </dl>
+            </section>
+
+            <section aria-labelledby="community-membership-title" className="hz-card space-y-sm">
+              <SectionHeader size="sm" id="community-membership-title" title="عضویت" />
+              {page.membershipInfoFa ? <Prose text={page.membershipInfoFa} /> : null}
+              {page.membershipUrl ? (
+                <a
+                  href={page.membershipUrl}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  className="hz-btn hz-btn--secondary hz-btn--block"
+                  data-testid="community-membership-link"
+                >
+                  <Icon name="arrowSquareOut" size="sm" />
+                  صفحه عضویت {kindFa}
+                </a>
+              ) : null}
+              {/* Membership is the community's own register; Hamzist neither takes the request nor confirms it (DEC-0170). */}
+              <p className="hz-caption" data-testid="community-membership-note">
+                عضویت را خودِ {kindFa} ثبت و تأیید می‌کند. همزیست عضویت نمی‌گیرد، عضویت کسی را تأیید نمی‌کند و هزینه‌ای در این باره دریافت نمی‌کند.
+              </p>
+            </section>
+
+            {page.managers.length > 0 ? (
+              <section aria-labelledby="community-managers-title" className="hz-card">
+                <SectionHeader size="sm" id="community-managers-title" title="مدیران" />
+                <ul className="divide-y divide-border-subtle" data-testid="community-managers">
+                  {page.managers.map((manager) => (
+                    <li key={manager.nameFa + (manager.roleFa ?? '')} className="hz-body-sm py-sm">
+                      <span className="font-bold">{manager.nameFa}</span>
+                      {manager.roleFa ? <span className="text-text-secondary">{'، ' + manager.roleFa}</span> : null}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+          </aside>
+        </div>
+      </div>
 
       {page.posts.length > 0 ? (
         <section aria-labelledby="community-posts-title">
-          <h2 id="community-posts-title" className="text-h3">
-            نوشته‌ها
-          </h2>
-          <ul className="mt-md space-y-sm" data-testid="community-posts">
+          <SectionHeader id="community-posts-title" title="نوشته‌ها" count={page.posts.length.toLocaleString('fa-IR')} />
+          <ul className="grid gap-s20 md:grid-cols-2 lg:grid-cols-3" data-testid="community-posts">
             {page.posts.map((post) => (
               <li key={post.slug}>
-                <Link
-                  href={path + '/posts/' + post.slug}
-                  className="block rounded-lg border border-border-default bg-bg-surface p-md transition-colors hover:border-border-control"
-                  data-testid={'community-post-' + post.slug}
-                >
-                  <p className="text-label-lg">{post.titleFa}</p>
-                  <p className="mt-2xs text-body-sm text-text-secondary">{post.summaryFa}</p>
+                <Link href={path + '/posts/' + post.slug} className="hz-card hz-card--feature hz-card--interactive hz-article h-full" data-testid={'community-post-' + post.slug}>
+                  <div className="hz-article__body">
+                    <span className="hz-tag">نوشته {kindFa}</span>
+                    <h3 className="hz-article__title">{post.titleFa}</h3>
+                    <p className="hz-article__summary">{post.summaryFa}</p>
+                    {post.publishedAt ? (
+                      <div className="hz-meta">
+                        <time className="hz-meta__item" dateTime={post.publishedAt.toISOString()}>
+                          {formatCivilDateFa(post.publishedAt.toISOString().slice(0, 10) as never)}
+                        </time>
+                      </div>
+                    ) : null}
+                  </div>
                 </Link>
               </li>
             ))}

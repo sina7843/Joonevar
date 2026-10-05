@@ -1,15 +1,19 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { eq, sql } from 'drizzle-orm';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../src/ui/access-denied.tsx';
 import { AppError } from '../../../src/domain/errors.ts';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
+import { SectionHeader, PageHeader } from '../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
+import { ButtonLink } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { ActionOwner, Identifier, StatusBadge } from '../../../src/ui/status.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
 import { findProfile } from '../../../src/identity/account.ts';
-import { Timeline, type TimelineItem } from '../../../src/ui/timeline.tsx';
 import { db } from '../../../src/db/client.ts';
 import { referenceBreeds } from '../../../src/db/schema/core.ts';
 import { familyOf, requireOwnedAnimal } from '../../../src/animals/service.ts';
@@ -49,9 +53,17 @@ const AUDIT_TITLE_FA: Record<string, string> = {
 };
 
 /** Sections that belong to features built in later prompts. */
-const PENDING_SECTIONS: ReadonlyArray<{ id: string; title: string; note: string }> = [
+const PENDING_SECTIONS: ReadonlyArray<{
+  id: string;
+  title: string;
+  note: string;
+}> = [
   { id: 'pedigree', title: 'شجره‌نامه', note: 'کد شجره‌نامه و وضعیت صدور.' },
-  { id: 'litter', title: 'بارداری، زایمان و Litter', note: 'اعلام کاربر و نتیجه مستقل دامپزشک.' },
+  {
+    id: 'litter',
+    title: 'بارداری، زایمان و Litter',
+    note: 'اعلام کاربر و نتیجه مستقل دامپزشک.',
+  },
 ];
 
 export default async function AnimalProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -74,8 +86,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
     : [];
   const family = await familyOf(db(), animal);
   const ownerProfile = await findProfile(db(), animal.ownerAccountId);
-  const ownerName =
-    ownerProfile === null ? null : ownerProfile.firstName + ' ' + ownerProfile.lastName;
+  const ownerName = ownerProfile === null ? null : ownerProfile.firstName + ' ' + ownerProfile.lastName;
   const foreign = await findForeignCase(db(), animal.id);
   const trail = await auditTrail(db(), { targetType: 'ANIMAL', targetId: animal.id }, { page: 1, pageSize: 20 });
   const { chip, conflicts } = await animalChipView(db(), animal.id);
@@ -90,417 +101,508 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
     .where(eq(samples.animalId, animal.id))
     .orderBy(sql`collected_at desc`);
 
-  const items: readonly TimelineItem[] = trail.items.map((row) => ({
-    id: row.id,
-    title: AUDIT_TITLE_FA[row.action] ?? 'رویداد پرونده',
-    whenFa: formatCivilDateFa(row.occurredAt.toISOString().slice(0, 10)),
-    status: { tone: 'neutral' as const, label: 'ثبت‌شده' },
-    owner: 'USER' as const,
-    summary: row.action === 'ANIMAL_LINEAGE_RESOLVED' ? 'نسل از رکورد والدین بازمحاسبه شد.' : 'رویداد پرونده حیوان.',
-    href: '/animals/' + animal.id,
-    ctaLabel: 'مشاهده',
-  }));
+  const name = animal.name ?? 'بدون نام';
+  const sexFa = animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : null;
+  const registered = animal.status === 'REGISTERED';
+  const dateFa = (value: Date) => formatCivilDateFa(value.toISOString().slice(0, 10));
 
   return (
-    <PublicShell actor={actor} title="پرونده حیوان" pathname={'/animals/' + id}>
-      <div className="hz-stagger space-y-lg">
-        {/*
-          * Prototype PET-009-O: the file opens with who this animal is — a tile,
-          * the name, what it is, its identifiers — and the two states that
-          * matter as chips above it. The identity is the header of the file, not
-          * the first of a stack of equal cards.
-          */}
-        <section aria-labelledby="animal-identity" className="space-y-md">
-          <div className="hz-rail flex gap-sm">
-            <StatusBadge tone={animal.status === 'REGISTERED' ? 'info' : 'neutral'}>
-              {animal.status === 'REGISTERED' ? 'پرونده اولیه' : 'پیش‌نویس'}
-            </StatusBadge>
-            <StatusBadge tone={animal.identityVerifiedAt === null ? 'neutral' : 'success'}>
-              {animal.identityVerifiedAt === null ? 'مشخصات اظهاری' : 'مشخصات رسمی تأییدشده'}
-            </StatusBadge>
-            {chip ? <StatusBadge tone="success">میکروچیپ ثبت‌شده</StatusBadge> : null}
-          </div>
+    <PublicShell
+      actor={actor}
+      title={name}
+      pathname={'/animals/' + id}
+      header={
+        <div>
+          <PageCrumbs
+            items={[{ name: 'خانه', href: '/dashboard' }, { name: 'حیوان‌های من', href: '/animals' }, { name }]}
+          />
+          <PageHeader
+            title={name}
+            back={{ href: '/animals' }}
+            aside={
+              <>
+                <span className="text-caption text-text-secondary" data-testid="pet-id">
+                  {animal.petId ? <Identifier value={animal.petId} /> : 'شناسه رسمی: — تا صدور برگه ثبتی'}
+                </span>
+                <StatusBadge tone={registered ? 'info' : 'neutral'}>
+                  {registered ? 'پرونده اولیه' : 'پیش‌نویس'}
+                </StatusBadge>
+              </>
+            }
+            meta={[
+              ['سگ', breed?.nameFa, sexFa].filter(Boolean).join(' · '),
+              animal.birthDate
+                ? 'تولد ' + formatCivilDateFa(animal.birthDate) + (animal.birthDateApproximate ? ' (تقریبی)' : '')
+                : 'تاریخ تولد: تعیین‌نشده',
+              generationLabel(animal.generation),
+            ]}
+            actions={
+              <ButtonLink tone="secondary" href="#edit" iconStart="pencilSimple">
+                ویرایش اطلاعات
+              </ButtonLink>
+            }
+          />
+        </div>
+      }
+    >
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+        <div className="min-w-0 space-y-xl lg:col-span-8">
+          <Card>
+            <SectionHeader size="sm" title={'مشخصات ' + name} />
+            {/* §10: verified data is not rewritten from this form, and the screen
+                says which of the two it is looking at. */}
+            <p className="mt-sm text-caption text-text-secondary" data-testid="identity-provenance">
+              {animal.identityVerifiedAt === null
+                ? 'این مشخصات اظهار شماست. در مراجعه به دامپزشک معتمد، مشخصات رسمی ثبت می‌شود و پس از آن تغییر نمی‌کند.'
+                : 'مشخصات رسمی، در ' +
+                  dateFa(animal.identityVerifiedAt) +
+                  ' توسط دامپزشک معتمد ثبت شده است و از این فرم تغییر نمی‌کند.'}
+            </p>
+            <div className="mt-md">
+              <KeyValueList
+                twoCol
+                rows={[
+                  { key: 'گونه', value: 'سگ' },
+                  { key: 'نژاد', value: breed?.nameFa },
+                  { key: 'جنس', value: sexFa },
+                  {
+                    key: 'تاریخ تولد',
+                    value: animal.birthDate
+                      ? formatCivilDateFa(animal.birthDate) + (animal.birthDateApproximate ? ' (تقریبی)' : '')
+                      : null,
+                    empty: 'تعیین‌نشده',
+                  },
+                  {
+                    key: 'نسل',
+                    value: generationLabel(animal.generation),
+                    testId: 'animal-generation',
+                  },
+                  {
+                    key: 'منبع شناسایی',
+                    testId: 'animal-origin',
+                    value:
+                      animal.origin === 'G0'
+                        ? 'بدون اسناد هویتی'
+                        : animal.origin === 'INTERNAL_G1PLUS'
+                          ? 'نسب ثبت‌شده در هم‌زیست'
+                          : 'Export Pedigree',
+                  },
+                  { key: 'رنگ', value: animal.color },
+                  { key: 'نشانه‌های ظاهری', value: animal.markings },
+                  {
+                    key: 'میکروچیپ اعلامی',
+                    testId: 'declared-microchip-value',
+                    value: animal.declaredMicrochipNumber ? (
+                      <Identifier value={animal.declaredMicrochipNumber} />
+                    ) : null,
+                  },
+                  // §23.3: a name identifies a person; an account key identifies a row.
+                  {
+                    key: 'مالک',
+                    value: <span data-testid="animal-owner">{ownerName ?? 'شما'}</span>,
+                  },
+                  {
+                    key: 'پدر',
+                    testId: 'family-sire',
+                    value: family.sire ? (
+                      <Link href={'/animals/' + family.sire.id} className="hz-link">
+                        {(family.sire.name ?? 'بدون نام') + ' · ' + generationLabel(family.sire.generation)}
+                      </Link>
+                    ) : null,
+                    empty: 'ثبت نشده',
+                  },
+                  {
+                    key: 'مادر',
+                    testId: 'family-dam',
+                    value: family.dam ? (
+                      <Link href={'/animals/' + family.dam.id} className="hz-link">
+                        {(family.dam.name ?? 'بدون نام') + ' · ' + generationLabel(family.dam.generation)}
+                      </Link>
+                    ) : null,
+                    empty: 'ثبت نشده',
+                  },
+                  {
+                    key: 'فرزندان',
+                    value:
+                      family.offspring.length === 0 ? null : family.offspring.length.toLocaleString('fa-IR') + ' مورد',
+                  },
+                ]}
+              />
+            </div>
+            <p className="mt-md text-caption text-text-secondary">
+              نسل فقط‌خواندنی است. شماره میکروچیپ اعلامی تا اسکن و تأیید دامپزشک معتمد رسمی نیست.
+            </p>
+          </Card>
+
+          <section aria-labelledby="animal-documents" className="space-y-lg">
+            <SectionHeader id="animal-documents" title="اسناد" count={sheet ? '۱ سند' : undefined} />
+            {sheet ? (
+              <article className="hz-card hz-document">
+                <div className="hz-document__head">
+                  <span className="hz-document__icon">
+                    <Icon name="fileText" size="md" />
+                  </span>
+                  <div className="hz-document__titles">
+                    <h3 className="hz-document__type">برگه ثبتی</h3>
+                    <span className="hz-document__subject">
+                      {name}
+                      {animal.petId ? (
+                        <>
+                          {'، '}
+                          <bdi className="hz-id" dir="ltr">
+                            {animal.petId}
+                          </bdi>
+                        </>
+                      ) : null}
+                    </span>
+                  </div>
+                </div>
+                <KeyValueList
+                  rows={[
+                    {
+                      key: 'شماره سند',
+                      value: <Identifier value={sheet.sheetNo} />,
+                    },
+                    {
+                      key: 'تاریخ صدور',
+                      value: sheet.issuedAt ? dateFa(sheet.issuedAt) : null,
+                    },
+                  ]}
+                />
+                <p className="mt-sm text-caption text-text-secondary" data-testid="animal-parentage-note">
+                  {SAMPLE_TAKEN_NOTE_FA} برگه ثبتی به معنی نتیجه ژنتیک یا شجره‌نامه نیست.
+                </p>
+                <div className="hz-card__footer">
+                  <Link
+                    href={'/documents/' + sheet.id}
+                    className="hz-btn hz-btn--secondary hz-btn--sm"
+                    data-testid="animal-sheet-link"
+                  >
+                    <Icon name="fileText" size="xs" />
+                    مشاهده سند
+                  </Link>
+                </div>
+              </article>
+            ) : (
+              <div className="hz-card">
+                <p className="text-body-sm text-text-secondary">
+                  هنوز سندی صادر نشده است. پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری، می‌توانید{' '}
+                  <Link href="/registration/new" className="hz-link">
+                    برگه ثبتی این حیوان را درخواست کنید
+                  </Link>
+                  .
+                </p>
+              </div>
+            )}
+          </section>
 
           <Card>
-            <div className="flex items-start gap-md">
-              <span
-                aria-hidden="true"
-                className="flex size-[var(--size-icon-lg)] shrink-0 items-center justify-center rounded-md bg-bg-brand-subtle text-text-brand"
-              >
-                <Icon name="dog" size="md" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <h2 id="animal-identity" className="truncate text-h3">
-                  {animal.name ?? 'بدون نام'}
-                </h2>
+            <SectionHeader size="sm" title="میکروچیپ و نمونه" />
+            <div className="mt-md space-y-md">
+              {chip ? (
+                <div>
+                  <p className="text-body-sm" data-testid="official-microchip">
+                    <Identifier label="شماره رسمی:" value={chip.number} />
+                  </p>
+                  <p className="mt-2xs text-caption text-text-secondary">
+                    روش خواندن: {READ_METHOD_FA[chip.readMethod]} · هر حیوان در طول عمر فقط یک میکروچیپ دارد؛ تعویض،
+                    انتقال یا شماره دوم وجود ندارد.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-body-sm text-text-secondary">
+                  شماره رسمی پس از اسکن و تأیید دامپزشک معتمد ثبت می‌شود.
+                </p>
+              )}
+              {conflicts.length > 0 ? (
+                <Alert tone="error" title="تعارض میکروچیپ">
+                  <span data-testid="animal-chip-conflict">تعارض ثبت‌شده: {conflicts[0]!.detailFa}</span>
+                </Alert>
+              ) : null}
+              {sampleRows.length === 0 ? (
+                <p className="text-body-sm text-text-secondary">
+                  کد رهگیری نمونه پس از انجام واقعی نمونه‌گیری صادر می‌شود.
+                </p>
+              ) : (
+                <dl className="hz-kv" data-testid="animal-samples">
+                  {sampleRows.map((sample) => (
+                    <div key={sample.id} className="hz-kv__row">
+                      <dt className="hz-kv__key">
+                        <Identifier value={sample.trackingCode} />
+                      </dt>
+                      <dd className="hz-kv__value">{SAMPLE_STATUS_FA[sample.status]}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          </Card>
+
+          <Card>
+            <SectionHeader size="sm" title="نسب و شجره‌نامه" />
+            <KeyValueList
+              rows={[
+                {
+                  key: 'نتیجه Parentage',
+                  value: parentage ? (
+                    <span className="flex flex-wrap items-center gap-sm">
+                      <span data-testid="animal-result-status">
+                        {RESULT_STATUS_FA[parentage.status]} · نسخه {parentage.resultVersion}
+                      </span>
+                      <Link href={'/pedigree/' + animal.id} className="hz-link" data-testid="animal-result-link">
+                        مشاهده نتیجه Parentage
+                      </Link>
+                    </span>
+                  ) : (
+                    'نتیجه‌ای ثبت نشده است. پس از دریافت و پردازش نمونه در مرکز ژنتیک، نتیجه در همین پرونده دیده می‌شود.'
+                  ),
+                },
+                {
+                  key: 'Export Pedigree',
+                  value: foreign ? (
+                    <span className="flex flex-wrap items-center gap-sm">
+                      <span data-testid="foreign-status">
+                        وضعیت: {FOREIGN_STATUS_FA[foreign.status]}
+                        {foreign.reasonFa ? ' — ' + foreign.reasonFa : ''}
+                      </span>
+                      <Link href={'/animals/' + animal.id + '/foreign-pedigree'} className="hz-link">
+                        مشاهده و مدیریت مدرک
+                      </Link>
+                    </span>
+                  ) : (
+                    <span>
+                      اگر این حیوان شجره‌نامه صادرشده خارج از هم‌زیست دارد،{' '}
+                      <Link href={'/animals/' + animal.id + '/foreign-pedigree'} className="hz-link">
+                        مدرک را برای بررسی انجمن بارگذاری کنید
+                      </Link>
+                      .
+                    </span>
+                  ),
+                },
+              ]}
+            />
+          </Card>
+
+          {/* §10 and §16: the official cases this animal is part of. */}
+          <Card>
+            <SectionHeader size="sm" title="مجوزها و جفت‌گیری" />
+            <div className="mt-md space-y-lg">
+              {permits.length === 0 ? (
+                <p className="text-body-sm text-text-secondary">پرونده مجوزی برای این حیوان ثبت نشده است.</p>
+              ) : (
+                <ul className="divide-y divide-border-subtle" data-testid="animal-permits">
+                  {permits.map((permit) => (
+                    <li key={permit.id} className="flex items-center justify-between gap-md py-md">
+                      <div className="min-w-0">
+                        <p className="hz-card__title">
+                          {permit.permitNo ? <bdi dir="ltr">{permit.permitNo}</bdi> : 'پرونده مجوز'}
+                        </p>
+                        <p className="text-caption text-text-secondary">{PERMIT_STATUS_FA[permit.status]}</p>
+                      </div>
+                      <Link href={'/mating/permits/' + permit.id} className="hz-link hz-link--standalone">
+                        مشاهده پرونده
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {/* §17.1: only mutually confirmed dates appear as the official history. */}
+              <div>
+                <p className="text-label-md">تاریخ‌های جفت‌گیری</p>
                 <p className="mt-2xs text-caption text-text-secondary">
-                  سگ · {breed?.nameFa ?? '—'} ·{' '}
-                  {animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : '—'}
+                  فقط تاریخ‌های تأییدشده دوطرفه؛ جدیدترین آن‌ها مبنای فاصله زمانی است.
                 </p>
-                {/*
-                  * The prototype header carries the identifier a person can use
-                  * — the Pet ID — and never the database key, which §23.2 keeps
-                  * separate from it and which means nothing to the owner.
-                  */}
-                <p className="mt-2xs text-caption text-text-secondary" data-testid="pet-id">
-                  شناسه رسمی (Pet ID):{' '}
-                  {animal.petId ? <Identifier value={animal.petId} /> : '— تا صدور برگه ثبتی'}
-                </p>
+                {matingDates.length === 0 ? (
+                  <p className="mt-sm text-body-sm text-text-secondary">تاریخ تأییدشده‌ای ثبت نشده است.</p>
+                ) : (
+                  <ul className="mt-sm space-y-sm" data-testid="animal-mating-dates">
+                    {matingDates.map((row) => (
+                      <li key={row.permitId + '-' + row.version} className="text-body-sm">
+                        <bdi dir="ltr" className="hz-id">
+                          {row.matedOn}
+                        </bdi>{' '}
+                        · {formatCivilDateFa(row.matedOn)} · نسخه {row.version} · مجوز{' '}
+                        {row.permitNo ? <bdi dir="ltr">{row.permitNo}</bdi> : '—'}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </Card>
-        </section>
 
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="shieldCheck" size="sm" className="text-text-brand" />
-            هویت
-          </h3>
-          {/* §10: verified data is not rewritten from this form, and the screen
-              says which of the two it is looking at. */}
-          <p className="mt-2xs text-caption text-text-secondary" data-testid="identity-provenance">
-            {animal.identityVerifiedAt === null
-              ? 'این مشخصات اظهار شماست. در مراجعه به دامپزشک معتمد، مشخصات رسمی ثبت می‌شود و پس از آن تغییر نمی‌کند.'
-              : 'مشخصات رسمی، در ' +
-                formatCivilDateFa(animal.identityVerifiedAt.toISOString().slice(0, 10)) +
-                ' توسط دامپزشک معتمد ثبت شده است و از این فرم تغییر نمی‌کند.'}
-          </p>
-          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
-            <dt className="text-text-secondary">تاریخ تولد</dt>
-            <dd>
-              {animal.birthDate ? formatCivilDateFa(animal.birthDate) : '—'}
-              {animal.birthDateApproximate ? ' (تقریبی)' : ''}
-            </dd>
-            <dt className="text-text-secondary">نسل</dt>
-            <dd data-testid="animal-generation">{generationLabel(animal.generation)}</dd>
-            <dt className="text-text-secondary">منبع شناسایی</dt>
-            <dd data-testid="animal-origin">
-              {animal.origin === 'G0'
-                ? 'بدون اسناد هویتی'
-                : animal.origin === 'INTERNAL_G1PLUS'
-                  ? 'نسب ثبت‌شده در هم‌زیست'
-                  : 'Export Pedigree'}
-            </dd>
-            <dt className="text-text-secondary">رنگ</dt>
-            <dd>{animal.color ?? '—'}</dd>
-            <dt className="text-text-secondary">نشانه‌های ظاهری</dt>
-            <dd>{animal.markings ?? '—'}</dd>
-            <dt className="text-text-secondary">میکروچیپ اعلامی</dt>
-            <dd data-testid="declared-microchip-value">
-              {animal.declaredMicrochipNumber ? (
-                <Identifier value={animal.declaredMicrochipNumber} />
-              ) : (
-                '—'
-              )}
-            </dd>
-          </dl>
-          <p className="mt-md text-caption text-text-secondary">
-            نسل فقط‌خواندنی است. شماره میکروچیپ اعلامی تا اسکن و تأیید دامپزشک معتمد رسمی نیست.
-          </p>
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="user" size="sm" className="text-text-brand" />
-            مالکیت
-          </h3>
-          <p className="mt-md text-body-sm" data-testid="animal-owner">
-            {/* §23.3: a name identifies a person; an account key identifies a row. */}
-            مالک: {ownerName ?? 'شما'}
-          </p>
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="dna" size="sm" className="text-text-brand" />
-            خانواده و نسب
-          </h3>
-          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
-            <dt className="text-text-secondary">پدر</dt>
-            <dd data-testid="family-sire">
-              {family.sire ? (
-                <Link href={'/animals/' + family.sire.id} className="text-text-brand underline underline-offset-4">
-                  {family.sire.name ?? 'بدون نام'} · {generationLabel(family.sire.generation)}
-                </Link>
-              ) : (
-                '—'
-              )}
-            </dd>
-            <dt className="text-text-secondary">مادر</dt>
-            <dd data-testid="family-dam">
-              {family.dam ? (
-                <Link href={'/animals/' + family.dam.id} className="text-text-brand underline underline-offset-4">
-                  {family.dam.name ?? 'بدون نام'} · {generationLabel(family.dam.generation)}
-                </Link>
-              ) : (
-                '—'
-              )}
-            </dd>
-            <dt className="text-text-secondary">فرزندان</dt>
-            <dd>{family.offspring.length === 0 ? '—' : family.offspring.length + ' مورد'}</dd>
-          </dl>
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="syringe" size="sm" className="text-text-brand" />
-            میکروچیپ
-          </h3>
-          {chip ? (
-            <>
-              <p className="mt-md text-body-sm" data-testid="official-microchip">
-                <Identifier label="شماره رسمی:" value={chip.number} />
-              </p>
-              <p className="mt-2xs text-caption text-text-secondary">
-                روش خواندن: {READ_METHOD_FA[chip.readMethod]} · هر حیوان در طول عمر فقط یک میکروچیپ دارد؛ تعویض،
-                انتقال یا شماره دوم وجود ندارد.
-              </p>
-            </>
-          ) : (
-            <p className="mt-md text-body-sm text-text-secondary">
-              شماره رسمی پس از اسکن و تأیید دامپزشک معتمد ثبت می‌شود.
-            </p>
-          )}
-          {conflicts.length > 0 ? (
-            <p className="mt-md text-caption text-status-error-text" data-testid="animal-chip-conflict">
-              تعارض ثبت‌شده: {conflicts[0]!.detailFa}
-            </p>
-          ) : null}
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="stamp" size="sm" className="text-text-brand" />
-            برگه ثبتی
-          </h3>
-          {sheet ? (
-            <>
-              <p className="mt-md text-body-sm">
-                <Link
-                  href={'/documents/' + sheet.id}
-                  className="text-text-brand underline underline-offset-4"
-                  data-testid="animal-sheet-link"
-                >
-                  <Identifier label="شماره برگه:" value={sheet.sheetNo} />
-                </Link>
-              </p>
-              <p className="mt-sm text-caption text-text-secondary" data-testid="animal-parentage-note">
-                {SAMPLE_TAKEN_NOTE_FA} برگه ثبتی به معنی نتیجه ژنتیک یا شجره‌نامه نیست.
-              </p>
-            </>
-          ) : (
-            <p className="mt-md text-body-sm text-text-secondary">
-              پس از کاشت یا تأیید میکروچیپ و نمونه‌گیری، می‌توانید{' '}
-              <Link href="/registration/new" className="text-text-brand underline underline-offset-4">
-                برگه ثبتی این حیوان را درخواست کنید
-              </Link>
-              .
-            </p>
-          )}
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="testTube" size="sm" className="text-text-brand" />
-            نمونه و Custody
-          </h3>
-          {sampleRows.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-secondary">
-              کد رهگیری نمونه پس از انجام واقعی نمونه‌گیری صادر می‌شود.
-            </p>
-          ) : (
-            <ul className="mt-md space-y-sm text-body-sm" data-testid="animal-samples">
-              {sampleRows.map((sample) => (
-                <li key={sample.id} className="flex items-center justify-between gap-md">
-                  <Identifier value={sample.trackingCode} />
-                  <span className="text-text-secondary">{SAMPLE_STATUS_FA[sample.status]}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="dna" size="sm" className="text-text-brand" />
-            Parentage Result
-          </h3>
-          {parentage ? (
-            <>
-              <p className="mt-md text-body-sm" data-testid="animal-result-status">
-                {RESULT_STATUS_FA[parentage.status]} · نسخه {parentage.resultVersion}
-              </p>
-              <p className="mt-sm text-body-sm">
-                <Link
-                  href={'/pedigree/' + animal.id}
-                  className="text-text-brand underline underline-offset-4"
-                  data-testid="animal-result-link"
-                >
-                  مشاهده نتیجه Parentage
-                </Link>
-              </p>
-            </>
-          ) : (
-            <p className="mt-md text-body-sm text-text-secondary">
-              نتیجه‌ای ثبت نشده است. پس از دریافت و پردازش نمونه در مرکز ژنتیک، نتیجه در همین پرونده دیده
-              می‌شود.
-            </p>
-          )}
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="certificate" size="sm" className="text-text-brand" />
-            Export Pedigree
-          </h3>
-          {foreign ? (
-            <>
-              <p className="mt-md text-body-sm" data-testid="foreign-status">
-                وضعیت: {FOREIGN_STATUS_FA[foreign.status]}
-                {foreign.reasonFa ? ' — ' + foreign.reasonFa : ''}
-              </p>
+          {/* Who owned this animal, as rows rather than as one mutable column
+              (PROMPT-007). A previous owner is never removed. */}
+          {ownership.length > 0 ? (
+            <Card>
+              <SectionHeader size="sm" title="تاریخچه مالکیت" />
               <p className="mt-sm text-caption text-text-secondary">
-                <Link
-                  href={'/animals/' + animal.id + '/foreign-pedigree'}
-                  className="text-text-brand underline underline-offset-4"
-                >
-                  مشاهده و مدیریت مدرک
-                </Link>
+                هر انتقال مالکیت یک ردیف جداست و حذف نمی‌شود؛ مدارک صادرشده در دوره هر مالک هم در پرونده می‌مانند.
               </p>
-            </>
-          ) : (
-            <p className="mt-md text-body-sm text-text-secondary">
-              اگر این حیوان شجره‌نامه صادرشده خارج از هم‌زیست دارد، می‌توانید{' '}
-              <Link
-                href={'/animals/' + animal.id + '/foreign-pedigree'}
-                className="text-text-brand underline underline-offset-4"
-              >
-                مدرک را برای بررسی انجمن بارگذاری کنید
-              </Link>
-              .
-            </p>
-          )}
-        </Card>
-
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="clipboardText" size="sm" className="text-text-brand" />
-            ویرایش اطلاعات مجاز
-          </h3>
-          <div className="mt-lg">
-            <AnimalEditForm
-              animalId={animal.id}
-              values={{
-                name: animal.name ?? '',
-                color: animal.color ?? '',
-                markings: animal.markings ?? '',
-                birthDateApproximate: animal.birthDateApproximate,
-              }}
-            />
-          </div>
-        </Card>
-
-        {/* §10 and §16: the official cases this animal is part of. */}
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="stamp" size="sm" className="text-text-brand" />
-            مجوزها
-          </h3>
-          {permits.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-disabled">پرونده مجوزی برای این حیوان ثبت نشده است.</p>
-          ) : (
-            <ul className="mt-lg space-y-md" data-testid="animal-permits">
-              {permits.map((permit) => (
-                <li key={permit.id} className="flex items-start justify-between gap-md">
-                  <div className="min-w-0">
-                    <p className="text-label-md">{permit.permitNo ?? 'پرونده مجوز'}</p>
-                    <p className="mt-2xs text-caption text-text-secondary">
-                      {PERMIT_STATUS_FA[permit.status]}
-                    </p>
-                  </div>
-                  <Link
-                    href={'/mating/permits/' + permit.id}
-                    className="text-label-md text-text-brand underline underline-offset-4"
-                  >
-                    مشاهده پرونده
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        {/* §17.1: only mutually confirmed dates appear as the official history. */}
-        <Card>
-          <h3 className="flex items-center gap-sm text-label-lg">
-            <Icon name="calendarDots" size="sm" className="text-text-brand" />
-            تاریخ‌های جفت‌گیری
-          </h3>
-          <p className="mt-2xs text-caption text-text-secondary">
-            فقط تاریخ‌های تأییدشده دوطرفه؛ جدیدترین آن‌ها مبنای فاصله زمانی است.
-          </p>
-          {matingDates.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-disabled">تاریخ تأییدشده‌ای ثبت نشده است.</p>
-          ) : (
-            <ul className="mt-lg space-y-sm" data-testid="animal-mating-dates">
-              {matingDates.map((row) => (
-                <li key={row.permitId + '-' + row.version} className="text-body-sm">
-                  <span dir="ltr" className="font-mono">
-                    {row.matedOn}
-                  </span>{' '}
-                  · {formatCivilDateFa(row.matedOn)} · نسخه {row.version} · مجوز {row.permitNo ?? '—'}
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Alert tone="info" title="بخش‌هایی که در مراحل بعدی پر می‌شوند">
-          ساختار پرونده کامل است؛ داده این بخش‌ها با ساخته‌شدن همان فرایندها ثبت می‌شود.
-        </Alert>
-
-        {PENDING_SECTIONS.map((section) => (
-          <Card key={section.id}>
-            <h3 className="text-label-lg">{section.title}</h3>
-            <p className="mt-2xs text-caption text-text-secondary">{section.note}</p>
-            <p className="mt-md text-body-sm text-text-disabled">اطلاعاتی برای نمایش وجود ندارد.</p>
-          </Card>
-        ))}
-
-        {/* Who owned this animal, as rows rather than as one mutable column
-            (PROMPT-007). A previous owner is never removed. */}
-        {ownership.length > 0 ? (
-          <Card>
-            <h3 className="text-label-lg">تاریخچه مالکیت</h3>
-            <p className="mt-2xs text-caption text-text-secondary">
-              هر انتقال مالکیت یک ردیف جداست و حذف نمی‌شود؛ مدارک صادرشده در دوره هر مالک هم در پرونده
-              می‌مانند.
-            </p>
-            <ul className="mt-lg space-y-sm" data-testid="ownership-history">
-              {ownership.map((entry) => (
-                <li key={entry.id} className="flex flex-wrap items-center gap-sm text-body-sm">
-                  <span>{new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium' }).format(entry.transferredAt)}</span>
-                  <span className="text-caption text-text-secondary">
-                    {entry.reason === 'MARKETPLACE_SALE' ? 'فروش در بازار همزیست' : 'اصلاح توسط پشتیبانی'}
-                  </span>
-                  {entry.priceToman !== null ? (
-                    <span className="text-caption text-text-secondary">
-                      قیمت ثبت‌شده: {entry.priceToman.toLocaleString('fa-IR')} تومان
+              <ul className="mt-md divide-y divide-border-subtle" data-testid="ownership-history">
+                {ownership.map((entry) => (
+                  <li key={entry.id} className="flex flex-wrap items-center gap-sm py-sm text-body-sm">
+                    <span>
+                      {new Intl.DateTimeFormat('fa-IR', {
+                        dateStyle: 'medium',
+                      }).format(entry.transferredAt)}
                     </span>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ) : null}
+                    <span className="text-caption text-text-secondary">
+                      {entry.reason === 'MARKETPLACE_SALE' ? 'فروش در بازار همزیست' : 'اصلاح توسط پشتیبانی'}
+                    </span>
+                    {entry.priceToman !== null ? (
+                      <span className="text-caption text-text-secondary">
+                        قیمت ثبت‌شده: {entry.priceToman.toLocaleString('fa-IR')} تومان
+                      </span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ) : null}
 
-        <section aria-labelledby="timeline-heading" className="space-y-md">
-          <h3 id="timeline-heading" className="text-h3">
-            تاریخچه
-          </h3>
-          <Timeline items={items} />
-        </section>
+          <Card>
+            <SectionHeader size="sm" title="تاریخچه پرونده" id="timeline-heading" />
+            <div className="mt-lg">
+              {trail.items.length === 0 ? (
+                <p className="text-body-sm text-text-secondary">هنوز رویدادی ثبت نشده است.</p>
+              ) : (
+                // P06: oldest at the top, so the eye reads down to the latest.
+                <ol className="hz-timeline">
+                  {[...trail.items]
+                    .sort((x, y) => x.occurredAt.getTime() - y.occurredAt.getTime())
+                    .map((row) => (
+                      <li key={row.id} className="hz-timeline__item hz-timeline__item--done">
+                        <span className="hz-timeline__marker" aria-hidden="true" />
+                        <div className="hz-timeline__content">
+                          <div className="hz-timeline__head">
+                            <span className="hz-timeline__title">{AUDIT_TITLE_FA[row.action] ?? 'رویداد پرونده'}</span>
+                          </div>
+                          <div className="hz-timeline__meta">{dateFa(row.occurredAt)}</div>
+                          <p className="hz-timeline__body">
+                            {row.action === 'ANIMAL_LINEAGE_RESOLVED'
+                              ? 'نسل از رکورد والدین بازمحاسبه شد.'
+                              : 'رویداد پرونده حیوان.'}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                </ol>
+              )}
+            </div>
+          </Card>
+
+          <Card>
+            <SectionHeader size="sm" title="بخش‌هایی که در مراحل بعدی پر می‌شوند" />
+            <p className="mt-sm text-caption text-text-secondary">
+              ساختار پرونده کامل است؛ داده این بخش‌ها با ساخته‌شدن همان فرایندها ثبت می‌شود.
+            </p>
+            <KeyValueList
+              rows={PENDING_SECTIONS.map((section) => ({
+                key: section.title,
+                value: null,
+                empty: '— ' + section.note,
+              }))}
+            />
+          </Card>
+
+          <section id="edit" className="hz-card scroll-mt-s80" aria-labelledby="edit-heading">
+            <SectionHeader size="sm" title="ویرایش اطلاعات مجاز" id="edit-heading" />
+            <div className="mt-lg">
+              <AnimalEditForm
+                animalId={animal.id}
+                values={{
+                  name: animal.name ?? '',
+                  color: animal.color ?? '',
+                  markings: animal.markings ?? '',
+                  birthDateApproximate: animal.birthDateApproximate,
+                }}
+              />
+            </div>
+          </section>
+        </div>
+
+        <aside className="min-w-0 space-y-xl lg:col-span-4" aria-label="وضعیت و اقدام">
+          <AnimalPhoto fileId={animal.photoFileId} name={name} />
+          <Card>
+            <SectionHeader size="sm" title="وضعیت پرونده" />
+            <div className="mt-md space-y-md">
+              <ActionOwner
+                owner="USER"
+                stack
+                extra={
+                  registered
+                    ? sheet
+                      ? 'درخواستی برای ' + name + ' در جریان نیست؛ خدمت بعدی را از پیشخوان انتخاب کنید.'
+                      : 'برای صدور برگه ثبتی، کاشت یا تأیید میکروچیپ و نمونه‌گیری را درخواست کنید.'
+                    : 'ثبت این حیوان هنوز کامل نشده است.'
+                }
+              />
+              <KeyValueList
+                rows={[
+                  {
+                    key: 'برگه ثبتی',
+                    value: sheet ? 'صادر شد' : null,
+                    empty: 'صادر نشده',
+                  },
+                  {
+                    key: 'مشخصات',
+                    value: (
+                      <StatusBadge tone={animal.identityVerifiedAt === null ? 'neutral' : 'success'} size="sm">
+                        {animal.identityVerifiedAt === null ? 'مشخصات اظهاری' : 'مشخصات رسمی تأییدشده'}
+                      </StatusBadge>
+                    ),
+                  },
+                  {
+                    key: 'میکروچیپ',
+                    value: chip ? (
+                      <StatusBadge tone="success" size="sm">
+                        میکروچیپ ثبت‌شده
+                      </StatusBadge>
+                    ) : null,
+                    empty: 'هنوز ثبت نشده',
+                  },
+                  {
+                    key: 'نتیجه Parentage',
+                    value: parentage ? RESULT_STATUS_FA[parentage.status] : null,
+                    empty: 'ثبت نشده',
+                  },
+                ]}
+              />
+              {registered ? (
+                sheet ? null : (
+                  <ButtonLink href="/registration/new" block iconStart="stamp">
+                    درخواست برگه ثبتی
+                  </ButtonLink>
+                )
+              ) : (
+                <ButtonLink href={'/animals/' + animal.id + '/edit'} block>
+                  ادامه ثبت
+                </ButtonLink>
+              )}
+            </div>
+          </Card>
+        </aside>
       </div>
     </PublicShell>
+  );
+}
+
+/**
+ * The owner's own photo is private: it is read through the authorised file
+ * route, never `/media`. Without one, the DS RecordImage placeholder.
+ */
+function AnimalPhoto({ fileId, name }: { fileId: string | null; name: string }): ReactNode {
+  return (
+    <div className="hz-media hz-media--4x3">
+      {fileId ? (
+        <img src={'/api/files/' + fileId} alt={'تصویر ' + name} width={800} height={600} />
+      ) : (
+        <div className="hz-media__empty" data-testid="record-image-empty">
+          <img src="/brand/logo/symbol.svg" alt="" />
+          <span className="hz-media__alt">تصویر ثبت نشده</span>
+        </div>
+      )}
+    </div>
   );
 }

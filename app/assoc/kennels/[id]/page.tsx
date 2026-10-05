@@ -5,9 +5,10 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { ASSOC_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, DeskVersionNote, Panel, whenFa } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
+import { ageInDays } from '../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { profiles } from '../../../../src/db/schema/identity.ts';
 import { breedsOfKennel, findKennel, KENNEL_STATUS_FA } from '../../../../src/kennels/service.ts';
@@ -37,59 +38,73 @@ export default async function AssocKennelPage({ params }: { params: Promise<{ id
     db().select().from(profiles).where(eq(profiles.accountId, kennel.ownerAccountId)).limit(1),
   ]);
 
+  const open = kennel.status === 'UNDER_REVIEW';
+  const age = ageInDays(kennel.submittedAt);
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — انجمن" pathname={'/assoc/kennels/' + id} nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{kennel.nameFa ?? 'کنل بدون نام'}</span></h2></div>
-              <p className="mt-2xs text-caption text-text-secondary">
-                {owner[0] ? owner[0].firstName + ' ' + owner[0].lastName : '—'}
+    <OpsShell actor={guard.actor} title="بررسی کنل" pathname={'/assoc/kennels/' + id} nav={ASSOC_NAV}>
+      <DeskHead
+        title={'کنل · ' + (kennel.nameFa ?? 'کنل بدون نام')}
+        status={{
+          tone: open ? 'info' : kennel.status === 'APPROVED' ? 'success' : kennel.status === 'REJECTED' ? 'error' : 'warning',
+          label: KENNEL_STATUS_FA[kennel.status],
+          testId: 'assoc-kennel-status',
+        }}
+        meta={[
+          'مالک: ' + (owner[0] ? owner[0].firstName + ' ' + owner[0].lastName : '—'),
+          'ارسال: ' + (whenFa(kennel.submittedAt) ?? '—'),
+          open && age !== null ? <span className="hz-age">{age.toLocaleString('fa-IR') + ' روز در صف'}</span> : null,
+          'نسخه ' + kennel.version.toLocaleString('fa-IR'),
+        ]}
+        owner={open ? 'ASSOCIATION' : kennel.status === 'NEEDS_CORRECTION' ? 'USER' : null}
+      />
+      <Desk
+        decisionTitle={open ? 'تصمیم انجمن' : 'نتیجه'}
+        decision={
+          open ? (
+            <>
+              <p className="text-caption text-text-secondary">
+                تأیید این پرونده، نقش پرورش‌دهنده همین حساب را فعال می‌کند. هیچ پرداخت جداگانه‌ای برای فعال‌سازی
+                نقش وجود ندارد.
               </p>
-            </div>
-            <StatusBadge tone="info">
-              <span data-testid="assoc-kennel-status">{KENNEL_STATUS_FA[kennel.status]}</span>
-            </StatusBadge>
+              <KennelReviewForm kennelId={kennel.id} version={kennel.version} />
+              <DeskVersionNote version={kennel.version} />
+            </>
+          ) : (
+            <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
+              وضعیت فعلی: {KENNEL_STATUS_FA[kennel.status]}
+              {kennel.reasonFa ? ' — ' + kennel.reasonFa : ''}
+            </Alert>
+          )
+        }
+      >
+        <Panel title="اطلاعات اعلام‌شده">
+          <div data-testid="assoc-kennel-detail">
+            <KeyValueList
+              twoCol
+              rows={[
+                { key: 'نام فارسی', value: kennel.nameFa },
+                { key: 'نام لاتین', value: kennel.nameEn ? <bdi dir="ltr">{kennel.nameEn}</bdi> : null },
+                { key: 'تلفن', value: kennel.phone ? <bdi className="hz-id" dir="ltr">{kennel.phone}</bdi> : null },
+                {
+                  key: 'نشانی کنل',
+                  value:
+                    [kennel.provinceFa, kennel.cityFa].filter(Boolean).join('، ') +
+                    (kennel.addressFa ? ' — ' + kennel.addressFa : ''),
+                },
+                {
+                  key: 'زمان ارسال',
+                  value: kennel.submittedAt ? formatCivilDateFa(kennel.submittedAt.toISOString().slice(0, 10)) : null,
+                },
+              ]}
+            />
           </div>
-
-          <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="assoc-kennel-detail">
-            <dt className="text-text-secondary">نام لاتین</dt>
-            <dd>{kennel.nameEn ?? '—'}</dd>
-            <dt className="text-text-secondary">تلفن</dt>
-            <dd>{kennel.phone ?? '—'}</dd>
-            <dt className="text-text-secondary">نشانی کنل</dt>
-            <dd>
-              {[kennel.provinceFa, kennel.cityFa].filter(Boolean).join(' · ')}
-              {kennel.addressFa ? ' — ' + kennel.addressFa : ''}
-            </dd>
-            <dt className="text-text-secondary">زمان ارسال</dt>
-            <dd>
-              {kennel.submittedAt ? formatCivilDateFa(kennel.submittedAt.toISOString().slice(0, 10)) : '—'}
-            </dd>
-          </dl>
-
-          <p className="mt-lg text-body-sm" data-testid="assoc-kennel-breeds">
-            نژادها ({breeds.length}): {breeds.map((row) => row.nameFa).join('، ') || '—'}
+        </Panel>
+        <Panel title="نژادها" count={breeds.length.toLocaleString('fa-IR')}>
+          <p className="text-body-sm" data-testid="assoc-kennel-breeds">
+            {breeds.map((row) => row.nameFa).join('، ') || '—'}
           </p>
-        </Card>
-
-        {kennel.status === 'UNDER_REVIEW' ? (
-          <Card>
-            <h3 className="text-label-lg">تصمیم انجمن</h3>
-            <p className="mt-md text-caption text-text-secondary">
-              تأیید این پرونده، نقش پرورش‌دهنده همین حساب را فعال می‌کند. هیچ پرداخت جداگانه‌ای برای فعال‌سازی
-              نقش وجود ندارد.
-            </p>
-            <KennelReviewForm kennelId={kennel.id} version={kennel.version} />
-          </Card>
-        ) : (
-          <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
-            وضعیت فعلی: {KENNEL_STATUS_FA[kennel.status]}
-            {kennel.reasonFa ? ' — ' + kennel.reasonFa : ''}
-          </Alert>
-        )}
-      </div>
+        </Panel>
+      </Desk>
     </OpsShell>
   );
 }

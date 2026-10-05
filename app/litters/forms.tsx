@@ -17,9 +17,7 @@ const EMPTY: AllocationFormState = {};
 
 function Result({ state }: { state: AllocationFormState }) {
   if (!state.message) return null;
-  return (
-    <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />
-  );
+  return <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />;
 }
 
 /**
@@ -44,7 +42,12 @@ export function ProposeAllocationForm({
   const [state, submit, pending] = useActionState(proposeAllocationAction, EMPTY);
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{isRevision ? 'ثبت نسخه اصلاح‌شده تخصیص' : 'پیشنهاد تخصیص توله‌ها'}</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>{isRevision ? 'ثبت نسخه اصلاح‌شده تخصیص' : 'پیشنهاد تخصیص توله‌ها'}</span>
+        </h2>
+      </div>
       <form action={submit} className="mt-lg space-y-lg" data-testid="propose-allocation-form">
         <input type="hidden" name="litterId" value={litterId} />
         <input type="hidden" name="permitId" value={permitId} />
@@ -87,25 +90,26 @@ export function RespondAllocationForm({
       <input type="hidden" name="allocationId" value={allocationId} />
       <input type="hidden" name="version" value={version} />
       <Result state={state} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">{'پاسخ شما به نسخه ' + version}</legend>
+      <fieldset className="hz-fieldset">
+        <legend className="hz-field__label">{'پاسخ شما به نسخه ' + version}</legend>
         {(
           [
             ['APPROVE', 'تأیید همین نسخه'],
             ['REJECT', 'رد با دلیل'],
           ] as const
         ).map(([value, label]) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
+          <label key={value} className="hz-radio">
             <input
               type="radio"
               name="decision"
               value={value}
               checked={decision === value}
               onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
               data-testid={'allocation-decision-' + value}
             />
-            {label}
+            <span className="hz-radio__text">
+              <span>{label}</span>
+            </span>
           </label>
         ))}
       </fieldset>
@@ -135,18 +139,16 @@ export function CardCheckoutForm({
       <form action={submit} className="space-y-lg" data-testid="card-checkout-form">
         <input type="hidden" name="permitId" value={permitId} />
         <Result state={state} />
-        <fieldset className="space-y-sm">
-          <legend className="text-label-md">توله‌های واجد شرایط</legend>
+        <fieldset className="hz-fieldset">
+          <legend className="hz-field__label">توله‌های واجد شرایط</legend>
           {puppies.map((puppy) => (
-            <label key={puppy.id} className="flex items-center gap-sm text-body-sm">
-              <input
-                type="checkbox"
-                name="puppy"
-                value={puppy.id}
-                className="size-[var(--size-selection-md)]"
-                data-testid={'card-pick-' + puppy.tempCode}
-              />
-              {puppy.tempCode} · {puppy.nameFa ?? 'بدون نام'}
+            <label key={puppy.id} className="hz-check">
+              <input type="checkbox" name="puppy" value={puppy.id} data-testid={'card-pick-' + puppy.tempCode} />
+              <span className="hz-check__text">
+                <span className="hz-check__label">
+                  {puppy.tempCode} · {puppy.nameFa ?? 'بدون نام'}
+                </span>
+              </span>
             </label>
           ))}
         </fieldset>

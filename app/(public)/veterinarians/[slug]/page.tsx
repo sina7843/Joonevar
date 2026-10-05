@@ -17,6 +17,7 @@ import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import Link from 'next/link';
 import { Alert } from '../../../../src/ui/alert.tsx';
+import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { PlaceMap } from '../../../../src/ui/map.tsx';
 import { mapConfig } from '../../../../src/geo/service.ts';
 
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 function Prose({ text }: { text: string }) {
   return (
-    <div className="mt-md space-y-md text-body-md">
+    <div className="hz-prose">
       {text.split(/\n{2,}/).map((paragraph, index) => (
         <p key={index}>{paragraph}</p>
       ))}
@@ -77,186 +78,204 @@ export default async function VeterinarianPage({ params }: Params) {
   ];
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
-    <article className="min-w-0 space-y-xl" data-testid="vet-page">
+    <div className="space-y-xl">
       <Breadcrumbs items={crumbs} origin={origin} />
-      <JsonLdScript
-        data={vetPersonLd(
-          {
-            name: page.nameFa,
-            path,
-            description: page.headlineFa,
-            telephone: page.phone,
-            specialties: page.specialtiesFa,
-            locations: page.locations.map((l) => ({
-              name: l.nameFa,
-              city: l.cityNameFa,
-              province: l.provinceNameFa,
-              address: l.addressFa,
-              telephone: l.phone,
-            })),
-          },
-          origin,
-        )}
-      />
+      <div className="grid gap-xl lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        <article className="min-w-0 space-y-xl" data-testid="vet-page">
+          <JsonLdScript
+            data={vetPersonLd(
+              {
+                name: page.nameFa,
+                path,
+                description: page.headlineFa,
+                telephone: page.phone,
+                specialties: page.specialtiesFa,
+                locations: page.locations.map((l) => ({
+                  name: l.nameFa,
+                  city: l.cityNameFa,
+                  province: l.provinceNameFa,
+                  address: l.addressFa,
+                  telephone: l.phone,
+                })),
+              },
+              origin,
+            )}
+          />
 
-      <header className="space-y-sm">
-        <RecordImage priority fileId={page.imageFileId} altFa={page.imageAltFa} className="mb-lg" />
-        <h1 className="text-h2 md:text-h1">{page.nameFa}</h1>
-        {page.headlineFa ? <p className="text-body-md text-text-secondary">{page.headlineFa}</p> : null}
-        {/* Each axis is its own badge; none of them implies another (P2-D05). */}
-        <div className="flex flex-wrap gap-xs" data-testid="vet-axes">
-          {page.verified ? (
-            <span data-testid="vet-verified">
-              <StatusBadge tone="info">کد نظام دامپزشکی تأییدشده</StatusBadge>
-            </span>
+          <header className="hz-vet items-center">
+            <RecordImage priority variant="avatar" fileId={page.imageFileId} altFa={page.imageAltFa} className="size-[88px]" />
+            <div className="hz-vet__body gap-xs">
+              <h1 className="hz-h2">{page.nameFa}</h1>
+              {page.headlineFa ? <p className="hz-body text-text-secondary">{page.headlineFa}</p> : null}
+              {/* Each axis is its own badge; none of them implies another (P2-D05). */}
+              <div className="flex flex-wrap gap-xs" data-testid="vet-axes">
+                {page.verified ? (
+                  <span data-testid="vet-verified">
+                    <StatusBadge tone="info">کد نظام دامپزشکی تأییدشده</StatusBadge>
+                  </span>
+                ) : null}
+                {page.trusted ? (
+                  <span data-testid="vet-trusted">
+                    <StatusBadge tone="success">دامپزشک معتمد همزیست</StatusBadge>
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          </header>
+
+          {page.owned ? null : (
+            <div data-testid="vet-unowned">
+              <Alert tone="info" title="این پروفایل بدون مالک است">
+                اطلاعات این صفحه از منبع عمومی ثبت و بررسی شده است و هنوز هیچ دامپزشکی مدیریت آن را به عهده نگرفته است. کد نظام آن
+                تأیید نشده است.{' '}
+                <Link href={'/account/vet-profile/claim/' + page.slug} className="hz-link" data-testid="vet-claim-link">
+                  این پروفایل شماست؟ درخواست Claim
+                </Link>
+              </Alert>
+            </div>
+          )}
+
+          {page.primary ? (
+            <div data-testid="vet-merged">
+              <Alert tone="warning" title="این رکورد تکراری بوده است">
+                {DUPLICATE_NOTICE_FA}{' '}
+                <Link href={'/veterinarians/' + page.primary.slug} className="hz-link">
+                  {page.primary.nameFa}
+                </Link>
+              </Alert>
+            </div>
           ) : null}
-          {page.trusted ? (
-            <span data-testid="vet-trusted">
-              <StatusBadge tone="success">دامپزشک معتمد همزیست</StatusBadge>
-            </span>
+
+          <section aria-labelledby="vet-facts-title" className="hz-card">
+            <SectionHeader size="sm" id="vet-facts-title" title="مشخصات" />
+            <dl className="hz-kv" data-testid="vet-facts">
+              {page.councilCode ? (
+                <div className="hz-kv__row">
+                  <dt className="hz-kv__key">کد نظام دامپزشکی</dt>
+                  <dd className="hz-kv__value">
+                    <bdi className="hz-id" dir="ltr" data-testid="vet-council-code">
+                      {page.councilCode}
+                    </bdi>
+                  </dd>
+                </div>
+              ) : null}
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">تخصص‌ها</dt>
+                {page.specialtiesFa.length > 0 ? (
+                  <dd className="hz-kv__value" data-testid="vet-specialties">
+                    {page.specialtiesFa.join('، ')}
+                  </dd>
+                ) : (
+                  <dd className="hz-kv__value hz-kv__value--empty">تعیین‌نشده</dd>
+                )}
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">گونه‌هایی که پذیرفته می‌شوند</dt>
+                {page.speciesFa.length > 0 ? (
+                  <dd className="hz-kv__value" data-testid="vet-species">
+                    {page.speciesFa.join('، ')}
+                  </dd>
+                ) : (
+                  <dd className="hz-kv__value hz-kv__value--empty">تعیین‌نشده</dd>
+                )}
+              </div>
+            </dl>
+          </section>
+
+          {page.bioFa ? (
+            <section aria-labelledby="vet-bio-title" className="hz-card">
+              <SectionHeader size="sm" id="vet-bio-title" title="معرفی" />
+              <Prose text={page.bioFa} />
+            </section>
           ) : null}
-        </div>
-      </header>
 
-      {page.owned ? null : (
-        <div data-testid="vet-unowned">
-          <Alert tone="info" title="این پروفایل بدون مالک است">
-            اطلاعات این صفحه از منبع عمومی ثبت و بررسی شده است و هنوز هیچ دامپزشکی مدیریت آن را به عهده نگرفته است. کد نظام آن تأیید
-            نشده است.{' '}
-            <Link href={'/account/vet-profile/claim/' + page.slug} className="text-text-brand underline underline-offset-4" data-testid="vet-claim-link">
-              این پروفایل شماست؟ درخواست Claim
-            </Link>
-          </Alert>
-        </div>
-      )}
+          {page.experienceFa ? (
+            <section aria-labelledby="vet-experience-title" className="hz-card">
+              <SectionHeader size="sm" id="vet-experience-title" title="سوابق" />
+              <Prose text={page.experienceFa} />
+            </section>
+          ) : null}
 
-      {page.primary ? (
-        <div data-testid="vet-merged">
-          <Alert tone="warning" title="این رکورد تکراری بوده است">
-            {DUPLICATE_NOTICE_FA}{' '}
-            <Link href={'/veterinarians/' + page.primary.slug} className="text-text-brand underline underline-offset-4">
-              {page.primary.nameFa}
-            </Link>
-          </Alert>
-        </div>
-      ) : null}
-
-      <dl className="grid gap-sm sm:grid-cols-2" data-testid="vet-facts">
-        {page.councilCode ? (
-          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
-            <dt className="text-body-sm text-text-secondary">کد نظام دامپزشکی</dt>
-            <dd className="text-label-md" dir="ltr" data-testid="vet-council-code">
-              {page.councilCode}
-            </dd>
-          </div>
-        ) : null}
-        {page.phone ? (
-          <div className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm">
-            <dt className="text-body-sm text-text-secondary">تلفن عمومی</dt>
-            <dd className="text-label-md" dir="ltr" data-testid="vet-phone">
-              <a href={'tel:' + page.phone}>{page.phone}</a>
-            </dd>
-          </div>
-        ) : null}
-        {page.specialtiesFa.length > 0 ? (
-          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
-            <dt className="text-body-sm text-text-secondary">تخصص‌ها</dt>
-            <dd className="mt-2xs text-label-md" data-testid="vet-specialties">
-              {page.specialtiesFa.join('، ')}
-            </dd>
-          </div>
-        ) : null}
-        {page.speciesFa.length > 0 ? (
-          <div className="rounded-lg border border-border-default bg-bg-surface px-md py-sm sm:col-span-2">
-            <dt className="text-body-sm text-text-secondary">گونه‌هایی که پذیرفته می‌شوند</dt>
-            <dd className="mt-2xs text-label-md" data-testid="vet-species">
-              {page.speciesFa.join('، ')}
-            </dd>
-          </div>
-        ) : null}
-      </dl>
-
-      {page.bioFa ? (
-        <section aria-labelledby="vet-bio-title">
-          <h2 id="vet-bio-title" className="text-h3">
-            معرفی
-          </h2>
-          <Prose text={page.bioFa} />
-        </section>
-      ) : null}
-
-      {page.experienceFa ? (
-        <section aria-labelledby="vet-experience-title">
-          <h2 id="vet-experience-title" className="text-h3">
-            سوابق
-          </h2>
-          <Prose text={page.experienceFa} />
-        </section>
-      ) : null}
-
-      {page.locations.length === 0 && !page.listed ? null : (
-      <section aria-labelledby="vet-locations-title">
-        <h2 id="vet-locations-title" className="text-h3">
-          محل‌های کار
-        </h2>
-        {page.listed ? (
-          <p className="mt-md flex flex-wrap items-center gap-2xs text-body-sm" data-testid="vet-listed-place">
-            <Icon name="mapPin" size="xs" />
-            {page.listed.provinceNameFa + ' · ' + page.listed.cityNameFa + (page.listed.contactFa ? ' · ' + page.listed.contactFa : '')}
-          </p>
-        ) : null}
-        <ul className="mt-md space-y-sm" data-testid="vet-locations">
-          {page.locations.map((location) => (
-            <li key={location.id} className="rounded-lg border border-border-default bg-bg-surface p-md" data-testid="vet-location">
-              <p className="text-label-lg">{location.nameFa}</p>
-              <p className="mt-2xs flex items-center gap-2xs text-body-sm text-text-secondary">
-                <Icon name="mapPin" size="xs" />
-                {[LOCATION_KIND_FA[location.kind], location.provinceNameFa, location.cityNameFa, location.neighborhoodFa]
-                  .filter(Boolean)
-                  .join(' · ')}
+          {page.locations.length === 0 && !page.listed ? null : (
+            <section aria-labelledby="vet-locations-title" className="space-y-md">
+              <SectionHeader id="vet-locations-title" title="محل‌های کار" />
+              {page.listed ? (
+                <p className="hz-meta__item hz-body-sm" data-testid="vet-listed-place">
+                  <Icon name="mapPin" size="xs" />
+                  {page.listed.provinceNameFa + '، ' + page.listed.cityNameFa + (page.listed.contactFa ? '، ' + page.listed.contactFa : '')}
+                </p>
+              ) : null}
+              <ul className="space-y-md" data-testid="vet-locations">
+                {page.locations.map((location) => (
+                  <li key={location.id} className="hz-card space-y-sm" data-testid="vet-location">
+                    <h3 className="hz-card__title">{location.nameFa}</h3>
+                    <p className="hz-entity__line hz-body-sm text-text-secondary">
+                      <Icon name="mapPin" size="xs" />
+                      {[LOCATION_KIND_FA[location.kind], location.provinceNameFa, location.cityNameFa, location.neighborhoodFa]
+                        .filter(Boolean)
+                        .join('، ')}
+                    </p>
+                    {location.addressFa ? <p className="hz-body-sm">{location.addressFa}</p> : null}
+                    {location.phone ? (
+                      <p className="hz-body-sm">
+                        {'تلفن: '}
+                        <a href={'tel:' + location.phone} className="hz-link" dir="ltr">
+                          {location.phone}
+                        </a>
+                      </p>
+                    ) : null}
+                    {location.hoursNoteFa ? (
+                      <p className="hz-entity__line hz-body-sm" data-testid="vet-location-hours">
+                        <Icon name="clock" size="xs" />
+                        {'ساعات اعلام‌شده: ' + location.hoursNoteFa}
+                      </p>
+                    ) : null}
+                    {/* Only places the veterinarian published reach this page (§20). */}
+                    <PlaceMap
+                      nameFa={location.nameFa}
+                      isPublic
+                      latitude={location.latitude}
+                      longitude={location.longitude}
+                      template={map.template}
+                      apiKey={map.apiKey}
+                      testId={'vet-location-map-' + location.id}
+                    />
+                  </li>
+                ))}
+              </ul>
+              <p className="hz-caption">
+                ساعات فقط برای اطلاع است. همزیست نوبت نمی‌دهد و درخواست خدمت از این صفحه ثبت نمی‌شود؛ پیش از مراجعه با محل کار
+                تماس بگیرید.
               </p>
-              {location.addressFa ? <p className="mt-xs text-body-sm">{location.addressFa}</p> : null}
-              {location.phone ? (
-                <p className="mt-xs text-body-sm">
-                  {'تلفن: '}
-                  <a href={'tel:' + location.phone} dir="ltr">
-                    {location.phone}
-                  </a>
-                </p>
-              ) : null}
-              {location.hoursNoteFa ? (
-                <p className="mt-xs text-body-sm" data-testid="vet-location-hours">
-                  {'ساعات اعلام‌شده: ' + location.hoursNoteFa}
-                </p>
-              ) : null}
-              {/* Only places the veterinarian published reach this page (§20). */}
-              <PlaceMap
-                nameFa={location.nameFa}
-                isPublic
-                latitude={location.latitude}
-                longitude={location.longitude}
-                template={map.template}
-                apiKey={map.apiKey}
-                testId={'vet-location-map-' + location.id}
-              />
-            </li>
-          ))}
-        </ul>
-        <p className="mt-sm text-caption text-text-secondary">
-          ساعات فقط برای اطلاع است. همزیست نوبت نمی‌دهد و درخواست خدمت از این صفحه ثبت نمی‌شود؛ پیش از مراجعه با محل کار
-          تماس بگیرید.
-        </p>
-      </section>
-      )}
-    </article>
+            </section>
+          )}
+        </article>
 
-      <RelatedColumn
-        groups={[
-          { titleFa: 'دامپزشکان مشابه', items: vets },
-          { titleFa: 'مراکز دامپزشکی', items: centres },
-        ]}
-      />
+        <div className="hz-reading__aside min-w-0 space-y-xl">
+          <aside className="hz-card space-y-md" aria-labelledby="vet-contact-title">
+            <SectionHeader size="sm" id="vet-contact-title" title="تماس" />
+            {page.phone ? (
+              <p className="hz-entity__line hz-body">
+                <Icon name="phone" size="sm" />
+                <span>
+                  {'تلفن عمومی: '}
+                  <a href={'tel:' + page.phone} className="hz-link" dir="ltr" data-testid="vet-phone">
+                    {page.phone}
+                  </a>
+                </span>
+              </p>
+            ) : (
+              <p className="hz-body-sm text-text-secondary">دامپزشک شماره تماس عمومی ثبت نکرده است؛ از محل کار تماس بگیرید.</p>
+            )}
+          </aside>
+          <RelatedColumn
+            groups={[
+              { titleFa: 'دامپزشکان مشابه', items: vets, link: { href: '/veterinarians', label: 'همه دامپزشکان' } },
+              { titleFa: 'مراکز دامپزشکی', items: centres, link: { href: '/centers', label: 'همه مراکز' } },
+            ]}
+          />
+        </div>
+      </div>
     </div>
   );
 }

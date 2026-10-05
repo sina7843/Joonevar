@@ -21,6 +21,7 @@ import {
   PUPPY_CARD_FEE_KEY,
 } from '../../../src/mating/allocation.ts';
 import { CardCheckoutForm } from '../../litters/forms.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,11 +32,7 @@ export const dynamic = 'force-dynamic';
  * says what is missing. The prerequisites are the ones the source names, and a
  * registration sheet for the puppy is not among them.
  */
-export default async function CardCheckoutPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ permit?: string }>;
-}) {
+export default async function CardCheckoutPage({ searchParams }: { searchParams: Promise<{ permit?: string }> }) {
   const guard = await guardRoute('/puppy-cards/checkout');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { permit: permitId } = await searchParams;
@@ -49,13 +46,21 @@ export default async function CardCheckoutPage({
 
   if (!permitId) {
     return (
-      <PublicShell actor={guard.actor} title="کارت توله" pathname="/puppy-cards/checkout">
+      <PublicShell
+        actor={guard.actor}
+        title="کارت توله"
+        pathname="/puppy-cards/checkout"
+        header={<PageHeader title={'کارت توله'} back={{ href: '/mating/permits' }} />}
+      >
         <div className="space-y-lg">
-          {eligibility.allowed ? null : (
-            <LockedServiceCard serviceLabel="کارت توله" lock={eligibility.lock} />
-          )}
+          {eligibility.allowed ? null : <LockedServiceCard serviceLabel="کارت توله" lock={eligibility.lock} />}
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کارت‌های صادرشده شما</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>کارت‌های صادرشده شما</span>
+              </h2>
+            </div>
             {myCards.length === 0 ? (
               <div className="mt-lg">
                 <EmptyState
@@ -66,10 +71,10 @@ export default async function CardCheckoutPage({
             ) : (
               <ul className="mt-lg space-y-md" data-testid="my-cards">
                 {myCards.map((row) => (
-                  <li key={row.card.id} className="rounded-xl border border-border-default p-lg">
+                  <li key={row.card.id} className="rounded-lg border border-border-default p-lg">
                     <Link
                       href={'/documents/puppy-card/' + row.card.id}
-                      className="text-text-brand underline underline-offset-4"
+                      className="hz-link"
                       data-testid={'open-card-' + row.tempCode}
                     >
                       {row.card.cardNo} · {row.tempCode} · {row.nameFa ?? 'بدون نام'}
@@ -103,10 +108,20 @@ export default async function CardCheckoutPage({
   const eligible = rows.filter((row) => row.eligible);
 
   return (
-    <PublicShell actor={guard.actor} title="صدور کارت توله" pathname="/puppy-cards/checkout">
+    <PublicShell
+      actor={guard.actor}
+      title="صدور کارت توله"
+      pathname="/puppy-cards/checkout"
+      header={<PageHeader title={'صدور کارت توله'} back={{ href: '/mating/permits' }} />}
+    >
       <div className="space-y-lg">
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کارت توله</span></h2></div>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>کارت توله</span>
+            </h2>
+          </div>
           <p className="mt-md text-caption text-text-secondary" data-testid="card-distinction-note">
             {CARD_DISTINCTION_NOTE_FA}
           </p>
@@ -115,11 +130,7 @@ export default async function CardCheckoutPage({
           </p>
           {litter ? (
             <p className="mt-sm text-body-sm">
-              <Link
-                href={'/litters/' + litter.id + '/allocation'}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="open-allocation"
-              >
+              <Link href={'/litters/' + litter.id + '/allocation'} className="hz-link" data-testid="open-allocation">
                 مشاهده تخصیص این پرونده
               </Link>
             </p>
@@ -127,12 +138,17 @@ export default async function CardCheckoutPage({
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت هر توله</span></h2></div>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>وضعیت هر توله</span>
+            </h2>
+          </div>
           <ul className="mt-lg space-y-md" data-testid="card-eligibility">
             {rows.map((row) => (
               <li
                 key={row.puppyId}
-                className="rounded-xl border border-border-default p-lg"
+                className="rounded-lg border border-border-default p-lg"
                 data-testid={'card-row-' + row.tempCode}
               >
                 <p className="text-label-md">
@@ -143,7 +159,7 @@ export default async function CardCheckoutPage({
                   <p className="mt-sm text-body-sm">
                     <Link
                       href={'/documents/puppy-card/' + row.card.id}
-                      className="text-text-brand underline underline-offset-4"
+                      className="hz-link"
                       data-testid={'issued-card-' + row.tempCode}
                     >
                       {'کارت ' + row.card.cardNo}
@@ -173,10 +189,15 @@ export default async function CardCheckoutPage({
           </Alert>
         ) : (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب و پرداخت</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>انتخاب و پرداخت</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
-              می‌توانید یک یا چند توله را انتخاب کنید؛ هزینه هر توله جدا محاسبه و در یک پرداخت جمع می‌شود و
-              کارت هر توله مستقل صادر می‌شود.
+              می‌توانید یک یا چند توله را انتخاب کنید؛ هزینه هر توله جدا محاسبه و در یک پرداخت جمع می‌شود و کارت هر توله
+              مستقل صادر می‌شود.
             </p>
             <CardCheckoutForm
               permitId={permit.id}

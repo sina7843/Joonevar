@@ -1,7 +1,8 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, DocFrame, Panel, PrivateNote, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -37,27 +38,32 @@ export default async function AssocVetStudentCasePage({ params }: { params: Prom
 
   return (
     <OpsShell actor={guard.actor} title="بررسی دانشجوی دامپزشکی" pathname="/assoc/vet-students" nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات متقاضی</span></h2></div>
-          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
-            <dt className="text-text-secondary">نام در حساب</dt>
-            <dd>{detail.applicantNameFa ?? '—'}</dd>
-            <dt className="text-text-secondary">کد ملی</dt>
-            <dd>{detail.applicantNationalId ? <Identifier value={detail.applicantNationalId} /> : '—'}</dd>
-            <dt className="text-text-secondary">نام اعلام‌شده</dt>
-            <dd>{latest?.fields.displayNameFa ?? '—'}</dd>
-            <dt className="text-text-secondary">شماره دانشجویی</dt>
-            <dd dir="ltr" data-testid="review-student-number">
-              {latest?.fields.studentNumber ?? '—'}
-            </dd>
-            <dt className="text-text-secondary">دانشگاه</dt>
-            <dd data-testid="review-student-university">{latest?.fields.universityFa ?? '—'}</dd>
-            <dt className="text-text-secondary">وضعیت</dt>
-            <dd data-testid="student-case-status">{detail.case.statusFa}</dd>
-          </dl>
-        </Card>
-
+      <DeskHead
+        title={'دانشجوی دامپزشکی · ' + (detail.applicantNameFa ?? latest?.fields.displayNameFa ?? '—')}
+        status={{ tone: waiting ? 'info' : detail.case.status === 'NEEDS_CORRECTION' ? 'warning' : detail.case.status === 'REJECTED' ? 'error' : 'success', label: detail.case.statusFa }}
+        meta={[
+          detail.applicantNationalId ? <Identifier label="کد ملی" value={detail.applicantNationalId} /> : null,
+          'نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR'),
+        ]}
+        owner={waiting ? 'ASSOCIATION' : detail.case.status === 'NEEDS_CORRECTION' ? 'USER' : null}
+        ownerExtra={review?.claimedByOther ? 'در دست ' + (review.claimerNameFa ?? 'بررسی‌کننده دیگر') : undefined}
+      />
+      <Desk
+        decisionTitle={waiting ? 'تصمیم' : 'نتیجه'}
+        decision={
+          <>
+            {review && waiting ? <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} /> : null}
+            {waiting && !review?.claimedByOther ? (
+              <DecideStudentCaseForm caseId={detail.case.id} version={detail.case.version} />
+            ) : waiting ? null : (
+              <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
+                {'وضعیت فعلی: ' + detail.case.statusFa}
+                {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}
+              </Alert>
+            )}
+          </>
+        }
+      >
         {duplicates > 0 ? (
           <Alert tone="warning" title="همین شماره دانشجویی در حساب دیگری هم آمده است">
             {detail.duplicates.profiles.map((row) => (row.displayNameFa ?? '') + ' (' + (row.universityFa ?? '—') + ')').join('، ') ||
@@ -65,76 +71,72 @@ export default async function AssocVetStudentCasePage({ params }: { params: Prom
           </Alert>
         ) : null}
 
-        <Card>
-          <h2 className="hz-card__title">مدارک</h2>
+        <Panel title="مدارک" aside={<PrivateNote />}>
           {detail.documents.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-disabled">مدرکی پیوست نشده است؛ مدرک در این مسیر اختیاری است.</p>
+            <p className="text-body-sm text-text-secondary">مدرکی پیوست نشده است؛ مدرک در این مسیر اختیاری است.</p>
           ) : (
-            <ul className="mt-md space-y-2xs text-body-sm">
+            <ul className="hz-desk__docs">
               {detail.documents.map((document) => (
                 <li key={document.id}>
-                  <a href={'/api/files/' + document.fileId} target="_blank" rel="noreferrer" className="text-text-brand underline underline-offset-4" data-testid="student-document-link">
-                    {'کارت دانشجویی — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
-                  </a>
-                  {document.submissionVersion === detail.case.currentSubmissionVersion ? (
-                    <DocumentPreview fileId={document.fileId} labelFa="کارت دانشجویی" testId="student-document-preview" />
-                  ) : null}
+                  <DocFrame
+                    href={'/api/files/' + document.fileId}
+                    label={'کارت دانشجویی — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
+                    linkLabel={'کارت دانشجویی — نسخه ' + document.submissionVersion.toLocaleString('fa-IR')}
+                    testId="student-document-link"
+                    icon="student"
+                  >
+                    {document.submissionVersion === detail.case.currentSubmissionVersion ? (
+                      <DocumentPreview fileId={document.fileId} labelFa="کارت دانشجویی" testId="student-document-preview" />
+                    ) : null}
+                  </DocFrame>
                 </li>
               ))}
             </ul>
           )}
-        </Card>
+        </Panel>
+
+        <Panel title="اطلاعات اعلام‌شده">
+          <KeyValueList
+            twoCol
+            rows={[
+              { key: 'نام در حساب', value: detail.applicantNameFa },
+              { key: 'کد ملی', value: detail.applicantNationalId ? <Identifier value={detail.applicantNationalId} /> : null },
+              { key: 'نام اعلام‌شده', value: latest?.fields.displayNameFa },
+              { key: 'شماره دانشجویی', value: latest?.fields.studentNumber ? <bdi dir="ltr">{latest.fields.studentNumber}</bdi> : null, testId: 'review-student-number' },
+              { key: 'دانشگاه', value: latest?.fields.universityFa, testId: 'review-student-university' },
+              { key: 'وضعیت', value: detail.case.statusFa, testId: 'student-case-status' },
+            ]}
+          />
+        </Panel>
 
         {detail.submissions.length > 1 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نسخه‌های ارسال</span></h2></div>
-            <ol className="mt-md space-y-sm text-body-sm" data-testid="student-submissions">
+          <Panel title="نسخه‌های ارسال">
+            <ol className="space-y-sm text-body-sm" data-testid="student-submissions">
               {detail.submissions.map((submission) => (
                 <li key={submission.version}>
                   {'نسخه ' + submission.version.toLocaleString('fa-IR') + ' · ' + formatInstantFa(submission.submittedAt) + ' · '}
                   {submission.fields.universityFa + ' · '}
-                  <span dir="ltr">{submission.fields.studentNumber}</span>
+                  <bdi dir="ltr">{submission.fields.studentNumber}</bdi>
                 </li>
               ))}
             </ol>
-          </Card>
+          </Panel>
         ) : null}
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه</span></h2></div>
-          <ol className="mt-md space-y-sm text-body-sm" data-testid="student-case-history">
-            {detail.history.map((event, index) => (
-              <li key={index}>
-                {formatInstantFa(new Date(event.at)) + ' · ' + (event.toStatusFa ?? event.action)}
-                {event.reasonFa ? ' — ' + event.reasonFa : ''}
-              </li>
-            ))}
-          </ol>
-        </Card>
-
-        {review && waiting ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بررسی</span></h2></div>
-            <div className="mt-md">
-              <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
-            </div>
-          </Card>
-        ) : null}
-
-        {waiting && !review?.claimedByOther ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
-            <div className="mt-lg">
-              <DecideStudentCaseForm caseId={detail.case.id} version={detail.case.version} />
-            </div>
-          </Card>
-        ) : waiting ? null : (
-          <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
-            {'وضعیت فعلی: ' + detail.case.statusFa}
-            {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}
-          </Alert>
-        )}
-      </div>
+        <Panel title="سابقه پرونده">
+          <div data-testid="student-case-history">
+            <CaseHistory
+              entries={[...detail.history].reverse().map((event, index) => ({
+                id: String(index),
+                title: event.toStatusFa ?? event.action,
+                whenFa: formatInstantFa(new Date(event.at)),
+                body: event.reasonFa ?? undefined,
+                current: index === 0,
+              }))}
+            />
+          </div>
+        </Panel>
+      </Desk>
     </OpsShell>
   );
 }

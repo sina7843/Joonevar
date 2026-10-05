@@ -35,9 +35,7 @@ export default async function CheckInPage() {
             description="تا ثبت مرکز و پروانه معتبر آن توسط سوپرادمین، پذیرش مراجعه ممکن نیست."
           />
         ) : (
-          <CheckInForm
-            locations={locations.map((l) => ({ id: l.id, nameFa: l.nameFa }))}
-          />
+          <CheckInForm locations={locations.map((l) => ({ id: l.id, nameFa: l.nameFa }))} />
         )}
       </div>
     </PublicShell>

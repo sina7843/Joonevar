@@ -11,6 +11,7 @@ import { db } from '../../../../src/db/client.ts';
 import { cardForOwner, CARD_DISTINCTION_NOTE_FA } from '../../../../src/mating/allocation.ts';
 import { PUPPY_STATUS_FA } from '../../../../src/mating/birth.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,24 +37,48 @@ export default async function PuppyCardPage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <PublicShell actor={guard.actor} title="کارت توله" pathname={'/documents/puppy-card/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="کارت توله"
+      pathname={'/documents/puppy-card/' + id}
+      header={<PageHeader title={'کارت توله'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg">
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>کارت توله</span></h2></div>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>کارت توله</span>
+            </h2>
+          </div>
           <div className="mt-lg" data-testid="card-no">
             <Identifier label="شماره کارت" value={view.card.cardNo} />
           </div>
-          <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="card-detail">
-            <dt className="text-text-secondary">کد موقت توله</dt>
-            <dd>{view.puppy.tempCode}</dd>
-            <dt className="text-text-secondary">نام</dt>
-            <dd>{view.puppy.nameFa ?? 'بدون نام'}</dd>
-            <dt className="text-text-secondary">وضعیت توله</dt>
-            <dd data-testid="card-puppy-status">{PUPPY_STATUS_FA[view.puppy.status] ?? view.puppy.status}</dd>
-            <dt className="text-text-secondary">نسخه تخصیص</dt>
-            <dd data-testid="card-allocation-version">{view.card.allocationVersion}</dd>
-            <dt className="text-text-secondary">تاریخ صدور</dt>
-            <dd>{formatCivilDateFa(view.card.issuedAt.toISOString().slice(0, 10))}</dd>
+          <dl className="hz-kv mt-lg" data-testid="card-detail">
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">کد موقت توله</dt>
+              <dd className="hz-kv__value">{view.puppy.tempCode}</dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">نام</dt>
+              <dd className="hz-kv__value">{view.puppy.nameFa ?? 'بدون نام'}</dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">وضعیت توله</dt>
+              <dd className="hz-kv__value" data-testid="card-puppy-status">
+                {PUPPY_STATUS_FA[view.puppy.status] ?? view.puppy.status}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">نسخه تخصیص</dt>
+              <dd className="hz-kv__value" data-testid="card-allocation-version">
+                {view.card.allocationVersion}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">تاریخ صدور</dt>
+              <dd className="hz-kv__value">{formatCivilDateFa(view.card.issuedAt.toISOString().slice(0, 10))}</dd>
+            </div>
           </dl>
           <Alert tone="info" title="این سند چه چیزی نیست">
             <span data-testid="card-distinction">{CARD_DISTINCTION_NOTE_FA}</span>
@@ -62,11 +87,7 @@ export default async function PuppyCardPage({ params }: { params: Promise<{ id: 
             قالب چاپی رسمی این کارت هنوز تحویل نشده است؛ خروجی PDF زیر، چاپ همین داده‌های ثبت‌شده در سامانه است.
           </p>
           <p className="mt-md text-body-sm">
-            <a
-              href={'/api/documents/puppy-card/' + id + '/pdf'}
-              className="text-text-brand underline underline-offset-4"
-              data-testid="download-pdf"
-            >
+            <a href={'/api/documents/puppy-card/' + id + '/pdf'} className="hz-link" data-testid="download-pdf">
               دریافت نسخه PDF این سند
             </a>
           </p>

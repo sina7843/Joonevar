@@ -98,7 +98,7 @@ export default async function ServicePage({ params }: Params) {
         <h2 id="service-prerequisites-title" className="text-h3">
           پیش‌نیازها
         </h2>
-        <ul className="mt-md list-disc space-y-xs pr-lg text-body-md" data-testid="service-prerequisites">
+        <ul className="mt-md list-disc space-y-xs ps-lg text-body-md" data-testid="service-prerequisites">
           {service.prerequisitesFa.map((item) => (
             <li key={item}>{item}</li>
           ))}
@@ -128,7 +128,7 @@ export default async function ServicePage({ params }: Params) {
         <h2 id="service-documents-title" className="text-h3">
           مدارک
         </h2>
-        <ul className="mt-md list-disc space-y-xs pr-lg text-body-md" data-testid="service-documents">
+        <ul className="mt-md list-disc space-y-xs ps-lg text-body-md" data-testid="service-documents">
           {service.documentsFa.map((item) => (
             <li key={item}>{item}</li>
           ))}

@@ -19,6 +19,7 @@ import { PUPPY_STATUS_FA } from '../../../../src/mating/birth.ts';
 import { PRE_BIRTH_RULE_NOTE_FA } from '../../../../src/domain/allocation.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { ProposeAllocationForm, RespondAllocationForm } from '../../forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,29 +58,32 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
   const canPropose = view.current === null || view.current.status !== 'PENDING_BOTH_OWNERS' || myAnswer === null;
 
   return (
-    <PublicShell actor={guard.actor} title="تخصیص توله‌ها" pathname={'/litters/' + id + '/allocation'}>
+    <PublicShell
+      actor={guard.actor}
+      title="تخصیص توله‌ها"
+      pathname={'/litters/' + id + '/allocation'}
+      header={<PageHeader title={'تخصیص توله‌ها'} back={{ href: '/mating/permits' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تخصیص مالکیت توله‌ها</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>تخصیص مالکیت توله‌ها</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {view.permit.permitNo ?? '—'} ·{' '}
-                <Link
-                  href={'/mating/permits/' + view.permit.id + '/birth'}
-                  className="text-text-brand underline underline-offset-4"
-                >
+                <Link href={'/mating/permits/' + view.permit.id + '/birth'} className="hz-link">
                   پرونده زایمان
                 </Link>
               </p>
             </div>
             <StatusBadge
               tone={
-                view.current?.status === 'FINAL'
-                  ? 'success'
-                  : view.current?.status === 'REJECTED'
-                    ? 'warning'
-                    : 'info'
+                view.current?.status === 'FINAL' ? 'success' : view.current?.status === 'REJECTED' ? 'warning' : 'info'
               }
             >
               <span data-testid="allocation-status">
@@ -94,16 +98,25 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
 
         {view.ruleContext ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توافق پیش از تولد (فقط زمینه پیشنهاد)</span></h2></div>
-            <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="rule-context">
-              <dt className="text-text-secondary">نوع توافق</dt>
-              <dd>{view.ruleContext.typeFa}</dd>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>توافق پیش از تولد (فقط زمینه پیشنهاد)</span>
+              </h2>
+            </div>
+            <dl className="hz-kv mt-lg" data-testid="rule-context">
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">نوع توافق</dt>
+                <dd className="hz-kv__value">{view.ruleContext.typeFa}</dd>
+              </div>
               {view.ruleContext.sides.map((side) => (
                 <div key={side.sideFa} className="contents">
-                  <dt className="text-text-secondary">{side.sideFa}</dt>
-                  <dd>
-                    {side.describeFa} · {view.partyNames[side.partyAccountId] ?? '—'}
-                  </dd>
+                  <div className="hz-kv__row">
+                    <dt className="hz-kv__key">{side.sideFa}</dt>
+                    <dd className="hz-kv__value">
+                      {side.describeFa} · {view.partyNames[side.partyAccountId] ?? '—'}
+                    </dd>
+                  </div>
                 </div>
               ))}
             </dl>
@@ -115,12 +128,17 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
 
         {view.current ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'نسخه ' + view.current.version + ' — مالک پیشنهادی هر توله'}</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>{'نسخه ' + view.current.version + ' — مالک پیشنهادی هر توله'}</span>
+              </h2>
+            </div>
             <ul className="mt-lg space-y-md" data-testid="allocation-items">
               {view.puppies.map((puppy) => (
                 <li
                   key={puppy.id}
-                  className="flex items-start justify-between gap-md rounded-xl border border-border-default p-lg"
+                  className="flex items-start justify-between gap-md rounded-lg border border-border-default p-lg"
                   data-testid={'allocation-row-' + puppy.tempCode}
                 >
                   <div className="min-w-0">
@@ -138,19 +156,21 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
               ))}
             </ul>
 
-            <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="allocation-approvals">
+            <dl className="hz-kv mt-lg" data-testid="allocation-approvals">
               {parties.map((party) => {
                 const answer = view.approvals.find((row) => row.partyAccountId === party) ?? null;
                 return (
                   <div key={party} className="contents">
-                    <dt className="text-text-secondary">{view.partyNames[party] ?? '—'}</dt>
-                    <dd data-testid={'approval-' + party}>
-                      {answer === null
-                        ? 'هنوز پاسخ نداده است'
-                        : answer.approved
-                          ? 'تأیید کرده است'
-                          : 'رد کرده است: ' + (answer.reasonFa ?? '')}
-                    </dd>
+                    <div className="hz-kv__row">
+                      <dt className="hz-kv__key">{view.partyNames[party] ?? '—'}</dt>
+                      <dd className="hz-kv__value" data-testid={'approval-' + party}>
+                        {answer === null
+                          ? 'هنوز پاسخ نداده است'
+                          : answer.approved
+                            ? 'تأیید کرده است'
+                            : 'رد کرده است: ' + (answer.reasonFa ?? '')}
+                      </dd>
+                    </div>
                   </div>
                 );
               })}
@@ -158,11 +178,7 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
             {view.current.noteFa ? <p className="mt-sm text-body-sm">{view.current.noteFa}</p> : null}
 
             {pending && myAnswer === null ? (
-              <RespondAllocationForm
-                litterId={id}
-                allocationId={view.current.id}
-                version={view.current.version}
-              />
+              <RespondAllocationForm litterId={id} allocationId={view.current.id} version={view.current.version} />
             ) : null}
             {pending && myAnswer !== null ? (
               <Alert tone="info" title="در انتظار تأیید طرف دیگر">
@@ -182,7 +198,7 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
             <p className="mt-lg text-body-sm">
               <Link
                 href={'/puppy-cards/checkout?permit=' + view.permit.id}
-                className="text-text-brand underline underline-offset-4"
+                className="hz-link"
                 data-testid="open-card-checkout"
               >
                 صدور کارت توله
@@ -217,12 +233,10 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
               {view.history.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-xl border border-border-default p-lg"
+                  className="rounded-lg border border-border-default p-lg"
                   data-testid={'allocation-version-' + row.version}
                 >
-                  <p className="text-label-md">
-                    {'نسخه ' + row.version + ' · ' + ALLOCATION_STATUS_FA[row.status]}
-                  </p>
+                  <p className="text-label-md">{'نسخه ' + row.version + ' · ' + ALLOCATION_STATUS_FA[row.status]}</p>
                   <p className="mt-2xs text-caption text-text-secondary">
                     {formatCivilDateFa(row.proposedAt.toISOString().slice(0, 10))} ·{' '}
                     {view.partyNames[row.proposedByAccountId] ?? '—'}

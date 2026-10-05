@@ -1,9 +1,8 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, CONTENT_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
+import { CaseItem, CaseList, ViewChips } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { ButtonLink } from '../../../src/ui/button.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -33,91 +32,93 @@ export default async function ContentReportsPage({ searchParams }: { searchParam
   const result = open ?? history!;
 
   return (
-    <OpsShell actor={guard.actor} title="ادمین محتوا" pathname="/content/reports" nav={CONTENT_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">گزارش‌های کاربران</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            گزارش‌های باز هر محتوا یک‌جا بررسی می‌شوند. نام گزارش‌دهنده در این صفحه نمی‌آید.
-          </p>
-          <nav aria-label="نمای گزارش‌ها" className="mt-lg flex gap-sm">
-            <Link
-              href="/content/reports"
-              aria-current={decided ? undefined : 'page'}
-              className={['rounded-full border px-lg py-xs text-label-md', decided ? 'border-border-subtle text-text-secondary' : 'border-border-brand bg-bg-brand-subtle text-text-brand'].join(' ')}
-            >
-              در انتظار بررسی
-            </Link>
-            <Link
-              href="/content/reports?view=decided"
-              aria-current={decided ? 'page' : undefined}
-              className={['rounded-full border px-lg py-xs text-label-md', decided ? 'border-border-brand bg-bg-brand-subtle text-text-brand' : 'border-border-subtle text-text-secondary'].join(' ')}
-            >
-              تصمیم‌گرفته
-            </Link>
-          </nav>
-        </Card>
+    <OpsShell actor={guard.actor} title="گزارش‌ها" pathname="/content/reports" nav={CONTENT_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">
+          گزارش‌های باز هر محتوا یک‌جا بررسی می‌شوند. نام گزارش‌دهنده در این صفحه نمی‌آید.
+        </span>
+      </p>
+      <ViewChips
+        label="نمای گزارش‌ها"
+        chips={[
+          { key: 'open', href: '/content/reports', label: 'در انتظار بررسی', current: !decided },
+          { key: 'decided', href: '/content/reports?view=decided', label: 'تصمیم‌گرفته', current: decided },
+        ]}
+      />
 
-        {open ? (
-          open.items.length === 0 ? (
-            <EmptyState title="گزارشی در انتظار بررسی نیست" description="گزارش‌های تازه کاربران اینجا نشان داده می‌شوند." />
-          ) : (
-            <ul className="space-y-sm" data-testid="report-queue">
-              {open.items.map((entry) => (
-                <li key={entry.contentId}>
-                  <Link
-                    href={'/content/reports/' + entry.contentId}
-                    className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
-                    data-testid={'report-queue-item-' + entry.contentId}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-sm">
-                      <div className="min-w-0">
-                        <p className="text-caption text-text-secondary">{KIND_FA[entry.kind]}</p>
-                        <p className="text-label-lg text-text-primary">{entry.titleFa}</p>
-                      </div>
-                      <div className="flex flex-wrap gap-xs">
-                        <StatusBadge tone="warning">{fa(entry.openReports) + ' گزارش باز'}</StatusBadge>
-                        <StatusBadge tone="neutral">{STATUS_FA[entry.status]}</StatusBadge>
-                        {entry.correctionRequested ? <StatusBadge tone="info">اصلاح درخواست شده</StatusBadge> : null}
-                      </div>
-                    </div>
-                    <p className="mt-sm text-caption text-text-secondary">
-                      {entry.reasons.map((reason) => REASON_FA[reason]).join('، ') + ' · آخرین گزارش: ' + formatInstantFa(entry.latestAt)}
-                    </p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )
-        ) : history!.items.length === 0 ? (
-          <EmptyState title="هنوز تصمیمی ثبت نشده است" description="گزارش‌های بررسی‌شده با تصمیم و دلیلشان اینجا می‌مانند." />
+      {open ? (
+        open.items.length === 0 ? (
+          <EmptyState title="گزارشی در انتظار بررسی نیست" description="گزارش‌های تازه کاربران اینجا نشان داده می‌شوند." />
         ) : (
-          <ul className="space-y-sm" data-testid="report-history">
-            {history!.items.map((report) => (
-              <li key={report.id} className="rounded-xl border border-border-default bg-bg-surface p-lg">
-                <div className="flex flex-wrap items-start justify-between gap-sm">
-                  <Link href={'/content/reports/' + report.contentId} className="text-label-md text-text-brand underline underline-offset-4">
-                    {report.titleFa}
-                  </Link>
-                  <StatusBadge tone={report.status === 'DISMISSED' ? 'neutral' : 'success'}>{REPORT_STATUS_FA[report.status]}</StatusBadge>
-                </div>
-                <p className="mt-xs text-body-sm">{REASON_FA[report.reason] + ' ← ' + DECISION_FA[report.decision]}</p>
-                <p className="mt-xs text-caption text-text-secondary">
-                  {(report.decisionReason ?? '') + ' · ' + (report.decidedByName ?? 'ادمین محتوا') + ' · ' + formatInstantFa(report.decidedAt)}
-                </p>
-              </li>
+          <CaseList label="صف گزارش‌ها" testId="report-queue">
+            {open.items.map((entry) => (
+              <CaseItem
+                key={entry.contentId}
+                type={KIND_FA[entry.kind]}
+                name={
+                  <>
+                    {entry.titleFa}
+                    {/* The reasons belong to the link: it names the case by what was reported. */}
+                    <span className="block text-caption font-normal text-text-secondary">
+                      {entry.reasons.map((reason) => REASON_FA[reason]).join('، ')}
+                    </span>
+                  </>
+                }
+                href={'/content/reports/' + entry.contentId}
+                linkTestId={'report-queue-item-' + entry.contentId}
+                sub={
+                  <>
+                    {'آخرین گزارش: ' + formatInstantFa(entry.latestAt)}
+                    {' · '}
+                    <span className={entry.openReports >= 3 ? 'hz-report__count hz-report__count--high' : 'hz-report__count'}>
+                      {fa(entry.openReports) + ' گزارش باز'}
+                    </span>
+                    {' · وضعیت محتوا: ' + STATUS_FA[entry.status]}
+                    {entry.correctionRequested ? ' · اصلاح درخواست شده' : ''}
+                  </>
+                }
+                ageDays={ageInDays(entry.latestAt)}
+                status={{ tone: 'info', label: 'در انتظار بررسی' }}
+                owner="SYSTEM"
+                ownerLabel="ادمین محتوا"
+                ownerIsUs
+              />
             ))}
-          </ul>
-        )}
+          </CaseList>
+        )
+      ) : history!.items.length === 0 ? (
+        <EmptyState title="هنوز تصمیمی ثبت نشده است" description="گزارش‌های بررسی‌شده با تصمیم و دلیلشان اینجا می‌مانند." />
+      ) : (
+        <CaseList label="گزارش‌های تصمیم‌گرفته" testId="report-history">
+          {history!.items.map((report) => (
+            <CaseItem
+              key={report.id}
+              name={report.titleFa}
+              href={'/content/reports/' + report.contentId}
+              sub={
+                REASON_FA[report.reason] +
+                ' ← ' +
+                DECISION_FA[report.decision] +
+                ' · ' +
+                (report.decisionReason ?? '') +
+                ' · ' +
+                (report.decidedByName ?? 'ادمین محتوا') +
+                ' · ' +
+                formatInstantFa(report.decidedAt)
+              }
+              status={{ tone: report.status === 'DISMISSED' ? 'neutral' : 'success', label: REPORT_STATUS_FA[report.status] }}
+            />
+          ))}
+        </CaseList>
+      )}
 
-        {result.totalPages > 1 ? (
-          <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
-            {result.page > 1 ? <ButtonLink tone="secondary" href={pageHref(result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
-            <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-            {result.page < result.totalPages ? <ButtonLink tone="secondary" href={pageHref(result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
-          </nav>
-        ) : null}
-      </div>
+      {result.totalPages > 1 ? (
+        <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
+          {result.page > 1 ? <ButtonLink tone="secondary" size="sm" href={pageHref(result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
+          <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
+          {result.page < result.totalPages ? <ButtonLink tone="secondary" size="sm" href={pageHref(result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
+        </nav>
+      ) : null}
     </OpsShell>
   );
 }

@@ -1,10 +1,13 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { Stepper } from '../../../src/ui/stepper.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
+import { ButtonLink } from '../../../src/ui/button.tsx';
+import { ActionOwner, StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
 import { NeedsCorrectionState, WaitingState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { findProfile, findResidence } from '../../../src/identity/account.ts';
@@ -24,8 +27,11 @@ const BADGE_TONE: Record<KycStatus, StatusTone> = {
   REJECTED: 'error',
 };
 
+const STEPS = [{ label: 'اطلاعات هویتی' }, { label: 'نشانی' }, { label: 'مدرک هویتی' }, { label: 'ارسال' }] as const;
+
 /**
- * KYC (§6.3).
+ * KYC (§6.3) — P07: the case is assembled on one page in four saved parts
+ * (each form saves on the server), with the summary column at the end.
  *
  * The valid data and the previously uploaded file survive a correction, so the
  * applicant edits the same case instead of starting again. Approval unlocks
@@ -45,125 +51,179 @@ export default async function KycPage() {
   const { apiKey: mapKey } = await mapApiKey(db());
   const mapKeyConfigured = mapKey !== null;
 
+  // The step the applicant is on, from what is saved: the address is optional,
+  // so it never holds the case back.
+  const current = !editable ? 4 : profile === null ? 1 : !hasDocument ? 3 : 4;
+  const ready = profile !== null && hasDocument;
+
   return (
-    <PublicShell actor={actor} title="احراز هویت" pathname="/account/kyc">
-      <div className="space-y-lg">
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <div>
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت پرونده</span></h2></div>
-              <p className="mt-2xs text-caption text-text-secondary">
-                احراز هویت با عضویت انجمن یکی نیست و هیچ‌کدام دیگری را فعال نمی‌کند.
-              </p>
-            </div>
-            <StatusBadge tone={BADGE_TONE[status]}>{KYC_STATUS_FA[status]}</StatusBadge>
-          </div>
+    <PublicShell
+      actor={actor}
+      title="احراز هویت"
+      pathname="/account/kyc"
+      header={
+        <PageHeader
+          title="احراز هویت"
+          back={{ href: '/dashboard' }}
+          aside={<StatusBadge tone={BADGE_TONE[status]}>{KYC_STATUS_FA[status]}</StatusBadge>}
+          meta={['احراز هویت با عضویت انجمن یکی نیست و هیچ‌کدام دیگری را فعال نمی‌کند.']}
+        />
+      }
+    >
+      {editable ? (
+        <Card variant="compact">
+          <Stepper steps={STEPS} current={current} label="مراحل احراز هویت" />
         </Card>
+      ) : null}
 
-        {/*
-          * §6.3: the case is assembled here rather than sending the applicant to
-          * another screen and back. Identity is required, the residence is not —
-          * §6.2 is explicit that an empty address never blocks the account, the
-          * KYC or registering an animal — and the identity card is required
-          * before the case can be submitted at all.
-          */}
-        {editable ? (
-          <Card>
-            <h3 className="text-label-lg">اطلاعات هویتی</h3>
-            <p className="mt-2xs text-caption text-text-secondary">
-              نام، نام خانوادگی، کد ملی و تاریخ تولد لازم است. نام نمایشی همان چیزی است که در صورت روشن‌بودن
-              نمایش، دیگران می‌بینند.
-            </p>
-            <div className="mt-lg">
-              <IdentityForm
-                values={{
-                  firstName: profile?.firstName ?? '',
-                  lastName: profile?.lastName ?? '',
-                  nationalId: profile?.nationalId ?? '',
-                  birthDate: profile?.birthDate ?? '',
-                  displayName: profile?.displayName ?? '',
-                  displayNameVisible: profile?.displayNameVisible ?? false,
-                }}
-                nationalIdLocked={false}
-                mode="edit"
-              />
-            </div>
-          </Card>
-        ) : null}
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+        <div className="space-y-xl lg:col-span-7">
+          {status === 'NEEDS_CORRECTION' && kyc?.reasonFa ? (
+            <NeedsCorrectionState reason={kyc.reasonFa} correctionHref="/account/kyc" />
+          ) : null}
 
-        {editable ? (
-          <Card>
-            <h3 className="text-label-lg">نشانی (اختیاری)</h3>
-            <p className="mt-2xs text-caption text-text-secondary">
-              خالی‌گذاشتن نشانی و کدپستی، ارسال پرونده را متوقف نمی‌کند (§۶.۲).
-            </p>
-            <div className="mt-lg">
-              <ResidenceForm
-                values={{
-                  province: residence?.province ?? '',
-                  city: residence?.city ?? '',
-                  address: residence?.address ?? '',
-                  postalCode: residence?.postalCode ?? '',
-                }}
-                mapAvailable={mapKeyConfigured}
-              />
-            </div>
-          </Card>
-        ) : null}
+          {status === 'UNDER_REVIEW' ? (
+            <WaitingState
+              title="پرونده شما در حال بررسی است"
+              owner="ASSOCIATION"
+              detail="زمان ثابتی برای پایان بررسی وعده داده نمی‌شود. نتیجه در همین صفحه و در اعلان‌ها اعلام می‌شود."
+            />
+          ) : null}
 
-        {profile === null ? (
-          <Alert tone="warning" title="اطلاعات هویتی هنوز ذخیره نشده است">
-            تا ذخیره‌شدن نام، نام خانوادگی، کد ملی و تاریخ تولد، پرونده قابل ارسال نیست.
-          </Alert>
-        ) : null}
+          {status === 'REJECTED' && kyc?.reasonFa ? (
+            <Alert tone="error" title="پرونده رد شد">
+              {kyc.reasonFa}
+            </Alert>
+          ) : null}
 
-        {status === 'UNDER_REVIEW' ? (
-          <WaitingState
-            title="پرونده شما در حال بررسی است"
-            owner="ASSOCIATION"
-            detail="زمان ثابتی برای پایان بررسی وعده داده نمی‌شود. نتیجه در همین صفحه و در اعلان‌ها اعلام می‌شود."
-          />
-        ) : null}
+          {status === 'APPROVED' ? (
+            <Alert
+              tone="success"
+              title="احراز هویت شما تأیید شده است"
+              action={
+                <ButtonLink href="/animals/new" iconStart="plus">
+                  ثبت حیوان
+                </ButtonLink>
+              }
+            >
+              اکنون می‌توانید حیوان خود را ثبت کنید. برای این کار عضویت لازم نیست.
+            </Alert>
+          ) : null}
 
-        {status === 'NEEDS_CORRECTION' && kyc?.reasonFa ? (
-          <NeedsCorrectionState reason={kyc.reasonFa} correctionHref="/account/kyc" />
-        ) : null}
-
-        {status === 'REJECTED' && kyc?.reasonFa ? (
-          <Alert tone="error" title="پرونده رد شد">
-            {kyc.reasonFa}
-          </Alert>
-        ) : null}
-
-        {status === 'APPROVED' ? (
-          <Alert tone="success" title="احراز هویت شما تأیید شده است">
-            اکنون می‌توانید حیوان خود را ثبت کنید. برای این کار عضویت لازم نیست.
-          </Alert>
-        ) : null}
-
-        {editable ? (
-          <>
+          {/*
+            * §6.3: the case is assembled here rather than sending the applicant to
+            * another screen and back. Identity is required, the residence is not —
+            * §6.2 is explicit that an empty address never blocks the account, the
+            * KYC or registering an animal — and the identity card is required
+            * before the case can be submitted at all.
+            */}
+          {editable ? (
             <Card>
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدرک هویتی</span></h2></div>
+              <p className="hz-overline">مرحله ۱ از ۴</p>
+              <h2 className="hz-h3">اطلاعات هویتی</h2>
               <p className="mt-2xs text-caption text-text-secondary">
-                {hasDocument
-                  ? 'تصویر بارگذاری‌شده شما حفظ شده است؛ در صورت نیاز می‌توانید آن را جایگزین کنید.'
-                  : 'فقط تصویر یا فایل کارت ملی پذیرفته می‌شود.'}
+                نام، نام خانوادگی، کد ملی و تاریخ تولد لازم است. نام نمایشی همان چیزی است که در صورت روشن‌بودن
+                نمایش، دیگران می‌بینند.
               </p>
+              {profile === null ? (
+                <div className="mt-md">
+                  <Alert tone="warning" title="اطلاعات هویتی هنوز ذخیره نشده است">
+                    تا ذخیره‌شدن نام، نام خانوادگی، کد ملی و تاریخ تولد، پرونده قابل ارسال نیست.
+                  </Alert>
+                </div>
+              ) : null}
               <div className="mt-lg">
-                <KycDocumentForm hasDocument={hasDocument} />
+                <IdentityForm
+                  values={{
+                    firstName: profile?.firstName ?? '',
+                    lastName: profile?.lastName ?? '',
+                    nationalId: profile?.nationalId ?? '',
+                    birthDate: profile?.birthDate ?? '',
+                    displayName: profile?.displayName ?? '',
+                    displayNameVisible: profile?.displayNameVisible ?? false,
+                  }}
+                  nationalIdLocked={false}
+                  mode="edit"
+                  primary={current === 1}
+                />
               </div>
             </Card>
+          ) : null}
+
+          {editable ? (
             <Card>
-              <KycSubmitForm disabled={profile === null || !hasDocument} />
-              {profile === null || !hasDocument ? (
-                <p className="mt-sm text-caption text-text-secondary">
-                  برای ارسال، تکمیل اطلاعات هویتی و بارگذاری تصویر کارت ملی لازم است.
-                </p>
-              ) : null}
+              <p className="hz-overline">مرحله ۲ از ۴</p>
+              <h2 className="hz-h3">نشانی (اختیاری)</h2>
+              <p className="mt-2xs text-caption text-text-secondary">
+                خالی‌گذاشتن نشانی و کدپستی، ارسال پرونده را متوقف نمی‌کند (§۶.۲).
+              </p>
+              <div className="mt-lg">
+                <ResidenceForm
+                  values={{
+                    province: residence?.province ?? '',
+                    city: residence?.city ?? '',
+                    address: residence?.address ?? '',
+                    postalCode: residence?.postalCode ?? '',
+                  }}
+                  mapAvailable={mapKeyConfigured}
+                />
+              </div>
             </Card>
-          </>
-        ) : null}
+          ) : null}
+
+          {editable ? (
+            <>
+              <Card>
+                <p className="hz-overline">مرحله ۳ از ۴</p>
+                <h2 className="hz-h3">مدرک هویتی</h2>
+                <p className="mt-2xs text-caption text-text-secondary">
+                  {hasDocument
+                    ? 'تصویر بارگذاری‌شده شما حفظ شده است؛ در صورت نیاز می‌توانید آن را جایگزین کنید.'
+                    : 'فقط تصویر یا فایل کارت ملی پذیرفته می‌شود.'}
+                </p>
+                <div className="mt-lg">
+                  <KycDocumentForm hasDocument={hasDocument} />
+                </div>
+              </Card>
+              <Card>
+                <p className="hz-overline">مرحله ۴ از ۴</p>
+                <h2 className="hz-h3 mb-md">ارسال برای بررسی</h2>
+                <KycSubmitForm disabled={!ready} />
+                {!ready ? (
+                  <p className="mt-sm text-caption text-text-secondary">
+                    برای ارسال، تکمیل اطلاعات هویتی و بارگذاری تصویر کارت ملی لازم است.
+                  </p>
+                ) : null}
+              </Card>
+            </>
+          ) : null}
+        </div>
+
+        <aside aria-label="خلاصه پرونده" className="space-y-lg lg:col-span-5">
+          <Card variant="compact">
+            <SectionHeader size="sm" title="خلاصه پرونده" />
+            <div className="mt-sm space-y-md">
+              <KeyValueList
+                rows={[
+                  { key: 'وضعیت', value: <StatusBadge tone={BADGE_TONE[status]}>{KYC_STATUS_FA[status]}</StatusBadge> },
+                  { key: 'نام', value: profile ? profile.firstName + ' ' + profile.lastName : null, empty: '— هنوز ذخیره نشده' },
+                  {
+                    key: 'کد ملی',
+                    value: profile?.nationalId ? <bdi dir="ltr">{profile.nationalId}</bdi> : null,
+                    empty: '— هنوز ذخیره نشده',
+                  },
+                  { key: 'نشانی', value: residence?.city ? [residence.province, residence.city].filter(Boolean).join('، ') : null, empty: 'اختیاری؛ واردنشده' },
+                  { key: 'تصویر کارت ملی', value: hasDocument ? 'بارگذاری‌شده' : null, empty: '— هنوز بارگذاری نشده' },
+                ]}
+              />
+              {editable ? (
+                <ActionOwner owner="USER" />
+              ) : status === 'UNDER_REVIEW' || status === 'READY' ? (
+                <ActionOwner owner="ASSOCIATION" />
+              ) : null}
+            </div>
+          </Card>
+        </aside>
       </div>
     </PublicShell>
   );

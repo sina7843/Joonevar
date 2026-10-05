@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
 import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { currentPaymentGateway } from '../../../../../src/adapters/current.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
-import { Card } from '../../../../../src/ui/card.tsx';
-import { Alert } from '../../../../../src/ui/alert.tsx';
+import { ButtonLink } from '../../../../../src/ui/button.tsx';
+import { PaymentResult } from '../../../../../src/ui/payment-result.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { verifyAttempt } from '../../../../../src/billing/payments.ts';
 import { paidEffects } from '../../../../../src/billing/effects.ts';
@@ -12,7 +11,8 @@ import { paidEffects } from '../../../../../src/billing/effects.ts';
 export const dynamic = 'force-dynamic';
 
 /**
- * Return from the gateway for a shop order — PROMPT-010.
+ * Return from the gateway for a shop order — PROMPT-010 (P08 return; the
+ * gateway return of checkout, not a product return).
  *
  * Arriving here proves nothing, so the gateway is asked again from the server.
  * That one call is what turns every hold in the order into a sale and starts
@@ -41,40 +41,37 @@ export default async function OrderReturnPage({
       )
     : ({ state: 'UNKNOWN_REFERENCE' } as const);
 
+  const facts = [{ key: 'خدمت', value: 'سفارش فروشگاه' }];
+  const back = (
+    <ButtonLink href={'/account/orders/' + id} block tone={outcome.state === 'PAID' ? 'primary' : 'secondary'} data-testid="back-to-order">
+      بازگشت به این سفارش
+    </ButtonLink>
+  );
+
   return (
     <PublicShell actor={guard.actor} title="نتیجه پرداخت سفارش" pathname="/account/orders">
-      <div className="space-y-lg p-lg">
-      <Card>
-        <div data-testid="order-payment-result">
-          {outcome.state === 'PAID' ? (
-            <Alert tone="success" title="پرداخت سفارش تأیید شد">
-              کالاها از موجودی فروشندگان کسر شد و سفارش هر فروشگاه جداگانه برای همان فروشگاه ارسال شد.
-            </Alert>
-          ) : null}
-          {outcome.state === 'FAILED' ? (
-            <Alert tone="error" title="پرداخت تأیید نشد">
-              {outcome.reasonFa} سفارش و کالاهای نگه‌داشته‌شده تا پایان مهلت باقی است و می‌توانید دوباره
-              تلاش کنید.
-            </Alert>
-          ) : null}
-          {outcome.state === 'CANCELLED' ? (
-            <Alert tone="warning" title="پرداخت لغو شد">
-              سفارش شما حفظ شده است و تا پایان مهلت نگه‌داشتن کالاها قابل پرداخت است.
-            </Alert>
-          ) : null}
-          {outcome.state === 'UNKNOWN_REFERENCE' ? (
-            <Alert tone="warning" title="این بازگشت از درگاه شناسایی نشد">
-              اگر مبلغی از حساب شما کم شده است، وضعیت سفارش را از صفحه خود سفارش دوباره بررسی کنید.
-            </Alert>
-          ) : null}
-        </div>
-        <p className="mt-lg text-caption">
-          <Link href={'/account/orders/' + id} className="text-text-brand" data-testid="back-to-order">
-            بازگشت به این سفارش
-          </Link>
-        </p>
-      </Card>
-      </div>
+      {outcome.state === 'PAID' ? (
+        <PaymentResult
+          state="PAID"
+          testId="order-payment-result"
+          title="پرداخت سفارش تأیید شد"
+          facts={facts}
+          next={['کالاها از موجودی فروشندگان کسر شد و سفارش هر فروشگاه جداگانه برای همان فروشگاه ارسال شد.']}
+          actions={back}
+        />
+      ) : outcome.state === 'FAILED' ? (
+        <PaymentResult state="FAILED" testId="order-payment-result" title="پرداخت تأیید نشد" facts={facts} actions={back}>
+          {outcome.reasonFa} سفارش و کالاهای نگه‌داشته‌شده تا پایان مهلت باقی است و می‌توانید دوباره تلاش کنید.
+        </PaymentResult>
+      ) : outcome.state === 'CANCELLED' ? (
+        <PaymentResult state="CANCELLED" testId="order-payment-result" title="پرداخت لغو شد" facts={facts} actions={back}>
+          سفارش شما حفظ شده است و تا پایان مهلت نگه‌داشتن کالاها قابل پرداخت است.
+        </PaymentResult>
+      ) : (
+        <PaymentResult state="UNKNOWN" testId="order-payment-result" title="این بازگشت از درگاه شناسایی نشد" actions={back}>
+          اگر مبلغی از حساب شما کم شده است، وضعیت سفارش را از صفحه خود سفارش دوباره بررسی کنید.
+        </PaymentResult>
+      )}
     </PublicShell>
   );
 }

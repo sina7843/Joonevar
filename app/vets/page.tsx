@@ -75,8 +75,8 @@ export default async function FinderPage({
     <PublicShell actor={guard.actor} title="یافتن دامپزشک معتمد" pathname="/vets">
       <div className="space-y-lg">
         <Alert tone="info" title="نوبت‌دهی وجود ندارد">
-          هم‌زیست ساعت و نوبت رزرو نمی‌کند. پس از ساخت درخواست، کد مراجعه و مهلت آن صادر می‌شود و هماهنگی زمان
-          با خود مرکز است.
+          هم‌زیست ساعت و نوبت رزرو نمی‌کند. پس از ساخت درخواست، کد مراجعه و مهلت آن صادر می‌شود و هماهنگی زمان با خود
+          مرکز است.
         </Alert>
 
         <FinderFilters
@@ -130,17 +130,13 @@ export default async function FinderPage({
                         context +
                         (selection === '' ? '' : '&sel=' + encodeURIComponent(selection))
                       }
-                      className="text-text-brand underline underline-offset-4"
+                      className="hz-link"
                       data-testid="open-location"
                     >
                       اطلاعات مرکز
                     </Link>
                     {row.location.phone ? (
-                      <Link
-                        href={'tel:' + row.location.phone}
-                        className="text-text-brand underline underline-offset-4"
-                        data-testid="finder-contact"
-                      >
+                      <Link href={'tel:' + row.location.phone} className="hz-link" data-testid="finder-contact">
                         تماس با مرکز
                       </Link>
                     ) : null}
@@ -149,7 +145,7 @@ export default async function FinderPage({
                   {selection === '' ? (
                     <p className="mt-lg text-caption text-text-secondary">
                       برای ساخت درخواست، ابتدا از{' '}
-                      <Link href={'/requests/new?context=' + context} className="text-text-brand underline">
+                      <Link href={'/requests/new?context=' + context} className="hz-link">
                         انتخاب حیوان‌ها
                       </Link>{' '}
                       شروع کنید.

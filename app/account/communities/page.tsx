@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
+import { ButtonLink } from '../../../src/ui/button.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { manageableCommunities, myCommunityInvitations } from '../../../src/communities/service.ts';
 import { COMMUNITY_KIND_FA, type CommunityKind } from '../../../src/communities/model.ts';
@@ -13,7 +14,7 @@ import { CommunityInvitationForm } from '../../../src/communities/forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
-/** The associations and clubs this account manages — §11, P2-D07 (PROMPT-010). */
+/** The associations and clubs this account manages — §11, P2-D07 (PROMPT-010). P05 list. */
 export default async function AccountCommunitiesPage() {
   const guard = await guardRoute('/account/communities');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
@@ -23,68 +24,79 @@ export default async function AccountCommunitiesPage() {
   ]);
 
   return (
-    <PublicShell actor={guard.actor} title="انجمن و کلاب من" pathname="/account/communities">
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">انجمن‌ها و کلاب‌هایی که مدیریت می‌کنید</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            مدیریت یک پرونده پس از واگذاری به حساب شما سپرده می‌شود. شماره ثبت و مجوز را بررسی همزیست ثبت می‌کند، نه مدیر پرونده.
-          </p>
-        </Card>
+    <PublicShell
+      actor={guard.actor}
+      title="انجمن و کلاب من"
+      pathname="/account/communities"
+      header={
+        <PageHeader
+          title="انجمن و کلاب من"
+          back={{ href: '/dashboard' }}
+          meta={[
+            ...(rows.length > 0 ? [rows.length.toLocaleString('fa-IR') + ' پرونده'] : []),
+            'شماره ثبت و مجوز را بررسی همزیست ثبت می‌کند، نه مدیر پرونده.',
+          ]}
+        />
+      }
+    >
+      {invitations.length > 0 ? (
+        <section className="space-y-md" aria-labelledby="community-invitations-title">
+          <SectionHeader id="community-invitations-title" title="دعوت‌های مدیریت" count={invitations.length.toLocaleString('fa-IR')} />
+          <ActionOwner owner="USER" />
+          <div className="space-y-md" data-testid="community-invitations">
+            {invitations.map((invitation) => (
+              <CommunityInvitationForm
+                key={invitation.id}
+                invitation={{
+                  id: invitation.id,
+                  version: invitation.version,
+                  communityNameFa: invitation.communityNameFa,
+                  roleFa: invitation.roleFa,
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-        {invitations.length > 0 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>دعوت‌های مدیریت</span></h2></div>
-            <div className="mt-lg space-y-md" data-testid="community-invitations">
-              {invitations.map((invitation) => (
-                <CommunityInvitationForm
-                  key={invitation.id}
-                  invitation={{
-                    id: invitation.id,
-                    version: invitation.version,
-                    communityNameFa: invitation.communityNameFa,
-                    roleFa: invitation.roleFa,
-                  }}
-                />
-              ))}
-            </div>
-          </Card>
-        ) : null}
-
-        {rows.length === 0 ? (
-          <EmptyState
-            title="هنوز پرونده‌ای به شما سپرده نشده است"
-            description="اگر مدیر یک انجمن یا کلاب هستید، از پشتیبانی همزیست واگذاری آن را بخواهید."
-          />
-        ) : (
-          <ul className="space-y-sm" data-testid="my-communities">
-            {rows.map((row) => (
-              <li key={row.community.id}>
+      {rows.length === 0 ? (
+        <EmptyState
+          icon="usersThree"
+          title="هنوز پرونده‌ای به شما سپرده نشده است"
+          description="اگر مدیر یک انجمن یا کلاب هستید، از پشتیبانی همزیست واگذاری آن را بخواهید."
+        />
+      ) : (
+        <ul className="hz-cardlist" data-testid="my-communities">
+          {rows.map((row) => (
+            <li key={row.community.id} className="hz-cardlist__item">
+              <div className="hz-cardlist__row">
                 <Link
                   href={'/account/communities/' + row.community.id}
-                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
+                  className="hz-cardlist__title min-w-0 hover:underline"
                   data-testid={'my-community-' + row.community.id}
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-sm">
-                    <div className="min-w-0">
-                      <p className="text-label-lg">{row.community.displayNameFa}</p>
-                      <p className="mt-2xs text-caption text-text-secondary">
-                        {[COMMUNITY_KIND_FA[row.community.kind as CommunityKind], row.cityNameFa ?? row.provinceNameFa].filter(Boolean).join(' · ')}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-xs">
-                      <StatusBadge tone={row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-                        {VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus]}
-                      </StatusBadge>
-                      {row.community.canPublishPosts ? <StatusBadge tone="info">ناشر مجاز</StatusBadge> : null}
-                    </div>
-                  </div>
+                  {row.community.displayNameFa}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                <span className="flex flex-wrap gap-xs">
+                  <StatusBadge tone={row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
+                    {VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus]}
+                  </StatusBadge>
+                  {row.community.canPublishPosts ? <StatusBadge tone="info">ناشر مجاز</StatusBadge> : null}
+                </span>
+              </div>
+              <div className="hz-cardlist__row">
+                <span className="hz-cardlist__meta">
+                  {[COMMUNITY_KIND_FA[row.community.kind as CommunityKind], row.cityNameFa ?? row.provinceNameFa].filter(Boolean).join(' · ')}
+                </span>
+                <ButtonLink tone="secondary" size="sm" href={'/account/communities/' + row.community.id}>
+                  مدیریت پرونده
+                  <span className="hz-visually-hidden"> {row.community.displayNameFa}</span>
+                </ButtonLink>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </PublicShell>
   );
 }

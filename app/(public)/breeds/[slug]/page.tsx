@@ -23,6 +23,8 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { CtaBand } from '../../public-ui.tsx';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -58,7 +60,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 function Prose({ text }: { text: string }) {
   return (
-    <div className="mt-md space-y-md text-body-md">
+    <div className="hz-prose">
       {text.split(/\n{2,}/).map((paragraph, index) => (
         <p key={index}>{paragraph}</p>
       ))}
@@ -68,7 +70,7 @@ function Prose({ text }: { text: string }) {
 
 function ExternalLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="nofollow noopener noreferrer" className="text-text-brand underline underline-offset-4">
+    <a href={href} target="_blank" rel="nofollow noopener noreferrer" className="hz-link">
       {children}
     </a>
   );
@@ -111,149 +113,167 @@ export default async function BreedPageView({ params }: Params) {
     relatedContent(db(), { limit: 3 }),
   ]);
 
+  const basics = facts.filter((fact) => !LEVEL_ATTRIBUTES.some((attribute) => attribute.labelFa === fact.label));
+  const traits = LEVEL_ATTRIBUTES.map(({ key, labelFa }) => ({ labelFa, level: breed[key] }));
+  const STEPS = { LOW: 1, MODERATE: 2, HIGH: 3 } as const;
+
   return (
-    <div className="mx-auto grid max-w-6xl gap-xl lg:grid-cols-[minmax(0,1fr)_320px]">
-    <article className="min-w-0 space-y-xl" data-testid="breed-page">
-      <Breadcrumbs items={crumbs} origin={origin} />
+    <div className="space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs items={crumbs} origin={origin} />
+        <PageHeader
+          title={breed.nameFa}
+          meta={[
+            <bdi key="en" dir="ltr">
+              {breed.nameEn}
+            </bdi>,
+            ...(group ? ['گروه FCI ' + fa(group.fciGroup)] : []),
+            ...(breed.size ? [SIZE_FA[breed.size]] : []),
+          ]}
+        />
+      </div>
 
-      {primary ? (
-        <Alert tone="info" title="این رکورد تکراری است">
-          <span data-testid="breed-duplicate-notice">
-            اطلاعات این نژاد در صفحه{' '}
-            <Link href={'/breeds/' + primary.slug} className="text-text-brand underline underline-offset-4">
-              {primary.nameFa}
-            </Link>{' '}
-            نگهداری می‌شود.
-          </span>
-        </Alert>
-      ) : breed.profileStatus === 'ARCHIVED' ? (
-        <Alert tone="warning" title="این صفحه بایگانی شده است">
-          <span data-testid="breed-archived-notice">مطالب این صفحه دیگر به‌روز نمی‌شود و ممکن است قدیمی باشد.</span>
-        </Alert>
-      ) : null}
+      <div className="grid gap-xl lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        <article className="min-w-0 space-y-xl" data-testid="breed-page">
+          {primary ? (
+            <Alert tone="info" title="این رکورد تکراری است">
+              <span data-testid="breed-duplicate-notice">
+                اطلاعات این نژاد در صفحه{' '}
+                <Link href={'/breeds/' + primary.slug} className="hz-link">
+                  {primary.nameFa}
+                </Link>{' '}
+                نگهداری می‌شود.
+              </span>
+            </Alert>
+          ) : breed.profileStatus === 'ARCHIVED' ? (
+            <Alert tone="warning" title="این صفحه بایگانی شده است">
+              <span data-testid="breed-archived-notice">مطالب این صفحه دیگر به‌روز نمی‌شود و ممکن است قدیمی باشد.</span>
+            </Alert>
+          ) : null}
 
-      <header>
-        <RecordImage priority fileId={breed.imageFileId} altFa={breed.imageAltFa} className="mb-lg" />
-        <h1 className="text-h2 md:text-h1">{breed.nameFa}</h1>
-        <p className="mt-xs text-body-md text-text-secondary">
-          <bdi>{breed.nameEn}</bdi>
-        </p>
-        {breed.altNames.length > 0 ? (
-          <p className="mt-sm text-body-sm text-text-secondary">
-            {'نام‌های دیگر: '}
-            {breed.altNames.map((name, index) => (
-              <Fragment key={name}>
-                {index > 0 ? '، ' : ''}
-                <bdi>{name}</bdi>
-              </Fragment>
-            ))}
-          </p>
-        ) : null}
-      </header>
+          <RecordImage priority variant="banner" fileId={breed.imageFileId} altFa={breed.imageAltFa} className="rounded-xl" />
 
-      {facts.length > 0 ? (
-        <section aria-labelledby="breed-facts-title">
-          <h2 id="breed-facts-title" className="text-h3">
-            مشخصات
-          </h2>
-          <dl className="mt-md grid gap-sm sm:grid-cols-2" data-testid="breed-facts">
-            {facts.map((fact) => (
-              <div
-                key={fact.label}
-                className="flex items-center justify-between gap-md rounded-lg border border-border-default bg-bg-surface px-md py-sm"
-              >
-                <dt className="text-body-sm text-text-secondary">{fact.label}</dt>
-                <dd className="text-label-md text-text-primary">{fact.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      ) : null}
-
-      {breed.historyFa ? (
-        <section aria-labelledby="breed-history-title">
-          <h2 id="breed-history-title" className="text-h3">
-            تاریخچه
-          </h2>
-          <Prose text={breed.historyFa} />
-        </section>
-      ) : null}
-
-      {breed.standardFa || breed.standardUrl ? (
-        <section aria-labelledby="breed-standard-title">
-          <h2 id="breed-standard-title" className="text-h3">
-            استاندارد نژاد
-          </h2>
-          {breed.standardFa ? <Prose text={breed.standardFa} /> : null}
-          {breed.standardUrl ? (
-            <p className="mt-md text-label-md">
-              <ExternalLink href={breed.standardUrl}>متن کامل استاندارد (پیوند بیرونی)</ExternalLink>
+          {breed.altNames.length > 0 ? (
+            <p className="hz-body-sm text-text-secondary">
+              {'نام‌های دیگر: '}
+              {breed.altNames.map((name, index) => (
+                <Fragment key={name}>
+                  {index > 0 ? '، ' : ''}
+                  <bdi>{name}</bdi>
+                </Fragment>
+              ))}
             </p>
           ) : null}
-        </section>
-      ) : null}
 
-      {claimGroups.length > 0 ? (
-        <section aria-labelledby="breed-health-title" data-testid="breed-health">
-          <h2 id="breed-health-title" className="text-h3">
-            سلامت و ژنتیک
-          </h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            این مطالب برای آگاهی است و جای معاینه دامپزشک را نمی‌گیرد. آزمایش‌های پیشنهادی از این صفحه ثبت یا سفارش داده
-            نمی‌شوند.
-          </p>
-          {claimGroups.map((entry) => (
-            <div key={entry.kind} className="mt-lg">
-              <h3 className="text-label-lg">{CLAIM_KIND_FA[entry.kind]}</h3>
-              <ul className="mt-sm space-y-sm">
-                {entry.items.map((claim) => (
-                  <li
-                    key={claim.id}
-                    className="rounded-lg border border-border-default bg-bg-surface p-md"
-                    data-testid="breed-claim"
-                  >
-                    <p className="text-label-md">{claim.titleFa}</p>
-                    {claim.noteFa ? <p className="mt-xs text-body-sm">{claim.noteFa}</p> : null}
-                    <p className="mt-sm text-caption text-text-secondary">
-                      {'منبع: '}
-                      {claim.sourceUrl ? (
-                        <ExternalLink href={claim.sourceUrl}>{claim.sourceTitle}</ExternalLink>
-                      ) : (
-                        claim.sourceTitle
-                      )}
-                      {' · بازبینی: '}
-                      <span data-testid="breed-claim-reviewed">{formatCivilDateFa(claim.reviewedOn)}</span>
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </section>
-      ) : null}
+          {facts.length > 0 ? (
+            <section aria-labelledby="breed-facts-title" className="hz-card">
+              <SectionHeader size="sm" id="breed-facts-title" title="مشخصات" />
+              <div className="hz-breed-profile" data-testid="breed-facts">
+                <dl className="hz-kv">
+                  {basics.map((fact) => (
+                    <div key={fact.label} className="hz-kv__row">
+                      <dt className="hz-kv__key">{fact.label}</dt>
+                      <dd className="hz-kv__value">{fact.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <dl className="hz-traits">
+                  {traits.map((trait) => (
+                    <div key={trait.labelFa} className={trait.level ? 'hz-trait' : 'hz-trait hz-trait--unset'}>
+                      <dt className="hz-trait__name">{trait.labelFa}</dt>
+                      <dd className="hz-trait__value">
+                        {trait.level ? (
+                          <span className="hz-meter3" aria-hidden="true">
+                            {[1, 2, 3].map((step) => (
+                              <span key={step} className={step <= STEPS[trait.level!] ? 'hz-meter3__step hz-meter3__step--on' : 'hz-meter3__step'} />
+                            ))}
+                          </span>
+                        ) : null}
+                        <span className="hz-trait__label">{trait.level ? LEVEL_FA[trait.level] : 'تعیین‌نشده'}</span>
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </section>
+          ) : null}
 
-    </article>
+          {breed.historyFa ? (
+            <section aria-labelledby="breed-history-title" className="hz-card">
+              <SectionHeader size="sm" id="breed-history-title" title="تاریخچه" />
+              <Prose text={breed.historyFa} />
+            </section>
+          ) : null}
 
-      <RelatedColumn
-        groups={[
-          {
-            // Only the second title claims a connection to this breed.
-            titleFa: related.length > 0 ? 'مطالب مرتبط' : 'خواندنی‌ها',
-            items:
-              related.length > 0
-                ? related.map((entry) => ({
-                    href: (KIND_PATH[entry.kind] ?? '') + '/' + entry.slug,
-                    titleFa: entry.titleFa,
-                    noteFa: KIND_FA[entry.kind] ?? null,
-                    imageFileId: entry.imageFileId,
-                    imageAltFa: entry.imageAltFa,
-                  }))
-                : latestReading,
-          },
-          { titleFa: 'نژادهای دیگر', items: otherBreeds },
-          { titleFa: 'مراکز دامپزشکی', items: centres },
-        ]}
-      />
+          {breed.standardFa || breed.standardUrl ? (
+            <section aria-labelledby="breed-standard-title" className="hz-card">
+              <SectionHeader size="sm" id="breed-standard-title" title="استاندارد نژاد" />
+              {breed.standardFa ? <Prose text={breed.standardFa} /> : null}
+              {breed.standardUrl ? (
+                <p className="mt-md hz-body-sm">
+                  <ExternalLink href={breed.standardUrl}>متن کامل استاندارد (پیوند بیرونی)</ExternalLink>
+                </p>
+              ) : null}
+            </section>
+          ) : null}
+
+          {claimGroups.length > 0 ? (
+            <section aria-labelledby="breed-health-title" className="hz-card" data-testid="breed-health">
+              <SectionHeader size="sm" id="breed-health-title" title="سلامت و ژنتیک" />
+              <p className="hz-caption">
+                این مطالب برای آگاهی است و جای معاینه دامپزشک را نمی‌گیرد. آزمایش‌های پیشنهادی از این صفحه ثبت یا سفارش داده
+                نمی‌شوند.
+              </p>
+              {claimGroups.map((entry) => (
+                <div key={entry.kind} className="mt-lg">
+                  <h3 className="hz-card__title">{CLAIM_KIND_FA[entry.kind]}</h3>
+                  <ul className="mt-sm divide-y divide-border-subtle">
+                    {entry.items.map((claim) => (
+                      <li key={claim.id} className="py-md" data-testid="breed-claim">
+                        <p className="text-label-lg">{claim.titleFa}</p>
+                        {claim.noteFa ? <p className="mt-xs hz-body-sm">{claim.noteFa}</p> : null}
+                        <p className="mt-xs hz-caption">
+                          {'منبع: '}
+                          {claim.sourceUrl ? <ExternalLink href={claim.sourceUrl}>{claim.sourceTitle}</ExternalLink> : claim.sourceTitle}
+                          {'، بازبینی: '}
+                          <span data-testid="breed-claim-reviewed">{formatCivilDateFa(claim.reviewedOn)}</span>
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </section>
+          ) : null}
+        </article>
+
+        <div className="hz-reading__aside min-w-0">
+          <RelatedColumn
+            groups={[
+              {
+                // Only the second title claims a connection to this breed.
+                titleFa: related.length > 0 ? 'مطالب مرتبط' : 'خواندنی‌ها',
+                noteAsTag: true,
+                items:
+                  related.length > 0
+                    ? related.map((entry) => ({
+                        href: (KIND_PATH[entry.kind] ?? '') + '/' + entry.slug,
+                        titleFa: entry.titleFa,
+                        noteFa: KIND_FA[entry.kind] ?? null,
+                        imageFileId: entry.imageFileId,
+                        imageAltFa: entry.imageAltFa,
+                      }))
+                    : latestReading,
+                link: { href: '/articles', label: 'همه آموزش‌ها' },
+              },
+              { titleFa: 'نژادهای دیگر', items: otherBreeds, link: { href: '/breeds', label: 'همه نژادها' } },
+              { titleFa: 'مراکز دامپزشکی', items: centres, link: { href: '/centers', label: 'همه مراکز' } },
+            ]}
+          />
+        </div>
+      </div>
+
+      <CtaBand id="breed-cta-title" />
     </div>
   );
 }

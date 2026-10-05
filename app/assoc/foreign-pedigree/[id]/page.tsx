@@ -4,7 +4,8 @@ import { eq } from 'drizzle-orm';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, whenFa } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -47,78 +48,70 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
     ? await db().select().from(pedigreeIssuers).where(eq(pedigreeIssuers.id, record.issuerId))
     : [];
 
+  const status = record.status as ForeignPedigreeStatus;
+  const open = status === 'UNDER_REVIEW';
   return (
     <OpsShell actor={guard.actor} title="بررسی Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات پرونده</span></h2></div>
-          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
-            <dt className="text-text-secondary">حیوان</dt>
-            <dd>{animal?.name ?? 'بدون نام'}</dd>
-            <dt className="text-text-secondary">نسل فعلی</dt>
-            <dd>{animal ? generationLabel(animal.generation) : '—'}</dd>
-            <dt className="text-text-secondary">صادرکننده</dt>
-            <dd data-testid="case-issuer">{issuer?.name ?? '—'}</dd>
-            <dt className="text-text-secondary">کد مدرک</dt>
-            <dd>{record.documentCode ? <Identifier value={record.documentCode} /> : '—'}</dd>
-            <dt className="text-text-secondary">وضعیت</dt>
-            <dd data-testid="foreign-case-status">{FOREIGN_STATUS_FA[record.status as ForeignPedigreeStatus]}</dd>
-          </dl>
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مدارک</span></h2></div>
-          <ul className="mt-md space-y-sm text-body-sm">
-            <li>
-              {record.frontFileId ? (
-                <a
-                  href={'/api/files/' + record.frontFileId}
-                  className="text-text-brand underline underline-offset-4"
-                  target="_blank"
-                  rel="noreferrer"
-                  data-testid="foreign-front-link"
-                >
-                  مشاهده تصویر روی برگه
-                </a>
-              ) : (
-                <span className="text-text-disabled">تصویر روی برگه بارگذاری نشده است.</span>
-              )}
-            </li>
-            <li>
-              {record.backFileId ? (
-                <a
-                  href={'/api/files/' + record.backFileId}
-                  className="text-text-brand underline underline-offset-4"
-                  target="_blank"
-                  rel="noreferrer"
-                  data-testid="foreign-back-link"
-                >
-                  مشاهده تصویر پشت برگه
-                </a>
-              ) : (
-                <span className="text-text-disabled">تصویر پشت برگه بارگذاری نشده است.</span>
-              )}
-            </li>
-          </ul>
-        </Card>
-
-        {record.status === 'UNDER_REVIEW' ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
-            <p className="mt-2xs text-caption text-text-secondary">
-              مبنای تأیید، فهرست صادرکنندگان موردتأیید انجمن است. زمان ثابتی برای پایان بررسی وعده داده نمی‌شود.
-            </p>
-            <div className="mt-lg">
+      <DeskHead
+        title={'Export Pedigree · ' + (animal?.name ?? 'بدون نام')}
+        status={{ tone: open ? 'info' : status === 'APPROVED' ? 'success' : status === 'REJECTED' ? 'error' : 'warning', label: FOREIGN_STATUS_FA[status] }}
+        meta={[
+          record.documentCode ? <Identifier label="کد مدرک" value={record.documentCode} /> : null,
+          'ارسال: ' + (whenFa(record.submittedAt) ?? '—'),
+          'نسخه ' + record.version.toLocaleString('fa-IR'),
+        ]}
+        owner={open ? 'ASSOCIATION' : status === 'NEEDS_CORRECTION' ? 'USER' : null}
+      />
+      <Desk
+        decisionTitle={open ? 'تصمیم' : 'نتیجه'}
+        decision={
+          open ? (
+            <>
+              <p className="text-caption text-text-secondary">
+                مبنای تأیید، فهرست صادرکنندگان موردتأیید انجمن است. زمان ثابتی برای پایان بررسی وعده داده نمی‌شود.
+              </p>
               <ForeignReviewForm caseId={record.id} version={record.version} />
-            </div>
-          </Card>
-        ) : (
-          <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
-            وضعیت فعلی: {FOREIGN_STATUS_FA[record.status as ForeignPedigreeStatus]}
-            {record.reasonFa ? ' — ' + record.reasonFa : ''}
-          </Alert>
-        )}
-      </div>
+              <DeskVersionNote version={record.version} />
+            </>
+          ) : (
+            <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
+              وضعیت فعلی: {FOREIGN_STATUS_FA[status]}
+              {record.reasonFa ? ' — ' + record.reasonFa : ''}
+            </Alert>
+          )
+        }
+      >
+        <Panel title="مدارک" aside={<PrivateNote />}>
+          <div className="hz-desk__docs">
+            <DocFrame
+              href={record.frontFileId ? '/api/files/' + record.frontFileId : null}
+              label="روی برگه"
+              linkLabel="مشاهده تصویر روی برگه"
+              testId="foreign-front-link"
+              icon="certificate"
+            />
+            <DocFrame
+              href={record.backFileId ? '/api/files/' + record.backFileId : null}
+              label="پشت برگه"
+              linkLabel="مشاهده تصویر پشت برگه"
+              testId="foreign-back-link"
+              icon="certificate"
+            />
+          </div>
+        </Panel>
+        <Panel title="اطلاعات پرونده">
+          <KeyValueList
+            twoCol
+            rows={[
+              { key: 'حیوان', value: animal?.name ?? 'بدون نام' },
+              { key: 'نسل فعلی', value: animal ? generationLabel(animal.generation) : null },
+              { key: 'صادرکننده', value: issuer?.name ?? '—', testId: 'case-issuer' },
+              { key: 'کد مدرک', value: record.documentCode ? <Identifier value={record.documentCode} /> : null },
+              { key: 'وضعیت', value: FOREIGN_STATUS_FA[status], testId: 'foreign-case-status' },
+            ]}
+          />
+        </Panel>
+      </Desk>
     </OpsShell>
   );
 }

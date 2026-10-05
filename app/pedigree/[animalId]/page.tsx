@@ -17,6 +17,7 @@ import { pedigreeOfAnimal } from '../../../src/documents/pedigree.ts';
 import { AppealForm } from '../forms.tsx';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,18 +44,25 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
 
   const [animal] = await db().select().from(animals).where(eq(animals.id, animalId));
   const parents = await parentResultCheck(db(), animalId);
-  const [appeals, pedigree] = await Promise.all([
-    appealsOfAnimal(db(), animalId),
-    pedigreeOfAnimal(db(), animalId),
-  ]);
+  const [appeals, pedigree] = await Promise.all([appealsOfAnimal(db(), animalId), pedigreeOfAnimal(db(), animalId)]);
 
   return (
-    <PublicShell actor={guard.actor} title="نتیجه Parentage" pathname={'/pedigree/' + animalId}>
+    <PublicShell
+      actor={guard.actor}
+      title="نتیجه Parentage"
+      pathname={'/pedigree/' + animalId}
+      header={<PageHeader title={'نتیجه Parentage'} back={{ href: '/pedigree' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{animal?.name ?? 'بدون نام'}</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>{animal?.name ?? 'بدون نام'}</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary">
                 {animal ? generationLabel(animal.generation) : '—'}
               </p>
@@ -68,19 +76,26 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
 
           {result === null ? (
             <p className="mt-lg text-body-sm text-text-secondary" data-testid="no-result-yet">
-              نتیجه‌ای برای این حیوان ثبت نشده است. پس از دریافت و پردازش نمونه در مرکز، نتیجه همین‌جا دیده
-              می‌شود.
+              نتیجه‌ای برای این حیوان ثبت نشده است. پس از دریافت و پردازش نمونه در مرکز، نتیجه همین‌جا دیده می‌شود.
             </p>
           ) : (
-            <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="result-detail">
-              <dt className="text-text-secondary">نسخه نتیجه</dt>
-              <dd data-testid="result-version">{result.resultVersion}</dd>
-              <dt className="text-text-secondary">زمان پردازش</dt>
-              <dd>
-                {result.processedAt ? formatCivilDateFa(result.processedAt.toISOString().slice(0, 10)) : '—'}
-              </dd>
-              <dt className="text-text-secondary">کد DNA</dt>
-              <dd>{result.technicalNoteFa ?? '—'}</dd>
+            <dl className="hz-kv mt-lg" data-testid="result-detail">
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">نسخه نتیجه</dt>
+                <dd className="hz-kv__value" data-testid="result-version">
+                  {result.resultVersion}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">زمان پردازش</dt>
+                <dd className="hz-kv__value">
+                  {result.processedAt ? formatCivilDateFa(result.processedAt.toISOString().slice(0, 10)) : '—'}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">کد DNA</dt>
+                <dd className="hz-kv__value">{result.technicalNoteFa ?? '—'}</dd>
+              </div>
             </dl>
           )}
         </Card>
@@ -88,8 +103,8 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
         {result?.status === 'WAITING_PARENT_RESULTS' ? (
           <Alert tone="warning" title="در انتظار تکمیل نتایج والدین">
             <span data-testid="waiting-parents">
-              {parents.state === 'WAITING' ? parents.missingFa : 'نتایج والدین در حال تکمیل است.'} نتیجه ناقص
-              به‌عنوان نتیجه نهایی ثبت نمی‌شود.
+              {parents.state === 'WAITING' ? parents.missingFa : 'نتایج والدین در حال تکمیل است.'} نتیجه ناقص به‌عنوان
+              نتیجه نهایی ثبت نمی‌شود.
             </span>
           </Alert>
         ) : null}
@@ -104,29 +119,31 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
 
         {pedigree ? (
           <Card>
-            <h3 className="text-label-lg">شجره‌نامه صادرشده</h3>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>شجره‌نامه صادرشده</span>
+              </h3>
+            </div>
             <p className="mt-md text-body-sm">
-              <Link
-                href={'/documents/pedigree/' + pedigree.id}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="animal-pedigree-link"
-              >
+              <Link href={'/documents/pedigree/' + pedigree.id} className="hz-link" data-testid="animal-pedigree-link">
                 مشاهده شجره‌نامه {pedigree.pedigreeCode}
               </Link>
             </p>
           </Card>
         ) : result?.status === 'FINAL' ? (
           <Card>
-            <h3 className="text-label-lg">صدور شجره‌نامه</h3>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>صدور شجره‌نامه</span>
+              </h3>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
               نتیجه نهایی است؛ برای صدور سند، پرداخت صدور در هم‌زیست لازم است.
             </p>
             <p className="mt-md text-body-sm">
-              <Link
-                href="/pedigree/issue"
-                className="text-text-brand underline underline-offset-4"
-                data-testid="go-to-issuance"
-              >
+              <Link href="/pedigree/issue" className="hz-link" data-testid="go-to-issuance">
                 درخواست صدور شجره‌نامه
               </Link>
             </p>
@@ -135,14 +152,16 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
 
         {appeals.length > 0 ? (
           <Card>
-            <h3 className="text-label-lg">اعتراض‌های ثبت‌شده</h3>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>اعتراض‌های ثبت‌شده</span>
+              </h3>
+            </div>
             <ul className="mt-md space-y-sm text-body-sm" data-testid="animal-appeals">
               {appeals.map((appeal) => (
                 <li key={appeal.id} className="flex items-center justify-between gap-md">
-                  <Link
-                    href={'/pedigree/appeals/' + appeal.id}
-                    className="text-text-brand underline underline-offset-4"
-                  >
+                  <Link href={'/pedigree/appeals/' + appeal.id} className="hz-link">
                     اعتراض {formatCivilDateFa(appeal.createdAt.toISOString().slice(0, 10))}
                   </Link>
                   <span className="text-text-secondary">{APPEAL_STATUS_FA[appeal.status]}</span>
@@ -158,11 +177,7 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
 
         <Card>
           <p className="text-body-sm">
-            <Link
-              href={'/animals/' + animalId}
-              className="text-text-brand underline underline-offset-4"
-              data-testid="back-to-animal"
-            >
+            <Link href={'/animals/' + animalId} className="hz-link" data-testid="back-to-animal">
               بازگشت به پرونده حیوان
             </Link>
           </p>

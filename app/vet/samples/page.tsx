@@ -10,6 +10,7 @@ import { custodyList } from '../../../src/clinical/samples.ts';
 import { isUnusable, SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { ShipmentForm } from './shipment-form.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,12 @@ export default async function VetSamplesPage() {
   const rows = await custodyList(db(), guard.actor);
 
   return (
-    <PublicShell actor={guard.actor} title="نمونه‌های نزد من" pathname="/vet/samples">
+    <PublicShell
+      actor={guard.actor}
+      title="نمونه‌های نزد من"
+      pathname="/vet/samples"
+      header={<PageHeader title={'نمونه‌های نزد من'} back={{ href: '/vet' }} />}
+    >
       <div className="space-y-lg">
         {rows.length === 0 ? (
           <EmptyState
@@ -51,10 +57,7 @@ export default async function VetSamplesPage() {
                     زمان نمونه‌گیری: {formatCivilDateFa(sample.collectedAt.toISOString().slice(0, 10))}
                   </p>
                   <p className="mt-sm text-body-sm">
-                    <Link
-                      href={'/vet/requests/' + sample.requestId}
-                      className="text-text-brand underline underline-offset-4"
-                    >
+                    <Link href={'/vet/requests/' + sample.requestId} className="hz-link">
                       مشاهده پرونده مراجعه
                     </Link>
                   </p>
@@ -64,9 +67,7 @@ export default async function VetSamplesPage() {
                       تا صدور دستور ارسال از مرکز ژنتیک، نمونه نزد شما می‌ماند. نمونه انقضای خودکار ندارد.
                     </p>
                   ) : null}
-                  {sample.status === 'SEND_INSTRUCTED' ? (
-                    <ShipmentForm sampleId={sample.id} />
-                  ) : null}
+                  {sample.status === 'SEND_INSTRUCTED' ? <ShipmentForm sampleId={sample.id} /> : null}
                   {sample.status === 'SHIPPED' ? (
                     <p className="mt-lg text-caption text-text-secondary">
                       ارسال روی همین کد رهگیری ثبت شد: {sample.shipmentRefFa}

@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { currentPaymentGateway } from '../../../../src/adapters/current.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
-import { Alert } from '../../../../src/ui/alert.tsx';
+import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { PaymentResult } from '../../../../src/ui/payment-result.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { verifyAttempt } from '../../../../src/billing/payments.ts';
 import { paidEffects } from '../../../../src/billing/effects.ts';
@@ -12,7 +11,7 @@ import { paidEffects } from '../../../../src/billing/effects.ts';
 export const dynamic = 'force-dynamic';
 
 /**
- * Return from the gateway for a seller plan — PROMPT-008.
+ * Return from the gateway for a seller plan — PROMPT-008 (P08 return).
  *
  * The verification is what starts the period and what makes the store active.
  * Coming back to this page proves nothing by itself, which is why the gateway
@@ -36,39 +35,37 @@ export default async function SellerPlanReturnPage({
       )
     : ({ state: 'UNKNOWN_REFERENCE' } as const);
 
+  const facts = [{ key: 'خدمت', value: 'پلن فروشندگی' }];
+  const back = (
+    <ButtonLink href="/account/seller" block tone={outcome.state === 'PAID' ? 'primary' : 'secondary'} data-testid="back-to-seller">
+      بازگشت به فروشگاه من
+    </ButtonLink>
+  );
+
   return (
     <PublicShell actor={guard.actor} title="نتیجه پرداخت پلن فروشندگی" pathname="/account/seller">
-      <div className="space-y-lg p-lg">
-        <Card>
-          <div data-testid="plan-payment-result">
-            {outcome.state === 'PAID' ? (
-              <Alert tone="success" title="پرداخت تأیید شد و دوره پلن آغاز شد">
-                فروشگاه شما فعال شد و می‌تواند فعالیت کند.
-              </Alert>
-            ) : null}
-            {outcome.state === 'FAILED' ? (
-              <Alert tone="error" title="پرداخت تأیید نشد">
-                {outcome.reasonFa} پرونده فروشگاه و مبلغ منجمدشده حفظ شده است و می‌توانید دوباره تلاش کنید.
-              </Alert>
-            ) : null}
-            {outcome.state === 'CANCELLED' ? (
-              <Alert tone="warning" title="پرداخت لغو شد">
-                پرونده فروشگاه حفظ شده است و خرید پلن دوباره قابل انجام است.
-              </Alert>
-            ) : null}
-            {outcome.state === 'UNKNOWN_REFERENCE' ? (
-              <Alert tone="warning" title="این بازگشت از درگاه شناسایی نشد">
-                اگر مبلغی از حساب شما کم شده است، از صفحه فروشگاه وضعیت پلن را دوباره بررسی کنید.
-              </Alert>
-            ) : null}
-          </div>
-          <p className="mt-lg text-caption">
-            <Link href="/account/seller" className="text-text-brand" data-testid="back-to-seller">
-              بازگشت به فروشگاه من
-            </Link>
-          </p>
-        </Card>
-      </div>
+      {outcome.state === 'PAID' ? (
+        <PaymentResult
+          state="PAID"
+          testId="plan-payment-result"
+          title="پرداخت تأیید شد و دوره پلن آغاز شد"
+          facts={facts}
+          next={['فروشگاه شما فعال شد و می‌تواند فعالیت کند.']}
+          actions={back}
+        />
+      ) : outcome.state === 'FAILED' ? (
+        <PaymentResult state="FAILED" testId="plan-payment-result" title="پرداخت تأیید نشد" facts={facts} actions={back}>
+          {outcome.reasonFa} پرونده فروشگاه و مبلغ منجمدشده حفظ شده است و می‌توانید دوباره تلاش کنید.
+        </PaymentResult>
+      ) : outcome.state === 'CANCELLED' ? (
+        <PaymentResult state="CANCELLED" testId="plan-payment-result" title="پرداخت لغو شد" facts={facts} actions={back}>
+          پرونده فروشگاه حفظ شده است و خرید پلن دوباره قابل انجام است.
+        </PaymentResult>
+      ) : (
+        <PaymentResult state="UNKNOWN" testId="plan-payment-result" title="این بازگشت از درگاه شناسایی نشد" actions={back}>
+          اگر مبلغی از حساب شما کم شده است، از صفحه فروشگاه وضعیت پلن را دوباره بررسی کنید.
+        </PaymentResult>
+      )}
     </PublicShell>
   );
 }

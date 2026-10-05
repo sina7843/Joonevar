@@ -25,21 +25,16 @@ export function AnimalEditForm({
   const [state, submit, pending] = useActionState(editAnimalAction, EMPTY);
   return (
     <form action={submit} className="space-y-lg" data-testid="animal-edit-form">
-      {state.message ? (
-        <Alert tone={state.tone === 'success' ? 'success' : 'error'} title={state.message} />
-      ) : null}
+      {state.message ? <Alert tone={state.tone === 'success' ? 'success' : 'error'} title={state.message} /> : null}
       <input type="hidden" name="animalId" value={animalId} />
       <TextField label="نام حیوان" name="name" defaultValue={values.name} data-testid="edit-name" />
       <TextField label="رنگ" name="color" defaultValue={values.color} data-testid="edit-color" />
       <TextField label="نشانه‌های ظاهری" name="markings" defaultValue={values.markings} data-testid="edit-markings" />
-      <label className="flex items-center gap-sm text-label-md">
-        <input
-          type="checkbox"
-          name="birthDateApproximate"
-          defaultChecked={values.birthDateApproximate}
-          className="size-[var(--size-selection-md)]"
-        />
-        تاریخ تولد تقریبی است
+      <label className="hz-check">
+        <input type="checkbox" name="birthDateApproximate" defaultChecked={values.birthDateApproximate} />
+        <span className="hz-check__text">
+          <span className="hz-check__label">تاریخ تولد تقریبی است</span>
+        </span>
       </label>
       <Button tone="secondary" type="submit" block disabled={pending} data-testid="save-animal-edit">
         {pending ? 'در حال ذخیره…' : 'ذخیره تغییرات'}

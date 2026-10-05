@@ -63,11 +63,11 @@ export default async function ComparePage({
             <table className="w-full border-collapse text-body-sm" data-testid="compare-table">
               <thead>
                 <tr>
-                  <th className="border-b border-border-subtle p-sm text-right">ویژگی</th>
+                  <th className="border-b border-border-subtle p-sm text-start">ویژگی</th>
                   {outcome.products.map((product) => (
                     <th
                       key={product.productId}
-                      className="border-b border-border-subtle p-sm text-right"
+                      className="border-b border-border-subtle p-sm text-start"
                       data-testid={'compare-product-' + product.productId}
                     >
                       {product.nameFa}
@@ -77,7 +77,7 @@ export default async function ComparePage({
               </thead>
               <tbody>
                 <tr>
-                  <th className="border-b border-border-subtle p-sm text-right">برند</th>
+                  <th className="border-b border-border-subtle p-sm text-start">برند</th>
                   {outcome.products.map((product) => (
                     <td key={product.productId} className="border-b border-border-subtle p-sm">
                       {product.brandFa ?? '—'}
@@ -85,7 +85,7 @@ export default async function ComparePage({
                   ))}
                 </tr>
                 <tr>
-                  <th className="border-b border-border-subtle p-sm text-right">کمترین قیمت</th>
+                  <th className="border-b border-border-subtle p-sm text-start">کمترین قیمت</th>
                   {outcome.products.map((product) => (
                     <td
                       key={product.productId}
@@ -98,7 +98,7 @@ export default async function ComparePage({
                 </tr>
                 {outcome.attributes.map((attribute) => (
                   <tr key={attribute}>
-                    <th className="border-b border-border-subtle p-sm text-right">{attribute}</th>
+                    <th className="border-b border-border-subtle p-sm text-start">{attribute}</th>
                     {outcome.products.map((product) => (
                       <td key={product.productId} className="border-b border-border-subtle p-sm">
                         {String(product.specifications[attribute] ?? '—')}

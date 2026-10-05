@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, CONTENT_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { DeskHead, Panel, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { reportsForContent } from '../../../../src/moderation/service.ts';
@@ -35,97 +36,97 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
   if (item.status !== 'DELETED') decisions.push('SOFT_DELETE');
   if (!data.restriction) decisions.push('RESTRICT_PUBLISHER');
 
+  const oldest = data.open.reduce<Date | null>((min, report) => (min === null || report.createdAt < min ? report.createdAt : min), null);
+  const age = ageInDays(oldest);
   return (
-    <OpsShell actor={guard.actor} title="ادمین محتوا" pathname="/content/reports" nav={CONTENT_NAV}>
-      <div className="space-y-lg">
-        <Link href="/content/reports" className="text-label-md text-text-brand underline underline-offset-4">
-          بازگشت به صف گزارش‌ها
-        </Link>
-
-        <Card>
-          <div className="flex flex-wrap items-start justify-between gap-md">
-            <div className="min-w-0">
-              <p className="text-caption text-text-secondary">{KIND_FA[item.kind] + ' · نویسنده: ' + data.authorName}</p>
-              <h2 className="text-h3">{item.titleFa}</h2>
-            </div>
-            <div className="flex flex-wrap gap-xs">
-              <StatusBadge tone="neutral">
-                <span data-testid="reported-content-status">{STATUS_FA[item.status]}</span>
-              </StatusBadge>
-              <StatusBadge tone="neutral">{PUBLIC_STATE_FA[data.publicState]}</StatusBadge>
-            </div>
-          </div>
-          <p className="mt-md flex flex-wrap gap-md text-label-md">
-            <Link href={'/content/' + item.id} className="text-text-brand underline underline-offset-4">
-              باز کردن در ویرایشگر
+    <OpsShell actor={guard.actor} title="بررسی گزارش محتوا" pathname="/content/reports" nav={CONTENT_NAV}>
+      <DeskHead
+        title={'گزارش محتوا، ' + item.titleFa}
+        status={{ tone: data.open.length > 0 ? 'info' : 'success', label: data.open.length > 0 ? 'در حال بررسی' : 'تعیین تکلیف شد' }}
+        meta={[
+          <>{'نوع: '}<b>{KIND_FA[item.kind]}</b></>,
+          <>{'نویسنده: '}<b>{data.authorName}</b></>,
+          <>{'وضعیت محتوا: '}<b data-testid="reported-content-status">{STATUS_FA[item.status]}</b></>,
+          PUBLIC_STATE_FA[data.publicState],
+          data.open.length > 0 && age !== null ? (
+            <span className="hz-age">
+              <Icon name="clock" size="xs" />
+              {fa(age) + ' روز در صف'}
+            </span>
+          ) : null,
+        ]}
+        owner={data.open.length > 0 ? 'SYSTEM' : null}
+        ownerExtra={data.open.length > 0 ? 'ادمین محتوا' : undefined}
+      >
+        <p className="flex flex-wrap gap-lg">
+          <Link href="/content/reports" className="hz-link hz-link--standalone">
+            <Icon name="arrowLeft" size="xs" mirror />
+            بازگشت به صف گزارش‌ها
+          </Link>
+          <Link href={'/content/' + item.id} className="hz-link hz-link--standalone">
+            باز کردن در ویرایشگر
+          </Link>
+          {publicPath && (data.publicState === 'VISIBLE' || data.publicState === 'ARCHIVED') ? (
+            <Link href={publicPath + '/' + item.slug} className="hz-link hz-link--standalone">
+              مشاهده در سایت
+              <Icon name="arrowSquareOut" size="xs" />
             </Link>
-            {publicPath && (data.publicState === 'VISIBLE' || data.publicState === 'ARCHIVED') ? (
-              <Link href={publicPath + '/' + item.slug} className="text-text-brand underline underline-offset-4">
-                مشاهده در سایت
-              </Link>
-            ) : null}
-          </p>
-        </Card>
+          ) : null}
+        </p>
+      </DeskHead>
 
-        {item.correctionNote ? (
-          <Alert tone="info" title="اصلاح از نویسنده درخواست شده و هنوز پاسخ نگرفته است">
-            <span data-testid="pending-correction">{item.correctionNote}</span>
-          </Alert>
-        ) : null}
-        {data.restriction ? (
-          <Alert tone="warning" title="نویسنده محدودیت انتشار دارد">
-            {restrictionMessage(data.restriction)}
-          </Alert>
-        ) : null}
+      <div className="hz-desk">
+        <div className="min-w-0 space-y-lg">
+          {item.correctionNote ? (
+            <Alert tone="info" title="اصلاح از نویسنده درخواست شده و هنوز پاسخ نگرفته است">
+              <span data-testid="pending-correction">{item.correctionNote}</span>
+            </Alert>
+          ) : null}
+          {data.restriction ? (
+            <Alert tone="warning" title="نویسنده محدودیت انتشار دارد">
+              {restrictionMessage(data.restriction)}
+            </Alert>
+          ) : null}
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{'گزارش‌های باز (' + fa(data.open.length) + ')'}</span></h2></div>
-          {data.open.length === 0 ? (
-            <div className="mt-lg">
+          <Panel title="گزارش‌ها" count={fa(data.open.length)} aside="هویت گزارش‌دهندگان در این صفحه نمی‌آید">
+            {data.open.length === 0 ? (
               <EmptyState title="گزارش بازی برای این محتوا نیست" description="تصمیم‌های قبلی پایین همین صفحه آمده‌اند." />
-            </div>
-          ) : (
-            <ul className="mt-lg space-y-sm" data-testid="open-reports">
-              {data.open.map((report) => (
-                <li key={report.id} className="rounded-lg border border-border-default p-md" data-testid="open-report">
-                  <p className="text-label-md">{REASON_FA[report.reason]}</p>
-                  {report.details ? <p className="mt-xs whitespace-pre-line text-body-sm">{report.details}</p> : null}
-                  <p className="mt-xs text-caption text-text-secondary">
-                    {formatInstantFa(report.createdAt) + (report.contentRevision ? ' · روی نسخه ' + fa(report.contentRevision) : '')}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+            ) : (
+              <ul className="hz-kv" data-testid="open-reports">
+                {data.open.map((report) => (
+                  <li key={report.id} className="hz-kv__row" data-testid="open-report">
+                    <span className="hz-kv__key">
+                      {formatInstantFa(report.createdAt) + (report.contentRevision ? ' · روی نسخه ' + fa(report.contentRevision) : '')}
+                    </span>
+                    <span className="hz-kv__value">
+                      <span className="hz-tag hz-tag--neutral">{REASON_FA[report.reason]}</span>
+                      {report.details ? <span className="mt-xs block whitespace-pre-line font-normal">{report.details}</span> : null}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
 
-        <DecisionForm contentId={item.id} decisions={decisions} hasOpenReports={data.open.length > 0} />
-
-        {data.decided.length > 0 ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم‌های قبلی</span></h2></div>
-            <ul className="mt-lg space-y-sm" data-testid="decided-reports">
-              {data.decided.map((report) => (
-                <li key={report.id} className="rounded-lg border border-border-default p-md">
-                  <div className="flex flex-wrap items-center justify-between gap-sm">
-                    <p className="text-label-md">
-                      {REASON_FA[report.reason] + (report.decision ? ' ← ' + DECISION_FA[report.decision] : '')}
-                    </p>
-                    <StatusBadge tone={report.status === 'DISMISSED' ? 'neutral' : 'success'}>
-                      {REPORT_STATUS_FA[report.status]}
-                    </StatusBadge>
-                  </div>
-                  <p className="mt-xs text-caption text-text-secondary">
-                    {(report.decisionReason ?? '') +
-                      ' · ' +
-                      (report.decidedByName ?? 'ادمین محتوا') +
-                      (report.decidedAt ? ' · ' + formatInstantFa(report.decidedAt) : '')}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ) : null}
+          {data.decided.length > 0 ? (
+            <Panel title="سابقه پرونده">
+              <div data-testid="decided-reports">
+                <CaseHistory
+                  entries={data.decided.map((report) => ({
+                    id: report.id,
+                    title: REASON_FA[report.reason] + (report.decision ? ' ← ' + DECISION_FA[report.decision] : ''),
+                    whenFa: (report.decidedByName ?? 'ادمین محتوا') + (report.decidedAt ? ' · ' + formatInstantFa(report.decidedAt) : ''),
+                    status: { tone: report.status === 'DISMISSED' ? 'neutral' : 'success', label: REPORT_STATUS_FA[report.status] },
+                    body: report.decisionReason ?? undefined,
+                  }))}
+                />
+              </div>
+            </Panel>
+          ) : null}
+        </div>
+        <div className="hz-desk__decision">
+          <DecisionForm contentId={item.id} decisions={decisions} hasOpenReports={data.open.length > 0} />
+        </div>
       </div>
     </OpsShell>
   );

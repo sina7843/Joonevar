@@ -1,10 +1,8 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { CaseItem, CaseList, Panel } from '../../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { centreReferenceData, manageableCentres } from '../../../../src/centres/service.ts';
 import { CENTRE_STATUS_FA, LICENCE_STATUS_FA, type CentreStatus, type LicenceStatusName } from '../../../../src/centres/model.ts';
@@ -23,51 +21,39 @@ export default async function ReviewCentresPage() {
   const [centres, reference] = await Promise.all([manageableCentres(db(), guard.actor), centreReferenceData(db())]);
 
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/centres" nav={REVIEW_NAV}>
-      <div className="space-y-lg">
-        <CentreCreateForm surface="review" types={reference.types} provinces={reference.provinces} cities={reference.cities} />
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مراکز</span></h2></div>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            مرکز بدون مالک با برچسب خودش منتشر می‌شود و تا Claim، مدیری ندارد.
-          </p>
+    <OpsShell actor={guard.actor} title="مراکز دامپزشکی" pathname="/review/centres" nav={REVIEW_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{centres.length.toLocaleString('fa-IR') + ' مرکز'}</span>
+        <span className="hz-page-header__meta-item">مرکز بدون مالک با برچسب خودش منتشر می‌شود و تا Claim، مدیری ندارد.</span>
+      </p>
+      <div className="grid items-start gap-lg lg:grid-cols-2">
+        <Panel title="مراکز" count={centres.length.toLocaleString('fa-IR')}>
           {centres.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="مرکزی ثبت نشده است" description="با فرم بالا مرکز بررسی‌شده را ثبت کنید." />
-            </div>
+            <EmptyState title="مرکزی ثبت نشده است" description="با فرم ثبت مرکز، مرکز بررسی‌شده را ثبت کنید." />
           ) : (
-            <ul className="mt-lg space-y-sm" data-testid="centre-list">
+            <CaseList label="مراکز" testId="centre-list">
               {centres.map((row) => (
-                <li key={row.centre.id}>
-                  <Link
-                    href={'/review/centres/' + row.centre.id}
-                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
-                    data-testid={'centre-row-' + row.centre.id}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-sm">
-                      <div className="min-w-0">
-                        <p className="text-label-lg">{row.centre.displayNameFa}</p>
-                        <p className="mt-2xs text-caption text-text-secondary">
-                          {[row.typeNameFa, row.cityNameFa, row.centre.sourceFa ? 'منبع: ' + row.centre.sourceFa : null].filter(Boolean).join(' · ')}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-xs">
-                        <StatusBadge tone={row.centre.publicStatus === 'PUBLISHED' ? 'success' : row.centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-                          {CENTRE_STATUS_FA[row.centre.publicStatus as CentreStatus]}
-                        </StatusBadge>
-                        <StatusBadge tone={row.centre.licenceStatus === 'VALID' ? 'info' : 'neutral'}>
-                          {'مجوز: ' + LICENCE_STATUS_FA[row.centre.licenceStatus as LicenceStatusName]}
-                        </StatusBadge>
-                        {row.centre.ownerAccountId ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
+                <CaseItem
+                  key={row.centre.id}
+                  type={row.centre.ownerAccountId ? undefined : 'بدون مالک'}
+                  name={row.centre.displayNameFa}
+                  href={'/review/centres/' + row.centre.id}
+                  linkTestId={'centre-row-' + row.centre.id}
+                  sub={
+                    [row.typeNameFa, row.cityNameFa, row.centre.sourceFa ? 'منبع: ' + row.centre.sourceFa : null].filter(Boolean).join(' · ') +
+                    ' · مجوز: ' +
+                    LICENCE_STATUS_FA[row.centre.licenceStatus as LicenceStatusName]
+                  }
+                  status={{
+                    tone: row.centre.publicStatus === 'PUBLISHED' ? 'success' : row.centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral',
+                    label: CENTRE_STATUS_FA[row.centre.publicStatus as CentreStatus],
+                  }}
+                />
               ))}
-            </ul>
+            </CaseList>
           )}
-        </Card>
+        </Panel>
+        <CentreCreateForm surface="review" types={reference.types} provinces={reference.provinces} cities={reference.cities} />
       </div>
     </OpsShell>
   );

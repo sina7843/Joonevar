@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseQueue, ageInDays } from '../../../src/ui/queue.tsx';
+import { QueueMeta } from '../../../src/ui/desk.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { foreignQueue, listIssuers } from '../../../src/animals/foreign-pedigree.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
@@ -32,7 +32,7 @@ export default async function AssocForeignPedigreePage() {
           <Alert tone="warning" title="فهرست صادرکنندگان موردتأیید خالی است">
             مبنای بررسی، فهرست صادرکنندگان موردتأیید انجمن است. تا ورود فهرست واقعی، هیچ مدرکی قابل تأیید
             نیست.{' '}
-            <Link href="/assoc/issuers" className="text-text-brand underline underline-offset-4">
+            <Link href="/assoc/issuers" className="hz-link">
               مدیریت فهرست صادرکنندگان
             </Link>
           </Alert>
@@ -44,33 +44,33 @@ export default async function AssocForeignPedigreePage() {
             description="مدارک ارسال‌شده مالکان در همین صف دیده می‌شوند."
           />
         ) : (
-          <ul className="space-y-md">
-            {page.items.map((item) => (
-              <li key={item.id}>
-                <Card>
-                  <div className="flex items-start justify-between gap-md">
-                    <div className="min-w-0">
-                      <h2 className="hz-card__title">{item.animalName}</h2>
-                      <p className="mt-2xs text-caption text-text-secondary">
-                        صادرکننده: {item.issuerName ?? '—'} · ارسال:{' '}
-                        {item.submittedAt ? formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : '—'}
-                      </p>
-                    </div>
-                    <StatusBadge tone="info">در حال بررسی</StatusBadge>
-                  </div>
-                  <div className="mt-lg">
-                    <Link
-                      href={'/assoc/foreign-pedigree/' + item.id}
-                      className="text-label-md text-text-brand underline underline-offset-4"
-                      data-testid="open-foreign-case"
-                    >
-                      بررسی پرونده
-                    </Link>
-                  </div>
-                </Card>
-              </li>
-            ))}
-          </ul>
+          <>
+            <QueueMeta
+              total={page.total}
+              oldestDays={Math.max(...page.items.map((item) => ageInDays(item.submittedAt) ?? 0))}
+            />
+            <CaseQueue
+              label="صف Export Pedigree"
+              rows={[...page.items]
+                .sort((x, y) => (x.submittedAt?.getTime() ?? 0) - (y.submittedAt?.getTime() ?? 0))
+                .map((item) => ({
+                  id: item.id,
+                  href: '/assoc/foreign-pedigree/' + item.id,
+                  name: item.animalName,
+                  code: item.documentCode,
+                  sub:
+                    'صادرکننده: ' +
+                    (item.issuerName ?? '—') +
+                    ' · ارسال: ' +
+                    (item.submittedAt ? formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : '—'),
+                  ageDays: ageInDays(item.submittedAt),
+                  status: { tone: 'info' as const, label: 'در حال بررسی' },
+                  owner: 'ASSOCIATION' as const,
+                  ownerIsUs: true,
+                  testId: 'open-foreign-case',
+                }))}
+            />
+          </>
         )}
       </div>
     </OpsShell>

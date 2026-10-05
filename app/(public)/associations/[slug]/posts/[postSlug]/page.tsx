@@ -42,7 +42,9 @@ export default async function CommunityPostPage({ params }: Params) {
   const path = communityPath + '/posts/' + post.slug;
 
   return (
-    <article className="mx-auto max-w-3xl space-y-xl" data-testid="community-post-page">
+    <div className="hz-reading">
+    <article className="hz-reading__main hz-content-detail space-y-xl" aria-labelledby="post-title" data-testid="community-post-page">
+      <header className="hz-content-detail__head">
       <Breadcrumbs
         items={[
           { name: 'خانه', path: '/' },
@@ -70,22 +72,33 @@ export default async function CommunityPostPage({ params }: Params) {
         )}
       />
 
-      <header className="space-y-sm">
-        <h1 className="text-h2 md:text-h1">{post.titleFa}</h1>
-        <p className="text-body-md text-text-secondary">{post.summaryFa}</p>
-        <p className="text-caption text-text-secondary" data-testid="community-post-author">
-          {'نوشته '}
-          <Link href={communityPath} className="text-text-brand underline underline-offset-4">
-            {post.communityNameFa}
-          </Link>
-        </p>
+        <span className="hz-tag">نوشته کلاب</span>
+        <h1 className="hz-content-detail__title" id="post-title">
+          {post.titleFa}
+        </h1>
+        <p className="hz-content-detail__lead">{post.summaryFa}</p>
+        <div className="hz-content-detail__byline">
+          <span className="hz-content-detail__author" data-testid="community-post-author">
+            <span className="hz-avatar-initials" aria-hidden="true">
+              {post.communityNameFa.trim().charAt(0)}
+            </span>
+            <span>
+              {'نوشته '}
+              <Link href={communityPath} className="hz-link">
+                {post.communityNameFa}
+              </Link>
+              <span className="hz-content-detail__author-role">ناشر</span>
+            </span>
+          </span>
+        </div>
       </header>
 
-      <div className="space-y-md text-body-md" data-testid="community-post-body">
+      <div className="hz-prose" data-testid="community-post-body">
         {post.bodyFa.split(/\n{2,}/).map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
         ))}
       </div>
     </article>
+    </div>
   );
 }

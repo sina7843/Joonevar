@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { Button } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { SelectField, TextField } from '../../src/ui/field.tsx';
+import { DecisionForm } from '../../src/ui/decision.tsx';
 import {
   answerAppealAction,
   takeAppealAction,
@@ -30,44 +31,24 @@ function Result({ state }: { state: CentreFormState }) {
  * to fix on the same receipt.
  */
 export function ReceiptReviewForm({ receiptId, version }: { receiptId: string; version: number }) {
-  const [state, submit, pending] = useActionState(reviewReceiptAction, EMPTY);
-  const [decision, setDecision] = useState<'APPROVED' | 'NEEDS_CORRECTION' | 'REJECTED'>('APPROVED');
-
   return (
-    <form action={submit} className="mt-lg space-y-lg" data-testid="receipt-review-form">
-      <input type="hidden" name="receiptId" value={receiptId} />
-      <input type="hidden" name="version" value={version} />
-      <Result state={state} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">تصمیم</legend>
-        {(
-          [
-            ['APPROVED', 'تأیید فیش'],
-            ['NEEDS_CORRECTION', 'نیازمند اصلاح'],
-            ['REJECTED', 'رد فیش'],
-          ] as const
-        ).map(([value, label]) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
-            <input
-              type="radio"
-              name="decision"
-              value={value}
-              checked={decision === value}
-              onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
-              data-testid={'receipt-decision-' + value}
-            />
-            {label}
-          </label>
-        ))}
-      </fieldset>
-      {decision === 'APPROVED' ? null : (
-        <TextField label="دلیل" name="reason" required data-testid="receipt-review-reason" />
-      )}
-      <Button type="submit" block disabled={pending} data-testid="submit-receipt-review">
-        {pending ? 'در حال ثبت…' : 'ثبت تصمیم'}
-      </Button>
-    </form>
+    <DecisionForm
+      action={reviewReceiptAction}
+      hidden={{ receiptId, version }}
+      formTestId="receipt-review-form"
+      submitTestId="submit-receipt-review"
+      reasonName="reason"
+      reasonTestId="receipt-review-reason"
+      reasonFor={['NEEDS_CORRECTION', 'REJECTED']}
+      reasonLabel={(value) => (value === 'REJECTED' ? 'دلیل رد' : 'دلیل اصلاح')}
+      audience="به پرداخت‌کننده نمایش داده می‌شود"
+      drafts={['تصویر فیش خوانا نیست', 'مبلغ فیش با هزینه مطابقت ندارد']}
+      choices={[
+        { value: 'APPROVED', label: 'تأیید فیش', desc: 'دستور ارسال نمونه‌های این فیش برای دامپزشک نگهدارنده صادر می‌شود.', testId: 'receipt-decision-APPROVED' },
+        { value: 'NEEDS_CORRECTION', label: 'نیازمند اصلاح', desc: 'فیش با دلیل به پرداخت‌کننده برمی‌گردد.', testId: 'receipt-decision-NEEDS_CORRECTION' },
+        { value: 'REJECTED', label: 'رد فیش', desc: 'فیش با دلیل بسته می‌شود.', testId: 'receipt-decision-REJECTED' },
+      ]}
+    />
   );
 }
 

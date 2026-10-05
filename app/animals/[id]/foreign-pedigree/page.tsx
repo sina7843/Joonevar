@@ -16,6 +16,7 @@ import {
 } from '../../../../src/animals/foreign-pedigree.ts';
 import { generationLabel } from '../../../../src/domain/lineage.ts';
 import { ForeignDetailsForm, ForeignSideForm, ForeignSubmitForm } from './forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,15 +57,25 @@ export default async function ForeignPedigreePage({ params }: { params: Promise<
   const hasBack = Boolean(record?.backFileId);
 
   return (
-    <PublicShell actor={actor} title="Export Pedigree" pathname={'/animals/' + id + '/foreign-pedigree'}>
+    <PublicShell
+      actor={actor}
+      title="Export Pedigree"
+      pathname={'/animals/' + id + '/foreign-pedigree'}
+      header={<PageHeader title={'Export Pedigree'} back={{ href: '/animals/' + id }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div>
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت پرونده</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>وضعیت پرونده</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary">
-                بررسی با انجمن و بر اساس فهرست صادرکنندگان موردتأیید آن انجام می‌شود. زمان ثابتی برای پایان
-                بررسی وعده داده نمی‌شود.
+                بررسی با انجمن و بر اساس فهرست صادرکنندگان موردتأیید آن انجام می‌شود. زمان ثابتی برای پایان بررسی وعده
+                داده نمی‌شود.
               </p>
             </div>
             <StatusBadge tone={TONE[status]}>{FOREIGN_STATUS_FA[status]}</StatusBadge>
@@ -80,10 +91,7 @@ export default async function ForeignPedigreePage({ params }: { params: Promise<
         ) : null}
 
         {status === 'NEEDS_CORRECTION' && record?.reasonFa ? (
-          <NeedsCorrectionState
-            reason={record.reasonFa}
-            correctionHref={'/animals/' + id + '/foreign-pedigree'}
-          />
+          <NeedsCorrectionState reason={record.reasonFa} correctionHref={'/animals/' + id + '/foreign-pedigree'} />
         ) : null}
 
         {status === 'REJECTED' && record?.reasonFa ? (
@@ -107,7 +115,12 @@ export default async function ForeignPedigreePage({ params }: { params: Promise<
         {editable ? (
           <>
             <Card>
-              <h3 className="text-label-lg">اطلاعات مدرک</h3>
+              <div className="hz-section-header hz-section-header--sm">
+                <h3 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>اطلاعات مدرک</span>
+                </h3>
+              </div>
               <div className="mt-lg">
                 <ForeignDetailsForm
                   animalId={animal.id}
@@ -118,14 +131,24 @@ export default async function ForeignPedigreePage({ params }: { params: Promise<
             </Card>
 
             <Card>
-              <h3 className="text-label-lg">تصویر روی برگه</h3>
+              <div className="hz-section-header hz-section-header--sm">
+                <h3 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>تصویر روی برگه</span>
+                </h3>
+              </div>
               <div className="mt-lg">
                 <ForeignSideForm animalId={animal.id} side="FRONT" attached={hasFront} />
               </div>
             </Card>
 
             <Card>
-              <h3 className="text-label-lg">تصویر پشت برگه</h3>
+              <div className="hz-section-header hz-section-header--sm">
+                <h3 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>تصویر پشت برگه</span>
+                </h3>
+              </div>
               <div className="mt-lg">
                 <ForeignSideForm animalId={animal.id} side="BACK" attached={hasBack} />
               </div>

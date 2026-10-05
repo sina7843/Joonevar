@@ -207,7 +207,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       {answer.skippedKindsFa.length > 0 ? (
         <div data-testid="search-skipped">
           <Alert tone="info" title="بعضی نتیجه‌ها با این فیلترها جست‌وجو نشدند">
-            <ul className="list-disc space-y-2xs pr-lg">
+            <ul className="list-disc space-y-2xs ps-lg">
               {answer.skippedKindsFa.map((note) => (
                 <li key={note}>{note}</li>
               ))}

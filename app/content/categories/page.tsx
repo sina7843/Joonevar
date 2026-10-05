@@ -1,7 +1,7 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, CONTENT_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { Panel } from '../../../src/ui/desk.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -18,27 +18,23 @@ export default async function ContentCategoriesPage() {
   const categories = await allCategories(db(), guard.actor);
 
   return (
-    <OpsShell actor={guard.actor} title="ادمین محتوا" pathname="/content/categories" nav={CONTENT_NAV}>
-      <div className="space-y-lg">
-        <CreateCategoryForm kinds={creatableKinds('CONTENT_ADMIN').map((value) => ({ value, label: KIND_FA[value] }))} />
-        <Card>
-          <h2 className="hz-card__title">دسته‌ها</h2>
+    <OpsShell actor={guard.actor} title="دسته‌ها" pathname="/content/categories" nav={CONTENT_NAV}>
+      <div className="grid items-start gap-lg lg:grid-cols-2">
+        <Panel title="دسته‌ها" count={categories.length.toLocaleString('fa-IR')}>
           {categories.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="هنوز دسته‌ای نیست" description="دسته‌ها اختیاری‌اند؛ برای مرتب‌کردن آموزش‌ها و خبرها بسازید." />
-            </div>
+            <EmptyState title="هنوز دسته‌ای نیست" description="دسته‌ها اختیاری‌اند؛ برای مرتب‌کردن آموزش‌ها و خبرها بسازید." />
           ) : (
-            <ul className="mt-lg space-y-sm" data-testid="category-list">
+            <ul data-testid="category-list">
               {categories.map((category) => (
-                <li key={category.id} className="flex flex-wrap items-center justify-between gap-sm rounded-lg border border-border-default p-md">
-                  <div>
-                    <p className="text-label-md">{category.nameFa}</p>
-                    <p className="text-caption text-text-secondary">
+                <li key={category.id} className="hz-setting">
+                  <div className="hz-setting__label">
+                    <span className="hz-setting__name">{category.nameFa}</span>
+                    <span className="hz-setting__hint">
                       {KIND_FA[category.kind] + ' · '}
-                      <bdi>{category.slug}</bdi>
-                    </p>
+                      <bdi className="hz-setting__key" dir="ltr">{category.slug}</bdi>
+                    </span>
                   </div>
-                  <div className="flex items-center gap-sm">
+                  <div className="hz-setting__end">
                     <StatusBadge tone={category.isActive ? 'success' : 'neutral'}>{category.isActive ? 'فعال' : 'کنارگذاشته'}</StatusBadge>
                     <CategoryStateForm categoryId={category.id} active={category.isActive} />
                   </div>
@@ -46,7 +42,8 @@ export default async function ContentCategoriesPage() {
               ))}
             </ul>
           )}
-        </Card>
+        </Panel>
+        <CreateCategoryForm kinds={creatableKinds('CONTENT_ADMIN').map((value) => ({ value, label: KIND_FA[value] }))} />
       </div>
     </OpsShell>
   );

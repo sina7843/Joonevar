@@ -35,10 +35,15 @@ export function SelectSheetAnimals({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب حیوان‌ها</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>انتخاب حیوان‌ها</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        هزینه هر حیوان جداگانه محاسبه می‌شود و در یک پرداخت گروهی جمع می‌شود. پس از پرداخت، دامپزشک معتمد و
-        نوع خدمت هر حیوان انتخاب می‌شود. مبلغ خدمت دامپزشک جدا است و در این پرداخت نیست.
+        هزینه هر حیوان جداگانه محاسبه می‌شود و در یک پرداخت گروهی جمع می‌شود. پس از پرداخت، دامپزشک معتمد و نوع خدمت هر
+        حیوان انتخاب می‌شود. مبلغ خدمت دامپزشک جدا است و در این پرداخت نیست.
       </p>
 
       <form action={submit} className="mt-lg space-y-lg" data-testid="sheet-select-form">
@@ -46,23 +51,25 @@ export function SelectSheetAnimals({
 
         <ul className="space-y-md" data-testid="sheet-animal-list">
           {animals.map((animal) => (
-            <li key={animal.animalId} className="rounded-xl border border-border-default p-lg">
-              <label className="flex items-start gap-sm text-body-sm">
+            <li key={animal.animalId} className="rounded-lg border border-border-default p-lg">
+              <label className="hz-check">
                 <input
                   type="checkbox"
                   name="animalId"
                   value={animal.animalId}
                   disabled={!animal.payable}
-                  className="mt-1 size-[var(--size-selection-md)]"
                   data-testid={'sheet-pick-' + animal.animalId}
                 />
-                <span>
-                  <span className="block">{animal.name ?? 'بدون نام'}</span>
+                <span className="hz-check__text">
+                  <span className="hz-check__label">{animal.name ?? 'بدون نام'}</span>
                   {feeLabel && animal.payable ? (
                     <span className="text-caption text-text-secondary">هزینه: {feeLabel}</span>
                   ) : null}
                   {animal.reasonFa ? (
-                    <span className="block text-caption text-text-secondary" data-testid={'sheet-reason-' + animal.animalId}>
+                    <span
+                      className="block text-caption text-text-secondary"
+                      data-testid={'sheet-reason-' + animal.animalId}
+                    >
                       {animal.reasonFa}
                     </span>
                   ) : null}

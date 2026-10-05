@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { Button } from '../../../src/ui/button.tsx';
+import { ActionRow, Button } from '../../../src/ui/button.tsx';
 import { FileField } from '../../../src/ui/field.tsx';
 import { submitKycAction, uploadKycDocumentAction, type FormState } from '../actions.ts';
 
@@ -34,9 +34,13 @@ export function KycDocumentForm({ hasDocument }: { hasDocument: boolean }) {
         hint="JPG، PNG یا PDF تا ۱۰ مگابایت. این فایل خصوصی است و فقط برای بررسی انجمن در دسترس قرار می‌گیرد."
         testId="kyc-file"
       />
-      <Button type="submit" tone="secondary" block disabled={pending} data-testid="upload-kyc">
-        {pending ? 'در حال بارگذاری…' : hasDocument ? 'جایگزینی تصویر کارت ملی' : 'بارگذاری تصویر کارت ملی'}
-      </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" tone="secondary" iconStart="uploadSimple" loading={pending} disabled={pending} loadingLabel="در حال بارگذاری…" data-testid="upload-kyc">
+            {hasDocument ? 'جایگزینی تصویر کارت ملی' : 'بارگذاری تصویر کارت ملی'}
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -46,8 +50,9 @@ export function KycSubmitForm({ disabled }: { disabled: boolean }) {
   return (
     <form action={submit} className="space-y-lg" data-testid="kyc-submit-form">
       <Result state={state} />
-      <Button type="submit" block disabled={disabled || pending} data-testid="submit-kyc">
-        {pending ? 'در حال ارسال…' : 'ارسال برای بررسی'}
+      {/* Disabled until the case is complete, so it is not the view's primary yet. */}
+      <Button type="submit" size="lg" block tone={disabled ? 'secondary' : 'primary'} loading={pending} disabled={disabled || pending} data-testid="submit-kyc">
+        ارسال برای بررسی
       </Button>
     </form>
   );

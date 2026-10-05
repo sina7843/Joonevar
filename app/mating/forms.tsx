@@ -15,19 +15,13 @@ import {
   submitPermitAction,
   type PermitFormState,
 } from './actions.ts';
-import {
-  PRE_BIRTH_RULE_NOTE_FA,
-  RULE_TYPE_FA,
-  type AllocationRuleType,
-} from '../../src/domain/allocation.ts';
+import { PRE_BIRTH_RULE_NOTE_FA, RULE_TYPE_FA, type AllocationRuleType } from '../../src/domain/allocation.ts';
 
 const EMPTY: PermitFormState = {};
 
 function Result({ state }: { state: PermitFormState }) {
   if (!state.message) return null;
-  return (
-    <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />
-  );
+  return <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />;
 }
 
 /**
@@ -35,11 +29,7 @@ function Result({ state }: { state: PermitFormState }) {
  * invite. The invitation button appears only after the code has really
  * resolved, so nobody is invited by a typo.
  */
-export function StartPermitForm({
-  animals,
-}: {
-  animals: readonly { id: string; label: string }[];
-}) {
+export function StartPermitForm({ animals }: { animals: readonly { id: string; label: string }[] }) {
   const [resolveState, resolve, resolving] = useActionState(resolvePartyAction, EMPTY);
   const [startState, start, starting] = useActionState(startPermitAction, EMPTY);
   const [ownAnimalId, setOwnAnimalId] = useState(animals[0]?.id ?? '');
@@ -48,7 +38,12 @@ export function StartPermitForm({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شروع مجوز رسمی جفت‌گیری</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>شروع مجوز رسمی جفت‌گیری</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
         این مسیر رسمی است و پرونده، شناسه و وضعیت جدا از «اعلام توافق شخصی» دارد.
       </p>
@@ -80,15 +75,29 @@ export function StartPermitForm({
 
       {resolved ? (
         <div className="mt-lg space-y-lg">
-          <dl className="grid grid-cols-2 gap-sm text-body-sm" data-testid="resolved-party">
-            <dt className="text-text-secondary">حیوان مقابل</dt>
-            <dd data-testid="resolved-animal">{resolved.animalName}</dd>
-            <dt className="text-text-secondary">جنسیت</dt>
-            <dd>{resolved.sexFa}</dd>
-            <dt className="text-text-secondary">کد شجره‌نامه</dt>
-            <dd dir="ltr" className="text-left font-mono">{resolved.pedigreeCode}</dd>
-            <dt className="text-text-secondary">مالک</dt>
-            <dd data-testid="resolved-owner">{resolved.ownerName}</dd>
+          <dl className="hz-kv" data-testid="resolved-party">
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">حیوان مقابل</dt>
+              <dd className="hz-kv__value" data-testid="resolved-animal">
+                {resolved.animalName}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">جنسیت</dt>
+              <dd className="hz-kv__value">{resolved.sexFa}</dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">کد شجره‌نامه</dt>
+              <dd className="hz-kv__value">
+                <bdi dir="ltr">{resolved.pedigreeCode}</bdi>
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">مالک</dt>
+              <dd className="hz-kv__value" data-testid="resolved-owner">
+                {resolved.ownerName}
+              </dd>
+            </div>
           </dl>
           <form action={start} className="space-y-lg" data-testid="start-permit-form">
             <Result state={startState} />
@@ -113,25 +122,26 @@ export function ConfirmPartyForm({ permitId }: { permitId: string }) {
     <form action={submit} className="mt-lg space-y-lg" data-testid="confirm-party-form">
       <input type="hidden" name="permitId" value={permitId} />
       <Result state={state} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">پاسخ شما</legend>
+      <fieldset className="hz-fieldset">
+        <legend className="hz-field__label">پاسخ شما</legend>
         {(
           [
             ['ACCEPT', 'تأیید مشارکت در این پرونده'],
             ['DECLINE', 'رد دعوت با دلیل'],
           ] as const
         ).map(([value, label]) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
+          <label key={value} className="hz-radio">
             <input
               type="radio"
               name="decision"
               value={value}
               checked={decision === value}
               onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
               data-testid={'party-decision-' + value}
             />
-            {label}
+            <span className="hz-radio__text">
+              <span>{label}</span>
+            </span>
           </label>
         ))}
       </fieldset>
@@ -164,27 +174,33 @@ export function AllocationRuleForm({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توافق تقسیم (Allocation Rule)</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>توافق تقسیم (Allocation Rule)</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary" data-testid="pre-birth-note">
         {PRE_BIRTH_RULE_NOTE_FA}
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="allocation-rule-form">
         <input type="hidden" name="permitId" value={permitId} />
         <Result state={state} />
-        <fieldset className="space-y-sm">
-          <legend className="text-label-md">نوع توافق</legend>
+        <fieldset className="hz-fieldset">
+          <legend className="hz-field__label">نوع توافق</legend>
           {(['FIXED', 'PERCENTAGE', 'MIXED'] as const).map((value) => (
-            <label key={value} className="flex items-center gap-sm text-body-sm">
+            <label key={value} className="hz-radio">
               <input
                 type="radio"
                 name="ruleType"
                 value={value}
                 checked={type === value}
                 onChange={() => setType(value)}
-                className="size-[var(--size-selection-md)]"
                 data-testid={'rule-type-' + value}
               />
-              {RULE_TYPE_FA[value]}
+              <span className="hz-radio__text">
+                <span>{RULE_TYPE_FA[value]}</span>
+              </span>
             </label>
           ))}
         </fieldset>

@@ -4,9 +4,10 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { ASSOC_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, DeskVersionNote, Panel, whenFa } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { Identifier, StatusBadge } from '../../../../src/ui/status.tsx';
+import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import {
   findPermit,
@@ -45,81 +46,99 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
   const [view, batch] = await Promise.all([permitView(db(), permit), permitBatch(db(), permit)]);
   const shareOf = (side: AllocationSide) => view.shares.find((row) => row.side === side) ?? null;
 
+  const open = permit.status === 'UNDER_REVIEW';
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — انجمن" pathname={'/assoc/permits/' + id} nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="flex items-start justify-between gap-md">
-            <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرونده مجوز جفت‌گیری</span></h2></div>
-              <p className="mt-2xs text-caption text-text-secondary">
-                {view.initiatorName + ' و ' + view.counterpartyName}
-              </p>
-            </div>
-            <StatusBadge tone={permit.status === 'ISSUED' ? 'success' : 'info'}>
-              <span data-testid="assoc-permit-status">{PERMIT_STATUS_FA[permit.status]}</span>
-            </StatusBadge>
-          </div>
-
-          {permit.permitNo ? (
-            <div className="mt-lg" data-testid="assoc-permit-no">
+    <OpsShell actor={guard.actor} title="بررسی مجوز جفت‌گیری" pathname={'/assoc/permits/' + id} nav={ASSOC_NAV}>
+      <DeskHead
+        title={'مجوز جفت‌گیری · ' + view.initiatorName + ' و ' + view.counterpartyName}
+        status={{
+          tone: permit.status === 'ISSUED' ? 'success' : open ? 'info' : permit.status === 'REJECTED' ? 'error' : 'warning',
+          label: PERMIT_STATUS_FA[permit.status],
+          testId: 'assoc-permit-status',
+        }}
+        meta={[
+          permit.permitNo ? (
+            <span data-testid="assoc-permit-no">
               <Identifier label="شماره مجوز" value={permit.permitNo} />
-            </div>
-          ) : null}
-
-          <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="assoc-permit-detail">
-            <dt className="text-text-secondary">حیوان نر</dt>
-            <dd>
-              {(view.sire.name ?? 'بدون نام') + ' — ' + (view.sire.pedigreeCode ?? '—')}
-              <span className="ms-sm text-caption text-text-secondary">{view.sire.ownerName}</span>
-            </dd>
-            <dt className="text-text-secondary">حیوان ماده</dt>
-            <dd>
-              {(view.dam.name ?? 'بدون نام') + ' — ' + (view.dam.pedigreeCode ?? '—')}
-              <span className="ms-sm text-caption text-text-secondary">{view.dam.ownerName}</span>
-            </dd>
-            <dt className="text-text-secondary">تأیید طرف مقابل</dt>
-            <dd data-testid="assoc-party-confirmed">
-              {permit.counterpartyConfirmedAt ? 'ثبت شده' : 'ثبت نشده'}
-            </dd>
-            <dt className="text-text-secondary">پرداخت هزینه مجوز</dt>
-            <dd data-testid="assoc-permit-payment">
-              {batch?.status === 'PAID' ? 'تأییدشده روی سرور' : 'تأیید نشده'}
-            </dd>
-            <dt className="text-text-secondary">نوع توافق تقسیم</dt>
-            <dd data-testid="assoc-rule-type">{permit.ruleType ? RULE_TYPE_FA[permit.ruleType] : '—'}</dd>
-            {permit.ruleType
-              ? (['SIRE_SIDE', 'DAM_SIDE'] as const).map((side) => (
-                  <div key={side} className="contents">
-                    <dt className="text-text-secondary">{SIDE_FA[side]}</dt>
-                    <dd data-testid={'assoc-share-' + side}>
-                      {describeShare(permit.ruleType!, {
-                        side,
-                        fixedCount: shareOf(side)?.fixedCount ?? null,
-                        percent: shareOf(side)?.percent ?? null,
-                      })}
-                    </dd>
-                  </div>
-                ))
-              : null}
-          </dl>
-          {permit.ruleNoteFa ? <p className="mt-sm text-body-sm">{permit.ruleNoteFa}</p> : null}
-          <p className="mt-sm text-caption text-text-secondary">{PRE_BIRTH_RULE_NOTE_FA}</p>
-        </Card>
-
-        {permit.status === 'UNDER_REVIEW' ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم عملیاتی</span></h2></div>
-            <PermitReviewForm permitId={permit.id} version={permit.version} />
-          </Card>
-        ) : (
-          <Alert tone="info" title="این پرونده در صف تصمیم نیست">
-            <span data-testid="assoc-permit-closed">
-              تصمیم فقط روی پرونده‌ای ثبت می‌شود که پرداخت و ارسال آن کامل شده و در حال بررسی است.
             </span>
-          </Alert>
-        )}
-      </div>
+          ) : null,
+          'ارسال: ' + (whenFa(permit.submittedAt) ?? '—'),
+          'نسخه ' + permit.version.toLocaleString('fa-IR'),
+        ]}
+        owner={open ? 'ASSOCIATION' : permit.status === 'NEEDS_CORRECTION' ? 'USER' : null}
+      />
+      <Desk
+        decisionTitle={open ? 'تصمیم عملیاتی' : 'نتیجه'}
+        decision={
+          open ? (
+            <>
+              <PermitReviewForm permitId={permit.id} version={permit.version} />
+              <DeskVersionNote version={permit.version} />
+            </>
+          ) : (
+            <Alert tone="info" title="این پرونده در صف تصمیم نیست">
+              <span data-testid="assoc-permit-closed">
+                تصمیم فقط روی پرونده‌ای ثبت می‌شود که پرداخت و ارسال آن کامل شده و در حال بررسی است.
+              </span>
+            </Alert>
+          )
+        }
+      >
+        <Panel title="طرفین و حیوان‌ها">
+          <div data-testid="assoc-permit-detail">
+            <KeyValueList
+              rows={[
+                {
+                  key: 'حیوان نر',
+                  value: (
+                    <>
+                      {(view.sire.name ?? 'بدون نام') + ' — '}
+                      <bdi dir="ltr">{view.sire.pedigreeCode ?? '—'}</bdi>
+                      <span className="ms-sm text-caption text-text-secondary">{view.sire.ownerName}</span>
+                    </>
+                  ),
+                },
+                {
+                  key: 'حیوان ماده',
+                  value: (
+                    <>
+                      {(view.dam.name ?? 'بدون نام') + ' — '}
+                      <bdi dir="ltr">{view.dam.pedigreeCode ?? '—'}</bdi>
+                      <span className="ms-sm text-caption text-text-secondary">{view.dam.ownerName}</span>
+                    </>
+                  ),
+                },
+                { key: 'تأیید طرف مقابل', value: permit.counterpartyConfirmedAt ? 'ثبت شده' : 'ثبت نشده', testId: 'assoc-party-confirmed' },
+                {
+                  key: 'پرداخت هزینه مجوز',
+                  value: batch?.status === 'PAID' ? 'تأییدشده روی سرور' : 'تأیید نشده',
+                  testId: 'assoc-permit-payment',
+                },
+              ]}
+            />
+          </div>
+        </Panel>
+        <Panel title="توافق تقسیم توله‌ها">
+          <KeyValueList
+            rows={[
+              { key: 'نوع توافق تقسیم', value: permit.ruleType ? RULE_TYPE_FA[permit.ruleType] : null, testId: 'assoc-rule-type' },
+              ...(permit.ruleType
+                ? (['SIRE_SIDE', 'DAM_SIDE'] as const).map((side) => ({
+                    key: SIDE_FA[side],
+                    testId: 'assoc-share-' + side,
+                    value: describeShare(permit.ruleType!, {
+                      side,
+                      fixedCount: shareOf(side)?.fixedCount ?? null,
+                      percent: shareOf(side)?.percent ?? null,
+                    }),
+                  }))
+                : []),
+            ]}
+          />
+          {permit.ruleNoteFa ? <p className="text-body-sm">{permit.ruleNoteFa}</p> : null}
+          <p className="text-caption text-text-secondary">{PRE_BIRTH_RULE_NOTE_FA}</p>
+        </Panel>
+      </Desk>
     </OpsShell>
   );
 }

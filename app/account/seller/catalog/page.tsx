@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
@@ -65,8 +66,8 @@ export default async function SellerCatalogPage() {
   const stores = await myStores(db(), actor);
   if (stores.length === 0) {
     return (
-      <PublicShell actor={actor} title="کاتالوگ فروشگاه" pathname="/account/seller">
-        <div className="space-y-lg p-lg">
+      <PublicShell actor={actor} title="کاتالوگ فروشگاه" pathname="/account/seller" header={<PageHeader title="کاتالوگ فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+        <div className="space-y-xl">
           <Alert tone="info" title="هنوز فروشگاهی ندارید">
             <span data-testid="catalog-no-store">
               برای ثبت کالا ابتدا پرونده فروشندگی را از صفحه «فروشگاه من» کامل کنید.
@@ -112,10 +113,10 @@ export default async function SellerCatalogPage() {
   }
 
   return (
-    <PublicShell actor={actor} title="کاتالوگ فروشگاه" pathname="/account/seller">
-      <div className="space-y-lg p-lg">
-        <p className="text-caption">
-          <Link href="/account/seller" className="text-text-brand" data-testid="back-to-store">
+    <PublicShell actor={actor} title="کاتالوگ فروشگاه" pathname="/account/seller" header={<PageHeader title="کاتالوگ فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+      <div className="space-y-xl">
+        <p>
+          <Link href="/account/seller" className="hz-link hz-link--standalone" data-testid="back-to-store">
             بازگشت به فروشگاه من
           </Link>
         </p>
@@ -129,7 +130,7 @@ export default async function SellerCatalogPage() {
         ) : null}
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>روش‌های ارسال</span></h2></div>
+          <SectionHeader size="sm" title="روش‌های ارسال" />
           <p className="mt-2xs text-caption text-text-secondary" data-testid="shipping-methods-note">
             {methods.length === 0
               ? 'تا ثبت حداقل یک روش ارسال، کالاهای شما در سبد خرید قابل پرداخت نیستند.'
@@ -169,7 +170,7 @@ export default async function SellerCatalogPage() {
         ) : null}
 
         <Card>
-          <h2 className="hz-card__title">کالای تازه</h2>
+          <SectionHeader size="sm" title="کالای تازه" />
           <p className="mt-2xs text-caption text-text-secondary" data-testid="plan-limit-note">
             {subscription.productLimit === null
               ? 'پلن فعلی شما سقف تعداد کالا ندارد.'
@@ -185,15 +186,15 @@ export default async function SellerCatalogPage() {
         </Card>
 
         <Card>
-          <h2 className="hz-card__title">کالاهای من</h2>
+          <SectionHeader size="sm" title="کالاهای من" />
           {products.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="products-empty">
               هنوز کالایی ثبت نکرده‌اید.
             </p>
           ) : (
-            <ul className="mt-lg space-y-lg" data-testid="seller-products">
+            <ul className="hz-cardlist mt-lg" data-testid="seller-products">
               {products.map((product) => (
-                <li key={product.id} className="space-y-md border-b border-border-subtle pb-lg last:border-0">
+                <li key={product.id} className="hz-cardlist__item">
                   <div className="flex flex-wrap items-center gap-sm">
                     <StatusBadge tone={product.status === 'PUBLISHED' ? 'success' : 'neutral'}>
                       <span data-testid={'product-status-' + product.id}>
@@ -221,7 +222,7 @@ export default async function SellerCatalogPage() {
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>عرضه‌های من</span></h2></div>
+          <SectionHeader size="sm" title="عرضه‌های من" />
           <div className="mt-lg">
             <NewOfferForm
               sellerId={store.id}
@@ -229,9 +230,9 @@ export default async function SellerCatalogPage() {
             />
           </div>
           {offers.length > 0 ? (
-            <ul className="mt-lg space-y-lg" data-testid="seller-offers">
+            <ul className="hz-cardlist mt-lg" data-testid="seller-offers">
               {offers.map((offer) => (
-                <li key={offer.id} className="space-y-md border-b border-border-subtle pb-lg last:border-0">
+                <li key={offer.id} className="hz-cardlist__item">
                   <div className="flex flex-wrap items-center gap-sm">
                     <StatusBadge tone={offer.status === 'ACTIVE' ? 'success' : 'neutral'}>
                       <span data-testid={'offer-status-' + offer.id}>
@@ -255,17 +256,17 @@ export default async function SellerCatalogPage() {
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>قیمت و موجودی</span></h2></div>
+          <SectionHeader size="sm" title="قیمت و موجودی" />
           {lines.length === 0 ? (
             <p className="mt-sm text-caption text-text-secondary" data-testid="skus-empty">
               هنوز قیمتی ثبت نشده است.
             </p>
           ) : (
-            <ul className="mt-lg space-y-lg" data-testid="seller-skus">
+            <ul className="hz-cardlist mt-lg" data-testid="seller-skus">
               {lines.map((line) => (
-                <li key={line.id} className="space-y-md border-b border-border-subtle pb-lg last:border-0">
+                <li key={line.id} className="hz-cardlist__item">
                   <p className="flex flex-wrap items-center gap-sm text-body-sm">
-                    <bdi className="hz-ltr font-mono">{line.sku}</bdi>
+                    <bdi className="hz-id" dir="ltr">{line.sku}</bdi>
                     <span>{line.productNameFa}</span>
                     {line.variantLabelFa ? (
                       <span className="text-caption text-text-secondary">{line.variantLabelFa}</span>

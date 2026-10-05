@@ -10,7 +10,8 @@ import type { StatusTone } from './status.tsx';
 export type StatusFamily = 'draft' | 'waiting' | 'action' | 'done' | 'blocked' | 'closed';
 
 export interface StatusEntry {
-  readonly labelFa: string;
+  /** null: no badge at all (REGISTERED — the record shows its id instead). */
+  readonly labelFa: string | null;
   readonly tone: StatusTone;
   readonly family: StatusFamily;
 }

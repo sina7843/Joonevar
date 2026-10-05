@@ -1,9 +1,8 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { CaseItem, CaseList, ViewChips } from '../../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -37,78 +36,63 @@ export default async function ReviewVetsPage({ searchParams }: { searchParams: S
     '/review/vets' + (target === 'OPEN' && targetPage === 1 ? '' : '?view=' + target + (targetPage > 1 ? '&page=' + targetPage : ''));
 
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/vets" nav={REVIEW_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">درخواست‌های دامپزشک</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            ساخت پروفایل و Claim با کد نظام و مدارک. تأیید، نقش دامپزشک معتمد خدمات همزیست را نمی‌دهد.
-          </p>
-          <nav aria-label="نمای درخواست‌ها" className="mt-lg flex flex-wrap gap-sm">
-            {VIEWS.map((entry) => (
-              <Link
-                key={entry.view}
-                href={href(entry.view)}
-                aria-current={entry.view === view ? 'page' : undefined}
-                data-testid={'review-view-' + entry.view}
-                className={[
-                  'rounded-full border px-lg py-xs text-label-md',
-                  entry.view === view ? 'border-border-brand bg-bg-brand-subtle text-text-brand' : 'border-border-subtle text-text-secondary',
-                ].join(' ')}
-              >
-                {entry.label}
-              </Link>
-            ))}
-          </nav>
-        </Card>
+    <OpsShell actor={guard.actor} title="درخواست‌های دامپزشک" pathname="/review/vets" nav={REVIEW_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{fa(result.total) + ' درخواست'}</span>
+        <span className="hz-page-header__meta-item">
+          ساخت پروفایل و Claim با کد نظام و مدارک. تأیید، نقش دامپزشک معتمد خدمات همزیست را نمی‌دهد.
+        </span>
+      </p>
+      <ViewChips
+        label="نمای درخواست‌ها"
+        chips={VIEWS.map((entry) => ({
+          key: entry.view,
+          href: href(entry.view),
+          label: entry.label,
+          current: entry.view === view,
+          testId: 'review-view-' + entry.view,
+        }))}
+      />
 
-        {result.items.length === 0 ? (
-          <EmptyState title={VIEWS.find((v) => v.view === view)!.empty} description="درخواست‌های تازه دامپزشکان اینجا نشان داده می‌شوند." />
-        ) : (
-          <ul className="space-y-sm" data-testid="review-queue">
-            {result.items.map((item) => (
-              <li key={item.id}>
-                <Link
-                  href={'/review/vets/' + item.id}
-                  className="block rounded-xl border border-border-default bg-bg-surface p-lg hover:border-border-control"
-                  data-testid={'review-item-' + item.id}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-sm">
-                    <div className="min-w-0">
-                      <p className="text-caption text-text-secondary">{APPLICATION_KIND_FA[item.kind]}</p>
-                      <p className="text-label-lg text-text-primary">{item.displayNameFa}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-xs">
-                      <StatusBadge tone={item.status === 'APPROVED' ? 'success' : item.status === 'SUBMITTED' ? 'warning' : 'neutral'}>
-                        {APPLICATION_STATUS_FA[item.status]}
-                      </StatusBadge>
-                      {item.appealedAt ? <StatusBadge tone="info">تجدیدنظر</StatusBadge> : null}
-                    </div>
-                  </div>
-                  <p className="mt-sm text-caption text-text-secondary">
-                    {[
-                      'کد نظام ' + item.councilCode,
-                      item.cityNameFa,
-                      item.targetNameFa && item.kind === 'CLAIM' ? 'پروفایل: ' + item.targetNameFa : null,
-                      'ارسال: ' + formatInstantFa(item.submittedAt),
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+      {result.items.length === 0 ? (
+        <EmptyState title={VIEWS.find((v) => v.view === view)!.empty} description="درخواست‌های تازه دامپزشکان اینجا نشان داده می‌شوند." />
+      ) : (
+        <CaseList label="درخواست‌های دامپزشک" testId="review-queue">
+          {result.items.map((item) => (
+            <CaseItem
+              key={item.id}
+              type={APPLICATION_KIND_FA[item.kind] + (item.appealedAt ? ' · تجدیدنظر' : '')}
+              name={item.displayNameFa}
+              href={'/review/vets/' + item.id}
+              linkTestId={'review-item-' + item.id}
+              code={item.councilCode}
+              sub={[
+                item.cityNameFa,
+                item.targetNameFa && item.kind === 'CLAIM' ? 'پروفایل: ' + item.targetNameFa : null,
+                'ارسال: ' + formatInstantFa(item.submittedAt),
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+              ageDays={item.status === 'SUBMITTED' ? ageInDays(item.submittedAt) : undefined}
+              status={{
+                tone: item.status === 'APPROVED' ? 'success' : item.status === 'SUBMITTED' ? 'info' : 'neutral',
+                label: APPLICATION_STATUS_FA[item.status],
+              }}
+              owner={item.status === 'SUBMITTED' ? 'SYSTEM' : null}
+              ownerLabel="اپراتور بررسی"
+              ownerIsUs
+            />
+          ))}
+        </CaseList>
+      )}
 
-        {result.totalPages > 1 ? (
-          <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
-            {result.page > 1 ? <ButtonLink tone="secondary" href={href(view, result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
-            <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-            {result.page < result.totalPages ? <ButtonLink tone="secondary" href={href(view, result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
-          </nav>
-        ) : null}
-      </div>
+      {result.totalPages > 1 ? (
+        <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
+          {result.page > 1 ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
+          <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
+          {result.page < result.totalPages ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
+        </nav>
+      ) : null}
     </OpsShell>
   );
 }

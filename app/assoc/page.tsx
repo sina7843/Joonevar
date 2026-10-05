@@ -1,19 +1,19 @@
-import Link from 'next/link';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { AccessDenied } from '../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../src/ui/shell.tsx';
-import { Card } from '../../src/ui/card.tsx';
-import { StatusBadge } from '../../src/ui/status.tsx';
+import { SectionHeader } from '../../src/ui/section-header.tsx';
+import { CountTiles, StatTiles } from '../../src/ui/desk.tsx';
 import { db } from '../../src/db/client.ts';
 import { associationQueues } from '../../src/operations/service.ts';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Association operations — §21.2, §21.5, D11.
+ * Association operations — §21.2, §21.5, D11 — DS P09 home / K13: a row of
+ * QueueTiles, then the summary StatTiles.
  *
- * Every row is a real count from the same table its detail screen reads, and
- * every row opens that queue. A successful F14 membership never returns to a
+ * Every tile is a real count from the same table its detail screen reads, and
+ * every tile opens that queue. A successful F14 membership never returns to a
  * blocking approval queue (D04), so membership is a register here, not a gate.
  */
 export default async function AssocPage() {
@@ -21,35 +21,42 @@ export default async function AssocPage() {
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
   const queues = await associationQueues(db(), guard.actor);
+  const open = queues.reduce((sum, queue) => sum + queue.waiting, 0);
+  const busy = queues.filter((queue) => queue.waiting > 0);
 
   return (
-    <OpsShell actor={guard.actor} title="پنل انجمن" pathname="/assoc" nav={ASSOC_NAV}>
-      <ul className="space-y-md" data-testid="assoc-queues">
-        {queues.map((queue) => (
-          <li key={queue.key}>
-            <Card>
-              <div className="flex items-start justify-between gap-md">
-                <div className="min-w-0">
-                  <h2 className="hz-card__title">{queue.titleFa}</h2>
-                  <p className="mt-2xs text-caption text-text-secondary">{queue.noteFa}</p>
-                </div>
-                <StatusBadge tone={queue.waiting > 0 ? 'warning' : 'neutral'}>
-                  <span data-testid={'queue-count-' + queue.key}>{queue.waiting}</span>
-                </StatusBadge>
-              </div>
-              <p className="mt-lg text-body-sm">
-                <Link
-                  href={queue.href}
-                  className="text-text-brand underline underline-offset-4"
-                  data-testid={'open-queue-' + queue.key}
-                >
-                  باز کردن صف
-                </Link>
-              </p>
-            </Card>
-          </li>
-        ))}
-      </ul>
+    <OpsShell actor={guard.actor} title="صف‌ها" pathname="/assoc" nav={ASSOC_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">محیط عملیاتی انجمن</span>
+        <span className="hz-page-header__meta-item">
+          {open.toLocaleString('fa-IR') + ' پرونده باز در ' + busy.length.toLocaleString('fa-IR') + ' صف'}
+        </span>
+      </p>
+
+      <CountTiles queues={queues} testId="assoc-queues" countTestId="queue-count-" linkTestId="open-queue-" />
+
+      <section className="space-y-md" aria-labelledby="assoc-summary">
+        <SectionHeader title="خلاصه پرونده‌ها" size="sm" id="assoc-summary" />
+        <StatTiles
+          tiles={[
+            { label: 'پرونده‌های باز', value: open, sub: 'در همه صف‌های انجمن' },
+            { label: 'صف‌های دارای پرونده', value: busy.length, sub: 'از ' + queues.length.toLocaleString('fa-IR') + ' صف' },
+            {
+              label: 'صف‌های خالی',
+              value: queues.length - busy.length,
+              sub: 'پرونده تازه پس از ارسال کاربر می‌آید',
+            },
+            {
+              label: 'بیشترین پرونده',
+              value: busy.length === 0 ? null : Math.max(...busy.map((queue) => queue.waiting)),
+              sub:
+                busy.length === 0
+                  ? 'همه صف‌ها خالی است'
+                  : [...busy].sort((a, b) => b.waiting - a.waiting)[0]!.titleFa,
+            },
+          ]}
+        />
+      </section>
     </OpsShell>
   );
 }

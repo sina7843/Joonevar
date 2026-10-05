@@ -1,9 +1,8 @@
-import { Card } from '../../../src/ui/card.tsx';
 import { Button } from '../../../src/ui/button.tsx';
-import { TextField } from '../../../src/ui/field.tsx';
+import { SearchField } from '../../../src/ui/search-field.tsx';
 
 /**
- * Finding one member in the register — §21.2.
+ * Finding one member in the register — §21.2 (DS P09 queue head: SearchField).
  *
  * A plain GET form, so a search is a shareable, resumable URL. It exists because
  * the list is bounded: without it, a member outside the newest page would be one
@@ -11,19 +10,18 @@ import { TextField } from '../../../src/ui/field.tsx';
  */
 export function MemberSearch({ term }: { term: string }) {
   return (
-    <Card>
-      <form method="get" action="/assoc/members" className="space-y-lg" data-testid="member-search">
-        <TextField
-          label="جست‌وجوی عضو"
-          name="q"
-          defaultValue={term}
-          hint="نام و نام خانوادگی، شماره عضویت، یا چهار رقم آخر موبایل."
-          data-testid="member-search-term"
-        />
-        <Button type="submit" data-testid="member-search-submit">
-          جست‌وجو
-        </Button>
-      </form>
-    </Card>
+    <form method="get" action="/assoc/members" className="flex flex-wrap items-center gap-sm" data-testid="member-search">
+      <SearchField
+        id="member-search-term"
+        label="جست‌وجوی عضو: نام، شماره عضویت یا چهار رقم آخر موبایل"
+        name="q"
+        defaultValue={term}
+        className="min-w-0 flex-1 basis-64"
+        data-testid="member-search-term"
+      />
+      <Button type="submit" tone="secondary" data-testid="member-search-submit">
+        جست‌وجو
+      </Button>
+    </form>
   );
 }

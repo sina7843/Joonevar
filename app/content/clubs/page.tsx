@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, CONTENT_NAV } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { clubReportQueue } from '../../../src/clubs/service.ts';
 import { REASON_FA, type ReportReason } from '../../../src/moderation/model.ts';
@@ -28,39 +27,44 @@ export default async function ContentClubsPage() {
 
   return (
     <OpsShell actor={guard.actor} title="گزارش کلاب‌ها" pathname="/content/clubs" nav={CONTENT_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <h2 className="text-h3">گزارش‌های کاربران درباره کلاب‌ها</h2>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            گزارش‌های باز هر کلاب یک‌جا بررسی می‌شوند. نام گزارش‌دهنده در این صفحه نمی‌آید و به کلاب هم گفته نمی‌شود.
-          </p>
-        </Card>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{fa(groups.length) + ' کلاب با گزارش باز'}</span>
+        <span className="hz-page-header__meta-item">
+          گزارش‌های باز هر کلاب یک‌جا بررسی می‌شوند. نام گزارش‌دهنده در این صفحه نمی‌آید و به کلاب هم گفته نمی‌شود.
+        </span>
+      </p>
 
-        {groups.length === 0 ? (
-          <EmptyState title="گزارش بازی درباره کلاب‌ها نیست" description="گزارش تازه کاربران در همین صفحه می‌آید." />
-        ) : (
-          <ul className="space-y-md" data-testid="club-report-queue">
-            {groups.map((group) => (
-              <li key={group.club.id} className="space-y-sm rounded-xl border border-border-default bg-bg-surface p-lg">
-                <div className="flex flex-wrap items-center justify-between gap-sm">
-                  <Link href={'/clubs/' + (group.club.publicSlug ?? '')} className="text-label-lg text-text-brand">
-                    {group.club.displayNameFa}
-                  </Link>
-                  <div className="flex flex-wrap gap-xs">
-                    <StatusBadge tone="warning">{fa(group.openReports) + ' گزارش باز'}</StatusBadge>
-                    <StatusBadge tone="neutral">{CLUB_LIFECYCLE_FA[group.club.lifecycle as ClubLifecycle]}</StatusBadge>
-                  </div>
-                </div>
-                <p className="text-body-sm text-text-secondary">
+      {groups.length === 0 ? (
+        <EmptyState title="گزارش بازی درباره کلاب‌ها نیست" description="گزارش تازه کاربران در همین صفحه می‌آید." />
+      ) : (
+        <CaseList label="گزارش‌های کلاب" testId="club-report-queue">
+          {groups.map((group) => (
+            <CaseItem
+              key={group.club.id}
+              type={CLUB_LIFECYCLE_FA[group.club.lifecycle as ClubLifecycle]}
+              name={group.club.displayNameFa}
+              href={'/clubs/' + (group.club.publicSlug ?? '')}
+              sub={
+                <>
                   {group.reasons.map((reason) => REASON_FA[reason as ReportReason] ?? reason).join('، ')}
-                </p>
-                <p className="text-caption text-text-secondary">{'نخستین گزارش: ' + formatInstantFa(group.firstReportedAt)}</p>
-                <ClubModerationForm clubId={group.club.id} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                  {' · '}
+                  <span className={group.openReports >= 3 ? 'hz-report__count hz-report__count--high' : 'hz-report__count'}>
+                    {fa(group.openReports) + ' گزارش باز'}
+                  </span>
+                  {' · نخستین گزارش: ' + formatInstantFa(group.firstReportedAt)}
+                </>
+              }
+              ageDays={ageInDays(group.firstReportedAt)}
+              status={{ tone: 'info', label: 'در انتظار بررسی' }}
+              owner="SYSTEM"
+              ownerLabel="ادمین محتوا"
+              ownerIsUs
+            >
+              <ClubModerationForm clubId={group.club.id} />
+            </CaseItem>
+          ))}
+        </CaseList>
+      )}
     </OpsShell>
   );
 }

@@ -14,6 +14,7 @@ import { db } from '../../../../src/db/client.ts';
 import { vetProfiles } from '../../../../src/db/schema/vets.ts';
 import { capabilitiesOf, eligibilityOf, findLocation } from '../../../../src/vets/registry.ts';
 import { CONTACT_FOR_PRICE_FA, CONTEXT_FA, type VisitContextName } from '../../../../src/domain/referral.ts';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,17 +55,30 @@ export default async function LocationPage({
     : 'MICROCHIP';
   const selection = query.sel ?? '';
 
-  const [vet] = await db().select().from(vetProfiles).where(eq(vetProfiles.accountId, location.vetAccountId ?? ''));
+  const [vet] = await db()
+    .select()
+    .from(vetProfiles)
+    .where(eq(vetProfiles.accountId, location.vetAccountId ?? ''));
   const eligibility = eligibilityOf(location, context);
   const capabilities = capabilitiesOf(location);
 
   return (
-    <PublicShell actor={guard.actor} title={location.nameFa} pathname={'/vets/location/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title={location.nameFa}
+      pathname={'/vets/location/' + id}
+      header={<PageHeader title={location.nameFa} back={{ href: '/vets' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{location.nameFa}</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>{location.nameFa}</span>
+                </h2>
+              </div>
               {vet ? (
                 <p className="mt-2xs text-caption text-text-secondary">
                   {vet.displayNameFa} · کد نظام دامپزشکی {vet.councilCode}
@@ -84,11 +98,7 @@ export default async function LocationPage({
           <p className="mt-lg text-body-sm">{location.addressFa}</p>
           {location.phone ? (
             <p className="mt-md text-body-sm">
-              <Link
-                href={'tel:' + location.phone}
-                className="text-text-brand underline underline-offset-4"
-                data-testid="location-contact"
-              >
+              <Link href={'tel:' + location.phone} className="hz-link" data-testid="location-contact">
                 تماس با مرکز
               </Link>
             </p>
@@ -99,7 +109,12 @@ export default async function LocationPage({
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">امکانات ثبت‌شده</h3>
+          <div className="hz-section-header hz-section-header--sm">
+            <h3 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>امکانات ثبت‌شده</span>
+            </h3>
+          </div>
           {capabilities.length === 0 ? (
             <p className="mt-md text-body-sm text-text-secondary">هنوز امکاناتی برای این مرکز ثبت نشده است.</p>
           ) : (
@@ -117,8 +132,7 @@ export default async function LocationPage({
         </Card>
 
         <Alert tone="info" title="نقشه هنوز در دسترس نیست">
-          سرویس نقشه پیکربندی نشده است؛ نشانی و تماس به‌صورت متنی نمایش داده می‌شود و هیچ موقعیت حدسی ساخته
-          نمی‌شود.
+          سرویس نقشه پیکربندی نشده است؛ نشانی و تماس به‌صورت متنی نمایش داده می‌شود و هیچ موقعیت حدسی ساخته نمی‌شود.
         </Alert>
 
         {eligibility.eligible && selection !== '' ? (

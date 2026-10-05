@@ -8,6 +8,7 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { permitEntry, PERMIT_STATUS_FA } from '../../../src/mating/permits.ts';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,14 +25,24 @@ export default async function PermitsPage() {
   const { eligibility, permits } = await permitEntry(db(), guard.actor);
 
   return (
-    <PublicShell actor={guard.actor} title="مجوز رسمی جفت‌گیری" pathname="/mating/permits">
+    <PublicShell
+      actor={guard.actor}
+      title="مجوز رسمی جفت‌گیری"
+      pathname="/mating/permits"
+      header={<PageHeader title={'مجوز رسمی جفت‌گیری'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg">
         {eligibility.allowed ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مجوز رسمی جفت‌گیری</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>مجوز رسمی جفت‌گیری</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
-              مسیر: انتخاب حیوان شجره‌دار خود → کد شجره‌نامه حیوان مقابل → شناسایی و تأیید طرف مقابل → ثبت
-              توافق تقسیم → مرور → پرداخت → ارسال → بررسی و صدور مجوز.
+              مسیر: انتخاب حیوان شجره‌دار خود → کد شجره‌نامه حیوان مقابل → شناسایی و تأیید طرف مقابل → ثبت توافق تقسیم →
+              مرور → پرداخت → ارسال → بررسی و صدور مجوز.
             </p>
             <div className="mt-lg">
               <ButtonLink href="/mating/permits/new" block data-testid="new-permit">
@@ -55,9 +66,7 @@ export default async function PermitsPage() {
                 <Card>
                   <div className="flex items-start justify-between gap-md">
                     <div className="min-w-0">
-                      <h3 className="text-label-md">
-                        {permit.permitNo ?? 'پرونده مجوز'}
-                      </h3>
+                      <h3 className="text-label-md">{permit.permitNo ?? 'پرونده مجوز'}</h3>
                       <p className="mt-2xs text-caption text-text-secondary">
                         {permit.initiatorAccountId === guard.actor.accountId
                           ? 'آغازکننده: شما'
@@ -77,11 +86,7 @@ export default async function PermitsPage() {
                     </StatusBadge>
                   </div>
                   <p className="mt-lg text-body-sm">
-                    <Link
-                      href={'/mating/permits/' + permit.id}
-                      className="text-text-brand underline underline-offset-4"
-                      data-testid="open-permit"
-                    >
+                    <Link href={'/mating/permits/' + permit.id} className="hz-link" data-testid="open-permit">
                       ادامه پرونده مجوز
                     </Link>
                   </p>

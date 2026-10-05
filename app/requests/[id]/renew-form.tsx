@@ -12,10 +12,8 @@ export function RenewReferralForm({ requestId }: { requestId: string }) {
   return (
     <form action={submit} className="space-y-lg" data-testid="renew-form">
       <input type="hidden" name="requestId" value={requestId} />
-      {state.message ? (
-        <Alert tone={state.tone === 'success' ? 'success' : 'error'} title={state.message} />
-      ) : null}
-      <Button tone="secondary" type="submit" block disabled={pending} data-testid="renew-referral">
+      {state.message ? <Alert tone={state.tone === 'success' ? 'success' : 'error'} title={state.message} /> : null}
+      <Button type="submit" block disabled={pending} data-testid="renew-referral">
         {pending ? 'در حال صدور…' : 'درخواست کد مراجعه جدید'}
       </Button>
     </form>

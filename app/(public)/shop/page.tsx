@@ -5,8 +5,13 @@ import { buildMetadata } from '../../../src/seo/metadata.ts';
 import { site } from '../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
-import { RecordImage } from '../../../src/ui/record-image.tsx';
+import { Button, ButtonLink } from '../../../src/ui/button.tsx';
+import { EmptyState } from '../../../src/ui/states.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
+import { SearchField } from '../../../src/ui/search-field.tsx';
+import { FilterChips } from '../../../src/ui/filter-bar.tsx';
+import { Pagination } from '../../../src/ui/pagination.tsx';
+import { ProductCard } from './product-card.tsx';
 import {
   isCanonicalShopIndex,
   parseShopFilter,
@@ -64,24 +69,28 @@ export default async function ShopIndexPage({
   const pages = Math.max(Math.ceil(total / SHOP_PAGE_SIZE), 1);
 
   const linkFor = (over: Partial<typeof filter>) => '/shop' + shopQueryString({ ...filter, ...over, page: 1 });
+  const active = shopQueryString({ ...filter, page: 1 }) !== '';
 
   return (
-    <div className="space-y-lg">
-      <Breadcrumbs
-        items={[
-          { name: 'خانه', path: '/' },
-          { name: 'فروشگاه', path: '/shop' },
-        ]}
-        origin={site().origin}
-      />
-
-      <header className="space-y-sm">
-        <h1 className="text-h2">فروشگاه کالای حیوانات</h1>
-        <p className="text-body-sm text-text-secondary" data-testid="shop-intro">
-          کالاها از فروشندگان تأییدشده عرضه می‌شوند و روی هر کالا می‌توانید قیمت و موجودی فروشندگان مختلف را
-          مقایسه کنید.
-        </p>
-      </header>
+    <div className="space-y-xl">
+      <div className="space-y-md">
+        <Breadcrumbs
+          items={[
+            { name: 'خانه', path: '/' },
+            { name: 'فروشگاه', path: '/shop' },
+          ]}
+          origin={site().origin}
+        />
+        <PageHeader
+          title="فروشگاه کالای حیوانات"
+          meta={[
+            <span key="intro" data-testid="shop-intro">
+              کالاها از فروشندگان تأییدشده عرضه می‌شوند و روی هر کالا می‌توانید قیمت و موجودی فروشندگان مختلف را
+              مقایسه کنید.
+            </span>,
+          ]}
+        />
+      </div>
 
       {blocked.length > 0 ? (
         <Alert tone="info" title="فروش عمومی دارو در این مرحله فعال نیست">
@@ -89,74 +98,78 @@ export default async function ShopIndexPage({
         </Alert>
       ) : null}
 
-      <nav aria-label="دسته‌ها" className="hz-rail flex gap-sm" data-testid="shop-categories">
-        <Link
-          href={linkFor({ categoryId: null })}
-          className="rounded-full border border-border-default px-md py-2xs text-caption"
-        >
-          همه دسته‌ها
-        </Link>
-        {categories.map((category) => (
-          <Link
-            key={category.id}
-            href={linkFor({ categoryId: category.id })}
-            className="whitespace-nowrap rounded-full border border-border-default px-md py-2xs text-caption"
-          >
-            {category.nameFa}
-          </Link>
-        ))}
+      <form method="get" action="/shop" role="search" className="flex gap-sm">
+        {filter.categoryId ? <input type="hidden" name="category" value={filter.categoryId} /> : null}
+        {filter.inStockOnly ? <input type="hidden" name="stock" value="1" /> : null}
+        <SearchField id="shop-q" name="q" label="جست‌وجوی کالا" defaultValue={filter.term ?? ''} className="min-w-0 flex-1 md:max-w-[36rem]" />
+        <Button type="submit" tone="secondary">
+          جست‌وجو
+        </Button>
+      </form>
+
+      <div className="flex flex-wrap items-center gap-sm">
+        <FilterChips
+          label="دسته‌ها"
+          testId="shop-categories"
+          chips={[
+            { key: 'all', href: linkFor({ categoryId: null }), label: 'همه دسته‌ها', current: filter.categoryId === null },
+            ...categories.map((category) => ({
+              key: category.id,
+              href: linkFor({ categoryId: category.id }),
+              label: category.nameFa,
+              current: filter.categoryId === category.id,
+            })),
+          ]}
+        />
         <Link
           href={linkFor({ inStockOnly: !filter.inStockOnly })}
-          className="whitespace-nowrap rounded-full border border-border-default px-md py-2xs text-caption"
+          aria-current={filter.inStockOnly ? 'true' : undefined}
+          className="hz-chip no-underline aria-[current=true]:border-border-brand aria-[current=true]:bg-bg-brand-subtle aria-[current=true]:text-text-brand"
           data-testid="shop-stock-filter"
         >
           {filter.inStockOnly ? 'همه کالاها' : 'فقط کالاهای موجود'}
         </Link>
-      </nav>
+      </div>
 
       {items.length === 0 ? (
-        <p className="text-body-sm text-text-secondary" data-testid="shop-empty">
-          کالایی با این شرایط پیدا نشد.
-        </p>
+        <div data-testid="shop-empty">
+          <EmptyState
+            title="کالایی با این شرایط پیدا نشد"
+            description={active ? 'فیلترها را بردارید یا واژه دیگری جست‌وجو کنید.' : 'کالاها پس از انتشار فروشندگان اینجا دیده می‌شوند.'}
+            action={
+              active ? (
+                <ButtonLink tone="secondary" href="/shop">
+                  پاک کردن همه
+                </ButtonLink>
+              ) : undefined
+            }
+          />
+        </div>
       ) : (
-        <ul className="grid gap-md md:grid-cols-3" data-testid="shop-results">
-          {items.map((item) => (
-            <li key={item.id} className="space-y-sm rounded-xl border border-border-default p-lg">
-              {item.imageFileId ? (
-                <RecordImage fileId={item.imageFileId} altFa={item.imageAltFa ?? item.nameFa} variant="thumb" />
-              ) : null}
-              <h2 className="hz-card__title">
-                <Link href={'/shop/' + item.slug} className="text-text-brand" data-testid={'shop-item-' + item.id}>
-                  {item.nameFa}
-                </Link>
-              </h2>
-              <p className="text-caption text-text-secondary">
-                {[item.brandFa, item.categoryNameFa].filter(Boolean).join(' · ')}
-              </p>
-              <p className="text-body-sm" data-testid={'shop-price-' + item.id}>
-                {item.fromPriceToman === null ? 'قیمت اعلام نشده' : 'از ' + fa(item.fromPriceToman) + ' تومان'}
-              </p>
-              <StatusBadge tone={item.available > 0 ? 'success' : 'neutral'}>
-                {item.available > 0 ? 'موجود' : 'ناموجود'}
-              </StatusBadge>
-            </li>
-          ))}
-        </ul>
+        <section aria-labelledby="shop-results-title" className="space-y-lg">
+          <h2 id="shop-results-title" className="hz-body-sm text-text-secondary" aria-live="polite">
+            {fa(total) + ' کالا'}
+          </h2>
+          <ul className="grid grid-cols-2 gap-md md:grid-cols-3 md:gap-s20 lg:grid-cols-4" data-testid="shop-results">
+            {items.map((item) => (
+              <li key={item.id}>
+                <ProductCard item={item} />
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
-      {pages > 1 ? (
-        <nav aria-label="صفحه‌بندی" className="flex flex-wrap gap-sm" data-testid="shop-pagination">
-          {Array.from({ length: pages }, (_, index) => index + 1).map((page) => (
-            <Link
-              key={page}
-              href={'/shop' + shopQueryString({ ...filter, page })}
-              className="rounded-lg border border-border-default px-md py-2xs text-caption"
-            >
-              {fa(page)}
-            </Link>
-          ))}
-        </nav>
-      ) : null}
+      <div data-testid="shop-pagination">
+        <Pagination
+          page={filter.page}
+          pageSize={SHOP_PAGE_SIZE}
+          total={total}
+          totalPages={pages}
+          hrefFor={(page) => '/shop' + shopQueryString({ ...filter, page })}
+          label="صفحه‌بندی کالاها"
+        />
+      </div>
     </div>
   );
 }

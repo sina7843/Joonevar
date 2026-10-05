@@ -13,12 +13,8 @@ import { db } from '../../../../../src/db/client.ts';
 import { permitForParty, PERMIT_STATUS_FA } from '../../../../../src/mating/permits.ts';
 import { litterView, PUPPY_STATUS_FA } from '../../../../../src/mating/birth.ts';
 import { formatCivilDateFa } from '../../../../../src/domain/calendar.ts';
-import {
-  CorrectBirthForm,
-  PuppyDeathForm,
-  PuppyNameForm,
-  RecordBirthForm,
-} from '../../../breeding-forms.tsx';
+import { CorrectBirthForm, PuppyDeathForm, PuppyNameForm, RecordBirthForm } from '../../../breeding-forms.tsx';
+import { PageHeader } from '../../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,7 +43,12 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
 
   if (permit.status !== 'ISSUED') {
     return (
-      <PublicShell actor={guard.actor} title="زایمان" pathname={'/mating/permits/' + id + '/birth'}>
+      <PublicShell
+        actor={guard.actor}
+        title="زایمان"
+        pathname={'/mating/permits/' + id + '/birth'}
+        header={<PageHeader title={'زایمان'} back={{ href: '/mating/permits/' + id }} />}
+      >
         <Card>
           <Alert tone="info" title="این پرونده هنوز مجوز صادرشده ندارد">
             <span data-testid="birth-locked">
@@ -63,53 +64,78 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
   const standing = view.puppies.filter((row) => row.status !== 'WITHDRAWN');
 
   return (
-    <PublicShell actor={guard.actor} title="زایمان و توله‌ها" pathname={'/mating/permits/' + id + '/birth'}>
+    <PublicShell
+      actor={guard.actor}
+      title="زایمان و توله‌ها"
+      pathname={'/mating/permits/' + id + '/birth'}
+      header={<PageHeader title={'زایمان و توله‌ها'} back={{ href: '/mating/permits/' + id }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نتیجه زایمان</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>نتیجه زایمان</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {permit.permitNo ?? '—'} ·{' '}
-                <Link
-                  href={'/mating/permits/' + id + '/pregnancy'}
-                  className="text-text-brand underline underline-offset-4"
-                >
+                <Link href={'/mating/permits/' + id + '/pregnancy'} className="hz-link">
                   اعلام بارداری
                 </Link>
               </p>
             </div>
             <StatusBadge tone={view.litter ? 'info' : 'neutral'}>
-              <span data-testid="birth-status">
-                {view.litter ? 'زایمان ثبت شده' : 'هنوز ثبت نشده'}
-              </span>
+              <span data-testid="birth-status">{view.litter ? 'زایمان ثبت شده' : 'هنوز ثبت نشده'}</span>
             </StatusBadge>
           </div>
 
           {view.litter ? (
-            <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="birth-counts">
-              <dt className="text-text-secondary">تاریخ تولد</dt>
-              <dd>{formatCivilDateFa(view.litter.bornOn)}</dd>
-              <dt className="text-text-secondary">زنده در زمان تولد (گزارش اولیه)</dt>
-              <dd data-testid="reported-live">{view.reportedLiveAtBirth}</dd>
-              <dt className="text-text-secondary">مرده در زمان تولد (گزارش اولیه)</dt>
-              <dd data-testid="reported-dead">{view.reportedDeadAtBirth}</dd>
-              <dt className="text-text-secondary">تعداد اعلام‌شده در نسخه فعلی</dt>
-              <dd data-testid="current-counts">
-                {view.current?.liveCount ?? 0} زنده · {view.current?.deadCount ?? 0} مرده (نسخه{' '}
-                {view.current?.version ?? 1})
-              </dd>
-              <dt className="text-text-secondary">پرونده‌های موقت موجود</dt>
-              <dd data-testid="profile-count">{view.profiles}</dd>
-              <dt className="text-text-secondary">زنده در حال حاضر</dt>
-              <dd data-testid="living-now">{view.livingNow}</dd>
+            <dl className="hz-kv mt-lg" data-testid="birth-counts">
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">تاریخ تولد</dt>
+                <dd className="hz-kv__value">{formatCivilDateFa(view.litter.bornOn)}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">زنده در زمان تولد (گزارش اولیه)</dt>
+                <dd className="hz-kv__value" data-testid="reported-live">
+                  {view.reportedLiveAtBirth}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">مرده در زمان تولد (گزارش اولیه)</dt>
+                <dd className="hz-kv__value" data-testid="reported-dead">
+                  {view.reportedDeadAtBirth}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">تعداد اعلام‌شده در نسخه فعلی</dt>
+                <dd className="hz-kv__value" data-testid="current-counts">
+                  {view.current?.liveCount ?? 0} زنده · {view.current?.deadCount ?? 0} مرده (نسخه{' '}
+                  {view.current?.version ?? 1})
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">پرونده‌های موقت موجود</dt>
+                <dd className="hz-kv__value" data-testid="profile-count">
+                  {view.profiles}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">زنده در حال حاضر</dt>
+                <dd className="hz-kv__value" data-testid="living-now">
+                  {view.livingNow}
+                </dd>
+              </div>
             </dl>
           ) : null}
 
           {view.litter ? (
             <p className="mt-lg text-caption text-text-secondary" data-testid="history-note">
-              تعداد پرونده‌های تاریخی لزوماً با تعداد فعلی توله‌های زنده برابر نیست؛ مرگ پس از تولد، گزارش
-              اولیه را تغییر نمی‌دهد.
+              تعداد پرونده‌های تاریخی لزوماً با تعداد فعلی توله‌های زنده برابر نیست؛ مرگ پس از تولد، گزارش اولیه را
+              تغییر نمی‌دهد.
             </p>
           ) : null}
         </Card>
@@ -132,7 +158,12 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
 
         {view.litter ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توله‌ها</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>توله‌ها</span>
+              </h2>
+            </div>
             {view.puppies.length === 0 ? (
               <div className="mt-lg">
                 <EmptyState
@@ -145,7 +176,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                 {view.puppies.map((puppy) => (
                   <li
                     key={puppy.id}
-                    className="rounded-xl border border-border-default p-lg"
+                    className="rounded-lg border border-border-default p-lg"
                     data-testid={'puppy-' + puppy.tempCode}
                   >
                     <div className="flex items-start justify-between gap-md">
@@ -169,16 +200,10 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                       </div>
                       <StatusBadge
                         tone={
-                          puppy.status === 'ALIVE'
-                            ? 'success'
-                            : puppy.status === 'DECEASED'
-                              ? 'warning'
-                              : 'neutral'
+                          puppy.status === 'ALIVE' ? 'success' : puppy.status === 'DECEASED' ? 'warning' : 'neutral'
                         }
                       >
-                        <span data-testid={'puppy-status-' + puppy.tempCode}>
-                          {PUPPY_STATUS_FA[puppy.status]}
-                        </span>
+                        <span data-testid={'puppy-status-' + puppy.tempCode}>{PUPPY_STATUS_FA[puppy.status]}</span>
                       </StatusBadge>
                     </div>
 
@@ -211,7 +236,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
             <p className="text-body-sm">
               <Link
                 href={'/litters/' + view.litter.id + '/allocation'}
-                className="text-text-brand underline underline-offset-4"
+                className="hz-link"
                 data-testid="open-allocation-from-birth"
               >
                 تخصیص مالکیت توله‌ها و صدور کارت
@@ -222,10 +247,19 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
 
         {view.history.length > 0 ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه نسخه‌ها</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>تاریخچه نسخه‌ها</span>
+              </h2>
+            </div>
             <ul className="mt-lg space-y-md" data-testid="birth-history">
               {view.history.map((row) => (
-                <li key={row.id} className="rounded-xl border border-border-default p-lg" data-testid={'birth-version-' + row.version}>
+                <li
+                  key={row.id}
+                  className="rounded-lg border border-border-default p-lg"
+                  data-testid={'birth-version-' + row.version}
+                >
                   <p className="text-label-md">
                     نسخه {row.version} · {row.liveCount} زنده · {row.deadCount} مرده ·{' '}
                     {row.kind === 'INITIAL' ? 'گزارش اولیه' : 'اصلاح'}

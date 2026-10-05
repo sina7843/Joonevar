@@ -21,6 +21,7 @@ import {
 } from '../../../src/kennels/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { KennelBreeds, KennelForm, PayKennelForm, SubmitKennelForm } from '../forms.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,15 +59,26 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
   const editable = kennel.status === 'DRAFT' || kennel.status === 'NEEDS_CORRECTION';
   const breedsEditable = kennel.status !== 'UNDER_REVIEW' && kennel.status !== 'REJECTED';
   const needsPayment = editable && batch?.status !== 'PAID';
-  const canSubmit = kennel.status === 'READY_TO_SUBMIT' || (kennel.status === 'NEEDS_CORRECTION' && batch?.status === 'PAID');
+  const canSubmit =
+    kennel.status === 'READY_TO_SUBMIT' || (kennel.status === 'NEEDS_CORRECTION' && batch?.status === 'PAID');
 
   return (
-    <PublicShell actor={guard.actor} title="پرونده کنل" pathname={'/kennels/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="پرونده کنل"
+      pathname={'/kennels/' + id}
+      header={<PageHeader title={'پرونده کنل'} back={{ href: '/kennels' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{kennel.nameFa ?? 'کنل بدون نام'}</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>{kennel.nameFa ?? 'کنل بدون نام'}</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary" data-testid="kennel-location">
                 {[kennel.provinceFa, kennel.cityFa].filter(Boolean).join(' · ') || 'نشانی ثبت نشده'}
                 {kennel.addressFa ? ' — ' + kennel.addressFa : ''}
@@ -103,8 +115,8 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
           {kennel.status === 'APPROVED' ? (
             <Alert tone="success" title="نقش پرورش‌دهنده فعال است">
               <span data-testid="breeder-active-note">
-                از تغییر نقش در بالای صفحه می‌توانید به محیط پرورش‌دهنده بروید. تغییر نژادها از همین صفحه انجام
-                می‌شود و پرداخت یا بررسی دوباره ندارد.
+                از تغییر نقش در بالای صفحه می‌توانید به محیط پرورش‌دهنده بروید. تغییر نژادها از همین صفحه انجام می‌شود و
+                پرداخت یا بررسی دوباره ندارد.
               </span>
             </Alert>
           ) : null}
@@ -138,8 +150,7 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
           <Card>
             <h2 className="hz-card__title">مرور و پرداخت</h2>
             <p className="mt-md text-body-sm">
-              هزینه ثبت کنل:{' '}
-              <span data-testid="kennel-fee">{feeLabel ?? 'تعیین‌نشده'}</span>
+              هزینه ثبت کنل: <span data-testid="kennel-fee">{feeLabel ?? 'تعیین‌نشده'}</span>
             </p>
             {feeLabel === null ? (
               <Alert tone="warning" title="تعرفه ثبت کنل هنوز ثبت نشده است">
@@ -159,7 +170,12 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
 
         {canSubmit ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ارسال برای بررسی انجمن</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>ارسال برای بررسی انجمن</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
               پرداخت این پرونده تأیید شده است. ارسال، پرونده را در صف بررسی انجمن قرار می‌دهد.
             </p>

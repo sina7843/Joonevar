@@ -45,13 +45,28 @@ export function ApplyForMembershipForm() {
 }
 
 /** Answer a correction the association asked for, on the same application. */
-export function ReviseMembershipApplicationForm({ applicationId, version, defaultStatement }: { applicationId: string; version: number; defaultStatement: string }) {
+export function ReviseMembershipApplicationForm({
+  applicationId,
+  version,
+  defaultStatement,
+}: {
+  applicationId: string;
+  version: number;
+  defaultStatement: string;
+}) {
   const [state, submit, pending] = useActionState(reviseMembershipApplicationAction, EMPTY);
   return (
     <form action={submit} className="space-y-md" data-testid="membership-revision-form">
       <input type="hidden" name="applicationId" value={applicationId} />
       <input type="hidden" name="expectedVersion" value={version} />
-      <TextAreaField label="پاسخ شما" name="statementFa" rows={3} maxLength={1000} defaultValue={defaultStatement} data-testid="membership-revision-statement" />
+      <TextAreaField
+        label="پاسخ شما"
+        name="statementFa"
+        rows={3}
+        maxLength={1000}
+        defaultValue={defaultStatement}
+        data-testid="membership-revision-statement"
+      />
       <Result state={state} testId="membership-revision-result" />
       <Button type="submit" block disabled={pending} data-testid="submit-membership-revision">
         {pending ? 'در حال ثبت…' : 'ارسال دوباره برای بررسی'}

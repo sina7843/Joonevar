@@ -9,6 +9,7 @@ import { db } from '../../../../src/db/client.ts';
 import { reportableContent } from '../../../../src/moderation/service.ts';
 import { KIND_FA, KIND_PATH } from '../../../../src/content/model.ts';
 import { ReportForm } from '../../../../src/moderation/forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,12 @@ export default async function ReportContentPage({ params }: { params: Promise<{ 
   const publicHref = (KIND_PATH[item.kind] ?? '') + '/' + item.slug;
 
   return (
-    <PublicShell actor={guard.actor} title="گزارش مطلب" pathname={path}>
+    <PublicShell
+      actor={guard.actor}
+      title="گزارش مطلب"
+      pathname={path}
+      header={<PageHeader title={'گزارش مطلب'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <p className="text-caption text-text-secondary">{KIND_FA[item.kind]}</p>

@@ -1,10 +1,8 @@
-import Link from 'next/link';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { AccessDenied } from '../../src/ui/access-denied.tsx';
 import { OpsShell, GENETICS_NAV } from '../../src/ui/shell.tsx';
-import { Card } from '../../src/ui/card.tsx';
+import { CountTiles } from '../../src/ui/desk.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
-import { StatusBadge } from '../../src/ui/status.tsx';
 import { db } from '../../src/db/client.ts';
 import { geneticsQueues } from '../../src/operations/service.ts';
 import { readSetting } from '../../src/settings/service.ts';
@@ -27,42 +25,20 @@ export default async function GeneticsPage() {
   ]);
 
   return (
-    <OpsShell actor={guard.actor} title="پنل مرکز ژنتیک" pathname="/genetics" nav={GENETICS_NAV}>
-      <div className="space-y-md">
-        <Alert tone="info" title="مرکز نمونه‌گیری نمی‌کند">
-          <span data-testid="centre-name">
-            {centreName.value === null
-              ? 'مشخصات مرکز هنوز در تنظیمات مدیریتی وارد نشده است و «تعیین‌نشده» می‌ماند.'
-              : 'مرکز ثابت: ' + String(centreName.value)}
-          </span>
-        </Alert>
-        <ul className="space-y-md" data-testid="genetics-queues">
-          {queues.map((queue) => (
-            <li key={queue.key}>
-              <Card>
-                <div className="flex items-start justify-between gap-md">
-                  <div className="min-w-0">
-                    <h2 className="hz-card__title">{queue.titleFa}</h2>
-                    <p className="mt-2xs text-caption text-text-secondary">{queue.noteFa}</p>
-                  </div>
-                  <StatusBadge tone={queue.waiting > 0 ? 'warning' : 'neutral'}>
-                    <span data-testid={'genetics-count-' + queue.key}>{queue.waiting}</span>
-                  </StatusBadge>
-                </div>
-                <p className="mt-lg text-body-sm">
-                  <Link
-                    href={queue.href}
-                    className="text-text-brand underline underline-offset-4"
-                    data-testid={'open-genetics-' + queue.key}
-                  >
-                    باز کردن صف
-                  </Link>
-                </p>
-              </Card>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <OpsShell actor={guard.actor} title="داشبورد مرکز ژنتیک" pathname="/genetics" nav={GENETICS_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">
+          {queues.reduce((sum, queue) => sum + queue.waiting, 0).toLocaleString('fa-IR') + ' مورد باز در ' + queues.length.toLocaleString('fa-IR') + ' صف'}
+        </span>
+      </p>
+      <Alert tone="info" title="مرکز نمونه‌گیری نمی‌کند">
+        <span data-testid="centre-name">
+          {centreName.value === null
+            ? 'مشخصات مرکز هنوز در تنظیمات مدیریتی وارد نشده است و «تعیین‌نشده» می‌ماند.'
+            : 'مرکز ثابت: ' + String(centreName.value)}
+        </span>
+      </Alert>
+      <CountTiles queues={queues} testId="genetics-queues" countTestId="genetics-count-" linkTestId="open-genetics-" />
     </OpsShell>
   );
 }

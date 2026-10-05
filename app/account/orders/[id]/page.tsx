@@ -1,12 +1,15 @@
 import { notFound as pageNotFound } from 'next/navigation';
 import { isUuid } from '../../../../src/domain/ids.ts';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { Card } from '../../../../src/ui/card.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { PageCrumbs } from '../../../../src/ui/page-crumbs.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
+import { ActionOwner, StatusBadge } from '../../../../src/ui/status.tsx';
 import { AppError } from '../../../../src/domain/errors.ts';
 import { orderForBuyer, subOrderHistory } from '../../../../src/commerce/orders.ts';
 import {
@@ -26,7 +29,9 @@ export const dynamic = 'force-dynamic';
 const fa = (value: number | bigint): string => value.toLocaleString('fa-IR');
 
 /**
- * One order, with each shop's part shown separately — PROMPT-010.
+ * One order, with each shop's part shown separately — PROMPT-010. P06 record
+ * file: the sub-orders (DS *SubOrderCard*) in the main column, the payment
+ * status, total and the one next move in the side column.
  *
  * The parent says what was paid and where it is going. Everything that can
  * still move — accepted, preparing, shipped, returned — belongs to a shop's
@@ -54,170 +59,186 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     ),
   );
   const historyOf = new Map(histories);
+  const pending = order.status === 'PENDING_PAYMENT';
 
   return (
-    <PublicShell actor={guard.actor} title={'سفارش ' + order.reference} pathname="/account/orders">
-      <div className="space-y-lg p-lg">
-      <p className="text-caption">
-        <Link href="/account/orders" className="text-text-brand" data-testid="back-to-orders">
-          بازگشت به سفارش‌ها
-        </Link>
-      </p>
-
-      <header className="space-y-sm">
-        <h2 className="text-h2" data-testid="order-reference">
-          سفارش {order.reference}
-        </h2>
-        <StatusBadge tone={order.status === 'PAID' ? 'success' : 'neutral'}>
-          <span data-testid="order-status">{ORDER_STATUS_FA[order.status as OrderStatus]}</span>
-        </StatusBadge>
-        <p className="text-body-sm" data-testid="order-total">
-          مبلغ پرداخت: {fa(order.grandTotalToman)} تومان
-          {order.shippingTotalToman > 0n ? ' (شامل ' + fa(order.shippingTotalToman) + ' تومان ارسال)' : ''}
-        </p>
-        {view.refundedToman > 0n ? (
-          <p className="text-body-sm" data-testid="order-refunded">
-            بازگردانده‌شده: {fa(view.refundedToman)} تومان
-          </p>
-        ) : null}
-      </header>
-
-      {order.status === 'PENDING_PAYMENT' ? (
-        <Alert tone="warning" title="این سفارش هنوز پرداخت نشده است">
-          <div className="space-y-sm">
-            <p className="text-body-sm" data-testid="order-hold-note">
-              کالاها تا {order.holdsExpireAt.toLocaleString('fa-IR')} برای شما نگه داشته شده‌اند.
-            </p>
-            <OrderActionForm
-              action={retryOrderPaymentAction}
-              orderId={order.id}
-              labelFa="پرداخت سفارش"
-              testPrefix="order-pay"
-              tone="primary"
-            />
-            <OrderActionForm
-              action={cancelOrderAction}
-              orderId={order.id}
-              labelFa="لغو سفارش"
-              testPrefix="order-cancel"
-              tone="ghost"
-            />
-          </div>
-        </Alert>
-      ) : null}
-
-      {order.status !== 'PENDING_PAYMENT' && order.status !== 'CANCELLED' ? (
-        <p className="text-caption">
-          <a
-            href={'/account/orders/' + order.id + '/invoice'}
-            className="text-text-brand"
-            data-testid="order-invoice"
-          >
-            دریافت فاکتور (PDF)
-          </a>
-        </p>
-      ) : null}
-
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نشانی تحویل</span></h2></div>
-        <p className="text-body-sm" data-testid="order-address">
-          {order.recipientNameFa} — {order.recipientPhone}
-          <br />
-          {[order.provinceFa, order.cityFa].filter(Boolean).join('، ')} {order.addressFa}
-          {order.postalCode ? ' — کد پستی ' + order.postalCode : ''}
-        </p>
-      </section>
-
-      <div className="space-y-lg" data-testid="order-parts">
-        {parts.map((part) => (
-          <section
-            key={part.subOrder.id}
-            className="space-y-md rounded-xl border border-border-default p-lg"
-            data-testid={'order-part-' + part.subOrder.id}
-          >
-            <header className="flex flex-wrap items-center justify-between gap-sm">
-              <h2 className="hz-card__title">{part.sellerNameFa}</h2>
-              <StatusBadge tone={part.subOrder.status === 'DELIVERED' ? 'success' : 'neutral'}>
-                <span data-testid={'suborder-status-' + part.subOrder.id}>
-                  {SUB_ORDER_STATUS_FA[part.subOrder.status as SubOrderStatus]}
-                </span>
+    <PublicShell
+      actor={guard.actor}
+      title={'سفارش ' + order.reference}
+      pathname="/account/orders"
+      header={
+        <div>
+          <PageCrumbs items={[{ href: '/dashboard', name: 'خانه' }, { href: '/account/orders', name: 'سفارش‌ها' }, { name: order.reference }]} />
+          <PageHeader
+            title={
+              <span data-testid="order-reference">
+                سفارش <bdi dir="ltr">{order.reference}</bdi>
+              </span>
+            }
+            back={{ href: '/account/orders', label: 'بازگشت به سفارش‌ها' }}
+            aside={
+              <StatusBadge tone={order.status === 'PAID' ? 'success' : pending ? 'warning' : 'neutral'}>
+                <span data-testid="order-status">{ORDER_STATUS_FA[order.status as OrderStatus]}</span>
               </StatusBadge>
-            </header>
-            <p className="text-caption text-text-secondary" data-testid={'suborder-ref-' + part.subOrder.id}>
-              شماره زیرسفارش: {part.subOrder.reference}
-            </p>
-            {part.subOrder.statusReasonFa ? (
-              <p className="text-caption" data-testid={'suborder-reason-' + part.subOrder.id}>
-                توضیح: {part.subOrder.statusReasonFa}
+            }
+            meta={[
+              parts.length.toLocaleString('fa-IR') + ' فروشگاه',
+              'ثبت ' + order.createdAt.toLocaleDateString('fa-IR'),
+            ]}
+            actions={
+              <a href="/account/orders" className="hz-link hz-link--standalone hz-show-md" data-testid="back-to-orders">
+                بازگشت به سفارش‌ها
+              </a>
+            }
+          />
+        </div>
+      }
+    >
+      <div className="grid items-start gap-xl lg:grid-cols-12">
+        <aside aria-label="وضعیت و اقدام" className="min-w-0 space-y-lg lg:col-span-4 lg:col-start-9 lg:row-start-1">
+          <Card variant="compact">
+            <SectionHeader size="sm" title="وضعیت و پرداخت" />
+            <div className="mt-md space-y-md">
+              <p className="text-body-sm" data-testid="order-total">
+                مبلغ پرداخت: <b>{fa(order.grandTotalToman)} تومان</b>
+                {order.shippingTotalToman > 0n ? ' (شامل ' + fa(order.shippingTotalToman) + ' تومان ارسال)' : ''}
               </p>
-            ) : null}
-            {part.subOrder.trackingCode ? (
-              <p className="text-caption" data-testid={'suborder-tracking-' + part.subOrder.id}>
-                کد رهگیری: {part.subOrder.trackingCode}
-              </p>
-            ) : null}
-
-            <ul className="space-y-2xs text-body-sm" data-testid={'suborder-items-' + part.subOrder.id}>
-              {part.items.map((item) => (
-                <li key={item.id}>
-                  {item.productNameFa}
-                  {item.variantLabelFa ? ' — ' + item.variantLabelFa : ''} × {fa(item.quantity)} ={' '}
-                  {fa(item.lineTotalToman)} تومان
-                </li>
-              ))}
-            </ul>
-            <p className="text-body-sm" data-testid={'suborder-total-' + part.subOrder.id}>
-              جمع این فروشگاه: {fa(part.subOrder.buyerTotalToman)} تومان
-              {part.subOrder.shippingWaived ? ' (ارسال رایگان)' : ''}
-            </p>
-
-            <SubOrderMoveForm
-              action={moveAsBuyerAction}
-              subOrderId={part.subOrder.id}
-              moves={part.moves}
-              testPrefix="buyer-move"
-            />
-
-            {part.subOrder.status === 'DELIVERED' ? (
-              <details data-testid={'return-open-' + part.subOrder.id}>
-                <summary className="text-caption text-text-brand">مرجوع کردن کالا</summary>
-                <div className="mt-sm">
-                  <ReturnRequestForm
-                    action={requestReturnAction}
-                    subOrderId={part.subOrder.id}
-                    items={part.items.map((item) => ({
-                      id: item.id,
-                      labelFa:
-                        item.productNameFa + (item.variantLabelFa ? ' — ' + item.variantLabelFa : ''),
-                      remaining: item.quantity - item.returnedQuantity,
-                      // The sentence frozen onto this line when it was bought,
-                      // not whatever the policy says today (PROMPT-011).
-                      blockedFa:
-                        item.returnRuleCode === 'NOT_RETURNABLE'
-                          ? (item.returnRuleReasonFa ??
-                            RETURN_RULE_FA[item.returnRuleCode as ReturnRule])
-                          : null,
-                    }))}
+              {view.refundedToman > 0n ? (
+                <p className="text-body-sm" data-testid="order-refunded">
+                  بازگردانده‌شده: {fa(view.refundedToman)} تومان
+                </p>
+              ) : null}
+              {pending ? (
+                <>
+                  <ActionOwner owner="USER" />
+                  <Alert tone="warning" title="این سفارش هنوز پرداخت نشده است">
+                    <p className="text-body-sm" data-testid="order-hold-note">
+                      کالاها تا {order.holdsExpireAt.toLocaleString('fa-IR')} برای شما نگه داشته شده‌اند.
+                    </p>
+                  </Alert>
+                  <OrderActionForm
+                    action={retryOrderPaymentAction}
+                    orderId={order.id}
+                    labelFa={'پرداخت سفارش'}
+                    testPrefix="order-pay"
+                    tone="primary"
                   />
-                </div>
-              </details>
-            ) : null}
+                  <OrderActionForm action={cancelOrderAction} orderId={order.id} labelFa="لغو سفارش" testPrefix="order-cancel" tone="ghost" />
+                </>
+              ) : null}
+              {!pending && order.status !== 'CANCELLED' ? (
+                <a href={'/account/orders/' + order.id + '/invoice'} className="hz-btn hz-btn--secondary hz-btn--block" data-testid="order-invoice">
+                  <Icon name="filePdf" size="sm" />
+                  دریافت فاکتور (PDF)
+                </a>
+              ) : null}
+            </div>
+          </Card>
 
-            <details>
-              <summary className="text-caption text-text-secondary">سابقه این زیرسفارش</summary>
-              <ol className="mt-sm space-y-2xs text-caption" data-testid={'suborder-history-' + part.subOrder.id}>
-                {(historyOf.get(part.subOrder.id) ?? []).map((event) => (
-                  <li key={event.id}>
-                    {event.createdAt.toLocaleString('fa-IR')} —{' '}
-                    {SUB_ORDER_STATUS_FA[event.toStatus as SubOrderStatus]}
-                    {event.reasonFa ? ' — ' + event.reasonFa : ''}
+          <Card variant="compact">
+            <SectionHeader size="sm" title="نشانی تحویل" />
+            <p className="mt-sm text-body-sm" data-testid="order-address">
+              {order.recipientNameFa} — <bdi dir="ltr">{order.recipientPhone}</bdi>
+              <br />
+              {[order.provinceFa, order.cityFa].filter(Boolean).join('، ')} {order.addressFa}
+              {order.postalCode ? ' — کد پستی ' + order.postalCode : ''}
+            </p>
+          </Card>
+        </aside>
+
+        <div className="min-w-0 space-y-lg lg:col-span-8 lg:col-start-1 lg:row-start-1" data-testid="order-parts">
+          <SectionHeader title="زیرسفارش هر فروشگاه" count={fa(parts.length)} />
+          {parts.map((part) => (
+            <section key={part.subOrder.id} className="hz-card hz-suborder" data-testid={'order-part-' + part.subOrder.id}>
+              <div className="hz-suborder__head">
+                <div className="hz-suborder__shop">
+                  <Icon name="storefront" size="md" />
+                  <div className="hz-suborder__shop-text">
+                    <h3 className="hz-suborder__name">{part.sellerNameFa}</h3>
+                    <span className="hz-suborder__sub" data-testid={'suborder-ref-' + part.subOrder.id}>
+                      شماره زیرسفارش: <bdi dir="ltr">{part.subOrder.reference}</bdi>
+                    </span>
+                  </div>
+                </div>
+                <StatusBadge tone={part.subOrder.status === 'DELIVERED' ? 'success' : 'neutral'}>
+                  <span data-testid={'suborder-status-' + part.subOrder.id}>
+                    {SUB_ORDER_STATUS_FA[part.subOrder.status as SubOrderStatus]}
+                  </span>
+                </StatusBadge>
+              </div>
+              {part.subOrder.statusReasonFa ? (
+                <p className="text-caption" data-testid={'suborder-reason-' + part.subOrder.id}>
+                  توضیح: {part.subOrder.statusReasonFa}
+                </p>
+              ) : null}
+              {part.subOrder.trackingCode ? (
+                <p className="text-caption" data-testid={'suborder-tracking-' + part.subOrder.id}>
+                  کد رهگیری: <bdi dir="ltr">{part.subOrder.trackingCode}</bdi>
+                </p>
+              ) : null}
+
+              <ul className="hz-suborder__items" data-testid={'suborder-items-' + part.subOrder.id}>
+                {part.items.map((item) => (
+                  <li key={item.id} className="hz-suborder__item">
+                    <span className="hz-suborder__item-text">
+                      <span className="hz-suborder__item-name">{item.productNameFa}</span>
+                      <span className="hz-suborder__item-meta">
+                        {(item.variantLabelFa ? item.variantLabelFa + ' · ' : '') + '× ' + fa(item.quantity)}
+                      </span>
+                    </span>
+                    <span className="hz-suborder__item-amount">{fa(item.lineTotalToman)} تومان</span>
                   </li>
                 ))}
-              </ol>
-            </details>
-          </section>
-        ))}
-      </div>
+              </ul>
+              <dl className="hz-suborder__sum">
+                <dt>جمع این فروشگاه</dt>
+                <dd data-testid={'suborder-total-' + part.subOrder.id}>
+                  {fa(part.subOrder.buyerTotalToman)} تومان
+                  {part.subOrder.shippingWaived ? ' (ارسال رایگان)' : ''}
+                </dd>
+              </dl>
+
+              <div className="hz-suborder__foot">
+                <SubOrderMoveForm action={moveAsBuyerAction} subOrderId={part.subOrder.id} moves={part.moves} testPrefix="buyer-move" />
+              </div>
+
+              {part.subOrder.status === 'DELIVERED' ? (
+                <details className="hz-accordion__item" data-testid={'return-open-' + part.subOrder.id}>
+                  <summary className="hz-link hz-link--standalone cursor-pointer">مرجوع کردن کالا</summary>
+                  <div className="mt-sm">
+                    <ReturnRequestForm
+                      action={requestReturnAction}
+                      subOrderId={part.subOrder.id}
+                      items={part.items.map((item) => ({
+                        id: item.id,
+                        labelFa: item.productNameFa + (item.variantLabelFa ? ' — ' + item.variantLabelFa : ''),
+                        remaining: item.quantity - item.returnedQuantity,
+                        // The sentence frozen onto this line when it was bought,
+                        // not whatever the policy says today (PROMPT-011).
+                        blockedFa:
+                          item.returnRuleCode === 'NOT_RETURNABLE'
+                            ? (item.returnRuleReasonFa ?? RETURN_RULE_FA[item.returnRuleCode as ReturnRule])
+                            : null,
+                      }))}
+                    />
+                  </div>
+                </details>
+              ) : null}
+
+              <details className="hz-accordion__item">
+                <summary className="hz-link hz-link--standalone cursor-pointer text-text-secondary">سابقه این زیرسفارش</summary>
+                <ol className="mt-sm space-y-2xs text-caption" data-testid={'suborder-history-' + part.subOrder.id}>
+                  {(historyOf.get(part.subOrder.id) ?? []).map((event) => (
+                    <li key={event.id}>
+                      {event.createdAt.toLocaleString('fa-IR')} — {SUB_ORDER_STATUS_FA[event.toStatus as SubOrderStatus]}
+                      {event.reasonFa ? ' — ' + event.reasonFa : ''}
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            </section>
+          ))}
+        </div>
       </div>
     </PublicShell>
   );

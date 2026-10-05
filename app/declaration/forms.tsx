@@ -12,19 +12,13 @@ import {
   startDeclarationAction,
   type DeclarationFormState,
 } from './actions.ts';
-import {
-  NOTE_KIND_FA,
-  SCOPE_NOTE_FA,
-  UNVERIFIED_NOTE_FA,
-} from '../../src/domain/declaration-copy.ts';
+import { NOTE_KIND_FA, SCOPE_NOTE_FA, UNVERIFIED_NOTE_FA } from '../../src/domain/declaration-copy.ts';
 
 const EMPTY: DeclarationFormState = {};
 
 function Result({ state }: { state: DeclarationFormState }) {
   if (!state.message) return null;
-  return (
-    <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />
-  );
+  return <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />;
 }
 
 /**
@@ -34,15 +28,16 @@ function Result({ state }: { state: DeclarationFormState }) {
  * exists in Hamzist; a hand-typed animal is never accepted, and the number must
  * be the owner of that record.
  */
-export function StartDeclarationForm({
-  animals,
-}: {
-  animals: readonly { id: string; label: string }[];
-}) {
+export function StartDeclarationForm({ animals }: { animals: readonly { id: string; label: string }[] }) {
   const [state, submit, pending] = useActionState(startDeclarationAction, EMPTY);
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام وجود توافق شخصی</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>اعلام وجود توافق شخصی</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary" data-testid="declaration-scope-note">
         {SCOPE_NOTE_FA}
       </p>
@@ -87,25 +82,26 @@ export function RespondDeclarationForm({ declarationId }: { declarationId: strin
     <form action={submit} className="mt-lg space-y-lg" data-testid="respond-declaration-form">
       <input type="hidden" name="declarationId" value={declarationId} />
       <Result state={state} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">پاسخ شما درباره «وجود» این توافق</legend>
+      <fieldset className="hz-fieldset">
+        <legend className="hz-field__label">پاسخ شما درباره «وجود» این توافق</legend>
         {(
           [
             ['CONFIRM', 'بله، چنین توافقی وجود دارد'],
             ['REJECT', 'خیر، با ثبت دلیل'],
           ] as const
         ).map(([value, label]) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
+          <label key={value} className="hz-radio">
             <input
               type="radio"
               name="decision"
               value={value}
               checked={decision === value}
               onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
               data-testid={'declaration-decision-' + value}
             />
-            {label}
+            <span className="hz-radio__text">
+              <span>{label}</span>
+            </span>
           </label>
         ))}
       </fieldset>
@@ -138,7 +134,12 @@ export function PersonalNoteForm({ declarationId }: { declarationId: string }) {
   const [kind, setKind] = useState<'MATING_DATE' | 'PREGNANCY' | 'BIRTH'>('MATING_DATE');
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>یادداشت شخصی (اختیاری)</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>یادداشت شخصی (اختیاری)</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary" data-testid="note-unverified-note">
         {UNVERIFIED_NOTE_FA}
       </p>

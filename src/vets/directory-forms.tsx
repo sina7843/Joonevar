@@ -255,7 +255,7 @@ export function VetPublicStatusForm({
           {blockers.length > 0 && profile.publicStatus !== 'PUBLISHED' ? (
             <div className="mt-md" data-testid="directory-blockers">
               <Alert tone="warning" title="پیش از انتشار">
-                <ul className="list-disc space-y-2xs pr-lg">
+                <ul className="list-disc space-y-2xs pe-lg">
                   {blockers.map((item) => (
                     <li key={item}>{item}</li>
                   ))}

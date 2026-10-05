@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { Alert } from '../../src/ui/alert.tsx';
-import { Button } from '../../src/ui/button.tsx';
+import { ActionRow, Button } from '../../src/ui/button.tsx';
 import { LocationField, TextField } from '../../src/ui/field.tsx';
 import { useState } from 'react';
 import {
@@ -46,11 +46,14 @@ export function IdentityForm({
   nationalIdLocked,
   mode,
   next,
+  primary = true,
 }: {
   values: Partial<ProfileValues>;
   nationalIdLocked: boolean;
   mode: 'complete' | 'edit';
   next?: string | null;
+  /** One primary per view: a page whose next step is elsewhere passes false. */
+  primary?: boolean;
 }) {
   const [state, submit, pending] = useActionState(
     mode === 'complete' ? completeProfileAction : saveProfileAction,
@@ -66,14 +69,14 @@ export function IdentityForm({
       <TextField label="نام خانوادگی" name="lastName" required defaultValue={values.lastName ?? ''} data-testid="last-name" />
 
       {nationalIdLocked ? (
-        <div className="space-y-xs">
-          <span className="block text-label-md">کد ملی</span>
-          <p className="rounded-md border border-border-disabled bg-bg-disabled px-md py-sm">
-            <bdi className="hz-ltr font-mono" data-testid="national-id-readonly">
+        <div className="hz-field">
+          <span className="hz-field__label">کد ملی</span>
+          <div className="hz-input hz-input--ltr flex items-center" aria-readonly="true" aria-disabled="true">
+            <bdi dir="ltr" data-testid="national-id-readonly">
               {values.nationalId}
             </bdi>
-          </p>
-          <p className="text-caption text-text-secondary">کد ملی پس از تأیید احراز هویت قابل تغییر نیست.</p>
+          </div>
+          <div className="hz-field__hint">کد ملی پس از تأیید احراز هویت قابل تغییر نیست.</div>
           <input type="hidden" name="nationalId" value={values.nationalId ?? ''} />
         </div>
       ) : (
@@ -106,20 +109,25 @@ export function IdentityForm({
         defaultValue={values.displayName ?? ''}
         data-testid="display-name"
       />
-      <label className="flex items-center gap-sm text-label-md">
+      <label className="hz-check">
         <input
           type="checkbox"
           name="displayNameVisible"
           defaultChecked={values.displayNameVisible ?? false}
-          className="size-[var(--size-selection-md)]"
           data-testid="display-name-visible"
         />
-        نام نمایشی برای دیگران دیده شود
+        <span className="hz-check__text">
+          <span className="hz-check__label">نام نمایشی برای دیگران دیده شود</span>
+        </span>
       </label>
 
-      <Button type="submit" block disabled={pending} data-testid="save-identity">
-        {pending ? 'در حال ذخیره…' : mode === 'complete' ? 'ادامه' : 'ذخیره اطلاعات هویتی'}
-      </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" tone={primary ? 'primary' : 'secondary'} size={primary ? 'lg' : 'md'} block={mode === 'complete'} loading={pending} disabled={pending} loadingLabel="در حال ذخیره…" data-testid="save-identity">
+            {mode === 'complete' ? 'ادامه' : 'ذخیره اطلاعات هویتی'}
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -160,9 +168,13 @@ export function ResidenceForm({
         defaultValue={values.postalCode ?? ''}
         data-testid="postal-code"
       />
-      <Button type="submit" block disabled={pending} data-testid="save-residence">
-        {pending ? 'در حال ذخیره…' : 'ذخیره اطلاعات سکونت'}
-      </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" tone="secondary" loading={pending} disabled={pending} loadingLabel="در حال ذخیره…" data-testid="save-residence">
+            ذخیره اطلاعات سکونت
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -179,9 +191,16 @@ export function MobileChangeForm({ currentMobile }: { currentMobile: string }) {
 
   return (
     <div className="space-y-xl">
-      <p className="text-body-sm">
-        شماره فعلی: <bdi className="hz-ltr font-mono" data-testid="current-mobile">{currentMobile}</bdi>
-      </p>
+      <div className="hz-setting">
+        <div className="hz-setting__label">
+          <span className="hz-setting__name">شماره فعلی</span>
+        </div>
+        <div className="hz-setting__end">
+          <bdi className="hz-setting__value" dir="ltr" data-testid="current-mobile">
+            {currentMobile}
+          </bdi>
+        </div>
+      </div>
 
       <form action={startSubmit} className="space-y-lg" data-testid="start-mobile-change">
         <Result state={startState} />
@@ -194,19 +213,27 @@ export function MobileChangeForm({ currentMobile }: { currentMobile: string }) {
           hint="کد تأیید به شماره جدید ارسال می‌شود. تا تأیید موفق، شماره فعلی معتبر می‌ماند."
           data-testid="new-mobile"
         />
-        <Button type="submit" block disabled={startPending} data-testid="send-change-code">
-          {startPending ? 'در حال ارسال…' : 'ارسال کد به شماره جدید'}
-        </Button>
+        <ActionRow
+          primary={
+            <Button type="submit" tone={challengeId && !done ? 'secondary' : 'primary'} loading={startPending} disabled={startPending} loadingLabel="در حال ارسال…" data-testid="send-change-code">
+              ارسال کد به شماره جدید
+            </Button>
+          }
+        />
       </form>
 
       {challengeId && !done ? (
-        <form action={confirmSubmit} className="space-y-lg" data-testid="confirm-mobile-change">
+        <form action={confirmSubmit} className="space-y-lg border-t border-border-subtle pt-xl" data-testid="confirm-mobile-change">
           <Result state={confirmState} />
           <input type="hidden" name="challengeId" value={challengeId} />
           <TextField label="کد تأیید شماره جدید" name="code" required ltr inputMode="numeric" data-testid="change-code" />
-          <Button type="submit" block disabled={confirmPending} data-testid="confirm-change">
-            {confirmPending ? 'در حال بررسی…' : 'تأیید تغییر شماره'}
-          </Button>
+          <ActionRow
+            primary={
+              <Button type="submit" loading={confirmPending} disabled={confirmPending} loadingLabel="در حال بررسی…" data-testid="confirm-change">
+                تأیید تغییر شماره
+              </Button>
+            }
+          />
         </form>
       ) : null}
 

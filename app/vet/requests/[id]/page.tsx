@@ -29,6 +29,7 @@ import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { checkOfRequest, resultsOfCheck } from '../../../../src/mating/pregnancy.ts';
 import { CorrectServiceForm } from './correct-form.tsx';
 import { ChipPanel, PregnancyPanel, SamplePanel, UnusableSampleForm } from './procedure.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -84,8 +85,7 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
   const latest = sampleRows[0] ?? null;
   const events = latest ? await eventsOfSample(db(), latest.id) : [];
   const liveSample = latest !== null && !isUnusable(latest.status);
-  const pregnancyCheck =
-    request.context === 'PREGNANCY' ? await checkOfRequest(db(), request.id) : null;
+  const pregnancyCheck = request.context === 'PREGNANCY' ? await checkOfRequest(db(), request.id) : null;
   const pregnancyResults = pregnancyCheck ? await resultsOfCheck(db(), pregnancyCheck.id) : [];
   // A Bluetooth reader in keyboard-wedge mode types the number into the field
   // itself, so there is nothing to integrate and the device methods are usable.
@@ -108,12 +108,22 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
   })();
 
   return (
-    <PublicShell actor={guard.actor} title="پرونده مراجعه" pathname={'/vet/requests/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="پرونده مراجعه"
+      pathname={'/vet/requests/' + id}
+      header={<PageHeader title={'پرونده مراجعه'} back={{ href: '/vet' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{SERVICE_TYPE_FA[request.serviceType]}</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>{SERVICE_TYPE_FA[request.serviceType]}</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary">
                 {CONTEXT_FA[request.context]} · {view.locationNameFa}
               </p>
@@ -149,11 +159,7 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
                 <dt className="text-text-secondary">کد مراجعه</dt>
                 <dd>{view.referral ? <Identifier value={view.referral.code} /> : '—'}</dd>
                 <dt className="text-text-secondary">زمان پذیرش</dt>
-                <dd>
-                  {request.checkedInAt
-                    ? formatCivilDateFa(request.checkedInAt.toISOString().slice(0, 10))
-                    : '—'}
-                </dd>
+                <dd>{request.checkedInAt ? formatCivilDateFa(request.checkedInAt.toISOString().slice(0, 10)) : '—'}</dd>
               </dl>
             </div>
           ) : (
@@ -165,8 +171,8 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
 
         {conflicts.length > 0 ? (
           <Alert tone="error" title="تعارض میکروچیپ ثبت شده است">
-            <span data-testid="chip-conflict">{conflicts[0]!.detailFa}</span> عملیات متوقف است و هیچ اتصالی
-            بازنویسی نمی‌شود.
+            <span data-testid="chip-conflict">{conflicts[0]!.detailFa}</span> عملیات متوقف است و هیچ اتصالی بازنویسی
+            نمی‌شود.
           </Alert>
         ) : null}
 
@@ -212,7 +218,12 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
 
         {chip ? (
           <Card>
-            <h3 className="text-label-lg">شماره رسمی میکروچیپ</h3>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>شماره رسمی میکروچیپ</span>
+              </h3>
+            </div>
             <p className="mt-md text-body-sm" data-testid="bound-chip-number">
               <Identifier value={chip.number} />
             </p>
@@ -232,10 +243,15 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
 
         {sampleRows.length > 0 ? (
           <Card>
-            <h3 className="text-label-lg">نمونه و Custody</h3>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>نمونه و Custody</span>
+              </h3>
+            </div>
             <ul className="mt-md space-y-lg" data-testid="sample-list">
               {sampleRows.map((sample) => (
-                <li key={sample.id} className="rounded-xl border border-border-default p-lg">
+                <li key={sample.id} className="rounded-lg border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <p className="text-body-sm">
                       <Identifier label="کد رهگیری نمونه:" value={sample.trackingCode} />
@@ -245,8 +261,8 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
                     </StatusBadge>
                   </div>
                   <p className="mt-sm text-caption text-text-secondary">
-                    زمان نمونه‌گیری: {formatCivilDateFa(sample.collectedAt.toISOString().slice(0, 10))} ·
-                    نگهدارنده: {vet?.displayNameFa ?? '—'}
+                    زمان نمونه‌گیری: {formatCivilDateFa(sample.collectedAt.toISOString().slice(0, 10))} · نگهدارنده:{' '}
+                    {vet?.displayNameFa ?? '—'}
                   </p>
                   {sample.unusableReasonFa ? (
                     <p className="mt-2xs text-caption text-text-secondary">دلیل: {sample.unusableReasonFa}</p>
@@ -278,34 +294,57 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
 
         {done && chip ? (
           <Card>
-            <h3 className="text-label-lg">مرور نهایی خدمت</h3>
-            <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm" data-testid="service-summary">
-              <dt className="text-text-secondary">حیوان</dt>
-              <dd>{view.animalName ?? 'بدون نام'}</dd>
-              <dt className="text-text-secondary">شناسه پرونده حیوان</dt>
-              <dd>
-                <Identifier value={request.animalId} />
-              </dd>
-              <dt className="text-text-secondary">نوع خدمت</dt>
-              <dd>{SERVICE_TYPE_FA[request.serviceType]}</dd>
-              <dt className="text-text-secondary">شماره میکروچیپ</dt>
-              <dd>
-                <Identifier value={chip.number} />
-              </dd>
-              <dt className="text-text-secondary">دامپزشک و کد نظام</dt>
-              <dd>
-                {vet?.displayNameFa ?? '—'} · {vet?.councilCode ?? '—'}
-              </dd>
-              <dt className="text-text-secondary">مرکز</dt>
-              <dd>{location?.nameFa ?? '—'}</dd>
-              <dt className="text-text-secondary">زمان انجام خدمت</dt>
-              <dd>
-                {latest ? formatCivilDateFa(latest.collectedAt.toISOString().slice(0, 10)) : '—'}
-              </dd>
-              <dt className="text-text-secondary">کد رهگیری نمونه</dt>
-              <dd>{latest ? <Identifier value={latest.trackingCode} /> : '—'}</dd>
-              <dt className="text-text-secondary">وضعیت</dt>
-              <dd>{REQUEST_STATUS_FA[request.status]}</dd>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>مرور نهایی خدمت</span>
+              </h3>
+            </div>
+            <dl className="hz-kv mt-md" data-testid="service-summary">
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">حیوان</dt>
+                <dd className="hz-kv__value">{view.animalName ?? 'بدون نام'}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">شناسه پرونده حیوان</dt>
+                <dd className="hz-kv__value">
+                  <Identifier value={request.animalId} />
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">نوع خدمت</dt>
+                <dd className="hz-kv__value">{SERVICE_TYPE_FA[request.serviceType]}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">شماره میکروچیپ</dt>
+                <dd className="hz-kv__value">
+                  <Identifier value={chip.number} />
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">دامپزشک و کد نظام</dt>
+                <dd className="hz-kv__value">
+                  {vet?.displayNameFa ?? '—'} · {vet?.councilCode ?? '—'}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">مرکز</dt>
+                <dd className="hz-kv__value">{location?.nameFa ?? '—'}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">زمان انجام خدمت</dt>
+                <dd className="hz-kv__value">
+                  {latest ? formatCivilDateFa(latest.collectedAt.toISOString().slice(0, 10)) : '—'}
+                </dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">کد رهگیری نمونه</dt>
+                <dd className="hz-kv__value">{latest ? <Identifier value={latest.trackingCode} /> : '—'}</dd>
+              </div>
+              <div className="hz-kv__row">
+                <dt className="hz-kv__key">وضعیت</dt>
+                <dd className="hz-kv__value">{REQUEST_STATUS_FA[request.status]}</dd>
+              </div>
             </dl>
             <Alert tone="info" title="امضای فیزیکی برگه در محل">
               <span data-testid="physical-signature-note">
@@ -318,12 +357,17 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
 
         {request.status === 'SUPERSEDED' && request.supersededByRequestId ? (
           <Card>
-            <h3 className="text-label-lg">این درخواست جایگزین شد</h3>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>این درخواست جایگزین شد</span>
+              </h3>
+            </div>
             <p className="mt-md text-body-sm">{request.supersedeReasonFa}</p>
             <p className="mt-md text-body-sm">
               <Link
                 href={'/vet/requests/' + request.supersededByRequestId}
-                className="text-text-brand underline underline-offset-4"
+                className="hz-link"
                 data-testid="open-replacement-request"
               >
                 رفتن به درخواست جدید برای پذیرش

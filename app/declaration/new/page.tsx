@@ -7,6 +7,7 @@ import { db } from '../../../src/db/client.ts';
 import { eligibilityFor } from '../../../src/domain/eligibility/service.ts';
 import { ownAnimals, NO_OFFICIAL_EFFECT_NOTE_FA } from '../../../src/mating/declaration.ts';
 import { StartDeclarationForm } from '../forms.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,19 +26,21 @@ export default async function NewDeclarationPage() {
   const animals = eligibility.allowed ? await ownAnimals(db(), guard.actor) : [];
 
   return (
-    <PublicShell actor={guard.actor} title="ثبت اعلام توافق شخصی" pathname="/declaration/new">
+    <PublicShell
+      actor={guard.actor}
+      title="ثبت اعلام توافق شخصی"
+      pathname="/declaration/new"
+      header={<PageHeader title={'ثبت اعلام توافق شخصی'} back={{ href: '/declaration' }} />}
+    >
       <div className="space-y-lg">
-        {eligibility.allowed ? null : (
-          <LockedServiceCard serviceLabel="اعلام توافق شخصی" lock={eligibility.lock} />
-        )}
+        {eligibility.allowed ? null : <LockedServiceCard serviceLabel="اعلام توافق شخصی" lock={eligibility.lock} />}
 
         {eligibility.allowed ? (
           animals.length === 0 ? (
             <Card>
               <Alert tone="warning" title="حیوان ثبت‌شده‌ای برای این مسیر ندارید">
                 <span data-testid="no-animal">
-                  این سرویس به دو پرونده حیوان موجود در هم‌زیست نیاز دارد؛ برگه ثبتی و شجره‌نامه شرط آن
-                  نیستند.
+                  این سرویس به دو پرونده حیوان موجود در هم‌زیست نیاز دارد؛ برگه ثبتی و شجره‌نامه شرط آن نیستند.
                 </span>
               </Alert>
             </Card>

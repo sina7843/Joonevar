@@ -5,20 +5,13 @@ import { Card } from '../../src/ui/card.tsx';
 import { Button } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { TextField } from '../../src/ui/field.tsx';
-import {
-  confirmDateAction,
-  declareDateAction,
-  differentDateAction,
-  type DateFormState,
-} from './dates-actions.ts';
+import { confirmDateAction, declareDateAction, differentDateAction, type DateFormState } from './dates-actions.ts';
 
 const EMPTY: DateFormState = {};
 
 function Result({ state }: { state: DateFormState }) {
   if (!state.message) return null;
-  return (
-    <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />
-  );
+  return <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />;
 }
 
 /**
@@ -43,19 +36,20 @@ export function DeclareDateForm({
   const suffix = replacesVersion === null ? '' : '-correction';
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>
-        {replacesVersion === null ? 'اعلام تاریخ جفت‌گیری' : 'اصلاح تاریخ (نسخه جدید)'}
-      </span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>{replacesVersion === null ? 'اعلام تاریخ جفت‌گیری' : 'اصلاح تاریخ (نسخه جدید)'}</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        هر دو طرف می‌توانند یک یا چند تاریخ اعلام کنند. اصلاح، نسخه تازه‌ای می‌سازد و رکورد قبلی حذف
-        نمی‌شود؛ نسخه اصلاح‌شده دوباره باید به تأیید طرف مقابل برسد.
+        هر دو طرف می‌توانند یک یا چند تاریخ اعلام کنند. اصلاح، نسخه تازه‌ای می‌سازد و رکورد قبلی حذف نمی‌شود؛ نسخه
+        اصلاح‌شده دوباره باید به تأیید طرف مقابل برسد.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid={'declare-date-form' + suffix}>
         <input type="hidden" name="permitId" value={permitId} />
         <input type="hidden" name="kind" value={kind} />
-        {replacesVersion === null ? null : (
-          <input type="hidden" name="replacesVersion" value={replacesVersion} />
-        )}
+        {replacesVersion === null ? null : <input type="hidden" name="replacesVersion" value={replacesVersion} />}
         <Result state={state} />
         <TextField
           label="تاریخ جفت‌گیری (میلادی، YYYY-MM-DD)"
@@ -98,9 +92,17 @@ export function RespondToDateForm({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پاسخ شما به نسخه {version}</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>پاسخ شما به نسخه {version}</span>
+        </h2>
+      </div>
       <p className="mt-md text-body-sm" data-testid="pending-date-value">
-        تاریخ اعلام‌شده: <span dir="ltr" className="font-mono">{matedOn}</span>
+        تاریخ اعلام‌شده:{' '}
+        <span dir="ltr" className="font-mono">
+          {matedOn}
+        </span>
       </p>
 
       <form action={confirm} className="mt-lg space-y-lg" data-testid="confirm-date-form">

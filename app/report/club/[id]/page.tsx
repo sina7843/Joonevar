@@ -7,6 +7,7 @@ import { Card } from '../../../../src/ui/card.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { reportableClub } from '../../../../src/clubs/service.ts';
 import { ClubReportForm } from '../../../../src/clubs/forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,12 @@ export default async function ReportClubPage({ params }: { params: Promise<{ id:
   if (club === null) notFound();
 
   return (
-    <PublicShell actor={guard.actor} title="گزارش کلاب" pathname={path}>
+    <PublicShell
+      actor={guard.actor}
+      title="گزارش کلاب"
+      pathname={path}
+      header={<PageHeader title={'گزارش کلاب'} back={{ href: '/dashboard' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <p className="text-caption text-text-secondary">کلاب</p>
@@ -34,7 +40,8 @@ export default async function ReportClubPage({ params }: { params: Promise<{ id:
             </Link>
           </h2>
           <p className="mt-xs text-body-sm text-text-secondary">
-            گزارش شما به ادمین محتوا می‌رسد و با دلیل بررسی می‌شود. هر حساب برای هر کلاب تا بسته‌شدن بررسی، یک گزارش باز دارد.
+            گزارش شما به ادمین محتوا می‌رسد و با دلیل بررسی می‌شود. هر حساب برای هر کلاب تا بسته‌شدن بررسی، یک گزارش باز
+            دارد.
           </p>
         </Card>
         <Card>

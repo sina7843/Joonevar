@@ -4,20 +4,21 @@ import { notFound } from 'next/navigation';
 import { db } from '../../../../src/db/client.ts';
 import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
-import { JsonLdScript } from '../../../../src/seo/json-ld.tsx';
-import { breadcrumbLd } from '../../../../src/seo/structured-data.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
-import { publicListing } from '../../../../src/marketplace/public-listings.ts';
-import { PROMOTED_LABEL_FA } from '../../../../src/marketplace/discovery-model.ts';
+import { Icon } from '../../../../src/ui/icon.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
+import { publicListing, publicListings } from '../../../../src/marketplace/public-listings.ts';
+import { PROMOTED_LABEL_FA, parseListingFilter } from '../../../../src/marketplace/discovery-model.ts';
 import { SELLER_KIND_FA } from '../../../../src/marketplace/listing-eligibility.ts';
 import { AskToBuyForm } from '../../../account/purchases/forms.tsx';
+import { ListingCard, ListingPrice } from '../listing-card.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const fa = (value: number | bigint): string => value.toLocaleString('fa-IR');
+const DATE_FA = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { dateStyle: 'long', timeZone: 'Asia/Tehran' });
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -41,8 +42,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   );
 }
 
+function Row({ label, children, testId, empty = false }: { label: string; children: React.ReactNode; testId?: string; empty?: boolean }) {
+  return (
+    <div className="hz-kv__row">
+      <dt className="hz-kv__key">{label}</dt>
+      <dd className={empty ? 'hz-kv__value hz-kv__value--empty' : 'hz-kv__value'} data-testid={testId}>
+        {children}
+      </dd>
+    </div>
+  );
+}
+
 /**
- * One public advert — Phase 3, PROMPT-004.
+ * One public advert — Phase 3, PROMPT-004, drawn as DS P03 / key screen K6:
+ * the gallery and the animal's facts in the main column, the price, the ask-to-
+ * buy form and the seller in the side column (sticky from 1024), then similar
+ * adverts.
  *
  * Two halves, the same way the seller's own page is split. What Hamzist holds
  * about the animal is stated as fact and read from the animal record. What only
@@ -67,163 +82,211 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
   ];
   const images = listing.mediaFileIds.filter((item) => item.kind === 'IMAGE');
   const video = listing.mediaFileIds.find((item) => item.kind === 'VIDEO') ?? null;
+  const sexFa = listing.animal.sex === 'MALE' ? 'نر' : listing.animal.sex === 'FEMALE' ? 'ماده' : null;
+  // Similar adverts: the newest public ones, this one left out. Hidden when there are none.
+  const similar = (await publicListings(db(), { ...parseListingFilter({}), page: 1, pageSize: 5 })).items
+    .filter((card) => card.id !== listing.id)
+    .slice(0, 4);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-lg px-lg py-lg">
-      <JsonLdScript data={breadcrumbLd(crumbs, origin)} />
-      <Breadcrumbs items={crumbs} origin={origin} />
+    <div className="space-y-s48 lg:space-y-s64">
+      <div className="space-y-xl">
+        <div className="space-y-md">
+          <Breadcrumbs items={crumbs} origin={origin} />
+          <PageHeader
+            title={<span data-testid="listing-title">{listing.titleFa}</span>}
+            aside={
+              listing.promoted || listing.reserved ? (
+                <span className="flex flex-wrap gap-xs">
+                  {listing.promoted ? (
+                    <StatusBadge tone="warning">
+                      <span data-testid="listing-ad-label">{PROMOTED_LABEL_FA}</span>
+                    </StatusBadge>
+                  ) : null}
+                  {listing.reserved ? (
+                    <StatusBadge tone="neutral">
+                      <span data-testid="listing-reserved">رزروشده</span>
+                    </StatusBadge>
+                  ) : null}
+                </span>
+              ) : undefined
+            }
+            meta={[
+              ...(listing.animal.breedFa
+                ? [
+                    <>
+                      <Icon name="pawPrint" size="xs" />
+                      {listing.animal.breedFa}
+                    </>,
+                  ]
+                : []),
+              ...(sexFa ? [sexFa] : []),
+              ...(listing.placeFa
+                ? [
+                    <>
+                      <Icon name="mapPin" size="xs" />
+                      {listing.placeFa}
+                    </>,
+                  ]
+                : []),
+              ...(listing.publishedAt ? ['منتشرشده ' + DATE_FA.format(listing.publishedAt)] : []),
+            ]}
+          />
+        </div>
 
-      <header className="space-y-sm">
-        <div className="flex flex-wrap items-start justify-between gap-sm">
-          <h1 className="text-h2" data-testid="listing-title">
-            {listing.titleFa}
-          </h1>
-          <div className="flex flex-wrap gap-xs">
-            {listing.promoted ? (
-              <StatusBadge tone="warning">
-                <span data-testid="listing-ad-label">{PROMOTED_LABEL_FA}</span>
-              </StatusBadge>
+        <div className="grid gap-xl lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
+          {/* Gallery: 4:3, the first photo large, the rest beside it. */}
+          <div className="min-w-0 space-y-md lg:col-start-1">
+            {images.length > 0 ? (
+              <ul className="grid grid-cols-4 gap-sm" data-testid="listing-images">
+                {images.map((item, index) => (
+                  <li key={index + item.fileId} className={index === 0 ? 'col-span-4' : undefined}>
+                    <RecordImage fileId={item.fileId} altFa={item.altFa} variant="4x3" priority={index === 0} className="rounded-xl" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <RecordImage fileId={null} altFa={listing.titleFa} variant="4x3" className="rounded-xl" />
+            )}
+            {video ? (
+              <video controls preload="metadata" className="w-full rounded-xl border border-border-default" data-testid="listing-video">
+                <source src={'/media/' + video.fileId} type="video/mp4" />
+              </video>
             ) : null}
+          </div>
+
+          {/* Side column: price and the one action, the seller, the safety note. */}
+          <aside aria-label="خرید و فروشنده" className="min-w-0 space-y-lg lg:sticky lg:top-[calc(var(--header-site)+24px)] lg:col-start-2 lg:row-span-2 lg:row-start-1">
+            <section className="hz-card space-y-md" aria-label="قیمت">
+              <ListingPrice mode={listing.priceMode} amount={listing.priceToman} size="lg" testId="listing-price" />
+              {listing.handoverFromFa ? (
+                <p className="hz-meta__item text-body-sm" data-testid="listing-handover">
+                  <Icon name="calendarBlank" size="xs" />
+                  زودترین تاریخ تحویل: {listing.handoverFromFa}
+                </p>
+              ) : null}
+              <Alert tone="info" title="پیش از هر پرداختی این را بخوانید">
+                <span data-testid="listing-safety">
+                  بیعانه فقط داخل همزیست پرداخت می‌شود و برابر کارمزد همزیست است. باقی مبلغ بیرون از همزیست تسویه
+                  می‌شود و همزیست درباره آن داوری نمی‌کند.
+                </span>
+              </Alert>
+            </section>
+
+            {/*
+              Asking to buy is where the public part ends (PROMPT-005). Reading the
+              advert needs nothing; the request itself needs a verified identity, and
+              the server says so when the form is posted — the page never decides it.
+            */}
             {listing.reserved ? (
-              <StatusBadge tone="info">
-                <span data-testid="listing-reserved">رزروشده</span>
-              </StatusBadge>
+              <Alert tone="neutral" title="این حیوان رزرو شده است">
+                <span data-testid="listing-reserved-notice">
+                  بیعانه این آگهی پرداخت شده و فعلاً درخواست تازه‌ای پذیرفته نمی‌شود.
+                </span>
+              </Alert>
+            ) : (
+              <AskToBuyForm listingId={listing.id} negotiable={listing.priceMode === 'NEGOTIABLE'} />
+            )}
+
+            <article className="hz-card hz-seller" aria-label="فروشنده">
+              <p className="hz-caption">فروشنده</p>
+              <div className="hz-entity mt-sm">
+                <RecordImage variant="thumb-lg" fileId={null} altFa={null} />
+                <div className="hz-entity__body">
+                  <h2 className="hz-entity__name">{listing.kennelNameFa ?? SELLER_KIND_FA[listing.sellerKind as 'OWNER' | 'KENNEL']}</h2>
+                  <span className="hz-entity__meta">
+                    {[SELLER_KIND_FA[listing.sellerKind as 'OWNER' | 'KENNEL'], listing.placeFa].filter(Boolean).join('، ')}
+                  </span>
+                </div>
+              </div>
+            </article>
+
+            <p className="hz-body-sm">
+              <Link href={'/report/listing/' + listing.id} className="hz-link hz-link--standalone" data-testid="report-listing-link">
+                <Icon name="flag" size="xs" />
+                گزارش این آگهی
+              </Link>
+            </p>
+          </aside>
+
+          <div className="min-w-0 space-y-lg lg:col-start-1">
+            <section className="hz-card" aria-labelledby="listing-facts-title">
+              <SectionHeader size="sm" id="listing-facts-title" title="مشخصات حیوان" link={{ href: '/verify', label: 'استعلام اصالت' }} />
+              <p className="hz-caption">این موارد از پرونده ثبت‌شده حیوان در همزیست خوانده می‌شوند.</p>
+              <dl className="hz-kv hz-kv--2col mt-sm" data-testid="listing-facts">
+                <Row label="نژاد" empty={!listing.animal.breedFa}>
+                  {listing.animal.breedFa ?? 'تعیین‌نشده'}
+                </Row>
+                <Row label="جنسیت" empty={sexFa === null}>
+                  {sexFa ?? 'ثبت نشده'}
+                </Row>
+                <Row label="تاریخ تولد" empty={!listing.animal.birthDate}>
+                  <bdi>{listing.animal.birthDate ?? 'ثبت نشده'}</bdi>
+                  {listing.animal.birthDateApproximate ? ' (تقریبی)' : ''}
+                </Row>
+                <Row label="میکروچیپ" testId="listing-fact-chip">
+                  {listing.animal.microchipRegistered ? 'ثبت‌شده' : 'ثبت نشده'}
+                </Row>
+                <Row label="شجره‌نامه">{listing.animal.pedigreeIssued ? 'صادرشده' : 'صادر نشده'}</Row>
+                <Row label="تست اصالت والدین">{listing.animal.parentageFinal ? 'نتیجه نهایی دارد' : 'ندارد'}</Row>
+              </dl>
+            </section>
+
+            <section className="hz-card" aria-labelledby="listing-declared-title">
+              <SectionHeader size="sm" id="listing-declared-title" title="اظهارات فروشنده" />
+              <p className="hz-caption" data-testid="listing-disclaimer">
+                همزیست سابقه واکسیناسیون، عقیم‌سازی و وضعیت سلامت را نگه نمی‌دارد. موارد زیر اظهار فروشنده‌اند و
+                توسط همزیست تأیید نشده‌اند.
+              </p>
+              <ul className="hz-kv mt-sm" data-testid="listing-declarations">
+                <li className="hz-kv__row">
+                  <span className="hz-kv__key">واکسیناسیون:</span> <span className="hz-kv__value">{listing.vaccinationFa ?? 'اعلام نشده'}</span>
+                </li>
+                <li className="hz-kv__row">
+                  <span className="hz-kv__key">عقیم‌سازی:</span> <span className="hz-kv__value">{listing.neuterFa ?? 'اعلام نشده'}</span>
+                </li>
+                {listing.healthNoteFa ? (
+                  <li className="hz-kv__row">
+                    <span className="hz-kv__key">یادداشت سلامت:</span> <span className="hz-kv__value">{listing.healthNoteFa}</span>
+                  </li>
+                ) : null}
+                <li className="hz-kv__row">
+                  <span className="hz-kv__key">دلیل فروش:</span> <span className="hz-kv__value">{listing.reasonForSaleFa ?? 'اعلام نشده'}</span>
+                </li>
+              </ul>
+            </section>
+
+            {listing.descriptionFa ? (
+              <section className="hz-card" aria-labelledby="listing-description-title">
+                <SectionHeader size="sm" id="listing-description-title" title="توضیح آگهی" />
+                <p className="hz-body whitespace-pre-line" data-testid="listing-description">
+                  {listing.descriptionFa}
+                </p>
+              </section>
             ) : null}
+
+            <section className="hz-card" aria-labelledby="listing-delivery-title">
+              <SectionHeader size="sm" id="listing-delivery-title" title="تحویل" />
+              <p className="hz-body" data-testid="listing-delivery">
+                {listing.deliveryFa.length > 0 ? listing.deliveryFa.join('، ') : 'اعلام نشده'}
+              </p>
+            </section>
           </div>
         </div>
-        <p className="text-label-lg" data-testid="listing-price">
-          {listing.priceMode === 'NEGOTIABLE'
-            ? 'قیمت توافقی'
-            : listing.priceToman !== null
-              ? fa(listing.priceToman) + ' تومان'
-              : 'قیمت اعلام نشده'}
-        </p>
-        <p className="text-caption text-text-secondary">
-          {[SELLER_KIND_FA[listing.sellerKind as 'OWNER' | 'KENNEL'], listing.kennelNameFa, listing.placeFa]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
-      </header>
+      </div>
 
-      {images.length > 0 ? (
-        <ul className="grid gap-md md:grid-cols-2" data-testid="listing-images">
-          {images.map((item, index) => (
-            <li key={item.fileId}>
-              <RecordImage fileId={item.fileId} altFa={item.altFa} variant="banner" priority={index === 0} />
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {video ? (
-        <video
-          controls
-          preload="metadata"
-          className="w-full rounded-lg border border-border-default"
-          data-testid="listing-video"
-        >
-          <source src={'/media/' + video.fileId} type="video/mp4" />
-        </video>
-      ) : null}
-
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اطلاعات قطعی از پرونده حیوان</span></h2></div>
-        <p className="text-caption text-text-secondary">
-          این موارد از پرونده ثبت‌شده حیوان در همزیست خوانده می‌شوند.
-        </p>
-        <dl className="grid gap-sm text-body-sm md:grid-cols-2" data-testid="listing-facts">
-          <div>
-            <dt className="text-caption text-text-secondary">نژاد</dt>
-            <dd>{listing.animal.breedFa ?? 'نامشخص'}</dd>
-          </div>
-          <div>
-            <dt className="text-caption text-text-secondary">جنسیت</dt>
-            <dd>{listing.animal.sex === 'MALE' ? 'نر' : listing.animal.sex === 'FEMALE' ? 'ماده' : 'ثبت نشده'}</dd>
-          </div>
-          <div>
-            <dt className="text-caption text-text-secondary">تاریخ تولد</dt>
-            <dd>
-              <bdi>{listing.animal.birthDate ?? 'ثبت نشده'}</bdi>
-              {listing.animal.birthDateApproximate ? ' (تقریبی)' : ''}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-caption text-text-secondary">میکروچیپ</dt>
-            <dd data-testid="listing-fact-chip">{listing.animal.microchipRegistered ? 'ثبت‌شده' : 'ثبت نشده'}</dd>
-          </div>
-          <div>
-            <dt className="text-caption text-text-secondary">شجره‌نامه</dt>
-            <dd>{listing.animal.pedigreeIssued ? 'صادرشده' : 'صادر نشده'}</dd>
-          </div>
-          <div>
-            <dt className="text-caption text-text-secondary">تست اصالت والدین</dt>
-            <dd>{listing.animal.parentageFinal ? 'نتیجه نهایی دارد' : 'ندارد'}</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اظهارات فروشنده</span></h2></div>
-        <p className="text-caption text-text-secondary" data-testid="listing-disclaimer">
-          همزیست سابقه واکسیناسیون، عقیم‌سازی و وضعیت سلامت را نگه نمی‌دارد. موارد زیر اظهار فروشنده‌اند و
-          توسط همزیست تأیید نشده‌اند.
-        </p>
-        <ul className="space-y-2xs text-body-sm" data-testid="listing-declarations">
-          <li>واکسیناسیون: {listing.vaccinationFa ?? 'اعلام نشده'}</li>
-          <li>عقیم‌سازی: {listing.neuterFa ?? 'اعلام نشده'}</li>
-          {listing.healthNoteFa ? <li>یادداشت سلامت: {listing.healthNoteFa}</li> : null}
-          <li>دلیل فروش: {listing.reasonForSaleFa ?? 'اعلام نشده'}</li>
-        </ul>
-      </section>
-
-      {listing.descriptionFa ? (
-        <section className="space-y-sm rounded-xl border border-border-default p-lg">
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>توضیح آگهی</span></h2></div>
-          <p className="whitespace-pre-line text-body-sm" data-testid="listing-description">
-            {listing.descriptionFa}
-          </p>
+      {similar.length > 0 ? (
+        <section aria-labelledby="similar-title">
+          <SectionHeader id="similar-title" title="آگهی‌های مشابه" link={{ href: '/animals-market' }} />
+          <ul className="grid grid-cols-2 gap-md md:gap-s20 lg:grid-cols-4">
+            {similar.map((card) => (
+              <li key={card.id}>
+                <ListingCard card={card} />
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
-
-      <section className="space-y-sm rounded-xl border border-border-default p-lg">
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تحویل</span></h2></div>
-        <p className="text-body-sm" data-testid="listing-delivery">
-          {listing.deliveryFa.length > 0 ? listing.deliveryFa.join('، ') : 'اعلام نشده'}
-        </p>
-        {listing.handoverFromFa ? (
-          <p className="text-caption text-text-secondary" data-testid="listing-handover">
-            زودترین تاریخ تحویل: {listing.handoverFromFa}
-          </p>
-        ) : null}
-      </section>
-
-      <Alert tone="info" title="پیش از هر پرداختی این را بخوانید">
-        <span data-testid="listing-safety">
-          بیعانه فقط داخل همزیست پرداخت می‌شود و برابر کارمزد همزیست است. باقی مبلغ بیرون از همزیست تسویه
-          می‌شود و همزیست درباره آن داوری نمی‌کند.
-        </span>
-      </Alert>
-
-      {/*
-        Asking to buy is where the public part ends (PROMPT-005). Reading the
-        advert needs nothing; the request itself needs a verified identity, and
-        the server says so when the form is posted — the page never decides it.
-      */}
-      {listing.reserved ? (
-        <Alert tone="info" title="این حیوان رزرو شده است">
-          <span data-testid="listing-reserved-notice">
-            بیعانه این آگهی پرداخت شده و فعلاً درخواست تازه‌ای پذیرفته نمی‌شود.
-          </span>
-        </Alert>
-      ) : (
-        <AskToBuyForm listingId={listing.id} negotiable={listing.priceMode === 'NEGOTIABLE'} />
-      )}
-
-      <p className="text-caption">
-        <Link href={'/report/listing/' + listing.id} className="text-text-brand" data-testid="report-listing-link">
-          گزارش این آگهی
-        </Link>
-      </p>
     </div>
   );
 }

@@ -17,7 +17,7 @@ function inline(nodes: readonly InlineNode[]): ReactNode {
       <a
         key={index}
         href={node.href}
-        className="text-text-brand underline underline-offset-4"
+       
         // An address a reader supplied is never vouched for by the site.
         {...(external ? { rel: 'nofollow noopener noreferrer', target: '_blank' } : {})}
       >
@@ -30,18 +30,18 @@ function inline(nodes: readonly InlineNode[]): ReactNode {
 function block(item: Block, index: number): ReactNode {
   if (item.kind === 'heading') {
     return item.level === 2 ? (
-      <h2 key={index} className="text-h3 text-text-primary">
+      <h2 key={index}>
         {inline(item.children)}
       </h2>
     ) : (
-      <h3 key={index} className="text-label-lg text-text-primary">
+      <h3 key={index}>
         {inline(item.children)}
       </h3>
     );
   }
   if (item.kind === 'quote') {
     return (
-      <blockquote key={index} className="border-s-2 border-border-brand ps-lg text-text-secondary">
+      <blockquote key={index}>
         {inline(item.children)}
       </blockquote>
     );
@@ -49,11 +49,11 @@ function block(item: Block, index: number): ReactNode {
   if (item.kind === 'list') {
     const items = item.items.map((entry, i) => <li key={i}>{inline(entry)}</li>);
     return item.ordered ? (
-      <ol key={index} className="list-decimal space-y-xs ps-lg">
+      <ol key={index}>
         {items}
       </ol>
     ) : (
-      <ul key={index} className="list-disc space-y-xs ps-lg">
+      <ul key={index} className="list-disc">
         {items}
       </ul>
     );
@@ -62,5 +62,5 @@ function block(item: Block, index: number): ReactNode {
 }
 
 export function RichText({ source, className = '' }: { source: string; className?: string }) {
-  return <div className={'space-y-md ' + className}>{parseRichText(source).map(block)}</div>;
+  return <div className={('hz-prose ' + className).trim()}>{parseRichText(source).map(block)}</div>;
 }

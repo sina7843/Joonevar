@@ -45,27 +45,46 @@ export function IdentityPanel({
   if (verified) {
     return (
       <Card>
-        <h3 className="text-label-lg">مشخصات رسمی حیوان</h3>
+        <div className="hz-section-header hz-section-header--sm">
+          <h3 className="hz-section-header__title">
+            <span className="hz-section-header__bar" aria-hidden="true" />
+            <span>مشخصات رسمی حیوان</span>
+          </h3>
+        </div>
         <p className="mt-md text-caption text-text-secondary" data-testid="identity-locked">
-          این مشخصات در {verified.at.toLocaleDateString('fa-IR')} ثبت شده‌اند و تغییر نمی‌کنند. اصلاح آن‌ها از
-          همان مسیری انجام می‌شود که آن‌ها را ساخته است.
+          این مشخصات در {verified.at.toLocaleDateString('fa-IR')} ثبت شده‌اند و تغییر نمی‌کنند. اصلاح آن‌ها از همان
+          مسیری انجام می‌شود که آن‌ها را ساخته است.
         </p>
-        <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="identity-summary">
-          <dt className="text-text-secondary">نام</dt>
-          <dd>{defaults.name ?? '—'}</dd>
-          <dt className="text-text-secondary">نژاد</dt>
-          <dd>{breedName ? breedName.nameFa : '—'}</dd>
-          <dt className="text-text-secondary">جنسیت</dt>
-          <dd>{defaults.sex === 'MALE' ? 'نر' : defaults.sex === 'FEMALE' ? 'ماده' : '—'}</dd>
-          <dt className="text-text-secondary">تاریخ تولد</dt>
-          <dd>
-            {defaults.birthDate ?? '—'}
-            {defaults.birthDateApproximate ? ' (تقریبی)' : ''}
-          </dd>
-          <dt className="text-text-secondary">رنگ</dt>
-          <dd>{defaults.color ?? '—'}</dd>
-          <dt className="text-text-secondary">علائم ظاهری</dt>
-          <dd>{defaults.markings ?? '—'}</dd>
+        <dl className="hz-kv mt-lg" data-testid="identity-summary">
+          <div className="hz-kv__row">
+            <dt className="hz-kv__key">نام</dt>
+            <dd className="hz-kv__value">{defaults.name ?? '—'}</dd>
+          </div>
+          <div className="hz-kv__row">
+            <dt className="hz-kv__key">نژاد</dt>
+            <dd className="hz-kv__value">{breedName ? breedName.nameFa : '—'}</dd>
+          </div>
+          <div className="hz-kv__row">
+            <dt className="hz-kv__key">جنسیت</dt>
+            <dd className="hz-kv__value">
+              {defaults.sex === 'MALE' ? 'نر' : defaults.sex === 'FEMALE' ? 'ماده' : '—'}
+            </dd>
+          </div>
+          <div className="hz-kv__row">
+            <dt className="hz-kv__key">تاریخ تولد</dt>
+            <dd className="hz-kv__value">
+              {defaults.birthDate ?? '—'}
+              {defaults.birthDateApproximate ? ' (تقریبی)' : ''}
+            </dd>
+          </div>
+          <div className="hz-kv__row">
+            <dt className="hz-kv__key">رنگ</dt>
+            <dd className="hz-kv__value">{defaults.color ?? '—'}</dd>
+          </div>
+          <div className="hz-kv__row">
+            <dt className="hz-kv__key">علائم ظاهری</dt>
+            <dd className="hz-kv__value">{defaults.markings ?? '—'}</dd>
+          </div>
         </dl>
       </Card>
     );
@@ -73,17 +92,20 @@ export function IdentityPanel({
 
   return (
     <Card>
-      <h3 className="text-label-lg">مشخصات رسمی حیوان</h3>
+      <div className="hz-section-header hz-section-header--sm">
+        <h3 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>مشخصات رسمی حیوان</span>
+        </h3>
+      </div>
       <Alert tone="warning" title="پیش از ثبت میکروچیپ تکمیل شود">
-        آنچه مالک وارد کرده اظهار اوست. مشخصات رسمی همین‌جا و با دیدن حیوان ثبت می‌شود و پس از ثبت تغییر
-        نمی‌کند؛ میکروچیپ هم تا آن زمان ثبت نمی‌شود.
+        آنچه مالک وارد کرده اظهار اوست. مشخصات رسمی همین‌جا و با دیدن حیوان ثبت می‌شود و پس از ثبت تغییر نمی‌کند؛
+        میکروچیپ هم تا آن زمان ثبت نمی‌شود.
       </Alert>
 
       <form action={submit} className="mt-lg space-y-lg" data-testid="identity-form">
         <input type="hidden" name="requestId" value={requestId} />
-        {state.message ? (
-          <Alert tone={state.ok ? 'success' : 'error'} title={state.message} />
-        ) : null}
+        {state.message ? <Alert tone={state.ok ? 'success' : 'error'} title={state.message} /> : null}
 
         <TextField
           label="نام حیوان"
@@ -120,23 +142,18 @@ export function IdentityPanel({
           defaultValue={defaults.birthDate ?? ''}
           data-testid="identity-birth-date"
         />
-        <label className="flex items-center gap-sm text-label-md">
+        <label className="hz-check">
           <input
             type="checkbox"
             name="birthDateApproximate"
             defaultChecked={defaults.birthDateApproximate}
-            className="size-[var(--size-selection-md)]"
             data-testid="identity-birth-approximate"
           />
-          تاریخ تولد تقریبی است
+          <span className="hz-check__text">
+            <span className="hz-check__label">تاریخ تولد تقریبی است</span>
+          </span>
         </label>
-        <TextField
-          label="رنگ"
-          name="color"
-          required
-          defaultValue={defaults.color ?? ''}
-          data-testid="identity-color"
-        />
+        <TextField label="رنگ" name="color" required defaultValue={defaults.color ?? ''} data-testid="identity-color" />
         <TextField
           label="علائم ظاهری"
           name="markings"

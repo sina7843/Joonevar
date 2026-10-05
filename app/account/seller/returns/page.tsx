@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { Card } from '../../../../src/ui/card.tsx';
@@ -40,8 +41,8 @@ export default async function SellerReturnsPage({
   const store = stores.find((row) => row.id === requested) ?? stores[0] ?? null;
   if (store === null) {
     return (
-      <PublicShell actor={guard.actor} title="مرجوعی‌های فروشگاه" pathname="/account/seller">
-        <div className="space-y-lg p-lg">
+      <PublicShell actor={guard.actor} title="مرجوعی‌های فروشگاه" pathname="/account/seller" header={<PageHeader title="مرجوعی‌های فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+        <div className="space-y-xl">
           <p className="text-body-sm text-text-secondary" data-testid="returns-no-store">
             هنوز فروشگاهی ندارید.
           </p>
@@ -53,10 +54,10 @@ export default async function SellerReturnsPage({
   const returns = await sellerReturns(db(), guard.actor, store.id);
 
   return (
-    <PublicShell actor={guard.actor} title="مرجوعی‌های فروشگاه" pathname="/account/seller">
-      <div className="space-y-lg p-lg">
-        <p className="text-caption">
-          <Link href="/account/seller/orders" className="text-text-brand" data-testid="back-to-seller-orders">
+    <PublicShell actor={guard.actor} title="مرجوعی‌های فروشگاه" pathname="/account/seller" header={<PageHeader title="مرجوعی‌های فروشگاه" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+      <div className="space-y-xl">
+        <p>
+          <Link href="/account/seller/orders" className="hz-link hz-link--standalone" data-testid="back-to-seller-orders">
             بازگشت به سفارش‌ها
           </Link>
         </p>
@@ -72,7 +73,7 @@ export default async function SellerReturnsPage({
             مرجوعی‌ای برای این فروشگاه ثبت نشده است.
           </p>
         ) : (
-          <ul className="space-y-lg" data-testid="seller-returns">
+          <ul className="hz-cardlist" data-testid="seller-returns">
             {returns.map((view) => (
               <li key={view.row.id}>
                 <Card>

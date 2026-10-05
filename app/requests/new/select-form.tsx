@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '../../../src/ui/card.tsx';
-import { Button } from '../../../src/ui/button.tsx';
+import { ActionRow, Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { SERVICE_TYPE_FA, type VisitServiceTypeName } from '../../../src/domain/referral.ts';
 import { encodeSelection } from '../selection.ts';
@@ -50,7 +50,12 @@ export function SelectAnimalsForm({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انتخاب حیوان و نوع خدمت</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>انتخاب حیوان و نوع خدمت</span>
+        </h2>
+      </div>
       {single ? null : (
         <p className="mt-md text-caption text-text-secondary">
           نوع خدمت هر حیوان جداگانه انتخاب می‌شود؛ انتخاب یک حیوان روی بقیه اثری ندارد.
@@ -66,34 +71,38 @@ export function SelectAnimalsForm({
         {animals.map((animal) => {
           const selected = chosen[animal.id];
           return (
-            <li key={animal.id} className="rounded-xl border border-border-default p-lg">
-              <label className="flex items-center gap-sm text-body-sm">
+            <li key={animal.id} className="rounded-lg border border-border-default px-lg py-xs">
+              <label className="hz-check">
                 <input
                   type="checkbox"
                   checked={selected !== undefined}
                   onChange={() => toggle(animal.id)}
-                  className="size-[var(--size-selection-md)]"
                   data-testid={'pick-animal-' + animal.id}
                 />
-                {animal.name ?? 'بدون نام'}
+                <span className="hz-check__text">
+                  <span className="hz-check__label">{animal.name ?? 'بدون نام'}</span>
+                </span>
               </label>
 
               {selected === undefined ? null : (
-                <fieldset className="mt-md space-y-sm ps-lg">
-                  <legend className="text-caption text-text-secondary">نوع خدمت این حیوان</legend>
-                  {services.map((service) => (
-                    <label key={service} className="flex items-center gap-sm text-body-sm">
-                      <input
-                        type="radio"
-                        name={'service-' + animal.id}
-                        checked={selected === service}
-                        onChange={() => setChosen((c) => ({ ...c, [animal.id]: service }))}
-                        className="size-[var(--size-selection-md)]"
-                        data-testid={'service-' + animal.id + '-' + service}
-                      />
-                      {SERVICE_TYPE_FA[service]}
-                    </label>
-                  ))}
+                <fieldset className="hz-fieldset mb-sm ps-s32">
+                  <legend className="hz-field__label">نوع خدمت این حیوان</legend>
+                  <div className="hz-choice-group hz-choice-group--inline">
+                    {services.map((service) => (
+                      <label key={service} className="hz-radio">
+                        <input
+                          type="radio"
+                          name={'service-' + animal.id}
+                          checked={selected === service}
+                          onChange={() => setChosen((c) => ({ ...c, [animal.id]: service }))}
+                          data-testid={'service-' + animal.id + '-' + service}
+                        />
+                        <span className="hz-radio__text">
+                          <span>{SERVICE_TYPE_FA[service]}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </fieldset>
               )}
             </li>
@@ -101,11 +110,14 @@ export function SelectAnimalsForm({
         })}
       </ul>
 
-      <div className="mt-lg">
-        <Button type="button" block onClick={submit} data-testid="choose-vet">
-          انتخاب دامپزشک و مرکز
-        </Button>
-      </div>
+      <ActionRow
+        sticky
+        primary={
+          <Button type="button" size="lg" onClick={submit} data-testid="choose-vet">
+            انتخاب دامپزشک و مرکز
+          </Button>
+        }
+      />
     </Card>
   );
 }

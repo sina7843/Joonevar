@@ -21,6 +21,7 @@ import {
 } from '../../../../../src/mating/pregnancy.ts';
 import { formatCivilDateFa } from '../../../../../src/domain/calendar.ts';
 import { DeclarePregnancyForm, RequestPregnancyCheckForm } from '../../../breeding-forms.tsx';
+import { PageHeader } from '../../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,7 +52,12 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
 
   if (permit.status !== 'ISSUED') {
     return (
-      <PublicShell actor={guard.actor} title="بارداری" pathname={'/mating/permits/' + id + '/pregnancy'}>
+      <PublicShell
+        actor={guard.actor}
+        title="بارداری"
+        pathname={'/mating/permits/' + id + '/pregnancy'}
+        header={<PageHeader title={'بارداری'} back={{ href: '/mating/permits/' + id }} />}
+      >
         <Card>
           <Alert tone="info" title="این پرونده هنوز مجوز صادرشده ندارد">
             <span data-testid="pregnancy-locked">
@@ -59,7 +65,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
             </span>
           </Alert>
           <p className="mt-lg text-body-sm">
-            <Link href={'/mating/permits/' + id} className="text-text-brand underline underline-offset-4">
+            <Link href={'/mating/permits/' + id} className="hz-link">
               بازگشت به پرونده مجوز
             </Link>
           </p>
@@ -73,15 +79,25 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
   const openRequests = dam ? await unlinkedPregnancyRequests(db(), guard.actor, dam.id) : [];
 
   return (
-    <PublicShell actor={guard.actor} title="بارداری" pathname={'/mating/permits/' + id + '/pregnancy'}>
+    <PublicShell
+      actor={guard.actor}
+      title="بارداری"
+      pathname={'/mating/permits/' + id + '/pregnancy'}
+      header={<PageHeader title={'بارداری'} back={{ href: '/mating/permits/' + id }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام بارداری</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>اعلام بارداری</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary">
                 مجوز {permit.permitNo ?? '—'} · حیوان ماده: {dam?.name ?? 'بدون نام'} ·{' '}
-                <Link href={'/mating/permits/' + id} className="text-text-brand underline underline-offset-4">
+                <Link href={'/mating/permits/' + id} className="hz-link">
                   بازگشت به پرونده
                 </Link>
               </p>
@@ -116,7 +132,12 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
         />
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تاریخچه اعلام‌های مالک</span></h2></div>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>تاریخچه اعلام‌های مالک</span>
+            </h2>
+          </div>
           {records.declarations.length === 0 ? (
             <div className="mt-lg">
               <EmptyState
@@ -129,7 +150,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
               {records.declarations.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-xl border border-border-default p-lg"
+                  className="rounded-lg border border-border-default p-lg"
                   data-testid={'declaration-' + row.version}
                 >
                   <p className="text-label-md">
@@ -167,11 +188,11 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
           ) : (
             <ul className="mt-lg space-y-md" data-testid="vet-results">
               {records.checks.map(({ check, results, latest, locationNameFa }) => (
-                <li key={check.id} className="rounded-xl border border-border-default p-lg">
+                <li key={check.id} className="rounded-lg border border-border-default p-lg">
                   {latest === null ? (
                     <p className="text-body-sm" data-testid="vet-result-pending">
-                      مراجعه ثبت شده است و نتیجه‌ای هنوز ثبت نشده؛ انتظار نتیجه، مهلت مسدودکننده‌ای برای
-                      پرونده نمی‌سازد.
+                      مراجعه ثبت شده است و نتیجه‌ای هنوز ثبت نشده؛ انتظار نتیجه، مهلت مسدودکننده‌ای برای پرونده
+                      نمی‌سازد.
                     </p>
                   ) : (
                     <div>
@@ -188,10 +209,8 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
                         (records.declaration.expectedCount ?? null) !== (latest.expectedCount ?? null)) ? (
                         <p className="mt-sm text-body-sm" data-testid="mismatch-values">
                           {MISMATCH_LABEL_FA}: اعلام مالک «{yesNo(records.declaration.pregnant)}
-                          {records.declaration.expectedCount !== null
-                            ? ' · ' + records.declaration.expectedCount
-                            : ''}
-                          » و نتیجه دامپزشک «{yesNo(latest.pregnant)}
+                          {records.declaration.expectedCount !== null ? ' · ' + records.declaration.expectedCount : ''}»
+                          و نتیجه دامپزشک «{yesNo(latest.pregnant)}
                           {latest.expectedCount !== null ? ' · ' + latest.expectedCount : ''}».
                         </p>
                       ) : null}
@@ -210,11 +229,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
 
         <Card>
           <p className="text-body-sm">
-            <Link
-              href={'/mating/permits/' + id + '/birth'}
-              className="text-text-brand underline underline-offset-4"
-              data-testid="open-birth"
-            >
+            <Link href={'/mating/permits/' + id + '/birth'} className="hz-link" data-testid="open-birth">
               ثبت نتیجه زایمان
             </Link>
           </p>

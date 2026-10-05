@@ -2,13 +2,14 @@ import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { currentPaymentGateway } from '../../../../../src/adapters/current.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
-import { Card } from '../../../../../src/ui/card.tsx';
-import { Alert } from '../../../../../src/ui/alert.tsx';
+import { PaymentResult } from '../../../../../src/ui/payment-result.tsx';
+import { Identifier } from '../../../../../src/ui/status.tsx';
 import { ButtonLink } from '../../../../../src/ui/button.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { env } from '../../../../../src/config/env.ts';
 import { verifyAttempt } from '../../../../../src/billing/payments.ts';
 import { paidEffects } from '../../../../../src/billing/effects.ts';
+import { PageHeader } from '../../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,39 +41,43 @@ export default async function PedigreeReturnPage({
     : ({ state: 'UNKNOWN_REFERENCE' } as const);
 
   return (
-    <PublicShell actor={guard.actor} title="نتیجه پرداخت صدور" pathname={'/pedigree/batch/' + id + '/return'}>
-      <div className="space-y-lg">
-        {outcome.state === 'PAID' ? (
-          <Alert tone="success" title="پرداخت تأیید شد">
-            تأیید روی سرور انجام شد. وضعیت صدور هر حیوان جداگانه در همان درخواست دیده می‌شود.
-          </Alert>
-        ) : null}
-        {outcome.state === 'FAILED' ? (
-          <Alert tone="error" title="پرداخت تأیید نشد">
-            {outcome.reasonFa} نتیجه Parentage همچنان در پرونده دیده می‌شود.
-          </Alert>
-        ) : null}
-        {outcome.state === 'CANCELLED' ? (
-          <Alert tone="warning" title="پرداخت لغو شد">
-            انتخاب و مبلغ هر قلم حفظ شده است و می‌توانید دوباره تلاش کنید.
-          </Alert>
-        ) : null}
-        {outcome.state === 'UNKNOWN_REFERENCE' ? (
-          <Alert tone="error" title="این بازگشت پرداخت شناسایی نشد">
-            هیچ پرداختی با این شناسه پیدا نشد.
-          </Alert>
-        ) : null}
-
-        <Card>
-          <p className="text-body-sm text-text-secondary">
-            وضعیت پرداخت فقط بر اساس تأیید سرور اعلام می‌شود؛ رسیدن به این صفحه به‌تنهایی سند پرداخت نیست.
-          </p>
-          <div className="mt-lg">
-            <ButtonLink href={'/pedigree/batch/' + id} block data-testid="back-to-pedigree-batch">
-              بازگشت به درخواست
-            </ButtonLink>
-          </div>
-        </Card>
+    <PublicShell
+      actor={guard.actor}
+      title="نتیجه پرداخت صدور"
+      pathname={'/pedigree/batch/' + id + '/return'}
+      header={<PageHeader title={'نتیجه پرداخت صدور'} back={{ href: '/pedigree/batch/' + id }} />}
+    >
+      <div className="mx-auto w-full max-w-[560px]">
+        <PaymentResult
+          state={outcome.state === 'UNKNOWN_REFERENCE' ? 'UNKNOWN' : outcome.state}
+          title={
+            outcome.state === 'PAID'
+              ? 'پرداخت تأیید شد'
+              : outcome.state === 'FAILED'
+                ? 'پرداخت تأیید نشد'
+                : outcome.state === 'CANCELLED'
+                  ? 'پرداخت لغو شد'
+                  : 'این بازگشت پرداخت شناسایی نشد'
+          }
+          facts={reference ? [{ key: 'شناسه پرداخت', value: <Identifier value={reference} /> }] : []}
+          actions={
+            <>
+              <ButtonLink tone="secondary" href={'/pedigree/batch/' + id} data-testid="back-to-pedigree-batch">
+                بازگشت به درخواست
+              </ButtonLink>
+            </>
+          }
+        >
+          {outcome.state === 'PAID' ? (
+            <>تأیید روی سرور انجام شد. وضعیت صدور هر حیوان جداگانه در همان درخواست دیده می‌شود.</>
+          ) : outcome.state === 'FAILED' ? (
+            <>{outcome.reasonFa} نتیجه Parentage همچنان در پرونده دیده می‌شود.</>
+          ) : outcome.state === 'CANCELLED' ? (
+            <>انتخاب و مبلغ هر قلم حفظ شده است و می‌توانید دوباره تلاش کنید.</>
+          ) : (
+            <>هیچ پرداختی با این شناسه پیدا نشد.</>
+          )}
+        </PaymentResult>
       </div>
     </PublicShell>
   );

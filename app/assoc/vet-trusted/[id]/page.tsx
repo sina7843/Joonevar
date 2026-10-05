@@ -1,7 +1,9 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { Desk, DeskHead, Panel, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { KeyValueList } from '../../../../src/ui/key-value.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { trustedCaseForReview } from '../../../../src/vets/trusted-application.ts';
@@ -37,116 +39,117 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
   const waiting = detail.case.status === 'SUBMITTED' || detail.case.status === 'UNDER_REVIEW';
   const current = detail.declarations.find((declaration) => declaration.submissionVersion === detail.case.currentSubmissionVersion);
 
+  const standing = detail.case.status === 'ACTIVE_TRUSTED_VET' || detail.case.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT';
   return (
     <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک معتمد" pathname="/assoc/vet-trusted" nav={ASSOC_NAV}>
-      <div className="space-y-lg">
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>متقاضی</span></h2></div>
-          <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm">
-            <dt className="text-text-secondary">نام</dt>
-            <dd>{detail.applicantNameFa ?? '—'}</dd>
-            <dt className="text-text-secondary">وضعیت</dt>
-            <dd data-testid="trusted-case-status">{detail.case.statusFa}</dd>
-          </dl>
-        </Card>
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>شرایط، همین حالا</span></h2></div>
-          <ul className="mt-md space-y-2xs text-body-sm" data-testid="trusted-eligibility-now">
+      <DeskHead
+        title={'دامپزشک معتمد · ' + (detail.applicantNameFa ?? '—')}
+        status={{
+          tone: waiting ? 'info' : detail.case.status === 'NEEDS_CORRECTION' ? 'warning' : detail.case.status === 'REJECTED' ? 'error' : 'success',
+          label: detail.case.statusFa,
+          testId: 'trusted-case-status',
+        }}
+        meta={['نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR')]}
+        owner={waiting ? 'ASSOCIATION' : detail.case.status === 'NEEDS_CORRECTION' ? 'USER' : null}
+        ownerExtra={review?.claimedByOther ? 'در دست ' + (review.claimerNameFa ?? 'بررسی‌کننده دیگر') : undefined}
+      />
+      <Desk
+        decisionTitle={waiting ? 'تصمیم' : standing ? 'تعلیق دسترسی معتمد' : 'نتیجه'}
+        decision={
+          <>
+            {review && waiting ? <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} /> : null}
+            {waiting && !review?.claimedByOther ? (
+              <>
+                <p className="text-caption text-text-secondary">تأیید فقط پرداخت دوره معتمد را باز می‌کند؛ Tag معتمد با پرداخت تأییدشده سرور فعال می‌شود.</p>
+                <DecideTrustedCaseForm caseId={detail.case.id} version={detail.case.version} />
+              </>
+            ) : null}
+            {standing ? (
+              <>
+                <p className="text-caption text-text-secondary">
+                  تعلیق، دسترسی معتمد را برمی‌دارد و Tag را به وضعیت پروانه برمی‌گرداند. هیچ کار انجام‌شده‌ای حذف نمی‌شود و پرداخت‌ها سر جای خود می‌مانند.
+                </p>
+                <SuspendTrustedForm accountId={detail.case.accountId} />
+              </>
+            ) : null}
+            {waiting ? null : (
+              <Alert tone="info" title="این درخواست در انتظار بررسی نیست">
+                {'وضعیت فعلی: ' + detail.case.statusFa}
+                {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}
+              </Alert>
+            )}
+          </>
+        }
+      >
+        <Panel title="شرایط، همین حالا">
+          <ul className="space-y-xs text-body-sm" data-testid="trusted-eligibility-now">
             {detail.eligibilityNow.map((requirement) => (
-              <li key={requirement.code}>
-                {(requirement.met ? '✓ ' : '✗ ') + requirement.labelFa}
-                {requirement.reasonFa ? ' — ' + requirement.reasonFa : ''}
+              <li key={requirement.code} className="flex items-start gap-xs">
+                <Icon
+                  name={requirement.met ? 'checkCircle' : 'xCircle'}
+                  size="sm"
+                  label={requirement.met ? 'برقرار' : 'برقرار نیست'}
+                  className={requirement.met ? 'text-status-success-text' : 'text-status-error-text'}
+                />
+                <span>
+                  {requirement.labelFa}
+                  {requirement.reasonFa ? ' — ' + requirement.reasonFa : ''}
+                </span>
               </li>
             ))}
           </ul>
           {!detail.stillEligible ? (
-            <div className="mt-md" data-testid="trusted-no-longer-eligible">
+            <div data-testid="trusted-no-longer-eligible">
               <Alert tone="warning" title="شرایط متقاضی دیگر برقرار نیست">
                 تا وقتی پروانه یا عضویت برقرار نشود، تأیید ثبت نمی‌شود. درخواست اصلاح یا رد همچنان ممکن است.
               </Alert>
             </div>
           ) : null}
-        </Card>
+        </Panel>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>خوداظهاری نسخه جاری</span></h2></div>
+        <Panel title="خوداظهاری نسخه جاری">
           {current ? (
-            <dl className="mt-md grid grid-cols-2 gap-sm text-body-sm" data-testid="trusted-declaration">
-              <dt className="text-text-secondary">نسخه تعهدنامه پذیرفته‌شده</dt>
-              <dd dir="ltr">{current.termsVersion}</dd>
-              <dt className="text-text-secondary">نسخه متن خوداظهاری</dt>
-              <dd dir="ltr">{current.declarationVersion}</dd>
-              <dt className="text-text-secondary">میکروچیپ‌ریدر</dt>
-              <dd>{current.microchipReaderDeclared ? 'اعلام‌شده (مدرک لازم نیست)' : '—'}</dd>
-              <dt className="text-text-secondary">زمان اعلام</dt>
-              <dd>{formatInstantFa(new Date(current.declaredAt))}</dd>
-            </dl>
+            <div data-testid="trusted-declaration">
+              <KeyValueList
+                twoCol
+                rows={[
+                  { key: 'متقاضی', value: detail.applicantNameFa },
+                  { key: 'نسخه تعهدنامه پذیرفته‌شده', value: <bdi dir="ltr">{current.termsVersion}</bdi> },
+                  { key: 'نسخه متن خوداظهاری', value: <bdi dir="ltr">{current.declarationVersion}</bdi> },
+                  { key: 'میکروچیپ‌ریدر', value: current.microchipReaderDeclared ? 'اعلام‌شده (مدرک لازم نیست)' : null },
+                  { key: 'زمان اعلام', value: formatInstantFa(new Date(current.declaredAt)) },
+                ]}
+              />
+            </div>
           ) : (
-            <p className="mt-md text-body-sm text-text-disabled">خوداظهاری این نسخه ثبت نشده است.</p>
+            <p className="text-body-sm text-text-secondary">خوداظهاری این نسخه ثبت نشده است.</p>
           )}
-          <h3 className="mt-lg text-label-md">{DECLARED_EQUIPMENT_FA}</h3>
-          <ul className="mt-xs space-y-2xs text-body-sm" data-testid="trusted-declared-equipment">
+          <h3 className="text-label-md">{DECLARED_EQUIPMENT_FA}</h3>
+          <ul className="space-y-2xs text-body-sm" data-testid="trusted-declared-equipment">
             {detail.declaredEquipment.length === 0 ? (
-              <li className="text-text-disabled">تجهیزی اعلام نشده است.</li>
+              <li className="text-text-secondary">تجهیزی اعلام نشده است.</li>
             ) : (
               detail.declaredEquipment.map((item) => <li key={item.code}>{item.nameFa + ' · اعلام‌شده در ' + formatInstantFa(new Date(item.declaredAt))}</li>)
             )}
           </ul>
-        </Card>
+        </Panel>
 
         {detail.submissions.length > 1 ? (
-          <Card>
-            <h2 className="hz-card__title">نسخه‌ها</h2>
-            <ol className="mt-md space-y-sm text-body-sm" data-testid="trusted-submissions">
-              {detail.submissions.map((submission) => (
-                <li key={submission.version}>
-                  {'نسخه ' + submission.version.toLocaleString('fa-IR') + ' · ' + formatInstantFa(submission.submittedAt)}
-                  {typeof submission.fields.statementFa === 'string' ? ' — ' + submission.fields.statementFa : ''}
-                </li>
-              ))}
-            </ol>
-          </Card>
-        ) : null}
-
-        {review && waiting ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>بررسی</span></h2></div>
-            <div className="mt-md">
-              <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} />
+          <Panel title="نسخه‌ها">
+            <div data-testid="trusted-submissions">
+              <CaseHistory
+                entries={[...detail.submissions].reverse().map((submission, index) => ({
+                  id: String(submission.version),
+                  title: 'نسخه ' + submission.version.toLocaleString('fa-IR'),
+                  whenFa: formatInstantFa(submission.submittedAt),
+                  body: typeof submission.fields.statementFa === 'string' ? submission.fields.statementFa : undefined,
+                  current: index === 0,
+                }))}
+              />
             </div>
-          </Card>
+          </Panel>
         ) : null}
-
-        {waiting && !review?.claimedByOther ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه</span></h2></div>
-            <p className="mt-xs text-caption text-text-secondary">تأیید فقط پرداخت دوره معتمد را باز می‌کند؛ Tag معتمد با پرداخت تأییدشده سرور فعال می‌شود.</p>
-            <div className="mt-lg">
-              <DecideTrustedCaseForm caseId={detail.case.id} version={detail.case.version} />
-            </div>
-          </Card>
-        ) : null}
-
-        {detail.case.status === 'ACTIVE_TRUSTED_VET' || detail.case.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT' ? (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تعلیق دسترسی معتمد</span></h2></div>
-            <p className="mt-xs text-caption text-text-secondary">
-              تعلیق، دسترسی معتمد را برمی‌دارد و Tag را به وضعیت پروانه برمی‌گرداند. هیچ کار انجام‌شده‌ای حذف نمی‌شود و پرداخت‌ها سر جای خود می‌مانند.
-            </p>
-            <div className="mt-lg">
-              <SuspendTrustedForm accountId={detail.case.accountId} />
-            </div>
-          </Card>
-        ) : null}
-
-        {waiting ? null : (
-          <Alert tone="info" title="این درخواست در انتظار بررسی نیست">
-            {'وضعیت فعلی: ' + detail.case.statusFa}
-            {detail.case.reviewNoteFa ? ' — ' + detail.case.reviewNoteFa : ''}
-          </Alert>
-        )}
-      </div>
+      </Desk>
     </OpsShell>
   );
 }

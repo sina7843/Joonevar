@@ -10,6 +10,7 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { ownerPostalRequest, POSTAL_DOCUMENT_FA } from '../../../../src/documents/postal.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,37 +42,63 @@ export default async function PostalRequestPage({ params }: { params: Promise<{ 
       : '/documents/' + request.documentId;
 
   return (
-    <PublicShell actor={guard.actor} title="درخواست ارسال پستی" pathname={'/documents/postal/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="درخواست ارسال پستی"
+      pathname={'/documents/postal/' + id}
+      header={<PageHeader title={'درخواست ارسال پستی'} back={{ href: documentHref }} />}
+    >
       <div className="space-y-lg">
         <Alert tone="success" title="درخواست ارسال ثبت شد">
           <span data-testid="postal-confirmation">
-            ثبت درخواست به معنی ارسال واقعی سند نیست. در این فاز اتصال به شرکت پستی، تعرفه حمل، برچسب، کد رهگیری
-            و وضعیت تحویل وجود ندارد.
+            ثبت درخواست به معنی ارسال واقعی سند نیست. در این فاز اتصال به شرکت پستی، تعرفه حمل، برچسب، کد رهگیری و وضعیت
+            تحویل وجود ندارد.
           </span>
         </Alert>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>مشخصات درخواست</span></h2></div>
-          <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="postal-detail">
-            <dt className="text-text-secondary">سند</dt>
-            <dd data-testid="postal-document-type">{POSTAL_DOCUMENT_FA[request.documentType]}</dd>
-            <dt className="text-text-secondary">گیرنده</dt>
-            <dd data-testid="postal-recipient-name">{request.recipientNameFa}</dd>
-            <dt className="text-text-secondary">تماس گیرنده</dt>
-            <dd>{request.recipientPhone}</dd>
-            <dt className="text-text-secondary">نشانی</dt>
-            <dd>
-              {[request.provinceFa, request.cityFa].filter(Boolean).join(' · ')}
-              {request.provinceFa || request.cityFa ? ' — ' : ''}
-              {request.addressFa}
-            </dd>
-            <dt className="text-text-secondary">کد پستی</dt>
-            <dd>{request.postalCode ?? '—'}</dd>
-            <dt className="text-text-secondary">زمان ثبت</dt>
-            <dd>{formatCivilDateFa(request.createdAt.toISOString().slice(0, 10))}</dd>
+          <div className="hz-section-header hz-section-header--sm">
+            <h2 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>مشخصات درخواست</span>
+            </h2>
+          </div>
+          <dl className="hz-kv mt-lg" data-testid="postal-detail">
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">سند</dt>
+              <dd className="hz-kv__value" data-testid="postal-document-type">
+                {POSTAL_DOCUMENT_FA[request.documentType]}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">گیرنده</dt>
+              <dd className="hz-kv__value" data-testid="postal-recipient-name">
+                {request.recipientNameFa}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">تماس گیرنده</dt>
+              <dd className="hz-kv__value">{request.recipientPhone}</dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">نشانی</dt>
+              <dd className="hz-kv__value">
+                {[request.provinceFa, request.cityFa].filter(Boolean).join(' · ')}
+                {request.provinceFa || request.cityFa ? ' — ' : ''}
+                {request.addressFa}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">کد پستی</dt>
+              <dd className="hz-kv__value">{request.postalCode ?? '—'}</dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">زمان ثبت</dt>
+              <dd className="hz-kv__value">{formatCivilDateFa(request.createdAt.toISOString().slice(0, 10))}</dd>
+            </div>
           </dl>
           <p className="mt-lg text-body-sm">
-            <Link href={documentHref} className="text-text-brand underline underline-offset-4" data-testid="postal-document-link">
+            <Link href={documentHref} className="hz-link" data-testid="postal-document-link">
               بازگشت به سند
             </Link>
           </p>

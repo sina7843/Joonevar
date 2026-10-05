@@ -14,6 +14,7 @@ import { parentageResults } from '../../../../src/db/schema/genetics.ts';
 import { APPEAL_STATUS_FA, ownerAppeal } from '../../../../src/genetics/appeals.ts';
 import { RESULT_STATUS_FA } from '../../../../src/genetics/service.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,20 +39,27 @@ export default async function AppealPage({ params }: { params: Promise<{ id: str
     throw error;
   }
 
-  const [disputed] = await db()
-    .select()
-    .from(parentageResults)
-    .where(eq(parentageResults.id, appeal.resultId));
+  const [disputed] = await db().select().from(parentageResults).where(eq(parentageResults.id, appeal.resultId));
   const [corrected] = appeal.correctedResultId
     ? await db().select().from(parentageResults).where(eq(parentageResults.id, appeal.correctedResultId))
     : [];
 
   return (
-    <PublicShell actor={guard.actor} title="اعتراض به نتیجه" pathname={'/pedigree/appeals/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="اعتراض به نتیجه"
+      pathname={'/pedigree/appeals/' + id}
+      header={<PageHeader title={'اعتراض به نتیجه'} back={{ href: '/pedigree' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>وضعیت اعتراض</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>وضعیت اعتراض</span>
+              </h2>
+            </div>
             <StatusBadge tone={appeal.status === 'ANSWERED' ? 'success' : 'info'}>
               <span data-testid="appeal-status">{APPEAL_STATUS_FA[appeal.status]}</span>
             </StatusBadge>
@@ -65,7 +73,12 @@ export default async function AppealPage({ params }: { params: Promise<{ id: str
         </Card>
 
         <Card>
-          <h3 className="text-label-lg">نتیجه مورد اعتراض</h3>
+          <div className="hz-section-header hz-section-header--sm">
+            <h3 className="hz-section-header__title">
+              <span className="hz-section-header__bar" aria-hidden="true" />
+              <span>نتیجه مورد اعتراض</span>
+            </h3>
+          </div>
           <p className="mt-md text-body-sm" data-testid="disputed-result">
             نسخه {disputed?.resultVersion ?? '—'} · {disputed ? RESULT_STATUS_FA[disputed.status] : '—'}
           </p>
@@ -76,7 +89,12 @@ export default async function AppealPage({ params }: { params: Promise<{ id: str
 
         {appeal.responseFa ? (
           <Card>
-            <h3 className="text-label-lg">پاسخ مرکز ژنتیک</h3>
+            <div className="hz-section-header hz-section-header--sm">
+              <h3 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>پاسخ مرکز ژنتیک</span>
+              </h3>
+            </div>
             <p className="mt-md text-body-sm" data-testid="appeal-response">
               {appeal.responseFa}
             </p>
@@ -92,11 +110,7 @@ export default async function AppealPage({ params }: { params: Promise<{ id: str
 
         <Card>
           <p className="text-body-sm">
-            <Link
-              href={'/pedigree/' + appeal.animalId}
-              className="text-text-brand underline underline-offset-4"
-              data-testid="back-to-animal-result"
-            >
+            <Link href={'/pedigree/' + appeal.animalId} className="hz-link" data-testid="back-to-animal-result">
               بازگشت به نتیجه این حیوان
             </Link>
           </p>

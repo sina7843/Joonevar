@@ -108,7 +108,7 @@ export default async function ParentageTestPage() {
         <h2 id="parentage-steps-title" className="text-h4">
           مراحل
         </h2>
-        <ol className="list-decimal space-y-sm pr-lg text-body-md" data-testid="parentage-steps">
+        <ol className="list-decimal space-y-sm ps-lg text-body-md" data-testid="parentage-steps">
           {STEPS.map((step) => (
             <li key={step}>{step}</li>
           ))}

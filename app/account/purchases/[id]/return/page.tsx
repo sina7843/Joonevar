@@ -1,10 +1,9 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { currentPaymentGateway } from '../../../../../src/adapters/current.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
-import { Card } from '../../../../../src/ui/card.tsx';
-import { Alert } from '../../../../../src/ui/alert.tsx';
+import { ButtonLink } from '../../../../../src/ui/button.tsx';
+import { PaymentResult } from '../../../../../src/ui/payment-result.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { verifyAttempt } from '../../../../../src/billing/payments.ts';
 import { paidEffects } from '../../../../../src/billing/effects.ts';
@@ -12,7 +11,7 @@ import { paidEffects } from '../../../../../src/billing/effects.ts';
 export const dynamic = 'force-dynamic';
 
 /**
- * Return from the gateway for a deposit — PROMPT-005.
+ * Return from the gateway for a deposit — PROMPT-005 (P08 return).
  *
  * The verification is what reserves the animal: the request becomes the deal,
  * the advert becomes RESERVED and the other requests are closed, all inside the
@@ -40,41 +39,37 @@ export default async function DepositReturnPage({
       )
     : ({ state: 'UNKNOWN_REFERENCE' } as const);
 
+  const facts = [{ key: 'خدمت', value: 'بیعانه خرید حیوان' }];
+  const back = (
+    <ButtonLink href={'/account/purchases/' + id} block tone={outcome.state === 'PAID' ? 'primary' : 'secondary'} data-testid="back-to-thread">
+      بازگشت به گفت‌وگوی این خرید
+    </ButtonLink>
+  );
+
   return (
     <PublicShell actor={guard.actor} title="نتیجه پرداخت بیعانه" pathname="/account/purchases">
-      <div className="space-y-lg p-lg">
-        <Card>
-          <div data-testid="deposit-result">
-            {outcome.state === 'PAID' ? (
-              <Alert tone="success" title="بیعانه تأیید شد و حیوان رزرو شد">
-                از این لحظه اطلاعات تماس طرف مقابل در گفت‌وگو در دسترس است و سایر درخواست‌های این آگهی بسته
-                شده‌اند.
-              </Alert>
-            ) : null}
-            {outcome.state === 'FAILED' ? (
-              <Alert tone="error" title="پرداخت تأیید نشد">
-                {outcome.reasonFa} درخواست و مبلغ منجمدشده آن حفظ شده است و تا پایان مهلت می‌توانید دوباره
-                تلاش کنید.
-              </Alert>
-            ) : null}
-            {outcome.state === 'CANCELLED' ? (
-              <Alert tone="warning" title="پرداخت لغو شد">
-                درخواست شما حفظ شده است و تا پایان مهلت قابل پرداخت است.
-              </Alert>
-            ) : null}
-            {outcome.state === 'UNKNOWN_REFERENCE' ? (
-              <Alert tone="warning" title="این بازگشت از درگاه شناسایی نشد">
-                اگر مبلغی از حساب شما کم شده است، از صفحه گفت‌وگو وضعیت پرداخت را دوباره بررسی کنید.
-              </Alert>
-            ) : null}
-          </div>
-          <p className="mt-lg text-caption">
-            <Link href={'/account/purchases/' + id} className="text-text-brand" data-testid="back-to-thread">
-              بازگشت به گفت‌وگوی این خرید
-            </Link>
-          </p>
-        </Card>
-      </div>
+      {outcome.state === 'PAID' ? (
+        <PaymentResult
+          state="PAID"
+          testId="deposit-result"
+          title="بیعانه تأیید شد و حیوان رزرو شد"
+          facts={facts}
+          next={['از این لحظه اطلاعات تماس طرف مقابل در گفت‌وگو در دسترس است و سایر درخواست‌های این آگهی بسته شده‌اند.']}
+          actions={back}
+        />
+      ) : outcome.state === 'FAILED' ? (
+        <PaymentResult state="FAILED" testId="deposit-result" title="پرداخت تأیید نشد" facts={facts} actions={back}>
+          {outcome.reasonFa} درخواست و مبلغ منجمدشده آن حفظ شده است و تا پایان مهلت می‌توانید دوباره تلاش کنید.
+        </PaymentResult>
+      ) : outcome.state === 'CANCELLED' ? (
+        <PaymentResult state="CANCELLED" testId="deposit-result" title="پرداخت لغو شد" facts={facts} actions={back}>
+          درخواست شما حفظ شده است و تا پایان مهلت قابل پرداخت است.
+        </PaymentResult>
+      ) : (
+        <PaymentResult state="UNKNOWN" testId="deposit-result" title="این بازگشت از درگاه شناسایی نشد" actions={back}>
+          اگر مبلغی از حساب شما کم شده است، از صفحه گفت‌وگو وضعیت پرداخت را دوباره بررسی کنید.
+        </PaymentResult>
+      )}
     </PublicShell>
   );
 }

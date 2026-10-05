@@ -10,6 +10,7 @@ import { readMoney } from '../../../src/settings/service.ts';
 import { formatTomanFa } from '../../../src/domain/money.ts';
 import { PEDIGREE_FEE_KEY, selectableForIssuance } from '../../../src/documents/pedigree.ts';
 import { SelectIssuanceAnimals } from '../forms.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,20 +29,27 @@ export default async function IssuePedigreePage() {
   const eligibility = await eligibilityFor(db(), actor.accountId, 'PEDIGREE');
   if (!eligibility.allowed) {
     return (
-      <PublicShell actor={actor} title="صدور شجره‌نامه" pathname="/pedigree/issue">
+      <PublicShell
+        actor={actor}
+        title="صدور شجره‌نامه"
+        pathname="/pedigree/issue"
+        header={<PageHeader title={'صدور شجره‌نامه'} back={{ href: '/pedigree' }} />}
+      >
         <LockedServiceCard serviceLabel="صدور شجره‌نامه" lock={eligibility.lock} />
       </PublicShell>
     );
   }
 
-  const [animals, fee] = await Promise.all([
-    selectableForIssuance(db(), actor),
-    readMoney(db(), PEDIGREE_FEE_KEY),
-  ]);
+  const [animals, fee] = await Promise.all([selectableForIssuance(db(), actor), readMoney(db(), PEDIGREE_FEE_KEY)]);
   const feeLabel = formatTomanFa(fee);
 
   return (
-    <PublicShell actor={actor} title="صدور شجره‌نامه" pathname="/pedigree/issue">
+    <PublicShell
+      actor={actor}
+      title="صدور شجره‌نامه"
+      pathname="/pedigree/issue"
+      header={<PageHeader title={'صدور شجره‌نامه'} back={{ href: '/pedigree' }} />}
+    >
       <div className="space-y-lg">
         {feeLabel === null ? (
           <Alert tone="warning" title="تعرفه صدور شجره‌نامه هنوز ثبت نشده است">

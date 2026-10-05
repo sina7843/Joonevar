@@ -1,10 +1,8 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
-import { Card } from '../../../../src/ui/card.tsx';
+import { CaseItem, CaseList, Panel } from '../../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { manageableCommunities } from '../../../../src/communities/service.ts';
 import { COMMUNITY_KIND_FA, COMMUNITY_SCOPE_FA, type CommunityKind, type CommunityScope } from '../../../../src/communities/model.ts';
@@ -24,54 +22,39 @@ export default async function ReviewCommunitiesPage() {
   const rows = await manageableCommunities(db(), guard.actor);
 
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/communities" nav={REVIEW_NAV}>
-      <div className="space-y-lg">
-        <CommunityCreateForm surface="review" />
-
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>انجمن‌ها و کلاب‌ها</span></h2></div>
-          <p className="mt-xs text-body-sm text-text-secondary">
-            مجوز انتشار مستقیم نوشته کلاب را سوپرادمین می‌دهد؛ اینجا فقط ثبت، مجوز و انتشار پرونده انجام می‌شود.
-          </p>
+    <OpsShell actor={guard.actor} title="انجمن و کلاب" pathname="/review/communities" nav={REVIEW_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{rows.length.toLocaleString('fa-IR') + ' رکورد'}</span>
+        <span className="hz-page-header__meta-item">
+          مجوز انتشار مستقیم نوشته کلاب را سوپرادمین می‌دهد؛ اینجا فقط ثبت، مجوز و انتشار پرونده انجام می‌شود.
+        </span>
+      </p>
+      <div className="grid items-start gap-lg lg:grid-cols-2">
+        <Panel title="انجمن‌ها و کلاب‌ها" count={rows.length.toLocaleString('fa-IR')}>
           {rows.length === 0 ? (
-            <div className="mt-lg">
-              <EmptyState title="رکوردی ثبت نشده است" description="با فرم بالا انجمن یا کلاب بررسی‌شده را ثبت کنید." />
-            </div>
+            <EmptyState title="رکوردی ثبت نشده است" description="با فرم ثبت، انجمن یا کلاب بررسی‌شده را ثبت کنید." />
           ) : (
-            <ul className="mt-lg space-y-sm" data-testid="community-list">
+            <CaseList label="انجمن‌ها و کلاب‌ها" testId="community-list">
               {rows.map((row) => (
-                <li key={row.community.id}>
-                  <Link
-                    href={'/review/communities/' + row.community.id}
-                    className="block rounded-xl border border-border-default p-lg hover:border-border-control"
-                    data-testid={'community-row-' + row.community.id}
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-sm">
-                      <div className="min-w-0">
-                        <p className="text-label-lg">{row.community.displayNameFa}</p>
-                        <p className="mt-2xs text-caption text-text-secondary">
-                          {[
-                            COMMUNITY_KIND_FA[row.community.kind as CommunityKind],
-                            'حوزه ' + COMMUNITY_SCOPE_FA[row.community.scope as CommunityScope],
-                            row.community.sourceFa ? 'منبع: ' + row.community.sourceFa : null,
-                          ]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-xs">
-                        <StatusBadge tone={row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-                          {VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus]}
-                        </StatusBadge>
-                        {row.community.ownerAccountId ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
+                <CaseItem
+                  key={row.community.id}
+                  type={COMMUNITY_KIND_FA[row.community.kind as CommunityKind] + (row.community.ownerAccountId ? '' : ' · بدون مالک')}
+                  name={row.community.displayNameFa}
+                  href={'/review/communities/' + row.community.id}
+                  linkTestId={'community-row-' + row.community.id}
+                  sub={['حوزه ' + COMMUNITY_SCOPE_FA[row.community.scope as CommunityScope], row.community.sourceFa ? 'منبع: ' + row.community.sourceFa : null]
+                    .filter(Boolean)
+                    .join(' · ')}
+                  status={{
+                    tone: row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral',
+                    label: VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus],
+                  }}
+                />
               ))}
-            </ul>
+            </CaseList>
           )}
-        </Card>
+        </Panel>
+        <CommunityCreateForm surface="review" />
       </div>
     </OpsShell>
   );

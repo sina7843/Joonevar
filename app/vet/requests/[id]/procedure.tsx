@@ -20,12 +20,7 @@ import {
 
 const EMPTY: VetFormState = {};
 
-const METHODS: readonly ChipReadMethod[] = [
-  'BLUETOOTH_READER',
-  'MOBILE_READER',
-  'PACKAGE_BARCODE',
-  'MANUAL',
-];
+const METHODS: readonly ChipReadMethod[] = ['BLUETOOTH_READER', 'MOBILE_READER', 'PACKAGE_BARCODE', 'MANUAL'];
 
 function Result({ state }: { state: VetFormState }) {
   if (!state.message) return null;
@@ -127,16 +122,21 @@ export function ChipPanel({
 }) {
   return (
     <Card>
-      <h3 className="text-label-lg">میکروچیپ</h3>
+      <div className="hz-section-header hz-section-header--sm">
+        <h3 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>میکروچیپ</span>
+        </h3>
+      </div>
       {readerReady ? (
         <p className="mt-md text-caption text-text-secondary" data-testid="reader-keyboard-wedge">
-          ریدر بلوتوث مانند صفحه‌کلید عمل می‌کند: کافی است روی فیلد شماره بایستید و با دستگاه بخوانید تا شماره
-          همان‌جا تایپ شود. ورود دستی و بارکد بسته هم همیشه در دسترس‌اند و شماره ثبت‌شده تفاوتی ندارد.
+          ریدر بلوتوث مانند صفحه‌کلید عمل می‌کند: کافی است روی فیلد شماره بایستید و با دستگاه بخوانید تا شماره همان‌جا
+          تایپ شود. ورود دستی و بارکد بسته هم همیشه در دسترس‌اند و شماره ثبت‌شده تفاوتی ندارد.
         </p>
       ) : (
         <p className="mt-md text-caption text-text-secondary" data-testid="reader-not-configured">
-          اتصال ریدر یکپارچه هنوز پیکربندی نشده است. بارکد بسته و ورود دستی همین حالا کار می‌کنند و شماره
-          ثبت‌شده تفاوتی ندارد.
+          اتصال ریدر یکپارچه هنوز پیکربندی نشده است. بارکد بسته و ورود دستی همین حالا کار می‌کنند و شماره ثبت‌شده تفاوتی
+          ندارد.
         </p>
       )}
 
@@ -217,10 +217,15 @@ export function SamplePanel({
   if (unusableSampleId !== null) {
     return (
       <Card>
-        <h3 className="text-label-lg">نمونه‌گیری مجدد</h3>
+        <div className="hz-section-header hz-section-header--sm">
+          <h3 className="hz-section-header__title">
+            <span className="hz-section-header__bar" aria-hidden="true" />
+            <span>نمونه‌گیری مجدد</span>
+          </h3>
+        </div>
         <p className="mt-md text-caption text-text-secondary">
-          نمونه و کد قبلی در سابقه می‌مانند. کد جدید فقط پس از انجام واقعی نمونه‌گیری صادر می‌شود و این مسیر
-          کاشت دوباره میکروچیپ نیست.
+          نمونه و کد قبلی در سابقه می‌مانند. کد جدید فقط پس از انجام واقعی نمونه‌گیری صادر می‌شود و این مسیر کاشت دوباره
+          میکروچیپ نیست.
         </p>
         <form action={submitResample} className="mt-lg space-y-lg" data-testid="resample-form">
           <input type="hidden" name="requestId" value={requestId} />
@@ -238,10 +243,14 @@ export function SamplePanel({
 
   return (
     <Card>
-      <h3 className="text-label-lg">نمونه‌گیری خون</h3>
+      <div className="hz-section-header hz-section-header--sm">
+        <h3 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>نمونه‌گیری خون</span>
+        </h3>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        در هر دو مسیر کاشت و تأیید، نمونه خون اجباری است. کد رهگیری فقط پس از انجام واقعی نمونه‌گیری صادر
-        می‌شود.
+        در هر دو مسیر کاشت و تأیید، نمونه خون اجباری است. کد رهگیری فقط پس از انجام واقعی نمونه‌گیری صادر می‌شود.
       </p>
       <form action={submitSample} className="mt-lg space-y-lg" data-testid="sampling-form">
         <input type="hidden" name="requestId" value={requestId} />
@@ -255,13 +264,7 @@ export function SamplePanel({
   );
 }
 
-export function UnusableSampleForm({
-  requestId,
-  sampleId,
-}: {
-  requestId: string;
-  sampleId: string;
-}) {
+export function UnusableSampleForm({ requestId, sampleId }: { requestId: string; sampleId: string }) {
   const [state, submit, pending] = useActionState(markSampleUnusableAction, EMPTY);
   return (
     <form action={submit} className="mt-lg space-y-lg" data-testid="unusable-form">
@@ -294,20 +297,19 @@ export function UnusableSampleForm({
  * It is an independent record: it carries this vet's name, council code, time
  * and examination location, and it never rewrites what the owner declared.
  */
-export function PregnancyPanel({
-  requestId,
-  isCorrection,
-}: {
-  requestId: string;
-  isCorrection: boolean;
-}) {
+export function PregnancyPanel({ requestId, isCorrection }: { requestId: string; isCorrection: boolean }) {
   const [state, submit, pending] = useActionState(recordPregnancyResultAction, EMPTY);
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{isCorrection ? 'اصلاح نتیجه بررسی بارداری' : 'ثبت نتیجه بررسی بارداری'}</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>{isCorrection ? 'اصلاح نتیجه بررسی بارداری' : 'ثبت نتیجه بررسی بارداری'}</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        این نتیجه رکورد مستقل شماست و اعلام مالک را بازنویسی نمی‌کند؛ در صورت اختلاف، هر دو مقدار با برچسب
-        خنثی نمایش داده می‌شود.
+        این نتیجه رکورد مستقل شماست و اعلام مالک را بازنویسی نمی‌کند؛ در صورت اختلاف، هر دو مقدار با برچسب خنثی نمایش
+        داده می‌شود.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="vet-pregnancy-form">
         <input type="hidden" name="requestId" value={requestId} />

@@ -19,9 +19,9 @@ export default async function ReviewCommunityPage({ params }: { params: Promise<
   if (data === null) notFound();
 
   return (
-    <OpsShell actor={guard.actor} title="اپراتور بررسی" pathname="/review/communities" nav={REVIEW_NAV}>
+    <OpsShell actor={guard.actor} title="انجمن و کلاب" pathname="/review/communities" nav={REVIEW_NAV}>
       <div className="space-y-lg">
-        <Link href="/review/communities" className="text-label-md text-text-brand underline underline-offset-4">
+        <Link href="/review/communities" className="hz-link hz-link--standalone">
           بازگشت به انجمن‌ها و کلاب‌ها
         </Link>
         <CommunityEditor data={data} surface="review" />

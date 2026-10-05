@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react';
 import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { TextAreaField, TextField } from '../../../src/ui/field.tsx';
+import { DecisionOptions } from '../../../src/ui/decision.tsx';
 import { MEMBERSHIP_DECISIONS, MEMBERSHIP_DECISION_FA, type MembershipDecision } from '../../../src/billing/membership-model.ts';
 import { decideMembershipAction, issueNumberAction, setMembershipStandingAction, type MemberFormState } from './actions.ts';
 
@@ -41,27 +42,20 @@ export function DecideMembershipForm({ applicationId, version }: { applicationId
     <form action={submit} className="mt-md space-y-md" data-testid="membership-decision-form">
       <input type="hidden" name="applicationId" value={applicationId} />
       <input type="hidden" name="expectedVersion" value={version} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">نتیجه بررسی</legend>
-        {MEMBERSHIP_DECISIONS.map((value) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
-            <input
-              type="radio"
-              name="decision"
-              value={value}
-              checked={decision === value}
-              onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
-              data-testid={'membership-decision-' + value}
-            />
-            {MEMBERSHIP_DECISION_FA[value]}
-          </label>
-        ))}
-      </fieldset>
+      <DecisionOptions
+        choices={MEMBERSHIP_DECISIONS.map((value) => ({
+          value,
+          label: MEMBERSHIP_DECISION_FA[value],
+          testId: 'membership-decision-' + value,
+        }))}
+        value={decision}
+        onChange={setDecision}
+        disabled={pending}
+      />
       <TextAreaField label="دلیل" name="reasonFa" required rows={3} maxLength={1000} hint="برای متقاضی نمایش داده می‌شود." data-testid="membership-decision-reason" />
       <Result state={state} testId="membership-decision-result" />
       <Button type="submit" disabled={pending} data-testid="submit-membership-decision">
-        {pending ? 'در حال ثبت…' : 'ثبت نتیجه'}
+        {pending ? 'در حال ثبت…' : 'ثبت تصمیم: ' + MEMBERSHIP_DECISION_FA[decision]}
       </Button>
     </form>
   );

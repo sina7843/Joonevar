@@ -1,4 +1,5 @@
 import { PublicShell } from '../../../../src/ui/shell.tsx';
+import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { Card } from '../../../../src/ui/card.tsx';
@@ -33,8 +34,8 @@ export default async function SellerReviewsPage({
   const store = stores.find((row) => row.id === requested) ?? stores[0] ?? null;
   if (store === null) {
     return (
-      <PublicShell actor={guard.actor} title="نظرها و پرسش‌ها" pathname="/account/seller">
-        <div className="space-y-lg p-lg">
+      <PublicShell actor={guard.actor} title="نظرها و پرسش‌ها" pathname="/account/seller" header={<PageHeader title="نظرها و پرسش‌ها" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+        <div className="space-y-xl">
           <p className="text-body-sm text-text-secondary" data-testid="reviews-no-store">
             هنوز فروشگاهی ندارید.
           </p>
@@ -50,10 +51,10 @@ export default async function SellerReviewsPage({
   ]);
 
   return (
-    <PublicShell actor={guard.actor} title="نظرها و پرسش‌ها" pathname="/account/seller">
-      <div className="space-y-lg p-lg">
+    <PublicShell actor={guard.actor} title="نظرها و پرسش‌ها" pathname="/account/seller" header={<PageHeader title="نظرها و پرسش‌ها" back={{ href: '/account/seller', label: 'فروشگاه من' }} />}>
+      <div className="space-y-xl">
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>امتیاز فروشگاه</span></h2></div>
+          <SectionHeader size="sm" title="امتیاز فروشگاه" />
           <p className="mt-sm text-h2" data-testid="seller-rating">
             {aggregate.count === 0 ? '—' : fa(aggregate.overall)}
           </p>
@@ -64,17 +65,17 @@ export default async function SellerReviewsPage({
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نظرها</span></h2></div>
+          <SectionHeader size="sm" title="نظرها" />
           {reviews.length === 0 ? (
             <p className="mt-2xs text-caption text-text-secondary" data-testid="seller-reviews-empty">
               هنوز نظری ثبت نشده است.
             </p>
           ) : (
-            <ul className="mt-md space-y-lg" data-testid="seller-reviews">
+            <ul className="hz-cardlist mt-md" data-testid="seller-reviews">
               {reviews.map((view) => (
                 <li
                   key={view.row.id}
-                  className="space-y-sm rounded-lg border border-border-default p-lg"
+                  className="hz-cardlist__item"
                   data-testid={'seller-review-' + view.row.id}
                 >
                   <p className="text-body-sm">
@@ -105,7 +106,7 @@ export default async function SellerReviewsPage({
         </Card>
 
         <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پرسش‌ها</span></h2></div>
+          <SectionHeader size="sm" title="پرسش‌ها" />
           <Alert tone="info" title="پرسش پس از بررسی ناظر به شما می‌رسد">
             <span data-testid="questions-note">
               پرسش‌های در انتظار بررسی اینجا نمایش داده نمی‌شوند.
@@ -116,11 +117,11 @@ export default async function SellerReviewsPage({
               پرسشی برای این فروشگاه ثبت نشده است.
             </p>
           ) : (
-            <ul className="mt-md space-y-lg" data-testid="seller-questions">
+            <ul className="hz-cardlist mt-md" data-testid="seller-questions">
               {questions.map((entry) => (
                 <li
                   key={entry.row.id}
-                  className="space-y-sm rounded-lg border border-border-default p-lg"
+                  className="hz-cardlist__item"
                   data-testid={'seller-question-' + entry.row.id}
                 >
                   <p className="text-body-sm">

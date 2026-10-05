@@ -20,9 +20,7 @@ const EMPTY: BreedingFormState = {};
 
 function Result({ state }: { state: BreedingFormState }) {
   if (!state.message) return null;
-  return (
-    <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />
-  );
+  return <Alert tone={state.ok ? (state.tone === 'info' ? 'info' : 'success') : 'error'} title={state.message} />;
 }
 
 /**
@@ -43,7 +41,12 @@ export function DeclarePregnancyForm({
   const [state, submit, pending] = useActionState(declarePregnancyAction, EMPTY);
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>{isCorrection ? 'اصلاح اعلام بارداری' : 'اعلام بارداری'}</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>{isCorrection ? 'اصلاح اعلام بارداری' : 'اعلام بارداری'}</span>
+        </h2>
+      </div>
       <form action={submit} className="mt-lg space-y-lg" data-testid="pregnancy-form">
         <input type="hidden" name="permitId" value={permitId} />
         <Result state={state} />
@@ -66,9 +69,7 @@ export function DeclarePregnancyForm({
           data-testid="pregnancy-expected"
         />
         <TextField label="توضیح (اختیاری)" name="note" data-testid="pregnancy-note" />
-        {isCorrection ? (
-          <TextField label="علت اصلاح" name="reason" required data-testid="pregnancy-reason" />
-        ) : null}
+        {isCorrection ? <TextField label="علت اصلاح" name="reason" required data-testid="pregnancy-reason" /> : null}
         <Button type="submit" block disabled={pending} data-testid="submit-pregnancy">
           {pending ? 'در حال ثبت…' : isCorrection ? 'ثبت نسخه اصلاحی' : 'ثبت اعلام'}
         </Button>
@@ -88,10 +89,15 @@ export function RequestPregnancyCheckForm({
   const [state, submit, pending] = useActionState(attachCheckAction, EMPTY);
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>درخواست تأیید اختیاری دامپزشک</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>درخواست تأیید اختیاری دامپزشک</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        این مرحله اختیاری است. دامپزشک و مرکز را در Finder انتخاب می‌کنید، درخواست فقط به همان دامپزشک
-        تخصیص می‌یابد و صف عمومی برای برداشتن پرونده وجود ندارد.
+        این مرحله اختیاری است. دامپزشک و مرکز را در Finder انتخاب می‌کنید، درخواست فقط به همان دامپزشک تخصیص می‌یابد و
+        صف عمومی برای برداشتن پرونده وجود ندارد.
       </p>
       <form action={startPregnancyFinderAction} className="mt-lg" data-testid="pregnancy-finder-form">
         <input type="hidden" name="permitId" value={permitId} />
@@ -125,10 +131,15 @@ export function RecordBirthForm({ permitId }: { permitId: string }) {
   const [state, submit, pending] = useActionState(recordBirthAction, EMPTY);
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>ثبت نتیجه زایمان</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>ثبت نتیجه زایمان</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
-        تعداد توله زنده و مرده دو عدد مستقل و صفر یا بیشترند. برای هر توله زنده یک پرونده موقت ساخته می‌شود؛
-        برای توله‌ای که در همین اعلام مرده ثبت شود، پرونده، کد موقت یا کارت ساخته نمی‌شود.
+        تعداد توله زنده و مرده دو عدد مستقل و صفر یا بیشترند. برای هر توله زنده یک پرونده موقت ساخته می‌شود؛ برای
+        توله‌ای که در همین اعلام مرده ثبت شود، پرونده، کد موقت یا کارت ساخته نمی‌شود.
       </p>
       <form action={submit} className="mt-lg space-y-lg" data-testid="birth-form">
         <input type="hidden" name="permitId" value={permitId} />
@@ -169,7 +180,12 @@ export function CorrectBirthForm({
 
   return (
     <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اصلاح تعداد</span></h2></div>
+      <div className="hz-section-header hz-section-header--sm">
+        <h2 className="hz-section-header__title">
+          <span className="hz-section-header__bar" aria-hidden="true" />
+          <span>اصلاح تعداد</span>
+        </h2>
+      </div>
       <p className="mt-md text-caption text-text-secondary">
         وجود پرونده توله مانع اصلاح نیست و بررسی انجمن دوباره لازم نمی‌شود. نسخه و مقدار قبلی حذف نمی‌شود.
       </p>
@@ -202,15 +218,13 @@ export function CorrectBirthForm({
               این کار پرونده را حذف نمی‌کند؛ آن را با علت شما «حذف‌شده با اصلاح گزارش اولیه» ثبت می‌کند.
             </p>
             {standing.map((puppy) => (
-              <label key={puppy.id} className="flex items-center gap-sm text-body-sm">
-                <input
-                  type="checkbox"
-                  name="withdraw"
-                  value={puppy.id}
-                  className="size-[var(--size-selection-md)]"
-                  data-testid={'withdraw-' + puppy.tempCode}
-                />
-                {puppy.tempCode} · {puppy.nameFa ?? 'بدون نام'} · {puppy.statusFa}
+              <label key={puppy.id} className="hz-check">
+                <input type="checkbox" name="withdraw" value={puppy.id} data-testid={'withdraw-' + puppy.tempCode} />
+                <span className="hz-check__text">
+                  <span className="hz-check__label">
+                    {puppy.tempCode} · {puppy.nameFa ?? 'بدون نام'} · {puppy.statusFa}
+                  </span>
+                </span>
               </label>
             ))}
           </fieldset>
@@ -239,12 +253,7 @@ export function PuppyDeathForm({
   const [open, setOpen] = useState(false);
   if (!open) {
     return (
-      <Button
-        type="button"
-        tone="secondary"
-        onClick={() => setOpen(true)}
-        data-testid={'open-death-' + tempCode}
-      >
+      <Button type="button" tone="secondary" onClick={() => setOpen(true)} data-testid={'open-death-' + tempCode}>
         ثبت مرگ پس از تولد
       </Button>
     );

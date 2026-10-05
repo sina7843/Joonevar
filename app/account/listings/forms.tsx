@@ -1,9 +1,9 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { Button } from '../../../src/ui/button.tsx';
+import { ActionRow, Button } from '../../../src/ui/button.tsx';
+import { Icon } from '../../../src/ui/icon.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { Card } from '../../../src/ui/card.tsx';
 import { FileField, SelectField, TextAreaField, TextField } from '../../../src/ui/field.tsx';
 import { startPromotionAction } from '../../market/moderation-actions.ts';
 import {
@@ -160,8 +160,8 @@ export function ListingContentForm({
         />
       </div>
 
-      <fieldset className="space-y-md rounded-xl border border-border-default p-lg">
-        <legend className="px-xs text-label-md">اظهارات فروشنده</legend>
+      <fieldset className="hz-fieldset gap-md border-t border-border-subtle pt-lg">
+        <legend className="hz-field__label">اظهارات فروشنده</legend>
         <p className="text-caption text-text-secondary">
           همزیست سابقه واکسیناسیون و عقیم‌سازی را نگه نمی‌دارد؛ این موارد اظهار فروشنده‌اند و به همین شکل به
           خریدار نشان داده می‌شوند. «نمی‌دانم» یک پاسخ معتبر است.
@@ -202,27 +202,32 @@ export function ListingContentForm({
         />
       </fieldset>
 
-      <fieldset className="space-y-sm rounded-xl border border-border-default p-lg">
-        <legend className="px-xs text-label-md">روش‌های تحویل که ارائه می‌دهید</legend>
+      <fieldset className="hz-fieldset border-t border-border-subtle pt-lg">
+        <legend className="hz-field__label">روش‌های تحویل که ارائه می‌دهید</legend>
         {DELIVERY_METHODS.map((method: DeliveryMethod) => (
-          <label key={method} className="flex items-center gap-sm text-body-sm">
+          <label key={method} className="hz-check">
             <input
               type="checkbox"
               name="deliveryMethods"
               value={method}
               defaultChecked={values.deliveryMethods.includes(method)}
               disabled={disabled}
-              className="size-5 rounded border-border-strong"
               data-testid={'listing-delivery-' + method}
             />
-            {DELIVERY_METHOD_FA[method]}
+            <span className="hz-check__text">
+              <span className="hz-check__label">{DELIVERY_METHOD_FA[method]}</span>
+            </span>
           </label>
         ))}
       </fieldset>
 
-      <Button type="submit" disabled={pending || disabled} data-testid="save-listing">
-        {pending ? 'در حال ذخیره…' : 'ذخیره اطلاعات آگهی'}
-      </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" tone="secondary" loading={pending} loadingLabel="در حال ذخیره…" disabled={pending || disabled} data-testid="save-listing">
+            ذخیره اطلاعات آگهی
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -320,21 +325,24 @@ export function BlockedAnimalCard({
   blockers: readonly { code: string; messageFa: string; href?: string; ctaFa?: string }[];
 }) {
   return (
-    <Card>
-      <h3 className="text-label-md">{title}</h3>
-      <ul className="mt-sm space-y-2xs text-caption text-text-secondary" data-testid="animal-blockers">
+    <article className="hz-locked" aria-disabled="true">
+      <h3 className="hz-locked__title">
+        <Icon name="lockSimple" size="sm" />
+        {title}
+      </h3>
+      <ul className="space-y-2xs" data-testid="animal-blockers">
         {blockers.map((blocker) => (
-          <li key={blocker.code}>
+          <li key={blocker.code} className="hz-locked__why">
             {blocker.messageFa}
             {blocker.href ? (
-              <a className="mx-xs text-text-brand" href={blocker.href}>
+              <a className="hz-link ms-xs" href={blocker.href}>
                 {blocker.ctaFa ?? 'ادامه'}
               </a>
             ) : null}
           </li>
         ))}
       </ul>
-    </Card>
+    </article>
   );
 }
 
@@ -357,7 +365,7 @@ export function PromotionForm({
         </div>
       ) : null}
       {buyable.length === 0 ? (
-        <p className="text-caption text-text-disabled" data-testid="promotion-unpriced">
+        <p className="hz-unset hz-unset--action whitespace-normal text-body-sm" data-testid="promotion-unpriced">
           تعرفه بسته‌های تبلیغ هنوز ثبت نشده است؛ تا ثبت مبلغ واقعی، خرید باز نمی‌شود.
         </p>
       ) : (

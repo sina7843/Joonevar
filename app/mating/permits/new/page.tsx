@@ -7,6 +7,7 @@ import { db } from '../../../../src/db/client.ts';
 import { eligibilityFor } from '../../../../src/domain/eligibility/service.ts';
 import { eligibleAnimals } from '../../../../src/mating/permits.ts';
 import { StartPermitForm } from '../../forms.tsx';
+import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,11 +26,14 @@ export default async function NewPermitPage() {
   const animals = eligibility.allowed ? await eligibleAnimals(db(), guard.actor) : [];
 
   return (
-    <PublicShell actor={guard.actor} title="شروع مجوز جفت‌گیری" pathname="/mating/permits/new">
+    <PublicShell
+      actor={guard.actor}
+      title="شروع مجوز جفت‌گیری"
+      pathname="/mating/permits/new"
+      header={<PageHeader title={'شروع مجوز جفت‌گیری'} back={{ href: '/mating/permits' }} />}
+    >
       <div className="space-y-lg">
-        {eligibility.allowed ? null : (
-          <LockedServiceCard serviceLabel="مجوز جفت‌گیری" lock={eligibility.lock} />
-        )}
+        {eligibility.allowed ? null : <LockedServiceCard serviceLabel="مجوز جفت‌گیری" lock={eligibility.lock} />}
 
         {eligibility.allowed ? (
           animals.length === 0 ? (

@@ -2,10 +2,10 @@ import { desc, eq, inArray } from 'drizzle-orm';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
-import { Card } from '../../../src/ui/card.tsx';
+import { CaseItem, CaseList, Panel } from '../../../src/ui/desk.tsx';
+import { ageInDays } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { parentageResults } from '../../../src/db/schema/genetics.ts';
@@ -45,78 +45,78 @@ export default async function GeneticsResultsPage() {
     : [];
 
   return (
-    <OpsShell actor={guard.actor} title="هم‌زیست — مرکز ژنتیک" pathname="/genetics/results" nav={GENETICS_NAV}>
-      <div className="space-y-lg">
-        <Alert tone="info" title="خروجی ژنتیکی فقط Parentage Result است">
-          هیچ خروجی موازی با نام DNA Profile و هیچ کد نتیجه دومی ساخته نمی‌شود. ثبت نتیجه به پرداخت صدور سند در
-          هم‌زیست وابسته نیست.
-        </Alert>
+    <OpsShell actor={guard.actor} title="نتایج" pathname="/genetics/results" nav={GENETICS_NAV}>
+      <p className="hz-page-header__meta">
+        <span className="hz-page-header__meta-item">{checks.length.toLocaleString('fa-IR') + ' نمونه در حال پردازش'}</span>
+        <span className="hz-page-header__meta-item">{waiting.length.toLocaleString('fa-IR') + ' نتیجه در انتظار والدین'}</span>
+      </p>
+      <Alert tone="info" title="خروجی ژنتیکی فقط Parentage Result است">
+        هیچ خروجی موازی با نام DNA Profile و هیچ کد نتیجه دومی ساخته نمی‌شود. ثبت نتیجه به پرداخت صدور سند در
+        هم‌زیست وابسته نیست.
+      </Alert>
 
-        <Card>
-          <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>نمونه‌های در حال پردازش</span></h2></div>
-          {checks.length === 0 ? (
-            <p className="mt-md text-body-sm text-text-secondary">نمونه‌ای در حال پردازش نیست.</p>
-          ) : (
-            <ul className="mt-lg space-y-lg" data-testid="processing-list">
-              {checks.map(({ row, parents }) => (
-                <li key={row.sample.id} className="rounded-xl border border-border-default p-lg">
-                  <p className="text-body-sm">
-                    <Identifier label="کد رهگیری نمونه:" value={row.sample.trackingCode} />
-                  </p>
-                  <p className="mt-2xs text-caption text-text-secondary">
-                    {row.animalName ?? 'بدون نام'} · {generationLabel(row.generation)}
-                  </p>
-                  <p className="mt-sm text-caption text-text-secondary" data-testid={'parent-check-' + row.animalId}>
+      {checks.length === 0 && waiting.length === 0 ? (
+        <EmptyState
+          title="کاری در صف نتایج نیست"
+          description="پس از شروع پردازش نمونه، ثبت Parentage Result از همین صفحه انجام می‌شود."
+        />
+      ) : null}
+
+      <Panel title="نمونه‌های در حال پردازش" count={checks.length.toLocaleString('fa-IR')}>
+        {checks.length === 0 ? (
+          <p className="text-body-sm text-text-secondary">نمونه‌ای در حال پردازش نیست.</p>
+        ) : (
+          <CaseList label="نمونه‌های در حال پردازش" testId="processing-list">
+            {checks.map(({ row, parents }) => (
+              <CaseItem
+                key={row.sample.id}
+                type={generationLabel(row.generation)}
+                name={row.animalName ?? 'بدون نام'}
+                code={row.sample.trackingCode}
+                sub={
+                  <span data-testid={'parent-check-' + row.animalId}>
                     {parents.state === 'READY'
                       ? row.generation === 0
                         ? 'حیوان G0: نتیجه مستقیم به همین حیوان نسبت داده می‌شود.'
                         : 'نتیجه هر دو والد کامل و قابل Resolve است.'
                       : parents.missingFa}
-                  </p>
-                  <RecordResultForm sampleId={row.sample.id} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        {waiting.length === 0 ? null : (
-          <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>در انتظار تکمیل نتایج والدین</span></h2></div>
-            <ul className="mt-lg space-y-lg" data-testid="waiting-list">
-              {waiting.map((result) => {
-                const animal = waitingAnimals.find((a) => a.id === result.animalId);
-                return (
-                  <li key={result.id} className="rounded-xl border border-border-default p-lg">
-                    <div className="flex items-start justify-between gap-md">
-                      <div className="min-w-0">
-                        <p className="text-body-sm">{animal?.name ?? 'بدون نام'}</p>
-                        <p className="mt-2xs text-caption text-text-secondary">
-                          {generationLabel(animal?.generation ?? 0)} · نسخه {result.resultVersion} ·{' '}
-                          {formatCivilDateFa(result.createdAt.toISOString().slice(0, 10))}
-                        </p>
-                      </div>
-                      <StatusBadge tone="info">
-                        <span data-testid={'result-status-' + result.animalId}>
-                          {RESULT_STATUS_FA[result.status]}
-                        </span>
-                      </StatusBadge>
-                    </div>
-                    <RefreshResultForm resultId={result.id} />
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
+                  </span>
+                }
+                ageDays={ageInDays(row.sample.collectedAt)}
+                status={{ tone: 'info', label: 'در حال پردازش' }}
+                owner="GENETICS_CENTRE"
+                ownerIsUs
+              >
+                <RecordResultForm sampleId={row.sample.id} />
+              </CaseItem>
+            ))}
+          </CaseList>
         )}
+      </Panel>
 
-        {checks.length === 0 && waiting.length === 0 ? (
-          <EmptyState
-            title="کاری در صف نتایج نیست"
-            description="پس از شروع پردازش نمونه، ثبت Parentage Result از همین صفحه انجام می‌شود."
-          />
-        ) : null}
-      </div>
+      {waiting.length === 0 ? null : (
+        <Panel title="در انتظار تکمیل نتایج والدین" count={waiting.length.toLocaleString('fa-IR')}>
+          <CaseList label="در انتظار تکمیل نتایج والدین" testId="waiting-list">
+            {waiting.map((result) => {
+              const animal = waitingAnimals.find((a) => a.id === result.animalId);
+              return (
+                <CaseItem
+                  key={result.id}
+                  type={generationLabel(animal?.generation ?? 0)}
+                  name={animal?.name ?? 'بدون نام'}
+                  sub={'نسخه ' + result.resultVersion.toLocaleString('fa-IR') + ' · ' + formatCivilDateFa(result.createdAt.toISOString().slice(0, 10))}
+                  ageDays={ageInDays(result.createdAt)}
+                  status={{ tone: 'info', label: RESULT_STATUS_FA[result.status], testId: 'result-status-' + result.animalId }}
+                  owner="GENETICS_CENTRE"
+                  ownerIsUs
+                >
+                  <RefreshResultForm resultId={result.id} />
+                </CaseItem>
+              );
+            })}
+          </CaseList>
+        </Panel>
+      )}
     </OpsShell>
   );
 }

@@ -18,6 +18,7 @@ import {
 } from '../../../src/mating/declaration.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { CancelDeclarationForm, PersonalNoteForm, RespondDeclarationForm } from '../forms.tsx';
+import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,12 +53,22 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
   const notesOpen = declaration.status === 'PENDING_COUNTERPARTY_CONFIRMATION' || declaration.status === 'CONFIRMED';
 
   return (
-    <PublicShell actor={guard.actor} title="اعلام توافق شخصی" pathname={'/declaration/' + id}>
+    <PublicShell
+      actor={guard.actor}
+      title="اعلام توافق شخصی"
+      pathname={'/declaration/' + id}
+      header={<PageHeader title={'اعلام توافق شخصی'} back={{ href: '/declaration' }} />}
+    >
       <div className="space-y-lg">
         <Card>
           <div className="flex items-start justify-between gap-md">
             <div className="min-w-0">
-              <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>اعلام وجود توافق شخصی</span></h2></div>
+              <div className="hz-section-header hz-section-header--sm">
+                <h2 className="hz-section-header__title">
+                  <span className="hz-section-header__bar" aria-hidden="true" />
+                  <span>اعلام وجود توافق شخصی</span>
+                </h2>
+              </div>
               <p className="mt-2xs text-caption text-text-secondary" data-testid="declaration-route-note">
                 این مسیر شخصی است و با «مجوز رسمی جفت‌گیری» یکی نیست؛ شناسه، وضعیت و Route جداگانه دارد.
               </p>
@@ -75,19 +86,33 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
             </StatusBadge>
           </div>
 
-          <dl className="mt-lg grid grid-cols-2 gap-sm text-body-sm" data-testid="declaration-detail">
-            <dt className="text-text-secondary">حیوان آغازکننده</dt>
-            <dd data-testid="declaration-own-animal-name">{view.initiatorAnimalName ?? 'بدون نام'}</dd>
-            <dt className="text-text-secondary">حیوان طرف مقابل</dt>
-            <dd data-testid="declaration-other-animal-name">{view.counterpartyAnimalName ?? 'بدون نام'}</dd>
-            <dt className="text-text-secondary">آغازکننده</dt>
-            <dd>{view.initiatorName}</dd>
-            <dt className="text-text-secondary">طرف مقابل</dt>
-            <dd>{view.counterpartyName}</dd>
-            <dt className="text-text-secondary">شماره دعوت‌شده</dt>
-            <dd dir="ltr" className="text-left font-mono" data-testid="declaration-mobile-tail">
-              {view.invitedMobileTail}
-            </dd>
+          <dl className="hz-kv mt-lg" data-testid="declaration-detail">
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">حیوان آغازکننده</dt>
+              <dd className="hz-kv__value" data-testid="declaration-own-animal-name">
+                {view.initiatorAnimalName ?? 'بدون نام'}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">حیوان طرف مقابل</dt>
+              <dd className="hz-kv__value" data-testid="declaration-other-animal-name">
+                {view.counterpartyAnimalName ?? 'بدون نام'}
+              </dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">آغازکننده</dt>
+              <dd className="hz-kv__value">{view.initiatorName}</dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">طرف مقابل</dt>
+              <dd className="hz-kv__value">{view.counterpartyName}</dd>
+            </div>
+            <div className="hz-kv__row">
+              <dt className="hz-kv__key">شماره دعوت‌شده</dt>
+              <dd className="hz-kv__value" data-testid="declaration-mobile-tail">
+                <bdi dir="ltr">{view.invitedMobileTail}</bdi>
+              </dd>
+            </div>
           </dl>
 
           {declaration.reasonFa ? (
@@ -106,10 +131,15 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
 
         {awaitingMe ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>پاسخ شما</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>پاسخ شما</span>
+              </h2>
+            </div>
             <p className="mt-md text-caption text-text-secondary">
-              فقط «وجود» توافق را تأیید یا رد می‌کنید؛ متن یا مفاد توافق در هم‌زیست ثبت نمی‌شود و کد
-              یک‌بارمصرف جدیدی برای امضا ساخته نمی‌شود.
+              فقط «وجود» توافق را تأیید یا رد می‌کنید؛ متن یا مفاد توافق در هم‌زیست ثبت نمی‌شود و کد یک‌بارمصرف جدیدی
+              برای امضا ساخته نمی‌شود.
             </p>
             <RespondDeclarationForm declarationId={declaration.id} />
           </Card>
@@ -130,10 +160,15 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
 
         {view.notes.length > 0 ? (
           <Card>
-            <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>یادداشت‌های شخصی (UNVERIFIED)</span></h2></div>
+            <div className="hz-section-header hz-section-header--sm">
+              <h2 className="hz-section-header__title">
+                <span className="hz-section-header__bar" aria-hidden="true" />
+                <span>یادداشت‌های شخصی (UNVERIFIED)</span>
+              </h2>
+            </div>
             <ul className="mt-lg space-y-md" data-testid="personal-notes">
               {view.notes.map((note) => (
-                <li key={note.id} className="rounded-xl border border-border-default p-lg">
+                <li key={note.id} className="rounded-lg border border-border-default p-lg">
                   <p className="text-label-md">
                     {NOTE_KIND_FA[note.kind] ?? note.kind}
                     {note.noteDate ? ' · ' + formatCivilDateFa(note.noteDate) : ''}
@@ -148,11 +183,7 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
 
         <Card>
           <p className="text-body-sm">
-            <Link
-              href="/mating/permits/new"
-              className="text-text-brand underline underline-offset-4"
-              data-testid="official-route-link"
-            >
+            <Link href="/mating/permits/new" className="hz-link" data-testid="official-route-link">
               مسیر رسمی: درخواست مجوز جفت‌گیری
             </Link>
           </p>
