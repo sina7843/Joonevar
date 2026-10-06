@@ -14,7 +14,7 @@ Where the system lacks something, the closest existing part is used and the gap 
 | 8 | Listing statuses reserved / sold / expired, expired centre licence | demo data | Not seedable through services (system-set states); demo rows are published. | DEC-0227 |
 | 9 | OTP as six boxes (DS *OtpField*) | `/login` | One LTR code input (autofill `one-time-code`, browser tests fill one field). | DEC-0226 |
 | 10 | Audit row person name and readable subject | `/admin/audit` | Role + target type/id; long values clamped to two lines with the full text in `title` (no client toggle). Audit rows store only an account id. | DEC-0228 |
-| 11 | ActionOwner labels for marketplace roles | `/market/*` queues | Team names: ناظر آگهی، داور بازار، مالی بازار، پشتیبانی بازار، بررسی فروشندگان، بررسی کاتالوگ، ناظر جفت‌یابی. Needs product-owner confirmation. | DEC-0228 |
+| 11 | ActionOwner labels for marketplace roles | `/market/*` queues | Team names: ناظر آگهی، داور بازار، مالی بازار، پشتیبانی بازار، بررسی فروشندگان، بررسی کاتالوگ، ناظر جفت‌یابی. Confirmed by the product owner (2026-10-06). | DEC-0228, DEC-0230 |
 | 12 | Case age on handovers, trust questions, reviews | `/market/handovers`, `/market/trust` | No age column: their queries return no submission time. | DEC-0228 |
 | 13 | «بدون دانلود» note on seller documents | `/market/sellers` | Omitted: `/api/files` may serve a download, so the note would be untrue. | DEC-0228 |
 | 14 | Raw status codes on promotion rules, review status, market setting value | `/market/promotions`, `/market/trust`, `/market/settings` | Kept as is: browser tests read the stored values. To migrate together with the dictionary (gap 4). | DEC-0228 |
