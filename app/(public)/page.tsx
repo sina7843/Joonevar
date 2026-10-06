@@ -174,6 +174,7 @@ export default async function HomePage() {
                     className="hz-input hz-input--ltr hz-input--sm"
                     placeholder="RS-4KQ7MZ2D"
                     aria-describedby="home-verify-hint"
+                    aria-label="شناسه سند برای استعلام اصالت"
                   />
                   <button type="submit" className="hz-btn hz-btn--secondary">
                     استعلام

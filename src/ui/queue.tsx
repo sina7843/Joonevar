@@ -138,14 +138,10 @@ export function CaseQueue({
               ) : null}
               {extraLabel ? <td data-label={extraLabel}>{row.extra ?? '—'}</td> : null}
               <td className="hz-table__open">
-                <Link
-                  className="hz-icon-btn hz-icon-btn--sm"
-                  href={row.href}
-                  aria-label={(row.openLabel ?? 'باز کردن پرونده') + (typeof row.name === 'string' ? ' ' + row.name : '')}
-                  tabIndex={-1}
-                >
+                {/* Decorative: the name is the one link per case, so a case is never two links. */}
+                <span className="hz-icon-btn hz-icon-btn--sm" aria-hidden="true">
                   <Icon name="caretRight" size="sm" mirror />
-                </Link>
+                </span>
               </td>
             </tr>
           ))}

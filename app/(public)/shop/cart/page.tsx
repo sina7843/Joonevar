@@ -188,7 +188,7 @@ export default async function CartPage({
                   </ul>
 
                   <fieldset className="space-y-sm border-t border-border-subtle pt-md" data-testid={'cart-methods-' + group.sellerId}>
-                    <legend className="hz-field__label float-start mb-sm w-full">روش ارسال</legend>
+                    <legend className="hz-field__label mb-sm">روش ارسال</legend>
                     {group.methodOffers.length === 0 ? (
                       <p className="hz-inline-msg hz-inline-msg--error" data-testid={'cart-no-method-' + group.sellerId}>
                         <Icon name="warningCircle" size="xs" />
@@ -199,13 +199,13 @@ export default async function CartPage({
                         {group.methodOffers.map((offer) => {
                           const chosen = offer.methodId === group.chosenMethodId;
                           return (
-                            <li key={offer.methodId}>
+                            <li key={offer.methodId} className="min-w-0">
                               {offer.problem === null ? (
                                 <Link
                                   href={withMethod(group.sellerId, offer.methodId)}
                                   aria-current={chosen ? 'true' : undefined}
                                   className={
-                                    'hz-option h-full text-text-primary no-underline' + (chosen ? ' border-border-brand bg-bg-brand-subtle' : '')
+                                    'hz-option h-full w-full min-w-0 text-text-primary no-underline' + (chosen ? ' border-border-brand bg-bg-brand-subtle' : '')
                                   }
                                   data-testid={'cart-method-' + offer.methodId}
                                 >

@@ -357,3 +357,8 @@ body {
   .hz-table--stack .hz-case__sub { max-width: 100%; white-space: normal; }
 }
 .hz-table__open { width: 44px; text-align: end; }
+
+/* Below 768 the whole queue card opens the case: the name link stretches over it. */
+@media (max-width: 767.98px) {
+  .hz-table--stack .hz-case__name::after { content: ""; position: absolute; inset: 0; }
+}

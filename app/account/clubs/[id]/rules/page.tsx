@@ -169,7 +169,7 @@ export default async function ClubRulesPage({ params }: { params: Promise<{ id: 
       ) : null}
 
       <Card>
-        <CardHeader title="نوشتن شرایط" subtitle="پس از ذخیره، پیش‌نویس را ببینید و سپس منتشر کنید." />
+        <CardHeader title="شرایط عضویت این کلاب" subtitle="پس از ذخیره، پیش‌نویس را ببینید و سپس منتشر کنید." />
         <div className="mt-md">
           <ClubRulesForm
             clubId={id}

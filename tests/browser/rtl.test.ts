@@ -483,7 +483,7 @@ test('the official logo renders at its true aspect ratio and is not cropped', as
   const page = await context.newPage();
   try {
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });
-    const logo = page.getByAltText('همزیست').first();
+    const logo = page.locator('img[alt="همزیست"]:visible').first();
     const metrics = await logo.evaluate((node) => {
       const image = node as HTMLImageElement;
       const rect = image.getBoundingClientRect();
@@ -502,7 +502,7 @@ test('the official logo renders at its true aspect ratio and is not cropped', as
     // The image optimizer resizes, so the served bitmap is smaller than the
     // source. What must hold is that neither step changes the shape: the served
     // image keeps the source ratio, and the rendered box keeps the served ratio.
-    const sourceRatio = 334 / 72;
+    const sourceRatio = 415.92 / 92; // DS lockup-horizontal-fa-light.svg
     const servedRatio = metrics.naturalWidth / metrics.naturalHeight;
     const renderedRatio = metrics.width / metrics.height;
     assert.ok(
@@ -514,10 +514,10 @@ test('the official logo renders at its true aspect ratio and is not cropped', as
       'logo is stretched: served=' + servedRatio + ' rendered=' + renderedRatio,
     );
 
-    // And the source file itself is the official export, byte-for-byte.
-    const header = await fs.readFile(path.join('public', 'brand', 'logo-fa-horizontal.png'));
-    assert.equal(header.readUInt32BE(16), 334, 'source logo width');
-    assert.equal(header.readUInt32BE(20), 72, 'source logo height');
+    // And the source file is the design system's export, byte for byte.
+    const served = await fs.readFile(path.join('public', 'brand', 'logo', 'lockup-horizontal-fa-light.svg'));
+    const source = await fs.readFile(path.join('docs', 'design-system', 'design-system', 'assets', 'brand', 'logo', 'lockup-horizontal-fa-light.svg'));
+    assert.ok(served.equals(source), 'the header logo is the delivered file');
   } finally {
     await context.close();
   }

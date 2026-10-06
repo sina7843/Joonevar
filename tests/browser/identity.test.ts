@@ -158,7 +158,8 @@ test('a new account signs in, completes its profile and reaches the dashboard', 
     await Promise.all([page.waitForURL('**/dashboard'), page.getByTestId('save-identity').click()]);
 
     const body = await page.locator('body').innerText();
-    assert.ok(body.includes('داشبورد'));
+    // DS K2: the dashboard opens with the greeting (P04 PageHeader), not a page name.
+    await page.getByTestId('dashboard-greeting').waitFor();
     // Registration is still locked because KYC has not been approved (§5).
     assert.ok(body.includes('برای ثبت حیوان هم‌زیست، احراز هویت لازم است'));
     await page.screenshot({ path: path.join(SHOTS, 'dashboard-new-account.png'), fullPage: true });

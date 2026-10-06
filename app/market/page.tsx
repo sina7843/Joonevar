@@ -46,7 +46,7 @@ export default async function MarketOverviewPage() {
   const configured = groups.reduce((sum, group) => sum + group.configured, 0);
   const open = flags.filter((flag) => flag.enabled).length;
   return (
-    <OpsShell actor={actor} title="مرور بازار" pathname="/market" nav={marketNav(actor)}>
+    <OpsShell actor={actor} title="عملیات بازار و فروشگاه" pathname="/market" nav={marketNav(actor)}>
       <p className="hz-page-header__meta">
         <span className="hz-page-header__meta-item" data-testid="market-context">
           {MARKETPLACE_CONTEXT_FA[actor.context] ?? 'سوپرادمین'}

@@ -233,7 +233,8 @@ test('the rendered pages use the Design System tokens, not ad-hoc values', async
     assert.match(tokens.font, /Vazirmatn|IRANSans|system/i, 'the Persian font family is the one the DS names');
 
     // The logo keeps its true aspect ratio rather than being stretched.
-    const logo = page.locator('img[alt*="زیست"], img[alt*="Hamzist"], svg[role="img"]').first();
+    // The shell carries a logo per breakpoint; the one on screen is checked.
+    const logo = page.locator('img[alt*="زیست"]:visible').first();
     if ((await logo.count()) > 0) {
       const box = await logo.boundingBox();
       assert.ok(box && box.width > 0 && box.height > 0, 'the logo renders with a real size');

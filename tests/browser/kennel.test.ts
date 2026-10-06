@@ -434,7 +434,9 @@ test('the whole kennel path runs: form, breeds, payment, submission and approval
     const caseRow = assoc.locator('[data-testid="kennel-queue"] > li').filter({ hasText: 'کنل نمونه ' + RUN });
     await caseRow.getByTestId('open-kennel-case').click();
     await assoc.waitForURL('**/assoc/kennels/**');
-    await expectText(assoc, 'نژادها (1)');
+    // Counts are Persian digits beside the panel title (DS content rules).
+    await expectText(assoc, 'نژادها');
+    await expectText(assoc, '۱');
     await expectText(assoc, 'هیچ پرداخت جداگانه‌ای برای فعال‌سازی نقش وجود ندارد');
     await assoc.getByTestId('kennel-decision-NEEDS_CORRECTION').check();
     await assoc.getByTestId('kennel-review-reason').fill('نشانی کنل دقیق‌تر شود.');

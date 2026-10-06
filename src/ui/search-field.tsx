@@ -22,7 +22,7 @@ export function SearchField({
       <span className="hz-input-wrap__icon" aria-hidden="true">
         <Icon name="magnifyingGlass" size="sm" />
       </span>
-      <input id={id} type="search" className="hz-input" placeholder={label} {...rest} />
+      <input id={id} type="search" className="hz-input" placeholder={label} aria-label={label} {...rest} />
     </div>
   );
 }
