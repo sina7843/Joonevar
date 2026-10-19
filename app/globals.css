@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /*
- * Hamzist Design System v1.0.3 (docs/design-system, DEC-0225).
+ * Hamzist Design System v1.0.4 (docs/design-system, DEC-0231).
  *
  * `tokens.css` and `bundle.css` are the system's own files, copied unchanged
  * apart from the font URLs. Components render its `.hz-*` classes. The bundle

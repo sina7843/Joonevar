@@ -1,7 +1,7 @@
 ﻿ID,Theme,Priority,Severity,Origin,Area,Key screens,Title,Page / component,Status,Commit,Note
-FND-001,T01,1,high,v1.0.4,FND,K1,CSS نسخهٔ v1.0.4 در کد نیست (bundle.css هنوز v1.0.3 است),همهٔ صفحه‌ها؛ به‌ویژه خانه `/` (K1)، SiteShell، Button، Stepper (`.hz-qty`)، SegmentedControl، ClubCard، CtaBand,,,
-KPUB-001,T01,1,high,v1.0.4,KPUB,K1,بلوک CSS «Home compositions» در bundle واردشده نیست,K1 — همهٔ قاب‌ها و ردیف‌های خانه,,,
-CMPA1-035,T01,1,medium,v1.0.4,CMPA1,,دکمه‌های `sm` روی صفحه لمسی ۴۴px نمی‌شوند (CSS v1.0.4 vendor نشده),Button / ButtonLink `--sm`,,,
+FND-001,T01,1,high,v1.0.4,FND,K1,CSS نسخهٔ v1.0.4 در کد نیست (bundle.css هنوز v1.0.3 است),همهٔ صفحه‌ها؛ به‌ویژه خانه `/` (K1)، SiteShell، Button، Stepper (`.hz-qty`)، SegmentedControl، ClubCard، CtaBand,FIXED,,bundle.css v1.0.4
+KPUB-001,T01,1,high,v1.0.4,KPUB,K1,بلوک CSS «Home compositions» در bundle واردشده نیست,K1 — همهٔ قاب‌ها و ردیف‌های خانه,FIXED,,bundle.css v1.0.4
+CMPA1-035,T01,1,medium,v1.0.4,CMPA1,,دکمه‌های `sm` روی صفحه لمسی ۴۴px نمی‌شوند (CSS v1.0.4 vendor نشده),Button / ButtonLink `--sm`,FIXED,,bundle.css v1.0.4
 RTU-008,T01,1,medium,v1.0.4,RTU,,CSS سیستم در کد نسخه v1.0.3 است و دکمه‌های `sm` روی لمس زیر ۴۴px می‌مانند,"
   - `/account/profile`
   - `/account/vet-profile/claim/[slug]`
@@ -10,10 +10,10 @@ RTU-008,T01,1,medium,v1.0.4,RTU,,CSS سیستم در کد نسخه v1.0.3 است
   - `/account/centres`
   - `/account/centres/claims`
   - `/veterinarians/[slug]` و فهرست‌های `/veterinarians`، `/centers`، `/clubs`، `/associations`، `/animals-market`
-  - همه `LockedServiceCard`ها (`src/ui/card.tsx:174` با `size=""sm""`)",,,
-SHL-001,T01,1,medium,v1.0.4,SHL,,اصلاح QA نسخه v1.0.4 هدر سایت (۱۰۲۴–۱۲۷۹) و هدف لمسی دکمه sm اعمال نشده,SiteShell header — همه ۴۲ مسیر عمومی,,,
-CMPB-025,T01,1,low,v1.0.4,CMPB,,QuantityStepper · قانون هدف لمسی ۴۴px در v1.0.4 در CSS وندورشده نیست,QuantityStepper (و `.hz-segmented__item`، `.hz-btn--sm`) — همهٔ صفحه‌ها روی صفحه‌لمسی,,,
-CMPB-099,T01,1,low,v1.0.4,CMPB,,Tabs · افزودهٔ v1.0.4 برای هدف لمسی ۴۴px در Segmented وارد نشده است,Segmented (فعلاً فقط RoleSwitcher از `hz-segmented` استفاده می‌کند),,,
+  - همه `LockedServiceCard`ها (`src/ui/card.tsx:174` با `size=""sm""`)",FIXED,,bundle.css v1.0.4
+SHL-001,T01,1,medium,v1.0.4,SHL,,اصلاح QA نسخه v1.0.4 هدر سایت (۱۰۲۴–۱۲۷۹) و هدف لمسی دکمه sm اعمال نشده,SiteShell header — همه ۴۲ مسیر عمومی,FIXED,,bundle.css v1.0.4
+CMPB-025,T01,1,low,v1.0.4,CMPB,,QuantityStepper · قانون هدف لمسی ۴۴px در v1.0.4 در CSS وندورشده نیست,QuantityStepper (و `.hz-segmented__item`، `.hz-btn--sm`) — همهٔ صفحه‌ها روی صفحه‌لمسی,FIXED,,bundle.css v1.0.4
+CMPB-099,T01,1,low,v1.0.4,CMPB,,Tabs · افزودهٔ v1.0.4 برای هدف لمسی ۴۴px در Segmented وارد نشده است,Segmented (فعلاً فقط RoleSwitcher از `hz-segmented` استفاده می‌کند),FIXED,,bundle.css v1.0.4
 CMPA1-031,T02,1,high,v1.0.4,CMPA1,K1,«نژاد این ماه» (`.hz-breed-feature`) در صفحه اصلی نیست,BreedCard — featured breed (K1),,,
 KPUB-002,T02,1,high,v1.0.4,KPUB,K1,خانه هنوز «نوار» دارد، نه ستونی از قاب‌ها؛ Hero کرمِ تمام‌عرض است نه قاب هلویی,K1 — چیدمان کل صفحه، Hero,,,
 KPUB-003,T02,1,high,v1.0.4,KPUB,K1,«نژاد این ماه» (featured breed) وجود ندارد,K1 — «نژادهای سگ» / `.hz-breed-feature`,,,
