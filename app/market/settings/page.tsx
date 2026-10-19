@@ -4,7 +4,6 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { ViewChips } from '../../../src/ui/desk.tsx';
 import { SectionHeader } from '../../../src/ui/section-header.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import {
@@ -121,9 +120,7 @@ export default async function MarketSettingsPage({
             <section key={view.group} className="hz-card" aria-labelledby={'market-group-title-' + view.group}>
               <div className="flex flex-wrap items-center justify-between gap-sm">
                 <SectionHeader title={view.labelFa} size="sm" id={'market-group-title-' + view.group} />
-                <StatusBadge tone={view.unset === 0 ? 'success' : 'warning'} size="sm">
-                  {'تعیین‌نشده: ' + view.unset.toLocaleString('fa-IR')}
-                </StatusBadge>
+                <span className="hz-tag hz-tag--neutral">{'تعیین‌نشده: ' + view.unset.toLocaleString('fa-IR')}</span>
               </div>
               {view.writable ? null : (
                 <p className="mt-xs text-caption text-text-secondary">این گروه در نقش فعلی شما فقط خواندنی است.</p>

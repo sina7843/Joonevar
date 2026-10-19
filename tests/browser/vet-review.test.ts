@@ -81,7 +81,7 @@ test('a student applies, and the case appears in the association workbench', asy
     await page.getByTestId('student-university').fill('دانشگاه آزمایشی');
     await page.getByTestId('student-card').setInputFiles({ name: 'card.png', mimeType: 'image/png', buffer: PNG });
     await page.getByTestId('submit-student').click();
-    await waitForText(page, 'student-case-status', 'ارسال‌شده');
+    await waitForText(page, 'student-case-status', 'در انتظار بررسی');
   });
 });
 

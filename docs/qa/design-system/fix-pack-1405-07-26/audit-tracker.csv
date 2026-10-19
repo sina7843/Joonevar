@@ -32,18 +32,18 @@ KPUB-015,T02,1,medium,code,KPUB,K1,بارگذاری و خطای مستقل بخ�
 KPUB-012,T02,1,low,code,KPUB,K1,«تازه‌ها»: فیلدهای کارت ویژه و فهرست، متن پیوند موبایل و `title`,K1 — ArticleCard `--feature` / `--horizontal`,FIXED,,K1 v1.0.4 (DEC-0232)
 KPUB-013,T02,1,low,code,KPUB,K1,جزئیات Hero: متن خلاصه، تیتر ثابت در کد، دکمهٔ استعلام موبایل و فرم استعلام,K1 — Hero,FIXED,,K1 v1.0.4 (DEC-0232)
 KPUB-014,T02,1,low,code,KPUB,K1,«دنبال چه می‌گردید؟»: ساختار کارت و متن توضیح,K1 — کاشی‌های ورود سریع,FIXED,,K1 v1.0.4 (DEC-0232)
-CMPB-083,T03,1,high,code,CMPB,,StatusBadge · تقریباً همهٔ badgeها tone و برچسب را در خود صفحه تعیین می‌کنند و از کلید دیکشنری استفاده نمی‌کنند,همهٔ صفحه‌های دارای وضعیت,,,
-FND-007,T03,1,high,code,FND,,وضعیت‌ها عملاً از دیکشنری نمی‌آیند: ۲۱۲ `StatusBadge` با برچسب و tone دست‌نویس,StatusBadge در تقریباً همهٔ صفحه‌های کاربر، عملیات و عمومی,,,
-RTO-016,T03,1,high,code,RTO,,هیچ StatusBadge عملیاتی از فرهنگ وضعیت استفاده نمی‌کند,*StatusBadge* «Never type a label by hand: the badge takes a status **key**»,,,
-RTU-001,T03,1,high,code,RTU,,StatusBadge هیچ‌جا از فرهنگ وضعیت استفاده نمی‌کند و برچسب‌های بازنشسته هنوز نمایش داده می‌شوند,همه صفحه‌های این حوزه که نشان وضعیت دارند (۶۰ فایل در این حوزه با `<StatusBadge tone=…>`),,,
-CMPA1-018,T03,1,medium,code,CMPA1,,AnimalCard برای حیوان ثبت‌شده هم نشان وضعیت می‌گذارد و برچسب‌ها از دیکشنری وضعیت نمی‌آیند,AnimalCard (داشبورد و «حیوان‌های من»),,,
-CMPB-042,T03,1,medium,code,CMPB,,OfferCard · برچسب وضعیت پیشنهاد از دیکشنری نیست و «پیشنهاد فعلی» نمایش داده می‌شود,کارت «قیمت» در ستون کناری رشته,,,
-CMPB-064,T03,1,medium,code,CMPB,,SubOrderCard · برچسب و tone وضعیت زیرسفارش از دیکشنری نیست,badge زیرسفارش در جزئیات سفارش و صفحهٔ سفارش‌های فروشنده,,,
-FND-008,T03,1,medium,code,FND,,حیوان ثبت‌شده badge «پرونده اولیه» می‌گیرد؛ REGISTERED نباید badge داشته باشد,`/animals` (کارت حیوان) و `/animals/[id]` (سربرگ پرونده),,,
-CMPB-070,T03,1,low,code,CMPB,K5,VetCard · برچسب «معتمد همزیست» و badgeهای اضافی روی کارت,فهرست دامپزشکان (K5),,,
-CMPB-084,T03,1,low,code,CMPB,,StatusBadge · variant آیکون‌دار و ثبت کلید ناشناخته وجود ندارند,`StatusBadge`,,,
-FND-009,T03,1,low,code,FND,K5,نشان اعتماد TRUSTED با برچسب و ظاهر ناهمسان,`/veterinarians` (VetCard، K5) و `/veterinarians/[slug]`,,,
-KOPS-020,T03,1,low,code,KOPS,K14,برچسب و رنگ وضعیت آگهی از دیکشنری وضعیت پیروی نمی‌کند؛ «اقدام بعدی با» همیشه «ناظر آگهی» است,K14 · StatusBadge / ActionOwner,,,
+CMPB-083,T03,1,high,code,CMPB,,StatusBadge · تقریباً همهٔ badgeها tone و برچسب را در خود صفحه تعیین می‌کنند و از کلید دیکشنری استفاده نمی‌کنند,همهٔ صفحه‌های دارای وضعیت,FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+FND-007,T03,1,high,code,FND,,وضعیت‌ها عملاً از دیکشنری نمی‌آیند: ۲۱۲ `StatusBadge` با برچسب و tone دست‌نویس,StatusBadge در تقریباً همهٔ صفحه‌های کاربر، عملیات و عمومی,FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+RTO-016,T03,1,high,code,RTO,,هیچ StatusBadge عملیاتی از فرهنگ وضعیت استفاده نمی‌کند,*StatusBadge* «Never type a label by hand: the badge takes a status **key**»,FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+RTU-001,T03,1,high,code,RTU,,StatusBadge هیچ‌جا از فرهنگ وضعیت استفاده نمی‌کند و برچسب‌های بازنشسته هنوز نمایش داده می‌شوند,همه صفحه‌های این حوزه که نشان وضعیت دارند (۶۰ فایل در این حوزه با `<StatusBadge tone=…>`),FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+CMPA1-018,T03,1,medium,code,CMPA1,,AnimalCard برای حیوان ثبت‌شده هم نشان وضعیت می‌گذارد و برچسب‌ها از دیکشنری وضعیت نمی‌آیند,AnimalCard (داشبورد و «حیوان‌های من»),FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+CMPB-042,T03,1,medium,code,CMPB,,OfferCard · برچسب وضعیت پیشنهاد از دیکشنری نیست و «پیشنهاد فعلی» نمایش داده می‌شود,کارت «قیمت» در ستون کناری رشته,FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+CMPB-064,T03,1,medium,code,CMPB,,SubOrderCard · برچسب و tone وضعیت زیرسفارش از دیکشنری نیست,badge زیرسفارش در جزئیات سفارش و صفحهٔ سفارش‌های فروشنده,FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+FND-008,T03,1,medium,code,FND,,حیوان ثبت‌شده badge «پرونده اولیه» می‌گیرد؛ REGISTERED نباید badge داشته باشد,`/animals` (کارت حیوان) و `/animals/[id]` (سربرگ پرونده),FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+CMPB-070,T03,1,low,code,CMPB,K5,VetCard · برچسب «معتمد همزیست» و badgeهای اضافی روی کارت,فهرست دامپزشکان (K5),FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+CMPB-084,T03,1,low,code,CMPB,,StatusBadge · variant آیکون‌دار و ثبت کلید ناشناخته وجود ندارند,`StatusBadge`,FIXED,,unknown key logs a warning; TRUSTED via TrustedMark (outside the 81 keys)
+FND-009,T03,1,low,code,FND,K5,نشان اعتماد TRUSTED با برچسب و ظاهر ناهمسان,`/veterinarians` (VetCard، K5) و `/veterinarians/[slug]`,FIXED,,DEC-0233; unkeyed states listed in GAPS #4
+KOPS-020,T03,1,low,code,KOPS,K14,برچسب و رنگ وضعیت آگهی از دیکشنری وضعیت پیروی نمی‌کند؛ «اقدام بعدی با» همیشه «ناظر آگهی» است,K14 · StatusBadge / ActionOwner,FIXED,,dictionary labels/tones; owner unchanged: both lists always wait on the listing moderator (DEC-0233)
 CMPB-079,T04,1,high,code,CMPB,K6 K7 K9 K10 K11 K12 K15 K18,StickyActionBar · نوار کنش چسبان موبایل در هیچ صفحه‌ای پیاده نشده است,نمای موبایل K6، K7، K9، K10، K11، K12، K15 (ویرایش) و K18,,,
 KPUB-026,T04,1,high,code,KPUB,K6 K7,نوار اقدام چسبان پایین صفحه (StickyActionBar) در موبایل وجود ندارد,K6 و K7 موبایل — `hz-sticky-bar`,,,
 KUSR-015,T04,1,high,code,KUSR,K9,پرونده حیوان در موبایل: ستون وضعیت به ته صفحه می‌رود و نوار اقدام چسبان نیست,K9 پرونده حیوان · موبایل (<1024),,,

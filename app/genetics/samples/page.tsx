@@ -3,7 +3,7 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
 import { SearchField } from '../../../src/ui/search-field.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -110,8 +110,11 @@ export default async function GeneticsSamplesPage({
                 sub={'زمان نمونه‌گیری: ' + formatCivilDateFa(sample.collectedAt.toISOString().slice(0, 10))}
                 ageDays={ageInDays(sample.collectedAt)}
                 status={{
-                  tone: unusable ? 'warning' : 'info',
-                  label: SAMPLE_STATUS_FA[sample.status as SampleStatusName],
+                  // GAPS #4: no dictionary key for IN_CUSTODY, INVALID, INSUFFICIENT, DAMAGED, LOST — module label kept.
+                  ...keyStatus(sample.status === 'RECEIVED' ? 'SAMPLE_RECEIVED' : sample.status, {
+                    tone: unusable ? 'warning' : 'info',
+                    label: SAMPLE_STATUS_FA[sample.status as SampleStatusName],
+                  }),
                   testId: 'centre-sample-status-' + animalId,
                 }}
                 owner={sample.status === 'PROCESSING' ? 'GENETICS_CENTRE' : owner}

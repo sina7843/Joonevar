@@ -5,7 +5,7 @@ import { PublicShell } from '../../src/ui/shell.tsx';
 import { Card, LockedServiceCard } from '../../src/ui/card.tsx';
 import { PageHeader, SectionHeader } from '../../src/ui/section-header.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
-import { Identifier, StatusBadge, type StatusTone } from '../../src/ui/status.tsx';
+import { Identifier, StatusBadge } from '../../src/ui/status.tsx';
 import { db } from '../../src/db/client.ts';
 import {
   membershipApplicationHistory,
@@ -46,15 +46,10 @@ const BENEFITS: readonly string[] = [
   'شرط لازم برای درخواست دامپزشک معتمد و شروط کلاب',
 ];
 
-const TONE: Partial<Record<MembershipStatus, StatusTone>> = {
-  ACTIVE: 'success',
-  APPROVED_AWAITING_PAYMENT: 'info',
-  PENDING_REVIEW: 'info',
-  NEEDS_CORRECTION: 'warning',
-  EXPIRED: 'warning',
-  SUSPENDED: 'error',
-  REVOKED: 'error',
-  REJECTED: 'error',
+/** Membership status → status-dictionary key where the model's name differs. */
+const STATUS_KEY: Partial<Record<MembershipStatus, string>> = {
+  APPROVED_AWAITING_PAYMENT: 'AWAITING_PAYMENT',
+  PAYMENT_PENDING: 'PENDING_PAYMENT',
 };
 
 export default async function MembershipPage() {
@@ -101,7 +96,7 @@ export default async function MembershipPage() {
                 </p>
               </div>
               <span data-testid="membership-status">
-                <StatusBadge tone={TONE[standing.status] ?? 'neutral'}>{standing.statusFa}</StatusBadge>
+                <StatusBadge status={STATUS_KEY[standing.status] ?? standing.status} />
               </span>
             </div>
 

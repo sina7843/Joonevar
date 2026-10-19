@@ -3,7 +3,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -11,7 +11,6 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { disputeQueue } from '../../../src/marketplace/disputes.ts';
 import {
   DISPUTE_SCOPE_FA,
-  DISPUTE_STATUS_FA,
   OUT_OF_SCOPE_FA,
   type DisputeScope,
 } from '../../../src/marketplace/cancellation-model.ts';
@@ -79,7 +78,7 @@ export default async function DisputeQueuePage() {
                 </>
               }
               ageDays={ageInDays(entry.createdAt)}
-              status={{ tone: 'info', label: DISPUTE_STATUS_FA[entry.status] ?? entry.status, testId: 'dispute-status-' + entry.id }}
+              status={{ ...keyStatus(entry.status), testId: 'dispute-status-' + entry.id }}
               owner="SYSTEM"
               ownerLabel="داور بازار"
               ownerIsUs

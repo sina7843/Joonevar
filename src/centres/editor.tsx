@@ -5,7 +5,7 @@ import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { formatCivilDateFa } from '../domain/calendar.ts';
 import { packagePurchaseEligibility } from '../vets/directory-model.ts';
 import type { CentreEditorData } from './service.ts';
-import { CENTRE_STATUS_FA, LICENCE_STATUS_FA, WEEKDAYS_FA, type CentreStatus, type LicenceStatusName } from './model.ts';
+import { LICENCE_STATUS_FA, WEEKDAYS_FA, type CentreStatus, type LicenceStatusName } from './model.ts';
 import type { CentreSurface } from './actions.ts';
 import {
   AttachLocationForm,
@@ -22,21 +22,28 @@ import {
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 const dateFa = (value: Date): string => formatCivilDateFa(value.toISOString().slice(0, 10));
 
-const MEMBER_STATUS_FA: Record<string, string> = {
-  INVITED: 'در انتظار پذیرش',
-  ACCEPTED: 'تأییدشده',
-  DECLINED: 'ردشده',
-  REMOVED: 'برداشته‌شده',
-};
+/** Team-member values that differ from the status-dictionary key; the rest are the key. */
+const memberKey = (status: string): string => (status === 'INVITED' ? 'PROPOSED' : status);
 
-function Axis({ label, tone, value, detail, testId }: { label: string; tone: StatusTone; value: string; detail?: string; testId: string }) {
+/** `status`: a status-dictionary key, or — only for a value with no key (GAPS #4) — tone + value. */
+function Axis({
+  label,
+  status,
+  detail,
+  testId,
+}: {
+  label: string;
+  status: string | { tone: StatusTone; value: string };
+  detail?: string;
+  testId: string;
+}) {
   return (
     <li className="flex flex-wrap items-start justify-between gap-sm border-b border-border-subtle py-sm last:border-b-0" data-testid={testId}>
       <div className="min-w-0">
         <p className="text-label-md">{label}</p>
         {detail ? <p className="mt-2xs text-caption text-text-secondary">{detail}</p> : null}
       </div>
-      <StatusBadge tone={tone}>{value}</StatusBadge>
+      {typeof status === 'string' ? <StatusBadge status={status} /> : <StatusBadge tone={status.tone}>{status.value}</StatusBadge>}
     </li>
   );
 }
@@ -86,9 +93,7 @@ export function CentreEditor({
             <p className="mt-2xs text-caption text-text-secondary">{facts.typeNameFa}</p>
           </div>
           <span data-testid="centre-public-status">
-            <StatusBadge tone={centre.publicStatus === 'PUBLISHED' ? 'success' : centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-              {CENTRE_STATUS_FA[centre.publicStatus as CentreStatus]}
-            </StatusBadge>
+            <StatusBadge status={centre.publicStatus} />
           </span>
         </div>
         {centre.publicStatus === 'PUBLISHED' && centre.publicSlug ? (
@@ -103,36 +108,39 @@ export function CentreEditor({
           <Axis
             testId="centre-axis-completeness"
             label="تکمیل پروفایل"
-            tone={completeness.complete ? 'success' : 'neutral'}
-            value={fa(completeness.done) + ' از ' + fa(completeness.total)}
+            // GAPS #4: a count, not a lifecycle status
+            status={{ tone: completeness.complete ? 'success' : 'neutral', value: fa(completeness.done) + ' از ' + fa(completeness.total) }}
             detail={completeness.missing.length > 0 ? 'مانده: ' + completeness.missing.join('، ') : undefined}
           />
           <Axis
             testId="centre-axis-ownership"
             label="مالکیت"
-            tone={centre.ownerAccountId ? 'info' : 'warning'}
-            value={centre.ownerAccountId ? 'دارای مدیر' : 'بدون مالک'}
+            // GAPS #4: no dictionary key for the ownership axis (OWNED / UNOWNED)
+            status={{ tone: centre.ownerAccountId ? 'info' : 'warning', value: centre.ownerAccountId ? 'دارای مدیر' : 'بدون مالک' }}
             detail={centre.claimedAt ? 'واگذاری در ' + dateFa(centre.claimedAt) : 'تا واگذاری یا Claim، مرکز مدیری ندارد.'}
           />
           <Axis
             testId="centre-axis-verification"
             label="تأیید مجوز"
-            tone={centre.licenceStatus === 'VALID' ? 'success' : centre.licenceStatus === 'NONE' ? 'neutral' : 'warning'}
-            value={LICENCE_STATUS_FA[centre.licenceStatus as LicenceStatusName]}
+            status={centre.licenceStatus}
             detail={centre.licenceVerifiedAt ? 'تأیید در ' + dateFa(centre.licenceVerifiedAt) : undefined}
           />
           <Axis
             testId="centre-axis-serves"
             label="همکار خدمات همزیست"
-            tone={facts.branches.some((branch) => branch.vetAccountId !== null && branch.licenceStatus === 'VALID' && branch.isActive) ? 'success' : 'neutral'}
-            value={facts.branches.some((branch) => branch.vetAccountId !== null && branch.licenceStatus === 'VALID' && branch.isActive) ? 'بله' : 'خیر'}
+            // GAPS #4: a yes/no fact, no dictionary key
+            status={
+              facts.branches.some((branch) => branch.vetAccountId !== null && branch.licenceStatus === 'VALID' && branch.isActive)
+                ? { tone: 'success', value: 'بله' }
+                : { tone: 'neutral', value: 'خیر' }
+            }
             detail="یعنی دست‌کم یک شعبه، محل کار ثبت‌شده و دارای پروانه معتبر در سامانه فاز یک است."
           />
           <Axis
             testId="centre-axis-advertising"
             label="تبلیغات"
-            tone="neutral"
-            value="بسته فعالی ندارد"
+            // GAPS #4: no dictionary key for «no active package»
+            status={{ tone: 'neutral', value: 'بسته فعالی ندارد' }}
             detail={purchase.allowed ? 'هیچ بسته‌ای مجوز یا تأیید نمی‌سازد.' : purchase.reasonFa}
           />
         </ul>
@@ -184,10 +192,8 @@ export function CentreEditor({
                     ) : null}
                   </div>
                   <div className="flex flex-wrap gap-xs">
-                    {branch.isOpen24h ? <StatusBadge tone="info">شبانه‌روزی</StatusBadge> : null}
-                    <StatusBadge tone={!branch.isActive ? 'warning' : branch.isPublic ? 'success' : 'neutral'}>
-                      {!branch.isActive ? 'غیرفعال' : branch.isPublic ? 'عمومی' : 'غیرعمومی'}
-                    </StatusBadge>
+                    {branch.isOpen24h ? <span className="hz-tag hz-tag--neutral">شبانه‌روزی</span> : null}
+                    <StatusBadge status={!branch.isActive ? 'INACTIVE' : branch.isPublic ? 'PUBLISHED' : 'HIDDEN'} />
                   </div>
                 </div>
                 {canEditContent ? (
@@ -248,9 +254,7 @@ export function CentreEditor({
                     <p className="text-label-md">{member.nameFa}</p>
                     {member.roleFa ? <p className="text-caption text-text-secondary">{member.roleFa}</p> : null}
                   </div>
-                  <StatusBadge tone={member.status === 'ACCEPTED' ? 'success' : member.status === 'INVITED' ? 'info' : 'neutral'}>
-                    {MEMBER_STATUS_FA[member.status] ?? member.status}
-                  </StatusBadge>
+                  <StatusBadge status={memberKey(member.status)} />
                 </div>
                 {canEditContent && member.status !== 'REMOVED' ? (
                   <MemberRemoveForm surface={surface} member={{ id: member.id, version: member.version }} />

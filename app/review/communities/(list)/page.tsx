@@ -2,11 +2,11 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { manageableCommunities } from '../../../../src/communities/service.ts';
 import { COMMUNITY_KIND_FA, COMMUNITY_SCOPE_FA, type CommunityKind, type CommunityScope } from '../../../../src/communities/model.ts';
-import { VET_PUBLIC_STATUS_FA, type VetPublicStatus } from '../../../../src/vets/directory-model.ts';
 import { CommunityCreateForm } from '../../../../src/communities/forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -45,10 +45,7 @@ export default async function ReviewCommunitiesPage() {
                   sub={['حوزه ' + COMMUNITY_SCOPE_FA[row.community.scope as CommunityScope], row.community.sourceFa ? 'منبع: ' + row.community.sourceFa : null]
                     .filter(Boolean)
                     .join(' · ')}
-                  status={{
-                    tone: row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral',
-                    label: VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus],
-                  }}
+                  status={keyStatus(row.community.publicStatus)}
                 />
               ))}
             </CaseList>

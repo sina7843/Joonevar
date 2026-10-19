@@ -10,7 +10,6 @@ import { Stepper } from '../../../../src/ui/stepper.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { BreedPicker } from '../../../../src/ui/breed-picker.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import {
   registerAnimalAction,
   registerMissingParentAction,
@@ -284,7 +283,7 @@ export function AnimalWizard({
                   hint="JPG یا PNG تا ۵ مگابایت. این تصویر خصوصی است."
                   testId="animal-photo"
                 />
-                {animal.hasPhoto ? <StatusBadge tone="success">تصویر ذخیره شده است</StatusBadge> : null}
+                {animal.hasPhoto ? <span className="hz-tag hz-tag--neutral">تصویر ذخیره شده است</span> : null}
                 <Button tone="secondary" type="submit" block disabled={photoPending} data-testid="upload-photo">
                   {photoPending ? 'در حال بارگذاری…' : 'بارگذاری تصویر'}
                 </Button>

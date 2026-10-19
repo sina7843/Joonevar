@@ -3,6 +3,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -76,8 +77,8 @@ export default async function HandoverRecoveryPage() {
                   </>
                 }
                 status={{
-                  tone: status === 'ON_HOLD' ? 'warning' : 'neutral',
-                  label: HANDOVER_STATUS_FA[status] ?? entry.status,
+                  // GAPS #4: no dictionary key for SELLER_ENTERED, REFUSED, ON_HOLD — module label and tone kept.
+                  ...keyStatus(status, { tone: status === 'ON_HOLD' ? 'warning' : 'neutral', label: HANDOVER_STATUS_FA[status] ?? entry.status }),
                   testId: 'handover-status-' + entry.inquiryId,
                 }}
                 owner="SYSTEM"

@@ -11,7 +11,6 @@ import { clubMemberQueue } from '../../../../../src/clubs/enrollment.ts';
 import { clubManagement } from '../../../../../src/clubs/service.ts';
 import {
   CLUB_MEMBERSHIP_STATUS_SHORT_FA,
-  CLUB_MEMBERSHIP_TONE,
   type ClubMembershipStatus,
 } from '../../../../../src/clubs/membership-model.ts';
 import { ClubMemberStandingForm, ClubMembershipDecisionForm } from '../../../../../src/clubs/rules-forms.tsx';
@@ -108,7 +107,7 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
               <li key={entry.membership.id} className="hz-cardlist__item">
                 <div className="hz-cardlist__row">
                   <span className="hz-cardlist__title">{entry.nameFa ?? 'کاربر همزیست'}</span>
-                  <StatusBadge tone="warning">{'درخواست ' + (entry.membership.appliedAt ? formatInstantFa(entry.membership.appliedAt) : '')}</StatusBadge>
+                  <span className="hz-tag hz-tag--neutral">{'درخواست ' + (entry.membership.appliedAt ? formatInstantFa(entry.membership.appliedAt) : '')}</span>
                 </div>
                 <ActionOwner owner="USER" />
                 <ClubMembershipDecisionForm clubId={id} membershipId={entry.membership.id} version={entry.membership.version} />
@@ -131,9 +130,14 @@ export default async function ClubMembersPage({ params }: { params: Promise<{ id
                   <div className="hz-cardlist__row">
                     <span className="hz-cardlist__title">{entry.nameFa ?? 'کاربر همزیست'}</span>
                     <span className="flex flex-wrap gap-xs">
-                      <StatusBadge tone={CLUB_MEMBERSHIP_TONE[status]}>{CLUB_MEMBERSHIP_STATUS_SHORT_FA[status]}</StatusBadge>
-                      {entry.unmetCount > 0 ? <StatusBadge tone="neutral">{fa(entry.unmetCount) + ' شرط برقرار نیست'}</StatusBadge> : null}
-                      {entry.staleRules ? <StatusBadge tone="info">پذیرفته‌شده با نسخه پیشین</StatusBadge> : null}
+                      {status === 'INELIGIBLE' ? (
+                        // GAPS #4: no dictionary key for INELIGIBLE
+                        <StatusBadge tone="neutral">{CLUB_MEMBERSHIP_STATUS_SHORT_FA[status]}</StatusBadge>
+                      ) : (
+                        <StatusBadge status={status} />
+                      )}
+                      {entry.unmetCount > 0 ? <span className="hz-tag hz-tag--neutral">{fa(entry.unmetCount) + ' شرط برقرار نیست'}</span> : null}
+                      {entry.staleRules ? <span className="hz-tag hz-tag--neutral">پذیرفته‌شده با نسخه پیشین</span> : null}
                     </span>
                   </div>
                   {entry.admittedVersionNumber !== null ? (

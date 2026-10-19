@@ -60,9 +60,14 @@ export default async function AppealPage({ params }: { params: Promise<{ id: str
                 <span>وضعیت اعتراض</span>
               </h2>
             </div>
-            <StatusBadge tone={appeal.status === 'ANSWERED' ? 'success' : 'info'}>
-              <span data-testid="appeal-status">{APPEAL_STATUS_FA[appeal.status]}</span>
-            </StatusBadge>
+            <span data-testid="appeal-status">
+              {appeal.status === 'ANSWERED' ? (
+                // GAPS #4: no dictionary key for ANSWERED
+                <StatusBadge tone="success">{APPEAL_STATUS_FA[appeal.status]}</StatusBadge>
+              ) : (
+                <StatusBadge status={appeal.status} />
+              )}
+            </span>
           </div>
           <p className="mt-lg text-body-sm" data-testid="appeal-message">
             {appeal.messageFa}

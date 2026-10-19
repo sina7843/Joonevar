@@ -4,8 +4,8 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { Identifier, type StatusTone } from '../../../../src/ui/status.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { Identifier } from '../../../../src/ui/status.tsx';
+import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
 import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, CaseHistory, whenFa } from '../../../../src/ui/desk.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -18,14 +18,8 @@ import { ReviewForm } from '../review-form.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const TONE: Record<KycStatus, StatusTone> = {
-  DRAFT: 'neutral',
-  READY: 'neutral',
-  UNDER_REVIEW: 'info',
-  APPROVED: 'success',
-  NEEDS_CORRECTION: 'warning',
-  REJECTED: 'error',
-};
+/** KYC values whose dictionary key has another name (dictionary READY is a payout state). */
+const kycKey = (status: KycStatus): string => (status === 'READY' ? 'READY_TO_SUBMIT' : status);
 
 /**
  * Case detail (§21.5) — DS P10 / K3 decision desk: record head → documents →
@@ -60,7 +54,7 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
     <OpsShell actor={guard.actor} title="بررسی احراز هویت" pathname="/assoc/kyc" nav={ASSOC_NAV}>
       <DeskHead
         title={'احراز هویت · ' + name}
-        status={{ tone: TONE[status], label: KYC_STATUS_FA[status], testId: 'case-status' }}
+        status={{ ...keyStatus(kycKey(status)), testId: 'case-status' }}
         meta={[
           profile ? (
             <>
@@ -126,7 +120,7 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
                     at: record.reviewedAt,
                     title: 'تصمیم انجمن',
                     whenFa: whenFa(record.reviewedAt),
-                    status: open ? undefined : { tone: TONE[status], label: KYC_STATUS_FA[status] },
+                    status: open ? undefined : keyStatus(kycKey(status)),
                     body: record.reasonFa ?? undefined,
                   }
                 : null,

@@ -148,7 +148,7 @@ export async function tradingStore(
 
     await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
     await page.getByTestId('submit-seller').click();
-    await page.getByTestId('seller-status').filter({ hasText: 'ارسال‌شده برای بررسی' }).waitFor();
+    await page.getByTestId('seller-status').filter({ hasText: 'در انتظار بررسی' }).waitFor();
   } finally {
     await store.close();
   }
@@ -284,7 +284,7 @@ export async function sellableProduct(
 
     await page.goto(BASE_URL + '/account/seller/catalog', { waitUntil: 'load' });
     await page.getByTestId('offer-move-active-' + offerId).click();
-    await page.getByTestId('offer-status-' + offerId).filter({ hasText: 'در حال فروش' }).waitFor();
+    await page.getByTestId('offer-status-' + offerId).filter({ hasText: 'فعال' }).waitFor();
   } finally {
     await pricing.close();
   }

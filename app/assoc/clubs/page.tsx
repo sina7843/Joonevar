@@ -2,7 +2,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { clubAuthorityQueue } from '../../../src/clubs/service.ts';
@@ -45,7 +45,7 @@ export default async function AssocClubsPage() {
                 linkTestId={'club-queue-' + club.id}
                 sub={'آخرین تغییر: ' + formatInstantFa(club.updatedAt)}
                 ageDays={ageInDays(club.updatedAt)}
-                status={{ tone: 'info', label: 'در انتظار بررسی' }}
+                status={keyStatus('PENDING_VERIFICATION')}
                 owner="ASSOCIATION"
                 ownerIsUs
               />
@@ -66,7 +66,7 @@ export default async function AssocClubsPage() {
                 type={CLUB_OWNERSHIP_KIND_FA[row.request.kind as ClubOwnershipKind]}
                 sub={(row.request.reasonFa ? row.request.reasonFa + ' · ' : '') + 'ثبت: ' + formatInstantFa(row.request.createdAt)}
                 ageDays={ageInDays(row.request.createdAt)}
-                status={{ tone: 'info', label: 'در انتظار بررسی' }}
+                status={keyStatus('SUBMITTED')}
                 owner="ASSOCIATION"
                 ownerIsUs
               >

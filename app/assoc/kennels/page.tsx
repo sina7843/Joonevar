@@ -1,11 +1,11 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { ASSOC_NAV, OpsShell } from '../../../src/ui/shell.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
-import { kennelQueue, KENNEL_STATUS_FA } from '../../../src/kennels/service.ts';
+import { kennelQueue } from '../../../src/kennels/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -41,7 +41,7 @@ export default async function AssocKennelsPage() {
                   (kennel.submittedAt ? formatCivilDateFa(kennel.submittedAt.toISOString().slice(0, 10)) : '—')
                 }
                 ageDays={ageInDays(kennel.submittedAt)}
-                status={{ tone: 'info', label: KENNEL_STATUS_FA[kennel.status] }}
+                status={keyStatus(kennel.status)}
                 owner="ASSOCIATION"
                 ownerIsUs
               />

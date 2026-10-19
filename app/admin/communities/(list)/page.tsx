@@ -8,7 +8,6 @@ import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { manageableCommunities } from '../../../../src/communities/service.ts';
 import { COMMUNITY_KIND_FA, COMMUNITY_SCOPE_FA, type CommunityKind, type CommunityScope } from '../../../../src/communities/model.ts';
-import { VET_PUBLIC_STATUS_FA, type VetPublicStatus } from '../../../../src/vets/directory-model.ts';
 import { CommunityCreateForm } from '../../../../src/communities/forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -69,18 +68,11 @@ export default async function AdminCommunitiesPage() {
                       </div>
                     </td>
                     <td data-label="وضعیت صفحه">
-                      <StatusBadge
-                        size="sm"
-                        tone={row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}
-                      >
-                        {VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus]}
-                      </StatusBadge>
+                      <StatusBadge status={row.community.publicStatus} size="sm" />
                     </td>
                     <td data-label="انتشار مطلب">
                       {row.community.canPublishPosts ? (
-                        <StatusBadge size="sm" tone="info">
-                          ناشر مجاز
-                        </StatusBadge>
+                        <span className="hz-tag hz-tag--neutral">ناشر مجاز</span>
                       ) : (
                         <span className="text-body-sm text-text-secondary">—</span>
                       )}
@@ -89,9 +81,7 @@ export default async function AdminCommunitiesPage() {
                       {row.community.ownerAccountId ? (
                         <span className="text-body-sm text-text-secondary">دارای مالک</span>
                       ) : (
-                        <StatusBadge size="sm" tone="warning">
-                          بدون مالک
-                        </StatusBadge>
+                        <span className="hz-tag hz-tag--neutral">بدون مالک</span>
                       )}
                     </td>
                   </tr>

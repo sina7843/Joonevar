@@ -390,7 +390,7 @@ before(async () => {
     const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
     await page.getByTestId('accept-inquiry-button-' + inquiryId).click();
-    await page.getByTestId('inquiry-status').filter({ hasText: 'در انتظار پرداخت بیعانه' }).waitFor();
+    await page.getByTestId('inquiry-status').filter({ hasText: 'پذیرفته‌شده' }).waitFor();
   } finally {
     await seller.close();
   }

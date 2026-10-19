@@ -410,7 +410,7 @@ test('a receipt is corrected in place, then approved, and the custodian ships', 
     await owner.page.getByTestId('upload-receipt').click();
     await expectText(owner.page, 'تصویر فیش بارگذاری شد');
     await owner.page.getByTestId('submit-receipt').click();
-    await expectText(owner.page, 'در حال بررسی مرکز');
+    await expectText(owner.page, 'در حال بررسی');
     await owner.page.screenshot({ path: path.join(SHOTS, 'receipt-submitted.png'), fullPage: true });
 
     // The centre sends it back with a reason.
@@ -439,7 +439,7 @@ test('a receipt is corrected in place, then approved, and the custodian ships', 
     await owner.page.getByTestId('upload-receipt').click();
     await expectText(owner.page, 'تصویر فیش بارگذاری شد');
     await owner.page.getByTestId('submit-receipt').click();
-    await expectText(owner.page, 'در حال بررسی مرکز');
+    await expectText(owner.page, 'در حال بررسی');
 
     // By id: the shared queue holds other runs' receipts.
     await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
@@ -488,7 +488,7 @@ test('the centre receives, processes and records a result without any issuance p
     await owner.page.getByTestId('upload-receipt').click();
     await expectText(owner.page, 'تصویر فیش بارگذاری شد');
     await owner.page.getByTestId('submit-receipt').click();
-    await expectText(owner.page, 'در حال بررسی مرکز');
+    await expectText(owner.page, 'در حال بررسی');
 
     // By id: the shared queue holds other runs' receipts.
     await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });

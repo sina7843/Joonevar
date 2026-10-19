@@ -10,7 +10,6 @@ import { db } from '../../../../src/db/client.ts';
 import { listPlans, livePackage, myTargets, subscriptionsOf } from '../../../../src/advertising/service.ts';
 import {
   AD_PERIOD_FA,
-  AD_STATE_FA,
   AD_TIER_FA,
   adState,
   remainingDays,
@@ -93,9 +92,7 @@ export default async function AccountPackagesPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-xs">
                     <span data-testid={'package-state-' + target.id}>
-                      <StatusBadge tone={liveState === 'ACTIVE' ? 'success' : 'neutral'}>
-                        {liveState === 'ACTIVE' ? 'بسته فعال' : 'بسته فعالی ندارد'}
-                      </StatusBadge>
+                      <StatusBadge status={liveState ?? 'NONE'} />
                     </span>
                     <Link href={target.manageRoute} className="hz-link hz-link--standalone">
                       مدیریت پرونده
@@ -187,19 +184,7 @@ export default async function AccountPackagesPage() {
                               {row.endsAt ? ' تا ' + formatInstantFa(row.endsAt) : ''}
                               {row.cancelReasonFa ? ' · دلیل لغو: ' + row.cancelReasonFa : ''}
                             </span>
-                            <StatusBadge
-                              tone={
-                                state === 'ACTIVE'
-                                  ? 'success'
-                                  : state === 'PENDING_PAYMENT'
-                                    ? 'info'
-                                    : state === 'PAYMENT_FAILED'
-                                      ? 'error'
-                                      : 'neutral'
-                              }
-                            >
-                              {AD_STATE_FA[state]}
-                            </StatusBadge>
+                            <StatusBadge status={state} />
                           </li>
                         );
                       })}

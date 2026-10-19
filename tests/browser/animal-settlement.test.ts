@@ -392,7 +392,7 @@ before(async () => {
     const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
     await page.getByTestId('accept-inquiry-button-' + inquiryId).click();
-    await page.getByTestId('inquiry-status').filter({ hasText: 'در انتظار پرداخت بیعانه' }).waitFor();
+    await page.getByTestId('inquiry-status').filter({ hasText: 'پذیرفته‌شده' }).waitFor();
   } finally {
     await seller.close();
   }
@@ -465,7 +465,7 @@ test('the refund is owed until a provider pays it, and then it says who did', as
       .first()
       .getAttribute('data-testid');
     const id = refundId!.replace('retry-refund-button-', '');
-    assert.equal(await page.getByTestId('refund-status-' + id).innerText(), 'در انتظار اجرا');
+    assert.equal(await page.getByTestId('refund-status-' + id).innerText(), 'در جریان');
     await page.screenshot({ path: path.join(SHOTS, 'refund-queue-desktop.png'), fullPage: true });
 
     /*

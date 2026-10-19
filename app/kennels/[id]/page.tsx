@@ -14,7 +14,6 @@ import {
   breedsOfKennel,
   kennelBatch,
   KENNEL_FEE_KEY,
-  KENNEL_STATUS_FA,
   requireOwnKennel,
   searchBreeds,
   submitReadiness,
@@ -89,17 +88,9 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
                 </p>
               ) : null}
             </div>
-            <StatusBadge
-              tone={
-                kennel.status === 'APPROVED'
-                  ? 'success'
-                  : kennel.status === 'NEEDS_CORRECTION' || kennel.status === 'REJECTED'
-                    ? 'warning'
-                    : 'info'
-              }
-            >
-              <span data-testid="kennel-status">{KENNEL_STATUS_FA[kennel.status]}</span>
-            </StatusBadge>
+            <span data-testid="kennel-status">
+              <StatusBadge status={kennel.status} />
+            </span>
           </div>
 
           {kennel.reasonFa ? (

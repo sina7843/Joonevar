@@ -67,15 +67,7 @@ export function CentreCard({ centre, testId }: { centre: CentreCardData; testId?
       </div>
       <div className="hz-card__section hz-centre__foot">
         پروانه فعالیت
-        {centre.verified ? (
-          <StatusBadge tone="success" size="sm">
-            معتبر
-          </StatusBadge>
-        ) : (
-          <StatusBadge tone="neutral" size="sm">
-            ثبت نشده
-          </StatusBadge>
-        )}
+        <StatusBadge status={centre.verified ? 'VALID' : 'NONE'} size="sm" />
       </div>
     </Link>
   );

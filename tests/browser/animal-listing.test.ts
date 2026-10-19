@@ -429,9 +429,9 @@ test('the advert is built, refuses to publish until it is complete, and then goe
 
     await page.getByTestId('move-reason-PAUSED').fill(REASON);
     await page.getByTestId('move-PAUSED').click();
-    await page.getByTestId('listing-status').filter({ hasText: 'متوقف‌شده توسط فروشنده' }).waitFor();
+    await page.getByTestId('listing-status').filter({ hasText: 'موقتاً متوقف' }).waitFor();
     await page.goto(listingUrl, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('listing-status').innerText(), 'متوقف‌شده توسط فروشنده');
+    assert.equal(await page.getByTestId('listing-status').innerText(), 'موقتاً متوقف');
     assert.equal(await page.getByTestId('listing-status-reason').innerText(), REASON);
 
     // Back to published, so the later tests see a live advert.

@@ -2,12 +2,11 @@ import { guardRoute } from '../../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, ViewChips } from '../../../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../../src/ui/states.tsx';
 import { ButtonLink } from '../../../../../src/ui/button.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { centreClaimQueue } from '../../../../../src/centres/claims.ts';
-import { APPLICATION_STATUS_FA, type VetApplicationStatus } from '../../../../../src/vets/onboarding-model.ts';
 import { formatInstantFa } from '../../../../../src/content/model.ts';
 
 export const dynamic = 'force-dynamic';
@@ -73,8 +72,7 @@ export default async function ReviewCentreClaimsPage({ searchParams }: { searchP
               sub={[item.roleFa, 'ارسال: ' + formatInstantFa(item.submittedAt)].filter(Boolean).join(' · ')}
               ageDays={item.status === 'SUBMITTED' ? ageInDays(item.submittedAt) : undefined}
               status={{
-                tone: item.status === 'SUBMITTED' ? 'info' : item.status === 'APPROVED' ? 'success' : 'neutral',
-                label: APPLICATION_STATUS_FA[item.status as VetApplicationStatus],
+                ...keyStatus(item.status),
               }}
               owner={item.status === 'SUBMITTED' ? 'SYSTEM' : null}
               ownerLabel="اپراتور بررسی"

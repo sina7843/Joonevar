@@ -189,7 +189,7 @@ test('the seller completes the file, accepts the versioned agreement and sends i
 
     await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
     await page.getByTestId('submit-seller').click();
-    await page.getByTestId('seller-status').filter({ hasText: 'ارسال‌شده برای بررسی' }).waitFor();
+    await page.getByTestId('seller-status').filter({ hasText: 'در انتظار بررسی' }).waitFor();
   } finally {
     await context.close();
   }
@@ -236,7 +236,7 @@ test('a reviewer verifies the account, approves, and the store still does not tr
     const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
     // Approved, and still not trading: that needs a plan period.
-    assert.equal(await page.getByTestId('seller-status').innerText(), 'تأییدشده، در انتظار فعال‌سازی');
+    assert.equal(await page.getByTestId('seller-status').innerText(), 'تأییدشده');
     assert.match(await page.getByTestId('plan-note').innerText(), /پرداخت تأییدشده/);
   } finally {
     await seller.close();

@@ -456,7 +456,7 @@ test('a buyer asks, the two sides agree a price, and the seller accepts one of t
     assert.match(await page.getByTestId('deposit-amount').innerText(), /۵۵۰٬۰۰۰/);
 
     await page.getByTestId('accept-inquiry-button-' + inquiryId).click();
-    await page.getByTestId('inquiry-status').filter({ hasText: 'در انتظار پرداخت بیعانه' }).waitFor();
+    await page.getByTestId('inquiry-status').filter({ hasText: 'پذیرفته‌شده' }).waitFor();
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
     assert.notEqual(await page.getByTestId('payment-deadline').innerText(), '—');
     await page.screenshot({ path: path.join(SHOTS, 'seller-accepted-desktop.png'), fullPage: true });
@@ -481,7 +481,7 @@ test('the verified deposit reserves the animal and opens the contact details', a
     assert.match(await page.getByTestId('deposit-result').innerText(), /رزرو شد/);
 
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('inquiry-status').innerText(), 'بیعانه پرداخت شد و رزرو انجام شد');
+    assert.equal(await page.getByTestId('inquiry-status').innerText(), 'رزروشده');
     // The one moment contact details appear, and they are the real ones.
     assert.match(await page.getByTestId('counterpart-contact').innerText(), /^0999/);
     // The transcript is frozen: a deal is what a dispute is argued from.

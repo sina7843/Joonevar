@@ -3,13 +3,13 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { parentageResults } from '../../../src/db/schema/genetics.ts';
-import { centreSamples, parentResultCheck, RESULT_STATUS_FA } from '../../../src/genetics/service.ts';
+import { centreSamples, parentResultCheck } from '../../../src/genetics/service.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { RecordResultForm, RefreshResultForm } from '../forms.tsx';
@@ -83,7 +83,7 @@ export default async function GeneticsResultsPage() {
                   </span>
                 }
                 ageDays={ageInDays(row.sample.collectedAt)}
-                status={{ tone: 'info', label: 'در حال پردازش' }}
+                status={keyStatus('PROCESSING')}
                 owner="GENETICS_CENTRE"
                 ownerIsUs
               >
@@ -106,7 +106,7 @@ export default async function GeneticsResultsPage() {
                   name={animal?.name ?? 'بدون نام'}
                   sub={'نسخه ' + result.resultVersion.toLocaleString('fa-IR') + ' · ' + formatCivilDateFa(result.createdAt.toISOString().slice(0, 10))}
                   ageDays={ageInDays(result.createdAt)}
-                  status={{ tone: 'info', label: RESULT_STATUS_FA[result.status], testId: 'result-status-' + result.animalId }}
+                  status={{ ...keyStatus(result.status), testId: 'result-status-' + result.animalId }}
                   owner="GENETICS_CENTRE"
                   ownerIsUs
                 >

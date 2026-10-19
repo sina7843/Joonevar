@@ -89,7 +89,7 @@ test('the superadmin records a club, writes its profile and invites a manager', 
     await page.getByTestId('manager-role').fill('دبیر کلاب');
     await page.getByTestId('manager-invite-reason').fill('مدیر معرفی‌شده');
     await page.getByTestId('invite-manager').click();
-    await expectText(page, 'در انتظار پذیرش');
+    await expectText(page, 'در انتظار پاسخ');
     await page.screenshot({ path: path.join(SHOTS, 'admin-community.png'), fullPage: true });
     return id;
   });

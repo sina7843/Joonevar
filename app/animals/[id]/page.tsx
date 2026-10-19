@@ -124,9 +124,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                 <span className="text-caption text-text-secondary" data-testid="pet-id">
                   {animal.petId ? <Identifier value={animal.petId} /> : 'شناسه رسمی: — تا صدور برگه ثبتی'}
                 </span>
-                <StatusBadge tone={registered ? 'info' : 'neutral'}>
-                  {registered ? 'پرونده اولیه' : 'پیش‌نویس'}
-                </StatusBadge>
+                <StatusBadge status={animal.status} />
               </>
             }
             meta={[
@@ -548,6 +546,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                   {
                     key: 'مشخصات',
                     value: (
+                      // GAPS #4: no dictionary key for the declared/verified identity state
                       <StatusBadge tone={animal.identityVerifiedAt === null ? 'neutral' : 'success'} size="sm">
                         {animal.identityVerifiedAt === null ? 'مشخصات اظهاری' : 'مشخصات رسمی تأییدشده'}
                       </StatusBadge>
@@ -556,6 +555,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                   {
                     key: 'میکروچیپ',
                     value: chip ? (
+                      // GAPS #4: no dictionary key for a registered microchip
                       <StatusBadge tone="success" size="sm">
                         میکروچیپ ثبت‌شده
                       </StatusBadge>

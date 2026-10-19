@@ -19,7 +19,6 @@ import {
   permitReadiness,
   permitView,
   PERMIT_FEE_KEY,
-  PERMIT_STATUS_FA,
 } from '../../../../src/mating/permits.ts';
 import {
   describeShare,
@@ -101,17 +100,9 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
                 مسیر رسمی هم‌زیست؛ این پرونده با «اعلام توافق شخصی» یکی نیست و شناسه و وضعیت جداگانه دارد.
               </p>
             </div>
-            <StatusBadge
-              tone={
-                permit.status === 'ISSUED'
-                  ? 'success'
-                  : permit.status === 'REJECTED' || permit.status === 'NEEDS_CORRECTION'
-                    ? 'warning'
-                    : 'info'
-              }
-            >
-              <span data-testid="permit-status">{PERMIT_STATUS_FA[permit.status]}</span>
-            </StatusBadge>
+            <span data-testid="permit-status">
+              <StatusBadge status={permit.status} />
+            </span>
           </div>
 
           {permit.permitNo ? (

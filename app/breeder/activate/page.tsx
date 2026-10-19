@@ -6,7 +6,7 @@ import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
-import { kennelEntry, KENNEL_STATUS_FA } from '../../../src/kennels/service.ts';
+import { kennelEntry } from '../../../src/kennels/service.ts';
 import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -54,23 +54,9 @@ export default async function BreederActivatePage() {
                 <span>وضعیت فعلی شما</span>
               </h3>
             </div>
-            {kennel ? (
-              <StatusBadge
-                tone={
-                  kennel.status === 'APPROVED'
-                    ? 'success'
-                    : kennel.status === 'NEEDS_CORRECTION' || kennel.status === 'REJECTED'
-                      ? 'warning'
-                      : 'info'
-                }
-              >
-                <span data-testid="breeder-status">{KENNEL_STATUS_FA[kennel.status]}</span>
-              </StatusBadge>
-            ) : (
-              <StatusBadge tone="neutral">
-                <span data-testid="breeder-status">شروع نشده</span>
-              </StatusBadge>
-            )}
+            <span data-testid="breeder-status">
+              <StatusBadge status={kennel ? kennel.status : 'NONE'} />
+            </span>
           </div>
 
           {kennel?.status === 'APPROVED' ? (

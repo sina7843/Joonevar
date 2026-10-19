@@ -975,7 +975,7 @@ export interface CommunityPublicPage {
   readonly aboutFa: string | null;
   readonly scope: CommunityScope;
   readonly placeFa: string | null;
-  readonly registration: { readonly statusFa: string; readonly number: string | null } | null;
+  readonly registration: { readonly status: string; readonly statusFa: string; readonly number: string | null } | null;
   readonly membershipInfoFa: string | null;
   readonly membershipUrl: string | null;
   readonly contactPhone: string | null;

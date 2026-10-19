@@ -5,11 +5,11 @@ import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
 import { DeskHead, DocFrame, Panel, PrivateNote } from '../../../../src/ui/desk.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { vetApplicationForReview } from '../../../../src/vets/onboarding.ts';
-import { APPLICATION_KIND_FA, APPLICATION_STATUS_FA, DOCUMENT_KIND_FA } from '../../../../src/vets/onboarding-model.ts';
+import { APPLICATION_KIND_FA, DOCUMENT_KIND_FA } from '../../../../src/vets/onboarding-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 import { ReviewDecisionForm } from '../../../../src/vets/onboarding-forms.tsx';
 
@@ -31,8 +31,8 @@ export default async function ReviewVetApplicationPage({ params }: { params: Pro
       <DeskHead
         title={APPLICATION_KIND_FA[application.kind] + ' · ' + application.displayNameFa}
         status={{
-          tone: open ? 'info' : application.status === 'APPROVED' ? 'success' : 'neutral',
-          label: <span data-testid="review-application-status">{APPLICATION_STATUS_FA[application.status]}</span>,
+          ...keyStatus(application.status),
+          testId: 'review-application-status',
         }}
         meta={[
           application.councilCode ? <bdi className="hz-id" dir="ltr">{application.councilCode}</bdi> : null,

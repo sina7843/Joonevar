@@ -78,9 +78,7 @@ export default async function ProfilePage() {
               <span className="hz-setting__hint">احراز هویت با عضویت انجمن یکی نیست و هیچ‌کدام دیگری را فعال نمی‌کند.</span>
             </div>
             <div className="hz-setting__end flex-wrap max-md:justify-start">
-              <StatusBadge tone={kycApproved ? 'success' : kyc ? 'info' : 'neutral'}>
-                {kycApproved ? 'احراز هویت تأییدشده' : kyc ? 'احراز هویت در جریان' : 'احراز هویت انجام نشده'}
-              </StatusBadge>
+              <StatusBadge status={!kyc ? 'NONE' : kyc.status === 'READY' ? 'READY_TO_SUBMIT' : kyc.status} />
               {kycApproved ? null : (
                 <Link href="/account/kyc" className="hz-btn hz-btn--ghost hz-btn--sm">
                   {kyc ? 'پیگیری' : 'شروع'}

@@ -6,11 +6,11 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { ActionOwner, StatusBadge, type StatusTone } from '../../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { myCentreClaims } from '../../../../src/centres/claims.ts';
 import { CLAIM_DOCUMENT_KIND_FA, type ClaimDocumentKind } from '../../../../src/suggestions/model.ts';
-import { APPLICATION_STATUS_FA, canAppeal, type VetApplicationStatus } from '../../../../src/vets/onboarding-model.ts';
+import { canAppeal } from '../../../../src/vets/onboarding-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 import {
   AppealCentreClaimForm,
@@ -19,14 +19,6 @@ import {
 } from '../../../../src/suggestions/forms.tsx';
 
 export const dynamic = 'force-dynamic';
-
-const TONE: Record<VetApplicationStatus, StatusTone> = {
-  SUBMITTED: 'info',
-  NEEDS_CORRECTION: 'warning',
-  APPROVED: 'success',
-  REJECTED: 'error',
-  WITHDRAWN: 'neutral',
-};
 
 /** The claims this account made on centres — Requirements-Phase-2 §10 (PROMPT-009). P05 list. */
 export default async function AccountCentreClaimsPage() {
@@ -72,9 +64,7 @@ export default async function AccountCentreClaimsPage() {
               <div className="hz-cardlist__row">
                 <span className="hz-cardlist__title min-w-0">{claim.centreNameFa}</span>
                 <span data-testid={'claim-status-' + claim.id}>
-                  <StatusBadge tone={TONE[claim.status as VetApplicationStatus]}>
-                    {APPLICATION_STATUS_FA[claim.status as VetApplicationStatus]}
-                  </StatusBadge>
+                  <StatusBadge status={claim.status} />
                 </span>
               </div>
               <span className="hz-cardlist__meta">

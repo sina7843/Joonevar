@@ -51,7 +51,7 @@ export default async function AssocKycPage() {
               (item.submittedAt ? 'ارسال: ' + formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : 'ارسال: —') +
               (item.version > 1 ? '، نسخه ' + item.version.toLocaleString('fa-IR') : ''),
             ageDays: ageInDays(item.submittedAt),
-            status: { tone: 'info' as const, label: 'در انتظار بررسی' },
+            status: { key: 'SUBMITTED' },
             owner: 'ASSOCIATION' as const,
             ownerIsUs: true,
             testId: 'open-case',

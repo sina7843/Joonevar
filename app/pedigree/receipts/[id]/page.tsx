@@ -12,7 +12,7 @@ import { Identifier, StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { animals } from '../../../../src/db/schema/animals.ts';
 import { samples } from '../../../../src/db/schema/clinical.ts';
-import { ownerReceipt, receiptItems, RECEIPT_STATUS_FA } from '../../../../src/genetics/service.ts';
+import { ownerReceipt, receiptItems } from '../../../../src/genetics/service.ts';
 import { SAMPLE_STATUS_FA, type SampleStatusName } from '../../../../src/domain/microchip.ts';
 import { ReceiptForms } from '../../forms.tsx';
 import { PageHeader } from '../../../../src/ui/section-header.tsx';
@@ -77,17 +77,9 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
         <Card>
           <div className="flex items-start justify-between gap-md">
             <h2 className="hz-card__title">وضعیت فیش</h2>
-            <StatusBadge
-              tone={
-                receipt.status === 'APPROVED'
-                  ? 'success'
-                  : receipt.status === 'NEEDS_CORRECTION' || receipt.status === 'REJECTED'
-                    ? 'warning'
-                    : 'info'
-              }
-            >
-              <span data-testid="receipt-status">{RECEIPT_STATUS_FA[receipt.status]}</span>
-            </StatusBadge>
+            <span data-testid="receipt-status">
+              <StatusBadge status={receipt.status} />
+            </span>
           </div>
           {receipt.reasonFa ? (
             <p className="mt-md text-body-sm" data-testid="receipt-reason">

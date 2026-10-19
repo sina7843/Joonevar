@@ -8,7 +8,9 @@ import { AppError } from '../../../../src/domain/errors.ts';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { Identifier, StatusBadge } from '../../../../src/ui/status.tsx';
+import { Identifier } from '../../../../src/ui/status.tsx';
+import { RequestStatusBadge } from '../../../requests/status-badges.tsx';
+import { SampleStatusBadge } from '../../sample-status-badge.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { env } from '../../../../src/config/env.ts';
 import { integrationSettings } from '../../../../src/adapters/integration-settings.ts';
@@ -18,7 +20,7 @@ import { animalChipView, procedureOf } from '../../../../src/clinical/microchip.
 import { breedOptions } from '../../../../src/animals/service.ts';
 import { IdentityPanel } from './identity.tsx';
 import { eventsOfSample, samplesOfRequest } from '../../../../src/clinical/samples.ts';
-import { isUnusable, READ_METHOD_FA, SAMPLE_STATUS_FA } from '../../../../src/domain/microchip.ts';
+import { isUnusable, READ_METHOD_FA } from '../../../../src/domain/microchip.ts';
 import {
   CONTEXT_FA,
   REQUEST_STATUS_FA,
@@ -128,9 +130,9 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
                 {CONTEXT_FA[request.context]} · {view.locationNameFa}
               </p>
             </div>
-            <StatusBadge tone={done ? 'success' : open ? 'success' : 'info'}>
-              <span data-testid="vet-request-status">{REQUEST_STATUS_FA[request.status]}</span>
-            </StatusBadge>
+            <span data-testid="vet-request-status">
+              <RequestStatusBadge status={request.status} />
+            </span>
           </div>
 
           {visible ? (
@@ -256,9 +258,7 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
                     <p className="text-body-sm">
                       <Identifier label="کد رهگیری نمونه:" value={sample.trackingCode} />
                     </p>
-                    <StatusBadge tone={isUnusable(sample.status) ? 'warning' : 'info'}>
-                      {SAMPLE_STATUS_FA[sample.status]}
-                    </StatusBadge>
+                    <SampleStatusBadge status={sample.status} />
                   </div>
                   <p className="mt-sm text-caption text-text-secondary">
                     زمان نمونه‌گیری: {formatCivilDateFa(sample.collectedAt.toISOString().slice(0, 10))} · نگهدارنده:{' '}

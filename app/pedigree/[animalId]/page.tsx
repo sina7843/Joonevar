@@ -11,7 +11,7 @@ import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
-import { ownerResult, parentResultCheck, RESULT_STATUS_FA } from '../../../src/genetics/service.ts';
+import { ownerResult, parentResultCheck } from '../../../src/genetics/service.ts';
 import { appealsOfAnimal, APPEAL_STATUS_FA } from '../../../src/genetics/appeals.ts';
 import { pedigreeOfAnimal } from '../../../src/documents/pedigree.ts';
 import { AppealForm } from '../forms.tsx';
@@ -68,9 +68,9 @@ export default async function AnimalPedigreePage({ params }: { params: Promise<{
               </p>
             </div>
             {result ? (
-              <StatusBadge tone={result.status === 'FINAL' ? 'success' : 'info'}>
-                <span data-testid="result-status">{RESULT_STATUS_FA[result.status]}</span>
-              </StatusBadge>
+              <span data-testid="result-status">
+                <StatusBadge status={result.status} />
+              </span>
             ) : null}
           </div>
 

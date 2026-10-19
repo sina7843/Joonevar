@@ -2,7 +2,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -15,23 +15,15 @@ import {
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
 import { membershipQueue } from '../../../src/billing/membership.ts';
-import { MEMBERSHIP_STATUS_FA, type MembershipStatus } from '../../../src/billing/membership-model.ts';
 import { DecideMembershipForm, IssueNumberForm, MembershipStateForm } from './forms.tsx';
 import { MemberSearch } from './search.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const STATUS_FA: Record<string, string> = MEMBERSHIP_STATUS_FA;
-
-const STATUS_TONE: Partial<Record<MembershipStatus, 'success' | 'info' | 'warning' | 'error' | 'neutral'>> = {
-  ACTIVE: 'success',
-  APPROVED_AWAITING_PAYMENT: 'info',
-  PENDING_REVIEW: 'info',
-  NEEDS_CORRECTION: 'warning',
-  EXPIRED: 'warning',
-  SUSPENDED: 'error',
-  REVOKED: 'error',
-  REJECTED: 'error',
+/** Membership values whose dictionary key has another name; the rest share the name. */
+const MEMBERSHIP_KEY: Record<string, string> = {
+  APPROVED_AWAITING_PAYMENT: 'AWAITING_PAYMENT',
+  PAYMENT_PENDING: 'PENDING_PAYMENT',
 };
 
 const NUMBER_FA: Record<string, string> = {
@@ -94,7 +86,7 @@ export default async function AssocMembersPage({
                 name={item.statementFa || 'درخواست عضویت'}
                 sub={'آخرین تغییر: ' + formatInstantFa(new Date(item.updatedAt))}
                 ageDays={ageInDays(new Date(item.updatedAt))}
-                status={{ tone: 'info', label: 'در انتظار بررسی انجمن' }}
+                status={keyStatus('PENDING_REVIEW')}
                 owner="ASSOCIATION"
                 ownerIsUs
               >
@@ -107,7 +99,7 @@ export default async function AssocMembersPage({
                 testId="membership-awaiting-correction"
                 type="درخواست عضویت"
                 name={'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
-                status={{ tone: 'warning', label: 'نیازمند اصلاح' }}
+                status={keyStatus('NEEDS_CORRECTION')}
                 owner="USER"
               />
             ))}
@@ -149,11 +141,7 @@ export default async function AssocMembersPage({
                     {row.activatedAt ? ' · فعال از ' + formatCivilDateFa(row.activatedAt.toISOString().slice(0, 10)) : ''}
                   </>
                 }
-                status={{
-                  tone: STATUS_TONE[row.status as MembershipStatus] ?? 'neutral',
-                  label: STATUS_FA[row.status] ?? row.status,
-                  testId: 'member-status-' + row.accountId,
-                }}
+                status={{ ...keyStatus(MEMBERSHIP_KEY[row.status] ?? row.status), testId: 'member-status-' + row.accountId }}
               >
                 {row.membershipNo === null ? <IssueNumberForm accountId={row.accountId} suffix={row.accountId} /> : null}
                 {row.status === 'ACTIVE' || row.status === 'SUSPENDED' || row.status === 'EXPIRED' ? (

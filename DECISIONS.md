@@ -3017,3 +3017,14 @@
   - نشان «معتمد» در همه کارت‌ها `shieldCheck` است (07-status، VetCard README، K5)؛ K1 HTML `sealCheck` دارد — ناسازگاری درون طراحی، اکثریت منابع ملاک شد.
   - هر بخش خانه جدا بارگذاری می‌شود (Suspense + اسکلت)، خطای هر بخش فقط همان قاب را به NetworkErrorState `--compact` می‌برد، و بخش خالی با قابش پنهان می‌شود.
 - **Limitation:** دامپزشکان نمایشی حساب کاربری و درخواست معتمد ندارند، پس در دیتابیس نمایشی فقط دامپزشکی که واقعاً معتمد است در «دامپزشکان معتمد» دیده می‌شود؛ عدد ساختگی ساخته نشد.
+
+## DEC-0233 — نشان‌های وضعیت از فرهنگ وضعیت (T03)
+
+- **تاریخ:** ۲۰۲۶-۱۰-۱۹ · **نوع:** TECHNICAL_CHOICE · **منبع:** FND-007، CMPB-083، RTU-001، RTO-016، FND-008، FND-009، CMPA1-018، CMPB-042، CMPB-064، CMPB-070، KOPS-020؛ `07-status.md`
+- **Decision:**
+  - ۱۴۰ نشان وضعیت حالا `<StatusBadge status={KEY} />` هستند. نقشه‌های TONE محلی حذف شدند. HIDDEN، CANCELLED، RESERVED و SOLD خنثی‌اند؛ SUSPENDED و FAILED قرمز؛ EXPIRED و PENDING_PAYMENT کهربایی؛ PUBLISHED و ACTIVE سبز. حیوان REGISTERED نشان ندارد و «پرونده اولیه» حذف شد.
+  - مقدار ماژولی که نام دیگری دارد با نگاشت محلی به کلید می‌رسد، مثلاً: KYC `READY`→`READY_TO_SUBMIT` (کلید `READY` یعنی «آماده واریز»)، پیشنهاد `REJECTED`→`DECLINED`، عضویت `APPROVED_AWAITING_PAYMENT`→`AWAITING_PAYMENT`، `PAYMENT_PENDING`→`PENDING_PAYMENT`، پرونده دامپزشک `VERIFIED_*`→`VERIFIED`، `ACTIVE_*_VET`→`ACTIVE`، نمونه `RECEIVED`→`SAMPLE_RECEIVED` و `IN_CUSTODY`→`COLLECTED`، مرجوعی `REQUESTED`→`RETURN_REQUESTED`، `SHIPPED_BACK`→`SHIPPED` و `RECEIVED`→`RETURNED`، استعلام `CONVERTED`→`RESERVED`، دعوت `INVITED`→`PROPOSED`، عضویت کلاب `PENDING_REVIEW`→`SUBMITTED`، نبود عضویت/کنل/بسته → `NONE`، و «عمومی/غیرعمومی» شعبه → `PUBLISHED`/`HIDDEN`.
+  - کلیدی که برچسبش در آن زمینه نادرست است به کار نرفت؛ برای نمونه `COMPLETED` (برچسب تحویل بازار) برای مراجعه، و `MARKED_UNUSABLE` که دلیل نمونه را پنهان می‌کند. این مقادیر و مقادیر بی‌کلید با tone و برچسب خودشان و توضیح `// GAPS #4` ماندند. فهرستشان در GAPS #4 آمده است.
+  - مؤلفه‌های مشترک (`QueueRow`، `DeskHead`/`CaseItem`، `CardHeader`، `RequestCard`، Timeline) هم کلید و هم جفت قدیمی `{tone,label}` را می‌پذیرند، تا مقادیر بی‌کلید بدون شکستن کار کنند. «معتمد» همه‌جا `TrustedMark` است. «کد نظام تأییدشده»، «مجوز معتبر ثبت‌شده» و برچسب‌های غیروضعیتی (شمارش، نقش، «شبانه‌روزی»، «ناشر مجاز»، «بدون مالک» در صف‌ها) به خط meta یا `hz-tag--neutral` رفتند. «بدون مالک» از کارت عمومی دامپزشک برداشته شد.
+  - GAPS #14: کد خام وضعیت در `/market/promotions` و `/market/trust` به `data-status` رفت و کاربر برچسب فرهنگ را می‌بیند. تست‌های مرورگر روی این ویژگی کار می‌کنند. `publicRegistration` (انجمن‌ها) فیلد فقط‌خواندنی `status` گرفت.
+- **Impact:** فقط ظاهر. برچسب‌ها کوتاه‌تر شدند (مثلاً «در حال بررسی مرکز» → «در حال بررسی»، «پروانه فعال» → «فعال»). توضیح نوع پرونده در عنوان صفحه می‌ماند. انتظارهای متنی تست‌های مرورگر به‌روز شده‌اند. «اقدام بعدی با» در `/market/listings` تغییر نکرد، چون هر دو فهرست آن همیشه منتظر ناظر آگهی‌اند.

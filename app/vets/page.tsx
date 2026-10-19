@@ -6,7 +6,6 @@ import { Card } from '../../src/ui/card.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
-import { StatusBadge } from '../../src/ui/status.tsx';
 import { db } from '../../src/db/client.ts';
 import { finderCities, searchFinder } from '../../src/vets/registry.ts';
 import { CONTACT_FOR_PRICE_FA, CONTEXT_FA, type VisitContextName } from '../../src/domain/referral.ts';
@@ -113,7 +112,7 @@ export default async function FinderPage({
                       <p className="mt-2xs text-body-sm">{row.location.addressFa}</p>
                     </div>
                     {row.distanceKm === null ? null : (
-                      <StatusBadge tone="neutral">{row.distanceKm.toFixed(1)} کیلومتر</StatusBadge>
+                      <span className="hz-tag hz-tag--neutral">{row.distanceKm.toFixed(1)} کیلومتر</span>
                     )}
                   </div>
 

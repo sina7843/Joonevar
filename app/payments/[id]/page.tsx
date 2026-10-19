@@ -47,8 +47,6 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
     throw error;
   }
 
-  const tone = receipt.status === 'PAID' ? 'success' : receipt.status === 'FAILED' ? 'error' : 'warning';
-
   return (
     <PublicShell
       actor={guard.actor}
@@ -66,7 +64,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           <PageHeader
             title={receipt.serviceFa}
             back={{ href: '/payments' }}
-            aside={<StatusBadge tone={tone}>{receipt.statusFa}</StatusBadge>}
+            aside={<StatusBadge status={receipt.status} />}
             meta={['ثبت: ' + formatInstantFa(receipt.createdAt), 'رسید پرداخت']}
           />
         </div>

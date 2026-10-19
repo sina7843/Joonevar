@@ -6,7 +6,6 @@ import { PageHeader } from '../../../../src/ui/section-header.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { mySavedSearches } from '../../../../src/finder/discovery.ts';
 import { filtersToQuery, type SearchFilters } from '../../../../src/finder/discovery-model.ts';
@@ -60,7 +59,7 @@ export default async function FinderSavedSearchesPage() {
                     {search.nameFa}
                   </Link>
                   <span className="flex items-center gap-sm">
-                    <StatusBadge tone={search.notify ? 'info' : 'neutral'}>{search.notify ? 'با خبر' : 'بدون خبر'}</StatusBadge>
+                    <span className="hz-tag hz-tag--neutral">{search.notify ? 'با خبر' : 'بدون خبر'}</span>
                     <DeleteSavedSearchForm id={search.id} />
                   </span>
                 </div>

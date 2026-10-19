@@ -66,19 +66,16 @@ export function DateHistory({
                   ) : null}
                   {row.noteFa ? <p className="mt-sm text-body-sm">{row.noteFa}</p> : null}
                 </div>
-                <StatusBadge
-                  tone={
-                    row.status === 'CONFIRMED'
-                      ? 'success'
-                      : row.status === 'CONFLICTED'
-                        ? 'warning'
-                        : row.status === 'SUPERSEDED'
-                          ? 'neutral'
-                          : 'info'
-                  }
-                >
-                  <span data-testid={'date-status-' + row.version}>{DATE_STATUS_FA[row.status]}</span>
-                </StatusBadge>
+                <span data-testid={'date-status-' + row.version}>
+                  {row.status === 'CONFLICTED' || row.status === 'CONFIRMED' ? (
+                    // GAPS #4: no dictionary key for CONFLICTED; dictionary CONFIRMED («وجود توافق تأیید شد») is the declaration label, not a mutually confirmed date
+                    <StatusBadge tone={row.status === 'CONFIRMED' ? 'success' : 'warning'}>
+                      {DATE_STATUS_FA[row.status]}
+                    </StatusBadge>
+                  ) : (
+                    <StatusBadge status={row.status} />
+                  )}
+                </span>
               </div>
               {row.status === 'CONFIRMED' && row.matedOn === basis ? (
                 <p className="mt-sm text-caption text-text-brand" data-testid="basis-marker">

@@ -10,7 +10,6 @@ import { myStores } from '../../../../src/commerce/sellers.ts';
 import { sellerReturns } from '../../../../src/commerce/returns.ts';
 import {
   RETURNED_CONDITION_FA,
-  RETURN_STATUS_FA,
   type ReturnStatus,
   type ReturnedCondition,
 } from '../../../../src/commerce/fulfilment-model.ts';
@@ -18,6 +17,9 @@ import { ReturnEvidenceForm, ReturnMoveForm } from '../../../../src/commerce/fin
 import { addReturnEvidenceAction, moveReturnAsSellerAction } from '../../orders/finance-actions.ts';
 
 export const dynamic = 'force-dynamic';
+
+/** Return statuses that differ from a status-dictionary key; the rest are keys as-is. */
+const RETURN_KEY: Partial<Record<ReturnStatus, string>> = { REQUESTED: 'RETURN_REQUESTED', SHIPPED_BACK: 'SHIPPED', RECEIVED: 'RETURNED' };
 
 const fa = (value: number | bigint): string => value.toLocaleString('fa-IR');
 
@@ -81,11 +83,9 @@ export default async function SellerReturnsPage({
                     <h2 className="text-label-lg" data-testid={'seller-return-ref-' + view.row.id}>
                       {view.row.reference} — زیرسفارش {view.subOrderReference}
                     </h2>
-                    <StatusBadge tone={view.row.status === 'REFUNDED' ? 'success' : 'neutral'}>
-                      <span data-testid={'seller-return-status-' + view.row.id}>
-                        {RETURN_STATUS_FA[view.row.status as ReturnStatus]}
-                      </span>
-                    </StatusBadge>
+                    <span data-testid={'seller-return-status-' + view.row.id}>
+                      <StatusBadge status={RETURN_KEY[view.row.status as ReturnStatus] ?? view.row.status} />
+                    </span>
                   </div>
 
                   <p className="mt-sm text-body-sm" data-testid={'seller-return-reason-' + view.row.id}>

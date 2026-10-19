@@ -3,11 +3,11 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { directoryReferenceData } from '../../../../src/vets/directory.ts';
 import { unownedVetProfiles } from '../../../../src/vets/onboarding.ts';
-import { VET_PUBLIC_STATUS_FA } from '../../../../src/vets/directory-model.ts';
 import { AddCityForm } from '../../../../src/vets/directory-forms.tsx';
 import { ReviewStatusForm, UnownedVetForm } from '../../../../src/vets/onboarding-forms.tsx';
 
@@ -38,7 +38,7 @@ export default async function ReviewUnownedVetsPage() {
                   name={profile.displayNameFa}
                   code={profile.councilCode}
                   sub={[profile.cityNameFa, 'منبع: ' + (profile.sourceFa ?? '—')].filter(Boolean).join(' · ')}
-                  status={{ tone: profile.publicStatus === 'PUBLISHED' ? 'success' : 'warning', label: VET_PUBLIC_STATUS_FA[profile.publicStatus] }}
+                  status={keyStatus(profile.publicStatus)}
                 >
                   {profile.publicStatus === 'PUBLISHED' && profile.publicSlug ? (
                     <Link href={'/veterinarians/' + profile.publicSlug} className="hz-link hz-link--standalone" data-testid={'unowned-link-' + profile.id}>

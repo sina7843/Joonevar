@@ -5,7 +5,7 @@ import { CaseQueue, ageInDays } from '../../../src/ui/queue.tsx';
 import { QueueMeta } from '../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
-import { permitQueue, PERMIT_STATUS_FA } from '../../../src/mating/permits.ts';
+import { permitQueue } from '../../../src/mating/permits.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +37,7 @@ export default async function AssocPermitsPage() {
                 name: 'پرونده مجوز جفت‌گیری',
                 sub: 'ارسال: ' + (permit.submittedAt ? formatCivilDateFa(permit.submittedAt.toISOString().slice(0, 10)) : '—'),
                 ageDays: ageInDays(permit.submittedAt),
-                status: { tone: 'info' as const, label: PERMIT_STATUS_FA[permit.status] ?? '—' },
+                status: { key: permit.status },
                 owner: 'ASSOCIATION' as const,
                 ownerIsUs: true,
                 testId: 'open-permit-case',

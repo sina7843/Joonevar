@@ -63,9 +63,7 @@ export default async function MarketSpeciesPage() {
                       </span>
                     </div>
                     <div className="hz-setting__end">
-                      <StatusBadge tone={row.enabled ? 'success' : 'neutral'} size="sm">
-                        {row.enabled ? 'فعال' : 'غیرفعال'}
-                      </StatusBadge>
+                      <StatusBadge status={row.enabled ? 'ACTIVE' : 'INACTIVE'} size="sm" />
                     </div>
                     {canWrite ? (
                       <div className="col-span-full">

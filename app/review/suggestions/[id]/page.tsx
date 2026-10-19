@@ -5,12 +5,11 @@ import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
 import { DeskHead, DocFrame, Panel, PrivateNote } from '../../../../src/ui/desk.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { suggestionForReview } from '../../../../src/suggestions/service.ts';
 import { SUGGESTION_KIND_FA, type SuggestionKind } from '../../../../src/suggestions/model.ts';
-import { APPLICATION_STATUS_FA, type VetApplicationStatus } from '../../../../src/vets/onboarding-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 import { SuggestionDecisionForm } from '../../../../src/suggestions/forms.tsx';
 
@@ -31,8 +30,8 @@ export default async function ReviewSuggestionPage({ params }: { params: Promise
       <DeskHead
         title={SUGGESTION_KIND_FA[suggestion.kind as SuggestionKind] + ' · ' + suggestion.displayNameFa}
         status={{
-          tone: open ? 'info' : suggestion.status === 'APPROVED' ? 'success' : 'neutral',
-          label: <span data-testid="suggestion-review-status">{APPLICATION_STATUS_FA[suggestion.status as VetApplicationStatus]}</span>,
+          ...keyStatus(suggestion.status),
+          testId: 'suggestion-review-status',
         }}
         meta={[
           'ثبت: ' + formatInstantFa(suggestion.createdAt),

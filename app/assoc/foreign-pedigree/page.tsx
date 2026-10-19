@@ -64,7 +64,7 @@ export default async function AssocForeignPedigreePage() {
                     ' · ارسال: ' +
                     (item.submittedAt ? formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : '—'),
                   ageDays: ageInDays(item.submittedAt),
-                  status: { tone: 'info' as const, label: 'در حال بررسی' },
+                  status: { key: 'UNDER_REVIEW' },
                   owner: 'ASSOCIATION' as const,
                   ownerIsUs: true,
                   testId: 'open-foreign-case',

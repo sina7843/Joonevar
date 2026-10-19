@@ -10,13 +10,16 @@ import { db } from '../../src/db/client.ts';
 import { eligibilityFor } from '../../src/domain/eligibility/service.ts';
 import {
   declarationsOfActor,
-  DECLARATION_STATUS_FA,
   NO_OFFICIAL_EFFECT_NOTE_FA,
   SCOPE_NOTE_FA,
 } from '../../src/mating/declaration.ts';
 import { PageHeader } from '../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
+
+/** Declaration status → status-dictionary key (the counterparty wait is AWAITING_COUNTERPARTY). */
+const statusKey = (status: string): string =>
+  status === 'PENDING_COUNTERPARTY_CONFIRMATION' ? 'AWAITING_COUNTERPARTY' : status;
 
 /**
  * The personal declarations of this account — §20.
@@ -84,17 +87,7 @@ export default async function DeclarationsPage() {
                           : 'شما طرف مقابل این اعلام هستید'}
                       </p>
                     </div>
-                    <StatusBadge
-                      tone={
-                        row.status === 'CONFIRMED'
-                          ? 'success'
-                          : row.status === 'REJECTED' || row.status === 'CANCELLED'
-                            ? 'warning'
-                            : 'info'
-                      }
-                    >
-                      {DECLARATION_STATUS_FA[row.status]}
-                    </StatusBadge>
+                    <StatusBadge status={statusKey(row.status)} />
                   </div>
                   <p className="mt-lg text-body-sm">
                     <Link href={'/declaration/' + row.id} className="hz-link" data-testid="open-declaration">

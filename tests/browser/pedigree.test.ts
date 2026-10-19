@@ -365,7 +365,7 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // By id: the shared queue holds other runs' receipts.
   await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
@@ -559,7 +559,7 @@ test('an appeal is answered by the centre and a correction never rewrites the is
     await centre.goto(BASE_URL + '/genetics/appeals/' + appealId, { waitUntil: 'load' });
     await expectText(centre, 'نتیجه اصلاحی، این سند را بازنویسی یا باطل');
     await centre.getByTestId('take-appeal').click();
-    await expectText(centre, 'در حال بررسی مرکز ژنتیک');
+    await centre.getByTestId('centre-appeal-status').filter({ hasText: 'در حال بررسی' }).waitFor();
     await centre.getByTestId('appeal-response-text').fill('بازبینی انجام شد و نتیجه اصلاح می‌شود.');
     await centre.getByTestId('appeal-correct-toggle').check();
     await centre.getByTestId('appeal-correction-note').fill('نتیجه اصلاحی پس از بازبینی.');

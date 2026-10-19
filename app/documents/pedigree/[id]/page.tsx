@@ -103,7 +103,7 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
           <PageHeader
             title={'شجره‌نامه ' + name}
             back={{ href: '/pedigree/' + document.animalId }}
-            aside={<StatusBadge tone="success">صادر شد</StatusBadge>}
+            aside={<StatusBadge status="ISSUED" />}
             meta={[<Identifier key="code" value={document.pedigreeCode} />, 'صادرشده در ' + issuedFa]}
             actions={
               <>

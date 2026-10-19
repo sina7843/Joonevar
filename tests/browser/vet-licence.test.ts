@@ -98,7 +98,7 @@ test('a licensed doctor submits every mandatory component, and the case waits fo
     await form.getByTestId('lic-clinic').fill('کلینیک آزمایشی ' + RUN);
     await form.getByTestId('lic-service-MICROCHIP_IMPLANT').check();
     await form.getByTestId('submit-licence').click();
-    await waitForText(page, 'licence-case-status', 'ارسال‌شده');
+    await waitForText(page, 'licence-case-status', 'در انتظار بررسی');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= MOBILE.width, 'no sideways scroll on a phone: ' + width);
   });
@@ -122,7 +122,7 @@ test('the association asks for a correction, and the applicant answers with a ne
     const form = page.getByTestId('licence-revision-form');
     await form.getByTestId('lic-date').fill('2023-02-01');
     await form.getByTestId('revise-licence').click();
-    await waitForText(page, 'licence-case-status', 'ارسال‌شده');
+    await waitForText(page, 'licence-case-status', 'در انتظار بررسی');
     await waitForText(page, 'licence-history', 'نیازمند اصلاح');
   });
 });
@@ -194,7 +194,7 @@ test('an unpaid gateway trip grants nothing, and a verified payment activates th
 
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
     await waitForText(page, 'vet-current-tag', 'دارای پروانه فعالیت');
-    await waitForText(page, 'licence-case-status', 'پروانه فعال');
+    await waitForText(page, 'licence-case-status', 'فعال');
     await waitForText(page, 'licence-period-standing', 'فعال');
     // The next step offered is a renewal, not a second activation.
     await page.getByTestId('renew-licence-period').waitFor();
@@ -285,7 +285,7 @@ test('the trusted request is offered only to an active licensed vet, and names t
     await page.getByTestId('trusted-decision-APPROVE').check();
     await page.getByTestId('trusted-decision-reason').fill('SYNTHETIC شرایط معتمد کامل است');
     await page.getByTestId('submit-trusted-decision').click();
-    await waitForText(page, 'trusted-case-status', 'معتمد تأییدشده، در انتظار پرداخت');
+    await waitForText(page, 'trusted-case-status', 'در انتظار پرداخت');
   });
 
   await as('applicant', MOBILE, async (page) => {

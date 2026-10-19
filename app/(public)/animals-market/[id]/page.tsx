@@ -104,9 +104,9 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
                     </StatusBadge>
                   ) : null}
                   {listing.reserved ? (
-                    <StatusBadge tone="neutral">
-                      <span data-testid="listing-reserved">رزروشده</span>
-                    </StatusBadge>
+                    <span data-testid="listing-reserved">
+                      <StatusBadge status="RESERVED" />
+                    </span>
                   ) : null}
                 </span>
               ) : undefined

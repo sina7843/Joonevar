@@ -60,14 +60,10 @@ export default async function AdminRolesPage() {
                         </div>
                       </td>
                       <td data-label="نقش">
-                        <StatusBadge tone="info" size="sm">
-                          {CONTENT_ROLE_FA[holder.role as ContentRoleName]}
-                        </StatusBadge>
+                        <span className="hz-tag hz-tag--neutral">{CONTENT_ROLE_FA[holder.role as ContentRoleName]}</span>
                       </td>
                       <td data-label="وضعیت">
-                        <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'} size="sm">
-                          {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
-                        </StatusBadge>
+                        <StatusBadge status={holder.status === 'ACTIVE' ? 'ACTIVE' : 'SUSPENDED'} size="sm" />
                       </td>
                     </tr>
                   ))}
@@ -108,14 +104,10 @@ export default async function AdminRolesPage() {
                         </div>
                       </td>
                       <td data-label="نقش">
-                        <StatusBadge tone="info" size="sm">
-                          {MARKETPLACE_ROLE_FA[holder.role as MarketplaceRoleName]}
-                        </StatusBadge>
+                        <span className="hz-tag hz-tag--neutral">{MARKETPLACE_ROLE_FA[holder.role as MarketplaceRoleName]}</span>
                       </td>
                       <td data-label="وضعیت">
-                        <StatusBadge tone={holder.status === 'ACTIVE' ? 'success' : 'neutral'} size="sm">
-                          {holder.status === 'ACTIVE' ? 'فعال' : 'تعلیق‌شده'}
-                        </StatusBadge>
+                        <StatusBadge status={holder.status === 'ACTIVE' ? 'ACTIVE' : 'SUSPENDED'} size="sm" />
                       </td>
                     </tr>
                   ))}

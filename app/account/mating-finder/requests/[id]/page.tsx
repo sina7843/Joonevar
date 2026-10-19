@@ -48,6 +48,17 @@ import { Icon } from '../../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
+/** Request statuses that differ from a status-dictionary key; the rest are keys as-is. */
+const REQUEST_KEY: Partial<Record<RequestStatus, string>> = { PRELIMINARILY_ACCEPTED: 'ACCEPTED', CONTRACT_CONFIRMED: 'CONFIRMED' };
+
+function RequestStatusBadge({ status, size }: { status: RequestStatus; size?: 'sm' | 'md' }) {
+  if (status === 'MATING_COMPLETED' || status === 'MATING_NOT_COMPLETED') {
+    // GAPS #4: no dictionary key for MATING_COMPLETED / MATING_NOT_COMPLETED
+    return <StatusBadge tone="info" size={size}>{REQUEST_STATUS_FA[status]}</StatusBadge>;
+  }
+  return <StatusBadge status={REQUEST_KEY[status] ?? status} size={size} />;
+}
+
 /**
  * One mating request — PHASE-4 PROMPT-005: its terms, history, conversation,
  * contract and the commands open to this party right now. The server decides
@@ -107,7 +118,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             back={{ href: '/account/mating-finder/requests' }}
             aside={
               <span data-testid="finder-request-status">
-                <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'}>{REQUEST_STATUS_FA[status]}</StatusBadge>
+                <RequestStatusBadge status={status} />
               </span>
             }
             meta={[ROUTE_FA[request.route], 'اعتبار تا ' + formatInstantFa(request.expiresAt)]}
@@ -166,9 +177,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             <p className="hz-caption">{CONFIRMATION_NAME_FA + '. ' + NOT_A_LEGAL_SIGNATURE_FA}</p>
             <div className="mt-sm flex flex-wrap items-center gap-sm">
               <span data-testid="finder-contract-state">
-                <StatusBadge tone={contract.contract.status === 'CONFIRMED' ? 'success' : contract.contract.status === 'CANCELLED' ? 'neutral' : 'info'}>
-                  {contract.contract.status === 'CONFIRMED' ? 'تأییدشده' : contract.contract.status === 'CANCELLED' ? 'لغوشده' : 'پیش‌نویس'}
-                </StatusBadge>
+                <StatusBadge status={contract.contract.status === 'DRAFTING' ? 'DRAFT' : contract.contract.status} />
               </span>
               <span className="text-caption">{'نسخه ' + fa(contract.current.number) + ' · تأیید شما: ' + (contract.approvedByMe ? 'بله' : 'نه') + ' · تأیید طرف مقابل: ' + (contract.approvedByOther ? 'بله' : 'نه')}</span>
             </div>
@@ -393,7 +402,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
           <div className="space-y-md">
             <KeyValueList
               rows={[
-                { key: 'وضعیت', value: <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'} size="sm">{REQUEST_STATUS_FA[status]}</StatusBadge> },
+                { key: 'وضعیت', value: <RequestStatusBadge status={status} size="sm" /> },
                 { key: 'اعتبار تا', value: formatInstantFa(request.expiresAt) },
               ]}
             />

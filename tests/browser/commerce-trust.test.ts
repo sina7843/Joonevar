@@ -149,10 +149,7 @@ test('a platform code comes off the basket, and points come off what is left', a
       .first()
       .getAttribute('data-testid'))!.replace('platform-rule-status-', '');
     await page.getByTestId('move-discount-' + ruleId + '-ACTIVE').click();
-    await page
-      .getByTestId('platform-rule-status-' + ruleId)
-      .filter({ hasText: 'ACTIVE' })
-      .waitFor();
+    await page.locator('[data-testid="platform-rule-status-' + ruleId + '"][data-status="ACTIVE"]').waitFor();
     await page.screenshot({ path: path.join(SHOTS, 'market-promotions-desktop.png'), fullPage: true });
   } finally {
     await ops.close();

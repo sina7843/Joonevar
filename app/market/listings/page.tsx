@@ -2,14 +2,13 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { AppError } from '../../../src/domain/errors.ts';
 import { appealQueue, listingReportQueue } from '../../../src/marketplace/listing-moderation.ts';
 import { REASON_FA, type ReportReason } from '../../../src/moderation/model.ts';
-import { LISTING_STATUS_FA, type ListingStatus } from '../../../src/marketplace/listing-model.ts';
 import { animalListings } from '../../../src/db/schema/marketplace.ts';
 import { inArray } from 'drizzle-orm';
 import { AppealDecisionForm, ListingDecisionForm } from '../../../src/marketplace/moderation-forms.tsx';
@@ -88,7 +87,7 @@ export default async function ListingModerationPage() {
                   </>
                 }
                 ageDays={ageInDays(entry.firstReportedAt)}
-                status={{ tone: entry.status === 'SUSPENDED' ? 'warning' : 'neutral', label: LISTING_STATUS_FA[entry.status as ListingStatus] }}
+                status={keyStatus(entry.status)}
                 owner="SYSTEM"
                 ownerLabel="ناظر آگهی"
                 ownerIsUs
@@ -134,7 +133,7 @@ export default async function ListingModerationPage() {
                 name={appeal.listingTitleFa ?? 'آگهی'}
                 sub={<><span className="block text-body-sm text-text-primary">{appeal.statementFa}</span>{when(appeal.createdAt)}</>}
                 ageDays={ageInDays(appeal.createdAt)}
-                status={{ tone: 'info', label: 'در انتظار بررسی' }}
+                status={keyStatus('SUBMITTED')}
                 owner="SYSTEM"
                 ownerLabel="ناظر آگهی"
                 ownerIsUs

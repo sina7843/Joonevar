@@ -322,7 +322,7 @@ test('one item goes back, and only that one is refunded', async () => {
     for (const step of ['APPROVED'] as const) {
       await page.getByTestId('seller-return-select-' + returnId).selectOption(step);
       await page.getByTestId('seller-return-submit-' + returnId).click();
-      await page.getByTestId('seller-return-status-' + returnId).filter({ hasText: 'پذیرفته‌شده' }).waitFor();
+      await page.getByTestId('seller-return-status-' + returnId).filter({ hasText: 'تأییدشده' }).waitFor();
     }
     await page.screenshot({ path: path.join(SHOTS, 'seller-returns-desktop.png'), fullPage: true });
 
@@ -454,7 +454,7 @@ test('an operator gathers what is left, sends it, and writes down the bank’s r
     await page.getByTestId('batch-move-submit-' + batchId).click();
     await page
       .getByTestId('settlement-batch-status-' + shop.sellerId)
-      .filter({ hasText: 'واریزشده' })
+      .filter({ hasText: 'پرداخت‌شده' })
       .waitFor();
     await page.screenshot({ path: path.join(SHOTS, 'settlement-paid-desktop.png'), fullPage: true });
   } finally {

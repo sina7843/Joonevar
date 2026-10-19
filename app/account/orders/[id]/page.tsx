@@ -13,9 +13,7 @@ import { ActionOwner, StatusBadge } from '../../../../src/ui/status.tsx';
 import { AppError } from '../../../../src/domain/errors.ts';
 import { orderForBuyer, subOrderHistory } from '../../../../src/commerce/orders.ts';
 import {
-  ORDER_STATUS_FA,
   SUB_ORDER_STATUS_FA,
-  type OrderStatus,
   type SubOrderStatus,
 } from '../../../../src/commerce/order-model.ts';
 import { OrderActionForm, SubOrderMoveForm } from '../../../../src/commerce/order-forms.tsx';
@@ -77,9 +75,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             }
             back={{ href: '/account/orders', label: 'بازگشت به سفارش‌ها' }}
             aside={
-              <StatusBadge tone={order.status === 'PAID' ? 'success' : pending ? 'warning' : 'neutral'}>
-                <span data-testid="order-status">{ORDER_STATUS_FA[order.status as OrderStatus]}</span>
-              </StatusBadge>
+              <span data-testid="order-status">
+                <StatusBadge status={order.status} />
+              </span>
             }
             meta={[
               parts.length.toLocaleString('fa-IR') + ' فروشگاه',
@@ -160,11 +158,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     </span>
                   </div>
                 </div>
-                <StatusBadge tone={part.subOrder.status === 'DELIVERED' ? 'success' : 'neutral'}>
-                  <span data-testid={'suborder-status-' + part.subOrder.id}>
-                    {SUB_ORDER_STATUS_FA[part.subOrder.status as SubOrderStatus]}
-                  </span>
-                </StatusBadge>
+                <span data-testid={'suborder-status-' + part.subOrder.id}>
+                  <StatusBadge status={part.subOrder.status} />
+                </span>
               </div>
               {part.subOrder.statusReasonFa ? (
                 <p className="text-caption" data-testid={'suborder-reason-' + part.subOrder.id}>

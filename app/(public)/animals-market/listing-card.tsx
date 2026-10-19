@@ -50,11 +50,7 @@ export function ListingCard({ card, testId }: { card: PublicListingCard; testId?
                 <span data-testid={'market-ad-label-' + card.id}>{PROMOTED_LABEL_FA}</span>
               </StatusBadge>
             ) : null}
-            {card.reserved ? (
-              <StatusBadge tone="neutral" size="sm">
-                رزروشده
-              </StatusBadge>
-            ) : null}
+            {card.reserved ? <StatusBadge status="RESERVED" size="sm" /> : null}
           </span>
         ) : null}
         <h3 className="hz-listing__title line-clamp-2">{card.titleFa}</h3>

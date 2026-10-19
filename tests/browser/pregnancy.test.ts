@@ -299,7 +299,7 @@ async function pedigreedAnimal(
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // Straight to this receipt: the shared development queue also holds rows left
   // by earlier runs.
@@ -520,7 +520,7 @@ test('the owner declares pregnancy without a vet, and the permit is untouched', 
 
   // The permit itself is exactly as it was issued.
   await owner.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
-  assert.equal(await owner.getByTestId('permit-status').innerText(), 'مجوز صادر شد');
+  assert.equal(await owner.getByTestId('permit-status').innerText(), 'صادر شد');
 });
 
 test('the assigned vet records an independent result and a difference stays neutral', async () => {
@@ -657,14 +657,14 @@ test('birth counts, provisional puppies, a correction and a later death', async 
   await owner
     .waitForFunction(
       (id) =>
-        document.querySelector('[data-testid="puppy-status-' + id + '"]')?.textContent?.includes('فوت‌شده'),
+        document.querySelector('[data-testid="puppy-status-' + id + '"]')?.textContent?.includes('فوت'),
       first,
       { timeout: 20_000 },
     )
     .catch(async () => {
       throw new Error('death was not recorded | body: ' + (await owner.locator('body').innerText()).slice(0, 1200));
     });
-  assert.equal(await owner.getByTestId('puppy-status-' + first).innerText(), 'فوت‌شده پس از تولد');
+  assert.equal(await owner.getByTestId('puppy-status-' + first).innerText(), 'فوت');
   assert.equal(await owner.getByTestId('living-now').innerText(), '2');
   assert.equal(await owner.getByTestId('profile-count').innerText(), '3', 'the profile is kept');
   assert.equal(await owner.getByTestId('reported-live').innerText(), '2');
@@ -688,5 +688,5 @@ test('birth counts, provisional puppies, a correction and a later death', async 
 
   // The permit is still exactly as issued after all of it.
   await owner.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
-  assert.equal(await owner.getByTestId('permit-status').innerText(), 'مجوز صادر شد');
+  assert.equal(await owner.getByTestId('permit-status').innerText(), 'صادر شد');
 });

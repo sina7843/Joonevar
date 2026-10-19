@@ -16,8 +16,6 @@ import { AppError } from '../../../../src/domain/errors.ts';
 import { inquiryThread } from '../../../../src/marketplace/inquiries.ts';
 import {
   CONTACT_BLOCKED_FA,
-  INQUIRY_STATUS_FA,
-  OFFER_STATUS_FA,
   canRespondToOffer,
   type InquiryStatus,
   type OfferParty,
@@ -171,9 +169,9 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
           <Card variant="compact">
             <div className="flex flex-wrap items-start justify-between gap-sm">
               <SectionHeader size="sm" title={thread.listingTitleFa} />
-              <StatusBadge tone={status === 'CONVERTED' ? 'success' : 'neutral'}>
-                <span data-testid="inquiry-status">{INQUIRY_STATUS_FA[status]}</span>
-              </StatusBadge>
+              <span data-testid="inquiry-status">
+                <StatusBadge status={status === 'CONVERTED' ? 'RESERVED' : status} />
+              </span>
             </div>
             <div className="mt-sm" data-testid="inquiry-facts">
               <KeyValueList
@@ -364,9 +362,12 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
             ) : (
               <>
                 {liveOffer ? (
-                  <p className="mt-sm text-body-sm" data-testid="live-offer">
-                    {OFFER_STATUS_FA[liveOffer.status as OfferStatus]}: {moneyFa(liveOffer.amountToman)} تومان (
-                    {liveOffer.party === 'BUYER' ? 'خریدار' : 'فروشنده'})
+                  <p className="mt-sm flex flex-wrap items-center gap-xs text-body-sm" data-testid="live-offer">
+                    {/* CMPB-042: an offer's REJECTED is the dictionary's DECLINED. */}
+                    <StatusBadge status={(liveOffer.status as OfferStatus) === 'REJECTED' ? 'DECLINED' : liveOffer.status} size="sm" />
+                    <span>
+                      {moneyFa(liveOffer.amountToman)} تومان ({liveOffer.party === 'BUYER' ? 'خریدار' : 'فروشنده'})
+                    </span>
                   </p>
                 ) : (
                   <p className="mt-sm text-caption text-text-secondary">هنوز پیشنهادی ثبت نشده است.</p>

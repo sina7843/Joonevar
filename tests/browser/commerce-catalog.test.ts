@@ -194,7 +194,7 @@ test('a reviewer publishes it, and only then can it be offered and priced', asyn
 
     await page.goto(BASE_URL + '/account/seller/catalog', { waitUntil: 'load' });
     await page.getByTestId('offer-move-active-' + offerId).click();
-    await page.getByTestId('offer-status-' + offerId).filter({ hasText: 'در حال فروش' }).waitFor();
+    await page.getByTestId('offer-status-' + offerId).filter({ hasText: 'فعال' }).waitFor();
   } finally {
     await context.close();
   }

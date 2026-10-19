@@ -247,9 +247,7 @@ export default async function ClubRulesPage({ params }: { params: Promise<{ id: 
                   {version.publishedAt ? <span className="hz-setting__hint">{formatInstantFa(version.publishedAt)}</span> : null}
                 </div>
                 <div className="hz-setting__end">
-                  <StatusBadge size="sm" tone={version.status === 'PUBLISHED' ? 'success' : 'neutral'}>
-                    {version.status === 'PUBLISHED' ? 'در اجرا' : version.status === 'DRAFT' ? 'پیش‌نویس' : 'بایگانی'}
-                  </StatusBadge>
+                  <StatusBadge size="sm" status={version.status} />
                 </div>
               </li>
             ))}

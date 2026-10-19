@@ -48,11 +48,11 @@ export function PatternGallery() {
       <SyntheticNotice>
         <div className="space-y-md">
           <div className="flex flex-wrap gap-sm">
-            <StatusBadge tone="neutral">پرونده اولیه</StatusBadge>
-            <StatusBadge tone="info">در حال بررسی</StatusBadge>
-            <StatusBadge tone="success">تأیید شده</StatusBadge>
-            <StatusBadge tone="warning">نیازمند اصلاح</StatusBadge>
-            <StatusBadge tone="error">رد شده</StatusBadge>
+            <StatusBadge status="DRAFT" />
+            <StatusBadge status="UNDER_REVIEW" />
+            <StatusBadge status="APPROVED" />
+            <StatusBadge status="NEEDS_CORRECTION" />
+            <StatusBadge status="REJECTED" />
           </div>
           <p className="text-body-sm">
             شناسه‌ها در متن فارسی خوانا می‌مانند: <Identifier label="کد مراجعه:" value="HZ-7K3M9QRPTX" /> و{' '}
@@ -140,14 +140,14 @@ export function PatternGallery() {
           name="نمونه ساختگی — حیوان آزمایشی"
           speciesBreed="سگ · ژرمن شپرد"
           petId={null}
-          status={{ tone: 'info', label: 'پرونده اولیه' }}
+          status="DRAFT"
           href="/dev/patterns"
         />
         <RequestCard
           title="کاشت یا تأیید میکروچیپ"
           requestCode="REQ-000123"
           animalName="نمونه ساختگی — حیوان آزمایشی"
-          status={{ tone: 'warning', label: 'در حال بررسی' }}
+          status="UNDER_REVIEW"
           owner="VET"
           deadlineFa="۲۶ شهریور ۱۴۰۵"
           resumeHref="/dev/patterns"
@@ -164,7 +164,7 @@ export function PatternGallery() {
               id: '1',
               title: 'ثبت درخواست مراجعه',
               whenFa: '۲۰ شهریور ۱۴۰۵',
-              status: { tone: 'success', label: 'انجام شد' },
+              status: 'APPROVED',
               owner: 'USER',
               summary: 'کد مراجعه صادر شد و مهلت آن ثبت شده است.',
               href: '/dev/patterns',
@@ -174,7 +174,7 @@ export function PatternGallery() {
               id: '2',
               title: 'پذیرش در محل',
               whenFa: '—',
-              status: { tone: 'neutral', label: 'در انتظار' },
+              status: 'PENDING',
               owner: 'VET',
               summary: 'پس از مراجعه، دامپزشک معتمد کد را بررسی می‌کند.',
               href: '/dev/patterns',

@@ -11,7 +11,6 @@ import { db } from '../../../../../src/db/client.ts';
 import { AppError } from '../../../../../src/domain/errors.ts';
 import { sellerListing } from '../../../../../src/marketplace/listings.ts';
 import { sellerInquiries } from '../../../../../src/marketplace/inquiries.ts';
-import { INQUIRY_STATUS_FA, type InquiryStatus } from '../../../../../src/marketplace/inquiry-model.ts';
 import { AcceptInquiryForm } from '../../../purchases/forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -97,9 +96,8 @@ export default async function ListingRequestsPage({ params }: { params: Promise<
               <li key={row.id} className="hz-cardlist__item" data-testid={'listing-request-' + row.id}>
                 <div className="hz-cardlist__row">
                   <span className="hz-cardlist__title">{'درخواست ' + dateTimeFa(row.createdAt)}</span>
-                  <StatusBadge tone={row.status === 'CONVERTED' ? 'success' : 'neutral'}>
-                    {INQUIRY_STATUS_FA[row.status as InquiryStatus] ?? row.status}
-                  </StatusBadge>
+                  {/* CONVERTED (deposit paid, advert reserved) is the dictionary's RESERVED. */}
+                  <StatusBadge status={row.status === 'CONVERTED' ? 'RESERVED' : row.status} />
                 </div>
                 <span className="hz-cardlist__meta">
                   قیمت نهایی: {moneyFa(row.finalPriceToman)} · بیعانه: {moneyFa(row.depositAmountToman)}

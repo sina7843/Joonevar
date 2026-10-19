@@ -202,7 +202,7 @@ test('the review operator records the licence, and a visitor reads the centre on
     const card = page.getByTestId('centre-card-' + centreSlug);
     await card.waitFor();
     const cardText = (await card.textContent()) ?? '';
-    assert.match(cardText, /مجوز معتبر/);
+    assert.match(cardText, /پروانه فعالیت\s*معتبر/);
     assert.match(cardText, /تهران/);
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= MOBILE.width, 'no sideways scroll on a phone: ' + width);
@@ -235,7 +235,7 @@ test('a veterinarian joins the team only after accepting the invitation', async 
     await page.getByTestId('member-reason').fill('SYNTHETIC دعوت به تیم');
     await page.getByTestId('invite-member').click();
     await waitForText(page, 'member-invite-result', 'دعوت فرستاده شد');
-    await waitForText(page, 'centre-members', 'در انتظار پذیرش');
+    await waitForText(page, 'centre-members', 'در انتظار پاسخ');
   });
 
   await as('visitor', MOBILE, async (page) => {

@@ -4,26 +4,17 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { ActionOwner, StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge } from '../../../src/ui/status.tsx';
 import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
 import { db } from '../../../src/db/client.ts';
 import { directoryReferenceData } from '../../../src/vets/directory.ts';
 import { mySuggestions } from '../../../src/suggestions/service.ts';
 import { SUGGESTION_KIND_FA, type SuggestionKind } from '../../../src/suggestions/model.ts';
-import { APPLICATION_STATUS_FA, type VetApplicationStatus } from '../../../src/vets/onboarding-model.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
 import { SuggestionCorrectionForm, SuggestionForm, WithdrawSuggestionForm } from '../../../src/suggestions/forms.tsx';
 
 export const dynamic = 'force-dynamic';
-
-const TONE: Record<VetApplicationStatus, StatusTone> = {
-  SUBMITTED: 'info',
-  NEEDS_CORRECTION: 'warning',
-  APPROVED: 'success',
-  REJECTED: 'error',
-  WITHDRAWN: 'neutral',
-};
 
 /**
  * Suggesting a directory record — Requirements-Phase-2 §10 (PROMPT-009).
@@ -87,9 +78,7 @@ export default async function AccountSuggestionsPage() {
                       </p>
                     </div>
                     <span data-testid={'suggestion-status-' + row.id}>
-                      <StatusBadge tone={TONE[row.status as VetApplicationStatus]}>
-                        {APPLICATION_STATUS_FA[row.status as VetApplicationStatus]}
-                      </StatusBadge>
+                      <StatusBadge status={row.status} />
                     </span>
                   </div>
 

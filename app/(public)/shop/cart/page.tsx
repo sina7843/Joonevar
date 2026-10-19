@@ -145,7 +145,7 @@ export default async function CartPage({
                 >
                   <header className="flex flex-wrap items-center justify-between gap-sm">
                     <SectionHeader id={'cart-group-title-' + group.sellerId} title={group.sellerNameFa} size="sm" />
-                    {group.sellerTrading ? null : <StatusBadge tone="neutral">فروش غیرفعال</StatusBadge>}
+                    {group.sellerTrading ? null : <StatusBadge status="INACTIVE" />}
                   </header>
 
                   <ul className="hz-cart-list">

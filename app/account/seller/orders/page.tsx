@@ -7,7 +7,6 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { myStores } from '../../../../src/commerce/sellers.ts';
 import { sellerOrders } from '../../../../src/commerce/orders.ts';
-import { SUB_ORDER_STATUS_FA, type SubOrderStatus } from '../../../../src/commerce/order-model.ts';
 import { SubOrderMoveForm } from '../../../../src/commerce/order-forms.tsx';
 import { moveAsSellerAction } from '../../orders/actions.ts';
 
@@ -91,11 +90,9 @@ export default async function SellerOrdersPage({
                 <h2 className="text-label-lg" data-testid={'seller-ref-' + row.subOrder.id}>
                   {row.subOrder.reference}
                 </h2>
-                <StatusBadge tone={row.subOrder.status === 'DELIVERED' ? 'success' : 'neutral'}>
-                  <span data-testid={'seller-state-' + row.subOrder.id}>
-                    {SUB_ORDER_STATUS_FA[row.subOrder.status as SubOrderStatus]}
-                  </span>
-                </StatusBadge>
+                <span data-testid={'seller-state-' + row.subOrder.id}>
+                  <StatusBadge status={row.subOrder.status} />
+                </span>
               </header>
 
               <ul className="space-y-2xs text-body-sm" data-testid={'seller-items-' + row.subOrder.id}>

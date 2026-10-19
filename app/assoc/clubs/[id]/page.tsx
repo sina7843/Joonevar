@@ -2,11 +2,12 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, Panel } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { clubForAuthority } from '../../../../src/clubs/service.ts';
-import { CLUB_LIFECYCLE_FA, CLUB_ROLE_FA, type ClubLifecycle } from '../../../../src/clubs/model.ts';
+import { CLUB_ROLE_FA, type ClubLifecycle } from '../../../../src/clubs/model.ts';
 import { COMMUNITY_SCOPE_FA } from '../../../../src/communities/model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 import { ClubStandingForm, ClubVerificationDecisionForm } from '../../../../src/clubs/forms.tsx';
@@ -55,10 +56,7 @@ export default async function AssocClubPage({ params }: { params: Promise<{ id: 
     <OpsShell actor={guard.actor} title={club.displayNameFa} pathname="/assoc/clubs" nav={ASSOC_NAV}>
       <DeskHead
         title={'کلاب · ' + club.displayNameFa}
-        status={{
-          tone: lifecycle === 'ACTIVE' ? 'success' : lifecycle === 'SUSPENDED' || lifecycle === 'REJECTED' ? 'error' : lifecycle === 'PENDING_VERIFICATION' ? 'info' : 'warning',
-          label: CLUB_LIFECYCLE_FA[lifecycle],
-        }}
+        status={{ ...keyStatus(lifecycle), testId: 'assoc-club-status' }}
         meta={['حوزه ' + (COMMUNITY_SCOPE_FA[club.scope as never] ?? club.scope), 'آخرین تغییر: ' + formatInstantFa(club.updatedAt), 'نسخه ' + club.version.toLocaleString('fa-IR')]}
         owner={lifecycle === 'PENDING_VERIFICATION' ? 'ASSOCIATION' : null}
       />

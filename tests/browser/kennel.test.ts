@@ -350,7 +350,7 @@ test('without a registration sheet the kennel entry is locked with that exact re
     await owner.page.goto(BASE_URL + '/breeder/activate', { waitUntil: 'load' });
     await expectText(owner.page, 'مدرک اضافه‌ای جز همان کارت ملی');
     await expectText(owner.page, 'پرداخت مستقلی با عنوان «فعال‌سازی نقش» وجود ندارد');
-    assert.equal((await owner.page.getByTestId('breeder-status').textContent())?.trim(), 'شروع نشده');
+    assert.equal((await owner.page.getByTestId('breeder-status').textContent())?.trim(), 'ثبت‌نشده');
     await owner.page.screenshot({ path: path.join(SHOTS, 'breeder-activation.png'), fullPage: true });
   } finally {
     await owner.context.close();
@@ -425,7 +425,7 @@ test('the whole kennel path runs: form, breeds, payment, submission and approval
     await owner.page.goto(BASE_URL + '/kennels/' + kennelId, { waitUntil: 'load' });
     assert.equal((await owner.page.getByTestId('kennel-status').textContent())?.trim(), 'آماده ارسال');
     await owner.page.getByTestId('submit-kennel').click();
-    await expectText(owner.page, 'در حال بررسی انجمن');
+    await expectText(owner.page, 'در حال بررسی');
     await owner.page.screenshot({ path: path.join(SHOTS, 'kennel-submitted.png'), fullPage: true });
 
     // The association sends it back once, then approves it.
@@ -457,7 +457,7 @@ test('the whole kennel path runs: form, breeds, payment, submission and approval
     await expectText(owner.page, 'اطلاعات کنل ذخیره شد');
     await owner.page.goto(BASE_URL + '/kennels/' + kennelId, { waitUntil: 'load' });
     await owner.page.getByTestId('submit-kennel').click();
-    await expectText(owner.page, 'در حال بررسی انجمن');
+    await expectText(owner.page, 'در حال بررسی');
 
     await assoc.goto(BASE_URL + '/assoc/kennels', { waitUntil: 'load' });
     await caseRow.getByTestId('open-kennel-case').click();
@@ -513,7 +513,7 @@ test('breeds are edited after approval with no new payment and no second review'
     await owner.page.waitForURL('**/kennels/**/return**');
     await owner.page.goto(BASE_URL + '/kennels/' + kennelId, { waitUntil: 'load' });
     await owner.page.getByTestId('submit-kennel').click();
-    await expectText(owner.page, 'در حال بررسی انجمن');
+    await expectText(owner.page, 'در حال بررسی');
 
     await assoc.goto(BASE_URL + '/assoc/kennels', { waitUntil: 'load' });
     const caseRow = assoc

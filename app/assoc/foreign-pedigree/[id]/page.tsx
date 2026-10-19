@@ -5,6 +5,7 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, whenFa } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
@@ -54,7 +55,7 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
     <OpsShell actor={guard.actor} title="بررسی Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
       <DeskHead
         title={'Export Pedigree · ' + (animal?.name ?? 'بدون نام')}
-        status={{ tone: open ? 'info' : status === 'APPROVED' ? 'success' : status === 'REJECTED' ? 'error' : 'warning', label: FOREIGN_STATUS_FA[status] }}
+        status={keyStatus(status)}
         meta={[
           record.documentCode ? <Identifier label="کد مدرک" value={record.documentCode} /> : null,
           'ارسال: ' + (whenFa(record.submittedAt) ?? '—'),

@@ -2,7 +2,8 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, ViewChips } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../vet-case-key.ts';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { doctorCaseQueue } from '../../../src/vets/doctor-application.ts';
@@ -56,7 +57,7 @@ export default async function AssocVetDoctorsPage({ searchParams }: { searchPara
               linkTestId="open-doctor-case"
               sub={<>{(item.claim ? 'Claim پروفایل بدون مالک · ' : 'پروفایل تازه · ') + (item.practiceScope ? SCOPE_FA[item.practiceScope] + ' · ' : '') + 'کد نظام '}<bdi dir="ltr">{item.councilCode ?? '—'}</bdi>{' · نسخه ' + item.submissionVersion.toLocaleString('fa-IR') + ' · ' + formatInstantFa(new Date(item.updatedAt))}</>}
               ageDays={ageInDays(new Date(item.updatedAt))}
-              status={{ tone: view === 'OPEN' ? 'info' : view === 'CORRECTION' ? 'warning' : 'neutral', label: item.statusFa }}
+              status={keyStatus(vetCaseKey(item.status))}
               owner={view === 'OPEN' ? 'ASSOCIATION' : view === 'CORRECTION' ? 'USER' : null}
               ownerIsUs
             />

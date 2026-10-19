@@ -77,7 +77,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const listingAppeals = appeals.filter((appeal) => appeal.listingId === listing.id);
   const moves = movesFrom(status, 'SELLER');
   const name = animal.nameFa ?? 'بدون نام';
-  const statusTone = status === 'PUBLISHED' ? 'success' : 'neutral';
+  const now = new Date();
 
   return (
     <PublicShell
@@ -91,9 +91,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             title={'آگهی فروش · ' + name}
             back={{ href: '/account/listings', label: 'آگهی‌های من' }}
             aside={
-              <StatusBadge tone={statusTone}>
-                <span data-testid="listing-status">{LISTING_STATUS_FA[status]}</span>
-              </StatusBadge>
+              <span data-testid="listing-status">
+                <StatusBadge status={status} />
+              </span>
             }
             meta={[
               'نسخه ' + listing.version.toLocaleString('fa-IR'),
@@ -259,7 +259,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                   <li key={promotion.id} className="hz-cardlist__item" data-testid={'promotion-row-' + promotion.id}>
                     <div className="hz-cardlist__row">
                       <span className="text-body-sm">{promotion.packageLabelFa}</span>
-                      <StatusBadge tone={promotion.stateFa === 'فعال' ? 'success' : 'neutral'}>{promotion.stateFa}</StatusBadge>
+                      <StatusBadge status={promotion.status === 'ACTIVE' && promotion.endsAt !== null && promotion.endsAt.getTime() <= now.getTime() ? 'EXPIRED' : promotion.status} />
                     </div>
                   </li>
                 ))}
@@ -345,7 +345,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             <div className="mt-md space-y-md">
               <div className="flex items-center justify-between gap-sm">
                 <span className="text-caption text-text-secondary">وضعیت</span>
-                <StatusBadge tone={statusTone}>{LISTING_STATUS_FA[status]}</StatusBadge>
+                <StatusBadge status={status} />
               </div>
               {listing.statusReasonFa ? (
                 <p className="text-body-sm" data-testid="listing-status-reason">

@@ -2,6 +2,7 @@ import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { reviewQueue } from '../../../src/commerce/reviews.ts';
@@ -51,7 +52,7 @@ export default async function MarketTrustPage() {
                 testId={'question-' + entry.question.id}
                 type="پرسش"
                 name={entry.productNameFa ?? entry.sellerNameFa ?? '—'}
-                status={{ tone: 'info', label: 'در انتظار بررسی' }}
+                status={keyStatus('SUBMITTED')}
                 owner="SYSTEM"
                 ownerLabel="ناظر آگهی"
                 ownerIsUs
@@ -83,12 +84,10 @@ export default async function MarketTrustPage() {
                       {view.dimensionsFa[2]}: {fa(view.row.scoreThree)}
                     </span>
                   </div>
-                  {/* The machine status stays as written: operators and checks read the same word. */}
-                  <StatusBadge tone={view.row.status === 'PUBLISHED' ? 'success' : 'neutral'} size="sm">
-                    <bdi dir="ltr" data-testid={'review-status-' + view.row.id}>
-                      {view.row.status}
-                    </bdi>
-                  </StatusBadge>
+                  {/* The stored value stays readable to checks on data-status; people read the dictionary label. */}
+                  <span data-testid={'review-status-' + view.row.id} data-status={view.row.status}>
+                    <StatusBadge status={view.row.status} size="sm" />
+                  </span>
                 </div>
                 {view.row.bodyFa ? (
                   <p className="text-body-sm" data-testid={'review-body-' + view.row.id}>

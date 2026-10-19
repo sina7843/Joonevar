@@ -49,9 +49,7 @@ export default async function IssuersPage() {
                     </span>
                   </div>
                   <div className="hz-setting__end">
-                    <StatusBadge tone={issuer.isActive ? 'success' : 'neutral'}>
-                      {issuer.isActive ? 'فعال' : 'غیرفعال'}
-                    </StatusBadge>
+                    <StatusBadge status={issuer.isActive ? 'ACTIVE' : 'INACTIVE'} />
                   </div>
                   <div className="col-span-full">
                     <ToggleIssuerForm issuerId={issuer.id} isActive={issuer.isActive} />

@@ -8,7 +8,6 @@ import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
 import { ActionOwner, StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { buyerInquiries, buyerRisk, sellerInquiries } from '../../../src/marketplace/inquiries.ts';
-import { INQUIRY_STATUS_FA, type InquiryStatus } from '../../../src/marketplace/inquiry-model.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +18,8 @@ const dateTimeFa = (value: Date | null) =>
 
 const moneyFa = (value: bigint | null) => (value === null ? 'تعیین‌نشده' : value.toLocaleString('fa-IR') + ' تومان');
 
-const statusFa = (status: string) => INQUIRY_STATUS_FA[status as InquiryStatus] ?? status;
+/** CONVERTED (deposit paid, advert reserved) is the dictionary's RESERVED; the rest are keys as-is. */
+const inquiryKey = (status: string): string => (status === 'CONVERTED' ? 'RESERVED' : status);
 
 /**
  * The two sides of one list — PROMPT-005. P05 list, two sections.
@@ -88,7 +88,7 @@ export default async function PurchasesPage() {
                   <Link href={'/account/purchases/' + row.id} className="hz-cardlist__title min-w-0 hover:underline">
                     {row.listingTitleFa}
                   </Link>
-                  <StatusBadge tone={row.status === 'CONVERTED' ? 'success' : 'neutral'}>{statusFa(row.status)}</StatusBadge>
+                  <StatusBadge status={inquiryKey(row.status)} />
                 </div>
                 <span className="hz-cardlist__meta">قیمت نهایی: {moneyFa(row.finalPriceToman)}</span>
                 {row.status === 'ACCEPTED' ? (
@@ -127,7 +127,7 @@ export default async function PurchasesPage() {
                   <Link href={'/account/purchases/' + row.id} className="hz-cardlist__title min-w-0 hover:underline">
                     {row.listingTitleFa}
                   </Link>
-                  <StatusBadge tone={row.status === 'CONVERTED' ? 'success' : 'neutral'}>{statusFa(row.status)}</StatusBadge>
+                  <StatusBadge status={inquiryKey(row.status)} />
                 </div>
                 <span className="hz-cardlist__meta">بیعانه: {moneyFa(row.depositAmountToman)}</span>
                 {row.status === 'OPEN' ? <ActionOwner owner="USER" /> : row.status === 'ACCEPTED' ? <ActionOwner owner="COUNTERPARTY" /> : null}

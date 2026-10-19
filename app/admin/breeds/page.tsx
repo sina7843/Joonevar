@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { STATUS_FA } from '../../../src/breeds/model.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ADMIN_NAV } from '../../../src/ui/shell.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
@@ -74,21 +73,17 @@ export default async function AdminBreedsPage() {
                       </div>
                     </td>
                     <td data-label="انتخاب در فرم‌ها">
-                      <StatusBadge tone={row.isActive ? 'success' : 'neutral'} size="sm">
-                        <span data-testid={'breed-state-' + row.nameEn}>{row.isActive ? 'فعال' : 'کنارگذاشته‌شده'}</span>
-                      </StatusBadge>
+                      <span data-testid={'breed-state-' + row.nameEn} data-status={row.isActive ? 'ACTIVE' : 'INACTIVE'}>
+                        <StatusBadge status={row.isActive ? 'ACTIVE' : 'INACTIVE'} size="sm" />
+                      </span>
                     </td>
                     <td data-label="صفحه عمومی">
                       {/* Two independent axes: offered in forms, and whether a public page exists (DEC-0155). */}
                       <span className="flex flex-wrap gap-xs">
-                        <StatusBadge tone={row.profileStatus === 'PUBLISHED' ? 'info' : 'neutral'} size="sm">
-                          <span data-testid={'breed-profile-' + row.nameEn}>{'صفحه: ' + STATUS_FA[row.profileStatus]}</span>
-                        </StatusBadge>
-                        {row.mergedIntoBreedId ? (
-                          <StatusBadge tone="warning" size="sm">
-                            تکراری
-                          </StatusBadge>
-                        ) : null}
+                        <span data-testid={'breed-profile-' + row.nameEn} data-status={row.profileStatus}>
+                          <StatusBadge status={row.profileStatus} size="sm" />
+                        </span>
+                        {row.mergedIntoBreedId ? <span className="hz-tag hz-tag--neutral">تکراری</span> : null}
                       </span>
                     </td>
                     <td data-label="کنش">

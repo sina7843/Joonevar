@@ -187,7 +187,7 @@ test('one payment covers both shops, and each becomes its own sub-order', async 
     // Two shops, each waiting on its own shop rather than on the order.
     assert.equal(await page.locator('[data-testid^="suborder-status-"]').count(), 2);
     for (const text of await page.locator('[data-testid^="suborder-status-"]').allInnerTexts()) {
-      assert.match(text, /در انتظار پذیرش فروشنده/);
+      assert.match(text, /پرداخت‌شده/);
     }
     await page.screenshot({ path: path.join(SHOTS, 'order-paid-desktop.png'), fullPage: true });
 
@@ -266,7 +266,7 @@ test('the other shop is untouched, and the buyer sees the two parts separately',
     assert.equal(statuses.length, 2);
     // One shop moved; the other stands exactly where the payment left it.
     assert.ok(statuses.some((text) => text.includes('ارسال‌شده')), statuses.join('،'));
-    assert.ok(statuses.some((text) => text.includes('در انتظار پذیرش فروشنده')), statuses.join('،'));
+    assert.ok(statuses.some((text) => text.includes('پرداخت‌شده')), statuses.join('،'));
 
     // The shipped one carries its tracking code, from the shop that entered it.
     assert.match(

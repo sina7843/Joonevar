@@ -174,15 +174,13 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
                             </span>
                           ) : null}
                           {community.owned ? null : (
+                            // GAPS #4: no dictionary key for UNOWNED (ownership axis)
                             <StatusBadge tone="warning" size="sm">
                               بدون مالک
                             </StatusBadge>
                           )}
-                          {community.registered ? (
-                            <StatusBadge tone="info" size="sm">
-                              ثبت معتبر
-                            </StatusBadge>
-                          ) : null}
+                          {/* A credential fact, not a lifecycle status (same rule as the vet code, FND-009). */}
+                          {community.registered ? <span className="hz-tag hz-tag--neutral">ثبت معتبر</span> : null}
                         </span>
                       ) : null}
                       {community.upcomingEvents > 0 ? (

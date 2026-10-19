@@ -6,10 +6,8 @@ import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
 import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
-import { statusOf } from '../../../../src/ui/status-dictionary.ts';
 import { Icon } from '../../../../src/ui/icon.tsx';
-import { MEMBERSHIP_STATUS_FA } from '../../../../src/billing/membership-model.ts';
-import { CLUB_LIFECYCLE_FA } from '../../../../src/clubs/model.ts';
+import type { MembershipStatus } from '../../../../src/billing/membership-model.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +24,11 @@ export function generateMetadata(): Metadata {
 }
 
 /** The membership states a person can actually be in, with what each one means. */
-const MEMBERSHIP: ReadonlyArray<{ status: keyof typeof MEMBERSHIP_STATUS_FA; meaning: string }> = [
+/** Membership values that differ from the status-dictionary key; the rest are the key. */
+const membershipKey = (status: MembershipStatus): string =>
+  status === 'APPROVED_AWAITING_PAYMENT' ? 'AWAITING_PAYMENT' : status === 'PAYMENT_PENDING' ? 'PENDING_PAYMENT' : status;
+
+const MEMBERSHIP: ReadonlyArray<{ status: MembershipStatus; meaning: string }> = [
   { status: 'NONE', meaning: 'هنوز درخواستی ثبت نشده است.' },
   { status: 'PENDING_REVIEW', meaning: 'درخواست ثبت شده و در انتظار بررسی انجمن است.' },
   { status: 'NEEDS_CORRECTION', meaning: 'انجمن اصلاحی خواسته است؛ دلیل روی همان پرونده نوشته شده.' },
@@ -85,8 +87,6 @@ const CLUB_MEANING: Record<(typeof CLUB_ORDER)[number], string> = {
  */
 export default function AssociationStatusPage() {
   const { origin } = site();
-  // Tones come from the shared dictionary (one tone per key for every viewer).
-  const tone = (key: string) => statusOf(key)?.tone ?? 'neutral';
 
   return (
     <div className="mx-auto max-w-[var(--container-reading)] space-y-xl">
@@ -101,7 +101,7 @@ export default function AssociationStatusPage() {
           {MEMBERSHIP.map((entry) => (
             <div key={entry.status} className="space-y-xs py-md first:pt-0 last:pb-0">
               <dt>
-                <StatusBadge tone={tone(entry.status)}>{MEMBERSHIP_STATUS_FA[entry.status]}</StatusBadge>
+                <StatusBadge status={membershipKey(entry.status)} />
               </dt>
               <dd className="hz-body-sm text-text-secondary">{entry.meaning}</dd>
             </div>
@@ -139,7 +139,7 @@ export default function AssociationStatusPage() {
           {CLUB_ORDER.map((state) => (
             <div key={state} className="space-y-xs py-md first:pt-0 last:pb-0">
               <dt>
-                <StatusBadge tone={tone(state)}>{CLUB_LIFECYCLE_FA[state]}</StatusBadge>
+                <StatusBadge status={state} />
               </dt>
               <dd className="hz-body-sm text-text-secondary">{CLUB_MEANING[state]}</dd>
             </div>

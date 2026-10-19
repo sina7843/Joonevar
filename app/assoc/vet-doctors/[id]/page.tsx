@@ -2,6 +2,8 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, DocFrame, Panel, PrivateNote, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../../vet-case-key.ts';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
@@ -43,7 +45,7 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
     <OpsShell actor={guard.actor} title="بررسی کد نظام دامپزشک" pathname="/assoc/vet-doctors" nav={ASSOC_NAV}>
       <DeskHead
         title={'کد نظام دامپزشک · ' + (detail.applicantNameFa ?? latest?.displayNameFa ?? '—')}
-        status={{ tone: waiting ? 'info' : detail.case.status === 'NEEDS_CORRECTION' ? 'warning' : detail.case.status === 'REJECTED' ? 'error' : 'success', label: detail.case.statusFa }}
+        status={keyStatus(vetCaseKey(detail.case.status))}
         meta={[
           latest?.councilCode ? <Identifier label="کد نظام" value={latest.councilCode} /> : null,
           detail.applicantNationalId ? <Identifier label="کد ملی" value={detail.applicantNationalId} /> : null,

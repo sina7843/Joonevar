@@ -7,7 +7,7 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { allPackages, listPlans } from '../../../src/advertising/service.ts';
-import { AD_PERIOD_FA, AD_STATE_FA, AD_TIER_FA, adState, type AdPeriod, type AdTier } from '../../../src/advertising/model.ts';
+import { AD_PERIOD_FA, AD_TIER_FA, adState, type AdPeriod, type AdTier } from '../../../src/advertising/model.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
 import { CancelPackageForm, PlanForm, UnpricedNotice } from '../../../src/advertising/forms.tsx';
 
@@ -56,9 +56,7 @@ export default async function AdminPackagesPage() {
                   {entry.plan.priceSettingKey}
                 </bdi>
               </div>
-              <StatusBadge tone={entry.plan.isActive === 1 ? 'success' : 'neutral'} size="sm">
-                {entry.plan.isActive === 1 ? 'ارائه می‌شود' : 'ارائه نمی‌شود'}
-              </StatusBadge>
+              <StatusBadge status={entry.plan.isActive === 1 ? 'ACTIVE' : 'INACTIVE'} size="sm" />
             </div>
             <dl className="hz-kv">
               <div className="hz-kv__row">
@@ -73,9 +71,9 @@ export default async function AdminPackagesPage() {
               <div className="hz-kv__row">
                 <dt className="hz-kv__key">ظرفیت فعال</dt>
                 <dd className="hz-kv__value">
-                  <StatusBadge tone={entry.full ? 'warning' : 'neutral'} size="sm">
+                  <span className="hz-tag hz-tag--neutral">
                     {'فعال: ' + fa(entry.activeCount) + (entry.plan.slotCapacity === null ? '' : ' از ' + fa(entry.plan.slotCapacity))}
-                  </StatusBadge>
+                  </span>
                 </dd>
               </div>
             </dl>
@@ -117,20 +115,7 @@ export default async function AdminPackagesPage() {
                       </span>
                       {row.cancelReasonFa ? <span className="hz-case__sub">{'دلیل لغو: ' + row.cancelReasonFa}</span> : null}
                     </div>
-                    <StatusBadge
-                      size="sm"
-                      tone={
-                        state === 'ACTIVE'
-                          ? 'success'
-                          : state === 'PENDING_PAYMENT'
-                            ? 'info'
-                            : state === 'PAYMENT_FAILED'
-                              ? 'error'
-                              : 'neutral'
-                      }
-                    >
-                      {AD_STATE_FA[state]}
-                    </StatusBadge>
+                    <StatusBadge status={state} size="sm" />
                   </div>
                   {state === 'ACTIVE' || state === 'PENDING_PAYMENT' ? (
                     <CancelPackageForm surface="admin" subscription={{ id: row.id, version: row.version }} />

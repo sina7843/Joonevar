@@ -2,6 +2,8 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, Panel, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../../vet-case-key.ts';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
@@ -44,11 +46,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
     <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک معتمد" pathname="/assoc/vet-trusted" nav={ASSOC_NAV}>
       <DeskHead
         title={'دامپزشک معتمد · ' + (detail.applicantNameFa ?? '—')}
-        status={{
-          tone: waiting ? 'info' : detail.case.status === 'NEEDS_CORRECTION' ? 'warning' : detail.case.status === 'REJECTED' ? 'error' : 'success',
-          label: detail.case.statusFa,
-          testId: 'trusted-case-status',
-        }}
+        status={{ ...keyStatus(vetCaseKey(detail.case.status)), testId: 'trusted-case-status' }}
         meta={['نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR')]}
         owner={waiting ? 'ASSOCIATION' : detail.case.status === 'NEEDS_CORRECTION' ? 'USER' : null}
         ownerExtra={review?.claimedByOther ? 'در دست ' + (review.claimerNameFa ?? 'بررسی‌کننده دیگر') : undefined}

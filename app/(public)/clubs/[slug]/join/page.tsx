@@ -6,14 +6,13 @@ import { AccessDenied } from '../../../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../../../src/ui/shell.tsx';
 import { Card, CardHeader } from '../../../../../src/ui/card.tsx';
 import { Alert } from '../../../../../src/ui/alert.tsx';
-import { ActionOwner, StatusBadge } from '../../../../../src/ui/status.tsx';
+import { ActionOwner } from '../../../../../src/ui/status.tsx';
 import { db } from '../../../../../src/db/client.ts';
 import { communities } from '../../../../../src/db/schema/communities.ts';
 import { clubJoinView } from '../../../../../src/clubs/enrollment.ts';
 import {
   CLUB_MEMBERSHIP_STATUS_FA,
   CLUB_MEMBERSHIP_STATUS_SHORT_FA,
-  CLUB_MEMBERSHIP_TONE,
   type ClubMembershipStatus,
 } from '../../../../../src/clubs/membership-model.ts';
 import { ClubApplyForm, ClubFeeForm, ClubLeaveForm } from '../../../../../src/clubs/rules-forms.tsx';
@@ -52,7 +51,16 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
           <CardHeader
             title={view.clubNameFa}
             subtitle="عضویت در کلاب با خود کلاب است؛ همزیست فقط شرط‌های اعلام‌شده کلاب را روی پرونده شما بررسی می‌کند."
-            badge={status ? { tone: CLUB_MEMBERSHIP_TONE[status], label: CLUB_MEMBERSHIP_STATUS_SHORT_FA[status] } : undefined}
+            badge={
+              status === null
+                ? undefined
+                : status === 'INELIGIBLE'
+                  ? // GAPS #4: no dictionary key for INELIGIBLE
+                    { tone: 'neutral', label: CLUB_MEMBERSHIP_STATUS_SHORT_FA[status] }
+                  : status === 'PENDING_REVIEW'
+                    ? 'SUBMITTED' // the club decides, not the association (PENDING_REVIEW's label names the association)
+                    : status
+            }
           />
           <Link href={'/clubs/' + slug} className="hz-link hz-link--standalone mt-md hz-body-sm">
             بازگشت به صفحه کلاب
@@ -70,7 +78,7 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
               <ul className="mt-md flex flex-wrap gap-xs" data-testid="club-asked">
                 {view.askedFa.map((asked) => (
                   <li key={asked}>
-                    <StatusBadge tone="neutral">{asked}</StatusBadge>
+                    <span className="hz-tag hz-tag--neutral">{asked}</span>
                   </li>
                 ))}
               </ul>

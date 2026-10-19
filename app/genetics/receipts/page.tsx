@@ -2,10 +2,10 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
-import { receiptQueue, RECEIPT_STATUS_FA } from '../../../src/genetics/service.ts';
+import { receiptQueue } from '../../../src/genetics/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +37,7 @@ export default async function GeneticsReceiptsPage() {
                 linkLabel="بررسی فیش"
                 linkTestId="open-receipt"
                 ageDays={ageInDays(receipt.submittedAt)}
-                status={{ tone: 'info', label: RECEIPT_STATUS_FA[receipt.status] }}
+                status={keyStatus(receipt.status)}
                 owner="GENETICS_CENTRE"
                 ownerIsUs
               />

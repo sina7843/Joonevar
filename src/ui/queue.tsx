@@ -2,6 +2,21 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Icon } from './icon.tsx';
 import { StatusBadge, type ActionOwnerKind, type StatusTone } from './status.tsx';
+import { statusOf } from './status-dictionary.ts';
+
+/** A queue/desk status: a status-dictionary key (preferred) or a legacy tone + label pair. */
+export type RowStatus = { readonly key: string } | { readonly tone: StatusTone; readonly label: string };
+
+/**
+ * Tone + label for a dictionary key, for components that still take the
+ * legacy pair (DeskHeader, CaseItem). A module value with no dictionary key
+ * (GAPS #4) uses `fallback`, else neutral with the raw key.
+ */
+export function keyStatus(key: string, fallback?: { tone: StatusTone; label: string }): { tone: StatusTone; label: string } {
+  const entry = statusOf(key);
+  if (entry?.labelFa) return { tone: entry.tone, label: entry.labelFa };
+  return fallback ?? { tone: 'neutral', label: key };
+}
 
 /**
  * CaseQueue — DS pattern P09 (`.hz-table--dense` + `.hz-case` + inline
@@ -22,7 +37,7 @@ export interface QueueRow {
   readonly ageDays?: number | null;
   /** Only when the clock is ours (P09 › Overdue). */
   readonly age?: 'late' | 'overdue';
-  readonly status?: { tone: StatusTone; label: string };
+  readonly status?: RowStatus;
   readonly owner?: ActionOwnerKind;
   /** The owner is the viewing environment itself. */
   readonly ownerIsUs?: boolean;
@@ -117,9 +132,13 @@ export function CaseQueue({
               {showStatus ? (
                 <td data-label="وضعیت">
                   {row.status ? (
-                    <StatusBadge tone={row.status.tone} size="sm">
-                      {row.status.label}
-                    </StatusBadge>
+                    'key' in row.status ? (
+                      <StatusBadge status={row.status.key} size="sm" />
+                    ) : (
+                      <StatusBadge tone={row.status.tone} size="sm">
+                        {row.status.label}
+                      </StatusBadge>
+                    )
                   ) : (
                     '—'
                   )}

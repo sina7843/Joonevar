@@ -299,7 +299,7 @@ async function pedigreedAnimal(
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // Straight to this receipt: the shared development queue also holds rows left
   // by earlier runs.
@@ -561,7 +561,7 @@ test('a rejection needs a new version, and both confirmations finalise it', asyn
     undefined,
     { timeout: 20_000 },
   );
-  assert.equal(await dam.getByTestId('allocation-status').innerText(), 'ردشده؛ نیازمند نسخه جدید');
+  assert.equal(await dam.getByTestId('allocation-status').innerText(), 'ردشده');
   await dam.screenshot({ path: path.join(SHOTS, 'allocation-rejected.png'), fullPage: true });
 
   // A revised proposal is version 2, and the earlier version stays readable.
@@ -583,11 +583,11 @@ test('a rejection needs a new version, and both confirmations finalise it', asyn
   await dam.getByTestId('submit-allocation-response').click();
   await dam.waitForFunction(
     () =>
-      document.querySelector('[data-testid="allocation-status"]')?.textContent?.includes('نهایی‌شده'),
+      document.querySelector('[data-testid="allocation-status"]')?.textContent?.includes('نتیجه نهایی'),
     undefined,
     { timeout: 20_000 },
   );
-  assert.equal(await dam.getByTestId('allocation-status').innerText(), 'نهایی‌شده با تأیید دوطرفه');
+  assert.equal(await dam.getByTestId('allocation-status').innerText(), 'نتیجه نهایی');
   await dam.screenshot({ path: path.join(SHOTS, 'allocation-final.png'), fullPage: true });
 });
 

@@ -30,6 +30,16 @@ export function Card({
   );
 }
 
+/**
+ * A status-dictionary key, or — only for a value the dictionary has no key for
+ * (GAPS #4) — an explicit tone and label.
+ */
+export type CardStatus = string | { tone: StatusTone; label: string };
+
+function CardStatusBadge({ status }: { status: CardStatus }) {
+  return typeof status === 'string' ? <StatusBadge status={status} /> : <StatusBadge tone={status.tone}>{status.label}</StatusBadge>;
+}
+
 export function CardHeader({
   title,
   subtitle,
@@ -38,7 +48,7 @@ export function CardHeader({
 }: {
   title: string;
   subtitle?: ReactNode;
-  badge?: { tone: StatusTone; label: string };
+  badge?: CardStatus;
   action?: ReactNode;
 }) {
   return (
@@ -47,7 +57,7 @@ export function CardHeader({
         <h3 className="hz-card__title">{title}</h3>
         {subtitle ? <div className="mt-2xs text-caption text-text-secondary">{subtitle}</div> : null}
       </div>
-      {badge ? <StatusBadge tone={badge.tone}>{badge.label}</StatusBadge> : null}
+      {badge ? <CardStatusBadge status={badge} /> : null}
       {action ?? null}
     </div>
   );
@@ -56,7 +66,8 @@ export function CardHeader({
 /**
  * Animal row — DS *AnimalCard* (`.hz-animal`): thumbnail, name, species and
  * breed, the identifier once issued, and the state as a badge. The whole row
- * is the link (§23.2: the Pet ID exists only once a sheet is issued).
+ * is the link (§23.2: the Pet ID exists only once a sheet is issued). `status`
+ * is a dictionary key; REGISTERED shows no badge — the Pet ID says it (CMPA1-018).
  */
 export function AnimalCard({
   name,
@@ -70,7 +81,7 @@ export function AnimalCard({
   name: string;
   speciesBreed: string;
   petId: string | null;
-  status: { tone: StatusTone; label: string };
+  status?: string;
   href: string;
   imageFileId?: string | null;
   imageAltFa?: string | null;
@@ -93,9 +104,7 @@ export function AnimalCard({
           {petId ? <Identifier label="شناسه:" value={petId} /> : 'شناسه: —'}
         </span>
       </div>
-      <div className="hz-animal__end">
-        <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
-      </div>
+      <div className="hz-animal__end">{status ? <StatusBadge status={status} /> : null}</div>
       <Icon name="caretRight" size="sm" mirror />
     </Link>
   );
@@ -118,7 +127,7 @@ export function RequestCard({
   title: string;
   requestCode: string;
   animalName: string;
-  status: { tone: StatusTone; label: string };
+  status: CardStatus;
   owner: ActionOwnerKind;
   deadlineFa?: string;
   resumeHref: string;
@@ -135,7 +144,7 @@ export function RequestCard({
             <span>حیوان: {animalName}</span>
           </div>
         </div>
-        <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+        <CardStatusBadge status={status} />
       </div>
       <div className="hz-request__foot">
         <ActionOwner owner={owner} extra={deadlineFa ? 'مهلت مراجعه تا ' + deadlineFa : undefined} />

@@ -2,7 +2,7 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel, QueueMeta, ViewChips } from '../../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { AppError } from '../../../../src/domain/errors.ts';
@@ -62,7 +62,8 @@ export default async function FinderReportsPage({ searchParams }: { searchParams
               name={r.categoryFa}
               sub={formatInstantFa(r.createdAt)}
               ageDays={r.status === 'OPEN' ? ageInDays(r.createdAt) : undefined}
-              status={r.status === 'OPEN' ? { tone: 'warning', label: 'در انتظار بررسی' } : { tone: 'neutral', label: 'تصمیم‌گرفته' }}
+              // GAPS #4: no dictionary key for a decided report («تصمیم‌گرفته»).
+              status={r.status === 'OPEN' ? keyStatus('OPEN') : { tone: 'neutral', label: 'تصمیم‌گرفته' }}
               owner={r.status === 'OPEN' ? 'SYSTEM' : null}
               ownerLabel={r.assigned && !r.assignedToMe ? 'همکار دیگر' : 'ناظر جفت‌یابی'}
               ownerIsUs={r.status === 'OPEN' && (!r.assigned || r.assignedToMe)}

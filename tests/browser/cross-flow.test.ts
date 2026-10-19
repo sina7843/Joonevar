@@ -300,7 +300,7 @@ async function pedigreedAnimal(
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // Straight to this receipt: the shared development queue also holds rows left
   // by earlier runs.
@@ -502,7 +502,7 @@ test('one journey: identity, animal, membership, visit, sheet, genetics and pedi
     }
 
     await sire.page.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
-    assert.equal(await sire.page.getByTestId('permit-status').innerText(), 'مجوز صادر شد');
+    assert.equal(await sire.page.getByTestId('permit-status').innerText(), 'صادر شد');
     await sire.page.screenshot({ path: path.join(SHOTS, 'journey-permit.png'), fullPage: true });
   } finally {
     await vet.close();
@@ -556,7 +556,7 @@ test('the same journey continues: dates, birth, allocation and the card', async 
   await dam.page.getByTestId('allocation-decision-APPROVE').check();
   await dam.page.getByTestId('submit-allocation-response').click();
   await dam.page.waitForFunction(
-    () => document.querySelector('[data-testid="allocation-status"]')?.textContent?.includes('نهایی‌شده'),
+    () => document.querySelector('[data-testid="allocation-status"]')?.textContent?.includes('نتیجه نهایی'),
     undefined,
     { timeout: 20_000 },
   );

@@ -10,7 +10,7 @@ import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { StatusBadge, TrustedMark } from '../../../../src/ui/status.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 
@@ -266,14 +266,14 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
                   <span className="min-w-0 space-y-xs">
                     <span className="flex flex-wrap items-center gap-xs">
                       <span className="text-label-lg text-text-primary">{result.titleFa}</span>
-                      <StatusBadge tone="neutral">{SEARCH_KIND_FA[result.kind]}</StatusBadge>
+                      <span className="hz-tag hz-tag--neutral">{SEARCH_KIND_FA[result.kind]}</span>
                       {result.promoted ? (
                         <span data-testid={'promoted-' + result.slug}>
                           <StatusBadge tone="info">{RANK_TIER_FA.PROMOTED}</StatusBadge>
                         </span>
                       ) : null}
-                      {result.trusted ? <StatusBadge tone="success">{RANK_TIER_FA.TRUSTED}</StatusBadge> : null}
-                      {result.verified ? <StatusBadge tone="info">{RANK_TIER_FA.VERIFIED}</StatusBadge> : null}
+                      {result.trusted ? <TrustedMark /> : null}
+                      {result.verified ? <StatusBadge status="VERIFIED" /> : null}
                     </span>
                     {result.subtitleFa ? <span className="block text-caption text-text-secondary">{result.subtitleFa}</span> : null}
                     {result.placeFa ? (

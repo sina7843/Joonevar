@@ -6,6 +6,7 @@ import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.t
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { GENETICS_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, Panel, whenFa } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
@@ -43,7 +44,8 @@ export default async function GeneticsAppealPage({ params }: { params: Promise<{
     <OpsShell actor={guard.actor} title="بررسی اعتراض" pathname={'/genetics/appeals/' + id} nav={GENETICS_NAV}>
       <DeskHead
         title={'اعتراض به نتیجه · ' + (animal?.name ?? 'بدون نام')}
-        status={{ tone: answered ? 'success' : 'info', label: APPEAL_STATUS_FA[appeal.status], testId: 'centre-appeal-status' }}
+        // GAPS #4: no dictionary key for ANSWERED — module label kept.
+        status={{ ...keyStatus(appeal.status, { tone: 'success', label: APPEAL_STATUS_FA[appeal.status] ?? appeal.status }), testId: 'centre-appeal-status' }}
         meta={[generationLabel(animal?.generation ?? 0), 'ثبت: ' + (whenFa(appeal.createdAt) ?? '—'), 'نسخه ' + appeal.version.toLocaleString('fa-IR')]}
         owner={answered ? null : 'GENETICS_CENTRE'}
       />

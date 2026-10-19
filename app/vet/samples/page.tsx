@@ -4,10 +4,10 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { Identifier } from '../../../src/ui/status.tsx';
+import { SampleStatusBadge } from '../sample-status-badge.tsx';
 import { db } from '../../../src/db/client.ts';
 import { custodyList } from '../../../src/clinical/samples.ts';
-import { isUnusable, SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { ShipmentForm } from './shipment-form.tsx';
 import { PageHeader } from '../../../src/ui/section-header.tsx';
@@ -49,9 +49,9 @@ export default async function VetSamplesPage() {
                     <p className="text-body-sm">
                       <Identifier label="کد رهگیری نمونه:" value={sample.trackingCode} />
                     </p>
-                    <StatusBadge tone={isUnusable(sample.status) ? 'warning' : 'info'}>
-                      <span data-testid={'custody-status-' + sample.id}>{SAMPLE_STATUS_FA[sample.status]}</span>
-                    </StatusBadge>
+                    <span data-testid={'custody-status-' + sample.id}>
+                      <SampleStatusBadge status={sample.status} />
+                    </span>
                   </div>
                   <p className="mt-sm text-caption text-text-secondary">
                     زمان نمونه‌گیری: {formatCivilDateFa(sample.collectedAt.toISOString().slice(0, 10))}

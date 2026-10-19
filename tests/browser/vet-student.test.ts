@@ -93,7 +93,7 @@ test('the ordinary account chooses the student path and applies with number, uni
     await page.getByTestId('student-card').setInputFiles({ name: 'card.png', mimeType: 'image/png', buffer: PNG });
     await page.getByTestId('submit-student').click();
     // The case card replaces the form in place: the persisted status is the confirmation.
-    await waitForText(page, 'student-case-status', 'ارسال‌شده');
+    await waitForText(page, 'student-case-status', 'در انتظار بررسی');
     assert.equal(await page.getByTestId('student-application-form').count(), 0, 'an account with an open case is not offered a second one');
   });
 });
@@ -108,7 +108,7 @@ test('the association asks for a correction, and the student reads the reason an
     const form = page.getByTestId('student-correction-form');
     await form.getByTestId('student-university').fill('دانشگاه درست');
     await form.getByTestId('resubmit-student').click();
-    await waitForText(page, 'student-case-status', 'ارسال‌شده');
+    await waitForText(page, 'student-case-status', 'در انتظار بررسی');
     assert.equal(await page.getByTestId('student-correction-form').count(), 0, 'an answered correction is not offered again');
   });
 });
@@ -118,7 +118,7 @@ test('once verified, the student sees the one student tag and nothing a doctor h
   await as(student, MOBILE, async (page) => {
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
     await waitForText(page, 'vet-current-tag', 'دانشجوی دامپزشکی');
-    await waitForText(page, 'student-case-status', 'دانشجوی تأییدشده');
+    await waitForText(page, 'student-case-status', 'تأییدشده');
     assert.equal(await page.getByTestId('vet-path-choice').count(), 0, 'the path choice is gone');
     assert.equal(await page.locator('text=پروفایل عمومی دایرکتوری').count(), 0, 'no directory editor');
 

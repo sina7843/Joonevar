@@ -5,6 +5,7 @@ import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.t
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { ASSOC_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, DeskVersionNote, Panel, whenFa } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
@@ -13,7 +14,6 @@ import {
   findPermit,
   permitBatch,
   permitView,
-  PERMIT_STATUS_FA,
 } from '../../../../src/mating/permits.ts';
 import {
   describeShare,
@@ -51,11 +51,7 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
     <OpsShell actor={guard.actor} title="بررسی مجوز جفت‌گیری" pathname={'/assoc/permits/' + id} nav={ASSOC_NAV}>
       <DeskHead
         title={'مجوز جفت‌گیری · ' + view.initiatorName + ' و ' + view.counterpartyName}
-        status={{
-          tone: permit.status === 'ISSUED' ? 'success' : open ? 'info' : permit.status === 'REJECTED' ? 'error' : 'warning',
-          label: PERMIT_STATUS_FA[permit.status],
-          testId: 'assoc-permit-status',
-        }}
+        status={{ ...keyStatus(permit.status), testId: 'assoc-permit-status' }}
         meta={[
           permit.permitNo ? (
             <span data-testid="assoc-permit-no">

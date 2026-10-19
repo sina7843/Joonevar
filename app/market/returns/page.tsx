@@ -3,7 +3,7 @@ import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
+import { keyStatus } from '../../../src/ui/queue.tsx';
 import { productCategories } from '../../../src/db/schema/catalog.ts';
 import { disputedReturns, livePolicy, policyExceptions } from '../../../src/commerce/returns.ts';
 import {
@@ -72,8 +72,8 @@ export default async function MarketReturnsPage() {
                   </>
                 }
                 status={{
-                  tone: 'warning',
-                  label: RETURN_STATUS_FA[view.row.status as ReturnStatus],
+                  // GAPS #4: no dictionary key for REQUESTED, SHIPPED_BACK, RECEIVED — module label kept.
+                  ...keyStatus(view.row.status, { tone: 'warning', label: RETURN_STATUS_FA[view.row.status as ReturnStatus] }),
                   testId: 'disputed-status-' + view.row.id,
                 }}
                 owner="SYSTEM"

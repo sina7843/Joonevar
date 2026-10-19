@@ -5,10 +5,10 @@ import { PublicShell } from '../../src/ui/shell.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
 import { PageHeader } from '../../src/ui/section-header.tsx';
-import { StatusBadge } from '../../src/ui/status.tsx';
+import { RequestStatusBadge } from './status-badges.tsx';
 import { db } from '../../src/db/client.ts';
 import { listOwnerRequests } from '../../src/vets/visits.ts';
-import { REQUEST_STATUS_FA, REQUEST_STATUS_TONE, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
+import { SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -92,9 +92,7 @@ export default async function RequestsPage() {
                       )}
                     </td>
                     <td data-label="وضعیت">
-                      <StatusBadge size="sm" tone={row.expired ? 'warning' : REQUEST_STATUS_TONE[row.request.status]!}>
-                        {row.expired ? 'مهلت گذشته' : REQUEST_STATUS_FA[row.request.status]!}
-                      </StatusBadge>
+                      <RequestStatusBadge size="sm" status={row.expired ? 'EXPIRED' : row.request.status} />
                     </td>
                     <td data-label="اقدام بعدی با">
                       <span

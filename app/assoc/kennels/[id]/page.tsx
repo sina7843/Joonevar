@@ -7,7 +7,7 @@ import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { ASSOC_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, DeskVersionNote, Panel, whenFa } from '../../../../src/ui/desk.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { profiles } from '../../../../src/db/schema/identity.ts';
@@ -44,11 +44,7 @@ export default async function AssocKennelPage({ params }: { params: Promise<{ id
     <OpsShell actor={guard.actor} title="بررسی کنل" pathname={'/assoc/kennels/' + id} nav={ASSOC_NAV}>
       <DeskHead
         title={'کنل · ' + (kennel.nameFa ?? 'کنل بدون نام')}
-        status={{
-          tone: open ? 'info' : kennel.status === 'APPROVED' ? 'success' : kennel.status === 'REJECTED' ? 'error' : 'warning',
-          label: KENNEL_STATUS_FA[kennel.status],
-          testId: 'assoc-kennel-status',
-        }}
+        status={{ ...keyStatus(kennel.status), testId: 'assoc-kennel-status' }}
         meta={[
           'مالک: ' + (owner[0] ? owner[0].firstName + ' ' + owner[0].lastName : '—'),
           'ارسال: ' + (whenFa(kennel.submittedAt) ?? '—'),

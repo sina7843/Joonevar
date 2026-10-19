@@ -415,7 +415,7 @@ test('two animals share one payment, and each one is issued or blocked on its ow
     await owner.page.screenshot({ path: path.join(SHOTS, 'sheet-paid.png'), fullPage: true });
 
     await owner.page.goto(BASE_URL + '/registration/' + batchId, { waitUntil: 'load' });
-    assert.equal((await owner.page.getByTestId('batch-status').textContent())?.trim(), 'پرداخت تأییدشده');
+    assert.equal((await owner.page.getByTestId('batch-status').textContent())?.trim(), 'پرداخت‌شده');
     assert.equal((await owner.page.getByTestId('item-state-' + first).textContent())?.trim(), 'صادر شد');
     assert.equal((await owner.page.getByTestId('item-state-' + second).textContent())?.trim(), 'متوقف');
     // The blocked reason is the product's own, naming the missing prerequisite.

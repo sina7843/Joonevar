@@ -75,8 +75,13 @@ export default async function ClubPage({ params }: Params) {
               </p>
               <div className="flex flex-wrap gap-xs">
                 <StatusBadge tone="success">تأیید انجمن</StatusBadge>
+                {/* GAPS #4: no dictionary key for UNOWNED (ownership axis) */}
                 {page.owned ? null : <StatusBadge tone="warning">بدون مالک</StatusBadge>}
-                {page.registration ? <StatusBadge tone="info">{'ثبت: ' + page.registration.statusFa}</StatusBadge> : null}
+                {page.registration ? (
+                  <span className="hz-meta__item hz-body-sm text-text-secondary">
+                    ثبت: <StatusBadge status={page.registration.status} />
+                  </span>
+                ) : null}
               </div>
             </div>
           </header>
@@ -111,7 +116,7 @@ export default async function ClubPage({ params }: Params) {
                     <li key={event.id} className="hz-card space-y-xs">
                       <div className="flex flex-wrap items-start justify-between gap-sm">
                         <h3 className="hz-card__title">{event.titleFa}</h3>
-                        {event.cancelled ? <StatusBadge tone="warning">لغو شد</StatusBadge> : null}
+                        {event.cancelled ? <StatusBadge status="CANCELLED" /> : null}
                       </div>
                       <p className="hz-entity__line hz-body-sm text-text-secondary">
                         <Icon name="calendarDots" size="xs" />

@@ -5,6 +5,7 @@ import { marketNav, OpsShell } from '../../src/ui/shell.tsx';
 import { Panel, StatTiles } from '../../src/ui/desk.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { StatusBadge } from '../../src/ui/status.tsx';
+import { keyStatus } from '../../src/ui/queue.tsx';
 import { db } from '../../src/db/client.ts';
 import { flagStates } from '../../src/marketplace/flags.ts';
 import { marketSpecies } from '../../src/marketplace/species.ts';
@@ -91,6 +92,7 @@ export default async function MarketOverviewPage() {
                   {flag.noteFa ? <span className="hz-setting__hint">{flag.noteFa}</span> : null}
                 </div>
                 <div className="hz-setting__end">
+                  {/* GAPS #4: no dictionary key for an open/closed flow flag. */}
                   <StatusBadge tone={flag.enabled ? 'success' : 'neutral'} size="sm">
                     {flag.enabled ? 'باز' : flag.configured ? 'بسته' : 'بسته (تعیین‌نشده)'}
                   </StatusBadge>
@@ -117,8 +119,9 @@ export default async function MarketOverviewPage() {
                   <ul className="mt-sm flex flex-wrap gap-xs">
                     {byMarket(market).map((row) => (
                       <li key={row.id} data-testid={'species-state-' + market + '-' + row.speciesCode}>
-                        <StatusBadge tone={row.enabled ? 'success' : 'neutral'} size="sm">
-                          {row.nameFa + ' — ' + (row.enabled ? 'فعال' : 'غیرفعال')}
+                        {/* Dictionary tone and label (ACTIVE / INACTIVE), prefixed with the species it describes. */}
+                        <StatusBadge tone={keyStatus(row.enabled ? 'ACTIVE' : 'INACTIVE').tone} size="sm">
+                          {row.nameFa + ' — ' + keyStatus(row.enabled ? 'ACTIVE' : 'INACTIVE').label}
                         </StatusBadge>
                       </li>
                     ))}

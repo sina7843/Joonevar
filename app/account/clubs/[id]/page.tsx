@@ -7,13 +7,12 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { PageCrumbs } from '../../../../src/ui/page-crumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { ActionOwner, StatusBadge, type StatusTone } from '../../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import type { IconName } from '../../../../src/ui/icon-paths.ts';
 import { db } from '../../../../src/db/client.ts';
 import { clubManagement } from '../../../../src/clubs/service.ts';
 import {
-  CLUB_LIFECYCLE_FA,
   CLUB_NOT_PUBLIC_FA,
   CLUB_OWNERSHIP_KIND_FA,
   CLUB_OWNERSHIP_STATUS_FA,
@@ -65,14 +64,6 @@ export default async function AccountClubPage({ params }: { params: Promise<{ id
   const lifecycle = club.lifecycle as ClubLifecycle;
   const can = (capability: string): boolean => view.capabilities.includes(capability as never);
   const canSubmit = can('SUBMIT') && (lifecycle === 'DRAFT' || lifecycle === 'NEEDS_CORRECTION');
-  const tone: StatusTone =
-    lifecycle === 'ACTIVE'
-      ? 'success'
-      : lifecycle === 'SUSPENDED' || lifecycle === 'REJECTED'
-        ? 'error'
-        : lifecycle === 'DRAFT' || lifecycle === 'ARCHIVED'
-          ? 'neutral'
-          : 'warning';
   const roleFa = CLUB_ROLE_FA[view.role as ClubRole] ?? 'انجمن';
 
   const links: { href: string; label: string; icon: IconName; testId?: string }[] = [];
@@ -98,7 +89,7 @@ export default async function AccountClubPage({ params }: { params: Promise<{ id
           <PageHeader
             title={club.displayNameFa}
             back={{ href: '/account/clubs', label: 'کلاب من' }}
-            aside={<StatusBadge tone={tone}>{CLUB_LIFECYCLE_FA[lifecycle]}</StatusBadge>}
+            aside={<StatusBadge status={lifecycle} />}
             meta={['نقش شما در این کلاب: ' + roleFa]}
           />
         </div>
@@ -194,7 +185,7 @@ export default async function AccountClubPage({ params }: { params: Promise<{ id
             <div className="mt-md space-y-md">
               <div className="flex items-center justify-between gap-sm">
                 <span className="text-caption text-text-secondary">وضعیت</span>
-                <StatusBadge tone={tone}>{CLUB_LIFECYCLE_FA[lifecycle]}</StatusBadge>
+                <StatusBadge status={lifecycle} />
               </div>
               {canSubmit ? <ActionOwner owner="USER" /> : lifecycle === 'PENDING_VERIFICATION' ? <ActionOwner owner="ASSOCIATION" /> : null}
               <p className="text-body-sm text-text-secondary" data-testid="club-lifecycle-note">

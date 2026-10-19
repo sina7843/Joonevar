@@ -11,7 +11,6 @@ import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import {
   declarationView,
-  DECLARATION_STATUS_FA,
   NOTE_KIND_FA,
   NO_OFFICIAL_EFFECT_NOTE_FA,
   SCOPE_NOTE_FA,
@@ -21,6 +20,10 @@ import { CancelDeclarationForm, PersonalNoteForm, RespondDeclarationForm } from 
 import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
+
+/** Declaration status → status-dictionary key (the counterparty wait is AWAITING_COUNTERPARTY). */
+const statusKey = (status: string): string =>
+  status === 'PENDING_COUNTERPARTY_CONFIRMATION' ? 'AWAITING_COUNTERPARTY' : status;
 
 /**
  * One personal declaration — §20, §17.3.
@@ -73,17 +76,9 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
                 این مسیر شخصی است و با «مجوز رسمی جفت‌گیری» یکی نیست؛ شناسه، وضعیت و Route جداگانه دارد.
               </p>
             </div>
-            <StatusBadge
-              tone={
-                declaration.status === 'CONFIRMED'
-                  ? 'success'
-                  : declaration.status === 'REJECTED' || declaration.status === 'CANCELLED'
-                    ? 'warning'
-                    : 'info'
-              }
-            >
-              <span data-testid="declaration-status">{DECLARATION_STATUS_FA[declaration.status]}</span>
-            </StatusBadge>
+            <span data-testid="declaration-status">
+              <StatusBadge status={statusKey(declaration.status)} />
+            </span>
           </div>
 
           <dl className="hz-kv mt-lg" data-testid="declaration-detail">

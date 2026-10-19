@@ -138,7 +138,7 @@ test('a veterinarian applies, answers a correction and, once verified, manages a
     await page.getByTestId('app-city').selectOption({ label: 'تهران' });
     await page.getByTestId('app-doc-COUNCIL_CARD').setInputFiles(card('council-card.png'));
     await page.getByTestId('submit-doctor-application').click();
-    await waitForText(page, 'doctor-case-status', 'ارسال‌شده');
+    await waitForText(page, 'doctor-case-status', 'در انتظار بررسی');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= MOBILE.width, 'no sideways scroll on a phone: ' + width);
     await page.screenshot({ path: path.join(SHOTS, 'application-submitted-mobile.png'), fullPage: true });
@@ -163,7 +163,7 @@ test('a veterinarian applies, answers a correction and, once verified, manages a
     await form.getByTestId('app-statement').fill('SYNTHETIC کارت خوانا دوباره پیوست شد');
     await form.getByTestId('app-doc-IDENTITY').setInputFiles(card('identity.png'));
     await form.getByTestId('resubmit-doctor-application').click();
-    await waitForText(page, 'doctor-case-status', 'ارسال‌شده');
+    await waitForText(page, 'doctor-case-status', 'در انتظار بررسی');
   });
 
   await as('association', DESKTOP, async (page) => {

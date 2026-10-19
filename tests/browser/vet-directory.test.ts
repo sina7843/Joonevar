@@ -210,7 +210,7 @@ test('a visitor filters the directory on a phone and reads the profile', async (
     await card.waitFor();
     const cardText = (await card.textContent()) ?? '';
     assert.match(cardText, /کد نظام تأییدشده/);
-    assert.match(cardText, /معتمد همزیست/);
+    assert.match(cardText, /معتمد/);
     assert.match(cardText, /شیراز/);
     assert.match(cardText, /جراحی/);
     const width = await page.evaluate(() => document.documentElement.scrollWidth);

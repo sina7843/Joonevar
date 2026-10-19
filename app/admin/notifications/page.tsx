@@ -30,6 +30,7 @@ export default async function AdminNotificationsPage() {
   return (
     <OpsShell actor={guard.actor} title="اعلان‌ها و پیامک" pathname="/admin/notifications" nav={ADMIN_NAV}>
       <div className="flex flex-wrap items-center gap-sm">
+        {/* GAPS #4: no dictionary key for the SMS channel switch. */}
         <StatusBadge tone={policy.smsEnabled ? 'success' : 'neutral'}>{policy.smsEnabled ? 'پیامک روشن' : 'پیامک خاموش'}</StatusBadge>
         <p className="hz-page-header__meta">
           <span className="hz-page-header__meta-item">
@@ -86,9 +87,7 @@ export default async function AdminNotificationsPage() {
                 <span className="hz-setting__hint text-body-sm text-text-primary">{template.smsFa}</span>
               </div>
               <div className="hz-setting__end">
-                <StatusBadge tone="neutral" size="sm">
-                  {template.channels.join(' · ')}
-                </StatusBadge>
+                <span className="hz-tag hz-tag--neutral">{template.channels.join(' · ')}</span>
               </div>
             </li>
           ))}

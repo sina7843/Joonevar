@@ -100,9 +100,7 @@ export default async function SellerPlansPage() {
                     </span>
                   </div>
                   <div className="hz-setting__end">
-                    <StatusBadge tone={plan.status === 'PUBLISHED' ? 'success' : 'neutral'} size="sm">
-                      {plan.status === 'PUBLISHED' ? 'منتشرشده' : plan.status === 'ARCHIVED' ? 'بایگانی' : 'پیش‌نویس'}
-                    </StatusBadge>
+                    <StatusBadge status={plan.status} size="sm" />
                   </div>
                 </li>
               ))}

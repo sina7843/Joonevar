@@ -102,6 +102,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
                 </Link>
               </p>
             </div>
+            {/* GAPS #4: no dictionary key for UNVERIFIED */}
             <StatusBadge tone={records.declaration ? 'info' : 'neutral'}>
               <span data-testid="declaration-status">
                 {records.declaration ? 'UNVERIFIED — اعلام مالک' : 'هنوز اعلامی ثبت نشده'}

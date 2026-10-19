@@ -3,14 +3,13 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { AppError } from '../../../src/domain/errors.ts';
 import { allCategories, mergeTargets, productDetail, productReviewQueue } from '../../../src/commerce/catalog.ts';
-import { PRODUCT_STATUS_FA, type ProductStatus } from '../../../src/commerce/catalog-model.ts';
 import { ProductDecisionForm, ProductMergeForm } from '../../../src/marketplace/settlement-forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -81,11 +80,8 @@ export default async function CatalogReviewPage() {
                 name={entry.nameFa}
                 sub={[entry.brandFa ?? 'بدون برند', entry.categoryNameFa, entry.sellerNameFa ?? 'کاتالوگ مشترک', when(entry.createdAt)].join(' · ')}
                 ageDays={ageInDays(entry.createdAt)}
-                status={{
-                  tone: 'info',
-                  label: PRODUCT_STATUS_FA[entry.status as ProductStatus] ?? entry.status,
-                  testId: 'catalog-status-' + entry.id,
-                }}
+                // PENDING_REVIEW here is the catalogue reviewer's queue, not the association's (dictionary PENDING_REVIEW).
+                status={{ ...keyStatus(entry.status === 'PENDING_REVIEW' ? 'SUBMITTED' : entry.status), testId: 'catalog-status-' + entry.id }}
                 owner="SYSTEM"
                 ownerLabel="بررسی کاتالوگ"
                 ownerIsUs

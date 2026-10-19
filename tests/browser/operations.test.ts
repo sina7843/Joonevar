@@ -431,7 +431,7 @@ test('managed data is edited from the panel and its history is readable', async 
 
     await page.getByTestId('toggle-breed-' + nameEn).click();
     await page.waitForFunction(
-      (id) => document.querySelector('[data-testid="breed-state-' + id + '"]')?.textContent?.includes('کنارگذاشته'),
+      (id) => document.querySelector('[data-testid="breed-state-' + id + '"]')?.getAttribute('data-status') === 'INACTIVE',
       nameEn,
       { timeout: 20_000 },
     );

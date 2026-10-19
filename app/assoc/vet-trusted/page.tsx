@@ -2,7 +2,8 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, ViewChips } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../vet-case-key.ts';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { trustedCaseQueue } from '../../../src/vets/trusted-application.ts';
@@ -55,7 +56,7 @@ export default async function AssocVetTrustedPage({ searchParams }: { searchPara
               linkTestId="open-trusted-case"
               sub={<>{'نسخه ' + item.submissionVersion.toLocaleString('fa-IR') + ' · ' + formatInstantFa(new Date(item.updatedAt))}</>}
               ageDays={ageInDays(new Date(item.updatedAt))}
-              status={{ tone: item.status === 'REJECTED' ? 'error' : item.status === 'NEEDS_CORRECTION' ? 'warning' : 'info', label: item.statusFa }}
+              status={keyStatus(vetCaseKey(item.status))}
               owner={item.status === 'NEEDS_CORRECTION' ? 'USER' : item.status === 'SUBMITTED' || item.status === 'UNDER_REVIEW' ? 'ASSOCIATION' : null}
               ownerIsUs
             />

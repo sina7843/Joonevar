@@ -3,7 +3,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -57,7 +57,8 @@ export default async function GeneticsAppealsPage() {
                 linkTestId="open-appeal"
                 sub={'ثبت: ' + formatCivilDateFa(appeal.createdAt.toISOString().slice(0, 10))}
                 ageDays={ageInDays(appeal.createdAt)}
-                status={{ tone: 'info', label: APPEAL_STATUS_FA[appeal.status] }}
+                // GAPS #4: no dictionary key for ANSWERED — module label kept.
+                status={keyStatus(appeal.status, { tone: 'success', label: APPEAL_STATUS_FA[appeal.status] ?? appeal.status })}
                 owner="GENETICS_CENTRE"
                 ownerIsUs
               />

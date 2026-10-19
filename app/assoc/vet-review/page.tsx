@@ -4,7 +4,8 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { CaseItem, CaseList } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../vet-case-key.ts';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { Button } from '../../../src/ui/button.tsx';
@@ -123,10 +124,7 @@ export default async function AssocVetReviewPage({ searchParams }: { searchParam
                     </>
                   }
                   ageDays={ageInDays(new Date(item.updatedAt))}
-                  status={{
-                    tone: item.status === 'SUBMITTED' || item.status === 'UNDER_REVIEW' ? 'info' : item.status === 'NEEDS_CORRECTION' ? 'warning' : 'neutral',
-                    label: item.statusFa,
-                  }}
+                  status={keyStatus(vetCaseKey(item.status))}
                   owner={item.status === 'SUBMITTED' || item.status === 'UNDER_REVIEW' ? 'ASSOCIATION' : item.status === 'NEEDS_CORRECTION' ? 'USER' : null}
                   ownerIsUs
                 />

@@ -2,7 +2,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, DocFrame, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -12,7 +12,6 @@ import { sellerDetail, sellerReviewQueue } from '../../../src/commerce/sellers.t
 import {
   IBAN_NOTE_FA,
   SELLER_KIND_FA,
-  SELLER_STATUS_FA,
   type SellerKind,
   type SellerStatus,
 } from '../../../src/commerce/seller-model.ts';
@@ -83,7 +82,7 @@ export default async function SellerReviewPage() {
                 name={entry.displayNameFa}
                 sub={(entry.legalNameFa ?? '—') + ' · ارسال: ' + when(entry.submittedAt)}
                 ageDays={ageInDays(entry.submittedAt)}
-                status={{ tone: status === 'APPROVED' ? 'success' : 'info', label: SELLER_STATUS_FA[status], testId: 'seller-status-' + entry.id }}
+                status={{ ...keyStatus(status), testId: 'seller-status-' + entry.id }}
                 owner="SYSTEM"
                 ownerLabel="بررسی فروشندگان"
                 ownerIsUs

@@ -3,7 +3,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -78,8 +78,8 @@ export default async function RefundQueuePage() {
               }
               ageDays={ageInDays(entry.createdAt)}
               status={{
-                tone: entry.status === 'FAILED' ? 'error' : 'neutral',
-                label: REFUND_STATUS_FA[entry.status] ?? entry.status,
+                // GAPS #4: no dictionary key for MANUAL_REQUIRED — module label kept.
+                ...keyStatus(entry.status, { tone: 'neutral', label: REFUND_STATUS_FA[entry.status] ?? entry.status }),
                 testId: 'refund-status-' + entry.id,
               }}
               owner="SYSTEM"

@@ -81,15 +81,16 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
                 </Link>
               </p>
             </div>
-            <StatusBadge
-              tone={
-                view.current?.status === 'FINAL' ? 'success' : view.current?.status === 'REJECTED' ? 'warning' : 'info'
-              }
-            >
-              <span data-testid="allocation-status">
-                {view.current ? ALLOCATION_STATUS_FA[view.current.status] : 'هنوز پیشنهادی ثبت نشده'}
-              </span>
-            </StatusBadge>
+            <span data-testid="allocation-status">
+              {view.current && view.current.status !== 'PENDING_BOTH_OWNERS' ? (
+                <StatusBadge status={view.current.status} />
+              ) : (
+                // GAPS #4: no dictionary key for PENDING_BOTH_OWNERS or for "no proposal yet"
+                <StatusBadge tone="info">
+                  {view.current ? ALLOCATION_STATUS_FA[view.current.status] : 'هنوز پیشنهادی ثبت نشده'}
+                </StatusBadge>
+              )}
+            </span>
           </div>
           <p className="mt-lg text-caption text-text-secondary" data-testid="no-arbitration-note">
             {NO_ARBITRATION_NOTE_FA}

@@ -6,11 +6,11 @@ import { Card } from '../../src/ui/card.tsx';
 import { EmptyState } from '../../src/ui/states.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { ButtonLink } from '../../src/ui/button.tsx';
-import { StatusBadge } from '../../src/ui/status.tsx';
+import { RequestStatusBadge } from '../requests/status-badges.tsx';
 import { db } from '../../src/db/client.ts';
 import { vetCompleted, vetQueue } from '../../src/vets/visits.ts';
 import { vetEligibilityFor } from '../../src/domain/eligibility/service.ts';
-import { REQUEST_STATUS_FA, REQUEST_STATUS_TONE, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
+import { SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
 
 export const dynamic = 'force-dynamic';
@@ -73,9 +73,7 @@ export default async function VetPage() {
                         </p>
                       ) : null}
                     </div>
-                    <StatusBadge tone={REQUEST_STATUS_TONE[row.request.status]!}>
-                      {REQUEST_STATUS_FA[row.request.status]}
-                    </StatusBadge>
+                    <RequestStatusBadge status={row.request.status} />
                   </div>
                   <p className="mt-lg text-body-sm">
                     <Link href={'/vet/requests/' + row.request.id} className="hz-link" data-testid="open-vet-request">

@@ -16,7 +16,6 @@ import { DUPLICATE_NOTICE_FA } from '../../../../src/admin/merge-model.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { PlaceMap } from '../../../../src/ui/map.tsx';
 import { mapConfig } from '../../../../src/geo/service.ts';
@@ -113,19 +112,19 @@ export default async function CentrePage({ params }: Params) {
 
           <RecordImage priority variant="banner" fileId={page.imageFileId} altFa={page.imageAltFa} className="rounded-xl" />
 
-          {/* Each axis is its own badge; none of them implies another (P2-D05). */}
-          <div className="flex flex-wrap gap-xs" data-testid="centre-badges">
+          {/* Each axis is shown on its own; none of them implies another (P2-D05). None is a lifecycle status: facts as tags/meta. */}
+          <div className="flex flex-wrap items-center gap-xs" data-testid="centre-badges">
             {page.verified ? (
-              <span data-testid="centre-verified">
-                <StatusBadge tone="info">مجوز معتبر ثبت‌شده</StatusBadge>
+              <span className="hz-body-sm text-text-secondary" data-testid="centre-verified">
+                مجوز معتبر ثبت‌شده
               </span>
             ) : null}
             {page.serves ? (
-              <span data-testid="centre-serves">
-                <StatusBadge tone="success">همکار خدمات همزیست</StatusBadge>
+              <span className="hz-tag hz-tag--neutral" data-testid="centre-serves">
+                همکار خدمات همزیست
               </span>
             ) : null}
-            {page.branches.some((branch) => branch.isOpen24h) ? <StatusBadge tone="neutral">شبانه‌روزی</StatusBadge> : null}
+            {page.branches.some((branch) => branch.isOpen24h) ? <span className="hz-tag hz-tag--neutral">شبانه‌روزی</span> : null}
           </div>
 
           {page.primary ? (
@@ -229,11 +228,7 @@ export default async function CentrePage({ params }: Params) {
                   <li key={branch.id} className="hz-card space-y-sm" data-testid="centre-branch">
                     <div className="flex flex-wrap items-start justify-between gap-sm">
                       <h3 className="hz-card__title">{branch.nameFa}</h3>
-                      {branch.isOpen24h ? (
-                        <StatusBadge tone="info" size="sm">
-                          شبانه‌روزی
-                        </StatusBadge>
-                      ) : null}
+                      {branch.isOpen24h ? <span className="hz-tag hz-tag--neutral">شبانه‌روزی</span> : null}
                     </div>
                     <p className="hz-entity__line hz-body-sm text-text-secondary">
                       <Icon name="mapPin" size="xs" />

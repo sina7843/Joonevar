@@ -40,6 +40,26 @@ export function Panel({
 }
 
 /**
+ * A desk status: a status-dictionary `key`, or — only for a value the
+ * dictionary has no key for (GAPS #4) — an explicit tone and label.
+ */
+export type DeskStatus =
+  | { key: string; testId?: string }
+  | { tone: StatusTone; label: ReactNode; testId?: string };
+
+function DeskStatusBadge({ status, size }: { status: DeskStatus; size?: 'sm' }) {
+  if ('key' in status) {
+    const badge = <StatusBadge status={status.key} size={size} />;
+    return status.testId ? <span data-testid={status.testId}>{badge}</span> : badge;
+  }
+  return (
+    <StatusBadge tone={status.tone} size={size}>
+      {status.testId ? <span data-testid={status.testId}>{status.label}</span> : status.label}
+    </StatusBadge>
+  );
+}
+
+/**
  * Record head of a desk (P10 › 2): title + badge, the meta line (codes, dates,
  * age, version) and whose move it is. The shell already renders the page h1,
  * so the record title is an h2.
@@ -53,7 +73,7 @@ export function DeskHead({
   children,
 }: {
   title: ReactNode;
-  status?: { tone: StatusTone; label: ReactNode; testId?: string };
+  status?: DeskStatus;
   meta?: readonly ReactNode[];
   owner?: ActionOwnerKind | null;
   ownerExtra?: ReactNode;
@@ -63,11 +83,7 @@ export function DeskHead({
     <section className="hz-card hz-desk__head">
       <div className="hz-desk__title">
         <h2 className="hz-h3">{title}</h2>
-        {status ? (
-          <StatusBadge tone={status.tone}>
-            {status.testId ? <span data-testid={status.testId}>{status.label}</span> : status.label}
-          </StatusBadge>
-        ) : null}
+        {status ? <DeskStatusBadge status={status} /> : null}
       </div>
       {meta && meta.length > 0 ? (
         <p className="hz-desk__meta">
@@ -249,7 +265,7 @@ export interface HistoryEntry {
   readonly id: string;
   readonly title: string;
   readonly whenFa?: string | null;
-  readonly status?: { tone: StatusTone; label: string };
+  readonly status?: string | { tone: StatusTone; label: string };
   readonly body?: ReactNode;
   readonly current?: boolean;
 }
@@ -268,11 +284,13 @@ export function CaseHistory({ entries }: { entries: readonly HistoryEntry[] }) {
           <div className="hz-timeline__content">
             <div className="hz-timeline__head">
               <span className="hz-timeline__title">{entry.title}</span>
-              {entry.status ? (
+              {entry.status === undefined ? null : typeof entry.status === 'string' ? (
+                <StatusBadge status={entry.status} size="sm" />
+              ) : (
                 <StatusBadge tone={entry.status.tone} size="sm">
                   {entry.status.label}
                 </StatusBadge>
-              ) : null}
+              )}
             </div>
             {entry.whenFa ? <div className="hz-timeline__meta">{entry.whenFa}</div> : null}
             {entry.body ? <p className="hz-timeline__body">{entry.body}</p> : null}
@@ -341,7 +359,7 @@ export function CaseItem({
   type?: string;
   ageDays?: number | null;
   age?: 'late' | 'overdue';
-  status?: { tone: StatusTone; label: ReactNode; testId?: string };
+  status?: DeskStatus;
   owner?: ActionOwnerKind | null;
   ownerIsUs?: boolean;
   /** Overrides the owner's label (e.g. «ناظر محتوا»). */
@@ -361,11 +379,7 @@ export function CaseItem({
             </span>
           ) : null}
         </div>
-        {status ? (
-          <StatusBadge tone={status.tone} size="sm">
-            {status.testId ? <span data-testid={status.testId}>{status.label}</span> : status.label}
-          </StatusBadge>
-        ) : null}
+        {status ? <DeskStatusBadge status={status} size="sm" /> : null}
       </div>
       <div className="hz-case mt-xs">
         {href && !linkLabel ? (

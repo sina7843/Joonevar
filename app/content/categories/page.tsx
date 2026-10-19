@@ -35,7 +35,7 @@ export default async function ContentCategoriesPage() {
                     </span>
                   </div>
                   <div className="hz-setting__end">
-                    <StatusBadge tone={category.isActive ? 'success' : 'neutral'}>{category.isActive ? 'فعال' : 'کنارگذاشته'}</StatusBadge>
+                    <StatusBadge status={category.isActive ? 'ACTIVE' : 'INACTIVE'} />
                     <CategoryStateForm categoryId={category.id} active={category.isActive} />
                   </div>
                 </li>

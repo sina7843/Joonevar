@@ -9,6 +9,7 @@ import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { statusOf } from '../../../src/ui/status-dictionary.ts';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { registrationSheets } from '../../../src/db/schema/documents.ts';
@@ -25,14 +26,6 @@ const STATE_FA = {
   AWAITING_ISSUANCE: 'در انتظار صدور',
   ISSUED: 'صادر شد',
   BLOCKED: 'متوقف',
-} as const;
-
-const BATCH_FA = {
-  DRAFT: 'پیش‌نویس',
-  AWAITING_PAYMENT: 'در انتظار پرداخت',
-  PAID: 'پرداخت تأییدشده',
-  FAILED: 'پرداخت ناموفق',
-  CANCELLED: 'پرداخت لغوشده',
 } as const;
 
 /**
@@ -102,9 +95,9 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
                 <span>مرور هزینه</span>
               </h2>
             </div>
-            <StatusBadge tone={batch.status === 'PAID' ? 'success' : batch.status === 'FAILED' ? 'warning' : 'info'}>
-              <span data-testid="batch-status">{BATCH_FA[batch.status]}</span>
-            </StatusBadge>
+            <span data-testid="batch-status">
+              <StatusBadge status={batch.status} />
+            </span>
           </div>
 
           {/*
@@ -165,11 +158,14 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
                 <li key={item.id} className="rounded-lg border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <span className="text-body-sm">{name}</span>
-                    <StatusBadge
-                      tone={item.state === 'ISSUED' ? 'success' : item.state === 'BLOCKED' ? 'warning' : 'info'}
-                    >
-                      <span data-testid={'item-state-' + item.animalId}>{STATE_FA[item.state]}</span>
-                    </StatusBadge>
+                    <span data-testid={'item-state-' + item.animalId}>
+                      {statusOf(item.state) ? (
+                        <StatusBadge status={item.state} />
+                      ) : (
+                        // GAPS #4: no dictionary key for AWAITING_ISSUANCE, BLOCKED
+                        <StatusBadge tone={item.state === 'BLOCKED' ? 'warning' : 'info'}>{STATE_FA[item.state]}</StatusBadge>
+                      )}
+                    </span>
                   </div>
                   {item.blockedReasonFa ? (
                     <p className="mt-sm text-caption text-text-secondary" data-testid={'item-reason-' + item.animalId}>

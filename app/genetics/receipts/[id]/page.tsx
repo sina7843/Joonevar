@@ -6,7 +6,7 @@ import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.t
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { GENETICS_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
 import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, whenFa } from '../../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
@@ -51,11 +51,7 @@ export default async function GeneticsReceiptPage({ params }: { params: Promise<
     <OpsShell actor={guard.actor} title="بررسی فیش" pathname={'/genetics/receipts/' + id} nav={GENETICS_NAV}>
       <DeskHead
         title="فیش پرداخت مستقیم"
-        status={{
-          tone: open ? 'info' : receipt.status === 'APPROVED' ? 'success' : receipt.status === 'REJECTED' ? 'error' : 'warning',
-          label: RECEIPT_STATUS_FA[receipt.status],
-          testId: 'centre-receipt-status',
-        }}
+        status={{ ...keyStatus(receipt.status), testId: 'centre-receipt-status' }}
         meta={[
           'ارسال: ' + (whenFa(receipt.submittedAt) ?? '—'),
           open && age !== null ? <span className="hz-age">{age.toLocaleString('fa-IR') + ' روز در صف'}</span> : null,

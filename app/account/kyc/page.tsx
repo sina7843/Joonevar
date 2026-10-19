@@ -7,25 +7,19 @@ import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
 import { Stepper } from '../../../src/ui/stepper.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { ButtonLink } from '../../../src/ui/button.tsx';
-import { ActionOwner, StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
+import { ActionOwner, StatusBadge } from '../../../src/ui/status.tsx';
 import { NeedsCorrectionState, WaitingState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { findProfile, findResidence } from '../../../src/identity/account.ts';
-import { findCase, KYC_STATUS_FA, type KycStatus } from '../../../src/identity/kyc.ts';
+import { findCase, type KycStatus } from '../../../src/identity/kyc.ts';
 import { KycDocumentForm, KycSubmitForm } from './kyc-forms.tsx';
 import { IdentityForm, ResidenceForm } from '../profile-forms.tsx';
 import { mapApiKey } from '../../../src/adapters/integration-settings.ts';
 
 export const dynamic = 'force-dynamic';
 
-const BADGE_TONE: Record<KycStatus, StatusTone> = {
-  DRAFT: 'neutral',
-  READY: 'info',
-  UNDER_REVIEW: 'info',
-  APPROVED: 'success',
-  NEEDS_CORRECTION: 'warning',
-  REJECTED: 'error',
-};
+/** KYC's READY is the dictionary's READY_TO_SUBMIT (dictionary READY is a payout state). */
+const kycKey = (status: KycStatus): string => (status === 'READY' ? 'READY_TO_SUBMIT' : status);
 
 const STEPS = [{ label: 'اطلاعات هویتی' }, { label: 'نشانی' }, { label: 'مدرک هویتی' }, { label: 'ارسال' }] as const;
 
@@ -65,7 +59,7 @@ export default async function KycPage() {
         <PageHeader
           title="احراز هویت"
           back={{ href: '/dashboard' }}
-          aside={<StatusBadge tone={BADGE_TONE[status]}>{KYC_STATUS_FA[status]}</StatusBadge>}
+          aside={<StatusBadge status={kycKey(status)} />}
           meta={['احراز هویت با عضویت انجمن یکی نیست و هیچ‌کدام دیگری را فعال نمی‌کند.']}
         />
       }
@@ -205,7 +199,7 @@ export default async function KycPage() {
             <div className="mt-sm space-y-md">
               <KeyValueList
                 rows={[
-                  { key: 'وضعیت', value: <StatusBadge tone={BADGE_TONE[status]}>{KYC_STATUS_FA[status]}</StatusBadge> },
+                  { key: 'وضعیت', value: <StatusBadge status={kycKey(status)} /> },
                   { key: 'نام', value: profile ? profile.firstName + ' ' + profile.lastName : null, empty: '— هنوز ذخیره نشده' },
                   {
                     key: 'کد ملی',

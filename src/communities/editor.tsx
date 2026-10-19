@@ -5,14 +5,12 @@ import { EmptyState } from '../ui/states.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { formatCivilDateFa } from '../domain/calendar.ts';
 import { packagePurchaseEligibility } from '../vets/directory-model.ts';
-import { VET_PUBLIC_STATUS_FA, type VetPublicStatus } from '../vets/directory-model.ts';
-import { LICENCE_STATUS_FA, type LicenceStatusName } from '../centres/model.ts';
+import type { VetPublicStatus } from '../vets/directory-model.ts';
+import type { LicenceStatusName } from '../centres/model.ts';
 import type { CommunityEditorData } from './service.ts';
 import {
   COMMUNITY_KIND_FA,
   COMMUNITY_SCOPE_FA,
-  EVENT_STATUS_FA,
-  MANAGER_STATUS_FA,
   type CommunityEventStatus,
   type CommunityKind,
   type CommunityScope,
@@ -48,14 +46,28 @@ export interface CommunityPost {
   readonly correctionNote: string | null;
 }
 
-function Axis({ label, tone, value, detail, testId }: { label: string; tone: StatusTone; value: string; detail?: string; testId: string }) {
+/** Manager values that differ from the status-dictionary key; the rest are the key. */
+const managerKey = (status: string): string => (status === 'INVITED' ? 'PROPOSED' : status);
+
+/** `status`: a status-dictionary key, or — only for a value with no key (GAPS #4) — tone + value. */
+function Axis({
+  label,
+  status,
+  detail,
+  testId,
+}: {
+  label: string;
+  status: string | { tone: StatusTone; value: string };
+  detail?: string;
+  testId: string;
+}) {
   return (
     <li className="flex flex-wrap items-start justify-between gap-sm border-b border-border-subtle py-sm last:border-b-0" data-testid={testId}>
       <div className="min-w-0">
         <p className="text-label-md">{label}</p>
         {detail ? <p className="mt-2xs text-caption text-text-secondary">{detail}</p> : null}
       </div>
-      <StatusBadge tone={tone}>{value}</StatusBadge>
+      {typeof status === 'string' ? <StatusBadge status={status} /> : <StatusBadge tone={status.tone}>{status.value}</StatusBadge>}
     </li>
   );
 }
@@ -113,9 +125,7 @@ export function CommunityEditor({
             </p>
           </div>
           <span data-testid="community-public-status">
-            <StatusBadge tone={community.publicStatus === 'PUBLISHED' ? 'success' : community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-              {VET_PUBLIC_STATUS_FA[community.publicStatus as VetPublicStatus]}
-            </StatusBadge>
+            <StatusBadge status={community.publicStatus} />
           </span>
         </div>
         {community.publicStatus === 'PUBLISHED' && community.publicSlug ? (
@@ -130,36 +140,34 @@ export function CommunityEditor({
           <Axis
             testId="community-axis-completeness"
             label="تکمیل پروفایل"
-            tone={completeness.complete ? 'success' : 'neutral'}
-            value={fa(completeness.done) + ' از ' + fa(completeness.total)}
+            // GAPS #4: a count, not a lifecycle status
+            status={{ tone: completeness.complete ? 'success' : 'neutral', value: fa(completeness.done) + ' از ' + fa(completeness.total) }}
             detail={completeness.missing.length > 0 ? 'مانده: ' + completeness.missing.join('، ') : undefined}
           />
           <Axis
             testId="community-axis-ownership"
             label="مالکیت"
-            tone={community.ownerAccountId ? 'info' : 'warning'}
-            value={community.ownerAccountId ? 'دارای مدیر' : 'بدون مالک'}
+            // GAPS #4: no dictionary key for the ownership axis (OWNED / UNOWNED)
+            status={{ tone: community.ownerAccountId ? 'info' : 'warning', value: community.ownerAccountId ? 'دارای مدیر' : 'بدون مالک' }}
             detail={community.claimedAt ? 'واگذاری ثبت‌شده' : 'تا واگذاری، این پرونده مدیری ندارد.'}
           />
           <Axis
             testId="community-axis-registration"
             label={kind === 'ASSOCIATION' ? 'تأیید ثبت و مجوز' : 'مجوز'}
-            tone={community.licenceStatus === 'VALID' ? 'success' : community.licenceStatus === 'NONE' ? 'neutral' : 'warning'}
-            value={LICENCE_STATUS_FA[community.licenceStatus as LicenceStatusName]}
+            status={community.licenceStatus}
             detail={kind === 'CLUB' ? 'کلاب مجوز ثبتی ندارد؛ این محور برای انجمن است.' : undefined}
           />
           <Axis
             testId="community-axis-publisher"
             label="ناشر مجاز"
-            tone={community.canPublishPosts ? 'success' : 'neutral'}
-            value={community.canPublishPosts ? 'فعال' : 'غیرفعال'}
+            status={community.canPublishPosts ? 'ACTIVE' : 'INACTIVE'}
             detail="مجوز انتشار مستقیم نوشته را فقط سوپرادمین می‌دهد و مجوز ثبتی یا تبلیغات آن را نمی‌سازد."
           />
           <Axis
             testId="community-axis-advertising"
             label="تبلیغات"
-            tone="neutral"
-            value="بسته فعالی ندارد"
+            // GAPS #4: no dictionary key for «no active package»
+            status={{ tone: 'neutral', value: 'بسته فعالی ندارد' }}
             detail={purchase.allowed ? 'هیچ بسته‌ای مجوز یا تأیید نمی‌سازد.' : purchase.reasonFa}
           />
         </ul>
@@ -200,9 +208,7 @@ export function CommunityEditor({
                     <p className="text-label-md">{manager.nameFa ?? 'بدون پروفایل هویتی'}</p>
                     {manager.roleFa ? <p className="text-caption text-text-secondary">{manager.roleFa}</p> : null}
                   </div>
-                  <StatusBadge tone={manager.status === 'ACCEPTED' ? 'success' : manager.status === 'INVITED' ? 'info' : 'neutral'}>
-                    {MANAGER_STATUS_FA[manager.status] ?? manager.status}
-                  </StatusBadge>
+                  <StatusBadge status={managerKey(manager.status)} />
                 </div>
                 {canEditContent && manager.status !== 'REMOVED' ? (
                   <ManagerRemoveForm surface={surface} manager={{ id: manager.id, version: manager.version }} />
@@ -234,9 +240,7 @@ export function CommunityEditor({
                       {dateFa(event.startsOn) + (event.endsOn ? ' تا ' + dateFa(event.endsOn) : '') + (event.placeFa ? ' · ' + event.placeFa : '')}
                     </p>
                   </div>
-                  <StatusBadge tone={event.status === 'PUBLISHED' ? 'success' : event.status === 'CANCELLED' ? 'warning' : 'neutral'}>
-                    {EVENT_STATUS_FA[event.status as CommunityEventStatus]}
-                  </StatusBadge>
+                  <StatusBadge status={event.status} />
                 </div>
                 {canEditContent ? (
                   <EventForm
@@ -293,17 +297,7 @@ export function CommunityEditor({
                     <li key={post.id} className="py-lg first:pt-0 last:pb-0" data-testid={'community-post-' + post.id}>
                       <div className="flex flex-wrap items-start justify-between gap-sm">
                         <h3 className="text-label-md">{post.titleFa}</h3>
-                        <StatusBadge
-                          tone={post.status === 'PUBLISHED' ? 'success' : post.status === 'HIDDEN' || post.status === 'DELETED' ? 'error' : 'neutral'}
-                        >
-                          {post.status === 'PUBLISHED'
-                            ? 'منتشرشده'
-                            : post.status === 'DRAFT'
-                              ? 'پیش‌نویس'
-                              : post.status === 'ARCHIVED'
-                                ? 'بایگانی‌شده'
-                                : 'از دسترس خارج‌شده توسط ادمین محتوا'}
-                        </StatusBadge>
+                        <StatusBadge status={post.status} />
                       </div>
                       {post.moderationNote ? (
                         <div className="mt-sm" data-testid={'post-moderation-' + post.id}>

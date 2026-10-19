@@ -301,7 +301,7 @@ async function pedigreedAnimal(
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // Straight to this receipt: the shared development queue also holds rows left
   // by earlier runs, and approving one of those would prove nothing here.
@@ -598,7 +598,7 @@ test('the rule, the payment, the submission and the issuance happen in the order
   // Both sides see the issued permit and its own number in the same case.
   for (const page of [owner, other]) {
     await page.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('permit-status').innerText(), 'مجوز صادر شد');
+    assert.equal(await page.getByTestId('permit-status').innerText(), 'صادر شد');
     assert.match(await page.getByTestId('permit-no').innerText(), /MP-[A-Z0-9]{8}/);
     await expectText(page, 'پرونده رسمی جفت‌گیری');
   }
@@ -640,13 +640,13 @@ test('both sides declare, correct, disagree and confirm a date on the real scree
   await owner.getByTestId('mated-on').fill(day(-6));
   await owner.getByTestId('submit-date').click();
   await owner.getByTestId('date-version-1').waitFor();
-  assert.equal(await owner.getByTestId('date-status-1').innerText(), 'در انتظار تأیید طرف مقابل');
+  assert.equal(await owner.getByTestId('date-status-1').innerText(), 'در انتظار پاسخ');
 
   // A correction appends version 2 and retires the pending approval.
   await owner.getByTestId('mated-on-correction').fill(day(-5));
   await owner.getByTestId('submit-date-correction').click();
   await owner.getByTestId('date-version-2').waitFor();
-  assert.equal(await owner.getByTestId('date-status-1').innerText(), 'جایگزین‌شده با نسخه جدید');
+  assert.equal(await owner.getByTestId('date-status-1').innerText(), 'جایگزین‌شده');
   await owner.screenshot({ path: path.join(DATE_SHOTS, 'dates-correction.png'), fullPage: true });
 
   // The other side answers with a different date: both values stay visible.

@@ -4,7 +4,7 @@ import { EmptyState } from '../ui/states.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { formatCivilDateFa } from '../domain/calendar.ts';
 import type { DirectoryEditorData } from './directory.ts';
-import { LOCATION_KIND_FA, VET_PUBLIC_STATUS_FA, packagePurchaseEligibility } from './directory-model.ts';
+import { LOCATION_KIND_FA, packagePurchaseEligibility } from './directory-model.ts';
 import type { DirectorySurface } from './directory-actions.ts';
 import {
   AddCityForm,
@@ -17,14 +17,25 @@ import {
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 const dateFa = (value: Date): string => formatCivilDateFa(value.toISOString().slice(0, 10));
 
-function Axis({ label, tone, value, detail, testId }: { label: string; tone: StatusTone; value: string; detail?: string; testId: string }) {
+/** `status`: a status-dictionary key, or — only for a value with no key (GAPS #4) — tone + value. */
+function Axis({
+  label,
+  status,
+  detail,
+  testId,
+}: {
+  label: string;
+  status: string | { tone: StatusTone; value: string };
+  detail?: string;
+  testId: string;
+}) {
   return (
     <li className="flex flex-wrap items-start justify-between gap-sm border-b border-border-subtle py-sm last:border-b-0" data-testid={testId}>
       <div className="min-w-0">
         <p className="text-label-md">{label}</p>
         {detail ? <p className="mt-2xs text-caption text-text-secondary">{detail}</p> : null}
       </div>
-      <StatusBadge tone={tone}>{value}</StatusBadge>
+      {typeof status === 'string' ? <StatusBadge status={status} /> : <StatusBadge tone={status.tone}>{status.value}</StatusBadge>}
     </li>
   );
 }
@@ -62,9 +73,7 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
             <p className="mt-2xs text-caption text-text-secondary">پروفایل عمومی دایرکتوری</p>
           </div>
           <span data-testid="directory-public-status">
-            <StatusBadge tone={profile.publicStatus === 'PUBLISHED' ? 'success' : profile.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-              {VET_PUBLIC_STATUS_FA[profile.publicStatus]}
-            </StatusBadge>
+            <StatusBadge status={profile.publicStatus} />
           </span>
         </div>
         {profile.publicStatus === 'PUBLISHED' && profile.publicSlug ? (
@@ -79,36 +88,38 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
           <Axis
             testId="axis-completeness"
             label="تکمیل پروفایل"
-            tone={completeness.complete ? 'success' : 'neutral'}
-            value={fa(completeness.done) + ' از ' + fa(completeness.total)}
+            // GAPS #4: a count, not a lifecycle status
+            status={{ tone: completeness.complete ? 'success' : 'neutral', value: fa(completeness.done) + ' از ' + fa(completeness.total) }}
             detail={completeness.missing.length > 0 ? 'مانده: ' + completeness.missing.join('، ') : undefined}
           />
           <Axis
             testId="axis-ownership"
             label="مالکیت"
-            tone={profile.accountId ? 'info' : 'warning'}
-            value={profile.accountId ? (profile.claimedAt ? 'Claim‌شده' : 'متعلق به حساب دامپزشک') : 'بدون مالک'}
+            // GAPS #4: no dictionary key for the ownership axis (CLAIMED / OWNED / UNOWNED)
+            status={{
+              tone: profile.accountId ? 'info' : 'warning',
+              value: profile.accountId ? (profile.claimedAt ? 'Claim‌شده' : 'متعلق به حساب دامپزشک') : 'بدون مالک',
+            }}
             detail={profile.claimedAt ? 'Claim تأییدشده در ' + dateFa(profile.claimedAt) : undefined}
           />
           <Axis
             testId="axis-verification"
             label="تأیید حرفه‌ای (کد نظام)"
-            tone={profile.councilVerifiedAt ? 'success' : 'neutral'}
-            value={profile.councilVerifiedAt ? 'تأییدشده' : 'تأییدنشده'}
+            // GAPS #4: no dictionary key for «تأییدنشده» (unverified)
+            status={profile.councilVerifiedAt ? 'VERIFIED' : { tone: 'neutral', value: 'تأییدنشده' }}
             detail={profile.councilVerifiedAt ? 'تأیید در ' + dateFa(profile.councilVerifiedAt) : undefined}
           />
           <Axis
             testId="axis-trusted"
             label="معتمد همزیست"
-            tone={facts.trusted ? 'success' : 'neutral'}
-            value={facts.trusted ? 'فعال' : 'غیرفعال'}
+            status={facts.trusted ? 'ACTIVE' : 'INACTIVE'}
             detail="از مسیر نقش دامپزشک معتمد فاز یک؛ تأیید پروفایل یا بسته آن را نمی‌سازد."
           />
           <Axis
             testId="axis-advertising"
             label="تبلیغات"
-            tone="neutral"
-            value="بسته فعالی ندارد"
+            // GAPS #4: no dictionary key for «no active package»
+            status={{ tone: 'neutral', value: 'بسته فعالی ندارد' }}
             detail={purchase.allowed ? 'هیچ بسته‌ای نشان حرفه‌ای نمی‌سازد.' : purchase.reasonFa}
           />
         </ul>
@@ -142,9 +153,7 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
                       {[LOCATION_KIND_FA[location.kind], location.provinceFa, location.cityFa, location.addressFa].filter(Boolean).join(' · ')}
                     </p>
                   </div>
-                  <StatusBadge tone={!location.isActive ? 'warning' : location.isPublic ? 'success' : 'neutral'}>
-                    {!location.isActive ? 'غیرفعال' : location.isPublic ? 'عمومی' : 'غیرعمومی'}
-                  </StatusBadge>
+                  <StatusBadge status={!location.isActive ? 'INACTIVE' : location.isPublic ? 'PUBLISHED' : 'HIDDEN'} />
                 </div>
                 <LocationPublicForm
                   surface={surface}

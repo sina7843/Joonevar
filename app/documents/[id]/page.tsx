@@ -83,7 +83,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ id: s
           <PageHeader
             title={'برگه ثبتی ' + name}
             back={{ href: '/animals/' + sheet.animalId }}
-            aside={<StatusBadge tone="success">صادر شد</StatusBadge>}
+            aside={<StatusBadge status="ISSUED" />}
             meta={[<Identifier key="no" value={sheet.sheetNo} />, 'صادرشده در ' + issuedFa]}
             actions={
               <a

@@ -2,10 +2,11 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { centreReferenceData, manageableCentres } from '../../../../src/centres/service.ts';
-import { CENTRE_STATUS_FA, LICENCE_STATUS_FA, type CentreStatus, type LicenceStatusName } from '../../../../src/centres/model.ts';
+import { LICENCE_STATUS_FA, type LicenceStatusName } from '../../../../src/centres/model.ts';
 import { CentreCreateForm } from '../../../../src/centres/forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -44,10 +45,7 @@ export default async function ReviewCentresPage() {
                     ' · مجوز: ' +
                     LICENCE_STATUS_FA[row.centre.licenceStatus as LicenceStatusName]
                   }
-                  status={{
-                    tone: row.centre.publicStatus === 'PUBLISHED' ? 'success' : row.centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral',
-                    label: CENTRE_STATUS_FA[row.centre.publicStatus as CentreStatus],
-                  }}
+                  status={keyStatus(row.centre.publicStatus)}
                 />
               ))}
             </CaseList>

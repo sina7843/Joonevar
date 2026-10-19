@@ -2,6 +2,7 @@ import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
@@ -70,8 +71,8 @@ export default async function SettlementPage() {
                 row.openBatch === null
                   ? undefined
                   : {
-                      tone: row.openBatch.status === 'PAID' ? 'success' : 'info',
-                      label: SETTLEMENT_STATUS_FA[row.openBatch.status as SettlementStatus],
+                      // GAPS #4: no dictionary key for RECONCILED — module label kept.
+                      ...keyStatus(row.openBatch.status, { tone: 'success', label: SETTLEMENT_STATUS_FA[row.openBatch.status as SettlementStatus] }),
                       testId: 'settlement-batch-status-' + row.sellerId,
                     }
               }

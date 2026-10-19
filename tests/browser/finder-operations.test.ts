@@ -166,7 +166,7 @@ test('report with evidence, moderator decision, appeal by the affected owner, an
     await a.getByTestId('finder-appeal-text').fill('SYNTHETIC پیام‌های من مزاحمت نبود');
     await a.getByTestId('finder-appeal-submit').click();
     await a.getByTestId('finder-appeal-status').waitFor();
-    assert.match(await a.getByTestId('finder-appeal-status').innerText(), /در حال بررسی/);
+    assert.match(await a.getByTestId('finder-appeal-status').innerText(), /در انتظار بررسی/);
     const overflow = await a.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert.ok(overflow <= 0, 'no horizontal scroll at 360px');
     await a.screenshot({ path: path.join(SHOTS, 'appeal-mobile.png'), fullPage: true });

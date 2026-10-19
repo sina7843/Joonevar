@@ -12,25 +12,12 @@ import { sellerListings } from '../../../src/marketplace/listings.ts';
 import { sellableAnimals } from '../../../src/marketplace/listing-eligibility.ts';
 import { flagEnabled } from '../../../src/marketplace/flags.ts';
 import {
-  LISTING_STATUS_FA,
   LIVE_LISTING_STATUSES,
   PRICE_MODE_FA,
-  type ListingStatus,
 } from '../../../src/marketplace/listing-model.ts';
 import { BlockedAnimalCard, StartListingForm } from './forms.tsx';
 
 export const dynamic = 'force-dynamic';
-
-const TONE: Record<ListingStatus, 'success' | 'warning' | 'neutral' | 'info'> = {
-  DRAFT: 'neutral',
-  PUBLISHED: 'success',
-  PAUSED: 'warning',
-  RESERVED: 'info',
-  SOLD: 'info',
-  EXPIRED: 'neutral',
-  SUSPENDED: 'warning',
-  REMOVED: 'neutral',
-};
 
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 
@@ -108,7 +95,7 @@ export default async function MyListingsPage() {
                 <Link href={'/account/listings/' + row.id} className="hz-cardlist__item hz-card--interactive text-text-primary no-underline">
                   <span className="hz-cardlist__row">
                     <span className="hz-cardlist__title min-w-0">{row.animalNameFa ?? 'بدون نام'}</span>
-                    <StatusBadge tone={TONE[row.status]}>{LISTING_STATUS_FA[row.status]}</StatusBadge>
+                    <StatusBadge status={row.status} />
                   </span>
                   <span className="hz-cardlist__row">
                     <span className="hz-cardlist__meta">

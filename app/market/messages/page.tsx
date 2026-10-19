@@ -2,7 +2,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -64,7 +64,7 @@ export default async function MessageModerationPage() {
               name={REASON_FA[entry.reason as ReportReason] ?? entry.reason}
               sub={when(entry.createdAt)}
               ageDays={ageInDays(entry.createdAt)}
-              status={entry.hiddenAt ? { tone: 'neutral', label: 'پنهان‌شده' } : { tone: 'info', label: 'در انتظار بررسی' }}
+              status={keyStatus(entry.hiddenAt ? 'HIDDEN' : 'SUBMITTED')}
               owner="SYSTEM"
               ownerLabel="ناظر آگهی"
               ownerIsUs

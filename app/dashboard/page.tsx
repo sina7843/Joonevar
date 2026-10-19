@@ -373,17 +373,17 @@ export default async function DashboardPage() {
         <section aria-labelledby="membership-heading" className="hz-card">
           <div className="flex items-start justify-between gap-md">
             <SectionHeader size="sm" id="membership-heading" title="عضویت انجمن" />
-            <StatusBadge
-              tone={
-                membershipActive
-                  ? 'success'
-                  : membership.status === 'APPROVED_AWAITING_PAYMENT' || membership.status === 'PENDING_REVIEW'
-                    ? 'info'
-                    : 'neutral'
-              }
-            >
-              <span data-testid="dashboard-membership-status">{membership.statusFa}</span>
-            </StatusBadge>
+            <span data-testid="dashboard-membership-status">
+              <StatusBadge
+                status={
+                  membership.status === 'APPROVED_AWAITING_PAYMENT'
+                    ? 'AWAITING_PAYMENT'
+                    : membership.status === 'PAYMENT_PENDING'
+                      ? 'PENDING_PAYMENT'
+                      : membership.status
+                }
+              />
+            </span>
           </div>
           <dl className="hz-kv hz-kv--2col">
             <div className="hz-kv__row">
@@ -460,13 +460,7 @@ export default async function DashboardPage() {
                       name={animal.name ?? 'بدون نام'}
                       speciesBreed={'سگ · ' + generationLabel(animal.generation)}
                       petId={animal.petId}
-                      status={
-                        animal.status === 'REGISTERED'
-                          ? animal.identityVerifiedAt === null
-                            ? { tone: 'info', label: 'پرونده اولیه' }
-                            : { tone: 'success', label: 'مشخصات رسمی ثبت‌شده' }
-                          : { tone: 'neutral', label: 'پیش‌نویس' }
-                      }
+                      status={animal.status}
                       href={animal.status === 'REGISTERED' ? '/animals/' + animal.id : '/animals/' + animal.id + '/edit'}
                     />
                   </li>
@@ -507,10 +501,14 @@ export default async function DashboardPage() {
                       title={SERVICE_TYPE_FA[row.request.serviceType]}
                       requestCode={row.referral?.code ?? '—'}
                       animalName={row.animalName ?? 'بدون نام'}
-                      status={{
-                        tone: row.expired ? 'warning' : REQUEST_STATUS_TONE[row.request.status]!,
-                        label: row.expired ? 'مهلت گذشته' : REQUEST_STATUS_FA[row.request.status]!,
-                      }}
+                      status={
+                        row.expired
+                          ? 'EXPIRED'
+                          : row.request.status === 'CHECKED_IN' || row.request.status === 'COMPLETED'
+                            ? // GAPS #4: no dictionary key for a visit request's CHECKED_IN / COMPLETED (COMPLETED's label is the market hand-over)
+                              { tone: REQUEST_STATUS_TONE[row.request.status]!, label: REQUEST_STATUS_FA[row.request.status]! }
+                            : row.request.status
+                      }
                       owner={row.request.status === 'ACTIVE' ? 'USER' : 'VET'}
                       {...(row.referral
                         ? { deadlineFa: formatCivilDateFa(row.referral.expiresAt.toISOString().slice(0, 10)) }

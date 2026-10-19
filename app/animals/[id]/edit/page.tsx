@@ -57,7 +57,7 @@ export default async function EditAnimalPage({
           <PageHeader
             title={'ثبت حیوان هم‌زیست' + (animal.name ? ' · ' + animal.name : '')}
             back={{ href: '/animals' }}
-            aside={animal.status === 'REGISTERED' ? null : <StatusBadge tone="neutral">پیش‌نویس</StatusBadge>}
+            aside={<StatusBadge status={animal.status} />}
             meta={['هر مرحله جدا ذخیره می‌شود؛ هر وقت برگردید از همان مرحله ادامه می‌دهید.']}
           />
         </div>

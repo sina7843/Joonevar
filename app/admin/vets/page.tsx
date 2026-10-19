@@ -4,7 +4,6 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { ADMIN_NAV, OpsShell } from '../../../src/ui/shell.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { eligibilityOf, listVetProfiles, locationsOfVet } from '../../../src/vets/registry.ts';
 import { VET_PUBLIC_STATUS_FA } from '../../../src/vets/directory-model.ts';
@@ -85,9 +84,9 @@ export default async function AdminVetsPage() {
                               {[location.cityFa, location.neighborhoodFa].filter(Boolean).join(' · ')}
                             </p>
                           </div>
-                          <StatusBadge tone={microchip.eligible ? 'success' : 'neutral'} size="sm">
+                          <span className="hz-tag hz-tag--neutral">
                             {microchip.eligible ? 'در Finder میکروچیپ' : 'خارج از Finder میکروچیپ'}
-                          </StatusBadge>
+                          </span>
                         </div>
                         {microchip.eligible ? null : <p className="mt-xs text-caption text-text-secondary">{microchip.reasonFa}</p>}
                         <EditLocationForm

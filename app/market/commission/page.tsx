@@ -107,9 +107,7 @@ export default async function CommissionRulesPage() {
                       </div>
                     </td>
                     <td data-label="وضعیت">
-                      <StatusBadge tone={rule.status === 'PUBLISHED' ? 'success' : 'neutral'} size="sm">
-                        {rule.status === 'PUBLISHED' ? 'منتشرشده' : rule.status === 'ARCHIVED' ? 'بایگانی' : 'پیش‌نویس'}
-                      </StatusBadge>
+                      <StatusBadge status={rule.status} size="sm" />
                     </td>
                     <td data-label="فرمول" className="hz-num">
                       {moneyFa(rule.fixedToman)} تومان + {percentFa(rule.percentBp)}

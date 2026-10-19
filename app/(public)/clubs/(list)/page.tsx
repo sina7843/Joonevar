@@ -155,9 +155,7 @@ export default async function ClubsPage({ searchParams }: { searchParams: Promis
                             </span>
                           ) : null}
                           <span className="mt-xs">
-                            <StatusBadge tone="success" size="sm">
-                              تأییدشده
-                            </StatusBadge>
+                            <StatusBadge status="APPROVED" size="sm" />
                           </span>
                         </div>
                       </div>

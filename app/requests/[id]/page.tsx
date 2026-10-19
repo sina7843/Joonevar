@@ -7,7 +7,8 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { ActionOwner, Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { ActionOwner, Identifier } from '../../../src/ui/status.tsx';
+import { ReferralStatusBadge, RequestStatusBadge } from '../status-badges.tsx';
 import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
 import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
@@ -18,11 +19,7 @@ import { SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import {
   CONTACT_FOR_PRICE_FA,
   CONTEXT_FA,
-  REFERRAL_STATUS_FA,
-  REQUEST_STATUS_FA,
   SERVICE_TYPE_FA,
-  REQUEST_STATUS_TONE,
-  REFERRAL_STATUS_TONE,
 } from '../../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { RenewReferralForm } from './renew-form.tsx';
@@ -64,14 +61,6 @@ export default async function RequestPage({
   const usable = referral !== null && referral.status === 'ACTIVE' && !expired;
 
   const title = SERVICE_TYPE_FA[request.serviceType] + ' · ' + (view.animalName ?? 'بدون نام');
-  const referralState = referral
-    ? expired && referral.status === 'ACTIVE'
-      ? { tone: 'warning' as const, label: 'منقضی' }
-      : {
-          tone: REFERRAL_STATUS_TONE[referral.status]!,
-          label: REFERRAL_STATUS_FA[referral.status],
-        }
-    : null;
   const expiryFa = referral ? formatCivilDateFa(referral.expiresAt.toISOString().slice(0, 10)) : null;
 
   return (
@@ -92,9 +81,9 @@ export default async function RequestPage({
             title={title}
             back={{ href: '/requests' }}
             aside={
-              <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!}>
-                <span data-testid="request-status">{REQUEST_STATUS_FA[request.status]}</span>
-              </StatusBadge>
+              <span data-testid="request-status">
+                <RequestStatusBadge status={request.status} />
+              </span>
             }
             meta={[
               CONTEXT_FA[request.context],
@@ -128,7 +117,7 @@ export default async function RequestPage({
                     {
                       key: 'وضعیت کد',
                       testId: 'referral-status',
-                      value: <StatusBadge tone={referralState!.tone}>{referralState!.label}</StatusBadge>,
+                      value: <ReferralStatusBadge status={referral.status} expired={expired} />,
                     },
                     {
                       key: 'مهلت مراجعه تا',
@@ -206,17 +195,13 @@ export default async function RequestPage({
                   {
                     key: 'وضعیت',
                     value: (
-                      <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!} size="sm">
-                        {REQUEST_STATUS_FA[request.status]}
-                      </StatusBadge>
+                      <RequestStatusBadge status={request.status} size="sm" />
                     ),
                   },
                   {
                     key: 'کد مراجعه',
-                    value: referralState ? (
-                      <StatusBadge tone={referralState.tone} size="sm">
-                        {referralState.label}
-                      </StatusBadge>
+                    value: referral ? (
+                      <ReferralStatusBadge status={referral.status} expired={expired} size="sm" />
                     ) : null,
                   },
                 ]}
