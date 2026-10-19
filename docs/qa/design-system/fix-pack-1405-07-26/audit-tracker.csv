@@ -14,24 +14,24 @@ RTU-008,T01,1,medium,v1.0.4,RTU,,CSS سیستم در کد نسخه v1.0.3 است
 SHL-001,T01,1,medium,v1.0.4,SHL,,اصلاح QA نسخه v1.0.4 هدر سایت (۱۰۲۴–۱۲۷۹) و هدف لمسی دکمه sm اعمال نشده,SiteShell header — همه ۴۲ مسیر عمومی,FIXED,,bundle.css v1.0.4
 CMPB-025,T01,1,low,v1.0.4,CMPB,,QuantityStepper · قانون هدف لمسی ۴۴px در v1.0.4 در CSS وندورشده نیست,QuantityStepper (و `.hz-segmented__item`، `.hz-btn--sm`) — همهٔ صفحه‌ها روی صفحه‌لمسی,FIXED,,bundle.css v1.0.4
 CMPB-099,T01,1,low,v1.0.4,CMPB,,Tabs · افزودهٔ v1.0.4 برای هدف لمسی ۴۴px در Segmented وارد نشده است,Segmented (فعلاً فقط RoleSwitcher از `hz-segmented` استفاده می‌کند),FIXED,,bundle.css v1.0.4
-CMPA1-031,T02,1,high,v1.0.4,CMPA1,K1,«نژاد این ماه» (`.hz-breed-feature`) در صفحه اصلی نیست,BreedCard — featured breed (K1),,,
-KPUB-002,T02,1,high,v1.0.4,KPUB,K1,خانه هنوز «نوار» دارد، نه ستونی از قاب‌ها؛ Hero کرمِ تمام‌عرض است نه قاب هلویی,K1 — چیدمان کل صفحه، Hero,,,
-KPUB-003,T02,1,high,v1.0.4,KPUB,K1,«نژاد این ماه» (featured breed) وجود ندارد,K1 — «نژادهای سگ» / `.hz-breed-feature`,,,
-KPUB-005,T02,1,high,v1.0.4,KPUB,K1,بخش «بازار همزیست» (۴ آگهی + ۴ کالا) نیست,K1 — «بازار همزیست»,,,
-KPUB-006,T02,1,high,v1.0.4,KPUB,K1,بخش «دامپزشکان و مراکز معتمد» (۴ دامپزشک + ۳ مرکز) نیست,K1 — «دامپزشکان و مراکز معتمد»,,,
-KPUB-008,T02,1,high,v1.0.4,KPUB,K1,«همزیست در یک نگاه»: جعبهٔ آمار قدیمی به‌جای `.hz-glance` (۴ شمارش با آیکون + سه گام با عکس),K1 — «همزیست در یک نگاه»,,,
-CMPA1-047,T02,1,medium,v1.0.4,CMPA1,K1,کارت کاور کلاب (`--cover`) در صفحه اصلی نیست,ClubCard `--cover` (K1),,,
-CMPA1-056,T02,1,medium,v1.0.4,CMPA1,K1,CtaBand صفحه اصلی گونه عکس‌دار `--media` را ندارد,CtaBand `--media` (K1),,,
-CMPA2-022,T02,1,medium,v1.0.4,CMPA2,K1,Hero صفحه‌ی خانه هنوز در نوار کِرِم تمام‌عرض است، نه در قاب هلویی (v1.0.4),`.hz-hero` (Hero محصولِ SiteShell؛ K1),,,
-KPUB-004,T02,1,medium,v1.0.4,KPUB,K1,ردیف نژادها: ۶ کاشی در شبکه به‌جای ۵ کاشی در `.hz-row` کشیدنی,K1 — «نژادهای سگ»,,,
-KPUB-007,T02,1,medium,v1.0.4,KPUB,K1,انجمن‌ها: ClubCard پیش‌فرض (آواتار) ۳تایی به‌جای `ClubCard --cover` ۴تایی,K1 — «انجمن‌ها و کلاب‌ها» / ClubCard,,,
-KPUB-009,T02,1,medium,v1.0.4,KPUB,K1,«روش کار» بخش جداست و گام‌هایش با طرح فرق دارد,K1 — گام‌ها,,,
-KPUB-010,T02,1,medium,v1.0.4,KPUB,K1,«خدمات همزیست»: تعرفه روی کارت، قاب کرم و پیوند «تعرفه‌ها و شرایط» نیست,K1 — ServiceCard,,,"Decision 14 (26 Mehr 1405): NO fee on public pages (DEC-0186 stays). Build the cream frame, white ServiceCards without footer, link «مشاهده همه» → /services. Ignore the fee / «تعیین‌نشده» / footnote parts of this finding."
-KPUB-011,T02,1,medium,v1.0.4,KPUB,K1,CtaBand پیش‌فرض به‌جای `CtaBand --media` با عکس,K1 — CtaBand,,,
-KPUB-015,T02,1,medium,code,KPUB,K1,بارگذاری و خطای مستقل بخش‌ها پیاده نشده است,K1 — حالت‌ها,,,
-KPUB-012,T02,1,low,code,KPUB,K1,«تازه‌ها»: فیلدهای کارت ویژه و فهرست، متن پیوند موبایل و `title`,K1 — ArticleCard `--feature` / `--horizontal`,,,
-KPUB-013,T02,1,low,code,KPUB,K1,جزئیات Hero: متن خلاصه، تیتر ثابت در کد، دکمهٔ استعلام موبایل و فرم استعلام,K1 — Hero,,,
-KPUB-014,T02,1,low,code,KPUB,K1,«دنبال چه می‌گردید؟»: ساختار کارت و متن توضیح,K1 — کاشی‌های ورود سریع,,,
+CMPA1-031,T02,1,high,v1.0.4,CMPA1,K1,«نژاد این ماه» (`.hz-breed-feature`) در صفحه اصلی نیست,BreedCard — featured breed (K1),FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-002,T02,1,high,v1.0.4,KPUB,K1,خانه هنوز «نوار» دارد، نه ستونی از قاب‌ها؛ Hero کرمِ تمام‌عرض است نه قاب هلویی,K1 — چیدمان کل صفحه، Hero,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-003,T02,1,high,v1.0.4,KPUB,K1,«نژاد این ماه» (featured breed) وجود ندارد,K1 — «نژادهای سگ» / `.hz-breed-feature`,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-005,T02,1,high,v1.0.4,KPUB,K1,بخش «بازار همزیست» (۴ آگهی + ۴ کالا) نیست,K1 — «بازار همزیست»,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-006,T02,1,high,v1.0.4,KPUB,K1,بخش «دامپزشکان و مراکز معتمد» (۴ دامپزشک + ۳ مرکز) نیست,K1 — «دامپزشکان و مراکز معتمد»,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-008,T02,1,high,v1.0.4,KPUB,K1,«همزیست در یک نگاه»: جعبهٔ آمار قدیمی به‌جای `.hz-glance` (۴ شمارش با آیکون + سه گام با عکس),K1 — «همزیست در یک نگاه»,FIXED,,K1 v1.0.4 (DEC-0232)
+CMPA1-047,T02,1,medium,v1.0.4,CMPA1,K1,کارت کاور کلاب (`--cover`) در صفحه اصلی نیست,ClubCard `--cover` (K1),FIXED,,K1 v1.0.4 (DEC-0232)
+CMPA1-056,T02,1,medium,v1.0.4,CMPA1,K1,CtaBand صفحه اصلی گونه عکس‌دار `--media` را ندارد,CtaBand `--media` (K1),FIXED,,K1 v1.0.4 (DEC-0232)
+CMPA2-022,T02,1,medium,v1.0.4,CMPA2,K1,Hero صفحه‌ی خانه هنوز در نوار کِرِم تمام‌عرض است، نه در قاب هلویی (v1.0.4),`.hz-hero` (Hero محصولِ SiteShell؛ K1),FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-004,T02,1,medium,v1.0.4,KPUB,K1,ردیف نژادها: ۶ کاشی در شبکه به‌جای ۵ کاشی در `.hz-row` کشیدنی,K1 — «نژادهای سگ»,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-007,T02,1,medium,v1.0.4,KPUB,K1,انجمن‌ها: ClubCard پیش‌فرض (آواتار) ۳تایی به‌جای `ClubCard --cover` ۴تایی,K1 — «انجمن‌ها و کلاب‌ها» / ClubCard,FIXED,,ClubCard --cover with next event; members count waits for CMPA1-048 (D)
+KPUB-009,T02,1,medium,v1.0.4,KPUB,K1,«روش کار» بخش جداست و گام‌هایش با طرح فرق دارد,K1 — گام‌ها,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-010,T02,1,medium,v1.0.4,KPUB,K1,«خدمات همزیست»: تعرفه روی کارت، قاب کرم و پیوند «تعرفه‌ها و شرایط» نیست,K1 — ServiceCard,FIXED,,"decision 14: no fee; cream frame, white cards, «مشاهده همه» → /services"
+KPUB-011,T02,1,medium,v1.0.4,KPUB,K1,CtaBand پیش‌فرض به‌جای `CtaBand --media` با عکس,K1 — CtaBand,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-015,T02,1,medium,code,KPUB,K1,بارگذاری و خطای مستقل بخش‌ها پیاده نشده است,K1 — حالت‌ها,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-012,T02,1,low,code,KPUB,K1,«تازه‌ها»: فیلدهای کارت ویژه و فهرست، متن پیوند موبایل و `title`,K1 — ArticleCard `--feature` / `--horizontal`,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-013,T02,1,low,code,KPUB,K1,جزئیات Hero: متن خلاصه، تیتر ثابت در کد، دکمهٔ استعلام موبایل و فرم استعلام,K1 — Hero,FIXED,,K1 v1.0.4 (DEC-0232)
+KPUB-014,T02,1,low,code,KPUB,K1,«دنبال چه می‌گردید؟»: ساختار کارت و متن توضیح,K1 — کاشی‌های ورود سریع,FIXED,,K1 v1.0.4 (DEC-0232)
 CMPB-083,T03,1,high,code,CMPB,,StatusBadge · تقریباً همهٔ badgeها tone و برچسب را در خود صفحه تعیین می‌کنند و از کلید دیکشنری استفاده نمی‌کنند,همهٔ صفحه‌های دارای وضعیت,,,
 FND-007,T03,1,high,code,FND,,وضعیت‌ها عملاً از دیکشنری نمی‌آیند: ۲۱۲ `StatusBadge` با برچسب و tone دست‌نویس,StatusBadge در تقریباً همهٔ صفحه‌های کاربر، عملیات و عمومی,,,
 RTO-016,T03,1,high,code,RTO,,هیچ StatusBadge عملیاتی از فرهنگ وضعیت استفاده نمی‌کند,*StatusBadge* «Never type a label by hand: the badge takes a status **key**»,,,

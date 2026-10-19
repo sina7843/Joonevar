@@ -1,0 +1,248 @@
+{
+  "K01-home-D": {
+    "path": "/",
+    "role": "visitor",
+    "storageState": null,
+    "note": ""
+  },
+  "K01-home-M": {
+    "path": "/",
+    "role": "visitor",
+    "storageState": null,
+    "note": ""
+  },
+  "K02-dashboard-D": {
+    "path": "/dashboard",
+    "role": "user",
+    "storageState": null,
+    "note": ""
+  },
+  "K02-dashboard-M": {
+    "path": "/dashboard",
+    "role": "user",
+    "storageState": null,
+    "note": ""
+  },
+  "K02-dashboard-new-M": {
+    "path": "/dashboard",
+    "role": "user",
+    "storageState": null,
+    "note": ""
+  },
+  "K02-dashboard-ops-D": {
+    "path": "/dashboard",
+    "role": "user",
+    "storageState": null,
+    "note": ""
+  },
+  "K03-kyc-desk-D": {
+    "path": "/assoc/kyc/[id]",
+    "role": "association operator",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K03-kyc-desk-M": {
+    "path": "/assoc/kyc/[id]",
+    "role": "association operator",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K04-article-D": {
+    "path": "/articles/[slug]",
+    "role": "visitor",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K04-article-M": {
+    "path": "/articles/[slug]",
+    "role": "visitor",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K05-vets-D": {
+    "path": "/veterinarians",
+    "role": "visitor",
+    "storageState": null,
+    "note": ""
+  },
+  "K05-vets-M": {
+    "path": "/veterinarians",
+    "role": "visitor",
+    "storageState": null,
+    "note": ""
+  },
+  "K06-listing-D": {
+    "path": "/animals-market/[id]",
+    "role": "visitor",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K06-listing-M": {
+    "path": "/animals-market/[id]",
+    "role": "visitor",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K07-product-D": {
+    "path": "/shop/[slug]",
+    "role": "visitor",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K07-product-M": {
+    "path": "/shop/[slug]",
+    "role": "visitor",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K08-login-D": {
+    "path": "/login",
+    "role": "visitor",
+    "storageState": null,
+    "note": ""
+  },
+  "K08-login-M": {
+    "path": "/login",
+    "role": "visitor",
+    "storageState": null,
+    "note": ""
+  },
+  "K09-animal-D": {
+    "path": "/animals/[id]",
+    "role": "user",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K09-animal-M": {
+    "path": "/animals/[id]",
+    "role": "user",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K10-animal-new-D": {
+    "path": "/animals/new",
+    "role": "user",
+    "storageState": null,
+    "note": ""
+  },
+  "K10-animal-new-M": {
+    "path": "/animals/new",
+    "role": "user",
+    "storageState": null,
+    "note": ""
+  },
+  "K11-request-D": {
+    "path": "/requests/[id]",
+    "role": "user",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K11-request-M": {
+    "path": "/requests/[id]",
+    "role": "user",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K12-vet-checkin-D": {
+    "path": "/vet/check-in",
+    "role": "trusted vet",
+    "storageState": null,
+    "note": ""
+  },
+  "K12-vet-checkin-M": {
+    "path": "/vet/check-in",
+    "role": "trusted vet",
+    "storageState": null,
+    "note": ""
+  },
+  "K13-assoc-home-D": {
+    "path": "/assoc",
+    "role": "association operator",
+    "storageState": null,
+    "note": ""
+  },
+  "K13-assoc-home-M": {
+    "path": "/assoc",
+    "role": "association operator",
+    "storageState": null,
+    "note": ""
+  },
+  "K14-market-listings-D": {
+    "path": "/market/listings",
+    "role": "listing moderator",
+    "storageState": null,
+    "note": ""
+  },
+  "K14-market-listings-M": {
+    "path": "/market/listings",
+    "role": "listing moderator",
+    "storageState": null,
+    "note": ""
+  },
+  "K15-settings-D": {
+    "path": "/admin/settings",
+    "role": "superadmin",
+    "storageState": null,
+    "note": ""
+  },
+  "K15-settings-M": {
+    "path": "/admin/settings",
+    "role": "superadmin",
+    "storageState": null,
+    "note": ""
+  },
+  "K15-settings-edit-M": {
+    "path": "/admin/settings",
+    "role": "superadmin",
+    "storageState": null,
+    "note": ""
+  },
+  "K16-content-report-D": {
+    "path": "/content/reports/[id]",
+    "role": "content admin",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K16-content-report-M": {
+    "path": "/content/reports/[id]",
+    "role": "content admin",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K17-listing-chat-D": {
+    "path": "/account/listings/[id]/requests",
+    "role": "seller",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K17-listing-chat-M": {
+    "path": "/account/listings/[id]/requests",
+    "role": "seller",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K18-pedigree-doc-D": {
+    "path": "/documents/pedigree/[id]",
+    "role": "",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K18-pedigree-doc-M": {
+    "path": "/documents/pedigree/[id]",
+    "role": "",
+    "storageState": null,
+    "note": "replace [..] with a demo record id that shows the hard case in key-screens/README.md"
+  },
+  "K19-genetics-samples-D": {
+    "path": "/genetics/samples",
+    "role": "genetics operator",
+    "storageState": null,
+    "note": ""
+  },
+  "K19-genetics-samples-M": {
+    "path": "/genetics/samples",
+    "role": "genetics operator",
+    "storageState": null,
+    "note": ""
+  }
+}

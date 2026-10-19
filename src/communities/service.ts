@@ -901,6 +901,8 @@ export interface CommunityCard {
   readonly owned: boolean;
   readonly registered: boolean;
   readonly upcomingEvents: number;
+  /** The nearest published upcoming event, for the cover card (DS ClubCard `--cover`). */
+  readonly nextEvent: { readonly titleFa: string; readonly startsOn: string; readonly placeFa: string | null } | null;
   readonly complete: boolean;
   /** A live advertising package, shown with its own label and nothing implied. */
   readonly promoted: boolean;
@@ -943,6 +945,11 @@ export async function publishedCommunities(
     owned: entry.community.ownerAccountId !== null,
     registered: entry.community.licenceStatus === 'VALID',
     upcomingEvents: entry.events.filter((event) => event.status === 'PUBLISHED' && isUpcoming(event, today)).length,
+    nextEvent:
+      entry.events
+        .filter((event) => event.status === 'PUBLISHED' && isUpcoming(event, today))
+        .sort((a, b) => a.startsOn.localeCompare(b.startsOn))
+        .map((event) => ({ titleFa: event.titleFa, startsOn: event.startsOn, placeFa: event.placeFa }))[0] ?? null,
     complete: communityCompleteness(completenessInputOf(entry)).complete,
     promoted: promotedWhenRelevant(promoted.has(entry.community.id), true),
   }));

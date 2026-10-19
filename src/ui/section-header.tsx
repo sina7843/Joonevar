@@ -17,7 +17,7 @@ export function SectionHeader({
 }: {
   title: ReactNode;
   count?: string;
-  link?: { href: string; label?: string; hiddenSuffix?: string };
+  link?: { href: string; label?: ReactNode; hiddenSuffix?: string };
   size?: 'md' | 'sm';
   as?: 'h2' | 'h3';
   id?: string;

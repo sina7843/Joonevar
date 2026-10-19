@@ -42,7 +42,7 @@ test('home shows what Hamzist does, how it works and a way into the directories'
     await page.goto(BASE_URL + '/', { waitUntil: 'load' });
     await page.getByTestId('home-services').waitFor();
     await expectText(page, 'ثبت رسمی و پیگیری سگ‌ها');
-    await expectText(page, 'روش کار');
+    await expectText(page, 'همزیست در یک نگاه');
 
     // Every service on the home page has its own page.
     const cards = page.locator('[data-testid^="home-service-"]');

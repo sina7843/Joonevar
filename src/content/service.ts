@@ -29,6 +29,7 @@ import {
   allowedMoves,
   bylineFor,
   canEditContent,
+  readMinutes,
   contentSlugify,
   creatableKinds,
   effectivePublishAt,
@@ -740,6 +741,8 @@ export interface ContentCard {
   readonly categoryNameFa: string | null;
   readonly imageFileId: string | null;
   readonly imageAltFa: string | null;
+  readonly byline: string;
+  readonly readMinutes: number;
 }
 
 export async function publicContentList(
@@ -779,9 +782,15 @@ export async function publicContentList(
   );
   const request = { page: query.page, pageSize: query.pageSize ?? 12 };
   const rows = await database
-    .select({ item: contentItems, categoryNameFa: contentCategories.nameFa })
+    .select({
+      item: contentItems,
+      categoryNameFa: contentCategories.nameFa,
+      authorName: profiles.displayName,
+      authorNameVisible: profiles.displayNameVisible,
+    })
     .from(contentItems)
     .leftJoin(contentCategories, eq(contentItems.categoryId, contentCategories.id))
+    .leftJoin(profiles, eq(profiles.accountId, contentItems.authorAccountId))
     .where(where)
     .orderBy(desc(contentItems.publishAt))
     .limit(request.pageSize)
@@ -789,7 +798,7 @@ export async function publicContentList(
   const [counted] = await database.select({ value: count() }).from(contentItems).where(where);
   const [all] = await database.select({ value: count() }).from(contentItems).where(visibleNow(query.kind, now));
 
-  const items: ContentCard[] = rows.map(({ item, categoryNameFa }) => ({
+  const items: ContentCard[] = rows.map(({ item, categoryNameFa, authorName, authorNameVisible }) => ({
     slug: item.slug,
     titleFa: item.titleFa,
     summaryFa: item.summaryFa,
@@ -797,6 +806,8 @@ export async function publicContentList(
     categoryNameFa,
     imageFileId: item.imageFileId,
     imageAltFa: item.imageAltFa,
+    byline: bylineFor(authorNameVisible === null ? null : { displayName: authorName, displayNameVisible: authorNameVisible }),
+    readMinutes: readMinutes(item.bodyFa),
   }));
   return {
     ...pageOf(items, Number(counted?.value ?? 0), request),

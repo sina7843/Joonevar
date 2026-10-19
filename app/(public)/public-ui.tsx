@@ -131,24 +131,46 @@ export function FilterPanel({
   );
 }
 
-/** P01 row 10 — the CtaBand: «ثبت حیوان» (primary, start), «استعلام اصالت سند» (secondary). */
-export function CtaBand({ id = 'cta-title' }: { id?: string }) {
+/**
+ * P01 row 11 — DS *CtaBand*: «ثبت حیوان» (primary, start), «استعلام اصالت سند» (secondary). With `media` it is `--media`: the photo first on phones, 5/12
+ * at the end on desktop; without it the plain band.
+ */
+export function CtaBand({ id = 'cta-title', media }: { id?: string; media?: { src: string; altFa: string } }) {
+  const content = (
+    <>
+      <h2 className="hz-cta__title" id={id}>
+        هویت حیوانت را ثبت کن
+      </h2>
+      <p className="hz-cta__body">ثبت در شش مرحله؛ هر مرحله ذخیره می‌شود و بعداً ادامه می‌دهید.</p>
+    </>
+  );
+  const actions = (
+    <div className="hz-cta__actions">
+      <ButtonLink href="/animals/new" size="lg" iconStart="plus">
+        ثبت حیوان
+      </ButtonLink>
+      <ButtonLink tone="secondary" size="lg" href="/verify" iconStart="shieldCheck">
+        استعلام اصالت سند
+      </ButtonLink>
+    </div>
+  );
+  if (media) {
+    return (
+      <section className="hz-cta hz-cta--media" aria-labelledby={id} data-testid="cta-band">
+        <figure className="hz-cta__media">
+          <img src={media.src} alt={media.altFa} loading="lazy" decoding="async" width={960} height={540} />
+        </figure>
+        <div className="hz-cta__content">
+          {content}
+          {actions}
+        </div>
+      </section>
+    );
+  }
   return (
-    <section className="hz-cta" aria-labelledby={id}>
-      <div className="hz-cta__text">
-        <h2 className="hz-cta__title" id={id}>
-          هویت حیوانت را ثبت کن
-        </h2>
-        <p className="hz-cta__body">ثبت در شش مرحله؛ هر مرحله ذخیره می‌شود و بعداً ادامه می‌دهید.</p>
-      </div>
-      <div className="hz-cta__actions">
-        <ButtonLink href="/animals/new" size="lg" iconStart="plus">
-          ثبت حیوان
-        </ButtonLink>
-        <ButtonLink tone="secondary" size="lg" href="/verify" iconStart="shieldCheck">
-          استعلام اصالت سند
-        </ButtonLink>
-      </div>
+    <section className="hz-cta" aria-labelledby={id} data-testid="cta-band">
+      <div className="hz-cta__text">{content}</div>
+      {actions}
     </section>
   );
 }

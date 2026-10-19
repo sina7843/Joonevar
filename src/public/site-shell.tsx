@@ -71,7 +71,7 @@ export async function SiteShell({ children }: { children: ReactNode }) {
       </header>
 
       <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
-        <div className="hz-container py-xl lg:pb-s64 lg:pt-s40">{children}</div>
+        <div className="hz-container py-xl lg:pb-s64 lg:pt-s40 has-[>.hz-home-stack]:!py-0">{children}</div>
       </main>
 
       <footer className="hz-site-footer" data-testid="site-footer">

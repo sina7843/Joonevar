@@ -1081,6 +1081,8 @@ export async function publishedCentres(database: DbClient, query: CentreQuery): 
   const filtered = facts
     .filter((entry) => {
       const places = placesOf(entry);
+      // DS decision 10 (11 Mehr 1405): an expired or revoked licence leaves public results; the centre's own panel still shows it.
+      if (entry.centre.licenceStatus === 'EXPIRED' || entry.centre.licenceStatus === 'REVOKED') return false;
       if (query.type && entry.centre.typeCode !== query.type) return false;
       if (query.service && !entry.serviceCodes.includes(query.service)) return false;
       if (query.species && !entry.speciesCodes.includes(query.species)) return false;

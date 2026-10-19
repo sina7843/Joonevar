@@ -85,9 +85,10 @@ export function EmptyState({
 }
 
 /** A technical failure the user can retry. Distinct from a rejected request (§24.3). */
-export function NetworkErrorState({ retryHref }: { retryHref: string }) {
+export function NetworkErrorState({ retryHref, compact = false }: { retryHref: string; compact?: boolean }) {
   return (
     <StateBox
+      compact={compact}
       role="alert"
       tone="error"
       icon="wifiSlash"

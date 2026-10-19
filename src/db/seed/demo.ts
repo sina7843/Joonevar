@@ -49,7 +49,7 @@ import { leaveReview } from '../../commerce/reviews.ts';
 import { answerQuestion, askQuestion, decideQuestion } from '../../commerce/questions.ts';
 // Directory and content
 import { createUnownedVetProfile } from '../../vets/onboarding.ts';
-import { changeCentreStatus, createCentre, updateCentreProfile } from '../../centres/service.ts';
+import { changeCentreStatus, createCentre, setCentreLicence, updateCentreProfile } from '../../centres/service.ts';
 import { addCommunityEvent, changeCommunityStatus, createCommunity, setCommunityPublisher, updateCommunityProfile } from '../../communities/service.ts';
 import { changeCommunityPostStatus, createCommunityPost, updateCommunityPost } from '../../communities/posts.ts';
 import { attachContentImage, changeContentStatus, createContent, updateContent } from '../../content/service.ts';
@@ -516,7 +516,7 @@ try {
   // ── Directory and content (directory.json, content.json) ───────────────────
   type Directory = {
     vets: Array<{ displayNameFa: string; city: string; councilCode: string; headlineFa: string; image: { slot: string } }>;
-    centres: Array<{ displayNameFa: string; typeFa: string; city: string; services: string[]; facilities: string[]; image: { slot: string } }>;
+    centres: Array<{ displayNameFa: string; typeFa: string; city: string; services: string[]; facilities: string[]; licenceStatus?: string; image: { slot: string } }>;
     communities: Array<{ kind: 'ASSOCIATION' | 'CLUB'; displayNameFa: string; scope: string; aboutFa: string; canPublishPosts: boolean; image: { slot: string }; events: Array<{ titleFa: string; at: { iso: string }; placeFa: string }> }>;
   };
   const directory = dsJson<Directory>('sample-content/directory.json');
@@ -559,6 +559,11 @@ try {
         created += 1;
       }
       await placePublicImage(admin, 'CENTRE', 'centre', centre!.id, c.image.slot);
+      // The licence the sample gives each centre (one is expired, so it leaves public results — decision 10).
+      const current = await one<{ licence_status: string; version: number } | undefined>(sql`select licence_status, version from centre where id = ${centre!.id}`);
+      if (c.licenceStatus && current && current.licence_status !== c.licenceStatus) {
+        await setCentreLicence(db, admin, { centreId: centre!.id, expectedVersion: current.version, licenceNumber: 'DEMO-' + centre!.id.slice(0, 8), licenceStatus: c.licenceStatus, reason: 'داده نمایشی' });
+      }
     });
     return created + ' مرکز تازه؛ ' + directory.centres.length + ' مرکز با تصویر' + failed;
   });

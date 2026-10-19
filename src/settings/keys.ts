@@ -377,6 +377,34 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     noteFa: 'D17: فاز اول فقط ثبت درخواست است.',
     seedValue: 'در این مرحله فقط درخواست ارسال ثبت می‌شود؛ ثبت درخواست به معنی ارسال واقعی سند نیست.',
   },
+  // ── Home page (DS v1.0.4 P01 items 5 and 11, DEC-0232) ─────────────────
+  {
+    key: 'home.featured_breed_slug',
+    group: 'GUIDE_TEXT',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'نژاد این ماه در صفحه اصلی (نشانی نژاد)',
+    noteFa: 'خالی یعنی نخستین نژاد منتشرشده‌ای که عکس، تاریخچه و ویژگی دارد.',
+    seedValue: null,
+  },
+  {
+    key: 'home.cta_image_path',
+    group: 'GUIDE_TEXT',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'عکس نوار دعوت پایین صفحه اصلی',
+    noteFa: 'فقط یکی از عکس‌های تأییدشده زیر /brand/imagery/ (مثلاً /brand/imagery/home-cta-garden.jpg). خالی یعنی عکس پیش‌فرض.',
+    seedValue: null,
+  },
+  {
+    key: 'home.cta_image_alt_fa',
+    group: 'GUIDE_TEXT',
+    kind: 'STRING',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'متن جایگزین عکس نوار دعوت صفحه اصلی',
+    noteFa: 'همراه عکس بالا لازم است؛ بدون آن عکس پیش‌فرض نمایش داده می‌شود.',
+    seedValue: null,
+  },
   // ── Moderation (Phase 2) ───────────────────────────────────────────────
   {
     key: 'moderation.report_daily_limit',

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { statusOf } from './status-dictionary.ts';
+import { Icon } from './icon.tsx';
 
 export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'error';
 
@@ -85,5 +86,18 @@ export function ActionOwner({
       </span>
       {extra ? <span className="hz-owner__extra">{extra}</span> : null}
     </div>
+  );
+}
+
+/**
+ * DS status `TRUSTED` — the «معتمد» mark: success badge with `shield-check`
+ * instead of the dot. Never has an opposite: an untrusted record shows nothing.
+ */
+export function TrustedMark() {
+  return (
+    <span className="hz-badge hz-badge--success">
+      <Icon name="shieldCheck" size="xs" />
+      معتمد
+    </span>
   );
 }
