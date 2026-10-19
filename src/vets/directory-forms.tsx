@@ -1,5 +1,6 @@
 'use client';
 
+import { ReasonField as SharedReasonField } from '../ui/decision.tsx';
 import { startTransition, useActionState, useState, type FormEvent } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
@@ -111,11 +112,12 @@ export function PlacePicker({
   );
 }
 
-function ReasonField({ surface, testId }: { surface: DirectorySurface; testId: string }) {
+/** A change note (DS ReasonField, compact): optional for the owner, required with history for staff. */
+function ChangeNoteField({ surface, testId }: { surface: DirectorySurface; testId: string }) {
   return surface === 'owner' ? (
-    <TextField label="یادداشت تغییر" name="reason" maxLength={500} data-testid={testId} />
+    <SharedReasonField name="reason" label="یادداشت تغییر" rows={2} audience={null} testId={testId} />
   ) : (
-    <TextField label="دلیل تغییر" name="reason" required maxLength={500} hint="در تاریخچه تغییرات ثبت می‌شود." data-testid={testId} />
+    <SharedReasonField name="reason" label="دلیل تغییر" required rows={2} audience={null} hint="در تاریخچه تغییرات ثبت می‌شود." testId={testId} />
   );
 }
 
@@ -218,7 +220,7 @@ export function VetPublicProfileForm({
           </div>
         </fieldset>
 
-        <ReasonField surface={surface} testId="directory-profile-reason" />
+        <ChangeNoteField surface={surface} testId="directory-profile-reason" />
         <Button type="submit" disabled={pending} data-testid="save-directory-profile">
           ذخیره پروفایل عمومی
         </Button>
@@ -276,7 +278,7 @@ export function VetPublicStatusForm({
               options={targets.map((value) => ({ value, label: VET_PUBLIC_STATUS_FA[value] }))}
               data-testid="directory-status-to"
             />
-            <ReasonField surface={surface} testId="directory-status-reason" />
+            <ChangeNoteField surface={surface} testId="directory-status-reason" />
             <Button type="submit" disabled={pending} data-testid="change-directory-status">
               ثبت وضعیت
             </Button>
@@ -338,7 +340,7 @@ export function LocationPublicForm({
         defaultChecked={location.isPublic}
         testId={'location-public-' + id}
       />
-      <ReasonField surface={surface} testId={'location-reason-' + id} />
+      <ChangeNoteField surface={surface} testId={'location-reason-' + id} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'save-location-public-' + id}>
         ذخیره محل کار
       </Button>

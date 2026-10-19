@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, DeskVersionNote, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -26,7 +27,8 @@ const when = (value: Date | null) =>
  * deliberately narrow — it skips the one-time code and nothing else, and every
  * condition of the transfer is checked again when it runs.
  *
- * DS P09 case cards with the narrow recovery step inline (no `[id]` route).
+ * DS P09 case cards; each opens its P10 desk with the narrow recovery step
+ * in a wide Drawer (no `[id]` route).
  */
 export default async function HandoverRecoveryPage() {
   const guard = await guardRoute('/market/handovers');
@@ -85,12 +87,30 @@ export default async function HandoverRecoveryPage() {
                 ownerLabel="پشتیبانی بازار"
                 ownerIsUs
               >
-                <HandoverRecoveryForm
-                  inquiryId={entry.inquiryId}
-                  version={entry.version}
-                  canRelease={status === 'ON_HOLD'}
-                  canRecord={status === 'SELLER_ENTERED'}
-                />
+                <CaseDrawer title="پرونده تحویل حیوان" testId={'open-handover-' + entry.inquiryId}>
+                  <DeskHead
+                    title={entry.animalNameFa}
+                    status={keyStatus(status, { tone: status === 'ON_HOLD' ? 'warning' : 'neutral', label: HANDOVER_STATUS_FA[status] ?? entry.status })}
+                    meta={['زمان قرار: ' + when(entry.scheduledAt)]}
+                  >
+                    {entry.endedReasonFa ? <p className="text-body-sm">{entry.endedReasonFa}</p> : null}
+                    <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
+                      پرونده معامله
+                    </Link>
+                  </DeskHead>
+                  <Panel title="اقدام">
+                    {status === 'ON_HOLD' || status === 'SELLER_ENTERED' ? null : (
+                      <p className="text-body-sm text-text-secondary">در این وضعیت اقدامی از این صفحه ممکن نیست.</p>
+                    )}
+                    <HandoverRecoveryForm
+                      inquiryId={entry.inquiryId}
+                      version={entry.version}
+                      canRelease={status === 'ON_HOLD'}
+                      canRecord={status === 'SELLER_ENTERED'}
+                    />
+                    <DeskVersionNote version={entry.version} />
+                  </Panel>
+                </CaseDrawer>
               </CaseItem>
             );
           })}

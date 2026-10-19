@@ -1,5 +1,6 @@
 'use client';
 
+import { ReasonField as SharedReasonField } from '../ui/decision.tsx';
 import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
@@ -39,11 +40,12 @@ const Hidden = ({ surface, centreId }: { surface: CentreSurface; centreId?: stri
   </>
 );
 
-function ReasonField({ surface, testId }: { surface: CentreSurface; testId: string }) {
+/** A change note (DS ReasonField, compact): optional for the owner, required with history for staff. */
+function ChangeNoteField({ surface, testId }: { surface: CentreSurface; testId: string }) {
   return surface === 'owner' ? (
-    <TextField label="یادداشت تغییر" name="reason" maxLength={500} data-testid={testId} />
+    <SharedReasonField name="reason" label="یادداشت تغییر" rows={2} audience={null} testId={testId} />
   ) : (
-    <TextField label="دلیل تغییر" name="reason" required maxLength={500} hint="در تاریخچه تغییرات ثبت می‌شود." data-testid={testId} />
+    <SharedReasonField name="reason" label="دلیل تغییر" required rows={2} audience={null} hint="در تاریخچه تغییرات ثبت می‌شود." testId={testId} />
   );
 }
 
@@ -105,7 +107,7 @@ export function CentreCreateForm({
           hint="فقط برای بررسی؛ در صفحه عمومی نمایش داده نمی‌شود."
           data-testid="centre-source"
         />
-        <ReasonField surface={surface} testId="centre-create-reason" />
+        <ChangeNoteField surface={surface} testId="centre-create-reason" />
         <Check name="confirmedNotDuplicate" label="مراکز مشابه را دیده‌ام و این مرکز تکراری نیست" defaultChecked={false} testId="centre-confirm" />
         <Button type="submit" disabled={pending} data-testid="create-centre">
           ثبت مرکز
@@ -201,7 +203,7 @@ export function CentreProfileForm({
           </div>
         </fieldset>
 
-        <ReasonField surface={surface} testId="centre-profile-reason" />
+        <ChangeNoteField surface={surface} testId="centre-profile-reason" />
         <Button type="submit" disabled={pending} data-testid="save-centre-profile">
           ذخیره پرونده مرکز
         </Button>
@@ -290,7 +292,7 @@ export function CentreStatusForm({
               options={targets.map((value) => ({ value, label: CENTRE_STATUS_FA[value] }))}
               data-testid="centre-status-to"
             />
-            <ReasonField surface={surface} testId="centre-status-reason" />
+            <ChangeNoteField surface={surface} testId="centre-status-reason" />
             <Button type="submit" disabled={pending} data-testid="change-centre-status">
               ثبت وضعیت
             </Button>
@@ -425,7 +427,7 @@ export function BranchForm({
       <Check name="isOpen24h" label="شبانه‌روزی" defaultChecked={branch?.isOpen24h ?? false} testId={'branch-24h' + suffix} />
       <Check name="isPublic" label="نمایش این شعبه در صفحه عمومی" defaultChecked={branch?.isPublic ?? true} testId={'branch-public' + suffix} />
       {branch ? <Check name="isActive" label="شعبه فعال است" defaultChecked={branch.isActive} testId={'branch-active' + suffix} /> : null}
-      {branch ? <ReasonField surface={surface} testId={'branch-reason' + suffix} /> : null}
+      {branch ? <ChangeNoteField surface={surface} testId={'branch-reason' + suffix} /> : null}
       <Button type="submit" tone="secondary" disabled={pending} data-testid={branch ? 'save-branch-' + branch.id : 'add-branch'}>
         {branch ? 'ذخیره شعبه' : 'افزودن شعبه'}
       </Button>
@@ -481,7 +483,7 @@ export function MemberInviteForm({ surface, centreId }: { surface: CentreSurface
         />
         <TextField label="سمت در مرکز" name="roleFa" maxLength={120} data-testid="member-role" />
       </div>
-      <ReasonField surface={surface} testId="member-reason" />
+      <ChangeNoteField surface={surface} testId="member-reason" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="invite-member">
         فرستادن دعوت
       </Button>
@@ -497,7 +499,7 @@ export function MemberRemoveForm({ surface, member }: { surface: CentreSurface; 
       <input type="hidden" name="memberId" value={member.id} />
       <input type="hidden" name="expectedVersion" value={member.version} />
       <div className="min-w-[12rem] flex-1">
-        <ReasonField surface={surface} testId={'member-remove-reason-' + member.id} />
+        <ChangeNoteField surface={surface} testId={'member-remove-reason-' + member.id} />
       </div>
       <Button type="submit" tone="ghost" disabled={pending} data-testid={'remove-member-' + member.id}>
         برداشتن از فهرست

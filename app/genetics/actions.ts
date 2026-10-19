@@ -12,7 +12,7 @@ import {
 } from '../../src/genetics/service.ts';
 import { markSampleUnusable } from '../../src/clinical/samples.ts';
 import { answerAppeal, takeAppeal } from '../../src/genetics/appeals.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 import type { UnusableStatus } from '../../src/domain/microchip.ts';
 
 export interface CentreFormState {
@@ -27,7 +27,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): CentreFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 

@@ -19,7 +19,7 @@ import {
 import { recordOfficialIdentity } from '../../src/clinical/identity.ts';
 import { recordVetPregnancyResult } from '../../src/mating/pregnancy.ts';
 import type { ChipReadMethod, UnusableStatus } from '../../src/domain/microchip.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 import type { VisitServiceTypeName } from '../../src/domain/referral.ts';
 
 export interface VetFormState {
@@ -37,7 +37,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): VetFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

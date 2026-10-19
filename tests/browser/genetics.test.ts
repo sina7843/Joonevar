@@ -529,6 +529,7 @@ test('the centre receives, processes and records a result without any issuance p
     const resultRow = centre
       .locator('[data-testid="processing-list"] > li')
       .filter({ hasText: animal.trackingCode });
+    await resultRow.getByTestId('open-result-case').click();
     await resultRow.getByTestId('result-note').fill('پردازش استاندارد.');
     await resultRow.getByTestId('submit-result').click();
     await expectText(centre, 'نتیجه نهایی ثبت شد');

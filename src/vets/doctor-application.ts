@@ -376,6 +376,17 @@ const QUEUE: Record<'OPEN' | 'CORRECTION' | 'DECIDED', readonly VetCaseStatus[]>
 /** Cases of this path only: a mirrored Phase 2 application finishes where it started (DEC-0191). */
 const thisPath = and(eq(vetProfessionalCases.caseType, 'COUNCIL'), isNull(vetProfessionalCases.legacyApplicationId));
 
+/** Ids of the open queue in queue order (oldest first) — the desk's «پرونده ۲ از ۴» and previous/next. */
+export async function doctorOpenCaseIds(database: DbClient, actor: Actor): Promise<string[]> {
+  assertReviewer(actor);
+  const rows = await database
+    .select({ id: vetProfessionalCases.id })
+    .from(vetProfessionalCases)
+    .where(and(thisPath, inArray(vetProfessionalCases.status, [...QUEUE.OPEN])))
+    .orderBy(asc(vetProfessionalCases.updatedAt), asc(vetProfessionalCases.id));
+  return rows.map((row) => row.id);
+}
+
 export async function doctorCaseQueue(
   database: DbClient,
   actor: Actor,

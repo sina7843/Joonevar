@@ -189,6 +189,8 @@ export async function approveMembershipApplication(
   try {
     const opsPage = await operatorContext.newPage();
     await opsPage.goto(BASE_URL + '/assoc/members', { waitUntil: 'load' });
+    // The queue row only opens the case; the decision is in its drawer.
+    await opsPage.getByTestId('open-membership-case').first().click();
     const form = opsPage.getByTestId('membership-decision-form').first();
     await form.waitFor();
     await form.getByTestId('membership-decision-APPROVE').check();

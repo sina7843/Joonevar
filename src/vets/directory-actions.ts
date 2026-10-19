@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../db/client.ts';
 import { guardRoute } from '../authz/guard.ts';
-import { AppError, validation } from '../domain/errors.ts';
+import { AppError, staleOf, validation } from '../domain/errors.ts';
 import { addCity, addOwnLocation, changeVetPublicStatus, updateLocationPublic, updateVetPublicProfile } from './directory.ts';
 
 export interface DirectoryEditState {
@@ -30,7 +30,7 @@ async function actorOf(form: FormData) {
 }
 
 function failure(error: unknown): DirectoryEditState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 

@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { db } from '../../../src/db/client.ts';
 import { env } from '../../../src/config/env.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 import {
   attachListingMedia,
   createListing,
@@ -41,7 +41,7 @@ export async function createListingAction(
     const listing = await createListing(db(), guard.actor, { animalId: text(form, 'animalId') });
     created = listing.id;
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
   revalidatePath('/account/listings');
@@ -73,7 +73,7 @@ export async function saveListingAction(
     revalidatePath('/account/listings/' + listingId);
     return { ok: true, message: 'اطلاعات آگهی ذخیره شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -100,7 +100,7 @@ export async function attachListingMediaAction(
     revalidatePath('/account/listings/' + listingId);
     return { ok: true, message: kind === 'VIDEO' ? 'ویدئو افزوده شد.' : 'تصویر افزوده شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -117,7 +117,7 @@ export async function removeListingMediaAction(
     revalidatePath('/account/listings/' + listingId);
     return { ok: true, message: 'رسانه حذف شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -149,7 +149,7 @@ export async function moveListingAction(
     revalidatePath('/account/listings/' + listingId);
     return { ok: true, message: 'وضعیت آگهی تغییر کرد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

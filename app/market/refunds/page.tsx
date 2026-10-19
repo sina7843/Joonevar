@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -86,15 +87,36 @@ export default async function RefundQueuePage() {
               ownerLabel="مالی بازار"
               ownerIsUs
             >
-              <div className="space-y-md">
+              <CaseDrawer title="پرونده استرداد بیعانه" testId={'open-refund-' + entry.id}>
+                <DeskHead
+                  title={<span className="hz-num">{moneyFa(entry.amountToman) + ' تومان'}</span>}
+                  status={keyStatus(entry.status, { tone: 'neutral', label: REFUND_STATUS_FA[entry.status] ?? entry.status })}
+                  meta={[
+                    entry.animalNameFa,
+                    <>
+                      {'گیرنده: '}
+                      <bdi dir="ltr">{entry.recipientMobile}</bdi>
+                    </>,
+                    'تلاش‌ها: ' + entry.attempts.toLocaleString('fa-IR'),
+                    when(entry.createdAt),
+                  ]}
+                >
+                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
+                    معامله
+                  </Link>
+                </DeskHead>
                 {entry.lastErrorFa ? (
-                  <p className="text-caption text-text-secondary" data-testid={'refund-error-' + entry.id}>
-                    آخرین خطا: {entry.lastErrorFa}
-                  </p>
+                  <Panel title="آخرین تلاش">
+                    <p className="text-caption text-text-secondary" data-testid={'refund-error-' + entry.id}>
+                      آخرین خطا: {entry.lastErrorFa}
+                    </p>
+                  </Panel>
                 ) : null}
-                <RetryRefundForm refundId={entry.id} retryable={entry.retryable} />
-                <ManualRefundForm refundId={entry.id} />
-              </div>
+                <Panel title="استرداد">
+                  <RetryRefundForm refundId={entry.id} retryable={entry.retryable} />
+                  <ManualRefundForm refundId={entry.id} />
+                </Panel>
+              </CaseDrawer>
             </CaseItem>
           ))}
         </CaseList>

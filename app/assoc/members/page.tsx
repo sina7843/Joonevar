@@ -14,6 +14,8 @@ import {
 } from '../../../src/operations/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
+import { CaseDrawer } from '../case-drawer.tsx';
 import { membershipQueue } from '../../../src/billing/membership.ts';
 import { DecideMembershipForm, IssueNumberForm, MembershipStateForm } from './forms.tsx';
 import { MemberSearch } from './search.tsx';
@@ -90,7 +92,16 @@ export default async function AssocMembersPage({
                 owner="ASSOCIATION"
                 ownerIsUs
               >
-                <DecideMembershipForm applicationId={item.id} version={item.version} />
+                <CaseDrawer title="درخواست عضویت" testId="open-membership-case">
+                  <KeyValueList
+                    rows={[
+                      { key: 'توضیح متقاضی', value: item.statementFa },
+                      { key: 'آخرین تغییر', value: formatInstantFa(new Date(item.updatedAt)) },
+                      { key: 'نسخه', value: item.version.toLocaleString('fa-IR') },
+                    ]}
+                  />
+                  <DecideMembershipForm applicationId={item.id} version={item.version} />
+                </CaseDrawer>
               </CaseItem>
             ))}
             {corrections.items.map((item) => (

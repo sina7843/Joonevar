@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card } from '../ui/card.tsx';
+import { SectionHeader } from '../ui/section-header.tsx';
 import { EmptyState } from '../ui/states.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { formatCivilDateFa } from '../domain/calendar.ts';
@@ -57,10 +58,16 @@ export function CentreEditor({
   data,
   surface,
   unlinkedLocations = [],
+  headless = false,
+  statusForm = true,
 }: {
   data: CentreEditorData;
   surface: CentreSurface;
   unlinkedLocations?: ReadonlyArray<{ id: string; label: string }>;
+  /** The page already shows the name and status (DeskHead / record summary). */
+  headless?: boolean;
+  /** false on the review desk, where publish / hide is the decision panel. */
+  statusForm?: boolean;
 }) {
   const { facts, completeness, blockers, reference } = data;
   const { centre } = facts;
@@ -87,15 +94,19 @@ export function CentreEditor({
   return (
     <div className="space-y-lg">
       <Card>
-        <div className="flex flex-wrap items-start justify-between gap-md">
-          <div>
-            <h2 className="hz-h3">{centre.displayNameFa}</h2>
-            <p className="mt-2xs text-caption text-text-secondary">{facts.typeNameFa}</p>
+        {headless ? (
+          <SectionHeader title="وضعیت پرونده" size="sm" />
+        ) : (
+          <div className="flex flex-wrap items-start justify-between gap-md">
+            <div>
+              <h2 className="hz-h3">{centre.displayNameFa}</h2>
+              <p className="mt-2xs text-caption text-text-secondary">{facts.typeNameFa}</p>
+            </div>
+            <span data-testid="centre-public-status">
+              <StatusBadge status={centre.publicStatus} />
+            </span>
           </div>
-          <span data-testid="centre-public-status">
-            <StatusBadge status={centre.publicStatus} />
-          </span>
-        </div>
+        )}
         {centre.publicStatus === 'PUBLISHED' && centre.publicSlug ? (
           <p className="mt-sm text-body-sm">
             <Link href={'/centers/' + centre.publicSlug} className="hz-link hz-link--standalone" data-testid="centre-public-link">
@@ -146,7 +157,7 @@ export function CentreEditor({
         </ul>
       </Card>
 
-      <CentreStatusForm surface={surface} centre={editable} blockers={blockers} />
+      {statusForm ? <CentreStatusForm surface={surface} centre={editable} blockers={blockers} /> : null}
       {canEditContent ? (
         <CentreProfileForm
           surface={surface}

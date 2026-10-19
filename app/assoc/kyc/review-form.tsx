@@ -26,21 +26,45 @@ const LABEL: Record<Decision, string> = { APPROVED: 'تأیید', NEEDS_CORRECTI
 export function ReviewForm({ caseId, version }: { caseId: string; version: number }) {
   const [state, submit, pending] = useActionState(reviewKycAction, EMPTY);
   const [decision, setDecision] = useState<Decision | null>(null);
+  const [reasonError, setReasonError] = useState<string | null>(null);
   const needsReason = decision !== null && decision !== 'APPROVED';
 
   return (
-    <form action={submit} className="flex flex-col gap-lg" data-testid="review-form">
+    <form
+      action={submit}
+      className="flex flex-col gap-lg"
+      data-testid="review-form"
+      noValidate
+      // P10 › Validation: an empty reason for correction or rejection is stopped here with the design message.
+      onSubmit={(event) => {
+        const reason = String(new FormData(event.currentTarget).get('reasonFa') ?? '').trim();
+        if (needsReason && reason === '') {
+          event.preventDefault();
+          setReasonError('برای ' + (decision === 'REJECTED' ? 'رد' : 'اصلاح') + '، دلیل را بنویسید یا یکی از دلیل‌های آماده را انتخاب کنید.');
+        }
+      }}
+    >
       {state.message ? <Alert tone={state.tone === 'success' ? 'success' : 'error'} title={state.message} /> : null}
       <input type="hidden" name="caseId" value={caseId} />
       <input type="hidden" name="expectedVersion" value={version} />
 
-      <DecisionOptions choices={CHOICES} value={decision} onChange={setDecision} disabled={pending} />
+      <DecisionOptions
+        choices={CHOICES}
+        value={decision}
+        onChange={(value) => {
+          setDecision(value);
+          setReasonError(null);
+        }}
+        disabled={pending}
+      />
 
       {needsReason ? (
         <ReasonField
           name="reasonFa"
-          label={decision === 'REJECTED' ? 'دلیل رد' : 'دلیل اصلاح'}
+          label="دلیل"
           required
+          hint="برای اصلاح و رد اجباری است."
+          error={reasonError}
           testId="review-reason"
           drafts={['تصویر خوانا نیست', 'تاریخ تولد مطابقت ندارد', 'مدرک ناقص است']}
         />

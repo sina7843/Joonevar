@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { AppError, validation } from '../../../src/domain/errors.ts';
+import { AppError, staleOf, validation } from '../../../src/domain/errors.ts';
 import { leaveReview, moderateReview, replyToReview } from '../../../src/commerce/reviews.ts';
 import { answerQuestion, askQuestion, decideQuestion } from '../../../src/commerce/questions.ts';
 import { follow, saveItem, setPreferences, unfollow, unsaveItem } from '../../../src/commerce/saved.ts';
@@ -47,7 +47,7 @@ function optionalDate(form: FormData, key: string): Date | null {
 }
 
 const failure = (error: unknown): TrustFormState => {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 };
 

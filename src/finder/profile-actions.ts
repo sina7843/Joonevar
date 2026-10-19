@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../db/client.ts';
 import { env } from '../config/env.ts';
 import { guardRoute } from '../authz/guard.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { recordAnimalLifeEvent } from '../animals/life-events.ts';
 import {
   activateProfile,
@@ -37,7 +37,7 @@ async function run(animalId: string, work: () => Promise<string>): Promise<Profi
     if (animalId) revalidatePath(PROFILES_ROUTE + '/' + animalId);
     return { ok: true, message };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

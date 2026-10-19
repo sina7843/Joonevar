@@ -1,7 +1,8 @@
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { keyStatus } from '../../../src/ui/queue.tsx';
 import { productCategories } from '../../../src/db/schema/catalog.ts';
@@ -80,26 +81,45 @@ export default async function MarketReturnsPage() {
                 ownerLabel="پشتیبانی بازار"
                 ownerIsUs
               >
-                <div className="space-y-sm">
-                  <p className="text-body-sm" data-testid={'disputed-reason-' + view.row.id}>
-                    {view.row.reasonFa}
-                    {view.row.decisionNoteFa ? ' — ' + view.row.decisionNoteFa : ''}
-                  </p>
-                  <dl className="hz-kv" data-testid={'disputed-items-' + view.row.id}>
-                    {view.items.map((item) => (
-                      <div key={item.id} className="hz-kv__row">
-                        <dt className="hz-kv__key">{item.productNameFa + ' × ' + fa(item.quantity)}</dt>
-                        <dd className="hz-kv__value hz-num">{fa(item.lineRefundToman)} تومان</dd>
-                      </div>
-                    ))}
-                  </dl>
-                  <ReturnMoveForm
-                    action={moveReturnAsOperatorAction}
-                    returnId={view.row.id}
-                    moves={view.moves}
-                    testPrefix="ops-return"
+                <CaseDrawer title="پرونده مرجوعی مورد اختلاف" testId={'open-return-' + view.row.id}>
+                  <DeskHead
+                    title={
+                      <>
+                        <bdi dir="ltr">{view.row.reference}</bdi>
+                        {' — ' + view.sellerNameFa}
+                      </>
+                    }
+                    status={keyStatus(view.row.status, { tone: 'warning', label: RETURN_STATUS_FA[view.row.status as ReturnStatus] })}
+                    meta={[
+                      <>
+                        {'زیرسفارش '}
+                        <bdi dir="ltr">{view.subOrderReference}</bdi>
+                      </>,
+                    ]}
                   />
-                </div>
+                  <Panel title="دلیل و اقلام">
+                    <p className="text-body-sm" data-testid={'disputed-reason-' + view.row.id}>
+                      {view.row.reasonFa}
+                      {view.row.decisionNoteFa ? ' — ' + view.row.decisionNoteFa : ''}
+                    </p>
+                    <dl className="hz-kv" data-testid={'disputed-items-' + view.row.id}>
+                      {view.items.map((item) => (
+                        <div key={item.id} className="hz-kv__row">
+                          <dt className="hz-kv__key">{item.productNameFa + ' × ' + fa(item.quantity)}</dt>
+                          <dd className="hz-kv__value hz-num">{fa(item.lineRefundToman)} تومان</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </Panel>
+                  <Panel title="تصمیم">
+                    <ReturnMoveForm
+                      action={moveReturnAsOperatorAction}
+                      returnId={view.row.id}
+                      moves={view.moves}
+                      testPrefix="ops-return"
+                    />
+                  </Panel>
+                </CaseDrawer>
               </CaseItem>
             ))}
           </CaseList>

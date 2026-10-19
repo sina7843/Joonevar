@@ -1,17 +1,17 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, DocFrame, Panel, PrivateNote, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { CaseAge, Desk, DeskHead, DeskVersionNote, deskPosition, DocFrame, Panel, PrivateNote, CaseHistory } from '../../../../src/ui/desk.tsx';
 import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { vetCaseKey } from '../../vet-case-key.ts';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
-import { licenceCaseForReview } from '../../../../src/vets/licence-application.ts';
+import { licenceCaseForReview, licenceOpenCaseIds } from '../../../../src/vets/licence-application.ts';
 import { DecideLicenceCaseForm } from '../../../../src/vets/licence-forms.tsx';
 import { reviewStateFor } from '../../../../src/vets/review-workbench.ts';
-import { DocumentPreview, ReviewPanel } from '../../../../src/vets/review-forms.tsx';
+import { ReviewPanel } from '../../../../src/vets/review-forms.tsx';
 import { DOCUMENT_KIND_FA, type ProfessionalDocumentKind } from '../../../../src/vets/professional-profile-model.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
@@ -29,7 +29,11 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
   const { id } = await params;
   const guard = await guardRoute('/assoc/vet-licences/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const [detail, review] = await Promise.all([licenceCaseForReview(db(), guard.actor, id), reviewStateFor(db(), guard.actor, id)]);
+  const [detail, review, queueIds] = await Promise.all([
+    licenceCaseForReview(db(), guard.actor, id),
+    reviewStateFor(db(), guard.actor, id),
+    licenceOpenCaseIds(db(), guard.actor),
+  ]);
 
   if (!detail) {
     return (
@@ -40,6 +44,8 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
   }
   const latest = detail.submissions.at(-1)?.fields;
   const waiting = detail.case.status === 'SUBMITTED' || detail.case.status === 'UNDER_REVIEW';
+  // Age in the queue counts from the first submission.
+  const firstSubmittedAt = detail.submissions[0] ? new Date(detail.submissions[0].submittedAt) : null;
   const duplicates = detail.duplicates.profiles.length + detail.duplicates.cases.length;
 
   const web = [latest?.websiteUrl, latest?.instagramHandle ? '@' + latest.instagramHandle : null].filter(Boolean).join(' · ');
@@ -48,9 +54,11 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
       <DeskHead
         title={'پروانه فعالیت · ' + (detail.applicantNameFa ?? '—')}
         status={keyStatus(vetCaseKey(detail.case.status))}
+        position={deskPosition(queueIds, detail.case.id, (caseId) => '/assoc/vet-licences/' + caseId)}
         meta={[
           latest?.licenceCode ? <Identifier label="کد پروانه" value={latest.licenceCode} /> : null,
           detail.applicantNationalId ? <Identifier label="کد ملی" value={detail.applicantNationalId} /> : null,
+          waiting && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null,
           'نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR'),
         ]}
         owner={waiting ? 'ASSOCIATION' : detail.case.status === 'NEEDS_CORRECTION' ? 'USER' : null}
@@ -65,6 +73,7 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
               <>
                 <p className="text-caption text-text-secondary">تأیید مدارک، پرونده را «در انتظار پرداخت» می‌کند و Tag دارای پروانه را فعال نمی‌کند.</p>
                 <DecideLicenceCaseForm caseId={detail.case.id} version={detail.case.version} />
+                <DeskVersionNote version={detail.case.currentSubmissionVersion} />
               </>
             ) : waiting ? null : (
               <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
@@ -104,9 +113,6 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
                       meta={latest?.licenceFileId === document.fileId ? '(فایل پروانه نسخه جاری)' : undefined}
                       icon="stamp"
                     >
-                      {document.submissionVersion === detail.case.currentSubmissionVersion ? (
-                        <DocumentPreview fileId={document.fileId} labelFa={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind]} testId={'licence-document-preview-' + document.kind} />
-                      ) : null}
                     </DocFrame>
                   </li>
                 );

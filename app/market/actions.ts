@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 import { SETTING_BY_KEY } from '../../src/settings/keys.ts';
 import { updateMarketSetting } from '../../src/marketplace/operations.ts';
 import { setSpeciesEnabled } from '../../src/marketplace/species.ts';
@@ -56,7 +56,7 @@ export async function updateMarketSettingAction(
     revalidatePath('/market/settings/' + encodeURIComponent(key));
     return { ok: true, message: raw === '' ? 'مقدار پاک شد و به «تعیین‌نشده» برگشت.' : 'مقدار ذخیره شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     if (error instanceof SyntaxError) return { ok: false, message: 'مقدار JSON معتبر نیست.' };
     throw error;
   }
@@ -83,7 +83,7 @@ export async function setSpeciesEnabledAction(
     revalidatePath('/market/species');
     return { ok: true, message: enabled ? 'این گونه فعال شد.' : 'این گونه غیرفعال شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

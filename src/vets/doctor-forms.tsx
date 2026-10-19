@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
 import { FileField, TextAreaField, TextField } from '../ui/field.tsx';
 import { PlacePicker, Result, type CityOption, type Option } from './directory-forms.tsx';
-import { DOCTOR_DECISIONS, DOCTOR_DECISION_FA, type DoctorDecision } from './professional-profile-model.ts';
+import { DOCTOR_DECISIONS, DOCTOR_DECISION_DESC_FA, DOCTOR_DECISION_FA } from './professional-profile-model.ts';
+import { DecisionForm } from '../ui/decision.tsx';
 import { DOCUMENT_KIND_FA } from './onboarding-model.ts';
 import { decideDoctorCaseAction, resubmitDoctorApplicationAction, submitDoctorApplicationAction, type DoctorState } from './doctor-actions.ts';
 
@@ -121,36 +122,26 @@ export function DoctorApplicationForm({
   );
 }
 
-/** The association admin's decision on a council code. Every decision carries a reason. */
+/**
+ * The association admin's decision on a council code (DS P10 panel).
+ * The decision service still requires a reason for every outcome (approval
+ * included), so the reason is asked for all three; the consequence sits under
+ * each label (DS DecisionDesk).
+ */
 export function DecideDoctorCaseForm({ caseId, version }: { caseId: string; version: number }) {
-  const [state, submit, pending] = useActionState(decideDoctorCaseAction, EMPTY);
-  const [decision, setDecision] = useState<DoctorDecision>('VERIFY');
   return (
-    <form action={submit} className="space-y-lg" data-testid="doctor-decision-form">
-      <input type="hidden" name="caseId" value={caseId} />
-      <input type="hidden" name="expectedVersion" value={version} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">نتیجه بررسی</legend>
-        {DOCTOR_DECISIONS.map((value) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
-            <input
-              type="radio"
-              name="decision"
-              value={value}
-              checked={decision === value}
-              onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
-              data-testid={'doctor-decision-' + value}
-            />
-            {DOCTOR_DECISION_FA[value]}
-          </label>
-        ))}
-      </fieldset>
-      <TextAreaField label="دلیل" name="reasonFa" required rows={3} maxLength={1000} hint="دلیل برای متقاضی نمایش داده می‌شود." data-testid="doctor-decision-reason" />
-      <Button type="submit" disabled={pending} data-testid="submit-doctor-decision">
-        {pending ? 'در حال ثبت…' : 'ثبت نتیجه'}
-      </Button>
-      <Result state={state} testId="doctor-decision-result" />
-    </form>
+    <DecisionForm
+      action={decideDoctorCaseAction}
+      hidden={{ caseId, expectedVersion: version }}
+      formTestId="doctor-decision-form"
+      submitTestId="submit-doctor-decision"
+      reasonName="reasonFa"
+      reasonTestId="doctor-decision-reason"
+      reasonFor={DOCTOR_DECISIONS}
+      reasonLabel={(value) => (value === 'REJECT' ? 'دلیل رد' : value === 'REQUEST_CORRECTION' ? 'دلیل اصلاح' : 'دلیل تأیید')}
+      audience="به متقاضی نمایش داده می‌شود"
+      drafts={['تصویر کارت نظام خوانا نیست', 'کد نظام با کارت نظام نمی‌خواند']}
+      choices={DOCTOR_DECISIONS.map((value) => ({ value, label: DOCTOR_DECISION_FA[value], desc: DOCTOR_DECISION_DESC_FA[value], testId: 'doctor-decision-' + value }))}
+    />
   );
 }

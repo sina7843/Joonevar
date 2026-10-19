@@ -1,5 +1,6 @@
 'use client';
 
+import { ReasonField as SharedReasonField } from '../ui/decision.tsx';
 import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
@@ -45,11 +46,12 @@ const Hidden = ({ surface, communityId }: { surface: CommunitySurface; community
   </>
 );
 
-function ReasonField({ surface, testId }: { surface: CommunitySurface; testId: string }) {
+/** A change note (DS ReasonField, compact): optional for the owner, required with history for staff. */
+function ChangeNoteField({ surface, testId }: { surface: CommunitySurface; testId: string }) {
   return surface === 'owner' ? (
-    <TextField label="یادداشت تغییر" name="reason" maxLength={500} data-testid={testId} />
+    <SharedReasonField name="reason" label="یادداشت تغییر" rows={2} audience={null} testId={testId} />
   ) : (
-    <TextField label="دلیل تغییر" name="reason" required maxLength={500} hint="در تاریخچه تغییرات ثبت می‌شود." data-testid={testId} />
+    <SharedReasonField name="reason" label="دلیل تغییر" required rows={2} audience={null} hint="در تاریخچه تغییرات ثبت می‌شود." testId={testId} />
   );
 }
 
@@ -108,7 +110,7 @@ export function CommunityCreateForm({ surface }: { surface: CommunitySurface }) 
           data-testid="community-scope"
         />
         <TextField label="منبع اطلاعات" name="sourceFa" maxLength={300} hint="فقط برای بررسی؛ عمومی نمایش داده نمی‌شود." data-testid="community-source" />
-        <ReasonField surface={surface} testId="community-create-reason" />
+        <ChangeNoteField surface={surface} testId="community-create-reason" />
         <Check name="confirmedNotDuplicate" label="رکوردهای هم‌نام را دیده‌ام و این مورد تکراری نیست" defaultChecked={false} testId="community-confirm" />
         <Button type="submit" disabled={pending} data-testid="create-community">
           ثبت
@@ -206,7 +208,7 @@ export function CommunityProfileForm({
           </div>
         </fieldset>
 
-        <ReasonField surface={surface} testId="community-profile-reason" />
+        <ChangeNoteField surface={surface} testId="community-profile-reason" />
         <Button type="submit" disabled={pending} data-testid="save-community-profile">
           ذخیره پرونده
         </Button>
@@ -347,7 +349,7 @@ export function CommunityStatusForm({
               options={targets.map((value) => ({ value, label: VET_PUBLIC_STATUS_FA[value] }))}
               data-testid="community-status-to"
             />
-            <ReasonField surface={surface} testId="community-status-reason" />
+            <ChangeNoteField surface={surface} testId="community-status-reason" />
             <Button type="submit" disabled={pending} data-testid="change-community-status">
               ثبت وضعیت
             </Button>
@@ -368,7 +370,7 @@ export function ManagerInviteForm({ surface, communityId }: { surface: Community
         <TextField label="شماره موبایل مدیر" name="mobile" ltr required inputMode="numeric" data-testid="manager-mobile" />
         <TextField label="سمت" name="roleFa" maxLength={120} data-testid="manager-role" />
       </div>
-      <ReasonField surface={surface} testId="manager-invite-reason" />
+      <ChangeNoteField surface={surface} testId="manager-invite-reason" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="invite-manager">
         فرستادن دعوت
       </Button>
@@ -384,7 +386,7 @@ export function ManagerRemoveForm({ surface, manager }: { surface: CommunitySurf
       <input type="hidden" name="managerId" value={manager.id} />
       <input type="hidden" name="expectedVersion" value={manager.version} />
       <div className="min-w-[12rem] flex-1">
-        <ReasonField surface={surface} testId={'manager-remove-reason-' + manager.id} />
+        <ChangeNoteField surface={surface} testId={'manager-remove-reason-' + manager.id} />
       </div>
       <Button type="submit" tone="ghost" disabled={pending} data-testid={'remove-manager-' + manager.id}>
         برداشتن از فهرست
@@ -515,7 +517,7 @@ export function EventForm({
             data-testid={'event-status' + suffix}
           />
           <TextField label="دلیل لغو" name="cancelReasonFa" maxLength={500} defaultValue={event.cancelReasonFa ?? ''} data-testid={'event-cancel-reason' + suffix} />
-          <ReasonField surface={surface} testId={'event-reason' + suffix} />
+          <ChangeNoteField surface={surface} testId={'event-reason' + suffix} />
         </>
       ) : (
         <SelectField

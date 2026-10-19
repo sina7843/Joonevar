@@ -9,6 +9,8 @@ import { clubAuthorityQueue } from '../../../src/clubs/service.ts';
 import { CLUB_OWNERSHIP_KIND_FA, type ClubOwnershipKind } from '../../../src/clubs/model.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
 import { ClubOwnershipDecisionForm } from '../../../src/clubs/forms.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
+import { CaseDrawer } from '../case-drawer.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +39,8 @@ export default async function AssocClubsPage() {
           <EmptyState title="کلابی در انتظار بررسی نیست" description="کلاب‌های تازه پس از تکمیل معرفی و راه ارتباطی به این صف می‌آیند." />
         ) : (
           <CaseList label="کلاب‌های در انتظار تأیید" testId="club-verification-queue">
-            {queue.waiting.map((club) => (
+            {/* P09: oldest first. */}
+            {[...queue.waiting].reverse().map((club) => (
               <CaseItem
                 key={club.id}
                 name={club.displayNameFa}
@@ -70,7 +73,18 @@ export default async function AssocClubsPage() {
                 owner="ASSOCIATION"
                 ownerIsUs
               >
-                <ClubOwnershipDecisionForm requestId={row.request.id} version={row.request.version} />
+                <CaseDrawer title={'درخواست مالکیت · ' + row.club.displayNameFa} testId={'open-ownership-case-' + row.request.id}>
+                  <KeyValueList
+                    rows={[
+                      { key: 'کلاب', value: row.club.displayNameFa },
+                      { key: 'نوع درخواست', value: CLUB_OWNERSHIP_KIND_FA[row.request.kind as ClubOwnershipKind] },
+                      { key: 'توضیح متقاضی', value: row.request.reasonFa },
+                      { key: 'ثبت', value: formatInstantFa(row.request.createdAt) },
+                      { key: 'نسخه', value: row.request.version.toLocaleString('fa-IR') },
+                    ]}
+                  />
+                  <ClubOwnershipDecisionForm requestId={row.request.id} version={row.request.version} />
+                </CaseDrawer>
               </CaseItem>
             ))}
           </CaseList>

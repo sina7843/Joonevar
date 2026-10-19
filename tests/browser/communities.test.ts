@@ -178,6 +178,7 @@ test('the review operator hides the page and the address then answers a real 404
     await expectText(page, NAME);
     await page.getByRole('link', { name: NAME }).click();
     await page.getByTestId('community-status-form').waitFor();
+    await page.getByTestId('community-status-to-HIDDEN').check();
     await page.getByTestId('community-status-reason').fill('گزارش اطلاعات نادرست');
     await page.getByTestId('change-community-status').click();
     await expectText(page, 'پنهان');

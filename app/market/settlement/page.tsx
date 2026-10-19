@@ -1,7 +1,8 @@
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { keyStatus } from '../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -80,61 +81,72 @@ export default async function SettlementPage() {
               ownerLabel="مالی بازار"
               ownerIsUs
             >
-              <div className="space-y-md">
-                {row.blockers.length > 0 ? (
-                  <ul className="list-inside list-disc text-caption text-text-secondary" data-testid={'settlement-blockers-' + row.sellerId}>
-                    {row.blockers.map((blocker) => (
-                      <li key={blocker}>{PAYOUT_BLOCKER_FA[blocker as PayoutBlocker] ?? blocker}</li>
-                    ))}
-                  </ul>
-                ) : null}
+              <CaseDrawer title="پرونده تسویه فروشنده" testId={'open-settlement-' + row.sellerId}>
+                <DeskHead
+                  title={row.sellerNameFa}
+                  status={
+                    row.openBatch === null
+                      ? undefined
+                      : keyStatus(row.openBatch.status, { tone: 'success', label: SETTLEMENT_STATUS_FA[row.openBatch.status as SettlementStatus] })
+                  }
+                  meta={['قابل تسویه: ' + fa(row.availableToman) + ' تومان', row.debtToman > 0n ? 'بدهی: ' + fa(row.debtToman) + ' تومان' : null]}
+                />
+                <Panel title="تسویه">
+                  {row.blockers.length > 0 ? (
+                    <ul className="list-inside list-disc text-caption text-text-secondary" data-testid={'settlement-blockers-' + row.sellerId}>
+                      {row.blockers.map((blocker) => (
+                        <li key={blocker}>{PAYOUT_BLOCKER_FA[blocker as PayoutBlocker] ?? blocker}</li>
+                      ))}
+                    </ul>
+                  ) : null}
 
-                {row.openBatch === null ? (
-                  row.blockers.length === 0 ? (
-                    <OpenBatchForm action={openBatchAction} sellerId={row.sellerId} />
-                  ) : null
-                ) : (
-                  <div className="space-y-sm">
-                    <div data-testid={'settlement-batch-' + row.sellerId}>
-                      <KeyValueList
-                        twoCol
-                        rows={[
-                          {
-                            key: 'دسته تسویه',
-                            value: (
-                              <bdi className="hz-id" dir="ltr">
-                                {row.openBatch.reference}
-                              </bdi>
-                            ),
-                          },
-                          { key: 'مبلغ', value: fa(row.openBatch.totalToman) + ' تومان' },
-                          {
-                            key: 'شبا',
-                            value: (
-                              <bdi className="hz-id" dir="ltr">
-                                {row.openBatch.ibanSnapshot}
-                              </bdi>
-                            ),
-                          },
-                          { key: 'به نام', value: row.openBatch.holderNameSnapshot },
-                        ]}
+                  {row.openBatch === null ? (
+                    row.blockers.length === 0 ? (
+                      <OpenBatchForm action={openBatchAction} sellerId={row.sellerId} />
+                    ) : null
+                  ) : (
+                    <div className="space-y-sm">
+                      <div data-testid={'settlement-batch-' + row.sellerId}>
+                        <KeyValueList
+                          twoCol
+                          rows={[
+                            {
+                              key: 'دسته تسویه',
+                              value: (
+                                <bdi className="hz-id" dir="ltr">
+                                  {row.openBatch.reference}
+                                </bdi>
+                              ),
+                            },
+                            { key: 'مبلغ', value: fa(row.openBatch.totalToman) + ' تومان' },
+                            {
+                              key: 'شبا',
+                              value: (
+                                <bdi className="hz-id" dir="ltr">
+                                  {row.openBatch.ibanSnapshot}
+                                </bdi>
+                              ),
+                            },
+                            { key: 'به نام', value: row.openBatch.holderNameSnapshot },
+                          ]}
+                        />
+                      </div>
+                      <BatchMoveForm
+                        action={moveBatchAction}
+                        batchId={row.openBatch.id}
+                        moves={settlementMovesFrom(row.openBatch.status as SettlementStatus)}
                       />
                     </div>
-                    <BatchMoveForm
-                      action={moveBatchAction}
-                      batchId={row.openBatch.id}
-                      moves={settlementMovesFrom(row.openBatch.status as SettlementStatus)}
-                    />
-                  </div>
-                )}
+                  )}
 
-                <details>
-                  <summary className="hz-link hz-link--standalone cursor-pointer">ثبت دستی در دفتر این فروشگاه</summary>
-                  <div className="mt-sm">
-                    <LedgerEntryForm action={ledgerEntryAction} sellerId={row.sellerId} />
-                  </div>
-                </details>
-              </div>
+                  <details>
+                    <summary className="hz-link hz-link--standalone cursor-pointer">ثبت دستی در دفتر این فروشگاه</summary>
+                    <div className="mt-sm">
+                      <LedgerEntryForm action={ledgerEntryAction} sellerId={row.sellerId} />
+                    </div>
+                  </details>
+                </Panel>
+              </CaseDrawer>
             </CaseItem>
           ))}
         </CaseList>

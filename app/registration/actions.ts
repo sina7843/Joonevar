@@ -8,7 +8,7 @@ import { env } from '../../src/config/env.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { cancelAttempt, latestAttempt, startAttempt } from '../../src/billing/payments.ts';
 import { createSheetRequest, retryIssuance } from '../../src/documents/registration-sheet.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface SheetFormState {
   readonly ok?: boolean;
@@ -23,7 +23,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): SheetFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

@@ -20,7 +20,7 @@ import {
   setForeignDetails,
   submitForeignCase,
 } from '../../src/animals/foreign-pedigree.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface FormState {
   readonly ok?: boolean;
@@ -35,7 +35,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): FormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { env } from '../../src/config/env.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { AppError, validation } from '../../src/domain/errors.ts';
+import { AppError, staleOf, validation } from '../../src/domain/errors.ts';
 import { currentPaymentGateway, currentPaymentProvider } from '../../src/adapters/current.ts';
 import { executeRefund, recordManualRefund } from '../../src/marketplace/refunds.ts';
 import { addDisputeEvidence, decideDispute } from '../../src/marketplace/disputes.ts';
@@ -33,7 +33,7 @@ function money(form: FormData, key: string): bigint {
 }
 
 const failure = (error: unknown): SettlementState => {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 };
 

@@ -4,7 +4,8 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { ASSOC_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, DeskVersionNote, Panel, whenFa } from '../../../../src/ui/desk.tsx';
+import { CaseAge, CaseHistory, Desk, DeskHead, DeskVersionNote, Panel, deskPosition, whenFa } from '../../../../src/ui/desk.tsx';
+import { auditSteps, historyFromAudit } from '../../audit-history.ts';
 import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
@@ -13,6 +14,7 @@ import { db } from '../../../../src/db/client.ts';
 import {
   findPermit,
   permitBatch,
+  permitQueue,
   permitView,
 } from '../../../../src/mating/permits.ts';
 import {
@@ -25,6 +27,17 @@ import {
 import { PermitReviewForm } from '../review-form.tsx';
 
 export const dynamic = 'force-dynamic';
+
+const HISTORY_FA: Record<string, string> = {
+  MATING_PERMIT_STARTED: 'شروع پرونده',
+  MATING_PERMIT_CONFIRMED: 'تأیید طرف مقابل',
+  MATING_PERMIT_DECLINED: 'رد طرف مقابل',
+  MATING_PERMIT_RULE_SAVED: 'ثبت توافق تقسیم',
+  MATING_PERMIT_PAYMENT_VERIFIED: 'پرداخت تأیید شد',
+  MATING_PERMIT_SUBMITTED: 'ارسال برای بررسی',
+  MATING_PERMIT_ISSUED: 'صدور مجوز',
+  MATING_PERMIT_REVIEWED: 'تصمیم انجمن',
+};
 
 /**
  * One permit at the association — §16 steps 8 and 9, §21.5.
@@ -43,15 +56,26 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
   const permit = await findPermit(db(), id);
   if (!permit) return <RecordNotFound error={notFoundError('پرونده مجوز پیدا نشد.')} />;
 
-  const [view, batch] = await Promise.all([permitView(db(), permit), permitBatch(db(), permit)]);
+  const [view, batch, steps, queue] = await Promise.all([
+    permitView(db(), permit),
+    permitBatch(db(), permit),
+    auditSteps('MATING_CASE', permit.id),
+    permitQueue(db(), guard.actor),
+  ]);
   const shareOf = (side: AllocationSide) => view.shares.find((row) => row.side === side) ?? null;
 
   const open = permit.status === 'UNDER_REVIEW';
+  const firstSubmittedAt = steps.filter((step) => step.action === 'MATING_PERMIT_SUBMITTED').at(-1)?.at ?? permit.submittedAt;
   return (
     <OpsShell actor={guard.actor} title="بررسی مجوز جفت‌گیری" pathname={'/assoc/permits/' + id} nav={ASSOC_NAV}>
       <DeskHead
         title={'مجوز جفت‌گیری · ' + view.initiatorName + ' و ' + view.counterpartyName}
         status={{ ...keyStatus(permit.status), testId: 'assoc-permit-status' }}
+        position={deskPosition(
+          queue.map((row) => row.id),
+          permit.id,
+          (permitId) => '/assoc/permits/' + permitId,
+        )}
         meta={[
           permit.permitNo ? (
             <span data-testid="assoc-permit-no">
@@ -59,6 +83,7 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
             </span>
           ) : null,
           'ارسال: ' + (whenFa(permit.submittedAt) ?? '—'),
+          open && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null,
           'نسخه ' + permit.version.toLocaleString('fa-IR'),
         ]}
         owner={open ? 'ASSOCIATION' : permit.status === 'NEEDS_CORRECTION' ? 'USER' : null}
@@ -133,6 +158,9 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
           />
           {permit.ruleNoteFa ? <p className="text-body-sm">{permit.ruleNoteFa}</p> : null}
           <p className="text-caption text-text-secondary">{PRE_BIRTH_RULE_NOTE_FA}</p>
+        </Panel>
+        <Panel title="سابقه پرونده">
+          <CaseHistory entries={historyFromAudit(steps, HISTORY_FA, open)} />
         </Panel>
       </Desk>
     </OpsShell>

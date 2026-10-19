@@ -392,7 +392,7 @@ test('a private KYC document is refused to a signed-in stranger', async () => {
     const opsPage = await signIn(operator, '09990000004');
     await opsPage.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
     await opsPage.getByTestId('open-case').first().click();
-    const href = await opsPage.getByTestId('kyc-document-link').getAttribute('href');
+    const href = await opsPage.getByTestId('kyc-document-link').getAttribute('src');
     assert.ok(href);
 
     const allowed = await opsPage.request.get(BASE_URL + href!);

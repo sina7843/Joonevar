@@ -11,7 +11,7 @@ import {
   updateBreedProfile,
 } from '../../../../src/breeds/service.ts';
 import { parseAltNames } from '../../../../src/breeds/model.ts';
-import { AppError } from '../../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../../src/domain/errors.ts';
 
 export interface BreedEditState {
   readonly ok?: boolean;
@@ -31,7 +31,7 @@ async function superadmin() {
 }
 
 function failure(error: unknown): BreedEditState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 

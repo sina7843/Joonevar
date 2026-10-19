@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card } from '../ui/card.tsx';
+import { SectionHeader } from '../ui/section-header.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { EmptyState } from '../ui/states.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
@@ -81,10 +82,16 @@ export function CommunityEditor({
   data,
   surface,
   posts = [],
+  headless = false,
+  statusForm = true,
 }: {
   data: CommunityEditorData;
   surface: CommunitySurface;
   posts?: readonly CommunityPost[];
+  /** The page already shows the name and status (DeskHead / record summary). */
+  headless?: boolean;
+  /** false on the review desk, where publish / hide is the decision panel. */
+  statusForm?: boolean;
 }) {
   const { facts, completeness, blockers, posting, reference } = data;
   const { community } = facts;
@@ -117,17 +124,21 @@ export function CommunityEditor({
   return (
     <div className="space-y-lg">
       <Card>
-        <div className="flex flex-wrap items-start justify-between gap-md">
-          <div>
-            <h2 className="hz-h3">{community.displayNameFa}</h2>
-            <p className="mt-2xs text-caption text-text-secondary">
-              {COMMUNITY_KIND_FA[kind] + ' · حوزه ' + COMMUNITY_SCOPE_FA[community.scope as CommunityScope]}
-            </p>
+        {headless ? (
+          <SectionHeader title="وضعیت پرونده" size="sm" />
+        ) : (
+          <div className="flex flex-wrap items-start justify-between gap-md">
+            <div>
+              <h2 className="hz-h3">{community.displayNameFa}</h2>
+              <p className="mt-2xs text-caption text-text-secondary">
+                {COMMUNITY_KIND_FA[kind] + ' · حوزه ' + COMMUNITY_SCOPE_FA[community.scope as CommunityScope]}
+              </p>
+            </div>
+            <span data-testid="community-public-status">
+              <StatusBadge status={community.publicStatus} />
+            </span>
           </div>
-          <span data-testid="community-public-status">
-            <StatusBadge status={community.publicStatus} />
-          </span>
-        </div>
+        )}
         {community.publicStatus === 'PUBLISHED' && community.publicSlug ? (
           <p className="mt-sm text-body-sm">
             <Link href={'/associations/' + community.publicSlug} className="hz-link hz-link--standalone" data-testid="community-public-link">
@@ -173,7 +184,7 @@ export function CommunityEditor({
         </ul>
       </Card>
 
-      <CommunityStatusForm surface={surface} community={editable} blockers={blockers} />
+      {statusForm ? <CommunityStatusForm surface={surface} community={editable} blockers={blockers} /> : null}
       {canEditContent ? (
         <CommunityProfileForm
           surface={surface}

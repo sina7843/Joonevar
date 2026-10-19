@@ -164,6 +164,7 @@ export async function tradingStore(
     sellerId = (await row.getAttribute('data-testid'))!.replace('seller-row-', '');
     for (const decision of ['UNDER_REVIEW', 'APPROVED'] as const) {
       await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+      await page.getByTestId('open-seller-' + sellerId).click();
       await page.getByTestId('seller-decision-select-' + sellerId).selectOption(decision);
       await page.getByTestId('seller-decide-' + sellerId).click();
       await expectText(page, 'تصمیم ثبت شد');
@@ -172,6 +173,7 @@ export async function tradingStore(
     // nothing can ever be settled to it, so a fixture that stops short of
     // this builds a store that cannot be paid (PROMPT-011).
     await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+    await page.getByTestId('open-seller-' + sellerId).click();
     const verify = page.getByTestId('verify-iban-submit-' + sellerId);
     if ((await verify.count()) > 0) {
       await page.getByTestId('verify-iban-note-' + sellerId).fill(options.reasonFa);
@@ -253,6 +255,7 @@ export async function sellableProduct(
   try {
     const page = await ops.newPage();
     await page.goto(BASE_URL + '/market/catalog', { waitUntil: 'load' });
+    await page.getByTestId('open-product-' + productId).click();
     await page.getByTestId('product-decision-select-' + productId).selectOption('PUBLISHED');
     await page.getByTestId('product-decide-' + productId).click();
     // A decided product leaves the review queue, taking its form — and the

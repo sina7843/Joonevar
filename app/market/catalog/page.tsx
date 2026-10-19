@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, DeskVersionNote, DocFrame, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
@@ -24,8 +24,8 @@ const when = (value: Date) =>
  * or sent back with a reason. The blocked categories are printed here too, so
  * the reviewer reads the same sentence a seller would if they tried.
  *
- * DS P09: there is no `[id]` route, so each case card carries its own desk
- * (publish / send back, merge) under the facts.
+ * DS P09/P10: there is no `[id]` route, so each row opens its desk (facts,
+ * images, publish / send back, merge) in a wide Drawer.
  */
 export default async function CatalogReviewPage() {
   const guard = await guardRoute('/market/catalog');
@@ -86,53 +86,59 @@ export default async function CatalogReviewPage() {
                 ownerLabel="بررسی کاتالوگ"
                 ownerIsUs
               >
-                <div className="space-y-md">
-                  <KeyValueList
-                    twoCol
-                    rows={[
-                      {
-                        key: 'بارکد',
-                        value: entry.barcode ? (
-                          <bdi className="hz-id" dir="ltr">
-                            {entry.barcode}
-                          </bdi>
-                        ) : null,
-                      },
-                      {
-                        key: 'تنوع‌ها',
-                        value: detail.variants.length === 0 ? 'تک‌نوع' : detail.variants.map((variant) => variant.labelFa).join('، '),
-                        testId: 'catalog-variants-' + entry.id,
-                      },
-                      { key: 'مناسب برای', value: detail.speciesCodes.join('، ') || null },
-                      {
-                        key: 'تصویرها',
-                        value:
-                          detail.media.length === 0 ? (
-                            'ندارد'
-                          ) : (
-                            <span className="flex flex-wrap gap-sm">
-                              {detail.media.map((image) => (
-                                <Link key={image.id} href={'/api/files/' + image.fileId} className="hz-link">
-                                  {image.altFa}
-                                </Link>
-                              ))}
-                            </span>
-                          ),
-                      },
-                    ]}
+                <CaseDrawer title="پرونده کالای پیشنهادی" testId={'open-product-' + entry.id}>
+                  <DeskHead
+                    title={entry.nameFa}
+                    status={keyStatus(entry.status === 'PENDING_REVIEW' ? 'SUBMITTED' : entry.status)}
+                    meta={[entry.brandFa ?? 'بدون برند', entry.categoryNameFa, entry.sellerNameFa ?? 'کاتالوگ مشترک', when(entry.createdAt)]}
                   />
-                  <ProductDecisionForm productId={entry.id} version={entry.version} />
-                  <ProductMergeForm
-                    productId={entry.id}
-                    version={entry.version}
-                    targets={targets
-                      .filter((target) => target.id !== entry.id)
-                      .map((target) => ({
-                        value: target.id,
-                        label: target.nameFa + (target.barcode ? ' — ' + target.barcode : ''),
-                      }))}
-                  />
-                </div>
+                  <Panel title="مشخصات کالا">
+                    <KeyValueList
+                      twoCol
+                      rows={[
+                        {
+                          key: 'بارکد',
+                          value: entry.barcode ? (
+                            <bdi className="hz-id" dir="ltr">
+                              {entry.barcode}
+                            </bdi>
+                          ) : null,
+                        },
+                        {
+                          key: 'تنوع‌ها',
+                          value: detail.variants.length === 0 ? 'تک‌نوع' : detail.variants.map((variant) => variant.labelFa).join('، '),
+                          testId: 'catalog-variants-' + entry.id,
+                        },
+                        { key: 'مناسب برای', value: detail.speciesCodes.join('، ') || null },
+                      ]}
+                    />
+                  </Panel>
+                  <Panel title="تصویرها" count={detail.media.length.toLocaleString('fa-IR')}>
+                    {detail.media.length === 0 ? (
+                      <p className="text-body-sm text-text-secondary">تصویری بارگذاری نشده است.</p>
+                    ) : (
+                      <div className="hz-desk__docs">
+                        {detail.media.map((image) => (
+                          <DocFrame key={image.id} href={'/api/files/' + image.fileId} label={image.altFa} />
+                        ))}
+                      </div>
+                    )}
+                  </Panel>
+                  <Panel title="تصمیم">
+                    <ProductDecisionForm productId={entry.id} version={entry.version} />
+                    <ProductMergeForm
+                      productId={entry.id}
+                      version={entry.version}
+                      targets={targets
+                        .filter((target) => target.id !== entry.id)
+                        .map((target) => ({
+                          value: target.id,
+                          label: target.nameFa + (target.barcode ? ' — ' + target.barcode : ''),
+                        }))}
+                    />
+                    <DeskVersionNote version={entry.version} />
+                  </Panel>
+                </CaseDrawer>
               </CaseItem>
             );
           })}

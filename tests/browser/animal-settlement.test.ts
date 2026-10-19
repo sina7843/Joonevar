@@ -461,10 +461,10 @@ test('the refund is owed until a provider pays it, and then it says who did', as
     assert.match(await page.getByTestId('refund-policy-note').innerText(), /شماره پیگیری/);
 
     const refundId = await page
-      .locator('[data-testid^="retry-refund-button-"]')
+      .locator('[data-testid^="open-refund-"]')
       .first()
       .getAttribute('data-testid');
-    const id = refundId!.replace('retry-refund-button-', '');
+    const id = refundId!.replace('open-refund-', '');
     assert.equal(await page.getByTestId('refund-status-' + id).innerText(), 'در جریان');
     await page.screenshot({ path: path.join(SHOTS, 'refund-queue-desktop.png'), fullPage: true });
 
@@ -474,6 +474,7 @@ test('the refund is owed until a provider pays it, and then it says who did', as
      * that form's success message — with it. Asserted on the resulting state
      * rather than on a toast that is gone by the time the page re-renders.
      */
+    await page.getByTestId('open-refund-' + id).click();
     await page.getByTestId('retry-refund-button-' + id).click();
     await page.getByTestId('refund-status-' + id).waitFor({ state: 'detached' });
 

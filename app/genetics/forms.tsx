@@ -44,9 +44,9 @@ export function ReceiptReviewForm({ receiptId, version }: { receiptId: string; v
       audience="به پرداخت‌کننده نمایش داده می‌شود"
       drafts={['تصویر فیش خوانا نیست', 'مبلغ فیش با هزینه مطابقت ندارد']}
       choices={[
-        { value: 'APPROVED', label: 'تأیید فیش', desc: 'دستور ارسال نمونه‌های این فیش برای دامپزشک نگهدارنده صادر می‌شود.', testId: 'receipt-decision-APPROVED' },
+        { value: 'APPROVED', label: 'تأیید', desc: 'دستور ارسال نمونه‌های این فیش برای دامپزشک نگهدارنده صادر می‌شود.', testId: 'receipt-decision-APPROVED' },
         { value: 'NEEDS_CORRECTION', label: 'نیازمند اصلاح', desc: 'فیش با دلیل به پرداخت‌کننده برمی‌گردد.', testId: 'receipt-decision-NEEDS_CORRECTION' },
-        { value: 'REJECTED', label: 'رد فیش', desc: 'فیش با دلیل بسته می‌شود.', testId: 'receipt-decision-REJECTED' },
+        { value: 'REJECTED', label: 'رد', desc: 'فیش با دلیل بسته می‌شود.', testId: 'receipt-decision-REJECTED' },
       ]}
     />
   );

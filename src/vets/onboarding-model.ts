@@ -40,7 +40,7 @@ export const DOCUMENT_KIND_FA: Record<VetDocumentKind, string> = {
 
 export const REVIEW_DECISION_FA: Record<ReviewDecision, string> = {
   APPROVE: 'تأیید',
-  REQUEST_CORRECTION: 'درخواست اصلاح',
+  REQUEST_CORRECTION: 'نیازمند اصلاح',
   REJECT: 'رد',
 };
 

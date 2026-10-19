@@ -330,6 +330,7 @@ async function pedigreedAnimal(
 
   await centre.goto(BASE_URL + '/genetics/results', { waitUntil: 'load' });
   const resultRow = centre.locator('[data-testid="processing-list"] > li').filter({ hasText: trackingCode });
+  await resultRow.getByTestId('open-result-case').click();
   await resultRow.getByTestId('result-note').fill('پردازش استاندارد.');
   await resultRow.getByTestId('submit-result').click();
   await expectText(centre, 'نتیجه نهایی ثبت شد');

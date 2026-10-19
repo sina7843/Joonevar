@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 import {
   decideAppeal,
   decideListingReports,
@@ -43,7 +43,7 @@ export async function submitMarketReportAction(
     });
     return { ok: true, message: 'گزارش شما ثبت شد و بررسی می‌شود. نام شما به فروشنده گفته نمی‌شود.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -68,7 +68,7 @@ export async function decideListingReportsAction(
       message: 'تصمیم ثبت شد و ' + result.closed.toLocaleString('fa-IR') + ' گزارش بسته شد.',
     };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -88,7 +88,7 @@ export async function submitAppealAction(
     revalidatePath('/account/listings');
     return { ok: true, message: 'اعتراض شما ثبت شد و بررسی می‌شود.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -108,7 +108,7 @@ export async function decideAppealAction(
     revalidatePath('/market/listings');
     return { ok: true, message: 'پاسخ اعتراض ثبت شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -134,7 +134,7 @@ export async function startPromotionAction(
     revalidatePath('/account/listings/' + listingId);
     return { ok: true, message: 'بسته تبلیغ ثبت شد؛ از صفحه پرداخت‌ها آن را پرداخت کنید.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -164,7 +164,7 @@ export async function decideMessageReportAction(
       message: result.hidden ? 'پیام پنهان شد و گزارش بسته شد.' : 'گزارش بدون اقدام بسته شد.',
     };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

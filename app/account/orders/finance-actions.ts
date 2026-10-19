@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { env } from '../../../src/config/env.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { AppError, validation } from '../../../src/domain/errors.ts';
+import { AppError, staleOf, validation } from '../../../src/domain/errors.ts';
 import { addReturnEvidence, moveReturn, requestReturn, publishReturnPolicy } from '../../../src/commerce/returns.ts';
 import { moveBatch, openSettlementBatch, recordOperatorEntry, requestCadence } from '../../../src/commerce/ledger.ts';
 import type { ReturnStatus, ReturnedCondition } from '../../../src/commerce/fulfilment-model.ts';
@@ -30,7 +30,7 @@ function count(form: FormData, key: string): number {
 }
 
 const failure = (error: unknown): FinanceFormState => {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 };
 

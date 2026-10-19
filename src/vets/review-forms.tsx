@@ -113,22 +113,3 @@ export function ReviewPanel({ review, isSuperadmin }: { review: ReviewPanelState
   );
 }
 
-/**
- * An inline preview of a private document. Nothing loads until the reviewer opens
- * it, so the audited view records an actual look. The file route answers with a
- * sandboxing policy and refuses framing by any other site.
- */
-export function DocumentPreview({ fileId, labelFa, testId }: { fileId: string; labelFa: string; testId: string }) {
-  return (
-    <details className="rounded-lg border border-border-default p-sm" data-testid={testId}>
-      <summary className="cursor-pointer text-label-md">{'پیش‌نمایش ' + labelFa}</summary>
-      <iframe
-        src={'/api/files/' + fileId}
-        title={'پیش‌نمایش ' + labelFa}
-        loading="lazy"
-        referrerPolicy="no-referrer"
-        className="mt-sm h-[28rem] w-full rounded-sm bg-surface-subtle"
-      />
-    </details>
-  );
-}

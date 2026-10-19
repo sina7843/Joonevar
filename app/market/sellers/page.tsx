@@ -1,7 +1,8 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, DocFrame, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
@@ -87,38 +88,44 @@ export default async function SellerReviewPage() {
                 ownerLabel="بررسی فروشندگان"
                 ownerIsUs
               >
-                <div className="space-y-md">
-                  <KeyValueList
-                    twoCol
-                    rows={[
-                      {
-                        key: 'شناسه ملی',
-                        value: detail.seller.nationalIdentifier ? (
-                          <bdi className="hz-id" dir="ltr">
-                            {detail.seller.nationalIdentifier}
-                          </bdi>
-                        ) : null,
-                      },
-                      {
-                        key: 'حساب تسویه',
-                        testId: 'seller-iban-' + entry.id,
-                        value: (
-                          <>
-                            <bdi className="hz-id" dir="ltr">
-                              {detail.maskedIban ?? '—'}
-                            </bdi>
-                            {entry.ibanVerifiedAt ? ' — تأییدشده' : ' — تأیید نشده'}
-                          </>
-                        ),
-                      },
-                      { key: 'مجوز اعلام‌شده', value: detail.seller.licenceKindFa ?? 'اعلام نشده' },
-                      { key: 'نشانی', value: detail.placeFa },
-                    ]}
+                <CaseDrawer title="پرونده فروشنده کالا" testId={'open-seller-' + entry.id}>
+                  <DeskHead
+                    title={entry.displayNameFa}
+                    status={keyStatus(status)}
+                    meta={[SELLER_KIND_FA[entry.kind as SellerKind], entry.legalNameFa ?? '—', 'ارسال: ' + when(entry.submittedAt)]}
                   />
-
-                  <div className="space-y-sm">
+                  <Panel title="مشخصات کسب‌وکار">
+                    <KeyValueList
+                      twoCol
+                      rows={[
+                        {
+                          key: 'شناسه ملی',
+                          value: detail.seller.nationalIdentifier ? (
+                            <bdi className="hz-id" dir="ltr">
+                              {detail.seller.nationalIdentifier}
+                            </bdi>
+                          ) : null,
+                        },
+                        {
+                          key: 'حساب تسویه',
+                          testId: 'seller-iban-' + entry.id,
+                          value: (
+                            <>
+                              <bdi className="hz-id" dir="ltr">
+                                {detail.maskedIban ?? '—'}
+                              </bdi>
+                              {entry.ibanVerifiedAt ? ' — تأییدشده' : ' — تأیید نشده'}
+                            </>
+                          ),
+                        },
+                        { key: 'مجوز اعلام‌شده', value: detail.seller.licenceKindFa ?? 'اعلام نشده' },
+                        { key: 'نشانی', value: detail.placeFa },
+                      ]}
+                    />
+                  </Panel>
+                  <Panel title="مدارک" count={detail.documents.length.toLocaleString('fa-IR')} aside={<PrivateNote />}>
                     {detail.documents.length > 0 ? (
-                      <div className="grid gap-md sm:grid-cols-2 lg:grid-cols-3" data-testid={'seller-docs-' + entry.id}>
+                      <div className="hz-desk__docs" data-testid={'seller-docs-' + entry.id}>
                         {detail.documents.map((document) => (
                           <DocFrame
                             key={document.id}
@@ -132,11 +139,15 @@ export default async function SellerReviewPage() {
                     ) : (
                       <p className="text-caption text-text-secondary">مدرکی بارگذاری نشده است.</p>
                     )}
-                  </div>
-
-                  <VerifyIbanForm sellerId={entry.id} />
-                  <SellerDecisionForm sellerId={entry.id} version={entry.version} />
-                </div>
+                  </Panel>
+                  <Panel title="مالکیت حساب تسویه">
+                    <VerifyIbanForm sellerId={entry.id} />
+                  </Panel>
+                  <Panel title="تصمیم">
+                    <SellerDecisionForm sellerId={entry.id} version={entry.version} />
+                    <DeskVersionNote version={entry.version} />
+                  </Panel>
+                </CaseDrawer>
               </CaseItem>
             );
           })}

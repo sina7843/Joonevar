@@ -4,7 +4,8 @@ import { eq } from 'drizzle-orm';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, whenFa } from '../../../../src/ui/desk.tsx';
+import { CaseAge, CaseHistory, Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, deskPosition, whenFa } from '../../../../src/ui/desk.tsx';
+import { auditSteps, historyFromAudit } from '../../audit-history.ts';
 import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
@@ -14,6 +15,7 @@ import { animals } from '../../../../src/db/schema/animals.ts';
 import { pedigreeIssuers } from '../../../../src/db/schema/core.ts';
 import {
   foreignCaseById,
+  foreignQueueIds,
   FOREIGN_STATUS_FA,
   type ForeignPedigreeStatus,
 } from '../../../../src/animals/foreign-pedigree.ts';
@@ -21,6 +23,11 @@ import { generationLabel } from '../../../../src/domain/lineage.ts';
 import { ForeignReviewForm } from '../review-form.tsx';
 
 export const dynamic = 'force-dynamic';
+
+const HISTORY_FA: Record<string, string> = {
+  FOREIGN_PEDIGREE_SUBMITTED: 'ارسال برای بررسی',
+  FOREIGN_PEDIGREE_REVIEWED: 'تصمیم انجمن',
+};
 
 /**
  * Case detail (§21.5): data and permitted documents → history → action.
@@ -44,21 +51,28 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
     );
   }
 
-  const [animal] = await db().select().from(animals).where(eq(animals.id, record.animalId));
+  const [[animal], steps, queueIds] = await Promise.all([
+    db().select().from(animals).where(eq(animals.id, record.animalId)),
+    auditSteps('FOREIGN_PEDIGREE_CASE', record.id),
+    foreignQueueIds(db(), guard.actor),
+  ]);
   const [issuer] = record.issuerId
     ? await db().select().from(pedigreeIssuers).where(eq(pedigreeIssuers.id, record.issuerId))
     : [];
 
   const status = record.status as ForeignPedigreeStatus;
   const open = status === 'UNDER_REVIEW';
+  const firstSubmittedAt = steps.filter((step) => step.action === 'FOREIGN_PEDIGREE_SUBMITTED').at(-1)?.at ?? record.submittedAt;
   return (
     <OpsShell actor={guard.actor} title="بررسی Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
       <DeskHead
         title={'Export Pedigree · ' + (animal?.name ?? 'بدون نام')}
         status={keyStatus(status)}
+        position={deskPosition(queueIds, record.id, (caseId) => '/assoc/foreign-pedigree/' + caseId)}
         meta={[
           record.documentCode ? <Identifier label="کد مدرک" value={record.documentCode} /> : null,
           'ارسال: ' + (whenFa(record.submittedAt) ?? '—'),
+          open && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null,
           'نسخه ' + record.version.toLocaleString('fa-IR'),
         ]}
         owner={open ? 'ASSOCIATION' : status === 'NEEDS_CORRECTION' ? 'USER' : null}
@@ -111,6 +125,9 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
               { key: 'وضعیت', value: FOREIGN_STATUS_FA[status], testId: 'foreign-case-status' },
             ]}
           />
+        </Panel>
+        <Panel title="سابقه پرونده">
+          <CaseHistory entries={historyFromAudit(steps, HISTORY_FA, open)} />
         </Panel>
       </Desk>
     </OpsShell>

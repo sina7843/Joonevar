@@ -150,10 +150,12 @@ test('a reviewer publishes it, and only then can it be offered and priced', asyn
     await page.getByTestId('catalog-queue').waitFor();
     assert.match(await page.getByTestId('catalog-blocked-note').innerText(), /دارو/);
 
+    // The row only opens the case; the desk (facts and decision) is in a Drawer.
     const productId = (await page
-      .locator('[data-testid^="product-decision-select-"]')
+      .locator('[data-testid^="open-product-"]')
       .first()
-      .getAttribute('data-testid'))!.replace('product-decision-select-', '');
+      .getAttribute('data-testid'))!.replace('open-product-', '');
+    await page.getByTestId('open-product-' + productId).click();
     assert.match(await page.getByTestId('catalog-variants-' + productId).innerText(), /۲ کیلو/);
 
     await page.screenshot({ path: path.join(SHOTS, 'catalog-review-desktop.png'), fullPage: true });

@@ -204,9 +204,10 @@ test('a reviewer verifies the account, approves, and the store still does not tr
     assert.match(await page.getByTestId('seller-review-note').innerText(), /پرداخت تأییدشده/);
 
     const sellerId = (await page
-      .locator('[data-testid^="seller-decision-select-"]')
+      .locator('[data-testid^="open-seller-"]')
       .first()
-      .getAttribute('data-testid'))!.replace('seller-decision-select-', '');
+      .getAttribute('data-testid'))!.replace('open-seller-', '');
+    await page.getByTestId('open-seller-' + sellerId).click();
 
     // The settlement account is masked on the queue, never shown whole.
     const iban = await page.getByTestId('seller-iban-' + sellerId).innerText();
@@ -218,11 +219,13 @@ test('a reviewer verifies the account, approves, and the store still does not tr
     await expectText(page, 'مالکیت حساب تسویه تأیید و ثبت شد');
 
     await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+    await page.getByTestId('open-seller-' + sellerId).click();
     await page.getByTestId('seller-decision-select-' + sellerId).selectOption('UNDER_REVIEW');
     await page.getByTestId('seller-decide-' + sellerId).click();
     await expectText(page, 'تصمیم ثبت شد');
 
     await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+    await page.getByTestId('open-seller-' + sellerId).click();
     await page.getByTestId('seller-decision-select-' + sellerId).selectOption('APPROVED');
     await page.getByTestId('seller-decide-' + sellerId).click();
     await expectText(page, 'تصمیم ثبت شد');

@@ -11,7 +11,7 @@
  * the existing scoped ASSOCIATION_OPERATOR permission is reused rather than a
  * new role or a new product gate being invented (DEC-0027).
  */
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { kycCases } from '../db/schema/identity.ts';
 import { accounts, storedFiles } from '../db/schema/core.ts';
@@ -281,6 +281,17 @@ export async function kycQueue(
     });
   }
   return pageOf(items, Number(counted?.total ?? 0), request);
+}
+
+/** Ids of the open queue, oldest submission first — the desk's «پرونده ۲ از ۴» and previous/next. */
+export async function kycQueueIds(database: DbClient, actor: Actor): Promise<string[]> {
+  if (actor.context !== 'ASSOCIATION_OPERATOR') return [];
+  const rows = await database
+    .select({ id: kycCases.id })
+    .from(kycCases)
+    .where(eq(kycCases.status, 'UNDER_REVIEW'))
+    .orderBy(asc(kycCases.submittedAt), asc(kycCases.id));
+  return rows.map((row) => row.id);
 }
 
 /**

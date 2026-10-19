@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { createVisitRequests, renewReferral } from '../../src/vets/visits.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 import type { VisitContextName } from '../../src/domain/referral.ts';
 import { parseSelection } from './selection.ts';
 
@@ -22,7 +22,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): FormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

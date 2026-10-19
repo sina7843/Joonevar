@@ -1,7 +1,9 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import Link from 'next/link';
+import { CaseItem, CaseList, DeskHead, DeskVersionNote, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -92,24 +94,44 @@ export default async function ListingModerationPage() {
                 ownerLabel="ناظر آگهی"
                 ownerIsUs
               >
-                <div className="space-y-sm">
-                  <ul className="hz-tag-list flex flex-wrap gap-xs" data-testid={'queue-reasons-' + entry.listingId}>
-                    {entry.reasonsFa.map((reason) => (
-                      <li key={reason}>
-                        <span className="hz-tag hz-tag--neutral">{REASON_FA[reason as ReportReason] ?? reason}</span>
+                <CaseDrawer title="پرونده گزارش آگهی" testId={'open-listing-' + entry.listingId}>
+                  <DeskHead
+                    title={entry.titleFa}
+                    status={keyStatus(entry.status)}
+                    meta={[
+                      <>
+                        {'فروشنده: '}
+                        <bdi dir="ltr">{entry.sellerMobile}</bdi>
+                      </>,
+                      'نخستین گزارش: ' + when(entry.firstReportedAt),
+                    ]}
+                  >
+                    <Link href={'/animals-market/' + entry.listingId} className="hz-link hz-link--standalone">
+                      دیدن آگهی
+                    </Link>
+                  </DeskHead>
+                  <Panel title="دلیل‌ها و نشانه‌ها">
+                    <ul className="hz-tag-list flex flex-wrap gap-xs" data-testid={'queue-reasons-' + entry.listingId}>
+                      {entry.reasonsFa.map((reason) => (
+                        <li key={reason}>
+                          <span className="hz-tag hz-tag--neutral">{REASON_FA[reason as ReportReason] ?? reason}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <ul className="flex flex-wrap items-center gap-md text-caption text-text-secondary" data-testid={'queue-signals-' + entry.listingId}>
+                      <li className={entry.signals.openReports >= 3 ? 'hz-report__count hz-report__count--high' : 'hz-report__count'}>
+                        {'گزارش باز: ' + fa(entry.signals.openReports)}
                       </li>
-                    ))}
-                  </ul>
-                  <ul className="flex flex-wrap items-center gap-md text-caption text-text-secondary" data-testid={'queue-signals-' + entry.listingId}>
-                    <li className={entry.signals.openReports >= 3 ? 'hz-report__count hz-report__count--high' : 'hz-report__count'}>
-                      {'گزارش باز: ' + fa(entry.signals.openReports)}
-                    </li>
-                    <li>{'گزارش‌دهنده متمایز: ' + fa(entry.signals.openReporters)}</li>
-                    {entry.signals.sellerRestrictedBefore ? <li>سابقه محدودیت فروشنده</li> : null}
-                    {entry.signals.sellerSuspendedBefore ? <li>سابقه اقدام روی این فروشنده</li> : null}
-                  </ul>
-                  <ListingDecisionForm listingId={entry.listingId} listingVersion={versions.get(entry.listingId) ?? 1} />
-                </div>
+                      <li>{'گزارش‌دهنده متمایز: ' + fa(entry.signals.openReporters)}</li>
+                      {entry.signals.sellerRestrictedBefore ? <li>سابقه محدودیت فروشنده</li> : null}
+                      {entry.signals.sellerSuspendedBefore ? <li>سابقه اقدام روی این فروشنده</li> : null}
+                    </ul>
+                  </Panel>
+                  <Panel title="تصمیم">
+                    <ListingDecisionForm listingId={entry.listingId} listingVersion={versions.get(entry.listingId) ?? 1} />
+                    <DeskVersionNote version={versions.get(entry.listingId) ?? 1} />
+                  </Panel>
+                </CaseDrawer>
               </CaseItem>
             ))}
           </CaseList>
@@ -138,7 +160,15 @@ export default async function ListingModerationPage() {
                 ownerLabel="ناظر آگهی"
                 ownerIsUs
               >
-                <AppealDecisionForm appealId={appeal.id} />
+                <CaseDrawer title="پرونده اعتراض فروشنده" testId={'open-appeal-' + appeal.id}>
+                  <DeskHead title={appeal.listingTitleFa ?? 'آگهی'} status={keyStatus('SUBMITTED')} meta={[when(appeal.createdAt)]} />
+                  <Panel title="متن اعتراض">
+                    <p className="text-body-sm">{appeal.statementFa}</p>
+                  </Panel>
+                  <Panel title="پاسخ">
+                    <AppealDecisionForm appealId={appeal.id} />
+                  </Panel>
+                </CaseDrawer>
               </CaseItem>
             ))}
           </CaseList>

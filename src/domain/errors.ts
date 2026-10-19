@@ -107,3 +107,18 @@ export function toErrorBody(error: unknown): { status: number; body: ErrorBody }
   }
   return { status: 500, body: { error: { code: 'INTERNAL', message: 'Unexpected server error' } } };
 }
+
+/**
+ * Whether a failure means "someone changed this record since you opened it"
+ * (DS DecisionDesk › Stale). Form states spread the result, so a desk can show
+ * the stale alert with «بارگذاری دوباره» instead of a red error.
+ *
+ * ponytail: services still raise most version races as CONFLICT with a
+ * «هم‌زمان / در این فاصله تغییر کرده» message, and tests pin that code; the
+ * message match bridges them until they all raise VERSION_STALE.
+ */
+export function staleOf(error: AppError): { stale?: true } {
+  if (error.code === 'VERSION_STALE') return { stale: true };
+  if (error.code === 'CONFLICT' && /هم‌زمان تغییر کرده|در این فاصله تغییر کرده/.test(error.message)) return { stale: true };
+  return {};
+}

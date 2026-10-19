@@ -7,7 +7,7 @@ import { db } from '../db/client.ts';
 import { env } from '../config/env.ts';
 import { guardRoute } from '../authz/guard.ts';
 import { currentSmsSender } from '../adapters/current.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { acceptTerms, cancelRequest, createRequest, markNotCompleted, proposeTerms, REQUESTS_ROUTE, respondToRequest, setContactConsent } from './requests.ts';
 import { blockConversation, postMessage } from './conversation.ts';
 import { cancelContract, confirmContract, editContract, ensureContractPdf, publishTemplate, requestContractCode, startContract } from './contracts.ts';
@@ -36,7 +36,7 @@ async function run(requestId: string, work: () => Promise<string | RequestFormSt
     if (requestId) revalidatePath(REQUESTS_ROUTE + '/' + requestId);
     return typeof result === 'string' ? { ok: true, message: result } : result;
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -63,7 +63,7 @@ export async function createRequestAction(_p: RequestFormState, form: FormData):
     });
     id = row.id;
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
   redirect(REQUESTS_ROUTE + '/' + id);
@@ -210,7 +210,7 @@ export async function publishTemplateAction(_p: RequestFormState, form: FormData
     revalidatePath('/admin/mating-finder');
     return { ok: true, message: 'قالب نسخه ' + row.version.toLocaleString('fa-IR') + ' منتشر شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

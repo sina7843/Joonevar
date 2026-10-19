@@ -16,7 +16,7 @@ export function PermitReviewForm({ permitId, version }: { permitId: string; vers
       reasonFor={['NEEDS_CORRECTION', 'REJECTED']}
       reasonLabel={(value) => (value === 'REJECTED' ? 'دلیل رد' : 'دلیل اصلاح')}
       choices={[
-        { value: 'ISSUED', label: 'صدور مجوز رسمی جفت‌گیری', desc: 'شماره مجوز یک‌بار ساخته می‌شود و برای هر دو طرف ثبت می‌شود.', testId: 'permit-decision-ISSUED' },
+        { value: 'ISSUED', label: 'تأیید', desc: 'مجوز رسمی جفت‌گیری صادر می‌شود؛ شماره مجوز یک‌بار ساخته و برای هر دو طرف ثبت می‌شود.', testId: 'permit-decision-ISSUED' },
         { value: 'NEEDS_CORRECTION', label: 'نیازمند اصلاح', desc: 'پرونده با دلیل به درخواست‌کننده برمی‌گردد.', testId: 'permit-decision-NEEDS_CORRECTION' },
         { value: 'REJECTED', label: 'رد', desc: 'پرونده با دلیل بسته می‌شود.', testId: 'permit-decision-REJECTED' },
       ]}

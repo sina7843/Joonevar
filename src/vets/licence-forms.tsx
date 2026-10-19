@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
-import { FileField, TextAreaField, TextField } from '../ui/field.tsx';
+import { FileField, TextField } from '../ui/field.tsx';
 import { Check, PlacePicker, Result, type CityOption, type Option } from './directory-forms.tsx';
-import { LICENCE_DECISIONS, LICENCE_DECISION_FA, MAX_CERTIFICATES, type LicenceDecision } from './professional-profile-model.ts';
+import { LICENCE_DECISIONS, LICENCE_DECISION_DESC_FA, LICENCE_DECISION_FA, MAX_CERTIFICATES } from './professional-profile-model.ts';
+import { DecisionForm } from '../ui/decision.tsx';
 import { decideLicenceCaseAction, reviseLicenceApplicationAction, submitLicenceApplicationAction, type LicenceState } from './licence-actions.ts';
 
 const EMPTY: LicenceState = {};
@@ -171,36 +172,26 @@ export function LicenceApplicationForm({
   );
 }
 
-/** The association admin's decision on licence documents. Every decision carries a reason. */
+/**
+ * The association admin's decision on licence documents (DS P10 panel).
+ * The decision service still requires a reason for every outcome (approval
+ * included), so the reason is asked for all three; the consequence sits under
+ * each label (DS DecisionDesk).
+ */
 export function DecideLicenceCaseForm({ caseId, version }: { caseId: string; version: number }) {
-  const [state, submit, pending] = useActionState(decideLicenceCaseAction, EMPTY);
-  const [decision, setDecision] = useState<LicenceDecision>('APPROVE');
   return (
-    <form action={submit} className="space-y-lg" data-testid="licence-decision-form">
-      <input type="hidden" name="caseId" value={caseId} />
-      <input type="hidden" name="expectedVersion" value={version} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">نتیجه بررسی</legend>
-        {LICENCE_DECISIONS.map((value) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
-            <input
-              type="radio"
-              name="decision"
-              value={value}
-              checked={decision === value}
-              onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
-              data-testid={'licence-decision-' + value}
-            />
-            {LICENCE_DECISION_FA[value]}
-          </label>
-        ))}
-      </fieldset>
-      <TextAreaField label="دلیل" name="reasonFa" required rows={3} maxLength={1000} hint="دلیل برای متقاضی نمایش داده می‌شود." data-testid="licence-decision-reason" />
-      <Button type="submit" disabled={pending} data-testid="submit-licence-decision">
-        {pending ? 'در حال ثبت…' : 'ثبت نتیجه'}
-      </Button>
-      <Result state={state} testId="licence-decision-result" />
-    </form>
+    <DecisionForm
+      action={decideLicenceCaseAction}
+      hidden={{ caseId, expectedVersion: version }}
+      formTestId="licence-decision-form"
+      submitTestId="submit-licence-decision"
+      reasonName="reasonFa"
+      reasonTestId="licence-decision-reason"
+      reasonFor={LICENCE_DECISIONS}
+      reasonLabel={(value) => (value === 'REJECT' ? 'دلیل رد' : value === 'REQUEST_CORRECTION' ? 'دلیل اصلاح' : 'دلیل تأیید')}
+      audience="به متقاضی نمایش داده می‌شود"
+      drafts={['تصویر پروانه خوانا نیست', 'تاریخ یا شماره پروانه با مدرک نمی‌خواند']}
+      choices={LICENCE_DECISIONS.map((value) => ({ value, label: LICENCE_DECISION_FA[value], desc: LICENCE_DECISION_DESC_FA[value], testId: 'licence-decision-' + value }))}
+    />
   );
 }

@@ -4,8 +4,9 @@ import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
 import { FileField, SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { DecisionForm } from '../ui/decision.tsx';
 import { Check, PlacePicker, Result, submitWith, type CityOption, type Option } from '../vets/directory-forms.tsx';
-import { REVIEW_DECISIONS, REVIEW_DECISION_FA } from '../vets/onboarding-model.ts';
+import { REVIEW_DECISIONS, type ReviewDecision } from '../vets/onboarding-model.ts';
 import { CLAIM_DOCUMENT_KINDS, CLAIM_DOCUMENT_KIND_FA, SUGGESTION_KINDS, SUGGESTION_KIND_FA } from './model.ts';
 import {
   appealCentreClaimAction,
@@ -158,54 +159,43 @@ export function WithdrawSuggestionForm({ suggestionId, version }: { suggestionId
   );
 }
 
-/** Stays mounted after the decision, so the recorded outcome is still shown (DEC-0165 pattern). */
-export function SuggestionDecisionForm({ suggestionId, version, open }: { suggestionId: string; version: number; open: boolean }) {
-  const [state, submit, pending] = useActionState(decideSuggestionAction, EMPTY);
-  if (!open) {
-    return (
-      <Card>
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
-        <div className="mt-md">
-          <Result state={state} testId="suggestion-decision-result" />
-        </div>
-        <p className="mt-sm text-body-sm text-text-secondary">این پیشنهاد در انتظار بررسی نیست.</p>
-      </Card>
-    );
-  }
+const REASON_LABEL = (value: ReviewDecision): string => (value === 'APPROVE' ? 'یادداشت تأیید' : value === 'REJECT' ? 'دلیل رد' : 'دلیل اصلاح');
+
+/**
+ * DS DecisionDesk decision panel for an open suggestion; the page shows the
+ * recorded outcome once it is decided. The service asks a reason for every
+ * outcome, so the reason follows each choice; approving also needs the
+ * not-a-duplicate confirmation.
+ */
+export function SuggestionDecisionForm({ suggestionId, version }: { suggestionId: string; version: number }) {
   return (
-    <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
-      <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="suggestion-decision-form">
-        <input type="hidden" name="suggestionId" value={suggestionId} />
-        <input type="hidden" name="expectedVersion" value={version} />
-        <Result state={state} testId="suggestion-decision-result" />
-        <SelectField
-          label="تصمیم"
-          name="decision"
-          required
-          options={REVIEW_DECISIONS.map((value) => ({ value, label: REVIEW_DECISION_FA[value] }))}
-          data-testid="suggestion-decision"
-        />
-        <TextAreaField
-          label="دلیل"
-          name="reasonFa"
-          rows={3}
-          required
-          maxLength={1000}
-          hint="برای پیشنهاددهنده نمایش داده و در تاریخچه ثبت می‌شود."
-          data-testid="suggestion-decision-reason"
-        />
-        <Check
-          name="confirmedNotDuplicate"
-          label="رکوردهای مشابه را دیدم و این مورد تکراری نیست"
-          defaultChecked={false}
-          testId="suggestion-decision-confirm"
-        />
-        <Button type="submit" disabled={pending} data-testid="submit-suggestion-decision">
-          ثبت تصمیم
-        </Button>
-      </form>
-    </Card>
+    <DecisionForm
+      action={decideSuggestionAction}
+      hidden={{ suggestionId, expectedVersion: version }}
+      formTestId="suggestion-decision-form"
+      submitTestId="submit-suggestion-decision"
+      reasonName="reasonFa"
+      reasonTestId="suggestion-decision-reason"
+      reasonFor={REVIEW_DECISIONS}
+      reasonLabel={REASON_LABEL}
+      audience="به پیشنهاددهنده نمایش داده می‌شود"
+      choices={[
+        { value: 'APPROVE', label: 'تأیید', desc: 'رکورد با برچسب «بدون مالک» منتشر می‌شود.', testId: 'suggestion-decision-APPROVE' },
+        { value: 'REQUEST_CORRECTION', label: 'نیازمند اصلاح', desc: 'پیشنهاد با دلیل به پیشنهاددهنده برمی‌گردد.', testId: 'suggestion-decision-REQUEST_CORRECTION' },
+        { value: 'REJECT', label: 'رد', desc: 'پیشنهاد با دلیل بسته می‌شود.', testId: 'suggestion-decision-REJECT' },
+      ]}
+    >
+      {(value) =>
+        value === 'APPROVE' ? (
+          <Check
+            name="confirmedNotDuplicate"
+            label="رکوردهای مشابه را دیدم و این مورد تکراری نیست"
+            defaultChecked={false}
+            testId="suggestion-decision-confirm"
+          />
+        ) : null
+      }
+    </DecisionForm>
   );
 }
 
@@ -351,46 +341,24 @@ export function AppealCentreClaimForm({ claimId, version }: { claimId: string; v
   );
 }
 
-export function CentreClaimDecisionForm({ claimId, version, open }: { claimId: string; version: number; open: boolean }) {
-  const [state, submit, pending] = useActionState(decideCentreClaimAction, EMPTY);
-  if (!open) {
-    return (
-      <Card>
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
-        <div className="mt-md">
-          <Result state={state} testId="claim-decision-result" />
-        </div>
-        <p className="mt-sm text-body-sm text-text-secondary">این درخواست در انتظار بررسی نیست.</p>
-      </Card>
-    );
-  }
+/** DS DecisionDesk decision panel for an open centre claim; the page shows the recorded outcome once decided. */
+export function CentreClaimDecisionForm({ claimId, version }: { claimId: string; version: number }) {
   return (
-    <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
-      <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="claim-decision-form">
-        <input type="hidden" name="claimId" value={claimId} />
-        <input type="hidden" name="expectedVersion" value={version} />
-        <Result state={state} testId="claim-decision-result" />
-        <SelectField
-          label="تصمیم"
-          name="decision"
-          required
-          options={REVIEW_DECISIONS.map((value) => ({ value, label: REVIEW_DECISION_FA[value] }))}
-          data-testid="claim-decision"
-        />
-        <TextAreaField
-          label="دلیل"
-          name="reasonFa"
-          rows={3}
-          required
-          maxLength={1000}
-          hint="برای درخواست‌دهنده نمایش داده و در تاریخچه ثبت می‌شود."
-          data-testid="claim-decision-reason"
-        />
-        <Button type="submit" disabled={pending} data-testid="submit-claim-decision">
-          ثبت تصمیم
-        </Button>
-      </form>
-    </Card>
+    <DecisionForm
+      action={decideCentreClaimAction}
+      hidden={{ claimId, expectedVersion: version }}
+      formTestId="claim-decision-form"
+      submitTestId="submit-claim-decision"
+      reasonName="reasonFa"
+      reasonTestId="claim-decision-reason"
+      reasonFor={REVIEW_DECISIONS}
+      reasonLabel={REASON_LABEL}
+      audience="به درخواست‌دهنده نمایش داده می‌شود"
+      choices={[
+        { value: 'APPROVE', label: 'تأیید', desc: 'مدیریت مرکز به درخواست‌دهنده سپرده می‌شود؛ تاریخچه مرکز می‌ماند.', testId: 'claim-decision-APPROVE' },
+        { value: 'REQUEST_CORRECTION', label: 'نیازمند اصلاح', desc: 'درخواست با دلیل به درخواست‌دهنده برمی‌گردد.', testId: 'claim-decision-REQUEST_CORRECTION' },
+        { value: 'REJECT', label: 'رد', desc: 'درخواست بسته می‌شود؛ درخواست‌دهنده یک‌بار می‌تواند تجدیدنظر بخواهد.', testId: 'claim-decision-REJECT' },
+      ]}
+    />
   );
 }

@@ -108,7 +108,7 @@ async function decide(page: Page, listPath: string, name: string, decision: stri
   await Promise.all([page.waitForURL((url) => /[0-9a-f-]{36}$/.test(url.pathname)), item.click()]);
   const prefix = listPath.includes('suggestions') ? 'suggestion' : 'claim';
   await page.getByTestId(prefix + '-decision-form').waitFor();
-  await page.getByTestId(prefix + '-decision').selectOption(decision);
+  await page.getByTestId(prefix + '-decision-' + decision).check();
   await page.getByTestId(prefix + '-decision-reason').fill(reason);
   await page.getByTestId('submit-' + prefix + '-decision').click();
   await waitForText(page, prefix + '-decision-result', expected);
@@ -193,11 +193,11 @@ test('a representative claims the centre with a document and takes over the same
     const item = page.locator('[data-testid^="claim-item-"]', { hasText: CENTRE_NAME });
     await item.waitFor();
     await Promise.all([page.waitForURL((url) => /[0-9a-f-]{36}$/.test(url.pathname)), item.click()]);
-    const document = await page.getByTestId('claim-document-CENTRE_LICENCE').getAttribute('href');
+    const document = await page.getByTestId('claim-document-CENTRE_LICENCE').getAttribute('src');
     const file = await page.request.get(BASE_URL + document!);
     assert.equal(file.status(), 200, 'the reviewer reads the licence');
     assert.equal(file.headers()['content-type'], 'image/png');
-    await page.getByTestId('claim-decision').selectOption('APPROVE');
+    await page.getByTestId('claim-decision-APPROVE').check();
     await page.getByTestId('claim-decision-reason').fill('SYNTHETIC پروانه با نام مرکز می‌خواند');
     await page.getByTestId('submit-claim-decision').click();
     await waitForText(page, 'claim-decision-result', 'سپرده شد');

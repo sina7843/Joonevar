@@ -8,9 +8,10 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { SearchField } from '../../../src/ui/search-field.tsx';
 import { SectionHeader } from '../../../src/ui/section-header.tsx';
 import { db } from '../../../src/db/client.ts';
-import { listSettingsForActor, type SettingRecord } from '../../../src/settings/service.ts';
+import { listSettingsForActor } from '../../../src/settings/service.ts';
 import { canWriteSettingGroup, type SettingGroupName } from '../../../src/authz/policy.ts';
 import { SettingForm } from './setting-form.tsx';
+import { displaySetting } from './display.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,14 +35,6 @@ const GROUP_FA: Record<SettingGroupName, string> = {
 };
 
 const fa = (value: number) => value.toLocaleString('fa-IR');
-
-function display(setting: SettingRecord): string {
-  if (!setting.configured) return 'تعیین‌نشده';
-  if (setting.kind === 'MONEY_TOMAN' && typeof setting.value === 'number') return fa(setting.value) + ' تومان';
-  if (setting.kind === 'INT' && typeof setting.value === 'number') return fa(setting.value);
-  if (setting.kind === 'BOOL') return setting.value === true ? 'فعال' : 'غیرفعال';
-  return typeof setting.value === 'string' ? setting.value : JSON.stringify(setting.value);
-}
 
 /**
  * Settings panel (§21.4, D15, D16) — DS P11 / K15: group nav, search and the
@@ -172,7 +165,7 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
                       </div>
                       <div className="hz-setting__end">
                         <span className={setting.configured ? 'hz-setting__value' : 'hz-setting__value hz-setting__value--unset'}>
-                          {display(setting)}
+                          {displaySetting(setting)}
                         </span>
                         <span className="text-caption text-text-secondary">{'نسخه ' + fa(setting.version)}</span>
                       </div>

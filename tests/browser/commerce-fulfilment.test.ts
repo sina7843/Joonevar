@@ -364,6 +364,7 @@ test('one item goes back, and only that one is refunded', async () => {
     await page.screenshot({ path: path.join(SHOTS, 'disputed-return-desktop.png'), fullPage: true });
 
     // The operator settles it: the goods are treated as received as sold.
+    await page.getByTestId('open-return-' + returnId).click();
     await page.getByTestId('ops-return-select-' + returnId).selectOption('RECEIVED');
     await page.getByTestId('ops-return-condition-' + returnId).selectOption('AS_SOLD');
     await page.getByTestId('ops-return-submit-' + returnId).click();
@@ -402,6 +403,8 @@ test('an operator gathers what is left, sends it, and writes down the bank’s r
     await page.goto(BASE_URL + '/market/settlement', { waitUntil: 'load' });
     assert.match(await page.getByTestId('settlement-manual-note').innerText(), /بیرون از همزیست انجام می‌شود/);
     await page.getByTestId('settlement-queue').waitFor();
+    // Each shop's row opens its desk in a Drawer.
+    await page.getByTestId('open-settlement-' + shop.sellerId).click();
 
     // The operator's own entry lives behind a disclosure, which has to be
     // opened before anything inside it can be used.
@@ -422,6 +425,7 @@ test('an operator gathers what is left, sends it, and writes down the bank’s r
       .waitFor();
 
     await page.goto(BASE_URL + '/market/settlement', { waitUntil: 'load' });
+    await page.getByTestId('open-settlement-' + shop.sellerId).click();
     await page.getByTestId('open-batch-' + shop.sellerId).click();
     // Once a batch exists the shop's row shows the batch instead of the
     // button, so the new state is what is waited for rather than a message
@@ -429,6 +433,7 @@ test('an operator gathers what is left, sends it, and writes down the bank’s r
     await page.locator('[data-testid^="batch-move-form-"]').first().waitFor();
 
     await page.goto(BASE_URL + '/market/settlement', { waitUntil: 'load' });
+    await page.getByTestId('open-settlement-' + shop.sellerId).click();
     const batchId = (await page
       .locator('[data-testid^="batch-move-form-"]')
       .first()
@@ -443,6 +448,7 @@ test('an operator gathers what is left, sends it, and writes down the bank’s r
 
     // A payment without the bank's reference is not a recorded payment.
     await page.goto(BASE_URL + '/market/settlement', { waitUntil: 'load' });
+    await page.getByTestId('open-settlement-' + shop.sellerId).click();
     await page.getByTestId('batch-move-select-' + batchId).selectOption('PAID');
     await page.getByTestId('batch-move-submit-' + batchId).click();
     await expectText(page, 'شماره پیگیری بانکی را وارد کنید');

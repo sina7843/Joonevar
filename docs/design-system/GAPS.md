@@ -22,3 +22,7 @@ Where the system lacks something, the closest existing part is used and the gap 
 | 16 | RadioCard as links (delivery method, vet path) | `/shop/cart`, `/account/vet-profile` | `.hz-option` links with `aria-current`. | DEC-0229 |
 | 17 | Sub-navigation for the mating-finder account area | `/account/mating-finder/*` | Scrolling chips. | DEC-0229 |
 | 18 | PlaceMap «list + map» with numbered pins | `/centers`, `/veterinarians` | Existing map embed kept; a tile provider is not chosen (DEC-0235, CMPB-123). | DEC-0235 |
+| 19 | Reason optional for «تأیید» (DecisionDesk) | vet, suggestion, claim, moderation desks | Reason stays required for every outcome: the services reject an empty reason, and relaxing that is a behaviour change. | DEC-0236 |
+| 20 | ReasonField internal note (`.hz-reason__add`) | all desks | Not shown: no column stores an internal note. | DEC-0236 |
+| 21 | Case code, assignee («مسئول»), «تخصیص به دیگری», «واگذاری به…» | DeskHead, CaseQueue, BulkActionBar | Not built: no assignment model (product owner, DEC-0235). | DEC-0235, DEC-0236 |
+| 22 | Late / overdue colour on case age | DeskHead, queues | Age shown uncoloured: no review-age threshold setting exists. | DEC-0236 |

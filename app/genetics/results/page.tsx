@@ -13,6 +13,9 @@ import { centreSamples, parentResultCheck } from '../../../src/genetics/service.
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { RecordResultForm, RefreshResultForm } from '../forms.tsx';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
+import { Identifier } from '../../../src/ui/status.tsx';
+import { CaseDrawer } from '../../assoc/case-drawer.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,7 +90,25 @@ export default async function GeneticsResultsPage() {
                 owner="GENETICS_CENTRE"
                 ownerIsUs
               >
-                <RecordResultForm sampleId={row.sample.id} />
+                <CaseDrawer title={'ثبت نتیجه · ' + (row.animalName ?? 'بدون نام')} testId="open-result-case">
+                  <KeyValueList
+                    rows={[
+                      { key: 'حیوان', value: row.animalName ?? 'بدون نام' },
+                      { key: 'نسل', value: generationLabel(row.generation) },
+                      { key: 'کد رهگیری نمونه', value: <Identifier value={row.sample.trackingCode} /> },
+                      {
+                        key: 'نتایج والدین',
+                        value:
+                          parents.state === 'READY'
+                            ? row.generation === 0
+                              ? 'حیوان G0: نتیجه مستقیم به همین حیوان نسبت داده می‌شود.'
+                              : 'نتیجه هر دو والد کامل و قابل Resolve است.'
+                            : parents.missingFa,
+                      },
+                    ]}
+                  />
+                  <RecordResultForm sampleId={row.sample.id} />
+                </CaseDrawer>
               </CaseItem>
             ))}
           </CaseList>

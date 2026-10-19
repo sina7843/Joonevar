@@ -1,7 +1,8 @@
 import { OpsShell, marketNav } from '../../../src/ui/shell.tsx';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { CaseItem, CaseList, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
@@ -57,10 +58,15 @@ export default async function MarketTrustPage() {
                 ownerLabel="ناظر آگهی"
                 ownerIsUs
               >
-                <div className="space-y-sm">
-                  <blockquote className="hz-card hz-card--subtle text-body-sm">{entry.question.bodyFa}</blockquote>
-                  <DecideQuestionForm action={decideQuestionAction} questionId={entry.question.id} />
-                </div>
+                <CaseDrawer title="پرونده پرسش" testId={'open-question-' + entry.question.id}>
+                  <DeskHead title={entry.productNameFa ?? entry.sellerNameFa ?? '—'} status={keyStatus('SUBMITTED')} />
+                  <Panel title="متن پرسش">
+                    <blockquote className="hz-card hz-card--subtle text-body-sm">{entry.question.bodyFa}</blockquote>
+                  </Panel>
+                  <Panel title="تصمیم">
+                    <DecideQuestionForm action={decideQuestionAction} questionId={entry.question.id} />
+                  </Panel>
+                </CaseDrawer>
               </CaseItem>
             ))}
           </CaseList>
@@ -94,7 +100,25 @@ export default async function MarketTrustPage() {
                     {view.row.bodyFa}
                   </p>
                 ) : null}
-                <ModerateReviewForm action={moderateReviewAction} reviewId={view.row.id} />
+                <CaseDrawer title="بررسی نظر" label="بررسی نظر" testId={'open-review-' + view.row.id}>
+                  <DeskHead
+                    title={view.sellerNameFa ?? 'معامله حیوان'}
+                    status={{ key: view.row.status }}
+                    meta={[
+                      view.dimensionsFa[0] + ': ' + fa(view.row.scoreOne),
+                      view.dimensionsFa[1] + ': ' + fa(view.row.scoreTwo),
+                      view.dimensionsFa[2] + ': ' + fa(view.row.scoreThree),
+                    ]}
+                  />
+                  {view.row.bodyFa ? (
+                    <Panel title="متن نظر">
+                      <p className="text-body-sm">{view.row.bodyFa}</p>
+                    </Panel>
+                  ) : null}
+                  <Panel title="تصمیم">
+                    <ModerateReviewForm action={moderateReviewAction} reviewId={view.row.id} />
+                  </Panel>
+                </CaseDrawer>
               </li>
             ))}
           </ul>

@@ -127,7 +127,7 @@ async function reportAs(page: Page, contentId: string, reason: string, details: 
 
 async function decide(page: Page, contentId: string, decision: string, reason: string, untilLocal?: string): Promise<void> {
   await page.goto(BASE_URL + '/content/reports/' + contentId, { waitUntil: 'load' });
-  await page.getByTestId('decision').selectOption(decision);
+  await page.getByTestId('decision-' + decision).check();
   if (untilLocal) await page.getByTestId('restrict-until').fill(untilLocal);
   await page.getByTestId('decision-reason').fill(reason);
   await page.getByTestId('submit-decision').click();

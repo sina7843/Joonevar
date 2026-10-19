@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../db/client.ts';
 import { guardRoute } from '../authz/guard.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { mergeRecord } from './merge.ts';
 
 export interface MergeFormState {
@@ -40,7 +40,7 @@ export async function mergeRecordAction(_previous: MergeFormState, form: FormDat
     for (const path of ['/veterinarians', '/centers', '/associations']) revalidatePath(path, 'layout');
     return { ok: true, message: '«' + row.nameFa + '» به‌عنوان تکراری ثبت شد و نشانی‌اش به رکورد اصلی اشاره می‌کند.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

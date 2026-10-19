@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Icon } from './icon.tsx';
 import type { IconName } from './icon-paths.ts';
 import { SectionHeader } from './section-header.tsx';
+import { DocumentPreview } from './document-preview.tsx';
 import { ActionOwner, StatusBadge, type ActionOwnerKind, type StatusTone } from './status.tsx';
 
 /**
@@ -70,6 +71,7 @@ export function DeskHead({
   meta,
   owner,
   ownerExtra,
+  position,
   children,
 }: {
   title: ReactNode;
@@ -77,6 +79,8 @@ export function DeskHead({
   meta?: readonly ReactNode[];
   owner?: ActionOwnerKind | null;
   ownerExtra?: ReactNode;
+  /** «پرونده ۲ از ۴» with the previous / next case in queue order (oldest first). */
+  position?: DeskPosition | null;
   children?: ReactNode;
 }) {
   return (
@@ -84,6 +88,7 @@ export function DeskHead({
       <div className="hz-desk__title">
         <h2 className="hz-h3">{title}</h2>
         {status ? <DeskStatusBadge status={status} /> : null}
+        {position ? <DeskNav position={position} /> : null}
       </div>
       {meta && meta.length > 0 ? (
         <p className="hz-desk__meta">
@@ -95,6 +100,61 @@ export function DeskHead({
       {owner ? <ActionOwner owner={owner} extra={ownerExtra} /> : null}
       {children}
     </section>
+  );
+}
+
+export interface DeskPosition {
+  readonly index: number;
+  readonly total: number;
+  readonly prevHref: string | null;
+  readonly nextHref: string | null;
+}
+
+function DeskNav({ position }: { position: DeskPosition }) {
+  const step = (href: string | null, label: string, icon: 'caretRight' | 'caretLeft') =>
+    href ? (
+      <Link className="hz-icon-btn hz-icon-btn--sm" href={href} aria-label={label}>
+        <Icon name={icon} size="xs" mirror />
+      </Link>
+    ) : (
+      <span className="hz-icon-btn hz-icon-btn--sm" aria-disabled="true" aria-label={label}>
+        <Icon name={icon} size="xs" mirror />
+      </span>
+    );
+  return (
+    <nav className="hz-desk__nav" aria-label="پرونده‌های صف">
+      {step(position.prevHref, 'پرونده قبلی', 'caretRight')}
+      <span>{'پرونده ' + position.index.toLocaleString('fa-IR') + ' از ' + position.total.toLocaleString('fa-IR')}</span>
+      {step(position.nextHref, 'پرونده بعدی', 'caretLeft')}
+    </nav>
+  );
+}
+
+/** The case's place in its queue (oldest first): `ids` in queue order, `href` builds a case address. */
+export function deskPosition(ids: readonly string[], id: string, href: (id: string) => string): DeskPosition | null {
+  const at = ids.indexOf(id);
+  if (at < 0 || ids.length < 2) return null;
+  return {
+    index: at + 1,
+    total: ids.length,
+    prevHref: at > 0 ? href(ids[at - 1]!) : null,
+    nextHref: at < ids.length - 1 ? href(ids[at + 1]!) : null,
+  };
+}
+
+/**
+ * Case age in the queue — DS `hz-age`: «۱۲ روز در صف», amber past the late
+ * threshold, red past the overdue one; thresholds are managed settings, and an
+ * unset threshold never colours anything.
+ */
+export function CaseAge({ since, lateDays, overdueDays, now = new Date() }: { since: Date; lateDays?: number | null; overdueDays?: number | null; now?: Date }) {
+  const days = Math.max(0, Math.floor((now.getTime() - since.getTime()) / 86_400_000));
+  const tone = overdueDays != null && days > overdueDays ? 'overdue' : lateDays != null && days > lateDays ? 'late' : null;
+  return (
+    <span className={tone ? 'hz-age hz-age--' + tone : 'hz-age'} title={tone ? 'بیش از مهلت بررسی' : undefined}>
+      <Icon name="clock" size="xs" />
+      {days.toLocaleString('fa-IR') + ' روز در صف'}
+    </span>
   );
 }
 
@@ -115,8 +175,11 @@ export function Desk({
     <div className="hz-desk">
       <div className="min-w-0 space-y-lg">{children}</div>
       {decision ? (
-        <aside className="hz-card hz-desk__decision" aria-labelledby="desk-decision-title">
-          <SectionHeader title={decisionTitle} size="sm" id="desk-decision-title" />
+        // Below 1024 the decision form itself is the fixed bar + sheet (DecisionForm), so the card dissolves.
+        <aside className="hz-card hz-desk__decision max-lg:contents" aria-labelledby="desk-decision-title">
+          <div className="hz-show-lg">
+            <SectionHeader title={decisionTitle} size="sm" id="desk-decision-title" />
+          </div>
           {decision}
         </aside>
       ) : null}
@@ -134,9 +197,9 @@ export function DeskVersionNote({ version }: { version: number }) {
 }
 
 /**
- * A private document in the desk (DS *DocumentPreview*, link variant): the
- * frame names the file and opens it through the authorized private-file route
- * only when the reviewer asks, so every view is a deliberate, audited look.
+ * A private document in the desk: DS *DocumentPreview* (zoom, rotate,
+ * fullscreen; no download or new tab) over the authorized private-file route,
+ * with the file named in the caption. A missing file is the dashed empty frame.
  */
 export function DocFrame({
   href,
@@ -157,18 +220,16 @@ export function DocFrame({
 }) {
   return (
     <figure className="hz-doc-figure">
-      <div className={href ? 'hz-doc' : 'hz-doc hz-doc--missing'}>
-        <div className="flex flex-col items-center gap-sm p-lg text-center">
-          <Icon name={href ? icon : 'imageBroken'} size="lg" className="text-text-secondary" />
-          {href ? (
-            <a href={href} target="_blank" rel="noreferrer" className="hz-link hz-link--standalone" data-testid={testId}>
-              {linkLabel ?? 'مشاهده ' + label}
-            </a>
-          ) : (
-            <span className="text-body-sm text-text-secondary">مدرکی بارگذاری نشده است.</span>
-          )}
+      {href ? (
+        <DocumentPreview src={href} altFa={linkLabel ?? label} testId={testId} />
+      ) : (
+        <div className="hz-doc hz-doc--missing">
+          <div className="hz-doc__status">
+            <Icon name={icon === 'fileText' ? 'imageBroken' : icon} size="lg" />
+            <span>{label + ' بارگذاری نشده است.'}</span>
+          </div>
         </div>
-      </div>
+      )}
       <figcaption className="hz-doc-figure__caption">
         <b>{label}</b>
         {meta ? <span>{meta}</span> : null}

@@ -488,6 +488,7 @@ test('a report reaches the queue, the decision hides the advert, and the appeal 
     await page.goto(BASE_URL + '/market/listings', { waitUntil: 'load' });
     await expectText(page, 'آگهی‌های گزارش‌شده');
     assert.match(await page.getByTestId('signals-disclaimer').innerText(), /ثابت نمی‌کند/);
+    await page.getByTestId('open-listing-' + listingId).click();
     const signals = await page.getByTestId('queue-signals-' + listingId).innerText();
     assert.match(signals, /گزارش باز/);
     await page.screenshot({ path: path.join(SHOTS, 'moderation-queue-desktop.png'), fullPage: true });
@@ -547,6 +548,7 @@ test('a report reaches the queue, the decision hides the advert, and the appeal 
     await expectText(page, 'اعتراض‌ها');
     const rowId = await page.locator('[data-testid="appeal-queue"] li').first().getAttribute('data-testid');
     const appealId = rowId!.replace('appeal-row-', '');
+    await page.getByTestId('open-appeal-' + appealId).click();
     await page.getByTestId('appeal-outcome-' + appealId).selectOption('OVERTURN');
     await page.getByTestId('appeal-decision-reason-' + appealId).fill('SYNTHETIC مدرک پذیرفته شد ' + RUN);
     await page.getByTestId('save-appeal-' + appealId).click();

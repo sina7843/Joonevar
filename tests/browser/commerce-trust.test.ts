@@ -309,9 +309,10 @@ test('a question waits for a moderator before anybody reads it', async () => {
     await page.goto(BASE_URL + '/market/trust', { waitUntil: 'load' });
     assert.match(await page.getByTestId('reputation-note').innerText(), /تبلیغ جایگاه می‌خرد، نه اعتبار/);
     const questionId = (await page
-      .locator('[data-testid^="decide-question-select-"]')
+      .locator('[data-testid^="open-question-"]')
       .first()
-      .getAttribute('data-testid'))!.replace('decide-question-select-', '');
+      .getAttribute('data-testid'))!.replace('open-question-', '');
+    await page.getByTestId('open-question-' + questionId).click();
     await page.getByTestId('decide-question-select-' + questionId).selectOption('PUBLISHED');
     await page.getByTestId('decide-question-submit-' + questionId).click();
     // A decided question leaves the queue, taking its form with it.

@@ -5,17 +5,25 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { ASSOC_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, DeskVersionNote, Panel, whenFa } from '../../../../src/ui/desk.tsx';
+import { CaseAge, CaseHistory, Desk, DeskHead, DeskVersionNote, Panel, deskPosition, whenFa } from '../../../../src/ui/desk.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
-import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
+import { auditSteps, historyFromAudit } from '../../audit-history.ts';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { profiles } from '../../../../src/db/schema/identity.ts';
-import { breedsOfKennel, findKennel, KENNEL_STATUS_FA } from '../../../../src/kennels/service.ts';
+import { breedsOfKennel, findKennel, kennelQueue, KENNEL_STATUS_FA } from '../../../../src/kennels/service.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { KennelReviewForm } from '../review-form.tsx';
 
 export const dynamic = 'force-dynamic';
+
+const HISTORY_FA: Record<string, string> = {
+  KENNEL_STARTED: 'شروع پرونده',
+  KENNEL_PAYMENT_VERIFIED: 'پرداخت تأیید شد',
+  KENNEL_SUBMITTED: 'ارسال برای بررسی',
+  KENNEL_REVIEWED: 'تصمیم انجمن',
+};
 
 /**
  * One kennel at the association — §15.2, §21.5.
@@ -33,22 +41,30 @@ export default async function AssocKennelPage({ params }: { params: Promise<{ id
   const kennel = await findKennel(db(), id);
   if (!kennel) return <RecordNotFound error={notFoundError('پرونده کنل پیدا نشد.')} />;
 
-  const [breeds, owner] = await Promise.all([
+  const [breeds, owner, steps, queue] = await Promise.all([
     breedsOfKennel(db(), kennel.id),
     db().select().from(profiles).where(eq(profiles.accountId, kennel.ownerAccountId)).limit(1),
+    auditSteps('KENNEL', kennel.id),
+    kennelQueue(db(), guard.actor),
   ]);
 
   const open = kennel.status === 'UNDER_REVIEW';
-  const age = ageInDays(kennel.submittedAt);
+  // Age counts from the first submission (a corrected case keeps its place in time).
+  const firstSubmittedAt = steps.filter((step) => step.action === 'KENNEL_SUBMITTED').at(-1)?.at ?? kennel.submittedAt;
   return (
     <OpsShell actor={guard.actor} title="بررسی کنل" pathname={'/assoc/kennels/' + id} nav={ASSOC_NAV}>
       <DeskHead
         title={'کنل · ' + (kennel.nameFa ?? 'کنل بدون نام')}
         status={{ ...keyStatus(kennel.status), testId: 'assoc-kennel-status' }}
+        position={deskPosition(
+          queue.map((row) => row.id),
+          kennel.id,
+          (kennelId) => '/assoc/kennels/' + kennelId,
+        )}
         meta={[
           'مالک: ' + (owner[0] ? owner[0].firstName + ' ' + owner[0].lastName : '—'),
           'ارسال: ' + (whenFa(kennel.submittedAt) ?? '—'),
-          open && age !== null ? <span className="hz-age">{age.toLocaleString('fa-IR') + ' روز در صف'}</span> : null,
+          open && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null,
           'نسخه ' + kennel.version.toLocaleString('fa-IR'),
         ]}
         owner={open ? 'ASSOCIATION' : kennel.status === 'NEEDS_CORRECTION' ? 'USER' : null}
@@ -99,6 +115,9 @@ export default async function AssocKennelPage({ params }: { params: Promise<{ id
           <p className="text-body-sm" data-testid="assoc-kennel-breeds">
             {breeds.map((row) => row.nameFa).join('، ') || '—'}
           </p>
+        </Panel>
+        <Panel title="سابقه پرونده">
+          <CaseHistory entries={historyFromAudit(steps, HISTORY_FA, open)} />
         </Panel>
       </Desk>
     </OpsShell>

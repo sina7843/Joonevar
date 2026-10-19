@@ -5,6 +5,7 @@ import { Card } from '../../../../src/ui/card.tsx';
 import { ActionRow, Button } from '../../../../src/ui/button.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../../../../src/ui/field.tsx';
+import { ReasonField } from '../../../../src/ui/decision.tsx';
 import {
   BREED_CLAIM_KINDS,
   BREED_COATS,
@@ -232,7 +233,7 @@ export function BreedStatusForm({
           options={targets.map((to) => ({ value: to, label: STATUS_FA[to] }))}
           data-testid="breed-status-to"
         />
-        <TextAreaField label="دلیل" name="reason" rows={2} required data-testid="breed-status-reason" />
+        <ReasonField name="reason" label="دلیل" required rows={2} audience={null} testId="breed-status-reason" />
         <Button type="submit" tone="secondary" disabled={pending} data-testid="change-breed-status">
           {pending ? 'در حال ثبت…' : 'ثبت وضعیت'}
         </Button>
@@ -281,7 +282,7 @@ export function ArchiveClaimForm({ breedId, claimId }: { breedId: string; claimI
       <input type="hidden" name="breedId" value={breedId} />
       <input type="hidden" name="claimId" value={claimId} />
       <Result state={state} testId="archive-claim-result" />
-      <TextField label="دلیل برداشتن از صفحه" name="reason" required data-testid="archive-claim-reason" />
+      <ReasonField name="reason" label="دلیل برداشتن از صفحه" required rows={2} audience={null} testId="archive-claim-reason" />
       <Button type="submit" tone="ghost" disabled={pending} data-testid="archive-claim">
         {pending ? 'در حال ثبت…' : 'برداشتن از صفحه عمومی'}
       </Button>
@@ -317,7 +318,7 @@ export function DuplicateForm({
           options={targets.map((target) => ({ value: target.id, label: target.nameFa + ' — ' + target.nameEn }))}
           data-testid="duplicate-primary"
         />
-        <TextAreaField label="دلیل" name="reason" rows={2} required data-testid="duplicate-reason" />
+        <ReasonField name="reason" label="دلیل" required rows={2} audience={null} testId="duplicate-reason" />
         <Button type="submit" tone="secondary" disabled={pending} data-testid="mark-duplicate">
           {pending ? 'در حال ثبت…' : 'ثبت تکراری'}
         </Button>

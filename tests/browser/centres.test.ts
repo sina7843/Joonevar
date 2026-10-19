@@ -277,10 +277,10 @@ test('hiding a centre removes its page, and the management environments stay clo
     await page.goto(BASE_URL + '/review/centres', { waitUntil: 'load' });
     const row = page.locator('[data-testid^="centre-row-"]', { hasText: CENTRE_NAME });
     await Promise.all([page.waitForURL((url) => /^\/review\/centres\/[0-9a-f-]{36}$/.test(url.pathname)), row.click()]);
-    await page.getByTestId('centre-status-to').selectOption('HIDDEN');
+    await page.getByTestId('centre-status-to-HIDDEN').check();
     await page.getByTestId('centre-status-reason').fill('SYNTHETIC پنهان‌سازی آزمایشی');
     await page.getByTestId('change-centre-status').click();
-    await waitForText(page, 'centre-status-result', 'مرکز پنهان شد');
+    await waitForText(page, 'centre-public-status', 'پنهان');
   });
 
   await as('visitor', MOBILE, async (page) => {

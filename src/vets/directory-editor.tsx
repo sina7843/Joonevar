@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card } from '../ui/card.tsx';
+import { SectionHeader } from '../ui/section-header.tsx';
 import { EmptyState } from '../ui/states.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { formatCivilDateFa } from '../domain/calendar.ts';
@@ -45,7 +46,16 @@ function Axis({
  * (Requirements-Phase-2 §7, §21; PROMPT-006, PROMPT-007). The five status axes
  * are shown one by one and never summed (P2-D05).
  */
-export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorData; surface: Exclude<DirectorySurface, 'review'> }) {
+export function VetDirectoryEditor({
+  data,
+  surface,
+  headless = false,
+}: {
+  data: DirectoryEditorData;
+  surface: Exclude<DirectorySurface, 'review'>;
+  /** The page already shows the name and status (record summary). */
+  headless?: boolean;
+}) {
   const { facts, completeness, blockers, reference } = data;
   const { profile } = facts;
   const purchase = packagePurchaseEligibility(profile);
@@ -67,15 +77,19 @@ export function VetDirectoryEditor({ data, surface }: { data: DirectoryEditorDat
   return (
     <div className="space-y-lg">
       <Card>
-        <div className="flex flex-wrap items-start justify-between gap-md">
-          <div>
-            <h2 className="hz-h3">{profile.displayNameFa}</h2>
-            <p className="mt-2xs text-caption text-text-secondary">پروفایل عمومی دایرکتوری</p>
+        {headless ? (
+          <SectionHeader title="وضعیت پرونده" size="sm" />
+        ) : (
+          <div className="flex flex-wrap items-start justify-between gap-md">
+            <div>
+              <h2 className="hz-h3">{profile.displayNameFa}</h2>
+              <p className="mt-2xs text-caption text-text-secondary">پروفایل عمومی دایرکتوری</p>
+            </div>
+            <span data-testid="directory-public-status">
+              <StatusBadge status={profile.publicStatus} />
+            </span>
           </div>
-          <span data-testid="directory-public-status">
-            <StatusBadge status={profile.publicStatus} />
-          </span>
-        </div>
+        )}
         {profile.publicStatus === 'PUBLISHED' && profile.publicSlug ? (
           <p className="mt-sm text-body-sm">
             <Link href={'/veterinarians/' + profile.publicSlug} className="hz-link hz-link--standalone" data-testid="directory-public-link">

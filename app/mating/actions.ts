@@ -19,7 +19,7 @@ import {
 import { profiles } from '../../src/db/schema/identity.ts';
 import { eq } from 'drizzle-orm';
 import type { AllocationRuleType } from '../../src/domain/allocation.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface PermitFormState {
   readonly ok?: boolean;
@@ -42,7 +42,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): PermitFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

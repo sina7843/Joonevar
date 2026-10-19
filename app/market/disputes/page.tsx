@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, DeskVersionNote, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -30,7 +31,8 @@ const when = (value: Date) =>
  * the reviewer works from, because a reviewer who quietly decides the remaining
  * price would be making a promise the product cannot keep.
  *
- * DS P09 + in-card P10 desk (no `[id]` route): facts, claim, note, decision.
+ * DS P09 queue; each row opens its P10 desk in a wide Drawer (no `[id]`
+ * route): facts, claim, note, decision.
  */
 export default async function DisputeQueuePage() {
   const guard = await guardRoute('/market/disputes');
@@ -83,13 +85,34 @@ export default async function DisputeQueuePage() {
               ownerLabel="داور بازار"
               ownerIsUs
             >
-              <div className="space-y-md">
-                <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'dispute-claim-' + entry.id}>
-                  {entry.claimFa}
-                </blockquote>
-                <ReviewerNoteForm disputeId={entry.id} />
-                <DisputeDecisionForm disputeId={entry.id} version={entry.version} depositFa={moneyFa(entry.depositAmountToman)} />
-              </div>
+              <CaseDrawer title="پرونده اختلاف" testId={'open-dispute-' + entry.id}>
+                <DeskHead
+                  title={entry.animalNameFa}
+                  status={keyStatus(entry.status)}
+                  meta={[
+                    DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope,
+                    'بیعانه: ' + moneyFa(entry.depositAmountToman) + ' تومان',
+                    'طرح‌کننده: ' + (entry.openedByParty === 'BUYER' ? 'خریدار' : 'فروشنده'),
+                    when(entry.createdAt),
+                  ]}
+                >
+                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
+                    گفت‌وگوی معامله
+                  </Link>
+                </DeskHead>
+                <Panel title="ادعا">
+                  <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'dispute-claim-' + entry.id}>
+                    {entry.claimFa}
+                  </blockquote>
+                </Panel>
+                <Panel title="یادداشت و مدرک بررسی">
+                  <ReviewerNoteForm disputeId={entry.id} />
+                </Panel>
+                <Panel title="رأی">
+                  <DisputeDecisionForm disputeId={entry.id} version={entry.version} depositFa={moneyFa(entry.depositAmountToman)} />
+                  <DeskVersionNote version={entry.version} />
+                </Panel>
+              </CaseDrawer>
             </CaseItem>
           ))}
         </CaseList>

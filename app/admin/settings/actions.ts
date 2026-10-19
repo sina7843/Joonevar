@@ -3,13 +3,19 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
-import { updateSetting } from '../../../src/settings/service.ts';
+import { readSettingForActor, updateSetting } from '../../../src/settings/service.ts';
+import { displaySetting } from './display.ts';
 import { SETTING_BY_KEY } from '../../../src/settings/keys.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface SettingFormState {
   readonly ok?: boolean;
   readonly message?: string;
+  /** The version just saved (DS P11 › Saved «نسخه N ذخیره شد»). */
+  readonly savedVersion?: number;
+  /** Someone saved this key after it was opened (DS P11 › Conflict): its current value and version. */
+  readonly stale?: boolean;
+  readonly current?: { readonly display: string; readonly version: number };
 }
 
 /**
@@ -25,8 +31,8 @@ export async function updateSettingAction(
   form: FormData,
 ): Promise<SettingFormState> {
   const key = String(form.get('key') ?? '');
+  const guard = await guardRoute('/admin/settings');
   try {
-    const guard = await guardRoute('/admin/settings');
     if (!guard.ok) throw guard.denied;
 
     const definition = SETTING_BY_KEY.get(key);
@@ -44,16 +50,21 @@ export async function updateSettingAction(
               ? Number(raw)
               : raw;
 
-    await updateSetting(db(), guard.actor, {
+    const saved = await updateSetting(db(), guard.actor, {
       key,
       value,
       reason: String(form.get('reason') ?? '').trim() || undefined,
       expectedVersion: Number(form.get('version')),
     });
     revalidatePath('/admin/settings');
-    return { ok: true, message: raw === '' ? 'مقدار پاک شد و به «تعیین‌نشده» برگشت.' : 'مقدار ذخیره شد.' };
+    return { ok: true, savedVersion: saved.version, message: raw === '' ? 'مقدار پاک شد و به «تعیین‌نشده» برگشت.' : 'مقدار ذخیره شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    // The service refuses a save on an older version with CONFLICT; the panel shows what is there now.
+    if (error instanceof AppError && error.code === 'CONFLICT' && guard.ok) {
+      const now = await readSettingForActor(db(), guard.actor, key);
+      return { ok: false, stale: true, current: { display: displaySetting(now), version: now.version } };
+    }
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     if (error instanceof SyntaxError) return { ok: false, message: 'مقدار JSON معتبر نیست.' };
     throw error;
   }

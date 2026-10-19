@@ -74,16 +74,22 @@ export function ActionOwner({
   owner,
   extra,
   stack = false,
+  label,
+  you,
 }: {
   owner: ActionOwnerKind;
   /** Deadline, amount or a short note at the inline end. */
   extra?: ReactNode;
   stack?: boolean;
+  /** A named desk role instead of the owner's generic label (e.g. «ادمین محتوا»). */
+  label?: string;
+  /** The viewer is the one who acts (warning strip); defaults to `owner === 'USER'`. */
+  you?: boolean;
 }) {
   return (
-    <div className={['hz-owner', owner === 'USER' ? 'hz-owner--you' : '', stack ? 'hz-owner--stack' : ''].join(' ').trim()}>
+    <div className={['hz-owner', (you ?? owner === 'USER') ? 'hz-owner--you' : '', stack ? 'hz-owner--stack' : ''].join(' ').trim()}>
       <span>
-        اقدام بعدی با: <b className="hz-owner__who">{OWNER_FA[owner]}</b>
+        اقدام بعدی با: <b className="hz-owner__who">{label ?? OWNER_FA[owner]}</b>
       </span>
       {extra ? <span className="hz-owner__extra">{extra}</span> : null}
     </div>

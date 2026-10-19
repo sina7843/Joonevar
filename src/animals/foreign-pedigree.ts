@@ -9,7 +9,7 @@
  * The generation that an approval writes comes from the reviewed document and
  * is read-only afterwards, exactly like a computed generation.
  */
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals, foreignPedigreeCases } from '../db/schema/animals.ts';
 import { pedigreeIssuers } from '../db/schema/core.ts';
@@ -326,6 +326,17 @@ export interface ForeignQueueItem {
   readonly documentCode: string | null;
   readonly submittedAt: Date | null;
   readonly version: number;
+}
+
+/** Ids of the open queue, oldest submission first — the desk's «پرونده ۲ از ۴» and previous/next. */
+export async function foreignQueueIds(database: DbClient, actor: Actor): Promise<string[]> {
+  if (actor.context !== 'ASSOCIATION_OPERATOR') return [];
+  const rows = await database
+    .select({ id: foreignPedigreeCases.id })
+    .from(foreignPedigreeCases)
+    .where(eq(foreignPedigreeCases.status, 'UNDER_REVIEW'))
+    .orderBy(asc(foreignPedigreeCases.submittedAt), asc(foreignPedigreeCases.id));
+  return rows.map((row) => row.id);
 }
 
 /** Association queue (§21.2, §21.5). */

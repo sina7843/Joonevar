@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '../../../../src/db/client.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
-import { AppError, validation } from '../../../../src/domain/errors.ts';
+import { AppError, staleOf, validation } from '../../../../src/domain/errors.ts';
 import { currentPaymentGateway, currentPaymentProvider } from '../../../../src/adapters/current.ts';
 import { startAttempt } from '../../../../src/billing/payments.ts';
 import { placeOrder, setCartLine } from '../../../../src/commerce/cart.ts';
@@ -30,7 +30,7 @@ function money(form: FormData, key: string): bigint {
 }
 
 const failure = (error: unknown): CartFormState => {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 };
 

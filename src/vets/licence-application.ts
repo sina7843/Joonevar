@@ -404,6 +404,17 @@ const QUEUE: Record<'OPEN' | 'CORRECTION' | 'DECIDED', readonly VetCaseStatus[]>
   DECIDED: ['LICENSE_APPROVED_AWAITING_PAYMENT', 'REJECTED'],
 };
 
+/** Ids of the open queue in queue order (oldest first) — the desk's «پرونده ۲ از ۴» and previous/next. */
+export async function licenceOpenCaseIds(database: DbClient, actor: Actor): Promise<string[]> {
+  assertReviewer(actor);
+  const rows = await database
+    .select({ id: vetProfessionalCases.id })
+    .from(vetProfessionalCases)
+    .where(and(eq(vetProfessionalCases.caseType, 'LICENCE'), inArray(vetProfessionalCases.status, [...QUEUE.OPEN])))
+    .orderBy(asc(vetProfessionalCases.updatedAt), asc(vetProfessionalCases.id));
+  return rows.map((row) => row.id);
+}
+
 export async function licenceCaseQueue(
   database: DbClient,
   actor: Actor,

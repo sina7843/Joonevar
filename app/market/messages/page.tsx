@@ -1,7 +1,8 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -69,21 +70,30 @@ export default async function MessageModerationPage() {
               ownerLabel="ناظر آگهی"
               ownerIsUs
             >
-              <div className="space-y-sm">
-                <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'message-body-' + entry.reportId}>
-                  {entry.bodyFa ?? 'این پیام متنی ندارد (پیوست یا رویداد پیشنهاد قیمت).'}
-                </blockquote>
-                {entry.redactedNoteFa ? <p className="text-caption text-text-secondary">{entry.redactedNoteFa}</p> : null}
-                {entry.detailsFa ? (
-                  <p className="text-caption text-text-secondary">توضیح گزارش‌دهنده: {entry.detailsFa}</p>
-                ) : null}
-                {entry.hiddenAt ? (
-                  <p className="text-caption text-text-secondary" data-testid={'already-hidden-' + entry.reportId}>
-                    این پیام پیش‌تر پنهان شده است.
-                  </p>
-                ) : null}
-                <MessageDecisionForm reportId={entry.reportId} />
-              </div>
+              <CaseDrawer title="پرونده گزارش پیام" testId={'open-message-' + entry.reportId}>
+                <DeskHead
+                  title={REASON_FA[entry.reason as ReportReason] ?? entry.reason}
+                  status={keyStatus(entry.hiddenAt ? 'HIDDEN' : 'SUBMITTED')}
+                  meta={[when(entry.createdAt)]}
+                />
+                <Panel title="پیام گزارش‌شده">
+                  <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'message-body-' + entry.reportId}>
+                    {entry.bodyFa ?? 'این پیام متنی ندارد (پیوست یا رویداد پیشنهاد قیمت).'}
+                  </blockquote>
+                  {entry.redactedNoteFa ? <p className="text-caption text-text-secondary">{entry.redactedNoteFa}</p> : null}
+                  {entry.detailsFa ? (
+                    <p className="text-caption text-text-secondary">توضیح گزارش‌دهنده: {entry.detailsFa}</p>
+                  ) : null}
+                  {entry.hiddenAt ? (
+                    <p className="text-caption text-text-secondary" data-testid={'already-hidden-' + entry.reportId}>
+                      این پیام پیش‌تر پنهان شده است.
+                    </p>
+                  ) : null}
+                </Panel>
+                <Panel title="تصمیم">
+                  <MessageDecisionForm reportId={entry.reportId} />
+                </Panel>
+              </CaseDrawer>
             </CaseItem>
           ))}
         </CaseList>

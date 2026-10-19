@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { ReasonField } from '../ui/decision.tsx';
 import { DISCOUNT_KINDS, DISCOUNT_KIND_FA, type DiscountKind } from './trust-model.ts';
 
 interface FormState {
@@ -116,7 +117,7 @@ export function ModerateReviewForm({ action, reviewId }: { action: Action; revie
         ]}
         data-testid={'moderate-select-' + reviewId}
       />
-      <TextAreaField label="دلیل" name="reason" required rows={2} data-testid={'moderate-reason-' + reviewId} />
+      <ReasonField name="reason" label="دلیل" required rows={2} audience={null} testId={'moderate-reason-' + reviewId} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'moderate-submit-' + reviewId}>
         ثبت
       </Button>
@@ -186,7 +187,7 @@ export function DecideQuestionForm({ action, questionId }: { action: Action; que
         ]}
         data-testid={'decide-question-select-' + questionId}
       />
-      <TextField label="دلیل" name="reason" data-testid={'decide-question-reason-' + questionId} />
+      <ReasonField name="reason" label="دلیل" rows={2} audience={null} testId={'decide-question-reason-' + questionId} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'decide-question-submit-' + questionId}>
         ثبت
       </Button>

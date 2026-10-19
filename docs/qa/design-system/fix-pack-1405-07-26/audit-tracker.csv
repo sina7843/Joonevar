@@ -73,35 +73,35 @@ RTU-007,T04,1,medium,code,RTU,,نوار زبانه پایین در فرم‌ها
   - `/puppy-cards/checkout`
   - `/account/packages`",FIXED,,DEC-0234
 SHL-021,T04,1,medium,code,SHL,,ActionRow چسبان موبایل در PublicShell زیر نوار تب پنهان می‌شود,PublicShell + `ActionRow sticky` / `hz-sticky-bar`,FIXED,,DEC-0234
-CMPA2-007,T05,1,high,code,CMPA2,K3 K16,DecisionDesk موبایل: نوار تصمیم چسبان پایین صفحه و BottomSheet دلیل وجود ندارد,DecisionDesk (K3 موبایل، K16 موبایل),,,
-CMPA2-018,T05,1,high,code,CMPA2,K3,DocumentPreview: مدرک خصوصی به‌صورت لینک «باز کردن در تب تازه» یا iframe داخل `<details>` است و ابزار زوم/چرخش/تمام‌صفحه ندارد,DocumentPreview (و ستون شواهد DecisionDesk، K3),,,
-KOPS-001,T05,1,high,code,KOPS,K3,نوار تصمیم چسبان پایین موبایل و BottomSheet دلیل وجود ندارد,K3 · DecisionDesk (موبایل/تبلت),,,
-KOPS-002,T05,1,high,code,KOPS,K3,نمایشگر مدرک: به‌جای پیش‌نمایش درون‌صفحه با ابزار، فقط یک لینک به تب تازه؛ روی/پشت کارت جدا نیست,K3 · DocumentPreview,,,
-RTO-007,T05,1,high,code,RTO,,فرم‌های تصمیم ساخته‌شده پیش از سیستم طراحی به‌جای `DecisionOptions` + `ReasonField`,*DecisionDesk* › «تصمیم» (سه کارت گزینه با پیامد یک‌خطی، `ReasonField`، primary با برچسب گزینه),,,
-RTO-010,T05,1,high,code,RTO,,مدرک خصوصی در زبانه تازه باز می‌شود؛ پیش‌نمایش با ابزار بزرگ‌نمایی و چرخش نیست,*DocumentPreview* (P10 › «مدارک»),,,
-CMPA2-008,T05,1,medium,needs decision,CMPA2,K3,DecisionDesk: سرِ پرونده جابه‌جایی پرونده‌ی قبلی/بعدی («پرونده ۲ از ۴») و breadcrumbs ندارد,DecisionDesk › Record head (K3 دسکتاپ),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPA2-009,T05,1,medium,code,CMPA2,,چهار میز تصمیمِ دامپزشکی فرم تصمیم محلیِ شبیه‌سازی‌شده دارند,DecisionDesk › Decision panel,,,
-CMPA2-011,T05,1,medium,code,CMPA2,,چهار صفحه‌ی بررسی چیدمان میز را دستی و بدون کارت و `aside` ساخته‌اند,DecisionDesk,,,
-CMPA2-012,T05,1,medium,needs decision,CMPA2,,DecisionDesk: حالت «نسخه‌ی کهنه» (version conflict) پیاده نشده است,DecisionDesk › States › Stale,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPB-015,T05,1,medium,code,CMPB,K3,ReasonField · یادداشت داخلی، حالت خطا و غیرفعال، تُن `--over` و مخاطب داخلی ندارد,ReasonField — میز تصمیم (DecisionDesk/KYC، K03) و همهٔ `DecisionForm`ها,,,
-CMPB-017,T05,1,medium,code,CMPB,K16 K15,ReasonField · بیشتر دلیل‌های تصمیم اپراتور TextAreaField یا TextField ساده‌اند و چند تابع محلی هم‌نام ReasonField هست,ReasonField — گزارش محتوا (K16)، تنظیمات (K15)، میزهای دامپزشک، کلاب، بازار و پیشنهاد، ویرایش مراکز و انجمن‌ها,,,
-KOPS-003,T05,1,medium,code,KOPS,K3,حالت «تصمیم کهنه» (تعارض نسخه) با لحن، متن و دکمه طراحی نیست,K3 · DecisionDesk stale alert (حالت سخت K3 «تصمیم کهنه»),,,
-KOPS-004,T05,1,medium,needs decision,KOPS,K3,سرِ پرونده ناقص است: «پرونده ۲ از ۴»، کد پرونده، موبایل، «ارسال دوباره»، سن دیرکرد و «مسئول» نیست,K3 · DeskHead,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-KOPS-005,T05,1,medium,code,KOPS,K3,«اطلاعات اعلام‌شده» چهار ردیف از هشت ردیف طراحی را دارد و تأیید رقم کنترل کد ملی نیست,K3 · KeyValueList `--2col`,,,
-KOPS-006,T05,1,medium,needs decision,KOPS,K3,«سابقه پرونده» یک ردیف برای هر نسخه ندارد؛ عنوان، کپشن و نام اقدام‌کننده با طراحی فرق دارد,K3 · Timeline (audit),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-KOPS-026,T05,1,medium,code,KOPS,K15,حالت‌های ذخیره و تعارض نسخه با طراحی نیست (Toast، Alert هشدار با مقدار تازه),K15 · States «Saving / Conflict»,,,
-KOPS-032,T05,1,medium,code,KOPS,K16,سر پرونده: شناسه محتوا، «ناشر»، «نخستین گزارش»، نسخه، سن دیرکرد، «مسئول» و ناوبری قبلی/بعدی نیست؛ مالک اقدام «همزیست» خوانده می‌شود,K16 · DeskHead,,,
-RTO-006,T05,1,medium,code,RTO,,تصمیم و اقدام درون کارت صف انجام می‌شود (بدون میز تصمیم یا Drawer),P09 Don't «decide cases inline in the table»؛ P10 «Queues without a `[id]` route … open the same desk in a wide `Drawer` from the end»,,,
-RTO-009,T05,1,medium,needs decision,RTO,,سر پرونده و ستون شواهد میزها ناقص است,P10 › Anatomy 2–3 (`DeskHead` + «سابقه پرونده» + افزوده‌های ماژول),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-RTO-011,T05,1,medium,code,RTO,,نوار تصمیم چسبان موبایل و BottomSheet در هیچ میزی نیست,P10 › Layout (موبایل «sticky bar `.hz-desk__bar` at the bottom (تأیید · اصلاح · رد …). اصلاح or رد opens a `BottomSheet`»، تبلت `Modal`),,,
-RTO-012,T05,1,medium,code,RTO,,حالت «تعارض نسخه» طراحی‌شده نیست؛ خطای عمومی قرمز نمایش داده می‌شود,P10 › States › Stale؛ P11 › States › Conflict,,,
-RTO-021,T05,1,medium,code,RTO,,پرونده‌های فقط‌خواندنی و چند میز بازبینی به‌شکل ویرایشگر فرم‌ها ساخته شده‌اند,P06 (پرونده فقط‌خواندنی عملیاتی) و P10 (میز بازبینی مرکز و انجمن، انتشار محتوا),,,
-CMPA2-010,T05,1,low,code,CMPA2,,برچسب سه نتیجه در چند ماژول تغییر کرده است,DecisionDesk › Decision set,,,
-CMPA2-013,T05,1,low,code,CMPA2,,ReasonField در DecisionDesk: خطای قابل‌اعلام ندارد و chip آماده متن نوشته‌شده را پاک می‌کند,DecisionDesk › دلیل,,,
-CMPB-016,T05,1,low,code,CMPB,K3,ReasonField · چیپ متن را جایگزین می‌کند و شمارنده روی هر کلید اعلام می‌شود,ReasonField — میز KYC (K03) و `DecisionForm`,,,
-KOPS-007,T05,1,low,code,KOPS,K3,برچسب و راهنمای فیلد دلیل، نمایش همیشگی آن و پیام اعتبارسنجی با طراحی نمی‌خواند,K3 · ReasonField,,,
-KOPS-008,T05,1,low,needs decision,KOPS,K3,پرونده بسته: به‌جای «نتیجه نهایی بدون پنل»، پنل «نتیجه» با Alert آبی؛ حالت «تخصیص به دیگری» نیست,K3 · حالت‌های قفل/بسته,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-RTO-008,T05,1,low,code,RTO,,برچسب سه نتیجه یکدست نیست,P10 › Content & data rules «Keep the three labels exactly: تأیید · نیازمند اصلاح · رد»,,,
+CMPA2-007,T05,1,high,code,CMPA2,K3 K16,DecisionDesk موبایل: نوار تصمیم چسبان پایین صفحه و BottomSheet دلیل وجود ندارد,DecisionDesk (K3 موبایل، K16 موبایل),FIXED,,DEC-0236
+CMPA2-018,T05,1,high,code,CMPA2,K3,DocumentPreview: مدرک خصوصی به‌صورت لینک «باز کردن در تب تازه» یا iframe داخل `<details>` است و ابزار زوم/چرخش/تمام‌صفحه ندارد,DocumentPreview (و ستون شواهد DecisionDesk، K3),FIXED,,DEC-0236
+KOPS-001,T05,1,high,code,KOPS,K3,نوار تصمیم چسبان پایین موبایل و BottomSheet دلیل وجود ندارد,K3 · DecisionDesk (موبایل/تبلت),FIXED,,DEC-0236
+KOPS-002,T05,1,high,code,KOPS,K3,نمایشگر مدرک: به‌جای پیش‌نمایش درون‌صفحه با ابزار، فقط یک لینک به تب تازه؛ روی/پشت کارت جدا نیست,K3 · DocumentPreview,FIXED,,DEC-0236
+RTO-007,T05,1,high,code,RTO,,فرم‌های تصمیم ساخته‌شده پیش از سیستم طراحی به‌جای `DecisionOptions` + `ReasonField`,*DecisionDesk* › «تصمیم» (سه کارت گزینه با پیامد یک‌خطی، `ReasonField`، primary با برچسب گزینه),FIXED,,"DEC-0236; internal note GAPS #20, approve reason GAPS #19"
+RTO-010,T05,1,high,code,RTO,,مدرک خصوصی در زبانه تازه باز می‌شود؛ پیش‌نمایش با ابزار بزرگ‌نمایی و چرخش نیست,*DocumentPreview* (P10 › «مدارک»),FIXED,,DEC-0236
+CMPA2-008,T05,1,medium,needs decision,CMPA2,K3,DecisionDesk: سرِ پرونده جابه‌جایی پرونده‌ی قبلی/بعدی («پرونده ۲ از ۴») و breadcrumbs ندارد,DecisionDesk › Record head (K3 دسکتاپ),FIXED,,DEC-0236
+CMPA2-009,T05,1,medium,code,CMPA2,,چهار میز تصمیمِ دامپزشکی فرم تصمیم محلیِ شبیه‌سازی‌شده دارند,DecisionDesk › Decision panel,FIXED,,DEC-0236
+CMPA2-011,T05,1,medium,code,CMPA2,,چهار صفحه‌ی بررسی چیدمان میز را دستی و بدون کارت و `aside` ساخته‌اند,DecisionDesk,FIXED,,DEC-0236
+CMPA2-012,T05,1,medium,needs decision,CMPA2,,DecisionDesk: حالت «نسخه‌ی کهنه» (version conflict) پیاده نشده است,DecisionDesk › States › Stale,FIXED,,DEC-0236
+CMPB-015,T05,1,medium,code,CMPB,K3,ReasonField · یادداشت داخلی، حالت خطا و غیرفعال، تُن `--over` و مخاطب داخلی ندارد,ReasonField — میز تصمیم (DecisionDesk/KYC، K03) و همهٔ `DecisionForm`ها,FIXED,,"DEC-0236; internal note GAPS #20, approve reason GAPS #19"
+CMPB-017,T05,1,medium,code,CMPB,K16 K15,ReasonField · بیشتر دلیل‌های تصمیم اپراتور TextAreaField یا TextField ساده‌اند و چند تابع محلی هم‌نام ReasonField هست,ReasonField — گزارش محتوا (K16)، تنظیمات (K15)، میزهای دامپزشک، کلاب، بازار و پیشنهاد، ویرایش مراکز و انجمن‌ها,FIXED,,DEC-0236; shared ReasonField everywhere (compact change notes)
+KOPS-003,T05,1,medium,code,KOPS,K3,حالت «تصمیم کهنه» (تعارض نسخه) با لحن، متن و دکمه طراحی نیست,K3 · DecisionDesk stale alert (حالت سخت K3 «تصمیم کهنه»),FIXED,,DEC-0236
+KOPS-004,T05,1,medium,needs decision,KOPS,K3,سرِ پرونده ناقص است: «پرونده ۲ از ۴»، کد پرونده، موبایل، «ارسال دوباره»، سن دیرکرد و «مسئول» نیست,K3 · DeskHead,FIXED,,"DEC-0236; case code/assignee not built (DEC-0235, GAPS #21)"
+KOPS-005,T05,1,medium,code,KOPS,K3,«اطلاعات اعلام‌شده» چهار ردیف از هشت ردیف طراحی را دارد و تأیید رقم کنترل کد ملی نیست,K3 · KeyValueList `--2col`,FIXED,,DEC-0236
+KOPS-006,T05,1,medium,needs decision,KOPS,K3,«سابقه پرونده» یک ردیف برای هر نسخه ندارد؛ عنوان، کپشن و نام اقدام‌کننده با طراحی فرق دارد,K3 · Timeline (audit),FIXED,,DEC-0236; one item per audit row; meta in head
+KOPS-026,T05,1,medium,code,KOPS,K15,حالت‌های ذخیره و تعارض نسخه با طراحی نیست (Toast، Alert هشدار با مقدار تازه),K15 · States «Saving / Conflict»,FIXED,,DEC-0236
+KOPS-032,T05,1,medium,code,KOPS,K16,سر پرونده: شناسه محتوا، «ناشر»، «نخستین گزارش»، نسخه، سن دیرکرد، «مسئول» و ناوبری قبلی/بعدی نیست؛ مالک اقدام «همزیست» خوانده می‌شود,K16 · DeskHead,FIXED,,"DEC-0236; case code/assignee not built (DEC-0235, GAPS #21)"
+RTO-006,T05,1,medium,code,RTO,,تصمیم و اقدام درون کارت صف انجام می‌شود (بدون میز تصمیم یا Drawer),P09 Don't «decide cases inline in the table»؛ P10 «Queues without a `[id]` route … open the same desk in a wide `Drawer` from the end»,FIXED,,DEC-0236
+RTO-009,T05,1,medium,needs decision,RTO,,سر پرونده و ستون شواهد میزها ناقص است,P10 › Anatomy 2–3 (`DeskHead` + «سابقه پرونده» + افزوده‌های ماژول),FIXED,,"DEC-0236; case code/assignee not built (DEC-0235, GAPS #21)"
+RTO-011,T05,1,medium,code,RTO,,نوار تصمیم چسبان موبایل و BottomSheet در هیچ میزی نیست,P10 › Layout (موبایل «sticky bar `.hz-desk__bar` at the bottom (تأیید · اصلاح · رد …). اصلاح or رد opens a `BottomSheet`»، تبلت `Modal`),FIXED,,DEC-0236
+RTO-012,T05,1,medium,code,RTO,,حالت «تعارض نسخه» طراحی‌شده نیست؛ خطای عمومی قرمز نمایش داده می‌شود,P10 › States › Stale؛ P11 › States › Conflict,FIXED,,DEC-0236
+RTO-021,T05,1,medium,code,RTO,,پرونده‌های فقط‌خواندنی و چند میز بازبینی به‌شکل ویرایشگر فرم‌ها ساخته شده‌اند,P06 (پرونده فقط‌خواندنی عملیاتی) و P10 (میز بازبینی مرکز و انجمن، انتشار محتوا),FIXED,,DEC-0236
+CMPA2-010,T05,1,low,code,CMPA2,,برچسب سه نتیجه در چند ماژول تغییر کرده است,DecisionDesk › Decision set,FIXED,,DEC-0236
+CMPA2-013,T05,1,low,code,CMPA2,,ReasonField در DecisionDesk: خطای قابل‌اعلام ندارد و chip آماده متن نوشته‌شده را پاک می‌کند,DecisionDesk › دلیل,FIXED,,DEC-0236
+CMPB-016,T05,1,low,code,CMPB,K3,ReasonField · چیپ متن را جایگزین می‌کند و شمارنده روی هر کلید اعلام می‌شود,ReasonField — میز KYC (K03) و `DecisionForm`,FIXED,,DEC-0236
+KOPS-007,T05,1,low,code,KOPS,K3,برچسب و راهنمای فیلد دلیل، نمایش همیشگی آن و پیام اعتبارسنجی با طراحی نمی‌خواند,K3 · ReasonField,FIXED,,"DEC-0236; internal note GAPS #20, approve reason GAPS #19"
+KOPS-008,T05,1,low,needs decision,KOPS,K3,پرونده بسته: به‌جای «نتیجه نهایی بدون پنل»، پنل «نتیجه» با Alert آبی؛ حالت «تخصیص به دیگری» نیست,K3 · حالت‌های قفل/بسته,FIXED,,DEC-0236
+RTO-008,T05,1,low,code,RTO,,برچسب سه نتیجه یکدست نیست,P10 › Content & data rules «Keep the three labels exactly: تأیید · نیازمند اصلاح · رد»,FIXED,,DEC-0236
 CMPA1-042,T06,1,high,code,CMPA1,,۳۴ صف عملیاتی در دسکتاپ هم کارت‌اند، نه جدول CaseQueue,CaseQueue (P9، حدود ۳۵ صفحه),,,
 CMPB-032,T06,1,high,code,CMPB,K14 K19,SortMenu · صف‌های K14 و K19 کنترل مرتب‌سازی ندارند و بازار حیوان select بومی دارد,SortMenu — صف آگهی‌ها (K14)، صف نمونه‌های ژنتیک (K19)، بازار حیوان عمومی، فروشگاه,,,
 KOPS-015,T06,1,high,code,KOPS,K14,به‌جای جدول ۴۴px با تصویر کوچک، فهرست کارتی با فرم تصمیم درون هر ردیف؛ تصمیم در صف گرفته می‌شود و میز (Drawer) وجود ندارد,K14 · CaseQueue / DataTable (comfortable) + DecisionDesk در Drawer,,,

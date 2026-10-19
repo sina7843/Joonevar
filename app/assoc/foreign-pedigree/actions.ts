@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { reviewForeignCase, type ForeignDecision } from '../../../src/animals/foreign-pedigree.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface ReviewState {
   readonly ok?: boolean;
@@ -37,7 +37,7 @@ export async function reviewForeignAction(_previous: ReviewState, form: FormData
     revalidatePath('/assoc/foreign-pedigree');
     return { ok: true, message: 'نتیجه بررسی ثبت شد و به مالک اعلام شد.', tone: 'success' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
     throw error;
   }
 }
