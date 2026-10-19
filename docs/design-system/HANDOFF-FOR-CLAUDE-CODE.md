@@ -1,8 +1,8 @@
-# Hamzist Design System v1.0.3 — handoff to the App
+# Hamzist Design System v1.0.4 — handoff to the App
 
 **For:** Claude Code working in the `App` repository (`X:\Work\01_Clients\دراگون\هم زیست\App`).
-**Approved by the product owner:** 11 Mehr 1405 (3 Oct 2026). Every open decision is closed; dark mode and the article reading tools are backlog for after the beta.
-**Binding rules for Claude Code:** `CLAUDE-CODE-DESIGN-SYSTEM-RULES.md` (read first) · start message: `START-PROMPT-FOR-CLAUDE-CODE.md` · demo data: `demo-content/` · changes since v1.0: `CHANGELOG.md`.
+**Approved by the product owner:** 11 Mehr 1405 (3 Oct 2026); home page (v1.0.4) 22 Mehr 1405 (14 Oct 2026). Every open decision is closed; dark mode and the article reading tools are backlog for after the beta.
+**Binding rules for Claude Code:** `CLAUDE-CODE-DESIGN-SYSTEM-RULES.md` (read first) · start message: `START-PROMPT-FOR-CLAUDE-CODE.md` · demo data: `demo-content/` · **final QA (required before done): `QA-FINAL-RECONCILIATION.md`** · changes since v1.0: `CHANGELOG.md`.
 **Checked against:** `App` at commit `74fbfb7` (Next.js 15, React 19, Tailwind CSS 4, tokens in `app/globals.css` `@theme`, components in `src/ui/*` and `src/<module>/*`).
 
 Live versions (same content as this folder, rendered):
@@ -22,6 +22,9 @@ This package is the new **Design System** source in the repo's source precedence
 | `CLAUDE-CODE-DESIGN-SYSTEM-RULES.md` | **Mandatory** rules: one visual language, forbidden styles, close fidelity to K1–K19, demo data, definition of done. |
 | `demo-content/DEMO-DATA-SPEC.md` · `images-manifest.json` | What to seed page by page so every designed screen is visible; where each of the 78 photos is used, with Persian alt text. |
 | `key-screens/` | **Images of K1–K19** at 1440 and 390 (+ 3 extra states) and the two brand boards — the visual reference for every page; index in `key-screens/README.md`. |
+| `key-screens/html/` | **The exact markup of every key-screen board** (43 files), renders offline with `tokens.css` + `bundle.css` and the package's photos: which components, classes, order and copy each page uses. |
+| `QA-FINAL-RECONCILIATION.md` | **Final QA** — compare the whole design system and every key screen with the code, fill what is missing, write the report. Links + offline sources, step by step. |
+| `qa/` | `ds-inventory.json` (everything to find in the code), `ds-audit.mjs` (static audit, exit 1 on FAIL), `compare-key-screens.mjs` (reference vs running app at 390/1440: screenshots + structural diff). |
 | `design-system/README.md` | Brand book and the rules that apply to every screen. |
 | `design-system/01-color.md` … `08-content.md` | Foundations: colour (incl. **code token → new token mapping**), typography, layout, iconography (approved 128 icons), imagery, motion, **status dictionary** (81 keys), content rules. |
 | `design-system/shells.md` | SiteShell, PublicShell, OpsShell at mobile / tablet / desktop. |
@@ -58,6 +61,7 @@ This package is the new **Design System** source in the repo's source precedence
 5. **Icons** — add the approved glyphs to `src/ui/icon-paths.ts` (camelCase of the Phosphor name).
 6. **Shells** — SiteShell, PublicShell, OpsShell at three breakpoints.
 7. **Core components** in `src/ui/*`, then the ★ new components as patterns need them, using `bundle.css` as the visual reference (translate to Tailwind utilities or import the `.hz-*` classes — pick one and record the decision).
-8. **Pages**, pattern by pattern, compared with K1–K19 on the key-screens canvas. Then remove the old token aliases.
+8. **Pages**, pattern by pattern, compared with K1–K19 on the key-screens canvas (and `key-screens/html/`). Then remove the old token aliases.
+9. **Final QA** — `QA-FINAL-RECONCILIATION.md` end to end; the work is done only when `qa/ds-audit.mjs` shows 0 FAIL and the report is written.
 
 Do not invent copy, statuses or colours that are not in the system; if something is missing, log a decision and keep to the closest existing part.

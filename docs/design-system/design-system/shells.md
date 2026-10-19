@@ -72,7 +72,7 @@ A person with an operator role still lands in PublicShell for their own animals;
 - **Lines, not shadows.** Chrome never casts a shadow; only floating layers do (`shadow-overlay-sm` for nav panels, `shadow-overlay-lg` for Drawers, `shadow-sticky` for a mobile sticky bar over content).
 - **Orange is emphasis.** In chrome it appears only as: the current item (`bg-brand-subtle` + `text-brand`), the environment label, alert counts and badges (`action-primary`), the tab indicator, the bell dot (`logo-mark`) and focus. At most one primary button per view, counting the top bar. Exception: the SiteShell header's «ورود / ثبت‌نام» / «پنل من» is a primary sm button (filled `user` icon) and does not count (v1.0.3).
 - **Current location** is shown twice: the item (`aria-current="page"`, fill icon) and the page title. In SiteShell the parent group in the header is also marked.
-- Landing pages may add `bg-feature` cards and one `bg-band`; the shell never changes colour per page.
+- Landing pages may add `bg-feature` cards and one `bg-band` (the home `/` uses section frames instead — P01); the shell never changes colour per page.
 
 ## Sticky and scroll behaviour
 

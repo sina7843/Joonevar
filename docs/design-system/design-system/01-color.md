@@ -13,7 +13,7 @@ The palette is **fixed at 27 colours** (25 from `app/globals.css` without `#171A
 | Cards, panels, tables, overlays | `bg-surface` | `white` #FFFFFF | Always outlined with `border-default` (1px) — white on white is separated by the line, never by a shadow |
 | Chrome | `bg-chrome` | `cream-50` #FFFCF8 | Header and footer (SiteShell); sidebar and top bar (PublicShell, OpsShell); mobile tab bar and sticky action bars. Always with a `border-default` edge toward the page |
 | Landing feature cards | `bg-feature` | `cream-50` #FFFCF8 | **SiteShell landing pages only** (home and section landings): quick links, breed, community, service and step cards, stats box, hero verify box — with `border-default` |
-| Landing band | `bg-band` | `cream-50` #FFFCF8 | **SiteShell landing pages only:** one full-width band, edge to edge (approved: «تازه‌ها»), `border-subtle` hairlines top and bottom; cards inside are `bg-surface` white. Max one per page |
+| Landing band | `bg-band` | `cream-50` #FFFCF8 | **SiteShell landing pages only:** one full-width band, edge to edge (no longer used on `/`: since v1.0.4 the home uses section frames, `bg-feature` / `bg-brand-subtle`), `border-subtle` hairlines top and bottom; cards inside are `bg-surface` white. Max one per page |
 | Quiet fill | `bg-subtle` | `sand-100` #FAF7F2 | Inside a surface: «اقدام بعدی با» box, locked-service card, table header, hover of secondary/ghost |
 | Brand tint | `bg-brand-subtle` | `peach-50` #FFF6ED | CTA box, active nav item, selected option, category tags |
 
@@ -72,7 +72,7 @@ One primary button per view. Orange is emphasis, never a background area.
 | `bg-surface` | `white` | Cards, panels, tables, modals, sheets — always with border-default. |
 | `bg-chrome` | `cream-50` | Header, footer, PublicShell/OpsShell sidebar and top bar, mobile tab bar, sticky action bars. Always separated from the page by border-default. |
 | `bg-feature` | `cream-50` | Landing pages only: feature cards (quick links, breed, community, service, step cards, stats box, hero verify box). Always with border-default. Never in PublicShell or OpsShell. |
-| `bg-band` | `cream-50` | Landing pages only: one full-width band edge to edge (e.g. «تازه‌ها»), border-subtle hairlines top and bottom; cards inside are bg-surface. |
+| `bg-band` | `cream-50` | Landing pages only: one full-width band edge to edge (section landings; `/` uses section frames since v1.0.4), border-subtle hairlines top and bottom; cards inside are bg-surface. |
 | `bg-subtle` | `sand-100` | Quiet fills inside surfaces: «اقدام بعدی با» box, locked-service card, table header row, hover on secondary/ghost controls. |
 | `bg-brand-subtle` | `peach-50` | Brand tint: CTA box, active nav item, selected radio card, category tag, avatar initials. |
 | `bg-disabled` | `sand-200` | Disabled control fill. |

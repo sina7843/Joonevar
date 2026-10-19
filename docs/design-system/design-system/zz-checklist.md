@@ -9,7 +9,7 @@ The pack's acceptance checklist (09), checked item by item at final delivery (10
 | 2–3 directions × 3 anchor screens × 390 / 1440 | ✓ | Canvas «Hamzist — Visual Directions»: A, B, C × home, dashboard, KYC desk × 2 sizes (18 frames). |
 | Real IRANSansX, not a substitute | ✓ | Fonts from `fonts/`, loaded in every frame and preview. |
 | Real SVG logo, current palette, no unmarked new colour | ✓ | Wordmark rebuilt from IRANSansX Black outlines, symbol verbatim. |
-| Home sections from code (8) | ✓ | K1 follows `app/(public)/page.tsx`, reordered on 11 Mehr 1405 (v1.0.3): «تازه‌ها» first, Hero in the band. |
+| Home sections from code (8) | ✓ | K1 follows `app/(public)/page.tsx`; redesigned and approved 22 Mehr 1405 (v1.0.4): framed sections, market, vets and centres added (P01). |
 | Persian digits, Toman, Jalali | ✓ | Rules in *Content*; helpers in `components/bundle.js`. |
 | Decision desk dense and working | ✓ | K3 + DecisionDesk. |
 | One-line description per direction | ✓ | Canvas row titles. Direction **A «دفتر رسمی»** approved, with B's radii. |
@@ -113,6 +113,8 @@ The pack's acceptance checklist (09), checked item by item at final delivery (10
 | 10 | Small component notes | **Approved**: BreedCard 5 meters + size and coat as facts; expired-licence centres hidden from public results; one icon per document type; ink rating stars; club scope «کشوری». |
 | 11 | Bulk sample receipt (genetics) | **Approved**: «ثبت دریافت نمونه» is a bulk action on `/genetics/samples` (K19). |
 | 12 | Ink alpha for shadows and scrim | **Approved**: shadows 12–24% and `overlay-scrim` 48% of the ink `#3A3B36`; no new colour. |
+| 13 | Home page look (K1) | **Approved 22 Mehr 1405 (v1.0.4)**: every section in a rounded frame (white / cream alternating, Hero peach), featured breed with trait meters, market + shop rows, vets + centres, club cover cards, counts + steps in one box, CtaBand with a photo. |
+| 14 | Fees on public pages | **Not shown** (26 Mehr 1405): the product decision DEC-0186 stays — no number on any public page; fees appear only in the payment flow. K1 «خدمات همزیست» cards have no price footer and no «تعیین‌نشده» note; the section link is «مشاهده همه». |
 
 ## Still open
 
@@ -142,13 +144,16 @@ Checked on 11 Mehr 1405 against `App` at commit `74fbfb7` (Next.js 15, React 19,
 **Recommended order for the integration** (one commit each, app runnable between steps):
 1. Fonts: copy the 11 IRANSansX woff2 files to `public/fonts/` and load them (`@font-face`); this closes DEC-0007.
 2. Tokens: extend `@theme` with the new names and values above (keep the old names as aliases until the end).
-3. Brand: copy `brand/` (logo SVGs, app icon **A**, favicons, OG image) to `public/brand/`, update `Logo`, `app/layout.tsx` metadata and the manifest (*Brand*).
+3. Brand: copy `design-system/assets/brand/` (logo SVGs, app icon **A**, favicons, OG image) to `public/brand/`, update `Logo`, `app/layout.tsx` metadata and the manifest (*Brand*).
 4. Status dictionary module; switch `StatusBadge` callers module by module.
 5. Shells: SiteShell → PublicShell → OpsShell at the three breakpoints (*Shells*).
 6. Core components in `src/ui/*` (Button tones and sizes, fields, Alert, Card variants, overlays), then the ★ new components as the patterns need them (P01–P12), using `components/bundle.css` class names as the reference implementation.
 7. Pages, pattern by pattern, checked against the key screens (K1–K19) on the design canvas.
 
 ### Updates after the v1 handoff
+
+- **v1.0.4 (22 Mehr 1405)** — home page (K1 at 1440 and 390, P01) and `components/bundle.css` block «Home compositions»: `.hz-frame` (+ `--cream`, `--peach`), `.hz-home-stack`, `.hz-subhead`, `.hz-row` (+ `--stack`), `.hz-breed-feature`, `.hz-club-cover` (ClubCard `--cover`), `.hz-glance`, `.hz-cta--media` (CtaBand `--media`). New sections on `/`: «بازار همزیست» (listings + products) and «دامپزشکان و مراکز معتمد» (vets + centres); «روش کار» moved into «همزیست در یک نگاه»; no full-bleed band on `/`. Data: the featured breed and the CtaBand photo are home settings with fallbacks (P01).
+  QA fixes in the same release: SiteShell header fits at 1024–1279 (nav item padding 8, bar gap 24); on coarse pointers `.hz-btn--sm`, `.hz-qty` buttons and `.hz-segmented__item` reach 44px; seller name is `<h2>` when it is the first heading under the page title (K6, K7); K17 phone has its `<h1>` (the conversation name).
 
 - **v1.0.3 (11 Mehr 1405)** — home page and site header (K1, K4–K7 updated on the key-screens canvas; no `bundle.css` change):
   1. **Home (P01) order:** «تازه‌ها» is the first section, on white. The one `bg-band` moved behind the Hero; on desktop the «استعلام اصالت سند» card in the Hero is `bg-surface` (white).

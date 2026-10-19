@@ -48,6 +48,10 @@ Composes `.hz-card.hz-card--interactive`, `.hz-media--avatar`, `.hz-badge--sm`.
 - **With / without upcoming event.** Only the next event is shown; past events never.
 - **Public** (no badge — only `ACTIVE` communities are listed) / **manager & operator** (badge when not active).
 
+### `--cover` (home, v1.0.4)
+
+`a.hz-card.hz-card--flush.hz-card--interactive.hz-club-cover` > `.hz-media--16x9` (the community's cover photo) + `.hz-card__section.hz-club-cover__body` (name `hz-entity__name`, kind · scope · members `hz-entity__meta`, optional `hz-community__event`). Used on `/` in a `.hz-row` of four. No cover photo → the RecordImage placeholder at 16:9.
+
 ## States
 
 - **Default** · **hover** (pointer): lift + `border-control`.

@@ -153,7 +153,7 @@ Config values (the only place hex appears in this section):
 
 ## Files — stable names
 
-Copy `design-system/brand/` to `App/public/brand/` keeping these paths (for the app icon, copy option **A**'s five PNGs from `app-icon/A/` into `app-icon/`):
+Copy `design-system/assets/brand/` to `App/public/brand/` keeping these paths (for the app icon, copy option **A**'s five PNGs from `app-icon/A/` into `app-icon/`):
 
 ```
 brand/logo/       symbol.svg

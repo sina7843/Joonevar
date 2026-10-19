@@ -63,6 +63,10 @@ Tiles: <768 two columns (or a horizontal scroller on the home page), 768–1023 
 
 Meters fill from the inline start (right in RTL, left in LTR) — they are flex children, no mirroring needed. The English name is isolated with `<bdi dir="ltr">` and aligned to the start of the Persian column (`align-self: flex-start`). Numbers in Persian digits; separate numeric meta items with «،», not «·».
 
+### Featured breed on the home page (v1.0.4)
+
+`.hz-breed-feature` > `figure.hz-breed-feature__media` (breed photo, 16:10) + `.hz-breed-feature__info`: overline «نژاد این ماه», `h3.hz-breed-feature__title` (Persian name + `<bdi class="hz-breed__en" dir="ltr">`), `historyFa`, the five trait meters (`dl.hz-traits`, same markup as the breed profile), «شناسنامه نژاد …» (secondary). Desktop photo 7/12 + profile 5/12; phones stacked. Only a breed with a photo, `historyFa` and all five traits can be featured.
+
 ## Accessibility
 
 - The meter is `aria-hidden`; the level is real text in the same `<dd>`, so it reads «انرژی، زیاد». It is never colour only: filled vs hollow steps differ in fill and the count of filled steps, and the text level is always present.

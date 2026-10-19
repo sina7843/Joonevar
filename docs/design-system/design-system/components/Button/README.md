@@ -54,7 +54,7 @@ default · hover (pointer only: primary → `action-primary-hover`, secondary/gh
 
 ## Mobile ↔ desktop
 
-<768: primary actions become `lg` + `block`, usually inside a sticky ActionRow; nothing below 44px. 768–1023: inline, `md`. ≥1024: inline, `md`; `sm` only in OpsShell tables and toolbars (pointer devices).
+<768: primary actions become `lg` + `block`, usually inside a sticky ActionRow; nothing below 44px — on coarse pointers `sm` buttons get `min-height: 44px` (bundle, v1.0.4). 768–1023: inline, `md`. ≥1024: inline, `md`; `sm` only in OpsShell tables and toolbars (pointer devices).
 
 ## RTL & LTR
 

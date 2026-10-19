@@ -1,7 +1,7 @@
 # Design System v1 — mandatory rules for Claude Code
 
 **Status:** binding instruction from the product owner (11 Mehr 1405 / 3 Oct 2026). It sits at item 1 of CLAUDE.md's source precedence ("current explicit user instructions") and overrides item 4's "Prototype … layout" for everything visual: layout, composition, components, colour, type, spacing, imagery.
-**Design source:** `docs/design-system/` (this package, v1.0.3). Live: design system https://claude.ai/artifact/XBu7b9eyzZKB3E31kc8vFn · key screens https://claude.ai/artifact/85Z6AZDVJRPzhWvYAEkY92.
+**Design source:** `docs/design-system/` (this package, v1.0.4). Live: design system https://claude.ai/artifact/XBu7b9eyzZKB3E31kc8vFn · key screens https://claude.ai/artifact/85Z6AZDVJRPzhWvYAEkY92.
 **Product behaviour is unchanged:** Requirements.md, D01–D19 and the flows still decide *what* a page does. The design system decides *how it looks and is composed*.
 
 ## 1. Non-negotiable
@@ -13,6 +13,9 @@
 5. **Content rules:** Persian digits; «۲۵۰٬۰۰۰ تومان»; Jalali dates; Latin ids in `<bdi dir="ltr">`; statuses only from the dictionary (`src/ui/status-dictionary.ts`, 81 keys) with one label + one tone for every viewer; «اقدام بعدی با: …» on every open case; one primary button per view, start = primary.
 6. **Imagery:** the **78 approved photos** in `design-system/assets/imagery/` are the app's images. All of them are used, each where its manifest entry says (`demo-content/images-manifest.json`), with its Persian alt text. No remote or stock images, no grey boxes where a photo exists.
 7. **Backlog — do not build now:** dark theme; article reading tools (progress bar, share, save, comments, likes).
+8. **Fonts — exact.** One family: **IRANSansX** (11 static woff2 in `design-system/fonts/` → `public/fonts/`, byte-identical), loaded only through the `@font-face` rules of `tokens.css` (weights 100–950, `font-display: swap`), stack `"IRANSansX", Tahoma, system-ui, sans-serif`, used only through the font tokens. Forbidden: any other family anywhere (including PDFs and print documents — they use IRANSansX too), the FaNum build, Google Fonts / `next/font/google`, faux bold (only the 11 weights exist). The full desktop family in the package's `fonts/` folder is for design tools and stays out of the repo.
+9. **Logo and brand files — exact.** Use only the files of `design-system/assets/brand/`, copied to `public/brand/` under the stable names of `brand.md › Files` (app icon **option A** only; B and C are never shipped). Each place gets the lockup and height of `brand.md › Usage per shell` (site header 36/30, ops sidebar 26, rail symbol 32, sign-in stacked 100, A4 head 40). Height only, never width; never recoloured, re-typeset, stretched, shadowed, placed on a photo, or below the minimum (use the symbol). The name is always «همزیست» in brand use. Favicon set + `favicon.ico` at the root, `app/layout.tsx` metadata, manifest (`theme_color`/`background_color` `#FFFCF8`) and OG image exactly as `brand.md` gives them.
+10. **Stylesheets in sync.** `src/ui/design-system/bundle.css` and `tokens.css` are copies of `design-system/components/bundle.css` and `design-system/tokens.css` (only the `@font-face` URLs may differ). Never edit them in the app; app-specific rules go in app CSS with tokens. When the design system changes, copy them again.
 
 ## 2. Demo data — make every designed screen visible
 
@@ -30,6 +33,8 @@ Pages without data only show empty states, so the design cannot be checked. Buil
 - No forbidden styles (rule 1.2) — add a check to `npm run check` that fails on hex, palette colours and physical direction utilities in `app/**` and `src/**` (allow-list `src/ui/design-system/*` and the PDF/print templates).
 - No horizontal scroll at 360–1440 and at 200% zoom; focus visible on every control; touch targets ≥ 44px on coarse pointers; `prefers-reduced-motion` respected.
 
+- **Final QA passed:** `QA-FINAL-RECONCILIATION.md` run end to end, `node docs/design-system/qa/ds-audit.mjs` with **0 FAIL**, every REVIEW item closed, `docs/qa/design-system/QA-REPORT.md` written.
+
 ## 4. When the system lacks something
 
 Use the closest existing component, log `DEC-NNNN`, and append the gap to `docs/design-system/GAPS.md` (what, where, what you used instead). Do not invent colours, statuses, icons or copy outside the system.
@@ -41,3 +46,4 @@ Use the closest existing component, log `DEC-NNNN`, and append the gap to `docs/
 3. The forbidden-style check (section 3) — fix what it finds.
 4. Walk every route group (public → user → vet → each ops environment) with demo data at 390/1440 and bring each page to its pattern/key screen; screenshots in `docs/qa/design-system/`.
 5. Report: pages done, gaps logged, photos used (78/78).
+6. **Final QA** — when everything above is done, run `QA-FINAL-RECONCILIATION.md` in full: compare the whole design system and every key screen with the code (links and offline copies are listed there), fill every missing part from the design system, and only then report the work as finished.

@@ -38,7 +38,7 @@
 | Animal market | 6 listings (2 photos each; 1 reserved, 1 sold, offers on), the K17 inquiry with offer and handover appointment | `listings/*` (12) |
 | Shop | 2 sellers (shipping 85,000 / 95,000; thresholds), 8 products with SKUs and stock (incl. low stock, reserved, out of stock), reviews, questions, a cart from two shops, 2 orders with sub-orders | `products/*` (8) |
 | Mating finder | 3 profiles (ready, invite only, unavailable) + 1 request in negotiation | animal photos |
-| Home | hero images, «تازه‌ها», featured vets, breeds, market, shop | `home/*` + `sample-hero-dog.jpg` |
+| Home | hero images, «تازه‌ها», featured breed (سگ سرابی, with traits), 5 breed tiles, 4 listings + 4 products, 4 trusted vets + 3 centres, 4 clubs with covers, counts + 3 steps, CtaBand photo (v1.0.4) | `home/*` + `sample-hero-dog.jpg` + the photos marked «home» in the manifest |
 
 ## Vet (PublicShell vet tabs) — K12
 

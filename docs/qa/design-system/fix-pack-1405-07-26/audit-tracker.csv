@@ -1,0 +1,556 @@
+﻿ID,Theme,Priority,Severity,Origin,Area,Key screens,Title,Page / component,Status,Commit,Note
+FND-001,T01,1,high,v1.0.4,FND,K1,CSS نسخهٔ v1.0.4 در کد نیست (bundle.css هنوز v1.0.3 است),همهٔ صفحه‌ها؛ به‌ویژه خانه `/` (K1)، SiteShell، Button، Stepper (`.hz-qty`)، SegmentedControl، ClubCard، CtaBand,,,
+KPUB-001,T01,1,high,v1.0.4,KPUB,K1,بلوک CSS «Home compositions» در bundle واردشده نیست,K1 — همهٔ قاب‌ها و ردیف‌های خانه,,,
+CMPA1-035,T01,1,medium,v1.0.4,CMPA1,,دکمه‌های `sm` روی صفحه لمسی ۴۴px نمی‌شوند (CSS v1.0.4 vendor نشده),Button / ButtonLink `--sm`,,,
+RTU-008,T01,1,medium,v1.0.4,RTU,,CSS سیستم در کد نسخه v1.0.3 است و دکمه‌های `sm` روی لمس زیر ۴۴px می‌مانند,"
+  - `/account/profile`
+  - `/account/vet-profile/claim/[slug]`
+  - `/account/clubs`
+  - `/account/communities`
+  - `/account/centres`
+  - `/account/centres/claims`
+  - `/veterinarians/[slug]` و فهرست‌های `/veterinarians`، `/centers`، `/clubs`، `/associations`، `/animals-market`
+  - همه `LockedServiceCard`ها (`src/ui/card.tsx:174` با `size=""sm""`)",,,
+SHL-001,T01,1,medium,v1.0.4,SHL,,اصلاح QA نسخه v1.0.4 هدر سایت (۱۰۲۴–۱۲۷۹) و هدف لمسی دکمه sm اعمال نشده,SiteShell header — همه ۴۲ مسیر عمومی,,,
+CMPB-025,T01,1,low,v1.0.4,CMPB,,QuantityStepper · قانون هدف لمسی ۴۴px در v1.0.4 در CSS وندورشده نیست,QuantityStepper (و `.hz-segmented__item`، `.hz-btn--sm`) — همهٔ صفحه‌ها روی صفحه‌لمسی,,,
+CMPB-099,T01,1,low,v1.0.4,CMPB,,Tabs · افزودهٔ v1.0.4 برای هدف لمسی ۴۴px در Segmented وارد نشده است,Segmented (فعلاً فقط RoleSwitcher از `hz-segmented` استفاده می‌کند),,,
+CMPA1-031,T02,1,high,v1.0.4,CMPA1,K1,«نژاد این ماه» (`.hz-breed-feature`) در صفحه اصلی نیست,BreedCard — featured breed (K1),,,
+KPUB-002,T02,1,high,v1.0.4,KPUB,K1,خانه هنوز «نوار» دارد، نه ستونی از قاب‌ها؛ Hero کرمِ تمام‌عرض است نه قاب هلویی,K1 — چیدمان کل صفحه، Hero,,,
+KPUB-003,T02,1,high,v1.0.4,KPUB,K1,«نژاد این ماه» (featured breed) وجود ندارد,K1 — «نژادهای سگ» / `.hz-breed-feature`,,,
+KPUB-005,T02,1,high,v1.0.4,KPUB,K1,بخش «بازار همزیست» (۴ آگهی + ۴ کالا) نیست,K1 — «بازار همزیست»,,,
+KPUB-006,T02,1,high,v1.0.4,KPUB,K1,بخش «دامپزشکان و مراکز معتمد» (۴ دامپزشک + ۳ مرکز) نیست,K1 — «دامپزشکان و مراکز معتمد»,,,
+KPUB-008,T02,1,high,v1.0.4,KPUB,K1,«همزیست در یک نگاه»: جعبهٔ آمار قدیمی به‌جای `.hz-glance` (۴ شمارش با آیکون + سه گام با عکس),K1 — «همزیست در یک نگاه»,,,
+CMPA1-047,T02,1,medium,v1.0.4,CMPA1,K1,کارت کاور کلاب (`--cover`) در صفحه اصلی نیست,ClubCard `--cover` (K1),,,
+CMPA1-056,T02,1,medium,v1.0.4,CMPA1,K1,CtaBand صفحه اصلی گونه عکس‌دار `--media` را ندارد,CtaBand `--media` (K1),,,
+CMPA2-022,T02,1,medium,v1.0.4,CMPA2,K1,Hero صفحه‌ی خانه هنوز در نوار کِرِم تمام‌عرض است، نه در قاب هلویی (v1.0.4),`.hz-hero` (Hero محصولِ SiteShell؛ K1),,,
+KPUB-004,T02,1,medium,v1.0.4,KPUB,K1,ردیف نژادها: ۶ کاشی در شبکه به‌جای ۵ کاشی در `.hz-row` کشیدنی,K1 — «نژادهای سگ»,,,
+KPUB-007,T02,1,medium,v1.0.4,KPUB,K1,انجمن‌ها: ClubCard پیش‌فرض (آواتار) ۳تایی به‌جای `ClubCard --cover` ۴تایی,K1 — «انجمن‌ها و کلاب‌ها» / ClubCard,,,
+KPUB-009,T02,1,medium,v1.0.4,KPUB,K1,«روش کار» بخش جداست و گام‌هایش با طرح فرق دارد,K1 — گام‌ها,,,
+KPUB-010,T02,1,medium,v1.0.4,KPUB,K1,«خدمات همزیست»: تعرفه روی کارت، قاب کرم و پیوند «تعرفه‌ها و شرایط» نیست,K1 — ServiceCard,,,"Decision 14 (26 Mehr 1405): NO fee on public pages (DEC-0186 stays). Build the cream frame, white ServiceCards without footer, link «مشاهده همه» → /services. Ignore the fee / «تعیین‌نشده» / footnote parts of this finding."
+KPUB-011,T02,1,medium,v1.0.4,KPUB,K1,CtaBand پیش‌فرض به‌جای `CtaBand --media` با عکس,K1 — CtaBand,,,
+KPUB-015,T02,1,medium,code,KPUB,K1,بارگذاری و خطای مستقل بخش‌ها پیاده نشده است,K1 — حالت‌ها,,,
+KPUB-012,T02,1,low,code,KPUB,K1,«تازه‌ها»: فیلدهای کارت ویژه و فهرست، متن پیوند موبایل و `title`,K1 — ArticleCard `--feature` / `--horizontal`,,,
+KPUB-013,T02,1,low,code,KPUB,K1,جزئیات Hero: متن خلاصه، تیتر ثابت در کد، دکمهٔ استعلام موبایل و فرم استعلام,K1 — Hero,,,
+KPUB-014,T02,1,low,code,KPUB,K1,«دنبال چه می‌گردید؟»: ساختار کارت و متن توضیح,K1 — کاشی‌های ورود سریع,,,
+CMPB-083,T03,1,high,code,CMPB,,StatusBadge · تقریباً همهٔ badgeها tone و برچسب را در خود صفحه تعیین می‌کنند و از کلید دیکشنری استفاده نمی‌کنند,همهٔ صفحه‌های دارای وضعیت,,,
+FND-007,T03,1,high,code,FND,,وضعیت‌ها عملاً از دیکشنری نمی‌آیند: ۲۱۲ `StatusBadge` با برچسب و tone دست‌نویس,StatusBadge در تقریباً همهٔ صفحه‌های کاربر، عملیات و عمومی,,,
+RTO-016,T03,1,high,code,RTO,,هیچ StatusBadge عملیاتی از فرهنگ وضعیت استفاده نمی‌کند,*StatusBadge* «Never type a label by hand: the badge takes a status **key**»,,,
+RTU-001,T03,1,high,code,RTU,,StatusBadge هیچ‌جا از فرهنگ وضعیت استفاده نمی‌کند و برچسب‌های بازنشسته هنوز نمایش داده می‌شوند,همه صفحه‌های این حوزه که نشان وضعیت دارند (۶۰ فایل در این حوزه با `<StatusBadge tone=…>`),,,
+CMPA1-018,T03,1,medium,code,CMPA1,,AnimalCard برای حیوان ثبت‌شده هم نشان وضعیت می‌گذارد و برچسب‌ها از دیکشنری وضعیت نمی‌آیند,AnimalCard (داشبورد و «حیوان‌های من»),,,
+CMPB-042,T03,1,medium,code,CMPB,,OfferCard · برچسب وضعیت پیشنهاد از دیکشنری نیست و «پیشنهاد فعلی» نمایش داده می‌شود,کارت «قیمت» در ستون کناری رشته,,,
+CMPB-064,T03,1,medium,code,CMPB,,SubOrderCard · برچسب و tone وضعیت زیرسفارش از دیکشنری نیست,badge زیرسفارش در جزئیات سفارش و صفحهٔ سفارش‌های فروشنده,,,
+FND-008,T03,1,medium,code,FND,,حیوان ثبت‌شده badge «پرونده اولیه» می‌گیرد؛ REGISTERED نباید badge داشته باشد,`/animals` (کارت حیوان) و `/animals/[id]` (سربرگ پرونده),,,
+CMPB-070,T03,1,low,code,CMPB,K5,VetCard · برچسب «معتمد همزیست» و badgeهای اضافی روی کارت,فهرست دامپزشکان (K5),,,
+CMPB-084,T03,1,low,code,CMPB,,StatusBadge · variant آیکون‌دار و ثبت کلید ناشناخته وجود ندارند,`StatusBadge`,,,
+FND-009,T03,1,low,code,FND,K5,نشان اعتماد TRUSTED با برچسب و ظاهر ناهمسان,`/veterinarians` (VetCard، K5) و `/veterinarians/[slug]`,,,
+KOPS-020,T03,1,low,code,KOPS,K14,برچسب و رنگ وضعیت آگهی از دیکشنری وضعیت پیروی نمی‌کند؛ «اقدام بعدی با» همیشه «ناظر آگهی» است,K14 · StatusBadge / ActionOwner,,,
+CMPB-079,T04,1,high,code,CMPB,K6 K7 K9 K10 K11 K12 K15 K18,StickyActionBar · نوار کنش چسبان موبایل در هیچ صفحه‌ای پیاده نشده است,نمای موبایل K6، K7، K9، K10، K11، K12، K15 (ویرایش) و K18,,,
+KPUB-026,T04,1,high,code,KPUB,K6 K7,نوار اقدام چسبان پایین صفحه (StickyActionBar) در موبایل وجود ندارد,K6 و K7 موبایل — `hz-sticky-bar`,,,
+KUSR-015,T04,1,high,code,KUSR,K9,پرونده حیوان در موبایل: ستون وضعیت به ته صفحه می‌رود و نوار اقدام چسبان نیست,K9 پرونده حیوان · موبایل (<1024),,,
+RTU-003,T04,1,high,code,RTU,,اقدام اصلی روی موبایل در `ActionRow` چسبان نیست,همه صفحه‌های `PublicShell` با الگوی P05، P07 و P08 که دکمه اصلی دارند. تنها استثنا `/requests/new` است.,,,
+CMPA1-016,T04,1,medium,code,CMPA1,,نوار عملیات چسبان (`--sticky`) هیچ‌جا استفاده نشده و بسیاری از فرم‌ها ActionRow ندارند,ActionRow,,,
+CMPB-090,T04,1,medium,code,CMPB,,PageHeader · کنش اصلی زیر ۷۶۸ به ActionRow چسبان منتقل نمی‌شود,PageHeader در همهٔ صفحه‌های رکورد که `actions` دارند,,,
+KUSR-025,T04,1,medium,code,KUSR,K10,موبایل K10: نوار اقدام چسبان مرحله نیست و نوار تب دیده می‌شود,K10 موبایل · StickyActionBar,,,
+KUSR-032,T04,1,medium,code,KUSR,K11,ستون کناری K11 «حیوان» و «پرداخت» ندارد؛ موبایل بدون نوار اقدام چسبان و با ترتیب متفاوت,K11 · aside و موبایل,,,
+RTU-007,T04,1,medium,code,RTU,,نوار زبانه پایین در فرم‌های چندمرحله‌ای و صفحه خلاصه پرداخت پنهان نمی‌شود,"همه صفحه‌های P07 و P08 در `PublicShell`، از جمله:
+  - `/animals/[id]/edit`
+  - `/animals/[id]/foreign-pedigree`
+  - `/requests/new`
+  - `/requests/new/review`
+  - `/registration/new`
+  - `/declaration/new`
+  - `/mating/permits/new` و `/[id]/dates`، `/[id]/pregnancy`، `/[id]/birth`
+  - `/pedigree/issue`
+  - `/litters/[id]/allocation`
+  - `/account/kyc`
+  - `/breeder/activate`
+  - `/account/centres/claim/[slug]`
+  - `/account/vet-profile/claim/[slug]`
+  - `/account/orders/[id]/return`
+  - `/account/purchases/[id]/return`
+  - `/report/*`
+  - `/membership`
+  - `/puppy-cards/checkout`
+  - `/account/packages`",,,
+SHL-021,T04,1,medium,code,SHL,,ActionRow چسبان موبایل در PublicShell زیر نوار تب پنهان می‌شود,PublicShell + `ActionRow sticky` / `hz-sticky-bar`,,,
+CMPA2-007,T05,1,high,code,CMPA2,K3 K16,DecisionDesk موبایل: نوار تصمیم چسبان پایین صفحه و BottomSheet دلیل وجود ندارد,DecisionDesk (K3 موبایل، K16 موبایل),,,
+CMPA2-018,T05,1,high,code,CMPA2,K3,DocumentPreview: مدرک خصوصی به‌صورت لینک «باز کردن در تب تازه» یا iframe داخل `<details>` است و ابزار زوم/چرخش/تمام‌صفحه ندارد,DocumentPreview (و ستون شواهد DecisionDesk، K3),,,
+KOPS-001,T05,1,high,code,KOPS,K3,نوار تصمیم چسبان پایین موبایل و BottomSheet دلیل وجود ندارد,K3 · DecisionDesk (موبایل/تبلت),,,
+KOPS-002,T05,1,high,code,KOPS,K3,نمایشگر مدرک: به‌جای پیش‌نمایش درون‌صفحه با ابزار، فقط یک لینک به تب تازه؛ روی/پشت کارت جدا نیست,K3 · DocumentPreview,,,
+RTO-007,T05,1,high,code,RTO,,فرم‌های تصمیم ساخته‌شده پیش از سیستم طراحی به‌جای `DecisionOptions` + `ReasonField`,*DecisionDesk* › «تصمیم» (سه کارت گزینه با پیامد یک‌خطی، `ReasonField`، primary با برچسب گزینه),,,
+RTO-010,T05,1,high,code,RTO,,مدرک خصوصی در زبانه تازه باز می‌شود؛ پیش‌نمایش با ابزار بزرگ‌نمایی و چرخش نیست,*DocumentPreview* (P10 › «مدارک»),,,
+CMPA2-008,T05,1,medium,needs decision,CMPA2,K3,DecisionDesk: سرِ پرونده جابه‌جایی پرونده‌ی قبلی/بعدی («پرونده ۲ از ۴») و breadcrumbs ندارد,DecisionDesk › Record head (K3 دسکتاپ),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA2-009,T05,1,medium,code,CMPA2,,چهار میز تصمیمِ دامپزشکی فرم تصمیم محلیِ شبیه‌سازی‌شده دارند,DecisionDesk › Decision panel,,,
+CMPA2-011,T05,1,medium,code,CMPA2,,چهار صفحه‌ی بررسی چیدمان میز را دستی و بدون کارت و `aside` ساخته‌اند,DecisionDesk,,,
+CMPA2-012,T05,1,medium,needs decision,CMPA2,,DecisionDesk: حالت «نسخه‌ی کهنه» (version conflict) پیاده نشده است,DecisionDesk › States › Stale,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-015,T05,1,medium,code,CMPB,K3,ReasonField · یادداشت داخلی، حالت خطا و غیرفعال، تُن `--over` و مخاطب داخلی ندارد,ReasonField — میز تصمیم (DecisionDesk/KYC، K03) و همهٔ `DecisionForm`ها,,,
+CMPB-017,T05,1,medium,code,CMPB,K16 K15,ReasonField · بیشتر دلیل‌های تصمیم اپراتور TextAreaField یا TextField ساده‌اند و چند تابع محلی هم‌نام ReasonField هست,ReasonField — گزارش محتوا (K16)، تنظیمات (K15)، میزهای دامپزشک، کلاب، بازار و پیشنهاد، ویرایش مراکز و انجمن‌ها,,,
+KOPS-003,T05,1,medium,code,KOPS,K3,حالت «تصمیم کهنه» (تعارض نسخه) با لحن، متن و دکمه طراحی نیست,K3 · DecisionDesk stale alert (حالت سخت K3 «تصمیم کهنه»),,,
+KOPS-004,T05,1,medium,needs decision,KOPS,K3,سرِ پرونده ناقص است: «پرونده ۲ از ۴»، کد پرونده، موبایل، «ارسال دوباره»، سن دیرکرد و «مسئول» نیست,K3 · DeskHead,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KOPS-005,T05,1,medium,code,KOPS,K3,«اطلاعات اعلام‌شده» چهار ردیف از هشت ردیف طراحی را دارد و تأیید رقم کنترل کد ملی نیست,K3 · KeyValueList `--2col`,,,
+KOPS-006,T05,1,medium,needs decision,KOPS,K3,«سابقه پرونده» یک ردیف برای هر نسخه ندارد؛ عنوان، کپشن و نام اقدام‌کننده با طراحی فرق دارد,K3 · Timeline (audit),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KOPS-026,T05,1,medium,code,KOPS,K15,حالت‌های ذخیره و تعارض نسخه با طراحی نیست (Toast، Alert هشدار با مقدار تازه),K15 · States «Saving / Conflict»,,,
+KOPS-032,T05,1,medium,code,KOPS,K16,سر پرونده: شناسه محتوا، «ناشر»، «نخستین گزارش»، نسخه، سن دیرکرد، «مسئول» و ناوبری قبلی/بعدی نیست؛ مالک اقدام «همزیست» خوانده می‌شود,K16 · DeskHead,,,
+RTO-006,T05,1,medium,code,RTO,,تصمیم و اقدام درون کارت صف انجام می‌شود (بدون میز تصمیم یا Drawer),P09 Don't «decide cases inline in the table»؛ P10 «Queues without a `[id]` route … open the same desk in a wide `Drawer` from the end»,,,
+RTO-009,T05,1,medium,needs decision,RTO,,سر پرونده و ستون شواهد میزها ناقص است,P10 › Anatomy 2–3 (`DeskHead` + «سابقه پرونده» + افزوده‌های ماژول),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTO-011,T05,1,medium,code,RTO,,نوار تصمیم چسبان موبایل و BottomSheet در هیچ میزی نیست,P10 › Layout (موبایل «sticky bar `.hz-desk__bar` at the bottom (تأیید · اصلاح · رد …). اصلاح or رد opens a `BottomSheet`»، تبلت `Modal`),,,
+RTO-012,T05,1,medium,code,RTO,,حالت «تعارض نسخه» طراحی‌شده نیست؛ خطای عمومی قرمز نمایش داده می‌شود,P10 › States › Stale؛ P11 › States › Conflict,,,
+RTO-021,T05,1,medium,code,RTO,,پرونده‌های فقط‌خواندنی و چند میز بازبینی به‌شکل ویرایشگر فرم‌ها ساخته شده‌اند,P06 (پرونده فقط‌خواندنی عملیاتی) و P10 (میز بازبینی مرکز و انجمن، انتشار محتوا),,,
+CMPA2-010,T05,1,low,code,CMPA2,,برچسب سه نتیجه در چند ماژول تغییر کرده است,DecisionDesk › Decision set,,,
+CMPA2-013,T05,1,low,code,CMPA2,,ReasonField در DecisionDesk: خطای قابل‌اعلام ندارد و chip آماده متن نوشته‌شده را پاک می‌کند,DecisionDesk › دلیل,,,
+CMPB-016,T05,1,low,code,CMPB,K3,ReasonField · چیپ متن را جایگزین می‌کند و شمارنده روی هر کلید اعلام می‌شود,ReasonField — میز KYC (K03) و `DecisionForm`,,,
+KOPS-007,T05,1,low,code,KOPS,K3,برچسب و راهنمای فیلد دلیل، نمایش همیشگی آن و پیام اعتبارسنجی با طراحی نمی‌خواند,K3 · ReasonField,,,
+KOPS-008,T05,1,low,needs decision,KOPS,K3,پرونده بسته: به‌جای «نتیجه نهایی بدون پنل»، پنل «نتیجه» با Alert آبی؛ حالت «تخصیص به دیگری» نیست,K3 · حالت‌های قفل/بسته,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTO-008,T05,1,low,code,RTO,,برچسب سه نتیجه یکدست نیست,P10 › Content & data rules «Keep the three labels exactly: تأیید · نیازمند اصلاح · رد»,,,
+CMPA1-042,T06,1,high,code,CMPA1,,۳۴ صف عملیاتی در دسکتاپ هم کارت‌اند، نه جدول CaseQueue,CaseQueue (P9، حدود ۳۵ صفحه),,,
+CMPB-032,T06,1,high,code,CMPB,K14 K19,SortMenu · صف‌های K14 و K19 کنترل مرتب‌سازی ندارند و بازار حیوان select بومی دارد,SortMenu — صف آگهی‌ها (K14)، صف نمونه‌های ژنتیک (K19)، بازار حیوان عمومی، فروشگاه,,,
+KOPS-015,T06,1,high,code,KOPS,K14,به‌جای جدول ۴۴px با تصویر کوچک، فهرست کارتی با فرم تصمیم درون هر ردیف؛ تصمیم در صف گرفته می‌شود و میز (Drawer) وجود ندارد,K14 · CaseQueue / DataTable (comfortable) + DecisionDesk در Drawer,,,
+KOPS-016,T06,1,high,code,KOPS,K14,نوار ابزار صف (جستجو، SortMenu، چیپ‌های نوع و دامنه، «فیلترها») وجود ندارد,K14 · SearchField + SortMenu + FilterBar,,,
+KOPS-017,T06,1,high,needs decision,KOPS,K14,انتخاب و BulkActionBar («واگذاری به…»، «پنهان‌کردن آگهی‌ها») وجود ندارد,K14 · BulkActionBar (حالت سخت K14 «کنش گروهی»),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KOPS-034,T06,1,high,code,KOPS,K19,به‌جای جدول dense صف نمونه‌ها، فهرست کارتی با فرم‌های گام درون کارت؛ نام حیوان لینک نیست و راهی برای باز کردن پرونده نیست,K19 · CaseQueue / DataTable dense (موبایل: کارت CaseQueue),,,
+KOPS-035,T06,1,high,needs decision,KOPS,K19,BulkActionBar با «ثبت دریافت نمونه (n)» و «واگذاری به…» (مصوب ۱۱ مهر) وجود ندارد,K19 · BulkActionBar,,,Already decided — Decision 11: «ثبت دریافت نمونه» bulk action on /genetics/samples approved.
+RTO-001,T06,1,high,code,RTO,,صف KYC و Export Pedigree فقط ۲۰ پرونده تازه‌تر را نشان می‌دهند، نه قدیمی‌ترین‌ها,صف احراز هویت و صف Export Pedigree,,,
+RTO-002,T06,1,high,code,RTO,,بیشتر صف‌ها در دسکتاپ هم فهرست کارت‌اند، نه DataTable متراکم,P09 › Collection (`CaseQueue` / `DataTable --dense`),,,
+RTO-003,T06,1,high,code,RTO,,صف‌ها Pagination ندارند و پرونده‌های بعد از صفحه اول در دسترس نیستند,*Pagination* «۱ تا ۲۵ از ۱۸۴ پرونده»,,,
+RTO-004,T06,1,high,code,RTO,,ابزار سر صف (جستجو، مرتب‌سازی، FilterBar نوع و دامنه، ستون «مسئول») تقریباً هیچ‌جا نیست,P09 › Anatomy 4–6 (`SearchField`، `SortMenu`، `FilterBar`، ستون مسئول),,,
+CMPA1-034,T06,1,medium,needs decision,CMPA1,,BulkActionBar و انتخاب چندتایی در صف‌ها وجود ندارد,BulkActionBar (P9),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA1-043,T06,1,medium,code,CMPA1,,CaseQueue: سرصف، شمارش زنده، جست‌وجو/مرتب‌سازی، ستون «مسئول»، صفحه‌بندی و دکمه باز کردن نیست,CaseQueue,,,
+CMPA2-001,T06,1,medium,code,CMPA2,,DataTable: کامپوننت مشترک وجود ندارد؛ هر صفحه جدول را دستی می‌نویسد,DataTable,,,
+CMPA2-002,T06,1,medium,code,CMPA2,,DataTable زیر 768: به‌جای CardList، خود جدول با CSS محلی «کارت» می‌شود و برچسب ستون‌ها گم می‌شود,DataTable (CardList),,,
+CMPB-093,T06,1,medium,code,CMPB,,Pagination · چهار فهرست صفحه‌بندی‌شده هیچ کنترل صفحه ندارند,Pagination (حالت نبودن),,,
+KOPS-018,T06,1,medium,code,KOPS,K14,صفحه‌بندی «۱ تا ۶ از ۲۴ پرونده» / «نمایش پرونده‌های بیشتر» وجود ندارد,K14 · Pagination,,,
+KOPS-019,T06,1,medium,code,KOPS,K14,قیمت آگهی و حالت «قیمت تعیین‌نشده» در صف نیست,K14 · Price / `hz-price--unset` (حالت سخت K14 «قیمت تعیین‌نشده»),,,
+KOPS-036,T06,1,medium,code,KOPS,K19,مرتب‌سازی، چیپ‌های نوع/دامنه و «فیلترها» نیست؛ جستجو دکمه جدا و متن دیگری دارد,K19 · SearchField + SortMenu + FilterBar,,,
+KOPS-037,T06,1,medium,code,KOPS,K19,«اقدام بعدی با» برای نمونه‌هایی که با دامپزشک‌اند هم `--you` (رنگ نوبت ما) می‌گیرد؛ سن از زمان نمونه‌گیری و بدون دیرکرد,K19 · ActionOwner / age,,,
+KOPS-039,T06,1,medium,code,KOPS,K19,سربرگ صف (شمارنده هشدار، قدیمی‌ترین دیرکرده، «به‌روزشده»، «باز کردن قدیمی‌ترین پرونده») و صفحه‌بندی با طراحی نمی‌خواند؛ Alert اضافه,K19 · PageHeader + Pagination,,,
+RTO-005,T06,1,medium,needs decision,RTO,,BulkActionBar در هیچ صفی نیست,*BulkActionBar*، P09 › 7,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTO-015,T06,1,medium,needs decision,RTO,,سن پرونده از «آخرین تغییر» حساب می‌شود و نشانگر دیرکرد هیچ‌جا نیست,P09 › Overdue و Content & data rules «Age = now − first submission»,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #12
+RTO-023,T06,1,medium,code,RTO,,ردیف‌های صف بدون کد، نام متمایز، وضعیت یا «اقدام بعدی با»,P09 › Content & data rules «Every row has `ActionOwner`»، «Case code = the record being decided»، «Animal-centred queues name the animal»,,,
+CMPA2-005,T06,1,low,needs decision,CMPA2,,DataTable: مرتب‌سازی، انتخاب گروهی و ستون‌های کمتر در 768–1023 پیاده نشده است,DataTable (variants: sortable، selectable),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA2-006,T06,1,low,code,CMPA2,,DataTable: حالت بارگذاری (اسکلت) و خطا برای جدول‌ها وجود ندارد,DataTable (States),,,
+KOPS-021,T06,1,low,code,KOPS,K14,بخش‌های اضافه در صف: Alert «این اعداد نشانه‌اند، نه حکم» و پنل «اعتراض‌ها» در همان صفحه,K14 · ترکیب صفحه,,,
+KOPS-038,T06,1,low,needs decision,KOPS,K19,خط وابستگی «منتظر: SM-…، نمونه مادر» برای پرونده‌های مسدود نیست,K19 · `hz-case__sub` dependency line,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-028,T09,1,high,code,CMPB,K15,SettingsPanel · هر ردیف تنظیم فرم ویرایش همیشه‌باز دارد؛ دکمهٔ «ویرایش»، ناحیهٔ `.hz-setting__edit` و حالت «پیش‌نویس» نیست,SettingsPanel — `/admin/settings` (K15)، `/market/settings`,,,
+KOPS-022,T09,1,high,code,KOPS,K15,مدل ویرایش: زیر هر ردیف یک فرم همیشه‌باز است؛ دکمه «ویرایش/تعیین مقدار»، ردیف در حال ویرایش با «پیش‌نویس» و «انصراف» وجود ندارد,K15 · SettingsPanel edit row (حالت سخت K15 «ویرایش نسخه‌دار با دلیل»),,,
+KOPS-023,T09,1,high,code,KOPS,K15,«دلیل تغییر» اجباری نیست (نه در فرم، نه در سرور),K15 · ReasonField در ویرایش تنظیم,,,
+KOPS-025,T09,1,high,code,KOPS,K15,موبایل: گروه‌ها Accordion نیستند، هشدار خلاصه تعیین‌نشده‌ها نیست و صفحه جداگانه ویرایش با نوار چسبان وجود ندارد,K15 · SettingsPanel موبایل + صفحه ویرایش کلید (`K15-settings-edit-M`),,,
+CMPB-021,T09,1,medium,code,CMPB,,Switch · کامپوننت Switch وجود ندارد و ۸ تنظیم بولی با فیلد متنی ویرایش می‌شوند,Switch — `/admin/settings` (کلیدهای `BOOL`)، و تنظیماتی که فوراً اعمال می‌شوند,,,
+CMPB-029,T09,1,medium,code,CMPB,K15,SettingsPanel · ناوبری گروه‌ها پیوند لنگری است و همهٔ گروه‌ها در یک صفحهٔ بلند رندر می‌شوند,SettingsPanel — `/admin/settings` (K15),,,
+CMPB-030,T09,1,medium,code,CMPB,K15,SettingsPanel · نمای موبایل و تبلت (آکاردئون، Select گروه، صفحهٔ ویرایش جدا) پیاده نشده,SettingsPanel — `/admin/settings` در <1024 (K15-M، K15-settings-edit-M),,,
+KOPS-024,T09,1,medium,code,KOPS,K15,چیدمان دسکتاپ: همه ۱۵ گروه پشت سر هم روی یک صفحه؛ گروه جاری، بخش «تعیین‌نشده در گروه‌های دیگر» و دکمه «تعیین مقدار» نیست,K15 · SettingsPanel group nav + group card,,,
+RTO-017,T09,1,medium,code,RTO,,تنظیمات بازار و فرم‌های پیکربندی با الگوی ویرایش P11 نمی‌خوانند,P11 › Anatomy 4–6، Layout و Content rules؛ *SettingsPanel*,,,
+RTO-018,T09,1,medium,needs decision,RTO,,برخی تغییرهای پیکربندی بدون دلیل یا بدون نسخه ذخیره می‌شوند,"P11 › Content & data rules «Every change records `{ key, value, reasonFa, expectedVersion }`»، Don't «save without a version check»",WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA1-013,T09,1,low,code,CMPA1,K15,گروه‌های تنظیمات روی موبایل آکاردئونی نیستند (`--sm`),Accordion `--sm` (P11، K15),,,
+CMPB-031,T09,1,low,code,CMPB,K15,SettingsPanel · جزئیات ردیف: «تعیین مقدار»، متن hint تعیین‌نشده، نسخهٔ اضافه و چیپ پیوندی,SettingsPanel — `/admin/settings` (K15),,,
+KOPS-027,T09,1,low,code,KOPS,K15,جزئیات سربرگ، جستجو و نام گروه‌ها,K15 · PageHeader / SearchField / group labels,,,
+CMPA1-001,T10,1,high,code,CMPA1,,قالب PDF اسناد هنوز پالت فیروزه‌ای قدیمی است و از A4DocumentTemplate پیروی نمی‌کند,A4DocumentTemplate (خروجی PDF همه اسناد: برگه ثبتی، شجره‌نامه، کارت توله، فاکتور، قرارداد),,,
+CMPB-122,T10,1,high,code,CMPB,K18,PedigreeTree · شجره فقط والدین را نشان می‌دهد؛ سه نسل، شاخهٔ جمع‌شده، شناسه‌ها و نمای فهرستی وجود ندارد,PedigreeTree در `/documents/pedigree/[id]` (K18),,,
+FND-016,T10,1,high,code,FND,K18,قالب PDF اسناد رسمی با پالت teal، فونت Vazirmatn/Consolas و جهت فیزیکی,خروجی PDF همهٔ اسناد (`/api/documents/[kind]/[id]/pdf`، فاکتور فروشگاه، قرارداد finder) — A4DocumentTemplate (K18),,,
+KUSR-042,T10,1,high,needs decision,KUSR,K18,شجره‌نامه فقط یک نسل (والدین) دارد؛ حالت سخت «نیای نامشخص در شجره» با «—» به‌جای «نامشخص»,K18 سند شجره‌نامه · `PedigreeTree` داخل `A4DocumentTemplate`,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA1-002,T10,1,medium,code,CMPA1,,PDF برچسب‌دار (tagged) نیست و فیلدها `dl` نیستند,A4DocumentTemplate,,,
+CMPA1-003,T10,1,medium,code,CMPA1,K18,نمای روی صفحه برگه ثبتی و شجره‌نامه بخش‌های قالب A4 را کم دارد,A4DocumentTemplate (K18),,,
+CMPA1-004,T10,1,medium,code,CMPA1,,کارت توله و مجوز جفت‌گیری اصلاً قالب A4 ندارند,A4DocumentTemplate، نوع‌های `PC-` و `MP-`,,,
+CMPA1-005,T10,1,medium,code,CMPA1,,حالت‌های A4 پیاده نشده: نسخه باطل، بدون عکس، صفحه دوم، دکمه چاپ، خلاصه موبایل,A4DocumentTemplate,,,
+CMPA2-017,T10,1,medium,code,CMPA2,,DocumentCard: کامپوننت مشترک نیست و پانویس «دریافت PDF» و «استعلام اصالت» ندارد,DocumentCard,,,
+KUSR-017,T10,1,medium,code,KUSR,K9,بخش «اسناد» پرونده حیوان: فقط برگه ثبتی، بدون «دریافت PDF» و «استعلام اصالت»,K9 · «اسناد» · `DocumentCard`,,,
+KUSR-043,T10,1,medium,code,KUSR,K18,سند شجره‌نامه داخل PublicShell است و نوار ابزار سند (چاپ، PDF، استعلام) و پوسته سندی طراحی را ندارد,K18 · پوسته و toolbar,,,
+KUSR-044,T10,1,medium,needs decision,KUSR,K18,برگه A4: QR، نام امضاکنندگان و پانویس صفحه/تاریخ چاپ نیست,K18 · `A4DocumentTemplate` (`hz-a4__titlebar`، `__sign`، `__foot`),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KUSR-045,T10,1,medium,code,KUSR,K18,موبایل سند شجره‌نامه: کارت‌ها و نوار چسبان «دریافت PDF / چاپ» به‌جای برگه A4 فشرده,K18 موبایل,,,
+CMPB-117,T07,2,high,needs decision,CMPB,K13,QueueTile · کاشی‌های صف خانهٔ انجمن سن قدیمی‌ترین پرونده و حالت هشدار ندارند,QueueTile در `/assoc` (K13)، `/genetics` و `/admin`,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #12
+KOPS-009,T07,2,high,needs decision,KOPS,K13,جدول «پرونده‌های قدیمی» (صف ترکیبی) در خانه انجمن وجود ندارد,K13 · CaseQueue / DataTable (موبایل: کارت‌های CaseQueue),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+SHL-003,T07,2,high,needs decision,SHL,K3 K13,شمارنده صف‌ها و هشدار «از مهلت گذشته» در سایدبار OpsShell نیست,OpsShell sidebar، ریل، Drawer — K3، K13 و همه محیط‌ها,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #2
+KOPS-010,T07,2,medium,needs decision,KOPS,K13,بخش «تصمیم‌های اخیر» در خانه انجمن وجود ندارد,K13 · DataTable تصمیم‌ها,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KOPS-011,T07,2,medium,needs decision,KOPS,K13,تایل‌های صف: سن قدیمی‌ترین پرونده، حالت `--alert` و پرچم «از مهلت بررسی گذشته» نیست؛ متن توضیح فنی («(Phase 2.5)») به‌جای آن دیده می‌شود,K13 · QueueTile (حالت سخت K13 «صف خالی و صف از مهلت گذشته»),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #12
+KOPS-012,T07,2,medium,code,KOPS,K13,مجموعه و نام تایل‌ها با طراحی نمی‌خواند (۱۲ تایل با نام‌های بلند به‌جای ۸ تایل گروه‌بندی‌شده),K13 · ردیف QueueTile,,,
+KOPS-013,T07,2,medium,needs decision,KOPS,K13,ردیف StatTile «خلاصه پرونده‌ها» آمار دیگری نشان می‌دهد و تایل‌ها لینک نیستند,K13 · StatTile,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTO-014,T07,2,medium,needs decision,RTO,,خانه محیط‌ها QueueTile و صف ترکیبی «صف‌ها» ندارند,*QueueTile*؛ P09 › Anatomy 3 (خانه),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+SHL-005,T07,2,medium,needs decision,SHL,K3 K13,نقطه هشدار و برچسب «… صف از مهلت گذشته» روی دکمه منوی OpsShell در موبایل نیست,OpsShell top bar <768 — K3، K13 (390),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #2
+CMPB-118,T07,2,low,needs decision,CMPB,,StatTile · خط تغییر (delta)، حالت‌های loading/error/unset ندارد و یک نسخهٔ دستی دارد,StatTile (`/assoc`، `/admin`، `/market`، `/market/analytics`، `/market/finder`، `/market/support`، `/admin/notifications`),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KOPS-014,T07,2,low,code,KOPS,K13,سربرگ صفحه: «به‌روزشده …» و اقدام ثانویه «باز کردن قدیمی‌ترین پرونده» نیست؛ ساختار `hz-page-header` استفاده نشده,K13 · PageHeader (ops),,,
+CMPB-088,T08,2,high,code,CMPB,K13 K19,PageHeader · OpsShell هدر صفحه ندارد؛ عنوان تنها و meta پراکنده است,PageHeader، گونهٔ «Ops queue / desk»، در همهٔ ۸۷ صفحهٔ OpsShell (کلیدی: `/assoc` K13 و `/genetics/samples` K19),,,
+SHL-004,T08,2,medium,code,SHL,,متن برچسب محیط اشتباه است («محیط عملیاتی اپراتور انجمن»، «محیط عملیاتی سوپرادمین»),OpsShell — `hz-sidebar__env`، زیرعنوان نوار بالای موبایل، `aria-label` سایدبار/Drawer/لوگو,,,
+SHL-006,T08,2,medium,code,SHL,K3 K13,breadcrumbs نوار بالای OpsShell با طراحی نمی‌خواند,OpsShell top bar ≥768 — K3، K13 (1440),,,
+SHL-007,T08,2,medium,code,SHL,K3,نوار بالای موبایل OpsShell دکمه «بازگشت به صف» و زیرعنوان پرونده ندارد,OpsShell top bar <768 در میز تصمیم — K3 (390),,,
+SHL-008,T08,2,medium,code,SHL,K3 K13,OpsShell عنوان h1 ثابت دارد و جایی برای PageHeader صفحه (متا، اقدام‌ها) نیست,OpsShell main — K3، K13,,,
+SHL-009,T08,2,medium,code,SHL,,در تبلت (۷۶۸–۱۰۲۳) ریل OpsShell قابل بازشدن نیست,OpsShell rail,,,
+SHL-010,T08,2,medium,code,SHL,,چگالی OpsShell (متن ۱۴/۲۴) در سطح پوسته اعمال نشده,OpsShell main,,,
+SHL-011,T08,2,low,needs decision,SHL,,وضعیت جمع/باز گروه‌ها و سایدبار ذخیره نمی‌شود و پیش‌فرض «گروه‌های دارای شمارنده» نیست,OpsShell sidebar (۱۵–۲۴ آیتم، بازار),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+SHL-012,T08,2,low,code,SHL,,دسترس‌پذیری ریل و اندازه لمسی آیتم‌های dense,OpsShell rail و sidebar,,,
+SHL-013,T08,2,low,code,SHL,,«کلاب‌ها» در گروه اشتباه سایدبار انجمن,OpsShell — ASSOC_NAV,,,
+SHL-015,T08,2,low,code,SHL,,پایین Drawer ناوبری OpsShell به‌جای ردیف‌ها یک popover دارد,OpsShell Drawer <768,,,
+CMPB-041,T11,2,high,code,CMPB,K17,OfferCard · کامپوننت OfferCard وجود ندارد؛ کارت پیشنهاد داخل گفت‌وگو ناقص است,پیام نوع پیشنهاد در رشتهٔ گفت‌وگوی آگهی (K17),,,
+KUSR-037,T11,2,high,code,KUSR,K17,`/account/listings/[id]/requests` فهرست کارتی درخواست‌هاست، نه ConversationList + رشته گفتگو در دو ستون,K17 گفتگوی آگهی · چیدمان کل صفحه (P12),,,
+CMPA1-054,T11,2,medium,needs decision,CMPA1,K17,ConversationList وجود ندارد؛ فهرست درخواست‌های آگهی (K17) کارت تاریخ‌دار است,ConversationList (P12),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-043,T11,2,medium,needs decision,CMPB,,OfferCard · دکمه‌ها، تأیید رد و حالت‌های پایانی مطابق طراحی نیستند,فرم پاسخ به پیشنهاد,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-111,T11,2,medium,code,CMPB,K17,"MessageBubble · گفتگو `role=""log""` و جداکنندهٔ روز قابل‌خواندن ندارد و نام فرستنده روی هر پیام تکرار می‌شود",MessageBubble / MessageThread در `/account/purchases/[id]` (K17) و `/account/mating-finder/requests/[id]`,,,
+CMPB-112,T11,2,medium,needs decision,CMPB,,MessageBubble · نوع‌های IMAGE، DOCUMENT، HANDOVER و SYSTEM و وضعیت تحویل پیام پیاده نشده‌اند,MessageBubble (شش نوع `inquiryMessageKind`),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-113,T11,2,medium,code,CMPB,K17,MessageComposer · ارسال با متن خالی فعال است، اندازهٔ فایل ثابت نوشته شده و حالت بسته کنترل غیرفعال ندارد,MessageComposer در `/account/purchases/[id]` (K17),,,
+CMPB-114,T11,2,medium,code,CMPB,,MessageComposer · گفتگوی جفت‌یابی به‌جای composer یک فرم معمولی دارد و حالت بسته ندارد,MessageComposer در `/account/mating-finder/requests/[id]`,,,
+KUSR-038,T11,2,medium,code,KUSR,K17,کارت خلاصه آگهی (context summary) در بالای صفحه درخواست‌ها نیست,K17 · Context summary,,,
+KUSR-039,T11,2,medium,code,KUSR,K17,"رشته گفتگو (P12) در `/account/purchases/[id]`: سرِ رشته، `role=""log""`، کارت پیشنهاد و وضعیت ارسال با طراحی فرق دارد",K17 · Thread header، `MessageBubble`، `OfferCard`,,,
+KUSR-041,T11,2,medium,v1.0.4,KUSR,K17,موبایل رشته گفتگو: نوار بالای اختصاصی، نوار context و پنهان شدن tab bar نیست,K17 موبایل,,,
+KUSR-040,T11,2,low,code,KUSR,K17,حالت سخت «گفتگوی بسته»: متن و حالت composer با طراحی فرق دارد,K17 · `MessageComposer` بسته,,,
+CMPB-024,T12,2,high,code,CMPB,K7,QuantityStepper · تعداد با SelectField و دکمهٔ «به‌روزرسانی» انتخاب می‌شود، نه گروه `.hz-qty`,QuantityStepper — صفحهٔ محصول (K07، کنار «افزودن به سبد») و ردیف‌های سبد خرید,,,
+CMPB-027,T12,2,high,code,CMPB,K7,VariantPicker · صفحهٔ محصول کاشی‌های انتخاب تنوع ندارد و تنوع فقط به‌صورت meta در کارت هر فروشنده آمده,VariantPicker — صفحهٔ محصول فروشگاه (K07),,,
+KPUB-036,T12,2,high,needs decision,KPUB,K7,K7 جعبهٔ خرید: فهرست «فروشندگان این کالا» به‌جای VariantPicker + قیمت + QuantityStepper + «افزودن به سبد» + یک SellerCard,K7 — offer box / VariantPicker / QuantityStepper / SellerCard,,,Already decided — Decision 9: variant option name approved (VariantPicker). Building the per-variant buy box is UI on existing variants.
+CMPA1-040,T12,2,medium,code,CMPA1,,CartRow: کنترل تعداد +/− نیست؛ انتخاب‌گر و دکمه «به‌روزرسانی» جایش را گرفته,CartRow,,,
+CMPA1-041,T12,2,medium,code,CMPA1,,CartRow همیشه `--stacked` است و ردیف ناموجود جمع خط و فرم تعداد را نشان می‌دهد,CartRow (`--stacked`، `--unavailable`),,,
+CMPB-022,T12,2,medium,code,CMPB,K7,Rating · نمایش امتیاز نوار پنج‌ستاره، «از ۵»، خلاصهٔ امتیاز و ستاره در ردیف نظرها را ندارد,Rating — صفحهٔ محصول (K07)، کارت محصول,,,
+CMPB-023,T12,2,medium,code,CMPB,,Rating · امتیازدهی با سه SelectField «۱ تا ۵» است، نه ستاره‌های رادیویی `.hz-rating-input`,Rating (Input) — فرم ثبت نظر پس از تحویل,,,
+CMPB-056,T12,2,medium,code,CMPB,K7,ProductCard · امتیاز (`.hz-rating`) روی کارت محصول نیست,کاشی محصول در `/shop` و «محصولات مرتبط» صفحهٔ محصول (K7),,,
+CMPB-057,T12,2,medium,code,CMPB,,ProductCard · نشان موجودی برای کالای موجود هم نمایش داده می‌شود و حالت‌های کم و ناموجود طبق طراحی نیستند,کاشی محصول,,,
+CMPB-059,T12,2,medium,code,CMPB,K7,StockBadge · کامپوننت دوحالته است و `--low`، `--reserved`، `--action` و آستانهٔ تنظیمی ندارد,نشان موجودی در کاشی محصول، صفحهٔ محصول (K7) و پنل فروشنده,,,
+CMPB-060,T12,2,medium,code,CMPB,K7,SellerCard · کارت فروشندهٔ صفحهٔ محصول خطوط ارسال، نوع و شهر فروشنده و لوگوی thumb-lg را ندارد,صفحهٔ محصول (K7)، فهرست «فروشندگان این کالا»,,,
+KPUB-030,T12,2,medium,code,KPUB,K6 K7,گالری: شبکهٔ ایستا به‌جای تصویر اصلی + نوار بندانگشتی تعاملی (K6، K7),K6 و K7 — Gallery,,,
+KPUB-039,T12,2,medium,code,KPUB,K7,K7 «نظر خریداران»: خلاصهٔ امتیاز و کارت نظر به‌جای متن خام؛ پرسش و پاسخ جدا,K7 — RatingSummary / Review / Q&A,,,
+CMPB-061,T12,2,low,v1.0.4,CMPB,K6 K7,SellerCard · سطح سرفصل نام فروشنده طبق قاعدهٔ v1.0.4 (h2 در buy box، h3 در بخش),buy box آگهی (K6) و محصول (K7),,,
+KPUB-037,T12,2,low,code,KPUB,K7,K7 سرصفحه: مسیر راهنما، برند/دسته به‌صورت پیوند، اندازهٔ h1 و Rating,K7 — Breadcrumbs، عنوان، Rating,,,
+KPUB-038,T12,2,low,code,KPUB,K7,K7 «توضیحات و مشخصات»: Accordion جعبه‌ای و ردیف‌های مشخصات,K7 — Accordion / KeyValueList,,,
+KPUB-040,T12,2,low,needs decision,KPUB,K7 K1,ProductCard: امتیاز، خط برند و نمایش موجودی,ProductCard (K7 «کالاهای مرتبط»، `/shop`، K1),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA2-036,T13,2,high,needs decision,CMPA2,K1 K6,ListingCard: آگهی «توافقی» مبلغ را نشان نمی‌دهد و «قیمت توافقی» جای مبلغ می‌نشیند (K1، K6),ListingCard + PriceDisplay آگهی,,,Already decided — Decision 7g (11 Mehr 1405): fixed price removed — every listing has an asking amount + «قابل مذاکره». Retire EXACT with a migration; log a DEC citing 7g.
+CMPB-054,T13,2,high,code,CMPB,K1 K14 K6,PriceDisplay · قیمت آگهی «قیمت توافقی» بدون مبلغ است و «قابل مذاکره» نمایش داده نمی‌شود,کارت آگهی (K1، K14) و جعبهٔ خرید آگهی (K6),,,
+KPUB-027,T13,2,high,code,KPUB,K6,K6 ستون کناری: فرم درون‌خطی «درخواست خرید» به‌جای یک دکمهٔ «پیام به فروشنده»,K6 — کارت قیمت و اقدام,,,
+KPUB-032,T13,2,high,code,KPUB,K6,K6 بخش «والدین» (پدر و مادر) نیست,K6 — «والدین»,,,
+CMPA2-037,T13,2,medium,code,CMPA2,,ListingCard: سن در meta نیست، «فروخته‌شده» نمایش داده نمی‌شود و ردیف و نشان اضافه دارد,ListingCard,,,
+CMPB-062,T13,2,medium,code,CMPB,K6,SellerCard · کارت فروشندهٔ آگهی بدون لینک، لوگو، badge «تأییدشده» و خطوط کنل است,buy box آگهی حیوان (K6),,,
+KPUB-029,T13,2,medium,needs decision,KPUB,K6 K1,قیمت آگهی: «قیمت توافقی» بدون مبلغ به‌جای «مبلغ + تومان + قابل مذاکره»,K6، ListingCard (K1 بازار، `/animals-market`، آگهی‌های مشابه) — PriceDisplay,,,Already decided — Decision 7g: as CMPA2-036.
+KPUB-031,T13,2,medium,needs decision,KPUB,K6,K6 «مشخصات حیوان»: ردیف‌ها و پیوند استعلام با طرح فرق دارد,K6 — KeyValueList,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KPUB-033,T13,2,medium,needs decision,KPUB,K6,K6 کارت «مدارک و سلامت» در ستون کناری نیست؛ اظهارات فروشنده و بخش‌های اضافه در ستون اصلی,K6 — «مدارک و سلامت»، پیام‌های اطلاع,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KPUB-034,T13,2,medium,needs decision,KPUB,K6,SellerCard در K6: بدون پیوند به کنل، نشان «تأییدشده» و خط‌های کنل,K6 — SellerCard,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KPUB-028,T13,2,low,code,KPUB,K6,K6: شمارش معکوس «N روز تا پایان نمایش» نیست,K6 — `hz-countdown`,,,
+KPUB-035,T13,2,low,code,KPUB,K6 K1,ListingCard: فیلدهای خط متا و خط فروشنده,ListingCard (K6 مشابه، `/animals-market`، K1),,,
+KPUB-045,T14,2,high,code,KPUB,,قواعد مشترک P02 در همهٔ فهرست‌های عمومی رعایت نشده است,P02 — `/veterinarians`، `/centers`، `/breeds`، `/associations`، `/clubs`، `/shop`، `/animals-market`، `/places/*`، `/search`، `/mating-finder`، `/vets` (PublicShell),,,
+CMPA1-045,T14,2,medium,code,CMPA1,,CenterCard: ساعت کار و امکانات نیست؛ تصویر 3:2؛ «n خدمت دیگر» نیست؛ نشان‌های اضافه و پروانه نامعتبر در نتایج عمومی,CenterCard (`/centers`),,,
+CMPA2-019,T14,2,medium,code,CMPA2,,Drawer فیلتر روی موبایل استفاده نشده است؛ فیلترها یک کارت `<details>` بازِ بالای نتایج‌اند,Drawer (Filter، end، `--full-mobile`),,,
+CMPA2-026,T14,2,medium,code,CMPA2,K5 K14 K19,FilterBar: گروه انتهایی (دکمه‌ی «فیلترها» با شمارنده، مرتب‌سازی، «پاک کردن همه») و حالت `--bleed` وجود ندارد,FilterBar (K5، K14، K19),,,
+CMPB-069,T14,2,medium,code,CMPB,K5,VetCard · ردیف «کد نظام» و نام کلینیک روی کارت نیست؛ badge «کد نظام تأییدشده» جای آن آمده است,فهرست دامپزشکان (K5),,,
+CMPB-123,T14,2,medium,needs decision,CMPB,,PlaceMap · گونهٔ «فهرست + نقشه» با پین‌های شماره‌دار و `hz-place-list` وجود ندارد,PlaceMap در فهرست‌های `/centers` و `/veterinarians` (و `/places/...`),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KPUB-021,T14,2,medium,code,KPUB,K5,ستون فیلتر: SelectFieldها با دکمهٔ «اعمال فیلترها» به‌جای fieldsetهای چک‌باکس با شمارش و اعمال فوری,K5 — ستون فیلتر (و همهٔ فهرست‌های P02؛ KPUB-045),,,
+KPUB-022,T14,2,medium,code,KPUB,K5,موبایل: پنل فیلتر باز بالای نتایج به‌جای دکمهٔ «فیلترها» + Drawer تمام‌صفحه,K5 موبایل — FilterBar / Drawer,,,
+KPUB-023,T14,2,medium,needs decision,KPUB,K5,مرتب‌سازی (SortMenu) نیست؛ شمارش «۷ دامپزشک، ۴ معتمد» و نوار FilterBar,K5 — FilterBar / SortMenu / شمارش,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KPUB-024,T14,2,medium,needs decision,KPUB,K5,VetCard: متن نشان «معتمد»، کد نظام، «تخصص: —» و نشان‌های اضافه,K5 — VetCard,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTU-005,T14,2,medium,code,RTU,,فیلترهای فهرست عمومی روی موبایل در Drawer باز نمی‌شوند,`/animals-market`، `/veterinarians`، `/centers`، `/associations`، `/clubs`، `/breeds`، `/mating-finder`، `/search`، `/vets` (هر فهرست P02 که فیلتر دارد),,,
+CMPA2-028,T14,2,low,code,CMPA2,,FilterBar: chipها لینک‌های `aria-current` داخل `nav` هستند، نه دکمه‌های `aria-pressed` در `fieldset`,FilterBar (chip),,,
+CMPB-071,T14,2,low,code,CMPB,,VetCard · کامپوننت مشترک وجود ندارد و markup در دو صفحه تکرار شده است,فهرست و پروفایل دامپزشک,,,
+KPUB-025,T14,2,low,code,KPUB,K5,سرصفحهٔ فهرست: مسیر «راهنمای دامپزشکی»، متن meta و پاراگراف اضافه,K5 — PageHeader landing,,,
+KUSR-001,T15,2,high,code,KUSR,K2,جدول «پرداخت‌ها» در داشبورد با PaymentRow طراحی نمی‌خواند (بدون شناسه HZP، تاریخ، StatusBadge و «پرداخت دوباره»),K2 داشبورد · بلوک «پرداخت‌ها» (PaymentRow),,,
+KUSR-005,T15,2,high,code,KUSR,K2,ردیف حیوان: بدون عکس، «G0» به‌جای نژاد و جنس، و badge برای حیوان ثبت‌شده,K2 · «حیوان‌های من» · `AnimalCard` (همان کامپوننت در `/animals`),,,
+KUSR-007,T15,2,high,needs decision,KUSR,K2,«درخواست‌های فعال» داشبورد فقط مراجعه‌های دامپزشک را دارد؛ RequestCard بدون «به‌روزرسانی»، overdue و aria-label,K2 · «درخواست‌های فعال» · `RequestCard`,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA2-003,T15,2,medium,code,CMPA2,,جدول پرداخت‌های داشبورد روی موبایل هم جدول می‌ماند و caption ندارد,DataTable,,,
+CMPB-066,T15,2,medium,code,CMPB,K2,ServiceCard · کارت‌های خدمت داشبورد (K2) فوتر تعرفه و واحد ندارند,داشبورد کاربر، بخش «سرویس‌ها»,,,
+CMPB-120,T15,2,medium,code,CMPB,K2,RequestCard · خط «مهلت گذشته»، یادداشت اصلاح و مبلغ وجود ندارد و برچسب وضعیت جایگزین می‌شود,RequestCard در `/dashboard` (K2),,,
+KUSR-002,T15,2,medium,code,KUSR,K2,پرداخت‌های داشبورد در موبایل جدول با اسکرول افقی است، نه CardList,K2 داشبورد موبایل · «پرداخت‌ها»,,,
+KUSR-004,T15,2,medium,code,KUSR,K2,کارت «عضویت انجمن» محتوای طراحی را ندارد و دکمه primary دوم می‌گذارد,K2 · «عضویت انجمن»,,,
+KUSR-006,T15,2,medium,code,KUSR,K2,کارت «حیوان‌های من» دکمه «ثبت حیوان» ندارد و لینک‌های اضافه دارد؛ حالت خالی اقدام ندارد,K2 · «حیوان‌های من»,,,
+KUSR-008,T15,2,medium,code,KUSR,K2,کارت‌های سرویس تعرفه ندارند و سرویس‌های قفل در یک کارت ادغام می‌شوند,K2 · «سرویس‌ها» (`ServiceCard`، `LockedServiceCard`),,,
+KUSR-011,T15,2,medium,code,KUSR,K2,هشدار «حساب شما هنوز کامل نیست»: شرط، مقصد و نوع دکمه,K2 کاربر تازه · Alert هشدار,,,
+KUSR-012,T15,2,medium,needs decision,KUSR,K2,بلوک «محیط‌های عملیاتی شما»، هشدار توقف پذیرش و چیدمان K2-ops,K2 با نقش عملیاتی · RoleSwitcher dashboard card,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-067,T15,2,low,code,CMPB,,ServiceCard · کارت با تعرفهٔ تعیین‌نشده همچنان لینک است و دلیل ندارد,`ServiceCard`، حالت fee نامعلوم,,,
+CMPB-121,T15,2,low,code,CMPB,,RequestCard · عنوان heading نیست و «پیگیری» زمینه ندارد,RequestCard,,,
+KUSR-003,T15,2,low,code,KUSR,K2,حالت خالی پرداخت‌ها EmptyState فشرده نیست,K2 · کاربر تازه و نقش عملیاتی · «پرداخت‌ها»,,,
+KUSR-009,T15,2,low,code,KUSR,K2,سرصفحه داشبورد آواتار ندارد و برای کاربر تازه «۰ حیوان / ۰ درخواست فعال» نشان می‌دهد,K2 · PageHeader سلام,,,
+KUSR-010,T15,2,low,code,KUSR,K2,هشدار اعلان‌های خوانده‌نشده: متن ثابت به‌جای خلاصه اعلان‌ها، و جای دکمه,K2 · Alert اعلان‌ها,,,
+KUSR-013,T15,2,low,needs decision,KUSR,K2,کارت «مسیر حرفه‌ای دامپزشکی» در طراحی K2 نیست,K2 · بین هشدارها و پرداخت‌ها,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KUSR-014,T15,2,low,code,KUSR,K2,فاصله ستون‌های حیوان‌ها/درخواست‌ها ۱۶ به‌جای ۲۴,K2 دسکتاپ,,,
+CMPB-102,T16,2,high,code,CMPB,K11,Timeline · صفحه‌های رکورد درخواست، ثبت، مجوز و سفارش «تاریخچه پرونده» ندارند,Timeline در P6 (رکورد)؛ صفحهٔ کلیدی K11 «پیگیری درخواست»,,,
+KUSR-016,T16,2,high,code,KUSR,K9,ستون کناری پرونده حیوان «خدمت بعدی»، تعرفه و کارت‌های قفل را ندارد,K9 · aside «وضعیت و اقدام»,,,
+KUSR-029,T16,2,high,code,KUSR,K11,صفحه پیگیری درخواست «تاریخچه پرونده» (Timeline) ندارد,K11 پیگیری درخواست · `Timeline`,,,
+KUSR-030,T16,2,high,needs decision,KUSR,K11,`/requests/[id]` فقط درخواست مراجعه دامپزشک است؛ حالت «نیازمند اصلاح» با دلیل و «اصلاح و ارسال دوباره» وجود ندارد,K11 · حالت سخت «نیازمند اصلاح، مهلت گذشته»,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTU-011,T16,2,high,code,RTU,,پرونده‌های P06 «اقدام بعدی با» ندارند,"پرونده‌هایی که در اسکن هیچ `ActionOwner`، `WaitingState` یا `NeedsCorrectionState` ندارند:
+  - `/registration/[id]`
+  - `/pedigree/[animalId]`
+  - `/pedigree/appeals/[id]`
+  - `/pedigree/batch/[id]`
+  - `/pedigree/receipts/[id]`
+  - `/declaration/[id]`
+  - `/payments/[id]`
+  - `/documents/[id]`
+  - `/documents/postal/[id]`
+  - `/documents/puppy-card/[id]`
+  - `/kennels/[id]`
+  - `/mating/permits/[id]`
+  - `/account/communities/[id]`
+  - `/account/mating-finder/profiles/[animalId]`
+  - `/vet/requests/[id]`",,,
+CMPA1-014,T16,2,medium,code,CMPA1,,«اقدام بعدی با» در فهرست درخواست‌ها برای پرونده‌های بسته هم نشان داده می‌شود و مالک ساختگی دارد,ActionOwner,,,
+CMPB-103,T16,2,medium,code,CMPB,,Timeline · API کامپوننت state ندارد، CTA اجباری است و رویداد آینده یا بازیگر ندارد,Timeline و CaseHistory,,,
+CMPB-104,T16,2,medium,code,CMPB,,"Timeline · نبود `aria-label`، `aria-current=""step""` و `<time datetime>`؛ دو نسخهٔ دستی",Timeline، CaseHistory و markup دستی,,,
+KUSR-018,T16,2,medium,code,KUSR,K9,ستون اصلی پرونده حیوان بخش‌های اضافه و placeholder دارد و Tabs ندارد,K9 · ستون اصلی,,,
+KUSR-019,T16,2,medium,needs decision,KUSR,K9,سرصفحه پرونده حیوان: badge «پرونده اولیه» به‌جای وضعیت حیات، شناسه بدون کپی، متای متفاوت,K9 · PageHeader record variant,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KUSR-021,T16,2,medium,code,KUSR,K9,تاریخچه پرونده حیوان: متن عمومی، بدون بازیگر و بدون رویدادهای صدور سند,K9 · «تاریخچه پرونده» (`Timeline`),,,
+KUSR-031,T16,2,medium,code,KUSR,K11,کارت «وضعیت و اقدام» K11: بدون Countdown، ActionOwner فقط برای ACTIVE، و بدون اقدام اصلاح,K11 · aside «وضعیت و اقدام» · `ActionOwner`، `Countdown`,,,
+CMPA1-015,T16,2,low,code,CMPA1,,ActionOwner حالت «مهلت گذشته» و پراپ `isViewer` ندارد؛ markup محلی در سه جا تکرار شده,ActionOwner,,,
+KUSR-020,T16,2,low,code,KUSR,K9,کارت «مشخصات» پرونده حیوان: ردیف‌ها و توضیح با طراحی فرق دارند,K9 · «مشخصات رکس» (`KeyValueList --2col`),,,
+KUSR-033,T16,2,low,code,KUSR,K11,سرصفحه و «جزئیات درخواست» K11: کد HZ- در متا نیست، تاریخ ثبت/به‌روزرسانی نیست، «هزینه» متن ثابت,K11 · PageHeader و KV جزئیات,,,
+KUSR-022,T17,2,medium,code,KUSR,K10,حالت سخت K10 «خطای اعتبارسنجی نام» پیاده نشده: نه خلاصه خطا، نه خطای زیر فیلد، نه فوکوس,K10 ثبت حیوان · اعتبارسنجی مرحله,,,
+KUSR-023,T17,2,medium,code,KUSR,K10,مرحله ۲ «نام و جنس» طراحی با مرحله ۲ کد («جنسیت و تولد») فرق دارد؛ گزینه «بدون نام» و تاریخ شمسی نیست,K10 · محتوای مرحله‌ها,,,
+KUSR-024,T17,2,medium,code,KUSR,K10,ستون «خلاصه پیش‌نویس» و «پس از ارسال» تعرفه، تصویر و لینک ویرایش ندارد؛ تاریخ لاتین ISO,K10 · ستون خلاصه (دسکتاپ) / خلاصه فشرده (موبایل),,,
+KUSR-026,T17,2,medium,code,KUSR,K10,`/animals/new` یک صفحه «شروع» واسط است، نه مرحله ۱ فرم؛ عنوان، هشدار سبز و یادداشت پیش‌نویس با طراحی فرق دارد,K10 · ورود به فرم,,,
+KUSR-028,T17,2,medium,code,KUSR,K10,مرحله تصویر بدون ذخیره پیش می‌رود و مرحله آخر «بازبینی» با لینک‌های ویرایش ندارد,K10 · مرحله ۴ (تصویر) و ۶ (مرور),,,
+CMPB-100,T17,2,low,code,CMPB,,Stepper · گونهٔ عمودی و زیرخط خلاصهٔ ذخیره‌شده وجود ندارد,Stepper (`/animals/new`، `/animals/[id]/edit`، `/requests/new`، `/account/kyc`),,,
+CMPB-101,T17,2,low,code,CMPB,K10,"Stepper · ترتیب متن و محل `role=""progressbar""` در فرم فشرده با طراحی فرق دارد",Stepper، فرم فشردهٔ موبایل (K10 موبایل),,,
+KUSR-027,T17,2,low,code,KUSR,K10,"Stepper فشرده موبایل: ترتیب برچسب، جای `role=""progressbar""` و متن «بعدی»",K10 موبایل · `Stepper` (compact),,,
+KUSR-034,T18,2,high,needs decision,KUSR,K12,میز پذیرش دامپزشک حالت «تراشه‌خوان» و انتخاب روش (segmented) ندارد,K12 پذیرش دامپزشک · ورودی اصلی,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KUSR-035,T18,2,high,needs decision,KUSR,K12,نتیجه پذیرش/خواندن کارت حیوان ندارد و حالت سخت «تراشهٔ ثبت‌نشده» پیاده نشده,K12 · «آخرین خواندن» و «خواندن قبلی»,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-098,T18,2,medium,code,CMPB,K12,Tabs · کامپوننت Tabs و Segmented وجود ندارد و MergeKindTabs محلی است,Tabs و Segmented (`/admin/merge`، `/vet/check-in` K12 و رکوردهای چندبخشی),,,
+KUSR-036,T18,2,medium,code,KUSR,K12,ستون «در انتظار پذیرش» (صف امروز با Countdown) در صفحه پذیرش نیست,K12 · ستون span 5,,,
+KOPS-028,T19,2,high,code,KOPS,K16,پنل تصمیم: به‌جای سه RadioCard «نگه داشتن · پنهان کردن · برداشتن»، یک SelectField با پنج گزینه؛ ReasonField، برچسب پویا، یادداشت نسخه و نوار موبایل نیست,K16 · DecisionDesk (پنل تصمیم),,,
+KOPS-029,T19,2,high,code,KOPS,K16,تصمیم محتوا نسخه پرونده را نمی‌فرستد (بدون `expectedVersion`),K16 · DecisionDesk versioning,,,
+KOPS-030,T19,2,high,code,KOPS,K16,پیش‌نمایش محتوای گزارش‌شده و ReportCard (خلاصه گزارش‌ها) در میز نیست,K16 · کارت محتوا + `ReportCard` (حالت سخت K16 «گزارش‌های متعدد»),,,
+CMPB-119,T19,2,medium,code,CMPB,K16,ReportCard · کامپوننت ReportCard وجود ندارد؛ میز گزارش محتوا کارت خلاصهٔ گزارش ندارد,ReportCard در `/content/reports/[contentId]` (K16)، و صف‌های `/content/reports`، `/content/clubs` و `/market/listings`,,,
+KOPS-031,T19,2,medium,needs decision,KOPS,K16,هویت گزارش‌دهندگان: طراحی آن را (محرمانه) به ادمین محتوا نشان می‌دهد، کد عمداً پنهان می‌کند,K16 · جدول «گزارش‌ها» (حالت سخت K16 «حریم گزارش‌دهنده»),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KOPS-033,T19,2,low,needs decision,KOPS,K16,«سابقه پرونده» فقط گزارش‌های تصمیم‌گرفته را دارد و پیش از نخستین تصمیم کلاً پنهان است,K16 · Timeline,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-003,T20,2,high,code,CMPB,K8,OtpField · کد تأیید یک فیلد متنی است، نه گروه ۶ خانه‌ای `.hz-otp`,OtpField — مرحلهٔ ۲ ورود (K08)، تأیید شمارهٔ جدید در پروفایل,,,
+CMPB-001,T20,2,medium,code,CMPB,K8,MobileField · ورودی موبایل کامپوننت واحد ندارد و ویژگی‌هایش در هر فرم فرق دارد,MobileField — ورود (K08)، پروفایل، نقش‌ها، فروشنده، مراکز، کلاب‌ها، اعلام جفت‌گیری,,,
+CMPB-004,T20,2,medium,code,CMPB,K8,OtpField · ردیف شمارش معکوس، پیوند «ویرایش شماره» و حالت منقضی وجود ندارد,OtpField — مرحلهٔ ۲ ورود (K08),,,
+KPUB-041,T20,2,medium,code,KPUB,K8,OtpField شش‌خانه‌ای و خطای درون‌فیلد پیاده نشده است,K8 مرحلهٔ ۲ — OtpField,,,
+CMPA1-055,T20,2,low,code,CMPA1,,Countdown ساخته نشده؛ تایمر OTP ثانیه‌شمار است و «n روز مانده»ها تاریخ و حالت ندارند,Countdown,,,
+CMPA2-033,T20,2,low,code,CMPA2,K8,InlineMessage: کامپوننت ندارد و صفحه‌ی ورود پیام را با Tailwind محلی شبیه‌سازی کرده است,InlineMessage (K8),,,
+CMPA2-040,T20,2,low,code,CMPA2,K8,"Logo: نماد 64px در `/login` و `/account/complete` با `alt=""همزیست""` و اندازه‌ی خارج از چهار اندازه‌ی مصوب",Logo (K8),,,
+CMPB-002,T20,2,low,code,CMPB,K8,MobileField · حالت «در حال ارسال» و جای خطای سرور با طراحی فرق دارد,MobileField — مرحلهٔ ۱ ورود (K08),,,
+FND-019,T20,2,low,code,FND,K8,صفحه‌های ورود و تکمیل حساب skip link ندارند,`/login` (K8)، `/account/complete`,,,
+KPUB-042,T20,2,low,needs decision,KPUB,K8,K8: پیوند «ویرایش شماره»، قالب شمارش معکوس و جملهٔ شرایط استفاده,K8 — متن‌ها و پیوندها,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KPUB-043,T20,2,low,code,KPUB,K8,K8: پیام ضدفیشینگ، متن معرفی و پانویس,K8 — InlineMessage، footer,,,
+CMPA2-034,T21,2,high,code,CMPA2,,"JalaliDateField وجود ندارد؛ ۱۵ ورودی تاریخ بومی میلادی (`type=""date""`/`datetime-local`) باقی است",JalaliDateField (P0),,,
+CMPB-005,T21,2,high,code,CMPB,,MoneyField · مبلغ تومان همه‌جا به‌صورت ورودی LTR با رقم لاتین و بی‌جداکننده گرفته می‌شود,MoneyField — قیمت آگهی، قیمت SKU، پیشنهاد قیمت، کارمزدها و تعرفه‌ها، تخفیف، حق عضویت، فیلتر قیمت بازار,,,
+CMPA1-046,T21,2,medium,code,CMPA1,,Checkbox و CheckboxGroup ساخته نشده؛ ۳۱ ورودی خام که ۱۰ تا هنوز `hz-check` ندارند,Checkbox,,,
+CMPA1-050,T21,2,medium,code,CMPA1,,Combobox ساخته نشده؛ BreedPicker الگوی combobox و یکسان‌سازی «ی/ي، ک/ك» ندارد,Combobox / BreedPicker,,,
+CMPA2-025,T21,2,medium,code,CMPA2,,FileField: عدد لاتین در حجم، بدون فهرست فرمت‌ها، بدون حالت آپلودشده/پیشرفت/حذف/اصلاح و برچسب «تغییر فایل»,FileField (۲۲ استفاده),,,
+CMPA2-032,T21,2,medium,needs decision,CMPA2,,ImageUploader وجود ندارد؛ تصویرهای رکورد با FileField بدون پیش‌نمایش، برش و (گاهی) متن جایگزین بارگذاری می‌شوند,ImageUploader,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA2-038,T21,2,medium,code,CMPA2,,LocationField: استان و شهر متن آزادند، نقشه پیاده نشده و فرم‌ها مختصات را تایپی می‌خواهند,LocationField,,,
+CMPB-006,T21,2,medium,code,CMPB,,NationalIdField · کد ملی بدون اعتبارسنجی رقم کنترل، خط موفقیت و ویژگی‌های ورودی,NationalIdField — فرم احراز هویت پروفایل، شناسهٔ فروشنده,,,
+CMPB-007,T21,2,medium,code,CMPB,,NationalIdField · حالت قفل‌شده یک div جعلی است و برچسبش به کنترل وصل نیست,NationalIdField — پروفایل پس از تأیید احراز هویت,,,
+CMPB-010,T21,2,medium,code,CMPB,,TextAreaField · شمارندهٔ نویسه و ردیف پایین ندارد و `maxLength` متن را بی‌صدا کوتاه می‌کند,TextAreaField — ۴۵ استفاده با `maxLength` در ۱۹ فایل,,,
+CMPB-012,T21,2,medium,code,CMPB,,TextField · آیکن، دکمهٔ انتهایی و اندازهٔ `sm` در API نیست و چند ورودی دستی بیرون از Field ساخته شده,TextField — تنظیمات ادمین، یابندهٔ جفت، فیلترهای عمومی، ویزارد حیوان، استعلام صفحهٔ اصلی,,,
+CMPB-013,T21,2,medium,code,CMPB,K5 K14 K15 K19,"SearchField · دکمهٔ پاک‌کردن، فهرست پیشنهاد، دکمهٔ فیلتر و `dir=""auto""` پیاده نشده و برچسب با placeholder یکی است",SearchField — ۱۳ صفحهٔ فهرست (دامپزشکان K05، بازار K14، تنظیمات K15، نمونه‌های ژنتیک K19 و …) و جست‌وجوی سربرگ,,,
+CMPB-014,T21,2,medium,code,CMPB,,SearchField · کنترل‌های شبیه‌سازی‌شده با Tailwind در `/search` و BreedPicker قاعدهٔ فوکوس v1.0.1 را می‌شکنند,SearchField (و selectهای فیلتر هم‌شکل SelectField) — صفحهٔ جست‌وجوی سراسری، انتخاب‌گر نژاد,,,
+CMPB-018,T21,2,medium,code,CMPB,,Radio · کامپوننت `RadioGroup` ندارد؛ فرم‌های دامپزشکی و گزارش محتوا رادیوی بومی با Tailwind دارند,Radio — درخواست‌های دامپزشک (عمومی/متخصص، نتیجهٔ بررسی)، بررسی پروانه، دانشجو، معتمد، چک‌لیست بازبینی، فرم گزارش محتوا,,,
+CMPB-019,T21,2,medium,code,CMPB,,RadioCard · روش ارسال در سبد خرید پیوندهایی با ظاهر `.hz-option` است، نه کارت رادیویی با قیمت در انتها,RadioCard — سبد خرید (روش ارسال هر فروشنده)، انتخاب مسیر در پروفایل دامپزشک,,,
+CMPB-026,T21,2,medium,code,CMPB,,MultiFileUploader · رسانهٔ آگهی، تصویر کالا و مدارک فروشنده یکی‌یکی با FileField بارگذاری می‌شوند,MultiFileUploader — ویرایش آگهی بازار، تصاویر کالای فروشگاه، مدارک فروشنده، رسانهٔ پروفایل جفت‌یابی,,,
+FND-002,T21,2,medium,code,FND,,قاعدهٔ focus در globals.css فوکوس اختصاصی فیلدهای متنی و offsetهای کامپوننت‌ها را از کار می‌اندازد,همهٔ فیلدهای متنی (TextField، TextAreaField، SelectField، OtpField، Combobox، MessageComposer) و Tabs، SegmentedControl، PopoverMenu، NotificationItem، Accordion، PlaceMap pin,,,
+FND-018,T21,2,medium,code,FND,,۲۱ checkbox/radio خام با ظاهر پیش‌فرض مرورگر و هدف لمسی کمتر از ۴۴px,فرم‌های پروفایل دامپزشک، کلاب، فروشگاه (ترجیحات، مالی، سفارش)، ژنتیک، محتوا، گزارش,,,
+CMPA2-023,T21,2,low,code,CMPA2,,Field: در یک فرم هم «*» و هم «(اختیاری)» نشان داده می‌شود و پراپ `optional` ندارد,Field,,,
+CMPA2-024,T21,2,low,code,CMPA2,,Field: `FieldGroup`/`.hz-fieldset` برای گروه‌های چک‌باکس و رادیو استفاده نشده است (۳۳ fieldset محلی),Field (group),,,
+CMPB-008,T21,2,low,code,CMPB,,SelectField · گزینهٔ «انتخاب کنید» غیرفعال نیست و همیشه رندر می‌شود,SelectField — همهٔ ۱۵۹ استفاده در ۴۰ فایل,,,
+CMPB-009,T21,2,low,code,CMPB,,SelectField · اندازهٔ `sm`، گروه‌بندی `optgroup` و حالت بارگذاری در API نیست,SelectField,,,
+CMPB-011,T21,2,low,code,CMPB,,TextAreaField · پیش‌فرض `rows` برابر ۵ است، نه ۳,TextAreaField,,,
+CMPB-020,T21,2,low,needs decision,CMPB,,RadioCard · انتخاب نوع خدمت در درخواست تازه قیمت و حالت «تعیین‌نشده» ندارد,RadioCard — `/requests/new` (نوع خدمت هر حیوان),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA1-006,T24,2,medium,code,CMPA1,,AccessDenied بیرون از شل رندر می‌شود و سایدبار حذف می‌شود,AccessDenied و RecordNotFound (`<AccessDenied` در ۱۸۴ فایل و `<RecordNotFound` در ۳۳ فایل از `app/`),,,
+CMPA1-007,T24,2,medium,code,CMPA1,,خط «آنچه کم است» کد خطای انگلیسی نشان می‌دهد و نقش لازم را نمی‌گوید,AccessDenied,,,
+CMPA1-008,T24,2,medium,code,CMPA1,,متن و اکشن‌های AccessDenied با جدول طراحی فرق دارد؛ «تغییر نقش» و `returnTo` نیست,AccessDenied,,,
+CMPB-080,T24,2,medium,code,CMPB,,PageStates · NetworkErrorState فقط در گالری استفاده شده و صفحهٔ خطا با Alert ساخته شده است,خطای بارگذاری صفحه یا بخش,,,
+CMPB-085,T24,2,medium,code,CMPB,,UnsetValue · کامپوننت و formatter مشترک نیست؛ مقدار تهی در دو جا به «۰ تومان» یا عدد ناقص تبدیل می‌شود,حق عضویت کلاب، سبد خرید,,,
+KOPS-040,T24,2,medium,code,KOPS,K3 K13 K14 K15 K16 K19,حالت‌های بارگذاری (Skeleton) و خطای شبکه (NetworkErrorState) برای صفحه‌های عملیاتی وجود ندارد,K3، K13، K14، K15، K16، K19 · Loading / Error states,,,
+RTO-013,T24,2,medium,code,RTO,,حالت‌های بارگذاری، خطا، نبود دسترسی و «پیدا نشد» در محیط عملیاتی ناقص یا ناهمسان‌اند,*PageStates*، *AccessDenied*، P09 و P10 › States,,,
+RTU-004,T24,2,medium,code,RTU,,حالت بارگذاری (اسکلت) و مرز خطا برای مسیرهای کاربر نیست,"
+  - همه صفحه‌های `PublicShell` به‌جز `/account/packages`.
+  - در `SiteShell`، این فهرست‌ها `loading.tsx` ندارند: `/animals-market`، `/clubs`، `/shop`، `/mating-finder`، `/places/[province]`، `/places/[province]/[city]`.
+  - صفحه‌های جزئیات عمومی هم `loading.tsx` ندارند.",,,
+CMPA1-009,T24,2,low,code,CMPA1,,عنوان AccessDenied فوکوس نمی‌گیرد و `<title>` صفحه تعیین نشده,AccessDenied,,,
+CMPA1-010,T24,2,low,code,CMPA1,,RecordNotFound با صفحه not-found عمومی یکسان نیست,AccessDenied (حالت record),,,
+CMPB-081,T24,2,low,code,CMPB,,PageStates · Skeleton چندشکلی و LoadingState در بیشتر مسیرها وجود ندارند,حالت بارگذاری,,,
+CMPB-082,T24,2,low,code,CMPB,K2,PageStates · markup دستی `.hz-state` و ناهماهنگی API کامپوننت‌های حالت,داشبورد (K2)، خریدها، و API `EmptyState`/`NeedsCorrectionState`,,,
+CMPB-086,T24,2,low,code,CMPB,,UnsetValue · متن و کلاس ناهمگون، و «تعیین‌نشده» برای فیلدهای خالی رکورد,نمایش مقدار تعیین‌نشده در صفحه‌های مختلف,,,
+FND-013,T24,2,low,code,FND,,مبلغ حق عضویت کلاب در نبود مقدار «۰ تومان» می‌شود,`/clubs/[slug]/join` (کارت «حق عضویت»),,,
+RTU-013,T24,2,low,code,RTU,,مقدار نامشخص با «—» به‌جای «تعیین‌نشده» نمایش داده می‌شود,"مسیرهایی که در جدول «—» دارند. بیشترین موارد:
+  - `/vet/requests/[id]` (۱۵)
+  - `/litters/[id]/allocation` (۷)
+  - `/pedigree` (۴)
+  - `/account/vet-profile` (۳)
+  - `/pedigree/[animalId]`، `/account/seller`، `/account/listings/[id]`
+  - `/payments` (`app/payments/page.tsx:80`، کد پیگیری درگاه)",,,
+CMPA2-031,T25,2,medium,code,CMPA2,K2 K6 K9 K11 K12 K18,Identifier: دکمه‌ی کپی هیچ‌جا پیاده نشده است (K2، K6، K9، K11، K12، K18),Identifier (with copy ★),,,
+FND-010,T25,2,medium,code,FND,,جداکنندهٔ «·» کنار ارقام فارسی در ۶۳ خط,خط‌های meta در کارت‌ها، صف‌ها و جزئیات (عمدتاً عملیات، finder، vet-profile),,,
+FND-011,T25,2,medium,code,FND,,ارقام لاتین و تاریخ ISO خام در متن فارسی,تاریخچهٔ تاریخ جفت‌گیری، پاسخ به تاریخ، بارداری، تولد، نتایج نسب، تبلیغات و مرجوعی بازار,,,
+RTO-022,T25,2,medium,code,RTO,,کلید Latin خام به‌جای برچسب فارسی به اپراتور نشان داده می‌شود,برچسب‌ها و محتوای عملیاتی (*08-content*),,,
+CMPA2-015,T25,2,low,code,CMPA2,,Divider: کامپوننت و کلاس `hz-divider` در کد استفاده نشده است,Divider,,,
+CMPA2-016,T25,2,low,code,CMPA2,,جداکننده‌ی «·» کنار عدد فارسی در سطرهای meta,Divider (vertical بین آیتم‌های meta),,,
+FND-012,T25,2,low,code,FND,,قالب‌بندی تاریخ بدون منطقهٔ زمانی `Asia/Tehran` (۳۹ جا),بازار (عملیات و کاربر)، سفارش‌ها، خریدها، پاداش‌ها، ذخیره‌شده‌ها، فروشنده، داشبورد، هیرو خانه,,,
+FND-014,T25,2,low,code,FND,,"شناسه و کد نژادنامه در `<span dir=""ltr"" class=""font-mono"">` به‌جای `<bdi dir=""ltr"">` با سبک `id`",`/mating/permits/[id]` (کد شجرهٔ نر و ماده)، تاریخچهٔ تاریخ جفت‌گیری، فرم پاسخ تاریخ,,,
+FND-024,T27,2,medium,needs decision,FND,,۱۰ عکس تأییدشدهٔ افراد (people/*) هیچ‌جا در برنامه نیستند,Avatar در منوی حساب، نوار بالا، ردیف دامپزشک/مالک، متقاضی میز تصمیم، گفت‌وگو,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #6
+FND-025,T27,2,medium,code,FND,,seed نمایشی تصویرهای ساختگی گرادیان + emoji + متن تولید می‌کند,پروفایل‌های جفت‌یابی (FULL_BODY و FACE)، و تصاویر پرکنندهٔ آگهی‌های بازار,,,
+FND-026,T27,2,medium,code,FND,,جعبهٔ خاکستری «بدون تصویر» به‌جای حالت طراحی‌شدهٔ RecordImage,`/vet/requests/[id]` (کارت حیوان در درخواست دامپزشک),,,
+CMPA1-026,T27,2,low,code,CMPA1,,کامپوننت Avatar ساخته نشده؛ حروف اول فقط یک حرف است و `.hz-person` هیچ‌جا به کار نرفته,Avatar (منوی حساب در سایدبار و نوار بالا، بایلاین محتوا، سرصفحه پروفایل‌های دایرکتوری),,,
+CMPA1-027,T27,2,low,code,CMPA1,,`.hz-avatar` برای شماره مرحله و آیکن به کار رفته (کاربرد خارج از نقش),Avatar,,,
+CMPB-072,T27,2,low,code,CMPB,,RecordImage · در قاب‌های کوچک، متن جایگزین تصویرِ نبوده پنهان‌شده رندر نمی‌شود,`RecordImage` با variant‌های `thumb`، `thumb-lg` و `avatar`,,,
+CMPB-073,T27,2,low,code,CMPB,,RecordImage · حالت خطای بارگذاری، props `fallbackAlt` و `focal`، و پشتیبانی فایل خصوصی وجود ندارند و چند صفحه markup دستی دارند,`RecordImage` و صفحه‌هایی که `.hz-media` را دستی می‌سازند,,,
+FND-027,T27,2,low,code,FND,,RecordImage: حالت «بارگذاری ناموفق»، alt پنهان در قاب‌های کوچک و alt ساختگی,RecordImage در همهٔ کارت‌ها و فهرست‌ها؛ عکس حیوان در `/animals` و `/animals/[id]`,,,
+SHL-002,T28,2,high,needs decision,SHL,K2 K9,فیلد جستجوی نوار بالای PublicShell در دسکتاپ وجود ندارد,PublicShell top bar (≥1024) — K2، K9 و همه ۱۰۷ صفحه PublicShell,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #3
+CMPB-115,T28,2,medium,code,CMPB,,NotificationItem · پنل اعلان زنگوله در ≥768 وجود ندارد,NotificationItem › Bell panel (`.hz-notification-panel`),,,
+SHL-014,T28,2,medium,code,SHL,,محتوای پنل AccountMenu و الگوی دسترس‌پذیری آن با طراحی فرق دارد,AccountMenu — نوار بالای OpsShell و جعبه کاربر PublicShell,,,
+SHL-016,T28,2,medium,code,SHL,,RoleSwitcher به‌صورت کنترل segmented بالای هر صفحه PublicShell است و محیط‌های عملیاتی را ندارد,RoleSwitcher — PublicShell و OpsShell,,,
+SHL-017,T28,2,medium,needs decision,SHL,,زنگ اعلان‌ها پنل ندارد (از ۷۶۸) و همیشه لینک است,NotificationBell — نوار بالای PublicShell,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+SHL-018,T28,2,medium,code,SHL,K2,شمارنده «اعلان‌ها» در سایدبار PublicShell نیست,PublicShell sidebar ≥1024 — K2,,,
+SHL-019,T28,2,medium,needs decision,SHL,,گروه «پرورش» برای BREEDER و فضاهای مالکیتی «حساب من» در سایدبار نیست,PublicShell sidebar,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+SHL-025,T28,2,medium,needs decision,SHL,K1 K5,فوتر سایت فهرست تماس و نماد اعتماد ندارد,SiteFooter — K1، K5 و همه صفحه‌های عمومی,WAITING_DECISION,,"Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #1, #5"
+CMPB-087,T28,2,low,code,CMPB,,SyntheticNotice · نوار «محیط آزمایشی» بالای هدر رندر نمی‌شود و کامپوننت کاربرد دیگری دارد,همهٔ صفحه‌ها در محیط غیرتولیدی,,,
+CMPB-116,T28,2,low,code,CMPB,,NotificationItem · زمان اعلان ساعت ندارد، تاریخ از روی UTC ساخته می‌شود و فهرست بعد از ۲۰ مورد قطع است,NotificationItem در `/notifications`,,,
+SHL-020,T28,2,low,code,SHL,,«سفارش‌ها» در سایدبار به مقصد اشتباه می‌رود,PublicShell sidebar › «حساب من»,,,
+SHL-022,T28,2,low,needs decision,SHL,,نوار تب دامپزشک معتمد: badge «صف من» و برچسب ناوبری,PublicShell tab bar — VET_TABS,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+SHL-023,T28,2,low,code,SHL,,جزئیات آیکون: تب «درخواست‌ها» و زنگ پرشده,PublicShell tab bar و نوار بالا,,,
+SHL-024,T28,2,low,code,SHL,,جعبه کاربر سایدبار PublicShell شهر را نشان نمی‌دهد,PublicShell sidebar user box,,,
+SHL-026,T28,2,low,code,SHL,,جزئیات دسترس‌پذیری ناوبری گروه‌بندی‌شده دسکتاپ,GroupedNav (≥1024),,,
+SHL-027,T28,2,low,code,SHL,,جزئیات منوی موبایل سایت,GroupedNav mobile Drawer (<1024),,,
+SHL-028,T28,2,low,code,SHL,,سمت باز شدن Drawerهای ناوبری — تناقض در خود طراحی,Drawer ناوبری SiteShell و OpsShell (<1024 / <768),,,
+CMPA1-021,T22,3,medium,code,CMPA1,,کامپوننت مشترک ArticleCard نیست؛ markup در ۶ فایل تکرار شده و ReadTime هیچ‌جا نیست,ArticleCard,,,
+CMPA2-035,T22,3,medium,code,CMPA2,,KeyValueList: حدود ۴۵ `<dl>` دستی؛ چند جا با grid محلی و بدون حالت خالی DS,KeyValueList,,,
+CMPB-055,T22,3,medium,code,CMPB,,PriceDisplay · کامپوننت `Price` و `formatToman` ساخته نشده‌اند و قیمت‌ها در هر صفحه دستی ساخته می‌شوند,همهٔ نمایش‌های پول,,,
+CMPB-089,T22,3,medium,code,CMPB,,PageHeader · ده صفحهٔ PublicShell به‌جای PageHeader فقط `h1` ساده دارند,PageHeader در PublicShell,,,
+CMPB-092,T22,3,medium,code,CMPB,,Pagination · صفحه‌بندی محلی در شش صفحه به‌جای کامپوننت,Pagination (نمونه‌های محلی),,,
+CMPB-095,T22,3,medium,code,CMPB,,SectionHeader · ۱۴۵ نسخهٔ دستی از markup در ۵۶ فایل,SectionHeader (look-alike محلی),,,
+RTU-010,T22,3,medium,code,RTU,,سرتیتر امضای سیستم (SectionHeader با نوار تأکید) در 61 صفحه نیست و به‌جایش تیتر خام آمده است,`/animals-market` (`app/(public)/animals-market/(list)/page.tsx`، 3 تیتر خام)، `/association/membership` (`app/(public)/association/membership/page.tsx`، 5 تیتر خام)، `/association/regulations` (`app/(public)/association/regulations/page.tsx`، 5 تیتر خام)، `/associations` (`app/(public)/associations/(list)/page.tsx`، 3 تیتر خام)، `/breeds` (`app/(public)/breeds/(list)/page.tsx`، 2 تیتر خام)، `/centers` (`app/(public)/centers/(list)/page.tsx`، 3 تیتر خام)، `/clubs` (`app/(public)/clubs/(list)/page.tsx`، 3 تیتر خام)، `/clubs/[slug]/join` (`app/(public)/clubs/[slug]/join/page.tsx`، 6 تیتر خام)، `/parentage-test` (`app/(public)/parentage-test/page.tsx`، 4 تیتر خام)، `/search` (`app/(public)/search/(list)/page.tsx`، 1 تیتر خام)، `/services` (`app/(public)/services/(list)/page.tsx`، 1 تیتر خام)، `/services/[slug]` (`app/(public)/services/[slug]/page.tsx`، 7 تیتر خام)، `/shop` (`app/(public)/shop/page.tsx`، 2 تیتر خام)، `/verify` (`app/(public)/verify/(list)/page.tsx`، 3 تیتر خام)، `/verify/[code]` (`app/(public)/verify/[code]/page.tsx`، 3 تیتر خام)، `/account/centres/[id]` (`app/account/centres/[id]/page.tsx`، 11 تیتر خام)، `/account/centres/claim/[slug]` (`app/account/centres/claim/[slug]/page.tsx`، 11 تیتر خام)، `/account/centres/claims` (`app/account/centres/claims/page.tsx`، 10 تیتر خام)، `/account/clubs` (`app/account/clubs/page.tsx`، 4 تیتر خام)، `/account/communities/[id]` (`app/account/communities/[id]/page.tsx`، 14 تیتر خام)، `/account/complete` (`app/account/complete/page.tsx`، 1 تیتر خام)، `/account/mating-finder/appeals` (`app/account/mating-finder/appeals/page.tsx`، 4 تیتر خام)، `/account/mating-finder/blocks` (`app/account/mating-finder/blocks/page.tsx`، 4 تیتر خام)، `/account/mating-finder/favorites` (`app/account/mating-finder/favorites/page.tsx`، 5 تیتر خام)، `/account/mating-finder/saved-searches` (`app/account/mating-finder/saved-searches/page.tsx`، 4 تیتر خام)، `/account/seller/orders` (`app/account/seller/orders/page.tsx`، 4 تیتر خام)، `/account/seller/returns` (`app/account/seller/returns/page.tsx`، 1 تیتر خام)، `/account/vet-profile/claim/[slug]` (`app/account/vet-profile/claim/[slug]/page.tsx`، 5 تیتر خام)، `/animals/[id]/foreign-pedigree` (`app/animals/[id]/foreign-pedigree/page.tsx`، 4 تیتر خام)، `/breeder/activate` (`app/breeder/activate/page.tsx`، 2 تیتر خام)، `/declaration/[id]` (`app/declaration/[id]/page.tsx`، 5 تیتر خام)، `/declaration/new` (`app/declaration/new/page.tsx`، 2 تیتر خام)، `/declaration` (`app/declaration/page.tsx`، 2 تیتر خام)، `/documents/postal/[id]` (`app/documents/postal/[id]/page.tsx`، 1 تیتر خام)، `/documents/puppy-card/[id]` (`app/documents/puppy-card/[id]/page.tsx`، 1 تیتر خام)، `/kennels/[id]` (`app/kennels/[id]/page.tsx`، 5 تیتر خام)، `/kennels` (`app/kennels/page.tsx`، 4 تیتر خام)، `/litters/[id]/allocation` (`app/litters/[id]/allocation/page.tsx`، 5 تیتر خام)، `/mating/permits/[id]/birth` (`app/mating/permits/[id]/birth/page.tsx`، 7 تیتر خام)، `/mating/permits/[id]/dates` (`app/mating/permits/[id]/dates/page.tsx`، 4 تیتر خام)، `/mating/permits/[id]` (`app/mating/permits/[id]/page.tsx`، 9 تیتر خام)، `/mating/permits/[id]/pregnancy` (`app/mating/permits/[id]/pregnancy/page.tsx`، 7 تیتر خام)، `/mating/permits/new` (`app/mating/permits/new/page.tsx`، 2 تیتر خام)، `/mating/permits` (`app/mating/permits/page.tsx`، 2 تیتر خام)، `/pedigree/[animalId]` (`app/pedigree/[animalId]/page.tsx`، 10 تیتر خام)، `/pedigree/appeals/[id]` (`app/pedigree/appeals/[id]/page.tsx`، 3 تیتر خام)، `/pedigree/batch/[id]` (`app/pedigree/batch/[id]/page.tsx`، 8 تیتر خام)، `/pedigree/issue` (`app/pedigree/issue/page.tsx`، 6 تیتر خام)، `/pedigree` (`app/pedigree/page.tsx`، 8 تیتر خام)، `/pedigree/receipts/[id]` (`app/pedigree/receipts/[id]/page.tsx`، 8 تیتر خام)، `/puppy-cards/checkout` (`app/puppy-cards/checkout/page.tsx`، 5 تیتر خام)، `/registration/[id]` (`app/registration/[id]/page.tsx`، 2 تیتر خام)، `/registration/new` (`app/registration/new/page.tsx`، 1 تیتر خام)، `/report/club/[id]` (`app/report/club/[id]/page.tsx`، 5 تیتر خام)، `/report/content/[id]` (`app/report/content/[id]/page.tsx`، 2 تیتر خام)، `/report/listing/[id]` (`app/report/listing/[id]/page.tsx`، 1 تیتر خام)، `/requests/new` (`app/requests/new/page.tsx`، 1 تیتر خام)، `/vet` (`app/vet/page.tsx`، 2 تیتر خام)، `/vet/requests/[id]` (`app/vet/requests/[id]/page.tsx`، 12 تیتر خام)، `/vets/location/[id]` (`app/vets/location/[id]/page.tsx`، 2 تیتر خام)، `/vets` (`app/vets/page.tsx`، 1 تیتر خام),,,
+CMPA1-017,T22,3,low,code,CMPA1,,Alert: آیکن neutral، عنوان اجباری، نبود اکشن دوم و `inlineAction`,Alert (در ۱۹۴ فایل),,,
+CMPA1-032,T22,3,low,code,CMPA1,,کامپوننت مشترک BreedCard نیست؛ tile در دو صفحه با تفاوت ساخته شده,BreedCard (tile),,,
+CMPA1-036,T22,3,low,code,CMPA1,,لحن‌های destructive عملاً استفاده نشده‌اند؛ کنش‌های پرخطر ghost یا secondary هستند,Button `destructive` / `destructive-outline`,,,
+CMPA1-037,T22,3,low,code,CMPA1,,حالت loading دکمه‌ها بیشتر دستی است و `aria-busy`/spinner ندارد,Button (loading),,,
+CMPA1-038,T22,3,low,code,CMPA1,,ButtonLink: پراپ `external` و حالت غیرفعال نیست؛ ۲۲ مورد markup خام `hz-btn`,ButtonLink,,,
+CMPA1-039,T22,3,low,code,CMPA1,,Card: گونه interactive، CardFooter/CardSection و سطح سرتیتر در API نیست؛ ۱۱۵ مورد markup خام,Card / CardHeader,,,
+CMPA1-057,T22,3,low,code,CMPA1,,CtaBand پراپ ندارد، در `app/` است و دو بار دستی تکرار شده,CtaBand,,,
+CMPA2-030,T22,3,low,code,CMPA2,,IconButton: کامپوننت React ندارد؛ ۱۴ استفاده‌ی دستی و یک SVG دستی در دکمه‌ی بستن overlay,IconButton,,,
+CMPA2-039,T22,3,low,code,CMPA2,,LockedServiceCard: `aria-disabled` روی کارت، کل دلیل Bold، و نبود حالت «بدون اقدام» و ردیف تعرفه,LockedServiceCard,,,
+CMPB-058,T22,3,low,code,CMPB,,ProductCard · کامپوننت در `src/ui` نیست و سطح سرفصل نام با طراحی فرق دارد,کاشی محصول,,,
+CMPB-068,T22,3,low,code,CMPB,,ServiceCard · سه صفحه markup محلی دارند و آیکون ابتدای عنوان در طراحی نیست,خانه، فهرست خدمات، راهنماها، و داشبورد,,,
+CMPB-091,T22,3,low,code,CMPB,,PageHeader · crumbs بیرون از `<header>` و دو پیاده‌سازی برای «بازگشت»,PageHeader + Breadcrumbs,,,
+CMPB-096,T22,3,low,code,CMPB,,SectionHeader · شمارش بدون اسم واحد و نمایش «۰»,SectionHeader / Panel,,,
+CMPB-097,T22,3,low,code,CMPB,,SectionHeader · لینک «مشاهده همه» بدون نام بخش برای صفحه‌خوان,SectionHeader (لینک انتها),,,
+CMPB-105,T22,3,low,code,CMPB,,TextLink · کامپوننت TextLink نیست و لینک‌های خارجی زبانهٔ تازه را اعلام نمی‌کنند,TextLink (۱۷۵ کاربرد خام `hz-link`، ۶۴ تای آن‌ها `hz-link--standalone`),,,
+CMPB-106,T22,3,low,code,CMPB,,TextLink · دکمهٔ کنش با ظاهر TextLink,TextLink در LocationField,,,
+CMPB-107,T22,3,low,code,CMPB,,TextStyles · چند heading دو بار سبک دارند: `text-h*` تیلویند کنار `.hz-h*`,TextStyles,,,
+RTO-024,T22,3,low,code,RTO,,نشانه‌گذاری محلی پیش از سیستم طراحی هنوز مانده است (بدون رنگ پالت),SectionHeader، Card title، Radio/Checkbox، KeyValueList,,,
+CMPA1-011,T23,3,medium,code,CMPA1,,کامپوننت Accordion ساخته نشده و `<details>`های خام هنوز سر جایشان هستند,Accordion,,,
+CMPA1-012,T23,3,medium,code,CMPA1,,بخش‌های «پرسش‌های پرتکرار» به جای Accordion با `dl` و کارت محلی ساخته شده‌اند,Accordion (FAQ),,,
+CMPA1-028,T23,3,medium,code,CMPA1,,BottomSheet در هیچ صفحه‌ای استفاده نشده و Overlay واکنش‌گرا وجود ندارد,BottomSheet,,,
+CMPB-033,T23,3,medium,code,CMPB,,PopoverMenu · کامپوننت عمومی منو و منوی «بیشتر» وجود ندارد,PopoverMenu — منوهای «بیشتر» روی آگهی‌ها و رکوردها، منوی مرتب‌سازی,,,
+CMPB-034,T23,3,medium,code,CMPB,,PopoverMenu · منوی حساب ناوبری پیکانی، جابه‌جایی فوکوس، `aria-controls` و نام منو ندارد,PopoverMenu (منوی حساب) — نوار بالای OpsShell و پایین نوار کناری,,,
+CMPB-074,T23,3,medium,code,CMPB,,Modal · کامپوننت Modal فقط در گالری dev استفاده شده و در هیچ صفحهٔ محصولی به‌کار نرفته است,`Modal` (و `BottomSheet`/`Drawer` هم‌خانواده),,,
+CMPB-075,T23,3,medium,code,CMPB,,Modal · API و دسترس‌پذیری Modal با طراحی فاصله دارد,`Modal`,,,
+CMPB-076,T23,3,medium,code,CMPB,,Toast · ToastRegion و `toast()` وجود ندارند و همهٔ تأییدها Alert درون‌خطی‌اند,پیام‌های کوتاه تأیید یا خطا در همهٔ شل‌ها,,,
+CMPB-078,T23,3,medium,code,CMPB,,SensitiveConfirm · دیالوگ تأیید حساس وجود ندارد و ادغام رکورد بدون دروازهٔ تأیید انجام می‌شود,اقدام‌های برگشت‌ناپذیر اپراتور (ادغام رکورد، ابطال سند/مجوز),,,
+CMPA1-029,T23,3,low,code,CMPA1,,BottomSheet: زیرعنوان، `aria-labelledby`، فوکوس اولیه و بستن با کشیدن,BottomSheet,,,
+CMPA2-020,T23,3,low,code,CMPA2,,API کامپوننت Drawer: `side`/`variant` ندارد، عنوانش با `aria-label` است و دکمه‌ی بستن برچسب کلی دارد,Drawer,,,
+CMPB-077,T23,3,low,code,CMPB,,Tooltip · کامپوننت Tooltip وجود ندارد و `title` بومی هنوز استفاده می‌شود,کارت‌های لینک‌دار و جدول audit,,,
+FND-004,T26,3,medium,code,FND,,سبک تایپ اضافهٔ `text-label-md` (14/22 · 600) که در سیستم نیست، ۹۰ بار استفاده شده,دکمه‌ها و برچسب‌های دست‌ساز در بسیاری از صفحه‌ها (finder، packages، cart، declaration، vet-profile، admin، dev…),,,
+FND-005,T26,3,medium,code,FND,,breakpointهای خارج از سیستم (`sm:` = 640 و `xl:` = 1280) در ۶۰ جا,فهرست‌های عمومی (بازار، انجمن‌ها، مراکز، کلاب‌ها، finder)، فرم‌های finder و مراکز,,,
+FND-015,T26,3,medium,code,FND,,اسکریپت `check:ds` بسیاری از سبک‌های ممنوع را نمی‌بیند و allow-list آن بیش از حد باز است,ابزار کنترل (`npm run check`),,,
+CMPA2-029,T26,3,low,code,CMPA2,,Icon: آینه‌کردن جهت‌دارها دستی است و چند جا غلط یا جاافتاده است؛ زنگ اعلان‌ها با شمارش خوانده‌نشده `fill` می‌شود,Icon,,,
+FND-003,T26,3,low,code,FND,,وزن ۸۰۰ عنوان‌ها (عنوان مقاله، CtaBand، A4، ستون فوتر) به ۷۰۰ می‌افتد,`/articles/[slug]` و پست کلاب (ContentDetail)، CtaBand، A4DocumentTemplate، SiteFooter,,,
+FND-006,T26,3,low,code,FND,,توکن‌ها و aliasهای اضافه و قدیمی در `@theme`,`@theme`؛ استفاده در `/services/[slug]` و `/dev/gateway`,,,
+FND-017,T26,3,low,code,FND,,مقدارهای دلخواه اندازه و فاصلهٔ حروف بیرون از توکن‌ها,ورود (OTP)، فرم قواعد کلاب، فرم دامپزشکان، جست‌وجو، خدمات,,,
+FND-020,T26,3,low,code,FND,,وزن fill برای آیکن‌های بیرون از فهرست ۱۳تایی و برای «خوانده‌نشده»,سایدبار PublicShell/OpsShell، tab bar موبایل، زنگ اعلان، امتیاز محصول,,,
+FND-021,T26,3,low,code,FND,,آیکن‌های بیرون از مجموعهٔ ۱۲۸تایی,رویدادهای انجمن/کلاب، شرایط عضویت کلاب,,,
+FND-022,T26,3,low,code,FND,,آینه‌سازی آیکن‌های جهت‌دار ناقص و چند glyph دستی برعکس,منوی موبایل SiteShell، بازگشت به فروشگاه، لینک‌های بیرونی، آیتم‌های ناوبری «مرجوعی»,,,
+FND-023,T26,3,low,code,FND,,ترنزیشن‌ها با مدت و منحنی پیش‌فرض Tailwind,caret بازشوی فیلترها (finder، فیلترهای عمومی)، کارت‌های نتیجهٔ جست‌وجو,,,
+CMPA2-021,T29,3,medium,needs decision,CMPA2,,Hero مجله (StoryHero) و FeaturedList «منتخب همزیست» در صفحه‌های فرود محتوا پیاده نشده‌اند,Hero (StoryHero) + FeaturedList,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-108,T29,3,medium,code,CMPB,K1 K4,ReadTime · زمان مطالعه هیچ‌جا ساخته و نمایش داده نمی‌شود,ReadTime در ArticleCard، Hero و FeaturedList خانه (K1) و سرصفحهٔ مقاله (K4),,,
+CMPB-125,T29,3,medium,code,CMPB,K4,RelatedColumn · آیتم‌ها عنوان h3 و متای «زمان مطالعه · تاریخ» ندارند,RelatedColumn در سرصفحهٔ مقاله (K4)، `/breeds/[slug]` و `/veterinarians/[slug]`,,,
+KPUB-017,T29,3,medium,needs decision,KPUB,K4 K1,«زمان مطالعه» (ReadTime) در هیچ‌جا نیست؛ متای مقاله «انتشار: …» با آیکون تقویم است,K4 سرصفحه و ستون مرتبط، K1 «تازه‌ها»، فهرست‌های `/articles`، `/news`، `/announcements`,,,"Already decided — ReadTime is computed from the article body (words ÷ 200, rounded up, Persian digits) — no new input data; treat as UI."
+KPUB-019,T29,3,medium,code,KPUB,K4,ستون «مطالب مرتبط»: چیدمان کارت و گروه اضافهٔ «مراکز دامپزشکی»,K4 — RelatedColumn,,,
+KPUB-046,T29,3,medium,code,KPUB,K4 K6 K7,قواعد مشترک P03 در صفحه‌های جزئیات هم‌خانواده,P03 — `/breeds/[slug]`، `/veterinarians/[slug]`، `/centers/[slug]`، `/news/[slug]`، `/announcements/[slug]`، `/services/[slug]`، `/mating-finder/[id]`، `/verify/[code]` و K4/K6/K7,,,
+CMPA1-022,T29,3,low,code,CMPA1,,نسبت تصویر، جای تگ و ساختار layoutها با طراحی فرق دارد,ArticleCard,,,
+CMPA1-030,T29,3,low,code,CMPA1,,Breadcrumbs: جمع‌شدن مسیر بلند و کوتاه‌سازی نام با `title` پیاده نشده,Breadcrumbs (`<Breadcrumbs` در ۳۳ صفحه عمومی، `<PageCrumbs` در ۲۳ صفحه پرونده),,,
+CMPA1-044,T29,3,low,code,CMPA1,,CategoryTag: کامپوننت و نگاشت مرکزی نوع محتوا نیست؛ تگ برند برای دسته و غیرمحتوا به کار رفته,CategoryTag,,,
+CMPA1-052,T29,3,low,needs decision,CMPA1,,ContentDetail: ReadTime، کپشن و اعتبار عکس، و نسخه `--compact` پیش‌نمایش نویسنده نیست,ContentDetail,,,Already decided — Decision 9: image caption / credit / source approved. ReadTime: compute from the body text (no new input). The --compact author preview is UI only.
+KPUB-016,T29,3,low,code,KPUB,K4,مسیر راهنما بدون سطح «مجله» و برچسب پیوند بازگشت موبایل,K4 — Breadcrumbs / بازگشت موبایل,,,
+KPUB-018,T29,3,low,needs decision,KPUB,K4,نویسنده: آواتار حروفی به‌جای عکس؛ عکس اصلی بدون زیرنویس و منبع عکس,K4 — byline و `figure.hz-figure`,,,Already decided — Decision 9: article image caption / credit / source approved as data-model additions. Author photo stays the initial avatar until profiles have an image (GAPS #6).
+KPUB-020,T29,3,low,code,KPUB,K4,برچسب‌های پایان مقاله پیوند نیستند,K4 — `hz-content-detail__foot`,,,
+KPUB-044,T29,3,low,code,KPUB,K4 K5 K6 K7,برچسب پیوند بازگشت موبایل: «بازگشت» ثابت در کد، نام والد در key screenها,Breadcrumbs موبایل در همهٔ صفحه‌های P02/P03 (K4، K5، K6، K7 و هم‌خانواده‌ها),,,
+KUSR-046,T30,3,high,code,KUSR,,فهرست `/documents` وجود ندارد؛ لینک «اسناد» سایدبار و «همه اسناد» به صفحه ناموجود می‌رود,P05 · «اسناد من»,,,
+RTU-002,T30,3,high,code,RTU,,فهرست‌های P05 نوار فیلتر خانواده وضعیت، صفحه‌بندی و «اقدام بعدی با» ندارند,"همه فهرست‌های P05 این حوزه؛ جزئیات هر مسیر در جدول بالا آمده است.
+  - نوار فیلتر فقط در `/account/mating-finder/profiles` هست.
+  - `Pagination` فقط در `/payments` هست.
+  - `ActionOwner` فقط در `/account/purchases`، `/account/clubs`، `/account/clubs/[id]/members` و `/account/mating-finder/requests` هست.
+- **مسیر و فایل کد (نمونه‌ها):**
+  - `app/animals/page.tsx`
+  - `app/requests/page.tsx`
+  - `app/registration/page.tsx`
+  - `app/pedigree/page.tsx`
+  - `app/declaration/page.tsx`
+  - `app/kennels/page.tsx`
+  - `app/mating/permits/page.tsx`
+  - `app/vet/samples/page.tsx`
+  - `app/notifications/page.tsx`
+  - `app/account/orders/page.tsx`
+  - `app/account/listings/page.tsx`
+  - `app/account/seller/*/page.tsx`
+  - `app/account/reviews/page.tsx`
+  - `app/account/saved/page.tsx`
+  - `app/account/centres/page.tsx`
+  - `app/account/mating-finder/{favorites,saved-searches,blocks,appeals}/page.tsx`
+  - هیچ‌کدام `<FilterChips>` یا `<Pagination>` ندارند.",,,
+CMPA2-004,T30,3,medium,code,CMPA2,,فهرست‌های رکوردی پنل کاربر در دسکتاپ هم فقط کارت‌اند (جدول ≥1024 ندارند),DataTable,,,
+CMPB-048,T30,3,medium,needs decision,CMPB,,PaymentResult · حالت PENDING (در حال تأیید) وجود ندارد,صفحه‌های بازگشت از درگاه (۱۲ مسیر),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-049,T30,3,medium,code,CMPB,,PaymentResult · فکت‌ها، دکمهٔ پرداخت دوباره و کپی شناسه ناقص‌اند,کارت نتیجهٔ پرداخت,,,
+CMPB-051,T30,3,medium,code,CMPB,,PaymentRow · ستون شناسه، کد درگاه را نشان می‌دهد نه شناسهٔ `HZP-`,فهرست پرداخت‌ها,,,
+CMPB-052,T30,3,medium,code,CMPB,,PaymentRow · ستون اقدام و «پرداخت دوباره» برای پرداخت ناموفق وجود ندارد,فهرست پرداخت‌ها,,,
+CMPB-094,T30,3,medium,code,CMPB,,Pagination · حالت «نمایش بیشتر»، دکمه‌های موبایل و حالت‌های loading/error ندارد,Pagination (گونه‌ها و حالت‌ها),,,
+KUSR-047,T30,3,medium,needs decision,KUSR,,`/payments`: ستون «کد پیگیری درگاه» به‌جای «شناسه پرداخت» HZP، بدون «پرداخت دوباره» و بدون کپی,P05 · `/payments` · PaymentRow,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KUSR-048,T30,3,medium,code,KUSR,,کارت‌های موبایل فهرست‌ها با CSS محلی از جدول ساخته شده‌اند و کل کارت لینک است,P05 موبایل · `/requests`، `/payments`، `/account/orders`,,,
+KUSR-050,T30,3,medium,needs decision,KUSR,,`/requests`: فقط درخواست‌های مراجعه، حالت خالی بدون «ثبت حیوان»، و برچسب‌های دستی,P05 · `/requests`,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+KUSR-051,T30,3,medium,code,KUSR,,دکمه‌های پرداخت P08 مبلغ را نام نمی‌برند و یادداشت انتقال به درگاه ندارند,P08 · صفحه‌های خلاصه/پرداخت (عضویت، صدور شجره‌نامه، برگه ثبتی گروهی، کنل، مجوز جفت‌گیری),,,
+RTU-006,T30,3,medium,needs decision,RTU,,صفحه‌های بازگشت از درگاه (P08) ناقص‌اند,"
+  - گروه الف (با `PageHeader` و `Identifier`):
+    - `/membership/return`
+    - `/registration/[id]/return`
+    - `/pedigree/batch/[id]/return`
+    - `/kennels/[id]/return`
+    - `/mating/permits/[id]/return`
+    - `/puppy-cards/return`
+  - گروه ب (بدون `PageHeader` و بدون شناسه پرداخت):
+    - `/account/packages/return`
+    - `/account/seller/return`
+    - `/account/vet-profile/return`
+    - `/account/mating-finder/return`",WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA1-019,T30,3,low,code,CMPA1,,چیدمان tile در AnimalCard نیست و `/animals` نسخه محلی ساخته است,AnimalCard `layout: 'tile'`,,,
+CMPA1-020,T30,3,low,code,CMPA1,,خط meta کارت حیوان ناقص است: نژاد/جنس/پیشرفت پیش‌نویس، «بدون نام» کم‌رنگ و `title`,AnimalCard,,,
+CMPA2-027,T30,3,low,needs decision,CMPA2,,FilterBar: فهرست‌های پنل کاربر و پرداخت‌ها هیچ FilterBar ندارند,FilterBar,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-050,T30,3,low,code,CMPB,,PaymentResult · عنوان وضعیت `<h2>` است، فوکوس به آن نمی‌رود و متن عنوان‌ها یکسان نیست,صفحه‌های بازگشت از درگاه,,,
+CMPB-053,T30,3,low,code,CMPB,,PaymentRow · موبایل، برچسب‌ها و حالت‌ها با طراحی متفاوت‌اند,فهرست پرداخت‌ها,,,
+KUSR-049,T30,3,low,code,KUSR,,`/animals`: کاشی‌ها badge «پرونده اولیه»، متای «G0» و ستون تکی موبایل دارند؛ اقدام اصلی موبایل چسبان نیست,P05 · `/animals` · `AnimalCard` tile,,,
+KUSR-052,T30,3,low,code,KUSR,,صفحه نتیجه پرداخت فوکوس را به عنوان نتیجه نمی‌برد,P08 · `PaymentResult` (همه صفحه‌های `…/return`),,,
+RTU-009,T30,3,low,code,RTU,,`/account/complete` شل ندارد و هدر سایت را دستی می‌سازد,`/account/complete`,,,
+RTU-012,T30,3,low,code,RTU,,مسیر صفحه (PageCrumbs) در پرونده‌ها و فرم‌های عمیق نیست,"
+  - P06 و P07 بدون `PageCrumbs`/`Breadcrumbs`:
+    - `/registration/[id]`
+    - `/pedigree/*`
+    - `/declaration/*`
+    - `/kennels/[id]`
+    - `/mating/permits/*`
+    - `/vet/requests/[id]`
+    - `/documents/postal/[id]`
+    - `/documents/puppy-card/[id]`
+    - `/litters/[id]/allocation`
+    - `/account/kyc`
+    - `/breeder/activate`
+    - `/account/vet-profile/claim/[slug]`
+    - `/animals/[id]/foreign-pedigree`
+    - `/registration/new`
+    - `/pedigree/issue`
+  - جزئیات در جدول آمده است.",,,
+CMPA1-051,T31,3,medium,code,CMPA1,,CompareTable با یک جدول Tailwind ساده و اسکرول افقی ساخته شده,CompareTable (`/shop/compare`),,,
+CMPA2-014,T31,3,medium,code,CMPA2,,DeliveryCodeCard وجود ندارد؛ کد تحویل در یک Alert و ورود فروشنده در یک TextField ساده است,DeliveryCodeCard (نمای خریدار و فروشنده),,,
+CMPB-044,T31,3,medium,code,CMPB,,OrderSummary · کامپوننت مشترک وجود ندارد؛ جعبهٔ خلاصه با فرم نشانی ترکیب شده است,سبد خرید، جعبهٔ کناری `.hz-summary`,,,
+CMPB-045,T31,3,medium,code,CMPB,,OrderSummary · وقتی هزینهٔ ارسال یک فروشگاه نامعلوم است، جمع ارسال و مبلغ نهایی عدد نشان می‌دهند,سبد خرید، ردیف‌های ارسال و مبلغ قابل پرداخت,,,
+CMPB-047,T31,3,medium,code,CMPB,,OrderSummary · حالت‌های به‌روزرسانی/انتقال به درگاه، live region و نوار چسبان موبایل وجود ندارند,سبد خرید، حالت‌ها و موبایل,,,
+CMPB-063,T31,3,medium,code,CMPB,,SubOrderCard · نوار مسیر ارسال (track) پنج‌مرحله‌ای وجود ندارد,جزئیات سفارش، کارت هر زیرسفارش,,,
+CMPB-065,T31,3,medium,code,CMPB,,SubOrderCard · سر سفارش، زیرعنوان «زیرسفارش ۱ از ۲، کرج»، تصویر کالا و ActionOwner طبق طراحی نیستند,جزئیات سفارش,,,
+CMPB-046,T31,3,low,code,CMPB,,OrderSummary · زیرردیف ارسال هر فروشگاه داخل خلاصه نیست,سبد چندفروشگاهی,,,
+CMPA1-053,T32,3,medium,code,CMPA1,,ContractCard ساخته نشده؛ قرارداد جفت‌یابی خط متنی است و کد یک‌بارمصرف OtpField نیست,ContractCard (P2),,,
+CMPB-035,T32,3,medium,code,CMPB,,MatingProfileCard · امتیاز عددی سازگاری به‌جای برچسب متنی,نتایج جفت‌یابی، جعبهٔ سازگاری (`.hz-fit`),,,
+CMPB-036,T32,3,medium,code,CMPB,,MatingProfileCard · فوتر کارت بدون «ارسال درخواست» و با متن متفاوت,کارت نتیجهٔ جفت‌یابی، `.hz-card__footer`,,,
+CMPB-037,T32,3,medium,code,CMPB,,MatingProfileCard · جملهٔ «چرا درخواست ممکن نیست» و راهنمای «حیوان من» روی کارت نیست,کارت جفت‌یابی، `.hz-mating__note` و `.hz-fit` حالت راهنما,,,
+CMPB-038,T32,3,low,code,CMPB,,MatingProfileCard · جزئیات متن و ساختار خطوط,بدنهٔ کارت (`.hz-entity__body`),,,
+CMPB-039,T32,3,low,code,CMPB,,MatingProfileCard · ستون‌بندی ۱۰۲۴–۱۲۷۹ و متن حالت خالی,شبکهٔ نتایج و `EmptyState`,,,
+CMPB-040,T32,3,low,code,CMPB,,MatingProfileCard · سطح سرفصل‌های گروه سازگاری و نبود اسکلت بارگذاری,کارت جفت‌یابی، دسترس‌پذیری و حالت بارگذاری,,,
+CMPA1-023,T33,3,medium,needs decision,CMPA1,,AuditRow: انجام‌دهنده، کنش و موضوع به‌صورت کد خام نمایش داده می‌شوند,AuditRow (P09),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #10
+CMPA1-024,T33,3,medium,code,CMPA1,,AuditRow: صفحه‌بندی، فیلترهای کامل، دکمه «نمایش متن کامل» و نشان وضعیت ندارد,AuditRow,,,
+CMPB-109,T33,3,medium,needs decision,CMPB,,MergeTool · ابزار مقایسه و ادغام وجود ندارد؛ فقط دو فهرست کشویی و دلیل,MergeTool در `/admin/merge`,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTO-019,T33,3,medium,needs decision,RTO,,`/admin/merge` به‌جای MergeTool دو SelectField دارد,*MergeTool*,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+RTO-020,T33,3,medium,needs decision,RTO,,ستون‌های AuditRow در تاریخچه ناقص یا خام‌اند,*AuditRow*,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #10
+RTO-025,T33,3,medium,needs decision,RTO,,پیکربندی نژاد Tabs و ImageUploader ندارد,P11 › Anatomy 7 (Entity config pages),WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA1-025,T33,3,low,code,CMPA1,,AuditRow کامپوننت مشترک ندارد و نسخه موبایل/تبلت با طراحی فرق دارد,AuditRow,,,
+CMPB-110,T33,3,low,code,CMPB,,MergeTool · تب‌های نوع رکورد ViewChips هستند و MergeKindTabs مرده است,MergeTool › Kind tabs,,,
+CMPA1-033,T34,3,medium,code,CMPA1,,پنل «مشخصات نژاد» در داده ناقص پنهان می‌شود و حالت `--unset` با طراحی فرق دارد,BreedCard — Profile panel,,,
+CMPA1-048,T34,3,medium,needs decision,CMPA1,,ClubCard رویداد پیش‌رو را فقط با شمارش نشان می‌دهد و تعداد اعضا ندارد,ClubCard,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPB-126,T34,3,medium,needs decision,CMPB,,VerificationResult · حالت «باطل‌شده»، جملهٔ نتیجه، فیلدهای عمومی و کنش‌های «پیدا نشد» وجود ندارد,VerificationResult در `/verify` و `/verify/[code]`,WAITING_DECISION,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data.
+CMPA1-049,T34,3,low,code,CMPA1,,کارت عمومی کلاب نشان «تأییدشده» و نشان‌های اضافه دارد,ClubCard (public),,,
+CMPB-124,T34,3,low,code,CMPB,,PlaceMap · قاب نقشهٔ تک‌مکان iframe ساده است و حالت «بدون موقعیت» در صفحهٔ عمومی متن نشان می‌دهد,PlaceMap (تک‌مکان) در `/centers/[slug]` و `/veterinarians/[slug]`,,,
