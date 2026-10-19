@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import { Card } from '../../src/ui/card.tsx';
-import { Button } from '../../src/ui/button.tsx';
+import { Button, StickyActionBar } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { SelectField, TextField } from '../../src/ui/field.tsx';
 import {
@@ -250,16 +250,18 @@ export function AllocationRuleForm({
   );
 }
 
-export function PayPermitForm({ permitId, batchId }: { permitId: string; batchId: string | null }) {
+export function PayPermitForm({ permitId, batchId, total }: { permitId: string; batchId: string | null; total?: string }) {
   const [state, submit, pending] = useActionState(payPermitAction, EMPTY);
   return (
     <div className="mt-lg space-y-md">
       <form action={submit} data-testid="pay-permit-form">
         <input type="hidden" name="permitId" value={permitId} />
         <Result state={state} />
-        <Button type="submit" block disabled={pending} data-testid="pay-permit">
-          {pending ? 'در حال انتقال به درگاه…' : 'پرداخت هزینه مجوز'}
-        </Button>
+        <StickyActionBar label="پرداخت" context="مجوز جفت‌گیری" total={total}>
+          <Button type="submit" size="lg" disabled={pending} aria-busy={pending || undefined} data-testid="pay-permit">
+            {pending ? 'در حال انتقال به درگاه…' : 'پرداخت هزینه مجوز'}
+          </Button>
+        </StickyActionBar>
       </form>
       {batchId ? (
         <form action={cancelPermitPaymentAction} data-testid="cancel-permit-payment-form">

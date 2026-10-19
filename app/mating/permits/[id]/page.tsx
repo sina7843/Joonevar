@@ -264,7 +264,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
                 </span>
               </Alert>
             ) : readiness.ready ? (
-              <PayPermitForm permitId={permit.id} batchId={batch?.id ?? null} />
+              <PayPermitForm permitId={permit.id} batchId={batch?.id ?? null} total={feeLabel} />
             ) : (
               <Alert tone="warning" title="برای پرداخت، پرونده کامل نیست">
                 <span data-testid="permit-not-ready">{readiness.reasonFa}</span>

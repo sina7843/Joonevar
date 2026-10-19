@@ -44,14 +44,14 @@ CMPB-070,T03,1,low,code,CMPB,K5,VetCard · برچسب «معتمد همزیست�
 CMPB-084,T03,1,low,code,CMPB,,StatusBadge · variant آیکون‌دار و ثبت کلید ناشناخته وجود ندارند,`StatusBadge`,FIXED,,unknown key logs a warning; TRUSTED via TrustedMark (outside the 81 keys)
 FND-009,T03,1,low,code,FND,K5,نشان اعتماد TRUSTED با برچسب و ظاهر ناهمسان,`/veterinarians` (VetCard، K5) و `/veterinarians/[slug]`,FIXED,,DEC-0233; unkeyed states listed in GAPS #4
 KOPS-020,T03,1,low,code,KOPS,K14,برچسب و رنگ وضعیت آگهی از دیکشنری وضعیت پیروی نمی‌کند؛ «اقدام بعدی با» همیشه «ناظر آگهی» است,K14 · StatusBadge / ActionOwner,FIXED,,dictionary labels/tones; owner unchanged: both lists always wait on the listing moderator (DEC-0233)
-CMPB-079,T04,1,high,code,CMPB,K6 K7 K9 K10 K11 K12 K15 K18,StickyActionBar · نوار کنش چسبان موبایل در هیچ صفحه‌ای پیاده نشده است,نمای موبایل K6، K7، K9، K10، K11، K12، K15 (ویرایش) و K18,,,
-KPUB-026,T04,1,high,code,KPUB,K6 K7,نوار اقدام چسبان پایین صفحه (StickyActionBar) در موبایل وجود ندارد,K6 و K7 موبایل — `hz-sticky-bar`,,,
-KUSR-015,T04,1,high,code,KUSR,K9,پرونده حیوان در موبایل: ستون وضعیت به ته صفحه می‌رود و نوار اقدام چسبان نیست,K9 پرونده حیوان · موبایل (<1024),,,
-RTU-003,T04,1,high,code,RTU,,اقدام اصلی روی موبایل در `ActionRow` چسبان نیست,همه صفحه‌های `PublicShell` با الگوی P05، P07 و P08 که دکمه اصلی دارند. تنها استثنا `/requests/new` است.,,,
-CMPA1-016,T04,1,medium,code,CMPA1,,نوار عملیات چسبان (`--sticky`) هیچ‌جا استفاده نشده و بسیاری از فرم‌ها ActionRow ندارند,ActionRow,,,
-CMPB-090,T04,1,medium,code,CMPB,,PageHeader · کنش اصلی زیر ۷۶۸ به ActionRow چسبان منتقل نمی‌شود,PageHeader در همهٔ صفحه‌های رکورد که `actions` دارند,,,
-KUSR-025,T04,1,medium,code,KUSR,K10,موبایل K10: نوار اقدام چسبان مرحله نیست و نوار تب دیده می‌شود,K10 موبایل · StickyActionBar,,,
-KUSR-032,T04,1,medium,code,KUSR,K11,ستون کناری K11 «حیوان» و «پرداخت» ندارد؛ موبایل بدون نوار اقدام چسبان و با ترتیب متفاوت,K11 · aside و موبایل,,,
+CMPB-079,T04,1,high,code,CMPB,K6 K7 K9 K10 K11 K12 K15 K18,StickyActionBar · نوار کنش چسبان موبایل در هیچ صفحه‌ای پیاده نشده است,نمای موبایل K6، K7، K9، K10، K11، K12، K15 (ویرایش) و K18,FIXED,,DEC-0234
+KPUB-026,T04,1,high,code,KPUB,K6 K7,نوار اقدام چسبان پایین صفحه (StickyActionBar) در موبایل وجود ندارد,K6 و K7 موبایل — `hz-sticky-bar`,FIXED,,DEC-0234
+KUSR-015,T04,1,high,code,KUSR,K9,پرونده حیوان در موبایل: ستون وضعیت به ته صفحه می‌رود و نوار اقدام چسبان نیست,K9 پرونده حیوان · موبایل (<1024),FIXED,,DEC-0234
+RTU-003,T04,1,high,code,RTU,,اقدام اصلی روی موبایل در `ActionRow` چسبان نیست,همه صفحه‌های `PublicShell` با الگوی P05، P07 و P08 که دکمه اصلی دارند. تنها استثنا `/requests/new` است.,,,"partial (DEC-0234): wizard, pay forms, K6/K7/K9 sticky; remaining pages with T16/T30"
+CMPA1-016,T04,1,medium,code,CMPA1,,نوار عملیات چسبان (`--sticky`) هیچ‌جا استفاده نشده و بسیاری از فرم‌ها ActionRow ندارند,ActionRow,FIXED,,DEC-0234
+CMPB-090,T04,1,medium,code,CMPB,,PageHeader · کنش اصلی زیر ۷۶۸ به ActionRow چسبان منتقل نمی‌شود,PageHeader در همهٔ صفحه‌های رکورد که `actions` دارند,FIXED,,DEC-0234
+KUSR-025,T04,1,medium,code,KUSR,K10,موبایل K10: نوار اقدام چسبان مرحله نیست و نوار تب دیده می‌شود,K10 موبایل · StickyActionBar,FIXED,,DEC-0234
+KUSR-032,T04,1,medium,code,KUSR,K11,ستون کناری K11 «حیوان» و «پرداخت» ندارد؛ موبایل بدون نوار اقدام چسبان و با ترتیب متفاوت,K11 · aside و موبایل,,,partial (DEC-0234): mobile order fixed; animal/payment side cards + sticky bar in T16
 RTU-007,T04,1,medium,code,RTU,,نوار زبانه پایین در فرم‌های چندمرحله‌ای و صفحه خلاصه پرداخت پنهان نمی‌شود,"همه صفحه‌های P07 و P08 در `PublicShell`، از جمله:
   - `/animals/[id]/edit`
   - `/animals/[id]/foreign-pedigree`
@@ -71,8 +71,8 @@ RTU-007,T04,1,medium,code,RTU,,نوار زبانه پایین در فرم‌ها
   - `/report/*`
   - `/membership`
   - `/puppy-cards/checkout`
-  - `/account/packages`",,,
-SHL-021,T04,1,medium,code,SHL,,ActionRow چسبان موبایل در PublicShell زیر نوار تب پنهان می‌شود,PublicShell + `ActionRow sticky` / `hz-sticky-bar`,,,
+  - `/account/packages`",FIXED,,DEC-0234
+SHL-021,T04,1,medium,code,SHL,,ActionRow چسبان موبایل در PublicShell زیر نوار تب پنهان می‌شود,PublicShell + `ActionRow sticky` / `hz-sticky-bar`,FIXED,,DEC-0234
 CMPA2-007,T05,1,high,code,CMPA2,K3 K16,DecisionDesk موبایل: نوار تصمیم چسبان پایین صفحه و BottomSheet دلیل وجود ندارد,DecisionDesk (K3 موبایل، K16 موبایل),,,
 CMPA2-018,T05,1,high,code,CMPA2,K3,DocumentPreview: مدرک خصوصی به‌صورت لینک «باز کردن در تب تازه» یا iframe داخل `<details>` است و ابزار زوم/چرخش/تمام‌صفحه ندارد,DocumentPreview (و ستون شواهد DecisionDesk، K3),,,
 KOPS-001,T05,1,high,code,KOPS,K3,نوار تصمیم چسبان پایین موبایل و BottomSheet دلیل وجود ندارد,K3 · DecisionDesk (موبایل/تبلت),,,

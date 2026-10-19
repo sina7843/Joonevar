@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { Card, CardHeader } from '../ui/card.tsx';
-import { Button } from '../ui/button.tsx';
+import { ActionRow, Button } from '../ui/button.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
 import { Result, submitWith } from '../vets/directory-forms.tsx';
 import { COMMUNITY_SCOPES, COMMUNITY_SCOPE_FA } from '../communities/model.ts';
@@ -186,17 +186,22 @@ export function ClubVerificationDecisionForm({ clubId, version }: { clubId: stri
       <input type="hidden" name="expectedVersion" value={version} />
       <TextAreaField label="دلیل تصمیم" name="reasonFa" rows={3} required maxLength={500} data-testid="club-verification-reason" />
       <Result state={state} testId="club-verification-result" />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" name="outcome" value="VERIFY" disabled={pending} data-testid="club-verify">
-          تأیید کلاب
-        </Button>
-        <Button type="submit" tone="secondary" name="outcome" value="NEEDS_CORRECTION" disabled={pending} data-testid="club-needs-correction">
-          درخواست اصلاح
-        </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" name="outcome" value="VERIFY" disabled={pending} data-testid="club-verify">
+            تأیید کلاب
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="outcome" value="NEEDS_CORRECTION" disabled={pending} data-testid="club-needs-correction">
+            درخواست اصلاح
+          </Button>
+        }
+      >
         <Button type="submit" tone="secondary" name="outcome" value="REJECT" disabled={pending} data-testid="club-reject">
           رد درخواست
         </Button>
-      </div>
+      </ActionRow>
     </form>
   );
 }
@@ -227,14 +232,18 @@ export function ClubOwnershipDecisionForm({ requestId, version }: { requestId: s
       <input type="hidden" name="expectedVersion" value={version} />
       <TextAreaField label="دلیل تصمیم" name="reasonFa" rows={2} required maxLength={500} data-testid={'club-ownership-decision-reason-' + requestId} />
       <Result state={state} testId={'club-ownership-decision-result-' + requestId} />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-ownership-approve-' + requestId}>
-          تأیید مالکیت
-        </Button>
-        <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-ownership-reject-' + requestId}>
-          رد درخواست
-        </Button>
-      </div>
+      <ActionRow
+        primary={
+          <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-ownership-approve-' + requestId}>
+            تأیید مالکیت
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-ownership-reject-' + requestId}>
+            رد درخواست
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -267,17 +276,22 @@ export function ClubModerationForm({ clubId }: { clubId: string }) {
       <Hidden surface="moderation" clubId={clubId} />
       <TextAreaField label="دلیل تصمیم" name="reasonFa" rows={2} required maxLength={500} data-testid={'club-moderation-reason-' + clubId} />
       <Result state={state} testId={'club-moderation-result-' + clubId} />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" tone="secondary" name="decision" value="DISMISS" disabled={pending} data-testid={'club-moderation-dismiss-' + clubId}>
-          رد گزارش‌ها
-        </Button>
-        <Button type="submit" name="decision" value="HIDE" disabled={pending} data-testid={'club-moderation-hide-' + clubId}>
-          پنهان‌کردن صفحه
-        </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" name="decision" value="HIDE" disabled={pending} data-testid={'club-moderation-hide-' + clubId}>
+            پنهان‌کردن صفحه
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="decision" value="DISMISS" disabled={pending} data-testid={'club-moderation-dismiss-' + clubId}>
+            رد گزارش‌ها
+          </Button>
+        }
+      >
         <Button type="submit" tone="secondary" name="decision" value="SOFT_DELETE" disabled={pending} data-testid={'club-moderation-remove-' + clubId}>
           خارج‌کردن از دسترس عمومی
         </Button>
-      </div>
+      </ActionRow>
     </form>
   );
 }

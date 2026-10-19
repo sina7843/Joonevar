@@ -7,7 +7,7 @@ import { Icon } from '../ui/icon.tsx';
 import { DeskHead, Panel } from '../ui/desk.tsx';
 import { Pagination } from '../ui/pagination.tsx';
 import { SelectField } from '../ui/field.tsx';
-import { Button } from '../ui/button.tsx';
+import { ActionRow, Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { EmptyState } from '../ui/states.tsx';
@@ -121,16 +121,20 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
             />
           </div>
         ) : null}
-        <div className="hz-action-row">
-          <Button type="submit" tone="secondary">
-            فیلتر
-          </Button>
-          {status || kind ? (
-            <ButtonLink tone="ghost" href={base}>
-              همه
-            </ButtonLink>
-          ) : null}
-        </div>
+        <ActionRow
+          primary={
+            <Button type="submit" tone="secondary">
+              فیلتر
+            </Button>
+          }
+          secondary={
+            status || kind ? (
+              <ButtonLink tone="ghost" href={base}>
+                همه
+              </ButtonLink>
+            ) : null
+          }
+        />
       </form>
 
       {result.items.length === 0 ? (

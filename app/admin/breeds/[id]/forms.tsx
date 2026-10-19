@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState } from 'react';
 import { Card } from '../../../../src/ui/card.tsx';
-import { Button } from '../../../../src/ui/button.tsx';
+import { ActionRow, Button } from '../../../../src/ui/button.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../../../../src/ui/field.tsx';
 import {
@@ -192,11 +192,13 @@ export function BreedProfileForm({
           data-testid="profile-standard-url"
         />
 
-        <div className="hz-action-row">
-          <Button type="submit" loading={pending} loadingLabel="در حال ذخیره…" disabled={pending} data-testid="save-breed-profile">
-            ذخیره پرونده نژاد
-          </Button>
-        </div>
+        <ActionRow
+          primary={
+            <Button type="submit" loading={pending} loadingLabel="در حال ذخیره…" disabled={pending} data-testid="save-breed-profile">
+              ذخیره پرونده نژاد
+            </Button>
+          }
+        />
       </form>
     </Card>
   );

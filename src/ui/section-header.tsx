@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Icon } from './icon.tsx';
+import { ActionRow } from './button.tsx';
 
 /**
  * SectionHeader — the system's signature (DS *SectionHeader*): a 4px accent bar
@@ -45,11 +46,14 @@ export function SectionHeader({
 /**
  * PageHeader — DS *PageHeader*: optional crumbs (≥768) and back link (<768),
  * the h1, a meta line, and the page actions (start = primary).
+ * `primaryAction` sits with the actions from 768 and below it moves to a
+ * sticky ActionRow at the bottom of the phone screen (CMPB-090).
  */
 export function PageHeader({
   title,
   meta,
   actions,
+  primaryAction,
   back,
   aside,
   level = 'h1',
@@ -58,6 +62,8 @@ export function PageHeader({
   title: ReactNode;
   meta?: readonly ReactNode[];
   actions?: ReactNode;
+  /** The page's one main action: in the header ≥768, a sticky bottom row <768. */
+  primaryAction?: ReactNode;
   back?: { href: string; label?: string };
   /** Next to the title (identifier, badge). */
   aside?: ReactNode;
@@ -88,7 +94,29 @@ export function PageHeader({
           </div>
         ) : null}
       </div>
-      {actions ? <div className="hz-page-header__actions">{actions}</div> : null}
+      {actions || primaryAction ? (
+        <div className="hz-page-header__actions">
+          {primaryAction ? <span className="hz-show-md">{primaryAction}</span> : null}
+          {actions}
+        </div>
+      ) : null}
+      {primaryAction ? (
+        <div className="hz-hide-md">
+          <ActionRow sticky primary={primaryAction} />
+        </div>
+      ) : null}
     </header>
+  );
+}
+
+/** Loading placeholder for a PageHeader: the title bar and one meta line. */
+export function PageHeaderSkeleton({ label = 'در حال بارگذاری' }: { label?: string }) {
+  return (
+    <div className="hz-page-header" role="status" aria-busy="true" aria-label={label}>
+      <div className="hz-page-header__text w-full">
+        <span className="hz-skeleton hz-skeleton--title" />
+        <span className="hz-skeleton hz-skeleton--text w-1/3" />
+      </div>
+    </div>
   );
 }

@@ -24,13 +24,13 @@ export const metadata: Metadata = {
 };
 
 /** The status bar follows the cream chrome (Brand › app-icon manifest colours). */
-export const viewport: Viewport = { themeColor: THEME_COLOR };
+export const viewport: Viewport = { themeColor: THEME_COLOR, viewportFit: 'cover' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // Persian and RTL are the product default, not a locale switch (§24.1).
   // `hz` is the design system's root: type, focus ring and reduced motion.
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" className="has-[.hz-sticky-bar]:[scroll-padding-block-end:120px] has-[.hz-action-row--sticky]:[scroll-padding-block-end:96px] max-md:has-[.hz-sticky-bar]:[&>body]:pb-[140px] max-md:has-[.hz-action-row--sticky]:[&>body]:pb-[88px]">
       <body className="hz">{children}</body>
     </html>
   );

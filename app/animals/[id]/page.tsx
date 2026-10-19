@@ -9,7 +9,7 @@ import { Card } from '../../../src/ui/card.tsx';
 import { SectionHeader, PageHeader } from '../../../src/ui/section-header.tsx';
 import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
-import { ButtonLink } from '../../../src/ui/button.tsx';
+import { ButtonLink, StickyActionBar } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { ActionOwner, Identifier, StatusBadge } from '../../../src/ui/status.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
@@ -520,7 +520,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
           </section>
         </div>
 
-        <aside className="min-w-0 space-y-xl lg:col-span-4" aria-label="وضعیت و اقدام">
+        <aside className="min-w-0 space-y-xl max-lg:order-first lg:col-span-4" aria-label="وضعیت و اقدام">
           <AnimalPhoto fileId={animal.photoFileId} name={name} />
           <Card>
             <SectionHeader size="sm" title="وضعیت پرونده" />
@@ -584,6 +584,21 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
           </Card>
         </aside>
       </div>
+
+      {/* K9 phones: the record's main action stays reachable above the tab bar (DS StickyActionBar). */}
+      {registered && sheet ? null : (
+        <StickyActionBar label="کنش‌های پرونده" overTabs className="md:hidden" context={name}>
+          {registered ? (
+            <ButtonLink href="/registration/new" size="lg" iconStart="stamp">
+              درخواست برگه ثبتی
+            </ButtonLink>
+          ) : (
+            <ButtonLink href={'/animals/' + animal.id + '/edit'} size="lg">
+              ادامه ثبت
+            </ButtonLink>
+          )}
+        </StickyActionBar>
+      )}
     </PublicShell>
   );
 }

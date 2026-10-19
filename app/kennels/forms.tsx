@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import { Card } from '../../src/ui/card.tsx';
-import { Button } from '../../src/ui/button.tsx';
+import { Button, StickyActionBar } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { TextField } from '../../src/ui/field.tsx';
 import {
@@ -215,16 +215,28 @@ export function KennelBreeds({
   );
 }
 
-export function PayKennelForm({ kennelId, batchId }: { kennelId: string; batchId: string | null }) {
+export function PayKennelForm({
+  kennelId,
+  batchId,
+  context,
+  total,
+}: {
+  kennelId: string;
+  batchId: string | null;
+  context?: string;
+  total?: string;
+}) {
   const [state, submit, pending] = useActionState(payKennelAction, EMPTY);
   return (
     <>
       <form action={submit} className="mt-lg space-y-lg" data-testid="pay-kennel-form">
         <input type="hidden" name="kennelId" value={kennelId} />
         <Result state={state} />
-        <Button type="submit" block disabled={pending} data-testid="pay-kennel">
-          {pending ? 'در حال انتقال به درگاه…' : 'پرداخت ثبت کنل'}
-        </Button>
+        <StickyActionBar label="پرداخت" context={context} total={total}>
+          <Button type="submit" size="lg" disabled={pending} aria-busy={pending || undefined} data-testid="pay-kennel">
+            {pending ? 'در حال انتقال به درگاه…' : 'پرداخت ثبت کنل'}
+          </Button>
+        </StickyActionBar>
       </form>
       {batchId ? (
         <form action={cancelKennelPaymentAction} className="mt-md" data-testid="cancel-kennel-payment-form">

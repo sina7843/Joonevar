@@ -123,7 +123,7 @@ export default async function SheetBatchPage({ params }: { params: Promise<{ id:
 
           {payable ? (
             <>
-              <PaySheetBatchForm batchId={batch.id} />
+              <PaySheetBatchForm batchId={batch.id} total={formatTomanFa(configuredMoney(total))} />
               {attempt && attempt.status === 'PENDING' ? <CancelSheetPaymentForm batchId={batch.id} /> : null}
             </>
           ) : null}

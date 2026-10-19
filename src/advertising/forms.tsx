@@ -42,7 +42,7 @@ export function BuyPackageForm({
           {disabledReasonFa}
         </p>
       ) : (
-        <Button type="submit" disabled={pending} data-testid={'buy-' + testId}>
+        <Button type="submit" size="lg" block disabled={pending} aria-busy={pending || undefined} data-testid={'buy-' + testId}>
           {pending ? 'در حال انتقال به درگاه…' : label}
         </Button>
       )}

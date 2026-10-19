@@ -8,7 +8,7 @@ import { JsonLdScript } from '../../../../src/seo/json-ld.tsx';
 import { breadcrumbLd } from '../../../../src/seo/structured-data.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
-import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { ButtonLink, StickyActionBar } from '../../../../src/ui/button.tsx';
 import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { ProductCard, StockBadge } from '../product-card.tsx';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
@@ -303,6 +303,20 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
           بازگشت به فروشگاه
         </Link>
       </p>
+
+      {/* K7 phones: the buy action stays reachable (DS StickyActionBar); from 768 it is in the buy box. */}
+      {cheapest ? (
+        <StickyActionBar
+          label="افزودن به سبد"
+          className="md:hidden"
+          context={product.nameFa}
+          total={fa(cheapest.priceToman) + ' تومان'}
+        >
+          <ButtonLink href="#offers-title" size="lg" iconStart="shoppingCart">
+            افزودن به سبد
+          </ButtonLink>
+        </StickyActionBar>
+      ) : null}
     </div>
   );
 }

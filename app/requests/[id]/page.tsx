@@ -186,7 +186,7 @@ export default async function RequestPage({
           </Card>
         </div>
 
-        <aside className="min-w-0 space-y-xl lg:col-span-4" aria-label="وضعیت و اقدام">
+        <aside className="min-w-0 space-y-xl max-lg:order-first lg:col-span-4" aria-label="وضعیت و اقدام">
           <Card>
             <SectionHeader size="sm" title="وضعیت و اقدام" />
             <div className="mt-md space-y-md">

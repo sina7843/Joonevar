@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react';
 import { Card } from '../../src/ui/card.tsx';
-import { Button } from '../../src/ui/button.tsx';
+import { Button, StickyActionBar } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { SelectField, TextField } from '../../src/ui/field.tsx';
 import {
@@ -152,9 +152,11 @@ export function CardCheckoutForm({
             </label>
           ))}
         </fieldset>
-        <Button type="submit" block disabled={pending} data-testid="pay-cards">
-          {pending ? 'در حال انتقال به درگاه…' : 'پرداخت و ادامه'}
-        </Button>
+        <StickyActionBar label="پرداخت" context="صدور کارت توله">
+          <Button type="submit" size="lg" disabled={pending} aria-busy={pending || undefined} data-testid="pay-cards">
+            {pending ? 'در حال انتقال به درگاه…' : 'پرداخت و ادامه'}
+          </Button>
+        </StickyActionBar>
       </form>
       {batchId ? (
         <form action={cancelCardPaymentAction} data-testid="cancel-card-payment-form">

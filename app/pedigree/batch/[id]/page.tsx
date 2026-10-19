@@ -118,7 +118,7 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
           <p className="mt-2xs text-caption text-text-secondary">
             این پرداخت با پرداخت مستقیم به مرکز ژنتیک یکی نیست؛ تأیید فیش مرکز جای این پرداخت را نمی‌گیرد.
           </p>
-          {payable ? <PayIssuanceForm batchId={batch.id} /> : null}
+          {payable ? <PayIssuanceForm batchId={batch.id} total={formatTomanFa(configuredMoney(total))} /> : null}
         </Card>
 
         <Card>

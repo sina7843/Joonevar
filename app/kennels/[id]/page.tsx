@@ -150,7 +150,12 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
                 </span>
               </Alert>
             ) : readiness.ready ? (
-              <PayKennelForm kennelId={kennel.id} batchId={batch?.id ?? null} />
+              <PayKennelForm
+                kennelId={kennel.id}
+                batchId={batch?.id ?? null}
+                context={'ثبت کنل، ' + (kennel.nameFa ?? 'کنل بدون نام')}
+                total={feeLabel}
+              />
             ) : (
               <Alert tone="warning" title="برای پرداخت و ارسال، اطلاعات کامل نیست">
                 <span data-testid="kennel-not-ready">{readiness.reasonFa}</span>

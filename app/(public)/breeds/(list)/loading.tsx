@@ -1,4 +1,5 @@
 import { LoadingState } from '../../../../src/ui/states.tsx';
+import { PageHeaderSkeleton } from '../../../../src/ui/section-header.tsx';
 
 /*
  * Loading state for the breed list only (DEC-0157).
@@ -10,5 +11,10 @@ import { LoadingState } from '../../../../src/ui/states.tsx';
  * breed page, home and about render before anything is sent.
  */
 export default function BreedListLoading() {
-  return <LoadingState rows={4} label="در حال بارگذاری نژادها" />;
+  return (
+    <div className="space-y-lg">
+      <PageHeaderSkeleton />
+      <LoadingState rows={4} label="در حال بارگذاری نژادها" />
+    </div>
+  );
 }

@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { Card } from '../../src/ui/card.tsx';
-import { Button } from '../../src/ui/button.tsx';
+import { Button, StickyActionBar } from '../../src/ui/button.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { FileField, TextField } from '../../src/ui/field.tsx';
 import {
@@ -212,15 +212,22 @@ export function SelectIssuanceAnimals({
   );
 }
 
-export function PayIssuanceForm({ batchId }: { batchId: string }) {
+export function PayIssuanceForm({ batchId, total }: { batchId: string; /** Frozen batch total, null when unset. */ total?: string | null }) {
   const [state, submit, pending] = useActionState(payIssuanceAction, EMPTY);
   return (
     <form action={submit} className="mt-lg space-y-lg" data-testid="pay-issuance-form">
       <input type="hidden" name="batchId" value={batchId} />
       <Result state={state} />
-      <Button type="submit" block disabled={pending} data-testid="pay-issuance">
-        {pending ? 'در حال انتقال به درگاه…' : 'پرداخت صدور'}
-      </Button>
+      <StickyActionBar
+        label="پرداخت"
+        context="صدور شجره‌نامه"
+        total={total === undefined ? undefined : (total ?? 'تعیین‌نشده')}
+        totalUnset={total === null}
+      >
+        <Button type="submit" size="lg" disabled={pending} aria-busy={pending || undefined} data-testid="pay-issuance">
+          {pending ? 'در حال انتقال به درگاه…' : 'پرداخت صدور'}
+        </Button>
+      </StickyActionBar>
     </form>
   );
 }

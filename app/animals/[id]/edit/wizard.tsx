@@ -3,7 +3,7 @@
 import { useActionState, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { ActionRow, Button, ButtonLink } from '../../../../src/ui/button.tsx';
+import { Button, ButtonLink, StickyActionBar } from '../../../../src/ui/button.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Field, FileField, SelectField, TextField } from '../../../../src/ui/field.tsx';
 import { Stepper } from '../../../../src/ui/stepper.tsx';
@@ -55,6 +55,8 @@ function Result({ state }: { state: FormState }) {
 }
 
 /** P07: the step heading inside the step card (the eye goes here, not to the Stepper). */
+const stepContext = (step: number): string => 'مرحله ' + step.toLocaleString('fa-IR') + ' از ۶، ' + STEPS[step - 1];
+
 function StepHead({ step }: { step: number }) {
   return (
     <div className="mb-lg">
@@ -157,9 +159,11 @@ export function AnimalWizard({
                   )}
                 </Field>
                 <BreedPicker breeds={breeds} defaultValue={animal.breedId} required testId="animal-breed" />
-                <Button type="submit" block disabled={savePending} data-testid="step-1-continue">
-                  ادامه
-                </Button>
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(1)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-1-continue">
+                    ادامه
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -219,18 +223,14 @@ export function AnimalWizard({
                     <span className="hz-check__label">تاریخ تولد تقریبی است</span>
                   </span>
                 </label>
-                <ActionRow
-                  primary={
-                    <Button type="submit" disabled={savePending} data-testid="step-2-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(2)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-2-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -253,18 +253,14 @@ export function AnimalWizard({
                   رنگ و نشانه‌های ظاهری اینجا اختیاری است و اظهار شما ثبت می‌شود. در مراجعه، دامپزشک معتمد همین‌ها را با
                   دیدن حیوان تکمیل یا اصلاح می‌کند و از آن پس رسمی و غیرقابل‌تغییر می‌شوند.
                 </Alert>
-                <ActionRow
-                  primary={
-                    <Button type="submit" disabled={savePending} data-testid="step-3-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(3)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-3-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -289,18 +285,14 @@ export function AnimalWizard({
                 </Button>
               </form>
               <div className="mt-lg">
-                <ActionRow
-                  primary={
-                    <Button type="button" onClick={next} data-testid="step-4-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(4)}>
+                  <Button size="lg" type="button" onClick={next} data-testid="step-4-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </div>
             </Card>
           ) : null}
@@ -349,18 +341,14 @@ export function AnimalWizard({
                 <Alert tone="warning" title="این شماره هنوز رسمی نیست">
                   شماره میکروچیپ فقط پس از اسکن و تأیید دامپزشک معتمد رسمی می‌شود.
                 </Alert>
-                <ActionRow
-                  primary={
-                    <Button type="submit" disabled={savePending} data-testid="step-5-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(5)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-5-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -521,15 +509,15 @@ export function AnimalWizard({
                 <Result state={registerState} />
                 <form action={register} className="mt-lg">
                   <input type="hidden" name="animalId" value={animal.id} />
-                  <Button type="submit" block disabled={registerPending} data-testid="register-animal">
-                    {registerPending ? 'در حال ثبت…' : 'ثبت حیوان هم‌زیست'}
-                  </Button>
+                  <StickyActionBar label="کنش‌های مرحله" context={stepContext(6)}>
+                    <Button size="lg" type="submit" disabled={registerPending} aria-busy={registerPending || undefined} data-testid="register-animal">
+                      {registerPending ? 'در حال ثبت…' : 'ثبت حیوان هم‌زیست'}
+                    </Button>
+                    <Button size="lg" tone="secondary" type="button" onClick={back}>
+                      مرحله قبل
+                    </Button>
+                  </StickyActionBar>
                 </form>
-                <div className="mt-md">
-                  <Button tone="secondary" type="button" block onClick={back}>
-                    مرحله قبل
-                  </Button>
-                </div>
               </Card>
             </div>
           ) : null}

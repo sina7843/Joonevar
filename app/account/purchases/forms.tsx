@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { Button } from '../../../src/ui/button.tsx';
+import { ActionRow, Button, StickyActionBar } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
@@ -107,14 +107,18 @@ export function OfferAnswerForm({ inquiryId, offerId }: { inquiryId: string; off
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <input type="hidden" name="offerId" value={offerId} />
       <Result state={state} />
-      <div className="flex gap-sm">
-        <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="offer-accept">
-          پذیرش این قیمت
-        </Button>
-        <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="offer-reject">
-          رد پیشنهاد
-        </Button>
-      </div>
+      <ActionRow
+        primary={
+          <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="offer-accept">
+            پذیرش این قیمت
+          </Button>
+        }
+        secondary={
+          <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="offer-reject">
+            رد پیشنهاد
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -178,19 +182,20 @@ export function PayDepositForm({ inquiryId, amountFa }: { inquiryId: string; amo
     <form action={submit} className="space-y-sm" data-testid="pay-deposit">
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <Result state={state} />
-      <Button
-        type="submit"
-        size="lg"
-        block
-        iconStart="lockSimple"
-        loading={pending}
-        loadingLabel="در حال انتقال به درگاه…"
-        disabled={pending}
-        data-testid="pay-deposit-button"
-      >
-        {'پرداخت بیعانه ' + amountFa + ' تومان'}
-      </Button>
       <p className="text-caption text-text-secondary">به درگاه بانک منتقل می‌شوید. پس از پرداخت به همزیست برمی‌گردید.</p>
+      <StickyActionBar label="پرداخت" context="بیعانه" total={amountFa + ' تومان'}>
+        <Button
+          type="submit"
+          size="lg"
+          iconStart="lockSimple"
+          loading={pending}
+          loadingLabel="در حال انتقال به درگاه…"
+          disabled={pending}
+          data-testid="pay-deposit-button"
+        >
+          {'پرداخت بیعانه ' + amountFa + ' تومان'}
+        </Button>
+      </StickyActionBar>
     </form>
   );
 }
@@ -272,14 +277,18 @@ export function HandoverAnswerForm({ inquiryId, proposalId }: { inquiryId: strin
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <input type="hidden" name="proposalId" value={proposalId} />
       <Result state={state} />
-      <div className="flex gap-sm">
-        <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="handover-accept">
-          پذیرش
-        </Button>
-        <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="handover-reject">
-          رد
-        </Button>
-      </div>
+      <ActionRow
+        primary={
+          <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="handover-accept">
+            پذیرش
+          </Button>
+        }
+        secondary={
+          <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="handover-reject">
+            رد
+          </Button>
+        }
+      />
     </form>
   );
 }

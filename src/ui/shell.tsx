@@ -210,7 +210,7 @@ export async function PublicShell({
             <div className="space-y-xl">{children}</div>
           </main>
 
-          <nav className="hz-tabbar" aria-label="ناوبری اصلی">
+          <nav className="hz-tabbar [.hz-app:has(.hz-action-row--sticky)_&]:max-md:hidden [.hz-app:has(.hz-sticky-bar:not([data-over-tabs]))_&]:max-md:hidden" aria-label="ناوبری اصلی">
             {tabs.map((tab) => {
               const active = isCurrent(pathname, tab.href);
               return (

@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '../ui/button.tsx';
+import { ActionRow, Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
 import { Result, submitWith } from '../vets/directory-forms.tsx';
@@ -279,14 +279,18 @@ export function ClubMembershipDecisionForm({ clubId, membershipId, version }: { 
       <input type="hidden" name="expectedVersion" value={version} />
       <TextField label="دلیل تصمیم" name="reasonFa" required maxLength={500} data-testid={'club-membership-reason-' + membershipId} />
       <Result state={state} testId={'club-membership-result-' + membershipId} />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-membership-approve-' + membershipId}>
-          پذیرش عضویت
-        </Button>
-        <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-membership-reject-' + membershipId}>
-          رد درخواست
-        </Button>
-      </div>
+      <ActionRow
+        primary={
+          <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-membership-approve-' + membershipId}>
+            پذیرش عضویت
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-membership-reject-' + membershipId}>
+            رد درخواست
+          </Button>
+        }
+      />
     </form>
   );
 }

@@ -233,6 +233,12 @@ export default async function MembershipPage() {
                     <PayMembershipForm
                       label={standing.kind === 'RENEWAL' ? 'تمدید و پرداخت دوره تازه' : 'پرداخت و فعال‌سازی عضویت'}
                       testId={standing.kind === 'RENEWAL' ? 'renew-membership' : 'pay-membership'}
+                      context={standing.kind === 'RENEWAL' ? 'تمدید عضویت انجمن' : 'عضویت انجمن'}
+                      total={
+                        standing.pendingAmountToman
+                          ? formatTomanFa({ configured: true, toman: toman(standing.pendingAmountToman) })
+                          : feeLabel
+                      }
                     />
                   </div>
                 </>

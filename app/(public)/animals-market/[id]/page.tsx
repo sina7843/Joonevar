@@ -14,6 +14,7 @@ import { publicListing, publicListings } from '../../../../src/marketplace/publi
 import { PROMOTED_LABEL_FA, parseListingFilter } from '../../../../src/marketplace/discovery-model.ts';
 import { SELLER_KIND_FA } from '../../../../src/marketplace/listing-eligibility.ts';
 import { AskToBuyForm } from '../../../account/purchases/forms.tsx';
+import { ButtonLink, StickyActionBar } from '../../../../src/ui/button.tsx';
 import { ListingCard, ListingPrice } from '../listing-card.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -185,7 +186,9 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
                 </span>
               </Alert>
             ) : (
-              <AskToBuyForm listingId={listing.id} negotiable={listing.priceMode === 'NEGOTIABLE'} />
+              <div id="listing-ask" className="scroll-mt-s96">
+                <AskToBuyForm listingId={listing.id} negotiable={listing.priceMode === 'NEGOTIABLE'} />
+              </div>
             )}
 
             <article className="hz-card hz-seller" aria-label="فروشنده">
@@ -287,6 +290,20 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
           </ul>
         </section>
       ) : null}
+
+      {/* K6 phones: the one action stays reachable (DS StickyActionBar); from 768 the side column holds it. */}
+      {listing.reserved ? null : (
+        <StickyActionBar
+          label="تماس با فروشنده"
+          className="md:hidden"
+          context={[listing.titleFa, listing.priceMode === 'NEGOTIABLE' ? 'قابل مذاکره' : null].filter(Boolean).join('، ')}
+          total={listing.priceToman !== null ? listing.priceToman.toLocaleString('fa-IR') + ' تومان' : undefined}
+        >
+          <ButtonLink href="#listing-ask" size="lg" iconStart="chatCircle">
+            پیام به فروشنده
+          </ButtonLink>
+        </StickyActionBar>
+      )}
     </div>
   );
 }

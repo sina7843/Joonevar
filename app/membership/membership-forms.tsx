@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react';
 import { Alert } from '../../src/ui/alert.tsx';
-import { Button } from '../../src/ui/button.tsx';
+import { Button, StickyActionBar } from '../../src/ui/button.tsx';
 import { TextAreaField } from '../../src/ui/field.tsx';
 import {
   applyForMembershipAction,
@@ -75,14 +75,26 @@ export function ReviseMembershipApplicationForm({
   );
 }
 
-export function PayMembershipForm({ label, testId = 'pay-membership' }: { label: string; testId?: string }) {
+export function PayMembershipForm({
+  label,
+  testId = 'pay-membership',
+  context,
+  total,
+}: {
+  label: string;
+  testId?: string;
+  context?: string;
+  total?: string | null;
+}) {
   const [state, submit, pending] = useActionState(payMembershipAction, EMPTY);
   return (
     <form action={submit} className="space-y-md" data-testid="pay-membership-form">
       {state.message ? <Alert tone="error" title={state.message} /> : null}
-      <Button type="submit" block disabled={pending} data-testid={testId}>
-        {pending ? 'در حال انتقال به درگاه…' : label}
-      </Button>
+      <StickyActionBar label="پرداخت" context={context} total={total ?? undefined}>
+        <Button type="submit" size="lg" disabled={pending} aria-busy={pending || undefined} data-testid={testId}>
+          {pending ? 'در حال انتقال به درگاه…' : label}
+        </Button>
+      </StickyActionBar>
     </form>
   );
 }
