@@ -21,3 +21,4 @@ Where the system lacks something, the closest existing part is used and the gap 
 | 15 | Cart line form (quantity input + remove) | `/shop/cart` | Existing forms placed in the CartRow quantity slot. | DEC-0229 |
 | 16 | RadioCard as links (delivery method, vet path) | `/shop/cart`, `/account/vet-profile` | `.hz-option` links with `aria-current`. | DEC-0229 |
 | 17 | Sub-navigation for the mating-finder account area | `/account/mating-finder/*` | Scrolling chips. | DEC-0229 |
+| 18 | PlaceMap «list + map» with numbered pins | `/centers`, `/veterinarians` | Existing map embed kept; a tile provider is not chosen (DEC-0235, CMPB-123). | DEC-0235 |
