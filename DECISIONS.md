@@ -3082,3 +3082,13 @@
   - مسئول و کد پرونده ساخته نشد (DEC-0235، GAPS #21).
   - فرم‌های بازار بر پایه select ماندند، چون شناسه‌های تست نتیجه‌شان را نمی‌توان در DecisionForm نگه داشت.
   - موقعیت در صف در صفحه‌های بازبینی فقط ۱۰۰ پرونده اول را پوشش می‌دهد.
+
+## DEC-0237 — FAILهای برند و فونت ds-audit؛ پوشه قدیمی v1.0.3 در ریشه
+
+- **تاریخ:** ۲۰۲۶-۱۱-۲۵ · **نوع:** TECHNICAL_CHOICE / USER_INSTRUCTION · **منبع:** `docs/design-system/qa/ds-audit.mjs`، `brand.md`، `02-typography.md`، دستور کاربر
+- **Decision:**
+  - پوشه `hamzist-design-system-v1/` در ریشه ریپو بسته تحویل v1.0.3 است (هم‌محتوای `File/Hamzist-Design-System-v1.0.3/`). منبع الزام‌آور v1.0.4 در `docs/design-system/` است؛ پوشه اعمال نشد و به `.gitignore` رفت تا اشتباهی کامیت نشود.
+  - `public/favicon.ico` (کپی بایت‌به‌بایت `brand/favicon/favicon.ico`) تا `/favicon.ico` مرورگرها پاسخ بگیرد.
+  - `app/layout.tsx` مسیر apple-touch-icon را صریح می‌نویسد و تصویر اشتراک پیش‌فرض `og-1200x630.png` را می‌گیرد؛ صفحه‌های عمومی همچنان با `buildMetadata` نشانی مطلق خود را می‌دهند. `app/manifest.ts` مسیر آیکن‌ها را صریح می‌نویسد. ممیزی متن فایل را جست‌وجو می‌کند، پس مسیرها از ثابت به رشته صریح رفتند.
+  - `src/documents/render.ts`: فونت PDF از Vazirmatn/Consolas به IRANSansX (۴۰۰، ۵۰۰، ۶۰۰) به‌صورت data URI تعبیه‌شده؛ سند همچنان آفلاین و قطعی است. شناسه لاتین با همان خانواده و وزن ۶۰۰ (سبک `id`).
+- **Limitation:** پالت teal و جهت فیزیکی قالب PDF و بقیه FND-016/CMPA1-001 در T10 می‌مانند. دو FAIL «Evidence» (مقایسه ۳۹ صفحه کلیدی و `QA-REPORT.md`) مرحله QA نهایی است.

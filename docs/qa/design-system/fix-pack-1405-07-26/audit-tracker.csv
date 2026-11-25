@@ -145,7 +145,7 @@ CMPB-031,T09,1,low,code,CMPB,K15,SettingsPanel · جزئیات ردیف: «تع�
 KOPS-027,T09,1,low,code,KOPS,K15,جزئیات سربرگ، جستجو و نام گروه‌ها,K15 · PageHeader / SearchField / group labels,,,
 CMPA1-001,T10,1,high,code,CMPA1,,قالب PDF اسناد هنوز پالت فیروزه‌ای قدیمی است و از A4DocumentTemplate پیروی نمی‌کند,A4DocumentTemplate (خروجی PDF همه اسناد: برگه ثبتی، شجره‌نامه، کارت توله، فاکتور، قرارداد),,,
 CMPB-122,T10,1,high,code,CMPB,K18,PedigreeTree · شجره فقط والدین را نشان می‌دهد؛ سه نسل، شاخهٔ جمع‌شده، شناسه‌ها و نمای فهرستی وجود ندارد,PedigreeTree در `/documents/pedigree/[id]` (K18),,,
-FND-016,T10,1,high,code,FND,K18,قالب PDF اسناد رسمی با پالت teal، فونت Vazirmatn/Consolas و جهت فیزیکی,خروجی PDF همهٔ اسناد (`/api/documents/[kind]/[id]/pdf`، فاکتور فروشگاه، قرارداد finder) — A4DocumentTemplate (K18),,,
+FND-016,T10,1,high,code,FND,K18,قالب PDF اسناد رسمی با پالت teal، فونت Vazirmatn/Consolas و جهت فیزیکی,خروجی PDF همهٔ اسناد (`/api/documents/[kind]/[id]/pdf`، فاکتور فروشگاه، قرارداد finder) — A4DocumentTemplate (K18),,,فونت به IRANSansX رفت (DEC-0237)؛ پالت و جهت فیزیکی در T10
 KUSR-042,T10,1,high,needs decision,KUSR,K18,شجره‌نامه فقط یک نسل (والدین) دارد؛ حالت سخت «نیای نامشخص در شجره» با «—» به‌جای «نامشخص»,K18 سند شجره‌نامه · `PedigreeTree` داخل `A4DocumentTemplate`,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 CMPA1-002,T10,1,medium,code,CMPA1,,PDF برچسب‌دار (tagged) نیست و فیلدها `dl` نیستند,A4DocumentTemplate,,,
 CMPA1-003,T10,1,medium,code,CMPA1,K18,نمای روی صفحه برگه ثبتی و شجره‌نامه بخش‌های قالب A4 را کم دارد,A4DocumentTemplate (K18),,,

@@ -12,6 +12,8 @@
  * the association's official printed template, which has not been delivered;
  * the page says so on its face rather than implying an official artefact.
  */
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { AppError } from '../domain/errors.ts';
 
 export interface DocumentField {
@@ -48,6 +50,27 @@ const escapeHtml = (value: string): string =>
     .replace(/"/g, '&quot;');
 
 /**
+ * IRANSansX, the system's only family (Typography), embedded as data URIs so the
+ * page stays offline and deterministic. Read once, on first render.
+ */
+let fontFaces: string | undefined;
+function documentFontFaces(): string {
+  fontFaces ??= (
+    [
+      ['Regular', 400],
+      ['Medium', 500],
+      ['DemiBold', 600],
+    ] as const
+  )
+    .map(([name, weight]) => {
+      const data = readFileSync(path.join(process.cwd(), 'public/fonts/IRANSansX-' + name + '.woff2')).toString('base64');
+      return "@font-face{font-family:'IRANSansX';src:url(data:font/woff2;base64," + data + ") format('woff2');font-weight:" + weight + ';}';
+    })
+    .join('');
+  return fontFaces;
+}
+
+/**
  * The printable page.
  *
  * Deliberately self-contained: no external stylesheet, no network font and no
@@ -78,13 +101,14 @@ export function documentHtml(spec: DocumentSpec): string {
 <html lang="fa" dir="rtl">
 <head><meta charset="utf-8"><title>${escapeHtml(spec.titleFa)}</title>
 <style>
+  ${documentFontFaces()}
   @page { size: A4; margin: 18mm; }
-  body { font-family: Vazirmatn, Tahoma, "Segoe UI", sans-serif; color: #10241f; line-height: 1.9; }
+  body { font-family: "IRANSansX", Tahoma, system-ui, sans-serif; color: #10241f; line-height: 1.9; }
   header { border-bottom: 2px solid #0f766e; padding-bottom: 12px; margin-bottom: 24px; }
   h1 { font-size: 22px; margin: 0; }
   .subtitle { color: #4b5563; font-size: 13px; margin-top: 6px; }
   .identifier { margin: 18px 0; font-size: 15px; }
-  .identifier code { direction: ltr; unicode-bidi: embed; font-family: Consolas, monospace; font-size: 17px; }
+  .identifier code { direction: ltr; unicode-bidi: embed; font-family: inherit; font-weight: 600; font-size: 17px; }
   table { width: 100%; border-collapse: collapse; }
   th, td { border-bottom: 1px solid #d1d5db; padding: 10px 6px; text-align: right; vertical-align: top; }
   th { width: 34%; color: #4b5563; font-weight: 500; }

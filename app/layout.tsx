@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { APPLE_ICON, FAVICONS, THEME_COLOR } from '../src/brand/assets.ts';
+import { FAVICONS, THEME_COLOR } from '../src/brand/assets.ts';
 
 export const metadata: Metadata = {
   title: 'همزیست',
@@ -19,8 +19,10 @@ export const metadata: Metadata = {
       ...FAVICONS.map((asset) => ({ url: asset.path, sizes: asset.width + 'x' + asset.height, type: 'image/png' })),
     ],
     shortcut: '/brand/favicon/favicon.ico',
-    apple: [{ url: APPLE_ICON.path, sizes: APPLE_ICON.width + 'x' + APPLE_ICON.height, type: 'image/png' }],
+    apple: [{ url: '/brand/app-icon/apple-touch-icon-180.png', sizes: '180x180', type: 'image/png' }],
   },
+  // Default share image; public pages replace it with an absolute URL via `buildMetadata`.
+  openGraph: { images: [{ url: '/brand/social/og-1200x630.png', width: 1200, height: 630 }] },
 };
 
 /** The status bar follows the cream chrome (Brand › app-icon manifest colours). */
