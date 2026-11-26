@@ -29,13 +29,19 @@ export function SectionHeader({
         <span className="hz-section-header__bar" aria-hidden="true" />
         <span>
           {title}
-          {count ? <span className="hz-section-header__count"> {count}</span> : null}
+          {/* A bare «۰» says nothing; an empty section shows its empty state instead (CMPB-096). */}
+          {count && count !== '۰' && count !== '0' ? <span className="hz-section-header__count"> {count}</span> : null}
         </span>
       </Tag>
       {link ? (
         <Link className="hz-link hz-link--standalone hz-section-header__link" href={link.href}>
           {link.label ?? 'مشاهده همه'}
-          {link.hiddenSuffix ? <span className="hz-visually-hidden"> {link.hiddenSuffix}</span> : null}
+          {/* «مشاهده همه» alone is ambiguous out of context: the section's name follows for screen readers (CMPB-097). */}
+          {link.hiddenSuffix ? (
+            <span className="hz-visually-hidden"> {link.hiddenSuffix}</span>
+          ) : typeof title === 'string' ? (
+            <span className="hz-visually-hidden">{' ' + title}</span>
+          ) : null}
           <Icon name="arrowRight" size="xs" mirror />
         </Link>
       ) : null}

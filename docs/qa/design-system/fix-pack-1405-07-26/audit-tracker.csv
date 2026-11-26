@@ -411,8 +411,8 @@ CMPA2-039,T22,3,low,code,CMPA2,,LockedServiceCard: `aria-disabled` روی کار
 CMPB-058,T22,3,low,code,CMPB,,ProductCard · کامپوننت در `src/ui` نیست و سطح سرفصل نام با طراحی فرق دارد,کاشی محصول,,,
 CMPB-068,T22,3,low,code,CMPB,,ServiceCard · سه صفحه markup محلی دارند و آیکون ابتدای عنوان در طراحی نیست,خانه، فهرست خدمات، راهنماها، و داشبورد,,,
 CMPB-091,T22,3,low,code,CMPB,,PageHeader · crumbs بیرون از `<header>` و دو پیاده‌سازی برای «بازگشت»,PageHeader + Breadcrumbs,,,
-CMPB-096,T22,3,low,code,CMPB,,SectionHeader · شمارش بدون اسم واحد و نمایش «۰»,SectionHeader / Panel,,,
-CMPB-097,T22,3,low,code,CMPB,,SectionHeader · لینک «مشاهده همه» بدون نام بخش برای صفحه‌خوان,SectionHeader (لینک انتها),,,
+CMPB-096,T22,3,low,code,CMPB,,SectionHeader · شمارش بدون اسم واحد و نمایش «۰»,SectionHeader / Panel,PARTIAL,DEC-0255,«۰» نمایش داده نمی‌شود؛ اسم واحد در همه فراخوان‌ها نه
+CMPB-097,T22,3,low,code,CMPB,,SectionHeader · لینک «مشاهده همه» بدون نام بخش برای صفحه‌خوان,SectionHeader (لینک انتها),FIXED,DEC-0255,نام بخش پنهان پس از «مشاهده همه»
 CMPB-105,T22,3,low,code,CMPB,,TextLink · کامپوننت TextLink نیست و لینک‌های خارجی زبانهٔ تازه را اعلام نمی‌کنند,TextLink (۱۷۵ کاربرد خام `hz-link`، ۶۴ تای آن‌ها `hz-link--standalone`),,,
 CMPB-106,T22,3,low,code,CMPB,,TextLink · دکمهٔ کنش با ظاهر TextLink,TextLink در LocationField,,,
 CMPB-107,T22,3,low,code,CMPB,,TextStyles · چند heading دو بار سبک دارند: `text-h*` تیلویند کنار `.hz-h*`,TextStyles,,,
