@@ -159,7 +159,7 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
                 <dt className="text-text-secondary">کاربر مرتبط</dt>
                 <dd data-testid="vet-owner-name">{view.ownerNameFa ?? '—'}</dd>
                 <dt className="text-text-secondary">کد مراجعه</dt>
-                <dd>{view.referral ? <Identifier value={view.referral.code} /> : '—'}</dd>
+                <dd>{view.referral ? <Identifier value={view.referral.code} copy /> : '—'}</dd>
                 <dt className="text-text-secondary">زمان پذیرش</dt>
                 <dd>{request.checkedInAt ? formatCivilDateFa(request.checkedInAt.toISOString().slice(0, 10)) : '—'}</dd>
               </dl>
@@ -256,7 +256,7 @@ export default async function VetRequestPage({ params }: { params: Promise<{ id:
                 <li key={sample.id} className="rounded-lg border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <p className="text-body-sm">
-                      <Identifier label="کد رهگیری نمونه:" value={sample.trackingCode} />
+                      <Identifier label="کد رهگیری نمونه:" value={sample.trackingCode} copy />
                     </p>
                     <SampleStatusBadge status={sample.status} />
                   </div>

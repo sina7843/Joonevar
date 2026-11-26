@@ -359,7 +359,7 @@ RTU-013,T24,2,low,code,RTU,,مقدار نامشخص با «—» به‌جای �
   - `/account/vet-profile` (۳)
   - `/pedigree/[animalId]`، `/account/seller`، `/account/listings/[id]`
   - `/payments` (`app/payments/page.tsx:80`، کد پیگیری درگاه)",,,
-CMPA2-031,T25,2,medium,code,CMPA2,K2 K6 K9 K11 K12 K18,Identifier: دکمه‌ی کپی هیچ‌جا پیاده نشده است (K2، K6، K9، K11، K12، K18),Identifier (with copy ★),,,
+CMPA2-031,T25,2,medium,code,CMPA2,K2 K6 K9 K11 K12 K18,Identifier: دکمه‌ی کپی هیچ‌جا پیاده نشده است (K2، K6، K9، K11، K12، K18),Identifier (with copy ★),FIXED,DEC-0254,CopyButton در Identifier؛ کد مراجعه، رهگیری، سند، شناسه حیوان
 FND-010,T25,2,medium,code,FND,,جداکنندهٔ «·» کنار ارقام فارسی در ۶۳ خط,خط‌های meta در کارت‌ها، صف‌ها و جزئیات (عمدتاً عملیات، finder، vet-profile),,,
 FND-011,T25,2,medium,code,FND,,ارقام لاتین و تاریخ ISO خام در متن فارسی,تاریخچهٔ تاریخ جفت‌گیری، پاسخ به تاریخ، بارداری، تولد، نتایج نسب، تبلیغات و مرجوعی بازار,,,
 RTO-022,T25,2,medium,code,RTO,,کلید Latin خام به‌جای برچسب فارسی به اپراتور نشان داده می‌شود,برچسب‌ها و محتوای عملیاتی (*08-content*),,,

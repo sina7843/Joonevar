@@ -1,3 +1,4 @@
+import { CopyButton } from './copy-button.tsx';
 import type { ReactNode } from 'react';
 import { statusOf } from './status-dictionary.ts';
 import { Icon } from './icon.tsx';
@@ -43,13 +44,14 @@ export function StatusBadge({
  * An identifier stays left-to-right inside Persian text — DS *Identifier*:
  * `<bdi dir="ltr">`, 13/20 · 600, never wraps (§24.3).
  */
-export function Identifier({ value, label }: { value: string; label?: string }) {
+export function Identifier({ value, label, copy = false }: { value: string; label?: string; copy?: boolean }) {
   return (
     <span className="hz-identifier">
       {label ? <span className="hz-identifier__label">{label}</span> : null}
       <bdi dir="ltr" data-testid="identifier">
         {value}
       </bdi>
+      {copy ? <CopyButton value={value} /> : null}
     </span>
   );
 }

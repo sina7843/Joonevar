@@ -138,7 +138,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
             aside={
               <>
                 <span className="text-caption text-text-secondary" data-testid="pet-id">
-                  {animal.petId ? <Identifier value={animal.petId} /> : 'شناسه رسمی: — تا صدور برگه ثبتی'}
+                  {animal.petId ? <Identifier value={animal.petId} copy /> : 'شناسه رسمی: — تا صدور برگه ثبتی'}
                 </span>
                 <StatusBadge status={animal.status} />
               </>
@@ -327,7 +327,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                   {sampleRows.map((sample) => (
                     <div key={sample.id} className="hz-kv__row">
                       <dt className="hz-kv__key">
-                        <Identifier value={sample.trackingCode} />
+                        <Identifier value={sample.trackingCode} copy />
                       </dt>
                       <dd className="hz-kv__value">{SAMPLE_STATUS_FA[sample.status]}</dd>
                     </div>

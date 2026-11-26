@@ -57,7 +57,7 @@ export function DocumentCard({
       </div>
       <KeyValueList
         rows={[
-          { key: 'شماره سند', value: <Identifier value={number} /> },
+          { key: 'شماره سند', value: <Identifier value={number} copy /> },
           { key: 'تاریخ صدور', value: issuedFa },
         ]}
       />

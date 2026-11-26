@@ -118,7 +118,7 @@ export default async function RequestPage({
             <Card>
               <SectionHeader size="sm" title="کد مراجعه" />
               <p className="mt-md text-h3" data-testid="referral-code">
-                <Identifier value={referral.code} />
+                <Identifier value={referral.code} copy />
               </p>
               <p className="mt-sm text-caption text-text-secondary">
                 QR و ورود دستی دو نمایش از همین یک کد هستند؛ کد دومی وجود ندارد.
@@ -153,7 +153,7 @@ export default async function RequestPage({
                 {sampleRows.map((sample) => (
                   <div key={sample.id} className="hz-kv__row">
                     <dt className="hz-kv__key">
-                      <Identifier label="کد رهگیری:" value={sample.trackingCode} />
+                      <Identifier label="کد رهگیری:" value={sample.trackingCode} copy />
                     </dt>
                     <dd className="hz-kv__value">{SAMPLE_STATUS_FA[sample.status]}</dd>
                   </div>
