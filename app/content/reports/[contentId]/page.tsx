@@ -89,6 +89,7 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
           open ? (
             <ReportDecisionForm
               contentId={item.id}
+              version={item.version}
               decisions={decisions}
               drafts={[...new Set(data.open.map((report) => REASON_FA[report.reason]))]}
             />

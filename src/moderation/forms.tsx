@@ -107,17 +107,20 @@ function RestrictUntilField() {
  */
 export function ReportDecisionForm({
   contentId,
+  version,
   decisions,
   drafts,
 }: {
   contentId: string;
+  /** The content version on screen; the server refuses a decision on a newer one (KOPS-029). */
+  version: number;
   decisions: readonly ModerationDecision[];
   drafts: readonly string[];
 }) {
   return (
     <DecisionForm
       action={decideReportsAction}
-      hidden={{ contentId }}
+      hidden={{ contentId, expectedVersion: String(version) }}
       formTestId="decision-form"
       submitTestId="submit-decision"
       reasonName="reason"

@@ -50,6 +50,7 @@ export async function decideReportsAction(_previous: ModerationFormState, form: 
       decision: text(form, 'decision'),
       reason: text(form, 'reason'),
       restrictUntil: until,
+      expectedVersion: text(form, 'expectedVersion') === '' ? undefined : Number(text(form, 'expectedVersion')),
     });
     revalidatePath('/content/reports');
     revalidatePath(path);

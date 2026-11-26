@@ -369,6 +369,12 @@ export interface DecisionInput {
   readonly reason: string;
   /** For RESTRICT_PUBLISHER: when it ends; null means until lifted. */
   readonly restrictUntil?: Date | null;
+  /**
+   * The content version the decider was looking at (KOPS-029). When given and
+   * the item changed since, the decision is refused rather than applied to a
+   * version nobody reviewed.
+   */
+  readonly expectedVersion?: number;
 }
 
 /**
@@ -396,6 +402,12 @@ export async function decideContentReports(
   return database.transaction(async (tx) => {
     const [item] = await tx.select().from(contentItems).where(eq(contentItems.id, input.contentId)).limit(1);
     if (!item) throw notFound('محتوا پیدا نشد.');
+    if (input.expectedVersion !== undefined && input.expectedVersion !== item.version) {
+      throw conflict('این محتوا از زمانی که این صفحه را باز کردید تغییر کرده است؛ صفحه را دوباره باز کنید و روی نسخه تازه تصمیم بگیرید.', {
+        expectedVersion: input.expectedVersion,
+        actualVersion: item.version,
+      });
+    }
 
     const closed = await tx
       .update(moderationReports)

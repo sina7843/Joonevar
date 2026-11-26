@@ -193,6 +193,26 @@ test('dismissing closes every open report with its decision, reason, actor and t
   await report(reporter, item);
 });
 
+test('a decision taken on a version that has since changed is refused and closes nothing (KOPS-029)', async () => {
+  const item = await published();
+  // Its own reporter, so the daily report limit of the shared fixtures is untouched.
+  const staleReporter = actorFor(await createTestAccount(testDb.db, '09990720009'));
+  await report(staleReporter, item);
+  const seen = (await reload(item.id)).version;
+  // The content moves on after the desk was opened.
+  await testDb.db.update(contentItems).set({ version: seen + 1 }).where(eq(contentItems.id, item.id));
+
+  await assert.rejects(
+    () => decideContentReports(testDb.db, admin, { contentId: item.id, decision: 'HIDE', reason: 'x', expectedVersion: seen }),
+    code('CONFLICT'),
+  );
+  const open = await testDb.db.select().from(moderationReports).where(eq(moderationReports.contentId, item.id));
+  assert.ok(open.every((row) => row.status === 'OPEN'), 'nothing was closed by the stale decision');
+
+  const result = await decideContentReports(testDb.db, admin, { contentId: item.id, decision: 'DISMISS', reason: 'منبع درست است', expectedVersion: seen + 1 });
+  assert.equal(result.closed, 1);
+});
+
 test('hiding and soft-deleting go through the content rules and tell the author', async () => {
   const hidden = await published();
   await report(reporter, hidden);
