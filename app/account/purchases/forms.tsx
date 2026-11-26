@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
+import { MoneyField } from '../../../src/ui/money-field.tsx';
 import { ActionRow, Button, StickyActionBar } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Card } from '../../../src/ui/card.tsx';
@@ -68,13 +69,11 @@ export function AskToBuyForm({ listingId }: { listingId: string }) {
           hint="تا پیش از پرداخت بیعانه، شماره تماس و شماره کارت در گفت‌وگو رد و بدل نمی‌شود."
           data-testid="inquiry-message"
         />
-        <TextField
-          label="پیشنهاد قیمت شما (تومان)"
+        <MoneyField
+          label="پیشنهاد قیمت شما"
           name="offerToman"
-          ltr
-          inputMode="numeric"
-          hint="اختیاری. بدون پیشنهاد، درخواست با همان مبلغ آگهی ثبت می‌شود. با رقم انگلیسی و بدون جداکننده."
-          data-testid="inquiry-offer"
+          hint="اختیاری. بدون پیشنهاد، درخواست با همان مبلغ آگهی ثبت می‌شود."
+          testId="inquiry-offer"
         />
         <Button type="submit" disabled={pending} data-testid="ask-to-buy-submit">
           {pending ? 'در حال ثبت…' : 'ثبت درخواست خرید'}
@@ -90,7 +89,7 @@ export function OfferForm({ inquiryId }: { inquiryId: string }) {
     <form action={submit} className="space-y-sm" data-testid="offer-form">
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <Result state={state} />
-      <TextField label="پیشنهاد قیمت (تومان)" name="amountToman" ltr inputMode="numeric" required data-testid="offer-amount" />
+      <MoneyField label="پیشنهاد قیمت" name="amountToman" required testId="offer-amount" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="offer-submit">
         {pending ? 'در حال ثبت…' : 'ثبت پیشنهاد'}
       </Button>

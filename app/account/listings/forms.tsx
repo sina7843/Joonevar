@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import { MoneyField } from '../../../src/ui/money-field.tsx';
 import { ActionRow, Button } from '../../../src/ui/button.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
@@ -87,16 +88,14 @@ export function ListingContentForm({
 
       {/* Decision 7g: every advert is an amount + «قابل مذاکره»; there is no price type to choose. */}
       <input type="hidden" name="priceMode" value="NEGOTIABLE" />
-      <TextField
-        label="مبلغ آگهی (تومان)"
+      <MoneyField
+        label="مبلغ آگهی"
         name="priceToman"
-        ltr
-        inputMode="numeric"
         required
         defaultValue={values.priceToman}
-        hint="قیمت آگهی همیشه قابل مذاکره است؛ خریدار می‌تواند پیشنهاد قیمت بدهد. فقط رقم، بدون جداکننده."
+        hint="قیمت آگهی همیشه قابل مذاکره است؛ خریدار می‌تواند پیشنهاد قیمت بدهد."
         disabled={disabled}
-        data-testid="listing-price"
+        testId="listing-price"
       />
 
       <TextAreaField

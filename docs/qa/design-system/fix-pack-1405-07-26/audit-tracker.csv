@@ -312,7 +312,7 @@ FND-019,T20,2,low,code,FND,K8,صفحه‌های ورود و تکمیل حساب 
 KPUB-042,T20,2,low,needs decision,KPUB,K8,K8: پیوند «ویرایش شماره»، قالب شمارش معکوس و جملهٔ شرایط استفاده,K8 — متن‌ها و پیوندها,FIXED,DEC-0251,«ویرایش شماره» و قالب شمارش معکوس
 KPUB-043,T20,2,low,code,KPUB,K8,K8: پیام ضدفیشینگ، متن معرفی و پانویس,K8 — InlineMessage، footer,,,
 CMPA2-034,T21,2,high,code,CMPA2,,"JalaliDateField وجود ندارد؛ ۱۵ ورودی تاریخ بومی میلادی (`type=""date""`/`datetime-local`) باقی است",JalaliDateField (P0),,,
-CMPB-005,T21,2,high,code,CMPB,,MoneyField · مبلغ تومان همه‌جا به‌صورت ورودی LTR با رقم لاتین و بی‌جداکننده گرفته می‌شود,MoneyField — قیمت آگهی، قیمت SKU، پیشنهاد قیمت، کارمزدها و تعرفه‌ها، تخفیف، حق عضویت، فیلتر قیمت بازار,,,
+CMPB-005,T21,2,high,code,CMPB,,MoneyField · مبلغ تومان همه‌جا به‌صورت ورودی LTR با رقم لاتین و بی‌جداکننده گرفته می‌شود,MoneyField — قیمت آگهی، قیمت SKU، پیشنهاد قیمت، کارمزدها و تعرفه‌ها، تخفیف، حق عضویت، فیلتر قیمت بازار,PARTIAL,DEC-0252,MoneyField در آگهی و پیشنهادهای قیمت؛ تنظیمات/پلن/کالا هنوز TextField
 CMPA1-046,T21,2,medium,code,CMPA1,,Checkbox و CheckboxGroup ساخته نشده؛ ۳۱ ورودی خام که ۱۰ تا هنوز `hz-check` ندارند,Checkbox,,,
 CMPA1-050,T21,2,medium,code,CMPA1,,Combobox ساخته نشده؛ BreedPicker الگوی combobox و یکسان‌سازی «ی/ي، ک/ك» ندارد,Combobox / BreedPicker,,,
 CMPA2-025,T21,2,medium,code,CMPA2,,FileField: عدد لاتین در حجم، بدون فهرست فرمت‌ها، بدون حالت آپلودشده/پیشرفت/حذف/اصلاح و برچسب «تغییر فایل»,FileField (۲۲ استفاده),,,
