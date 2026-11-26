@@ -70,7 +70,7 @@ export default async function ServicePage({ params }: Params) {
         </h2>
         <p className="mt-md text-body-md">{service.definitionFa}</p>
         <p className="mt-md text-body-sm text-text-secondary">
-          <span className="text-label-md text-text-primary">{'مخاطب: '}</span>
+          <span className="text-label-sm text-text-primary">{'مخاطب: '}</span>
           {service.audienceFa}
         </p>
       </section>
@@ -112,7 +112,7 @@ export default async function ServicePage({ params }: Params) {
         <ol className="mt-md space-y-sm" data-testid="service-steps">
           {service.stepsFa.map((step, index) => (
             <li key={step} className="flex gap-md rounded-lg border border-border-default bg-bg-surface p-md">
-              <span className="flex size-[28px] shrink-0 items-center justify-center rounded-full bg-action-primary-default text-label-md text-action-primary-on">
+              <span className="flex size-[28px] shrink-0 items-center justify-center rounded-full bg-action-primary-default text-label-sm text-action-primary-on">
                 {(index + 1).toLocaleString('fa-IR')}
               </span>
               <span className="text-body-md">{step}</span>

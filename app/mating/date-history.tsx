@@ -44,7 +44,7 @@ export function DateHistory({
             >
               <div className="flex items-start justify-between gap-md">
                 <div className="min-w-0">
-                  <p className="text-label-md">
+                  <p className="text-label-sm">
                     نسخه {row.version} ·{' '}
                     <span dir="ltr" className="font-mono">
                       {row.matedOn}

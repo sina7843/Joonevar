@@ -213,7 +213,7 @@ export function CorrectBirthForm({
         <TextField label="علت اصلاح" name="reason" required data-testid="correct-reason" />
         {reducing ? (
           <fieldset className="space-y-sm" data-testid="withdraw-list">
-            <legend className="text-label-md">کدام پرونده‌ها با این اصلاح کنار گذاشته می‌شوند؟</legend>
+            <legend className="text-label-sm">کدام پرونده‌ها با این اصلاح کنار گذاشته می‌شوند؟</legend>
             <p className="text-caption text-text-secondary">
               این کار پرونده را حذف نمی‌کند؛ آن را با علت شما «حذف‌شده با اصلاح گزارش اولیه» ثبت می‌کند.
             </p>

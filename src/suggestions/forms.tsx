@@ -204,7 +204,7 @@ export function SuggestionDecisionForm({ suggestionId, version }: { suggestionId
 function ClaimDocumentFields({ required }: { required: boolean }) {
   return (
     <fieldset className="space-y-md">
-      <legend className="text-label-md">مدارک</legend>
+      <legend className="text-label-sm">مدارک</legend>
       <p className="text-caption text-text-secondary">
         JPG، PNG یا PDF تا ۱۰ مگابایت برای هر فایل. مدارک خصوصی‌اند و فقط شما و اپراتور بررسی آن‌ها را می‌بینند.
       </p>

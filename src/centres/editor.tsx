@@ -41,7 +41,7 @@ function Axis({
   return (
     <li className="flex flex-wrap items-start justify-between gap-sm border-b border-border-subtle py-sm last:border-b-0" data-testid={testId}>
       <div className="min-w-0">
-        <p className="text-label-md">{label}</p>
+        <p className="text-label-sm">{label}</p>
         {detail ? <p className="mt-2xs text-caption text-text-secondary">{detail}</p> : null}
       </div>
       {typeof status === 'string' ? <StatusBadge status={status} /> : <StatusBadge tone={status.tone}>{status.value}</StatusBadge>}
@@ -187,7 +187,7 @@ export function CentreEditor({
               <li key={branch.id} className="py-lg first:pt-0 last:pb-0" data-testid={'centre-branch-' + branch.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
-                    <h3 className="text-label-md">{branch.nameFa}</h3>
+                    <h3 className="text-label-sm">{branch.nameFa}</h3>
                     <p className="mt-2xs text-caption text-text-secondary">
                       {[branch.provinceNameFa, branch.cityNameFa, branch.addressFa].filter(Boolean).join(' · ')}
                     </p>
@@ -239,7 +239,7 @@ export function CentreEditor({
         )}
         {canEditContent ? (
           <div className="mt-lg border-t border-border-subtle pt-lg">
-            <h3 className="text-label-md">افزودن شعبه</h3>
+            <h3 className="text-label-sm">افزودن شعبه</h3>
             <BranchForm surface={surface} centreId={centre.id} provinces={reference.provinces} cities={reference.cities} />
           </div>
         ) : null}
@@ -262,7 +262,7 @@ export function CentreEditor({
               <li key={member.id} className="py-md first:pt-0 last:pb-0" data-testid={'centre-member-' + member.id}>
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <div className="min-w-0">
-                    <p className="text-label-md">{member.nameFa}</p>
+                    <p className="text-label-sm">{member.nameFa}</p>
                     {member.roleFa ? <p className="text-caption text-text-secondary">{member.roleFa}</p> : null}
                   </div>
                   <StatusBadge status={memberKey(member.status)} />

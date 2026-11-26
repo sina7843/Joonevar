@@ -76,7 +76,7 @@ export default async function RewardsPage() {
               {view.entries.map((entry) => (
                 <li key={entry.id} className="flex flex-wrap items-baseline justify-between gap-sm py-sm" data-testid={'loyalty-entry-' + entry.id}>
                   <span className="min-w-0">
-                    <span className="block text-label-md">{LOYALTY_KIND_FA[entry.kind] + ' — ' + entry.descriptionFa}</span>
+                    <span className="block text-label-sm">{LOYALTY_KIND_FA[entry.kind] + ' — ' + entry.descriptionFa}</span>
                     <span className="hz-caption">{entry.createdAt.toLocaleDateString('fa-IR')}</span>
                   </span>
                   <span className="text-label-lg">{fa(entry.points)}</span>

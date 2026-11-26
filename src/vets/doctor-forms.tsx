@@ -73,7 +73,7 @@ export function DoctorApplicationForm({
           />
         </div>
         <fieldset className="space-y-sm">
-          <legend className="text-label-md">عمومی یا متخصص</legend>
+          <legend className="text-label-sm">عمومی یا متخصص</legend>
           {(
             [
               ['GENERAL', 'دکتر دامپزشک عمومی'],
@@ -98,7 +98,7 @@ export function DoctorApplicationForm({
         <PlacePicker provinces={provinces} cities={cities} defaultProvince={defaults.provinceCode} defaultCity={defaults.cityId} testIdPrefix="app-" />
         <TextAreaField label="توضیح برای بررسی" name="statementFa" rows={3} maxLength={2000} defaultValue={defaults.statementFa ?? ''} data-testid="app-statement" />
         <fieldset className="space-y-md">
-          <legend className="text-label-md">مدارک</legend>
+          <legend className="text-label-sm">مدارک</legend>
           <p className="text-caption text-text-secondary">
             JPG، PNG یا PDF تا ۱۰ مگابایت. مدارک خصوصی‌اند و فقط شما و ادمین انجمن آن‌ها را می‌بینید؛ هر مشاهده ثبت می‌شود.
           </p>

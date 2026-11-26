@@ -429,9 +429,9 @@ CMPB-078,T23,3,medium,code,CMPB,,SensitiveConfirm · دیالوگ تأیید ح�
 CMPA1-029,T23,3,low,code,CMPA1,,BottomSheet: زیرعنوان، `aria-labelledby`، فوکوس اولیه و بستن با کشیدن,BottomSheet,,,
 CMPA2-020,T23,3,low,code,CMPA2,,API کامپوننت Drawer: `side`/`variant` ندارد، عنوانش با `aria-label` است و دکمه‌ی بستن برچسب کلی دارد,Drawer,,,
 CMPB-077,T23,3,low,code,CMPB,,Tooltip · کامپوننت Tooltip وجود ندارد و `title` بومی هنوز استفاده می‌شود,کارت‌های لینک‌دار و جدول audit,,,
-FND-004,T26,3,medium,code,FND,,سبک تایپ اضافهٔ `text-label-md` (14/22 · 600) که در سیستم نیست، ۹۰ بار استفاده شده,دکمه‌ها و برچسب‌های دست‌ساز در بسیاری از صفحه‌ها (finder، packages، cart، declaration، vet-profile، admin، dev…),,,
+FND-004,T26,3,medium,code,FND,,سبک تایپ اضافهٔ `text-label-md` (14/22 · 600) که در سیستم نیست، ۹۰ بار استفاده شده,دکمه‌ها و برچسب‌های دست‌ساز در بسیاری از صفحه‌ها (finder، packages، cart، declaration، vet-profile، admin، dev…),FIXED,DEC-0255,text-label-md → text-label-sm در ۴۷ فایل؛ توکن حذف
 FND-005,T26,3,medium,code,FND,,breakpointهای خارج از سیستم (`sm:` = 640 و `xl:` = 1280) در ۶۰ جا,فهرست‌های عمومی (بازار، انجمن‌ها، مراکز، کلاب‌ها، finder)، فرم‌های finder و مراکز,,,
-FND-015,T26,3,medium,code,FND,,اسکریپت `check:ds` بسیاری از سبک‌های ممنوع را نمی‌بیند و allow-list آن بیش از حد باز است,ابزار کنترل (`npm run check`),,,
+FND-015,T26,3,medium,code,FND,,اسکریپت `check:ds` بسیاری از سبک‌های ممنوع را نمی‌بیند و allow-list آن بیش از حد باز است,ابزار کنترل (`npm run check`),PARTIAL,DEC-0255,قانون سبک تایپ بیرون از سیستم؛ بقیه سبک‌های ممنوع نه
 CMPA2-029,T26,3,low,code,CMPA2,,Icon: آینه‌کردن جهت‌دارها دستی است و چند جا غلط یا جاافتاده است؛ زنگ اعلان‌ها با شمارش خوانده‌نشده `fill` می‌شود,Icon,,,
 FND-003,T26,3,low,code,FND,,وزن ۸۰۰ عنوان‌ها (عنوان مقاله، CtaBand، A4، ستون فوتر) به ۷۰۰ می‌افتد,`/articles/[slug]` و پست کلاب (ContentDetail)، CtaBand، A4DocumentTemplate، SiteFooter,,,
 FND-006,T26,3,low,code,FND,,توکن‌ها و aliasهای اضافه و قدیمی در `@theme`,`@theme`؛ استفاده در `/services/[slug]` و `/dev/gateway`,,,

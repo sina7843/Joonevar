@@ -407,7 +407,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
               )}
               {/* §17.1: only mutually confirmed dates appear as the official history. */}
               <div>
-                <p className="text-label-md">تاریخ‌های جفت‌گیری</p>
+                <p className="text-label-sm">تاریخ‌های جفت‌گیری</p>
                 <p className="mt-2xs text-caption text-text-secondary">
                   فقط تاریخ‌های تأییدشده دوطرفه؛ جدیدترین آن‌ها مبنای فاصله زمانی است.
                 </p>

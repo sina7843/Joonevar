@@ -74,7 +74,7 @@ export default async function AdminMergePage({ searchParams }: { searchParams: P
                     {row.primary ? (
                       <>
                         {' ← '}
-                        <b className="text-label-md">{row.primary.nameFa}</b>
+                        <b className="text-label-sm">{row.primary.nameFa}</b>
                       </>
                     ) : null}
                   </span>

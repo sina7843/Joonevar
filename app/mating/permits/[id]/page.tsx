@@ -187,7 +187,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
           {permit.ruleType ? (
             <div className="mt-lg" data-testid="permit-rule-summary">
-              <h3 className="text-label-md">{'توافق تقسیم: ' + RULE_TYPE_FA[permit.ruleType]}</h3>
+              <h3 className="text-label-sm">{'توافق تقسیم: ' + RULE_TYPE_FA[permit.ruleType]}</h3>
               <dl className="hz-kv mt-sm">
                 {(['SIRE_SIDE', 'DAM_SIDE'] as const).map((side) => (
                   <div key={side} className="contents">

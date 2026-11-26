@@ -158,7 +158,7 @@ export function CentreProfileForm({
         </div>
 
         <fieldset>
-          <legend className="text-label-md">خدمات</legend>
+          <legend className="text-label-sm">خدمات</legend>
           <div className="mt-sm grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
             {services.map((row) => (
               <Check
@@ -173,7 +173,7 @@ export function CentreProfileForm({
           </div>
         </fieldset>
         <fieldset>
-          <legend className="text-label-md">گونه‌هایی که پذیرفته می‌شوند</legend>
+          <legend className="text-label-sm">گونه‌هایی که پذیرفته می‌شوند</legend>
           <div className="mt-sm flex flex-wrap gap-lg">
             {speciesList.map((row) => (
               <Check
@@ -188,7 +188,7 @@ export function CentreProfileForm({
           </div>
         </fieldset>
         <fieldset>
-          <legend className="text-label-md">امکانات</legend>
+          <legend className="text-label-sm">امکانات</legend>
           <div className="mt-sm grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
             {facilities.map((row) => (
               <Check
@@ -355,7 +355,7 @@ const KINDS = [
 function HoursFields({ branch, suffix }: { branch?: EditableBranch; suffix: string }) {
   return (
     <fieldset>
-      <legend className="text-label-md">ساعات اعلام‌شده</legend>
+      <legend className="text-label-sm">ساعات اعلام‌شده</legend>
       <p className="mt-2xs text-caption text-text-secondary">
         روزهایی که خالی بماند اعلام نشده‌اند. این ساعات فقط اطلاع‌رسانی است و نوبت نمی‌دهد.
       </p>
@@ -516,7 +516,7 @@ export function CentreInvitationForm({ invitation }: { invitation: { id: string;
   const [state, submit, pending] = useActionState(respondToCentreInvitationAction, EMPTY);
   return (
     <div className="rounded-xl border border-border-default p-lg" data-testid={'centre-invitation-' + invitation.id}>
-      <p className="text-label-md">{invitation.centreNameFa}</p>
+      <p className="text-label-sm">{invitation.centreNameFa}</p>
       {invitation.roleFa ? <p className="mt-2xs text-caption text-text-secondary">{'سمت پیشنهادی: ' + invitation.roleFa}</p> : null}
       <p className="mt-xs text-body-sm text-text-secondary">تا وقتی نپذیرید، نام شما در صفحه این مرکز نمایش داده نمی‌شود.</p>
       <Result state={state} testId={'centre-invitation-result-' + invitation.id} />

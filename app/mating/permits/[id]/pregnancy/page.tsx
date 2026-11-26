@@ -154,7 +154,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
                   className="rounded-lg border border-border-default p-lg"
                   data-testid={'declaration-' + row.version}
                 >
-                  <p className="text-label-md">
+                  <p className="text-label-sm">
                     نسخه {row.version} · {yesNo(row.pregnant)}
                     {row.expectedCount !== null ? ' · تعداد تخمینی ' + row.expectedCount : ''}
                   </p>
@@ -197,7 +197,7 @@ export default async function PregnancyPage({ params }: { params: Promise<{ id: 
                     </p>
                   ) : (
                     <div>
-                      <p className="text-label-md" data-testid="vet-result-value">
+                      <p className="text-label-sm" data-testid="vet-result-value">
                         {yesNo(latest.pregnant)}
                         {latest.expectedCount !== null ? ' · تعداد تخمینی ' + latest.expectedCount : ''}
                       </p>

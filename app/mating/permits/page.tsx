@@ -66,7 +66,7 @@ export default async function PermitsPage() {
                 <Card>
                   <div className="flex items-start justify-between gap-md">
                     <div className="min-w-0">
-                      <h3 className="text-label-md">{permit.permitNo ?? 'پرونده مجوز'}</h3>
+                      <h3 className="text-label-sm">{permit.permitNo ?? 'پرونده مجوز'}</h3>
                       <p className="mt-2xs text-caption text-text-secondary">
                         {permit.initiatorAccountId === guard.actor.accountId
                           ? 'آغازکننده: شما'

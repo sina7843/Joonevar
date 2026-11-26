@@ -33,7 +33,7 @@ function Axis({
   return (
     <li className="flex flex-wrap items-start justify-between gap-sm border-b border-border-subtle py-sm last:border-b-0" data-testid={testId}>
       <div className="min-w-0">
-        <p className="text-label-md">{label}</p>
+        <p className="text-label-sm">{label}</p>
         {detail ? <p className="mt-2xs text-caption text-text-secondary">{detail}</p> : null}
       </div>
       {typeof status === 'string' ? <StatusBadge status={status} /> : <StatusBadge tone={status.tone}>{status.value}</StatusBadge>}
@@ -162,7 +162,7 @@ export function VetDirectoryEditor({
               <li key={location.id} className="py-lg first:pt-0 last:pb-0" data-testid={'directory-location-' + location.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
-                    <h3 className="text-label-md">{location.nameFa}</h3>
+                    <h3 className="text-label-sm">{location.nameFa}</h3>
                     <p className="mt-2xs text-caption text-text-secondary">
                       {[LOCATION_KIND_FA[location.kind], location.provinceFa, location.cityFa, location.addressFa].filter(Boolean).join(' · ')}
                     </p>

@@ -109,7 +109,7 @@ export function MergeKindTabs({ current }: { current: MergeKind }) {
           href={'/admin/merge?kind=' + kind}
           aria-current={kind === current ? 'page' : undefined}
           className={[
-            'inline-flex min-h-[var(--size-control-sm)] items-center rounded-md border px-md text-label-md',
+            'inline-flex min-h-[var(--size-control-sm)] items-center rounded-md border px-md text-label-sm',
             kind === current ? 'border-border-brand text-text-brand' : 'border-border-subtle text-text-secondary',
           ].join(' ')}
           data-testid={'merge-kind-' + kind}

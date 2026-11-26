@@ -109,7 +109,7 @@ export default async function FinderProfilesPage() {
                           : fa(entry.eligibility.problems.length) + ' شرط ورود هنوز برقرار نیست.'}
                       </span>
                     </span>
-                    <Link href={'/account/mating-finder/profiles/' + entry.animal.id} className="inline-flex items-center gap-xs text-label-md text-text-brand">
+                    <Link href={'/account/mating-finder/profiles/' + entry.animal.id} className="inline-flex items-center gap-xs text-label-sm text-text-brand">
                       مدیریت
                       <Icon name="caretRight" size="sm" mirror />
                     </Link>

@@ -130,7 +130,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
           ) : (
             <p className="text-body-sm text-text-secondary">خوداظهاری این نسخه ثبت نشده است.</p>
           )}
-          <h3 className="text-label-md">{DECLARED_EQUIPMENT_FA}</h3>
+          <h3 className="text-label-sm">{DECLARED_EQUIPMENT_FA}</h3>
           <ul className="space-y-2xs text-body-sm" data-testid="trusted-declared-equipment">
             {detail.declaredEquipment.length === 0 ? (
               <li className="text-text-secondary">تجهیزی اعلام نشده است.</li>

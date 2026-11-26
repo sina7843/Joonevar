@@ -30,7 +30,7 @@ export function ReportForm({ contentId, backHref }: { contentId: string; backHre
     return (
       <div className="space-y-lg">
         <Result state={state} testId="report-result" />
-        <a href={backHref} className="text-label-md text-text-brand underline underline-offset-4">
+        <a href={backHref} className="text-label-sm text-text-brand underline underline-offset-4">
           بازگشت به مطلب
         </a>
       </div>
@@ -41,7 +41,7 @@ export function ReportForm({ contentId, backHref }: { contentId: string; backHre
       <input type="hidden" name="contentId" value={contentId} />
       <Result state={state} testId="report-result" />
       <fieldset className="space-y-xs">
-        <legend className="mb-sm text-label-md">
+        <legend className="mb-sm text-label-sm">
           دلیل گزارش <span className="text-status-error-text" aria-hidden="true">*</span>
         </legend>
         {REPORT_REASONS.map((reason) => (

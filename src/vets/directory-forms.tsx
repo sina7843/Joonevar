@@ -171,7 +171,7 @@ export function VetPublicProfileForm({
         />
 
         <fieldset>
-          <legend className="text-label-md">تخصص‌ها</legend>
+          <legend className="text-label-sm">تخصص‌ها</legend>
           <div className="mt-sm grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
             {specialties.map((row) => (
               <Check
@@ -187,7 +187,7 @@ export function VetPublicProfileForm({
         </fieldset>
 
         <fieldset>
-          <legend className="text-label-md">گونه‌هایی که پذیرفته می‌شوند</legend>
+          <legend className="text-label-sm">گونه‌هایی که پذیرفته می‌شوند</legend>
           <div className="mt-sm flex flex-wrap gap-lg">
             {species.map((row) => (
               <Check
@@ -203,7 +203,7 @@ export function VetPublicProfileForm({
         </fieldset>
 
         <fieldset>
-          <legend className="text-label-md">رضایت نمایش</legend>
+          <legend className="text-label-sm">رضایت نمایش</legend>
           <div className="mt-sm space-y-xs">
             <Check
               name="showPhone"

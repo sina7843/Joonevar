@@ -115,7 +115,7 @@ export default async function MarketOverviewPage() {
             <div className="space-y-md" data-testid="market-species-summary">
               {(['ANIMAL_SALE', 'MERCHANDISE'] as const).map((market) => (
                 <div key={market}>
-                  <p className="text-label-md">{MARKET_FA[market]}</p>
+                  <p className="text-label-sm">{MARKET_FA[market]}</p>
                   <ul className="mt-sm flex flex-wrap gap-xs">
                     {byMarket(market).map((row) => (
                       <li key={row.id} data-testid={'species-state-' + market + '-' + row.speciesCode}>

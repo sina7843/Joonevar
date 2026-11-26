@@ -143,7 +143,7 @@ export default async function MatingFinderAccountPage() {
                       {'طرح ' + FINDER_AUDIENCE_FA[slot.audience] + ' — ' + FINDER_DURATION_FA[slot.durationMonths as FinderDuration]}
                     </p>
                     <p className="text-label-lg">{planRow.titleFa}</p>
-                    <p className={planRow.priceToman === null ? 'hz-unset text-label-md' : 'text-h4'} data-testid={'finder-plan-price-' + testId}>
+                    <p className={planRow.priceToman === null ? 'hz-unset text-label-sm' : 'text-h4'} data-testid={'finder-plan-price-' + testId}>
                       {price(planRow.priceToman)}
                     </p>
                     <p className="mt-xs text-caption text-text-secondary">{'ظرفیت: ' + fa(planRow.activeAnimalCapacity) + ' حیوان فعال'}</p>

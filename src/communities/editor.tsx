@@ -65,7 +65,7 @@ function Axis({
   return (
     <li className="flex flex-wrap items-start justify-between gap-sm border-b border-border-subtle py-sm last:border-b-0" data-testid={testId}>
       <div className="min-w-0">
-        <p className="text-label-md">{label}</p>
+        <p className="text-label-sm">{label}</p>
         {detail ? <p className="mt-2xs text-caption text-text-secondary">{detail}</p> : null}
       </div>
       {typeof status === 'string' ? <StatusBadge status={status} /> : <StatusBadge tone={status.tone}>{status.value}</StatusBadge>}
@@ -216,7 +216,7 @@ export function CommunityEditor({
               <li key={manager.id} className="py-md first:pt-0 last:pb-0" data-testid={'community-manager-' + manager.id}>
                 <div className="flex flex-wrap items-center justify-between gap-sm">
                   <div className="min-w-0">
-                    <p className="text-label-md">{manager.nameFa ?? 'بدون پروفایل هویتی'}</p>
+                    <p className="text-label-sm">{manager.nameFa ?? 'بدون پروفایل هویتی'}</p>
                     {manager.roleFa ? <p className="text-caption text-text-secondary">{manager.roleFa}</p> : null}
                   </div>
                   <StatusBadge status={managerKey(manager.status)} />
@@ -246,7 +246,7 @@ export function CommunityEditor({
               <li key={event.id} className="py-lg first:pt-0 last:pb-0" data-testid={'community-event-' + event.id}>
                 <div className="flex flex-wrap items-start justify-between gap-sm">
                   <div className="min-w-0">
-                    <h3 className="text-label-md">{event.titleFa}</h3>
+                    <h3 className="text-label-sm">{event.titleFa}</h3>
                     <p className="mt-2xs text-caption text-text-secondary">
                       {dateFa(event.startsOn) + (event.endsOn ? ' تا ' + dateFa(event.endsOn) : '') + (event.placeFa ? ' · ' + event.placeFa : '')}
                     </p>
@@ -281,7 +281,7 @@ export function CommunityEditor({
         )}
         {canEditContent ? (
           <div className="mt-lg border-t border-border-subtle pt-lg">
-            <h3 className="text-label-md">افزودن رویداد</h3>
+            <h3 className="text-label-sm">افزودن رویداد</h3>
             <EventForm surface={surface} communityId={community.id} provinces={reference.provinces} cities={reference.cities} />
           </div>
         ) : null}
@@ -307,7 +307,7 @@ export function CommunityEditor({
                   {posts.map((post) => (
                     <li key={post.id} className="py-lg first:pt-0 last:pb-0" data-testid={'community-post-' + post.id}>
                       <div className="flex flex-wrap items-start justify-between gap-sm">
-                        <h3 className="text-label-md">{post.titleFa}</h3>
+                        <h3 className="text-label-sm">{post.titleFa}</h3>
                         <StatusBadge status={post.status} />
                       </div>
                       {post.moderationNote ? (
@@ -335,7 +335,7 @@ export function CommunityEditor({
                 </ul>
               )}
               <div className="mt-lg border-t border-border-subtle pt-lg">
-                <h3 className="text-label-md">نوشته تازه</h3>
+                <h3 className="text-label-sm">نوشته تازه</h3>
                 <PostCreateForm surface={surface} communityId={community.id} />
               </div>
             </>

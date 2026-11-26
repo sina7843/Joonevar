@@ -197,7 +197,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             {contract.contract.status === 'DRAFTING' ? (
               <>
                 <details className="mt-md">
-                  <summary className="cursor-pointer text-label-md text-text-brand">ویرایش (نسخه تازه می‌سازد)</summary>
+                  <summary className="cursor-pointer text-label-sm text-text-brand">ویرایش (نسخه تازه می‌سازد)</summary>
                   <EditContractForm
                     requestId={id}
                     contractId={contract.contract.id}
@@ -216,7 +216,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             ) : null}
             {contract.contract.status === 'CONFIRMED' ? (
               <p className="mt-md">
-                <a href={'/api/finder/contracts/' + contract.contract.id + '/pdf'} className="text-label-md text-text-brand underline underline-offset-4" data-testid="finder-contract-pdf">
+                <a href={'/api/finder/contracts/' + contract.contract.id + '/pdf'} className="text-label-sm text-text-brand underline underline-offset-4" data-testid="finder-contract-pdf">
                   دریافت PDF نسخه تأییدشده
                 </a>
               </p>
@@ -368,11 +368,11 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             دیگر پروفایل‌ها و پیام‌های یکدیگر را نمی‌بینید؛ به طرف مقابل گفته نمی‌شود چه کسی مسدود کرده است.
           </p>
           <details className="mt-sm">
-            <summary className="cursor-pointer text-label-md">گزارش این درخواست</summary>
+            <summary className="cursor-pointer text-label-sm">گزارش این درخواست</summary>
             <FinderReportForm target="REQUEST" id={id} testId="finder-report-request" />
           </details>
           <details className="mt-sm">
-            <summary className="cursor-pointer text-label-md">گزارش کاربر مقابل</summary>
+            <summary className="cursor-pointer text-label-sm">گزارش کاربر مقابل</summary>
             <FinderReportForm target="ACCOUNT" id={id} testId="finder-report-account" />
           </details>
           <div className="mt-md">
@@ -416,7 +416,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             {can('START_CONTRACT') ? <CommandForm action="start-contract" requestId={id} version={request.version} label="تنظیم قرارداد" tone="primary" testId="finder-start-contract" /> : null}
             {can('PROPOSE_TERMS') ? (
               <details>
-                <summary className="cursor-pointer text-label-md text-text-brand">پیشنهاد شرایط تازه</summary>
+                <summary className="cursor-pointer text-label-sm text-text-brand">پیشنهاد شرایط تازه</summary>
                 <ProposeTermsForm requestId={id} version={request.version} defaults={defaults} />
               </details>
             ) : null}

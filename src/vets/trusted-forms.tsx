@@ -87,7 +87,7 @@ export function TrustedApplicationForm({
         </label>
         {equipment.length > 0 ? (
           <fieldset className="space-y-2xs">
-            <legend className="text-label-md">سایر تجهیزات اعلام‌شده (اختیاری)</legend>
+            <legend className="text-label-sm">سایر تجهیزات اعلام‌شده (اختیاری)</legend>
             {equipment.map((item) => (
               <Check key={item.code} name="equipmentCodes" value={item.code} label={item.nameFa} defaultChecked={false} testId={'trusted-equipment-' + item.code} />
             ))}

@@ -104,7 +104,7 @@ export default async function MyListingsPage() {
                       {' · '}
                       {fa(row.imageCount)} تصویر
                     </span>
-                    <span className="inline-flex items-center gap-xs text-label-md text-text-brand">
+                    <span className="inline-flex items-center gap-xs text-label-sm text-text-brand">
                       {row.status === 'DRAFT' ? 'ادامه ویرایش' : 'مشاهده آگهی'}
                       <Icon name="caretRight" size="sm" mirror />
                     </span>

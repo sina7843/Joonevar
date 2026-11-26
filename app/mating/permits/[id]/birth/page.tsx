@@ -182,7 +182,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                   >
                     <div className="flex items-start justify-between gap-md">
                       <div className="min-w-0">
-                        <p className="text-label-md">
+                        <p className="text-label-sm">
                           <Identifier value={puppy.tempCode} />
                         </p>
                         <p className="mt-2xs text-caption text-text-secondary">
@@ -262,7 +262,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                   className="rounded-lg border border-border-default p-lg"
                   data-testid={'birth-version-' + row.version}
                 >
-                  <p className="text-label-md">
+                  <p className="text-label-sm">
                     نسخه {row.version} · {row.liveCount} زنده · {row.deadCount} مرده ·{' '}
                     {row.kind === 'INITIAL' ? 'گزارش اولیه' : 'اصلاح'}
                   </p>

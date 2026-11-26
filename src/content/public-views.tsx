@@ -346,7 +346,7 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
           <RichText source={item.bodyFa} />
           {item.sources.length > 0 ? (
             <div className="hz-prose__source mt-s32 border-t border-border-subtle pt-lg" data-testid="content-sources">
-              <h2 id="content-sources-title" className="text-label-md text-text-secondary">
+              <h2 id="content-sources-title" className="text-label-sm text-text-secondary">
                 منابع
               </h2>
               <ol className="mt-xs list-decimal space-y-2xs ps-xl" aria-labelledby="content-sources-title">

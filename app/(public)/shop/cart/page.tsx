@@ -211,7 +211,7 @@ export default async function CartPage({
                                 >
                                   <Icon name={chosen ? 'checkCircle' : 'truck'} size="sm" className={chosen ? 'text-text-brand' : 'text-text-secondary'} />
                                   <span className="min-w-0">
-                                    <span className="block text-label-md">{offer.labelFa}</span>
+                                    <span className="block text-label-sm">{offer.labelFa}</span>
                                     <span className="hz-caption block">
                                       {(offer.waived ? 'رایگان' : fa(offer.toman!) + ' تومان') + ' · آماده‌سازی ' + fa(offer.preparationDays) + ' روز'}
                                     </span>
@@ -221,7 +221,7 @@ export default async function CartPage({
                                 <span className="hz-option h-full cursor-default bg-bg-subtle" data-testid={'cart-method-blocked-' + offer.methodId}>
                                   <Icon name="prohibit" size="sm" className="text-text-secondary" />
                                   <span className="min-w-0">
-                                    <span className="block text-label-md text-text-secondary">{offer.labelFa}</span>
+                                    <span className="block text-label-sm text-text-secondary">{offer.labelFa}</span>
                                     <span className="hz-caption block">{offer.problemFa}</span>
                                   </span>
                                 </span>

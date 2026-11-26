@@ -69,7 +69,7 @@ function Filter({
 }) {
   return (
     <div className="space-y-xs">
-      <label htmlFor={'search-' + id} className="block text-label-md">
+      <label htmlFor={'search-' + id} className="block text-label-sm">
         {label}
       </label>
       <select id={'search-' + id} name={id} defaultValue={value ?? ''} className={CONTROL} data-testid={'search-filter-' + id}>
@@ -140,7 +140,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         data-testid="search-form"
       >
         <div className="space-y-xs sm:col-span-2">
-          <label htmlFor="search-q" className="block text-label-md">
+          <label htmlFor="search-q" className="block text-label-sm">
             عبارت جست‌وجو
           </label>
           <input id="search-q" name="q" type="search" defaultValue={query.term} className={CONTROL} data-testid="search-input" />

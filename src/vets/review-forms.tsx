@@ -67,7 +67,7 @@ export function ReviewPanel({ review, isSuperadmin }: { review: ReviewPanelState
           <p className="text-caption text-text-secondary">{'بررسی‌ها برای نسخه ' + review.submissionVersion.toLocaleString('fa-IR') + ' ثبت می‌شوند. برای موردی که درست نیست توضیح لازم است.'}</p>
           {review.checks.map((check) => (
             <fieldset key={check.code} className="space-y-xs rounded-lg border border-border-default p-md" data-testid={'review-check-' + check.code}>
-              <legend className="px-2xs text-label-md">{check.labelFa}</legend>
+              <legend className="px-2xs text-label-sm">{check.labelFa}</legend>
               <div className="flex flex-wrap gap-md">
                 {REVIEW_CHECK_RESULTS.map((result) => (
                   <label key={result} className="flex items-center gap-xs text-body-sm">

@@ -178,7 +178,7 @@ export function CommunityProfileForm({
         <TextField label="نشانی عضویت" name="membershipUrl" ltr maxLength={300} defaultValue={community.membershipUrl ?? ''} data-testid="community-membership-url" />
 
         <fieldset>
-          <legend className="text-label-md">گونه‌های مرتبط</legend>
+          <legend className="text-label-sm">گونه‌های مرتبط</legend>
           <div className="mt-sm flex flex-wrap gap-lg">
             {speciesList.map((row) => (
               <Check
@@ -193,7 +193,7 @@ export function CommunityProfileForm({
           </div>
         </fieldset>
         <fieldset>
-          <legend className="text-label-md">نژادهای مرتبط</legend>
+          <legend className="text-label-sm">نژادهای مرتبط</legend>
           <div className="mt-sm grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
             {breeds.map((row) => (
               <Check
@@ -406,7 +406,7 @@ export function CommunityInvitationForm({
   const [state, submit, pending] = useActionState(respondToCommunityInvitationAction, EMPTY);
   return (
     <div className="rounded-xl border border-border-default p-lg" data-testid={'community-invitation-' + invitation.id}>
-      <p className="text-label-md">{invitation.communityNameFa}</p>
+      <p className="text-label-sm">{invitation.communityNameFa}</p>
       {invitation.roleFa ? <p className="mt-2xs text-caption text-text-secondary">{'سمت پیشنهادی: ' + invitation.roleFa}</p> : null}
       <p className="mt-xs text-body-sm text-text-secondary">تا وقتی نپذیرید، نام شما در صفحه عمومی نمایش داده نمی‌شود.</p>
       <Result state={state} testId={'community-invitation-result-' + invitation.id} />

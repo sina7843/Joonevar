@@ -80,7 +80,7 @@ export default async function DeclarationsPage() {
                 <Card>
                   <div className="flex items-start justify-between gap-md">
                     <div className="min-w-0">
-                      <h3 className="text-label-md">اعلام توافق شخصی</h3>
+                      <h3 className="text-label-sm">اعلام توافق شخصی</h3>
                       <p className="mt-2xs text-caption text-text-secondary">
                         {row.initiatorAccountId === guard.actor.accountId
                           ? 'آغازکننده: شما'

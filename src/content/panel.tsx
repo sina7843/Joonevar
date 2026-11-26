@@ -317,7 +317,7 @@ export async function ContentEditorView({ actor, panel, contentId }: { actor: Ac
               {data.revisions.map((revision) => (
                 <li key={revision.number} className="flex flex-wrap items-center justify-between gap-sm py-sm first:pt-0 last:pb-0">
                   <div className="min-w-0">
-                    <p className="text-label-md">
+                    <p className="text-label-sm">
                       {'نسخه ' + fa(revision.number)}
                       {revision.number === row.revisionNumber ? <span className="text-caption font-normal text-text-secondary"> · فعلی</span> : null}
                     </p>

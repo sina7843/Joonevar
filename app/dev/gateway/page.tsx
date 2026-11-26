@@ -57,7 +57,7 @@ export default async function DevGatewayPage({
             <input type="hidden" name="decision" value="paid" />
             <button
               type="submit"
-              className="min-h-[var(--size-control-md)] rounded-md bg-action-primary-default px-lg text-label-md text-action-primary-on"
+              className="min-h-[var(--size-control-md)] rounded-md bg-action-primary-default px-lg text-label-sm text-action-primary-on"
               data-testid="gateway-pay"
             >
               پرداخت موفق
@@ -70,7 +70,7 @@ export default async function DevGatewayPage({
             <input type="hidden" name="decision" value="failed" />
             <button
               type="submit"
-              className="min-h-[var(--size-control-md)] rounded-md border border-border-brand px-lg text-label-md"
+              className="min-h-[var(--size-control-md)] rounded-md border border-border-brand px-lg text-label-sm"
               data-testid="gateway-fail"
             >
               پرداخت ناموفق

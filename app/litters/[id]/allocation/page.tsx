@@ -143,7 +143,7 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
                   data-testid={'allocation-row-' + puppy.tempCode}
                 >
                   <div className="min-w-0">
-                    <p className="text-label-md">
+                    <p className="text-label-sm">
                       <Identifier value={puppy.tempCode} />
                     </p>
                     <p className="mt-2xs text-caption text-text-secondary">
@@ -237,7 +237,7 @@ export default async function AllocationPage({ params }: { params: Promise<{ id:
                   className="rounded-lg border border-border-default p-lg"
                   data-testid={'allocation-version-' + row.version}
                 >
-                  <p className="text-label-md">{'نسخه ' + row.version + ' · ' + ALLOCATION_STATUS_FA[row.status]}</p>
+                  <p className="text-label-sm">{'نسخه ' + row.version + ' · ' + ALLOCATION_STATUS_FA[row.status]}</p>
                   <p className="mt-2xs text-caption text-text-secondary">
                     {formatCivilDateFa(row.proposedAt.toISOString().slice(0, 10))} ·{' '}
                     {view.partyNames[row.proposedByAccountId] ?? '—'}

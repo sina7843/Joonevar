@@ -82,7 +82,7 @@ export function LicenceApplicationForm({
           data-testid="lic-council-code"
         />
         <fieldset className="space-y-sm">
-          <legend className="text-label-md">عمومی یا متخصص</legend>
+          <legend className="text-label-sm">عمومی یا متخصص</legend>
           {(
             [
               ['GENERAL', 'دکتر دامپزشک عمومی'],
@@ -119,7 +119,7 @@ export function LicenceApplicationForm({
         {newDoctor ? <PlacePicker provinces={provinces} cities={cities} testIdPrefix="lic-" /> : null}
 
         <fieldset className="space-y-md">
-          <legend className="text-label-md">مدارک</legend>
+          <legend className="text-label-sm">مدارک</legend>
           <p className="text-caption text-text-secondary">
             JPG، PNG یا PDF تا ۱۰ مگابایت برای هر فایل. نوع واقعی فایل بررسی می‌شود. مدارک خصوصی‌اند و فقط شما و ادمین انجمن آن‌ها را می‌بینید؛
             هر مشاهده ثبت می‌شود.
@@ -138,7 +138,7 @@ export function LicenceApplicationForm({
         </fieldset>
 
         <fieldset className="space-y-md">
-          <legend className="text-label-md">اطلاعات حرفه‌ای (اختیاری)</legend>
+          <legend className="text-label-sm">اطلاعات حرفه‌ای (اختیاری)</legend>
           <div className="grid gap-md md:grid-cols-2">
             <TextField label="نام کلینیک" name="clinicNameFa" maxLength={120} defaultValue={defaults.clinicNameFa ?? ''} data-testid="lic-clinic" />
             <TextField label="تلفن حرفه‌ای" name="phone" ltr inputMode="tel" maxLength={20} defaultValue={defaults.phone ?? ''} data-testid="lic-phone" />
@@ -147,7 +147,7 @@ export function LicenceApplicationForm({
           </div>
           {services.length > 0 ? (
             <div>
-              <p className="text-label-md">خدمات</p>
+              <p className="text-label-sm">خدمات</p>
               <div className="mt-sm grid gap-2xs md:grid-cols-2">
                 {services.map((service) => (
                   <Check

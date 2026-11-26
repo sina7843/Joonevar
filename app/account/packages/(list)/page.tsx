@@ -103,7 +103,7 @@ export default async function AccountPackagesPage() {
 
                 {live ? (
                   <div className="hz-card hz-card--subtle" data-testid={'live-package-' + target.id}>
-                    <p className="text-label-md">
+                    <p className="text-label-sm">
                       {'بسته فعال: ' +
                         AD_TIER_FA[history.find((row) => row.id === live.id)?.tier as AdTier] +
                         ' ' +
@@ -140,7 +140,7 @@ export default async function AccountPackagesPage() {
                         return (
                           <li key={entry.plan.id} className="hz-card hz-card--compact flex flex-col gap-xs" data-testid={'plan-card-' + testId}>
                             <p className="text-label-lg">{entry.tierFa + ' ' + entry.periodFa}</p>
-                            <p className={entry.priceFa ? 'text-h4' : 'hz-unset text-label-md'} data-testid={'plan-price-' + testId}>
+                            <p className={entry.priceFa ? 'text-h4' : 'hz-unset text-label-sm'} data-testid={'plan-price-' + testId}>
                               {entry.priceFa ?? 'قیمت ثبت‌نشده'}
                             </p>
                             {entry.plan.featuresFa ? (

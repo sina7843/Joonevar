@@ -164,7 +164,7 @@ export default async function DeclarationPage({ params }: { params: Promise<{ id
             <ul className="mt-lg space-y-md" data-testid="personal-notes">
               {view.notes.map((note) => (
                 <li key={note.id} className="rounded-lg border border-border-default p-lg">
-                  <p className="text-label-md">
+                  <p className="text-label-sm">
                     {NOTE_KIND_FA[note.kind] ?? note.kind}
                     {note.noteDate ? ' · ' + formatCivilDateFa(note.noteDate) : ''}
                   </p>

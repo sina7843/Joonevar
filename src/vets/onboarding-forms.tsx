@@ -25,7 +25,7 @@ const TEN_MB = 10 * 1024 * 1024;
 function DocumentFields({ requireCouncilCard }: { requireCouncilCard: boolean }) {
   return (
     <fieldset className="space-y-md">
-      <legend className="text-label-md">مدارک</legend>
+      <legend className="text-label-sm">مدارک</legend>
       <p className="text-caption text-text-secondary">
         JPG، PNG یا PDF تا ۱۰ مگابایت برای هر فایل و روی هم حداکثر ۱۲ مگابایت. مدارک خصوصی‌اند و فقط شما و اپراتور بررسی آن‌ها را
         می‌بینید.

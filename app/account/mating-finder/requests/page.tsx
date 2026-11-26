@@ -67,7 +67,7 @@ export default async function FinderRequestsPage() {
                 </div>
                 <div className="hz-cardlist__row">
                   <span className="hz-cardlist__meta">{'به‌روزشده ' + formatInstantFa(r.updatedAt)}</span>
-                  <Link href={'/account/mating-finder/requests/' + r.id} className="inline-flex items-center gap-xs text-label-md text-text-brand">
+                  <Link href={'/account/mating-finder/requests/' + r.id} className="inline-flex items-center gap-xs text-label-sm text-text-brand">
                     {LIVE_STATUSES.includes(status) ? 'پیگیری' : 'مشاهده'}
                     <Icon name="caretRight" size="sm" mirror />
                   </Link>

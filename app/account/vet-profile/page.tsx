@@ -562,7 +562,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                   data-testid={'path-' + value}
                 >
                   <Icon name={path === value ? 'checkCircle' : value === 'student' ? 'student' : 'stethoscope'} size="sm" className="text-text-brand" />
-                  <span className="text-label-md">{label}</span>
+                  <span className="text-label-sm">{label}</span>
                 </Link>
               ))}
             </div>
