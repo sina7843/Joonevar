@@ -54,9 +54,9 @@ export interface PedigreeNode {
 export interface PedigreeSheet {
   readonly subject: { readonly nameFa: string; readonly metaFa: string };
   /** Generation 1: sire, dam. */
-  readonly parents: readonly PedigreeNode[];
+  readonly parents: readonly [PedigreeNode, PedigreeNode];
   /** Generation 2: sire's sire, sire's dam, dam's sire, dam's dam. */
-  readonly grandparents: readonly PedigreeNode[];
+  readonly grandparents: readonly [PedigreeNode, PedigreeNode, PedigreeNode, PedigreeNode];
 }
 
 export interface DocumentSigner {

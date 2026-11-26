@@ -1,7 +1,8 @@
 import { notFound as pageNotFound } from 'next/navigation';
 import { isUuid } from '../../../../src/domain/ids.ts';
 import Link from 'next/link';
-import { eq, inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
+import QRCode from 'qrcode';
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { AppError } from '../../../../src/domain/errors.ts';
@@ -20,6 +21,10 @@ import { postalRequestsForDocument, savedAddress } from '../../../../src/documen
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { generationLabel } from '../../../../src/domain/lineage.ts';
 import { PostalRequestForm } from '../../../pedigree/forms.tsx';
+import { pedigreeSheetOf } from '../../../../src/documents/pedigree-tree.ts';
+import type { PedigreeNode } from '../../../../src/documents/render.ts';
+import { PrintButton } from '../../../../src/ui/print-button.tsx';
+import { site } from '../../../../src/public/request.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,13 +54,14 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
   const [breed] = animal?.breedId
     ? await db().select().from(referenceBreeds).where(eq(referenceBreeds.id, animal.breedId))
     : [];
-  const parentIds = [document.sireAnimalId, document.damAnimalId].filter((v): v is string => v !== null);
-  const parents = parentIds.length
-    ? await db()
-        .select({ id: animals.id, name: animals.name, generation: animals.generation })
-        .from(animals)
-        .where(inArray(animals.id, parentIds))
-    : [];
+  const tree = await pedigreeSheetOf(db(), {
+    animalId: document.animalId,
+    sireAnimalId: document.sireAnimalId,
+    damAnimalId: document.damAnimalId,
+  });
+  const verifyUrl = site().origin + '/verify?code=' + encodeURIComponent(document.pedigreeCode);
+  const qr = await QRCode.toString(verifyUrl, { type: 'svg', margin: 0, errorCorrectionLevel: 'M' });
+  const qrSrc = 'data:image/svg+xml;utf8,' + encodeURIComponent(qr);
 
   const [address, postal] = await Promise.all([
     savedAddress(db(), guard.actor.accountId),
@@ -64,27 +70,45 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
 
   const name = animal?.name ?? 'بدون نام';
   const issuedFa = formatCivilDateFa(document.issuedAt.toISOString().slice(0, 10));
-  const sire = document.sireAnimalId ? parents.find((p) => p.id === document.sireAnimalId) : undefined;
-  const dam = document.damAnimalId ? parents.find((p) => p.id === document.damAnimalId) : undefined;
-  const parentNode = (
-    role: string,
-    parentId: string | null,
-    parent: { name: string | null; generation: number } | undefined,
-    testId: string,
-    row: number,
-  ) => (
-    <li className="hz-ped hz-ped--g1" style={{ ['--r' as string]: row }}>
-      <div className={parentId ? 'hz-ped__node' : 'hz-ped__node hz-ped__node--unknown'}>
-        <span className="hz-ped__role">{role}</span>
+  const printedFa = formatCivilDateFa(new Date().toISOString().slice(0, 10));
+  const pedNode = (node: PedigreeNode, gen: 1 | 2, row: number, link: 'has-parents' | 'collapsed-parents' | null, testId?: string) => (
+    <li className={'hz-ped hz-ped--g' + gen + (link ? ' hz-ped--' + link : '')} style={{ ['--r' as string]: row }}>
+      <div className={node.nameFa !== null ? 'hz-ped__node' : 'hz-ped__node hz-ped__node--unknown'}>
+        <span className="hz-ped__role">{node.roleFa}</span>
         <span className="hz-ped__name" data-testid={testId}>
-          {parentId ? (parent?.name ?? 'بدون نام') : '—'}
+          {node.nameFa ?? 'نامشخص'}
         </span>
-        <span className="hz-ped__meta">
-          {parentId && parent ? generationLabel(parent.generation) : 'در همزیست ثبت نشده'}
-        </span>
+        <span className="hz-ped__meta">{node.nameFa !== null ? node.metaFa : (node.unknownFa ?? 'در همزیست ثبت نشده')}</span>
       </div>
     </li>
   );
+  const [sire, dam] = tree.parents;
+  const [sireSire, sireDam, damSire, damDam] = tree.grandparents;
+  // A parent with no recorded parents collapses to one «اجداد …» note instead of two empty boxes.
+  const branch = (parent: PedigreeNode, side: 'پدری' | 'مادری', row: number, testId: string, pair: readonly [PedigreeNode, PedigreeNode]) => {
+    const known = pair[0].nameFa !== null || pair[1].nameFa !== null;
+    return (
+      <>
+        {pedNode(parent, 1, row, known ? 'has-parents' : 'collapsed-parents', testId)}
+        {known ? (
+          <>
+            {pedNode(pair[0], 2, row, null)}
+            {pedNode(pair[1], 2, row + 2, null)}
+          </>
+        ) : (
+          <li className="hz-ped hz-ped--rest2" style={{ ['--r' as string]: row }}>
+            <div className="hz-ped__node hz-ped__node--unknown">
+              <span className="hz-ped__role">{'اجداد ' + side}</span>
+              <span className="hz-ped__name">نامشخص</span>
+              <span className="hz-ped__meta">
+                {parent.nameFa !== null ? 'والدین «' + parent.nameFa + '» در همزیست ثبت نشده‌اند.' : 'والدین ثبت نشده‌اند.'}
+              </span>
+            </div>
+          </li>
+        )}
+      </>
+    );
+  };
 
   return (
     <PublicShell
@@ -107,6 +131,7 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
             meta={[<Identifier key="code" value={document.pedigreeCode} />, 'صادرشده در ' + issuedFa]}
             actions={
               <>
+                <PrintButton />
                 <a
                   href={'/api/documents/pedigree/' + id + '/pdf'}
                   className="hz-btn hz-btn--primary"
@@ -154,11 +179,15 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
 
         <div className="hz-a4__titlebar">
           <div>
-            <h2 className="hz-a4__title">شجره‌نامه هم‌زیست</h2>
+            <h2 className="hz-a4__title">شجره‌نامه سه‌نسلی</h2>
             <p className="hz-a4__lead">
-              این سند اجداد ثبت‌شده «{name}» را گواهی می‌کند و با شماره بالا قابل استعلام است. اجدادی که ثبت نشده‌اند با
-              «—» آمده‌اند.
+              این سند اجداد ثبت‌شده «{name}» را تا سه نسل گواهی می‌کند و با شماره بالا قابل استعلام است. اجدادی که ثبت
+              نشده‌اند «نامشخص» آمده‌اند.
             </p>
+          </div>
+          <div className="hz-a4__qr">
+            <img src={qrSrc} alt="" width={104} height={104} />
+            <span className="hz-a4__qr-cap">استعلام اصالت</span>
           </div>
         </div>
 
@@ -206,8 +235,13 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
         </section>
 
         <section className="hz-a4__section">
-          <h3 className="hz-a4__section-title">والدین</h3>
-          <div className="hz-pedigree">
+          <h3 className="hz-a4__section-title">حیوان و اجداد</h3>
+          <figure className="hz-pedigree m-0" aria-label={'شجره سه‌نسلی ' + name}>
+            <div className="hz-pedigree__cols" aria-hidden="true">
+              <span className="hz-pedigree__col">حیوان</span>
+              <span className="hz-pedigree__col">والدین</span>
+              <span className="hz-pedigree__col">پدربزرگ و مادربزرگ</span>
+            </div>
             <ol className="hz-pedigree__grid m-0 list-none p-0">
               <li className="hz-ped hz-ped--g0 hz-ped--has-parents">
                 <div className="hz-ped__node hz-ped__node--subject">
@@ -216,20 +250,22 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
                   <span className="hz-ped__meta">{breed?.nameFa ?? '—'}</span>
                 </div>
               </li>
-              {parentNode('پدر', document.sireAnimalId, sire, 'pedigree-sire', 1)}
-              {parentNode('مادر', document.damAnimalId, dam, 'pedigree-dam', 5)}
+              {branch(sire, 'پدری', 1, 'pedigree-sire', [sireSire, sireDam])}
+              {branch(dam, 'مادری', 5, 'pedigree-dam', [damSire, damDam])}
             </ol>
-          </div>
+          </figure>
         </section>
 
         <div className="hz-a4__sign max-md:grid-cols-1">
           <div className="hz-a4__sign-slot">
             <span className="hz-a4__sign-line" />
             <span className="hz-a4__sign-role">بررسی و صدور — انجمن</span>
+            <span className="hz-a4__sign-name">—</span>
           </div>
           <div className="hz-a4__sign-slot">
             <span className="hz-a4__sign-line" />
             <span className="hz-a4__sign-role">تأیید هویت و میکروچیپ — دامپزشک معتمد</span>
+            <span className="hz-a4__sign-name">—</span>
           </div>
           <span className="hz-a4__seal">مهر انجمن</span>
         </div>
@@ -242,9 +278,10 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
               <b>
                 <bdi dir="ltr">{document.pedigreeCode}</bdi>
               </b>{' '}
-              را در «استعلام اصالت» همزیست وارد کنید.
+              را در «استعلام اصالت» همزیست وارد کنید یا کد QR را اسکن کنید.
             </span>
           </p>
+          <span className="whitespace-nowrap">{'صفحه ۱ از ۱، چاپ ' + printedFa}</span>
         </footer>
       </article>
 
