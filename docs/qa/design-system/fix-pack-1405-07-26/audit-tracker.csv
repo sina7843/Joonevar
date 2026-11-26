@@ -219,17 +219,17 @@ KPUB-033,T13,2,medium,needs decision,KPUB,K6,K6 کارت «مدارک و سلا�
 KPUB-034,T13,2,medium,needs decision,KPUB,K6,SellerCard در K6: بدون پیوند به کنل، نشان «تأییدشده» و خط‌های کنل,K6 — SellerCard,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 KPUB-028,T13,2,low,code,KPUB,K6,K6: شمارش معکوس «N روز تا پایان نمایش» نیست,K6 — `hz-countdown`,,,
 KPUB-035,T13,2,low,code,KPUB,K6 K1,ListingCard: فیلدهای خط متا و خط فروشنده,ListingCard (K6 مشابه، `/animals-market`، K1),,,
-KPUB-045,T14,2,high,code,KPUB,,قواعد مشترک P02 در همهٔ فهرست‌های عمومی رعایت نشده است,P02 — `/veterinarians`، `/centers`، `/breeds`، `/associations`، `/clubs`، `/shop`، `/animals-market`، `/places/*`، `/search`، `/mating-finder`، `/vets` (PublicShell),,,
+KPUB-045,T14,2,high,code,KPUB,,قواعد مشترک P02 در همهٔ فهرست‌های عمومی رعایت نشده است,P02 — `/veterinarians`، `/centers`، `/breeds`، `/associations`، `/clubs`، `/shop`، `/animals-market`، `/places/*`، `/search`، `/mating-finder`، `/vets` (PublicShell),PARTIAL,DEC-0246,ستون فیلتر و Drawer مشترک؛ بقیه قواعد P02 باز
 CMPA1-045,T14,2,medium,code,CMPA1,,CenterCard: ساعت کار و امکانات نیست؛ تصویر 3:2؛ «n خدمت دیگر» نیست؛ نشان‌های اضافه و پروانه نامعتبر در نتایج عمومی,CenterCard (`/centers`),,,
-CMPA2-019,T14,2,medium,code,CMPA2,,Drawer فیلتر روی موبایل استفاده نشده است؛ فیلترها یک کارت `<details>` بازِ بالای نتایج‌اند,Drawer (Filter، end، `--full-mobile`),,,
-CMPA2-026,T14,2,medium,code,CMPA2,K5 K14 K19,FilterBar: گروه انتهایی (دکمه‌ی «فیلترها» با شمارنده، مرتب‌سازی، «پاک کردن همه») و حالت `--bleed` وجود ندارد,FilterBar (K5، K14، K19),,,
+CMPA2-019,T14,2,medium,code,CMPA2,,Drawer فیلتر روی موبایل استفاده نشده است؛ فیلترها یک کارت `<details>` بازِ بالای نتایج‌اند,Drawer (Filter، end، `--full-mobile`),FIXED,DEC-0246,Drawer فیلتر زیر ۱۰۲۴
+CMPA2-026,T14,2,medium,code,CMPA2,K5 K14 K19,FilterBar: گروه انتهایی (دکمه‌ی «فیلترها» با شمارنده، مرتب‌سازی، «پاک کردن همه») و حالت `--bleed` وجود ندارد,FilterBar (K5، K14، K19),PARTIAL,DEC-0246,دکمه فیلترها با شمارنده و پاک کردن همه؛ SortMenu و --bleed نه
 CMPB-069,T14,2,medium,code,CMPB,K5,VetCard · ردیف «کد نظام» و نام کلینیک روی کارت نیست؛ badge «کد نظام تأییدشده» جای آن آمده است,فهرست دامپزشکان (K5),,,
 CMPB-123,T14,2,medium,needs decision,CMPB,,PlaceMap · گونهٔ «فهرست + نقشه» با پین‌های شماره‌دار و `hz-place-list` وجود ندارد,PlaceMap در فهرست‌های `/centers` و `/veterinarians` (و `/places/...`),DECIDED_NO,,DEC-0235: no map tile provider yet; GAPS #18
-KPUB-021,T14,2,medium,code,KPUB,K5,ستون فیلتر: SelectFieldها با دکمهٔ «اعمال فیلترها» به‌جای fieldsetهای چک‌باکس با شمارش و اعمال فوری,K5 — ستون فیلتر (و همهٔ فهرست‌های P02؛ KPUB-045),,,
-KPUB-022,T14,2,medium,code,KPUB,K5,موبایل: پنل فیلتر باز بالای نتایج به‌جای دکمهٔ «فیلترها» + Drawer تمام‌صفحه,K5 موبایل — FilterBar / Drawer,,,
+KPUB-021,T14,2,medium,code,KPUB,K5,ستون فیلتر: SelectFieldها با دکمهٔ «اعمال فیلترها» به‌جای fieldsetهای چک‌باکس با شمارش و اعمال فوری,K5 — ستون فیلتر (و همهٔ فهرست‌های P02؛ KPUB-045),PARTIAL,DEC-0246,اعمال فوری در دسکتاپ؛ هنوز SelectField، نه چک‌باکس با شمارش
+KPUB-022,T14,2,medium,code,KPUB,K5,موبایل: پنل فیلتر باز بالای نتایج به‌جای دکمهٔ «فیلترها» + Drawer تمام‌صفحه,K5 موبایل — FilterBar / Drawer,FIXED,DEC-0246,دکمه «فیلترها» + Drawer تمام‌قد
 KPUB-023,T14,2,medium,needs decision,KPUB,K5,مرتب‌سازی (SortMenu) نیست؛ شمارش «۷ دامپزشک، ۴ معتمد» و نوار FilterBar,K5 — FilterBar / SortMenu / شمارش,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 KPUB-024,T14,2,medium,needs decision,KPUB,K5,VetCard: متن نشان «معتمد»، کد نظام، «تخصص: —» و نشان‌های اضافه,K5 — VetCard,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-RTU-005,T14,2,medium,code,RTU,,فیلترهای فهرست عمومی روی موبایل در Drawer باز نمی‌شوند,`/animals-market`، `/veterinarians`، `/centers`، `/associations`، `/clubs`، `/breeds`، `/mating-finder`، `/search`، `/vets` (هر فهرست P02 که فیلتر دارد),,,
+RTU-005,T14,2,medium,code,RTU,,فیلترهای فهرست عمومی روی موبایل در Drawer باز نمی‌شوند,`/animals-market`، `/veterinarians`، `/centers`، `/associations`، `/clubs`، `/breeds`، `/mating-finder`، `/search`، `/vets` (هر فهرست P02 که فیلتر دارد),FIXED,DEC-0246,Drawer فیلتر در پنج فهرست
 CMPA2-028,T14,2,low,code,CMPA2,,FilterBar: chipها لینک‌های `aria-current` داخل `nav` هستند، نه دکمه‌های `aria-pressed` در `fieldset`,FilterBar (chip),,,
 CMPB-071,T14,2,low,code,CMPB,,VetCard · کامپوننت مشترک وجود ندارد و markup در دو صفحه تکرار شده است,فهرست و پروفایل دامپزشک,,,
 KPUB-025,T14,2,low,code,KPUB,K5,سرصفحهٔ فهرست: مسیر «راهنمای دامپزشکی»، متن meta و پاراگراف اضافه,K5 — PageHeader landing,,,

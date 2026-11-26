@@ -90,11 +90,7 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
           <FilterPanel
             clearHref="/associations"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect id="community-kind" form={FORM} name="kind" label="نوع" all="انجمن و کلاب" value={query.kind} testId="community-filter-kind"
               options={COMMUNITY_KINDS.map((kind) => ({ value: kind, label: COMMUNITY_KIND_FA[kind] }))} />

@@ -86,11 +86,7 @@ export default async function ClubsPage({ searchParams }: { searchParams: Promis
           <FilterPanel
             clearHref="/clubs"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect id="club-scope" form={FORM} name="scope" label="حوزه" all="همه حوزه‌ها" value={query.scope} testId="club-filter-scope"
               options={COMMUNITY_SCOPES.map((scope) => ({ value: scope, label: COMMUNITY_SCOPE_FA[scope] }))} />

@@ -106,11 +106,8 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
             clearHref="/animals-market"
             active={active}
             clearTestId="market-clear-filters"
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM} data-testid="market-apply-filters">
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
+            applyTestId="market-apply-filters"
           >
             <FilterSelect id="market-breed" form={FORM} name="breed" label="نژاد" value={filter.breedId} all="همه نژادها" testId="market-filter-breed"
               options={options.breeds.map((row) => ({ value: row.id, label: row.nameFa }))} />

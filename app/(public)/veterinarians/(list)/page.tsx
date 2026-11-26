@@ -202,11 +202,7 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
           <FilterPanel
             clearHref="/veterinarians"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect
               id="vet-specialty"

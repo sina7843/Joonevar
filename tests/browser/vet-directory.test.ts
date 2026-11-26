@@ -201,11 +201,13 @@ test('a visitor filters the directory on a phone and reads the profile', async (
     await page.goto(BASE_URL + '/veterinarians', { waitUntil: 'load' });
     await page.getByTestId('vet-search').waitFor();
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
+    // Below 1024 the filters live in a Drawer opened from «فیلترها» (P02, T14).
+    await page.getByTestId('filters-open').click();
     await page.getByTestId('vet-filter-specialty').selectOption('SURGERY');
     await page.getByTestId('vet-filter-province').selectOption('fars');
     await Promise.all([
       page.waitForURL((url) => url.searchParams.get('province') === 'fars'),
-      page.getByTestId('vet-search-submit').click(),
+      page.getByTestId('filters-apply').click(),
     ]);
     const card = page.getByTestId('vet-card-' + slug);
     await card.waitFor();

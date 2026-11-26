@@ -108,11 +108,7 @@ export default async function CentersPage({ searchParams }: { searchParams: Prom
           <FilterPanel
             clearHref="/centers"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect id="centre-type" form={FORM} name="type" label="نوع مرکز" all="همه انواع" value={query.type} testId="centre-filter-type"
               options={reference.types.map((row) => ({ value: row.code, label: row.nameFa }))} />

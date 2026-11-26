@@ -88,48 +88,7 @@ export function FilterInput({
   );
 }
 
-/**
- * The P02 filter column: a white card «فیلترها» at the start from 1024px, above
- * the results below it. It is a `<details>` that starts open, so on a phone the
- * visitor can fold it away; every control stays reachable without script.
- */
-export function FilterPanel({
-  children,
-  clearHref,
-  active,
-  footer,
-  clearTestId,
-}: {
-  children: ReactNode;
-  clearHref: string;
-  active: boolean;
-  footer?: ReactNode;
-  /** A clear link that tests address: always rendered. */
-  clearTestId?: string;
-}) {
-  return (
-    <details open className="hz-card group lg:sticky lg:top-[calc(var(--header-site)+24px)]">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-sm">
-        <span className="hz-section-header__title text-h4">
-          <span className="hz-section-header__bar" aria-hidden="true" />
-          فیلترها
-        </span>
-        <Icon name="caretDown" size="sm" className="transition-transform group-open:rotate-180" />
-      </summary>
-      <div className="mt-md flex flex-col gap-md">{children}</div>
-      <div className="mt-lg flex flex-wrap items-center justify-between gap-sm border-t border-border-subtle pt-md">
-        {footer}
-        {active || clearTestId ? (
-          <Link className="hz-link hz-body-sm" href={clearHref} data-testid={clearTestId}>
-            پاک کردن همه
-          </Link>
-        ) : (
-          <span className="hz-caption">فیلتری فعال نیست</span>
-        )}
-      </div>
-    </details>
-  );
-}
+export { FilterPanel } from './filter-panel.tsx';
 
 /**
  * P01 row 11 — DS *CtaBand*: «ثبت حیوان» (primary, start), «استعلام اصالت سند» (secondary). With `media` it is `--media`: the photo first on phones, 5/12

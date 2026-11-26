@@ -193,11 +193,12 @@ test('the review operator records the licence, and a visitor reads the centre on
     await page.goto(BASE_URL + '/centers', { waitUntil: 'load' });
     await page.getByTestId('centre-search').waitFor();
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
+    await page.getByTestId('filters-open').click();
     await page.getByTestId('centre-filter-type').selectOption('HOSPITAL');
     await page.getByTestId('centre-filter-verified').check();
     await Promise.all([
       page.waitForURL((url) => url.searchParams.get('verified') === '1'),
-      page.getByTestId('centre-search-submit').click(),
+      page.getByTestId('filters-apply').click(),
     ]);
     const card = page.getByTestId('centre-card-' + centreSlug);
     await card.waitFor();
