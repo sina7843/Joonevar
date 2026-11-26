@@ -66,4 +66,8 @@ test('the PDF is tagged and carries the structure tree', async (t) => {
   assert.ok(text.startsWith('%PDF'));
   assert.match(text, /\/StructTreeRoot/);
   assert.match(text, /\/Lang/);
+  // Every page is exactly A4 (595 × 842 pt).
+  const boxes = text.match(/\/MediaBox\s*\[[^\]]*\]/g) ?? [];
+  assert.ok(boxes.length > 0, 'pages have a MediaBox');
+  for (const box of boxes) assert.match(box, /\[\s*0\s+0\s+595(\.\d+)?\s+84[12](\.\d+)?\s*\]/, box);
 });

@@ -325,7 +325,8 @@ export async function renderDocumentPdf(spec: DocumentSpec): Promise<Uint8Array>
     const pages = Math.max(1, Math.ceil((height - 1) / 1123));
     if (pages > 1) await page.setContent(documentHtml(spec, { qrSvg, pages }), { waitUntil: 'load' });
     // Tagged (accessible) PDF with an outline: h1/h2 become structure and dl rows read as pairs.
-    return await page.pdf({ format: 'A4', printBackground: true, tagged: true, outline: true, preferCSSPageSize: true });
+    // format, not @page: Chromium's CSS A4 comes out 594.96 × 841.92 pt, not A4.
+    return await page.pdf({ format: 'A4', printBackground: true, tagged: true, outline: true });
   } finally {
     await browser.close();
   }

@@ -137,7 +137,7 @@ test('the club decides with a reason, and never sees the applicant’s own reaso
     await page.screenshot({ path: path.join(SHOTS, 'club-members-desktop.png'), fullPage: true });
 
     const decision = page.getByTestId('club-membership-queue').locator('form').first();
-    await decision.locator('input[name="reasonFa"]').fill('با معرفی یکی از اعضای کلاب.');
+    await decision.locator('[name="reasonFa"]').fill('با معرفی یکی از اعضای کلاب.');
     await decision.getByRole('button', { name: 'پذیرش عضویت' }).click();
     // The decided application leaves the queue, which is the outcome worth pinning.
     await page.getByTestId('club-membership-queue').waitFor({ state: 'detached', timeout: 15_000 });
