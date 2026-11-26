@@ -119,7 +119,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();

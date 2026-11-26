@@ -112,7 +112,7 @@ const textOf = async (page: Page, testId: string): Promise<string> => ((await pa
  */
 async function decide(page: Page, name: string, decision: string, reason: string, expectedStatus: string): Promise<void> {
   await page.goto(BASE_URL + '/assoc/vet-doctors?view=OPEN', { waitUntil: 'load' });
-  const item = page.locator('[data-testid="doctor-queue"] > li', { hasText: name });
+  const item = page.locator('[data-testid="doctor-queue"] tbody > tr', { hasText: name });
   await item.waitFor();
   await Promise.all([page.waitForURL((url) => /^\/assoc\/vet-doctors\/[0-9a-f-]{36}$/.test(url.pathname)), item.getByTestId('open-doctor-case').click()]);
   await page.getByTestId('doctor-decision-form').waitFor();
@@ -254,7 +254,7 @@ test('a reviewer publishes an unowned profile, and a veterinarian claims it and 
 
   await as('association', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-doctors?view=OPEN', { waitUntil: 'load' });
-    const item = page.locator('[data-testid="doctor-queue"] > li', { hasText: unownedName });
+    const item = page.locator('[data-testid="doctor-queue"] tbody > tr', { hasText: unownedName });
     await item.waitFor();
     assert.match((await item.textContent()) ?? '', /Claim/);
     await decide(page, unownedName, 'VERIFY', 'SYNTHETIC هویت و کارت نظام تطبیق داده شد', 'کد نظام تأییدشده');

@@ -73,7 +73,7 @@ async function waitForText(page: Page, testId: string, text: string): Promise<vo
 /** A decided case no longer shows its form; the persisted status proves the decision. */
 async function decide(page: Page, decision: 'APPROVE' | 'REQUEST_CORRECTION', reason: string, expectedStatus: string): Promise<void> {
   await page.goto(BASE_URL + '/assoc/vet-licences?view=OPEN', { waitUntil: 'load' });
-  const item = page.locator('[data-testid="licence-queue"] > li', { hasText: LICENCE_CODE });
+  const item = page.locator('[data-testid="licence-queue"] tbody > tr', { hasText: LICENCE_CODE });
   await item.getByTestId('open-licence-case').click();
   await page.getByTestId('licence-decision-form').waitFor();
   await page.getByTestId('licence-decision-' + decision).check();
@@ -247,7 +247,7 @@ test('the trusted request is offered only to an active licensed vet, and names t
     await page.getByTestId('submit-kyc').click();
     await page.getByText('پرونده شما در حال بررسی است').first().waitFor();
     await as('association', DESKTOP, async (ops) => {
-      await ops.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+      await ops.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
       await ops.getByTestId('open-case').first().click();
       await ops.getByTestId('review-form').waitFor();
       await ops.getByTestId('decision-APPROVED').check();

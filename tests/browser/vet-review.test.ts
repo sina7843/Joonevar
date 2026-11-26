@@ -67,7 +67,7 @@ async function openFromWorkbench(page: Page, claim = ''): Promise<void> {
   if (claim) await page.getByTestId('review-filter-claim').selectOption(claim);
   await page.getByTestId('review-filter-q').fill(STUDENT_NUMBER);
   await Promise.all([page.waitForURL('**/assoc/vet-review?**q=' + STUDENT_NUMBER + '**'), page.getByTestId('review-filter-submit').click()]);
-  const items = page.locator('[data-testid="review-queue"] > li');
+  const items = page.locator('[data-testid="review-queue"] tbody > tr');
   assert.equal(await items.count(), 1, 'the filters find exactly this case');
   await Promise.all([page.waitForURL('**/assoc/vet-students/**'), items.first().getByTestId('open-review-case').click()]);
 }

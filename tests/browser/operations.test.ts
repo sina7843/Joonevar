@@ -107,7 +107,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -466,7 +466,7 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
       waitUntil: 'load',
     });
     await page.getByTestId('member-list').waitFor();
-    const vetRow = page.locator('[data-testid="member-list"] > li').filter({ hasText: 'دامپزشک آزمایشی' });
+    const vetRow = page.locator('[data-testid="member-list"] tbody > tr').filter({ hasText: 'دامپزشک آزمایشی' });
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
     await vetRow.locator('[data-testid^="membership-reason-"]').fill('بررسی عملیاتی آزمایشی ' + RUN);
     await vetRow.locator('[data-testid^="submit-membership-"]').click();
@@ -512,7 +512,7 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
     await page.goto(BASE_URL + '/assoc/members?q=' + encodeURIComponent('دامپزشک آزمایشی'), {
       waitUntil: 'load',
     });
-    const vetRow = page.locator('[data-testid="member-list"] > li').filter({ hasText: 'دامپزشک آزمایشی' });
+    const vetRow = page.locator('[data-testid="member-list"] tbody > tr').filter({ hasText: 'دامپزشک آزمایشی' });
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
     await vetRow.locator('[data-testid^="membership-reason-"]').fill('بازگردانی وضعیت آزمایشی ' + RUN);
     await vetRow.locator('[data-testid^="submit-membership-"]').click();

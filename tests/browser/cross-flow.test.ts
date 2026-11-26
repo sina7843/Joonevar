@@ -120,7 +120,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -317,7 +317,7 @@ async function pedigreedAnimal(
   await expectText(vet, 'ارسال روی همین کد رهگیری ثبت شد');
 
   const centreRow = () =>
-    centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
+    centre.locator('[data-testid="centre-sample-list"] tbody > tr').filter({ hasText: trackingCode });
   // The centre's list is bounded, so a specific sample is reached by its
   // tracking code rather than by scrolling the queue (DEC-0128).
   await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
@@ -330,7 +330,7 @@ async function pedigreedAnimal(
   await centreRow().getByText('در حال پردازش').waitFor({ timeout: 45_000 });
 
   await centre.goto(BASE_URL + '/genetics/results', { waitUntil: 'load' });
-  const resultRow = centre.locator('[data-testid="processing-list"] > li').filter({ hasText: trackingCode });
+  const resultRow = centre.locator('[data-testid="processing-list"] tbody > tr').filter({ hasText: trackingCode });
   await resultRow.getByTestId('open-result-case').click();
   await resultRow.getByTestId('result-note').fill('پردازش استاندارد.');
   await resultRow.getByTestId('submit-result').click();

@@ -71,7 +71,7 @@ async function decideAsOperator(decision: 'VERIFY' | 'REQUEST_CORRECTION', reaso
   await as(operator, DESKTOP, async (page) => {
     const view = 'OPEN';
     await page.goto(BASE_URL + '/assoc/vet-students?view=' + view, { waitUntil: 'load' });
-    const card = page.locator('[data-testid="student-queue"] > li').filter({ hasText: STUDENT_NUMBER });
+    const card = page.locator('[data-testid="student-queue"] tbody > tr').filter({ hasText: STUDENT_NUMBER });
     await card.getByTestId('open-student-case').click();
     await page.getByTestId('student-decision-form').waitFor();
     await page.getByTestId('student-decision-' + decision).check();

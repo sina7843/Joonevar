@@ -109,7 +109,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -432,7 +432,7 @@ test('the whole kennel path runs: form, breeds, payment, submission and approval
     // The association sends it back once, then approves it.
     await assoc.goto(BASE_URL + '/assoc/kennels', { waitUntil: 'load' });
     await assoc.getByTestId('kennel-queue').waitFor();
-    const caseRow = assoc.locator('[data-testid="kennel-queue"] > li').filter({ hasText: 'کنل نمونه ' + RUN });
+    const caseRow = assoc.locator('[data-testid="kennel-queue"] tbody > tr').filter({ hasText: 'کنل نمونه ' + RUN });
     await caseRow.getByTestId('open-kennel-case').click();
     await assoc.waitForURL('**/assoc/kennels/**');
     // Counts are Persian digits beside the panel title (DS content rules).
@@ -518,7 +518,7 @@ test('breeds are edited after approval with no new payment and no second review'
 
     await assoc.goto(BASE_URL + '/assoc/kennels', { waitUntil: 'load' });
     const caseRow = assoc
-      .locator('[data-testid="kennel-queue"] > li')
+      .locator('[data-testid="kennel-queue"] tbody > tr')
       .filter({ hasText: 'کنل ویرایش ' + RUN });
     await caseRow.getByTestId('open-kennel-case').click();
     await assoc.waitForURL('**/assoc/kennels/**');
