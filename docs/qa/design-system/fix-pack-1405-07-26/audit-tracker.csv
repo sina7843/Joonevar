@@ -441,9 +441,9 @@ FND-021,T26,3,low,code,FND,,آیکن‌های بیرون از مجموعهٔ ۱�
 FND-022,T26,3,low,code,FND,,آینه‌سازی آیکن‌های جهت‌دار ناقص و چند glyph دستی برعکس,منوی موبایل SiteShell، بازگشت به فروشگاه، لینک‌های بیرونی، آیتم‌های ناوبری «مرجوعی»,,,
 FND-023,T26,3,low,code,FND,,ترنزیشن‌ها با مدت و منحنی پیش‌فرض Tailwind,caret بازشوی فیلترها (finder، فیلترهای عمومی)، کارت‌های نتیجهٔ جست‌وجو,,,
 CMPA2-021,T29,3,medium,needs decision,CMPA2,,Hero مجله (StoryHero) و FeaturedList «منتخب همزیست» در صفحه‌های فرود محتوا پیاده نشده‌اند,Hero (StoryHero) + FeaturedList,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPB-108,T29,3,medium,code,CMPB,K1 K4,ReadTime · زمان مطالعه هیچ‌جا ساخته و نمایش داده نمی‌شود,ReadTime در ArticleCard، Hero و FeaturedList خانه (K1) و سرصفحهٔ مقاله (K4),,,
+CMPB-108,T29,3,medium,code,CMPB,K1 K4,ReadTime · زمان مطالعه هیچ‌جا ساخته و نمایش داده نمی‌شود,ReadTime در ArticleCard، Hero و FeaturedList خانه (K1) و سرصفحهٔ مقاله (K4),FIXED,DEC-0254,readMinutes در صفحه مقاله و خانه
 CMPB-125,T29,3,medium,code,CMPB,K4,RelatedColumn · آیتم‌ها عنوان h3 و متای «زمان مطالعه · تاریخ» ندارند,RelatedColumn در سرصفحهٔ مقاله (K4)، `/breeds/[slug]` و `/veterinarians/[slug]`,,,
-KPUB-017,T29,3,medium,needs decision,KPUB,K4 K1,«زمان مطالعه» (ReadTime) در هیچ‌جا نیست؛ متای مقاله «انتشار: …» با آیکون تقویم است,K4 سرصفحه و ستون مرتبط، K1 «تازه‌ها»، فهرست‌های `/articles`، `/news`، `/announcements`,,,"Already decided — ReadTime is computed from the article body (words ÷ 200, rounded up, Persian digits) — no new input data; treat as UI."
+KPUB-017,T29,3,medium,needs decision,KPUB,K4 K1,«زمان مطالعه» (ReadTime) در هیچ‌جا نیست؛ متای مقاله «انتشار: …» با آیکون تقویم است,K4 سرصفحه و ستون مرتبط، K1 «تازه‌ها»، فهرست‌های `/articles`، `/news`، `/announcements`,FIXED,DEC-0254,ReadTime از متن (۲۰۰ کلمه/دقیقه) در متای مقاله
 KPUB-019,T29,3,medium,code,KPUB,K4,ستون «مطالب مرتبط»: چیدمان کارت و گروه اضافهٔ «مراکز دامپزشکی»,K4 — RelatedColumn,,,
 KPUB-046,T29,3,medium,code,KPUB,K4 K6 K7,قواعد مشترک P03 در صفحه‌های جزئیات هم‌خانواده,P03 — `/breeds/[slug]`، `/veterinarians/[slug]`، `/centers/[slug]`، `/news/[slug]`، `/announcements/[slug]`، `/services/[slug]`، `/mating-finder/[id]`، `/verify/[code]` و K4/K6/K7,,,
 CMPA1-022,T29,3,low,code,CMPA1,,نسبت تصویر، جای تگ و ساختار layoutها با طراحی فرق دارد,ArticleCard,,,

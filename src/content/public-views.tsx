@@ -7,7 +7,7 @@ import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { db } from '../db/client.ts';
 import { publicContentBySlug, publicContentList } from './service.ts';
-import { KIND_FA, KIND_PATH, KIND_PLURAL_FA, TEAM_BYLINE } from './model.ts';
+import { KIND_FA, KIND_PATH, KIND_PLURAL_FA, TEAM_BYLINE, readMinutes } from './model.ts';
 import { EXTERNAL_BODY_NOTICE_FA, isExternalBodyCategory } from './taxonomy.ts';
 import { formatCivilDateFa } from '../domain/calendar.ts';
 import { buildMetadata } from '../seo/metadata.ts';
@@ -308,10 +308,14 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
                 <span className="hz-content-detail__author-role">{byline === TEAM_BYLINE ? 'ناشر' : 'نویسنده'}</span>
               </span>
             </span>
+            {/* DS ContentDetail meta: «۶ دقیقه مطالعه · ۵ مهر ۱۴۰۵» (ReadTime from the body, KPUB-017). */}
             <div className="hz-meta">
+              <span className="hz-meta__item" data-testid="read-time">
+                <Icon name="clock" size="xs" />
+                {readMinutes(item.bodyFa ?? '').toLocaleString('fa-IR') + ' دقیقه مطالعه'}
+              </span>
               <time className="hz-meta__item" dateTime={item.publishAt!.toISOString()}>
-                <Icon name="calendarBlank" size="xs" />
-                {'انتشار: ' + DATE_FA.format(item.publishAt!)}
+                {DATE_FA.format(item.publishAt!)}
               </time>
             </div>
           </div>
