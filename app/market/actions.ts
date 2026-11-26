@@ -7,6 +7,9 @@ import { AppError, staleOf } from '../../src/domain/errors.ts';
 import { SETTING_BY_KEY } from '../../src/settings/keys.ts';
 import { updateMarketSetting } from '../../src/marketplace/operations.ts';
 import { setSpeciesEnabled } from '../../src/marketplace/species.ts';
+import { readSettingForActor } from '../../src/settings/service.ts';
+import { displaySetting } from '../../src/settings/display.ts';
+import type { SettingRowState } from '../../src/ui/setting-row.tsx';
 
 export interface MarketFormState {
   readonly ok?: boolean;
@@ -22,12 +25,12 @@ export interface MarketFormState {
  * reads as closed and for a tariff reads as «تعیین‌نشده» rather than free.
  */
 export async function updateMarketSettingAction(
-  _previous: MarketFormState,
+  _previous: SettingRowState,
   form: FormData,
-): Promise<MarketFormState> {
+): Promise<SettingRowState> {
   const key = String(form.get('key') ?? '');
+  const guard = await guardRoute('/market/settings');
   try {
-    const guard = await guardRoute('/market/settings');
     if (!guard.ok) throw guard.denied;
 
     const definition = SETTING_BY_KEY.get(key);
@@ -45,7 +48,7 @@ export async function updateMarketSettingAction(
               ? Number(raw)
               : raw;
 
-    await updateMarketSetting(db(), guard.actor, {
+    const saved = await updateMarketSetting(db(), guard.actor, {
       key,
       value,
       reason: String(form.get('reason') ?? ''),
@@ -54,8 +57,13 @@ export async function updateMarketSettingAction(
     revalidatePath('/market');
     revalidatePath('/market/settings');
     revalidatePath('/market/settings/' + encodeURIComponent(key));
-    return { ok: true, message: raw === '' ? 'مقدار پاک شد و به «تعیین‌نشده» برگشت.' : 'مقدار ذخیره شد.' };
+    return { ok: true, savedVersion: saved.version, message: raw === '' ? 'مقدار پاک شد و به «تعیین‌نشده» برگشت.' : 'مقدار ذخیره شد.' };
   } catch (error) {
+    // A save on an older version: show what is there now and keep the draft (P11 › Conflict).
+    if (error instanceof AppError && error.code === 'CONFLICT' && guard.ok) {
+      const now = await readSettingForActor(db(), guard.actor, key);
+      return { ok: false, stale: true, current: { display: displaySetting(now), version: now.version } };
+    }
     if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     if (error instanceof SyntaxError) return { ok: false, message: 'مقدار JSON معتبر نیست.' };
     throw error;

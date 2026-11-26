@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { ViewChips } from '../../../src/ui/desk.tsx';
 import { SectionHeader } from '../../../src/ui/section-header.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -14,7 +13,12 @@ import {
 } from '../../../src/marketplace/operations.ts';
 import { canReadSettingGroup } from '../../../src/authz/policy.ts';
 import { AppError } from '../../../src/domain/errors.ts';
-import { MarketSettingForm } from '../forms.tsx';
+import { SettingRow } from '../../../src/ui/setting-row.tsx';
+import { GroupSelect } from '../../../src/ui/group-select.tsx';
+import { SearchField } from '../../../src/ui/search-field.tsx';
+import { hrefWith } from '../../../src/ui/queue-head.tsx';
+import { displaySetting } from '../../../src/settings/display.ts';
+import { updateMarketSettingAction } from '../actions.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,19 +36,22 @@ const SOURCE_FA: Record<string, string> = {
  * says where its number comes from, so an operating default is never mistaken
  * later for an approved tariff, and links to its own history.
  */
-/** The stored value as written (operators edit the raw form). */
-const shown = (value: unknown): string => (typeof value === 'object' ? JSON.stringify(value) : String(value));
+/** The raw form the operator types ('' when unset). */
+const raw = (setting: { configured: boolean; value: unknown }): string =>
+  setting.configured ? (typeof setting.value === 'object' ? JSON.stringify(setting.value) : String(setting.value)) : '';
 
 export default async function MarketSettingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ group?: string }>;
+  searchParams: Promise<{ group?: string; q?: string; unset?: string }>;
 }) {
   const guard = await guardRoute('/market/settings');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
 
-  const { group } = await searchParams;
+  const { group, q, unset: unsetParam } = await searchParams;
+  const term = (q ?? '').trim();
+  const onlyUnset = unsetParam === '1';
   const selected = isMarketSettingGroup(group) ? group : undefined;
   // Asking for a group by URL that this role may not read is a refusal, not a
   // crash: the service throws and the denial screen answers, the same as every
@@ -94,20 +101,30 @@ export default async function MarketSettingsPage({
         </nav>
 
         <div className="hz-settings__main">
-          <div className="hz-hide-lg">
-            <ViewChips
-              label="گروه‌های تنظیمات بازار"
-              chips={[
-                { key: 'all', href: '/market/settings', label: 'همه', current: selected === undefined },
-                ...tabs.map((name) => ({
-                  key: name,
-                  href: '/market/settings?group=' + name,
-                  label: MARKET_GROUP_FA[name],
-                  current: selected === name,
-                })),
-              ]}
-            />
+          <div className="hz-settings__tools">
+            <form method="get" action="/market/settings" className="flex min-w-0 flex-1 basis-64 items-center gap-sm" role="search">
+              {selected ? <input type="hidden" name="group" value={selected} /> : null}
+              {onlyUnset ? <input type="hidden" name="unset" value="1" /> : null}
+              <SearchField id="market-settings-search" label="نام فارسی یا کلید" name="q" defaultValue={term} className="min-w-0 flex-1" />
+            </form>
+            <Link
+              href={hrefWith('/market/settings', { group: selected, q: term || undefined }, { unset: onlyUnset ? undefined : '1' })}
+              className="hz-chip no-underline"
+              aria-pressed={onlyUnset}
+              data-testid="market-unset-filter"
+            >
+              فقط تعیین‌نشده
+              <span className="hz-chip__count">{unset.toLocaleString('fa-IR')}</span>
+            </Link>
           </div>
+          <GroupSelect
+            label="گروه"
+            className="hz-hide-lg"
+            options={[
+              { value: 'all', label: 'همه', href: '/market/settings', current: selected === undefined },
+              ...tabs.map((name) => ({ value: name, label: MARKET_GROUP_FA[name], href: '/market/settings?group=' + name, current: selected === name })),
+            ]}
+          />
 
           {groups.length === 0 ? (
             <EmptyState
@@ -125,65 +142,51 @@ export default async function MarketSettingsPage({
               {view.writable ? null : (
                 <p className="mt-xs text-caption text-text-secondary">این گروه در نقش فعلی شما فقط خواندنی است.</p>
               )}
-              <ul>
-                {view.settings.map((setting) => (
-                  <li key={setting.key} className="hz-setting" data-testid={'market-setting-' + setting.key}>
-                    <div className="hz-setting__label">
-                      <span className="hz-setting__name">{setting.labelFa}</span>
-                      <bdi className="hz-setting__key" dir="ltr">
-                        {setting.key}
-                      </bdi>
-                      {setting.noteFa ? <span className="hz-setting__hint">{setting.noteFa}</span> : null}
-                      {!setting.configured ? (
-                        <span className="hz-setting__hint">تا تعیین مقدار، مسیر وابسته به این کلید بسته می‌ماند.</span>
-                      ) : null}
-                      <span className="hz-setting__hint">
-                        {(SOURCE_FA[setting.source] ?? setting.source) + ' · نسخه ' + setting.version.toLocaleString('fa-IR') + ' · '}
-                        <Link
-                          href={'/market/settings/' + encodeURIComponent(setting.key)}
-                          className="hz-link"
-                          data-testid={'market-history-link-' + setting.key}
-                        >
-                          تاریخچه
-                        </Link>
-                      </span>
-                    </div>
-                    <div className="hz-setting__end">
-                      {setting.configured ? (
-                        <bdi
-                          className={
-                            shown(setting.value).length > 24
-                              ? 'hz-setting__value w-[20rem] max-w-full [overflow-wrap:anywhere]'
-                              : 'hz-setting__value whitespace-nowrap'
-                          }
-                          dir="ltr"
-                          data-testid={'market-value-' + setting.key}
-                        >
-                          {shown(setting.value)}
-                        </bdi>
-                      ) : (
-                        <span className="hz-setting__value hz-setting__value--unset">تعیین‌نشده</span>
-                      )}
-                    </div>
-                    {view.writable ? (
-                      <div className="col-span-full">
-                        <MarketSettingForm
-                          settingKey={setting.key}
-                          version={setting.version}
-                          value={
-                            setting.configured
-                              ? typeof setting.value === 'object'
-                                ? JSON.stringify(setting.value)
-                                : String(setting.value)
-                              : ''
-                          }
-                          kind={setting.kind}
-                        />
-                      </div>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
+              <div>
+                {view.settings
+                  .filter(
+                    (setting) =>
+                      (!onlyUnset || !setting.configured) &&
+                      (term === '' || setting.labelFa.includes(term) || setting.key.toLowerCase().includes(term.toLowerCase())),
+                  )
+                  .map((setting) => (
+                    <SettingRow
+                      key={setting.key}
+                      setting={{
+                        key: setting.key,
+                        labelFa: setting.labelFa,
+                        kind: setting.kind,
+                        configured: setting.configured,
+                        raw: raw(setting),
+                        display: displaySetting(setting),
+                        version: setting.version,
+                      }}
+                      writable={view.writable}
+                      action={updateMarketSettingAction}
+                      mobileHref={'/market/settings/' + encodeURIComponent(setting.key)}
+                      ids={{
+                        row: 'market-setting-' + setting.key,
+                        value: 'market-setting-value-' + setting.key,
+                        reason: 'market-setting-reason-' + setting.key,
+                        save: 'market-setting-save-' + setting.key,
+                        edit: 'market-setting-edit-' + setting.key,
+                        form: 'market-setting-form-' + setting.key,
+                        display: 'market-value-' + setting.key,
+                      }}
+                      hints={
+                        <>
+                          {setting.noteFa ? <span className="hz-setting__hint">{setting.noteFa}</span> : null}
+                          <span className="hz-setting__hint">
+                            {(SOURCE_FA[setting.source] ?? setting.source) + ' · '}
+                            <Link href={'/market/settings/' + encodeURIComponent(setting.key)} className="hz-link" data-testid={'market-history-link-' + setting.key}>
+                              تاریخچه
+                            </Link>
+                          </span>
+                        </>
+                      }
+                    />
+                  ))}
+              </div>
             </section>
           ))}
         </div>

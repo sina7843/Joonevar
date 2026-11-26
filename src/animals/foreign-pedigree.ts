@@ -19,6 +19,7 @@ import { putPrivateFile } from '../files/storage.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page, type PageRequest } from '../domain/pagination.ts';
 import type { Actor } from '../authz/actor.ts';
+import { likeOf, type QueueSort } from '../domain/queue-query.ts';
 import { requireOwnedAnimal } from './service.ts';
 
 export type ForeignPedigreeStatus = 'DRAFT' | 'UNDER_REVIEW' | 'APPROVED' | 'NEEDS_CORRECTION' | 'REJECTED';
@@ -345,9 +346,22 @@ export async function foreignQueue(
   actor: Actor,
   request: PageRequest,
   statuses: readonly ForeignPedigreeStatus[] = ['UNDER_REVIEW'],
-): Promise<Page<ForeignQueueItem>> {
+  filter: { readonly q?: string; readonly sort?: QueueSort } = {},
+): Promise<Page<ForeignQueueItem> & { readonly all: number }> {
   if (actor.context !== 'ASSOCIATION_OPERATOR') throw forbidden('این صف فقط برای اپراتور انجمن است.');
-  const where = inArray(foreignPedigreeCases.status, statuses as ForeignPedigreeStatus[]);
+  const inQueue = inArray(foreignPedigreeCases.status, statuses as ForeignPedigreeStatus[]);
+  const q = (filter.q ?? '').trim();
+  const where =
+    q === ''
+      ? inQueue
+      : and(inQueue, sql`(coalesce(${animals.name}, '') ilike ${likeOf(q)} or coalesce(${foreignPedigreeCases.documentCode}, '') ilike ${likeOf(q)})`);
+  // P09: oldest submission first unless the operator picks another order (RTO-001).
+  const order =
+    filter.sort === 'name'
+      ? [asc(animals.name), asc(foreignPedigreeCases.id)]
+      : filter.sort === 'newest'
+        ? [desc(foreignPedigreeCases.submittedAt), asc(foreignPedigreeCases.id)]
+        : [asc(foreignPedigreeCases.submittedAt), asc(foreignPedigreeCases.id)];
 
   const rows = await database
     .select({
@@ -364,29 +378,39 @@ export async function foreignQueue(
     .innerJoin(animals, eq(animals.id, foreignPedigreeCases.animalId))
     .leftJoin(pedigreeIssuers, eq(pedigreeIssuers.id, foreignPedigreeCases.issuerId))
     .where(where)
-    .orderBy(desc(foreignPedigreeCases.submittedAt))
+    .orderBy(...order)
     .limit(request.pageSize)
     .offset(offsetOf(request));
 
-  const [counted] = await database
-    .select({ total: sql<string>`count(*)` })
-    .from(foreignPedigreeCases)
-    .where(where);
+  const countOf = async (condition: typeof where) =>
+    Number(
+      (
+        await database
+          .select({ total: sql<string>`count(*)` })
+          .from(foreignPedigreeCases)
+          .innerJoin(animals, eq(animals.id, foreignPedigreeCases.animalId))
+          .where(condition)
+      )[0]?.total ?? 0,
+    );
+  const [total, all] = await Promise.all([countOf(where), q === '' ? Promise.resolve(-1) : countOf(inQueue)]);
 
-  return pageOf(
-    rows.map((row) => ({
-      id: row.id,
-      animalId: row.animalId,
-      animalName: row.animalName ?? 'بدون نام',
-      status: row.status as ForeignPedigreeStatus,
-      issuerName: row.issuerName,
-      documentCode: row.documentCode,
-      submittedAt: row.submittedAt,
-      version: row.version,
-    })),
-    Number(counted?.total ?? 0),
-    request,
-  );
+  return {
+    ...pageOf(
+      rows.map((row) => ({
+        id: row.id,
+        animalId: row.animalId,
+        animalName: row.animalName ?? 'بدون نام',
+        status: row.status as ForeignPedigreeStatus,
+        issuerName: row.issuerName,
+        documentCode: row.documentCode,
+        submittedAt: row.submittedAt,
+        version: row.version,
+      })),
+      total,
+      request,
+    ),
+    all: all < 0 ? total : all,
+  };
 }
 
 export async function foreignCaseById(database: DbClient, caseId: string) {
@@ -448,7 +472,7 @@ export async function addIssuer(
 export async function setIssuerActive(
   database: Database,
   actor: Actor,
-  input: { issuerId: string; isActive: boolean; reasonFa: string },
+  input: { issuerId: string; isActive: boolean; reasonFa: string; expectedVersion: number },
 ) {
   if (actor.context !== 'ASSOCIATION_OPERATOR') {
     throw forbidden('مدیریت فهرست صادرکنندگان فقط از محیط عملیاتی انجمن انجام می‌شود.');
@@ -462,19 +486,27 @@ export async function setIssuerActive(
     .where(eq(pedigreeIssuers.id, input.issuerId))
     .limit(1);
   if (!current) throw notFound('صادرکننده پیدا نشد.');
+  const stale = () =>
+    conflict('این صادرکننده در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.', {
+      expectedVersion: input.expectedVersion,
+      actualVersion: current.version,
+    });
+  if (current.version !== input.expectedVersion) throw stale();
 
   return database.transaction(async (tx) => {
     const [updated] = await tx
       .update(pedigreeIssuers)
-      .set({ isActive: input.isActive, updatedAt: new Date() })
-      .where(eq(pedigreeIssuers.id, input.issuerId))
+      .set({ isActive: input.isActive, version: current.version + 1, updatedAt: new Date() })
+      .where(and(eq(pedigreeIssuers.id, input.issuerId), eq(pedigreeIssuers.version, current.version)))
       .returning();
+    if (!updated) throw stale();
     await recordAudit(tx, actor, {
       action: input.isActive ? 'PEDIGREE_ISSUER_ACTIVATED' : 'PEDIGREE_ISSUER_DEACTIVATED',
       targetType: 'PEDIGREE_ISSUER',
       targetId: input.issuerId,
-      before: { isActive: current.isActive },
-      after: { isActive: input.isActive },
+      targetVersion: updated.version,
+      before: { isActive: current.isActive, version: current.version },
+      after: { isActive: input.isActive, version: updated.version },
       reason,
     });
     return updated!;

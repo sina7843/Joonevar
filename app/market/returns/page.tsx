@@ -4,6 +4,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { CaseItem, CaseList, DeskHead, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
 import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
+import { EmptyState } from '../../../src/ui/states.tsx';
 import { keyStatus } from '../../../src/ui/queue.tsx';
 import { productCategories } from '../../../src/db/schema/catalog.ts';
 import { disputedReturns, livePolicy, policyExceptions } from '../../../src/commerce/returns.ts';
@@ -15,6 +16,8 @@ import {
 } from '../../../src/commerce/fulfilment-model.ts';
 import { ReturnMoveForm, ReturnPolicyForm } from '../../../src/commerce/finance-forms.tsx';
 import { moveReturnAsOperatorAction, publishReturnPolicyAction } from '../../account/orders/finance-actions.ts';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +31,7 @@ const fa = (value: number | bigint): string => value.toLocaleString('fa-IR');
  * narrows the promise and never lengthens it, and every one carries the
  * sentence the buyer reads.
  */
-export default async function MarketReturnsPage() {
+export default async function MarketReturnsPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/returns');
   if (!guard.ok) throw guard.denied;
 
@@ -41,6 +44,12 @@ export default async function MarketReturnsPage() {
       .orderBy(productCategories.nameFa),
   ]);
   const exceptions = policy === null ? [] : await policyExceptions(db(), policy.id);
+  const query = readQueueQuery(await searchParams);
+  const page = sliceQueue(disputes, query, {
+    text: (view) => [view.row.reference, view.subOrderReference, view.sellerNameFa].join(' '),
+    at: (view) => view.row.createdAt,
+    name: (view) => view.sellerNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="مرجوعی و سیاست آن" nav={marketNav(guard.actor)} pathname="/market/returns">
@@ -55,74 +64,89 @@ export default async function MarketReturnsPage() {
             مرجوعی مورد اختلافی وجود ندارد.
           </p>
         ) : (
-          <CaseList label="مرجوعی‌های مورد اختلاف" testId="disputed-returns">
-            {disputes.map((view) => (
-              <CaseItem
-                key={view.row.id}
-                type="مرجوعی"
-                name={
-                  <span data-testid={'disputed-ref-' + view.row.id}>
-                    <bdi dir="ltr">{view.row.reference}</bdi>
-                    {' — ' + view.sellerNameFa}
-                  </span>
-                }
-                sub={
-                  <>
-                    {'زیرسفارش '}
-                    <bdi dir="ltr">{view.subOrderReference}</bdi>
-                  </>
-                }
-                status={{
-                  // GAPS #4: no dictionary key for REQUESTED, SHIPPED_BACK, RECEIVED — module label kept.
-                  ...keyStatus(view.row.status, { tone: 'warning', label: RETURN_STATUS_FA[view.row.status as ReturnStatus] }),
-                  testId: 'disputed-status-' + view.row.id,
-                }}
-                owner="SYSTEM"
-                ownerLabel="پشتیبانی بازار"
-                ownerIsUs
-              >
-                <CaseDrawer title="پرونده مرجوعی مورد اختلاف" testId={'open-return-' + view.row.id}>
-                  <DeskHead
-                    title={
-                      <>
+          <QueueFrame
+            path="/market/returns"
+            params={{ q: query.q || undefined, sort: query.sort === 'oldest' ? undefined : query.sort }}
+            query={query}
+            page={page}
+            all={page.all}
+            noun="مرجوعی"
+            searchLabel="جست‌وجوی نام یا کد"
+            testId="returns-queue-frame"
+          >
+            {page.items.length === 0 ? (
+              <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+            ) : (
+              <CaseList label="مرجوعی‌های مورد اختلاف" testId="disputed-returns">
+                {page.items.map((view) => (
+                  <CaseItem
+                    key={view.row.id}
+                    type="مرجوعی"
+                    name={
+                      <span data-testid={'disputed-ref-' + view.row.id}>
                         <bdi dir="ltr">{view.row.reference}</bdi>
                         {' — ' + view.sellerNameFa}
-                      </>
+                      </span>
                     }
-                    status={keyStatus(view.row.status, { tone: 'warning', label: RETURN_STATUS_FA[view.row.status as ReturnStatus] })}
-                    meta={[
+                    sub={
                       <>
                         {'زیرسفارش '}
                         <bdi dir="ltr">{view.subOrderReference}</bdi>
-                      </>,
-                    ]}
-                  />
-                  <Panel title="دلیل و اقلام">
-                    <p className="text-body-sm" data-testid={'disputed-reason-' + view.row.id}>
-                      {view.row.reasonFa}
-                      {view.row.decisionNoteFa ? ' — ' + view.row.decisionNoteFa : ''}
-                    </p>
-                    <dl className="hz-kv" data-testid={'disputed-items-' + view.row.id}>
-                      {view.items.map((item) => (
-                        <div key={item.id} className="hz-kv__row">
-                          <dt className="hz-kv__key">{item.productNameFa + ' × ' + fa(item.quantity)}</dt>
-                          <dd className="hz-kv__value hz-num">{fa(item.lineRefundToman)} تومان</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </Panel>
-                  <Panel title="تصمیم">
-                    <ReturnMoveForm
-                      action={moveReturnAsOperatorAction}
-                      returnId={view.row.id}
-                      moves={view.moves}
-                      testPrefix="ops-return"
-                    />
-                  </Panel>
-                </CaseDrawer>
-              </CaseItem>
-            ))}
-          </CaseList>
+                      </>
+                    }
+                    status={{
+                      // GAPS #4: no dictionary key for REQUESTED, SHIPPED_BACK, RECEIVED — module label kept.
+                      ...keyStatus(view.row.status, { tone: 'warning', label: RETURN_STATUS_FA[view.row.status as ReturnStatus] }),
+                      testId: 'disputed-status-' + view.row.id,
+                    }}
+                    owner="SYSTEM"
+                    ownerLabel="پشتیبانی بازار"
+                    ownerIsUs
+                  >
+                    <CaseDrawer title="پرونده مرجوعی مورد اختلاف" testId={'open-return-' + view.row.id}>
+                      <DeskHead
+                        title={
+                          <>
+                            <bdi dir="ltr">{view.row.reference}</bdi>
+                            {' — ' + view.sellerNameFa}
+                          </>
+                        }
+                        status={keyStatus(view.row.status, { tone: 'warning', label: RETURN_STATUS_FA[view.row.status as ReturnStatus] })}
+                        meta={[
+                          <>
+                            {'زیرسفارش '}
+                            <bdi dir="ltr">{view.subOrderReference}</bdi>
+                          </>,
+                        ]}
+                      />
+                      <Panel title="دلیل و اقلام">
+                        <p className="text-body-sm" data-testid={'disputed-reason-' + view.row.id}>
+                          {view.row.reasonFa}
+                          {view.row.decisionNoteFa ? ' — ' + view.row.decisionNoteFa : ''}
+                        </p>
+                        <dl className="hz-kv" data-testid={'disputed-items-' + view.row.id}>
+                          {view.items.map((item) => (
+                            <div key={item.id} className="hz-kv__row">
+                              <dt className="hz-kv__key">{item.productNameFa + ' × ' + fa(item.quantity)}</dt>
+                              <dd className="hz-kv__value hz-num">{fa(item.lineRefundToman)} تومان</dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </Panel>
+                      <Panel title="تصمیم">
+                        <ReturnMoveForm
+                          action={moveReturnAsOperatorAction}
+                          returnId={view.row.id}
+                          moves={view.moves}
+                          testPrefix="ops-return"
+                        />
+                      </Panel>
+                    </CaseDrawer>
+                  </CaseItem>
+                ))}
+              </CaseList>
+            )}
+          </QueueFrame>
         )}
       </Panel>
 

@@ -182,7 +182,8 @@ export interface UpdateSettingInput {
   readonly key: string;
   /** null clears the value back to NOT_CONFIGURED. */
   readonly value: unknown;
-  readonly reason?: string;
+  /** Required: every change is explained in the history (P11, KOPS-023). */
+  readonly reason: string;
   /** Optimistic guard: reject a write based on a stale reading of the panel. */
   readonly expectedVersion?: number;
 }
@@ -194,6 +195,8 @@ export async function updateSetting(
 ): Promise<SettingRecord> {
   const definition = SETTING_BY_KEY.get(input.key);
   if (!definition) throw notFound('Unknown product setting: ' + input.key);
+  const reason = (input.reason ?? '').trim();
+  if (reason === '') throw validation('دلیل تغییر را بنویسید؛ در تاریخچه تغییرات ثبت می‌شود.');
 
   return database.transaction(async (tx) => {
     const row = await loadRow(tx, input.key);
@@ -229,7 +232,7 @@ export async function updateSetting(
       targetVersion: nextVersion,
       before: { value: row.value, version: row.version, configured: row.value !== null },
       after: { value: nextValue, version: nextVersion, configured: nextValue !== null },
-      reason: input.reason ?? null,
+      reason,
     });
 
     return toRecord(updated);

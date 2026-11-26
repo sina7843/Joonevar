@@ -108,7 +108,7 @@ export default async function SellerPlansPage() {
           )}
         </Panel>
         <Panel title="انتشار نسخه تازه">
-          <SellerPlanForm />
+          <SellerPlanForm versions={Object.fromEntries(history.map((plan) => [plan.code, plan.version]).sort((a, b) => (a[1] as number) - (b[1] as number)))} />
         </Panel>
       </div>
     </OpsShell>

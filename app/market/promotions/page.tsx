@@ -77,10 +77,10 @@ export default async function MarketPromotionsPage() {
                     )}
                   </span>
                   {rule.status === 'DRAFT' || rule.status === 'PAUSED' ? (
-                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="ACTIVE" labelFa="فعال کردن" />
+                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} version={rule.version} to="ACTIVE" labelFa="فعال کردن" />
                   ) : null}
                   {rule.status === 'ACTIVE' ? (
-                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="PAUSED" labelFa="توقف" />
+                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} version={rule.version} to="PAUSED" labelFa="توقف" />
                   ) : null}
                 </div>
               </li>

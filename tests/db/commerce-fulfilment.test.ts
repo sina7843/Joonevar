@@ -41,7 +41,7 @@ import { addSku, createOffer, loadSku, moveOffer } from '../../src/commerce/inve
 import { addShippingMethod, setSkuWeight } from '../../src/commerce/shipping.ts';
 import { placeOrder, setCartLine, viewCart } from '../../src/commerce/cart.ts';
 import { moveSubOrder, startOrderPayment } from '../../src/commerce/orders.ts';
-import { moveReturn, publishReturnPolicy, requestReturn } from '../../src/commerce/returns.ts';
+import { moveReturn, policyVersionCount, publishReturnPolicy, requestReturn } from '../../src/commerce/returns.ts';
 import {
   balancesFor,
   clearDueHolds,
@@ -92,6 +92,8 @@ async function openShop(ctx: MatingCtx): Promise<void> {
   await ensureCategories(ctx.testDb.db);
   await ensureLaunchPlans(ctx.testDb.db, ctx.admin.actor);
   await publishReturnPolicy(ctx.testDb.db, marketAdmin(ctx), {
+    reasonFa: 'SYNTHETIC — دلیل آزمایشی',
+    expectedVersion: await policyVersionCount(ctx.testDb.db),
     version: 'SYNTHETIC-RETURN-1',
     windowDays: 7,
     bodyFa: 'SYNTHETIC — متن آزمایشی سیاست مرجوعی برای تست خودکار این فاز.',
@@ -422,6 +424,8 @@ test('a category exception is frozen onto the line and refuses the return by its
 
     // The policy in force forbids returning this category at all.
     await publishReturnPolicy(ctx.testDb.db, marketAdmin(ctx), {
+    reasonFa: 'SYNTHETIC — دلیل آزمایشی',
+    expectedVersion: await policyVersionCount(ctx.testDb.db),
       version: 'SYNTHETIC-RETURN-2',
       windowDays: 7,
       bodyFa: 'SYNTHETIC — نسخه دوم سیاست مرجوعی برای تست استثناها.',
@@ -456,6 +460,8 @@ test('a category exception is frozen onto the line and refuses the return by its
     // A policy published afterwards does not reach backwards: the line was
     // bought under the old terms and keeps them.
     await publishReturnPolicy(ctx.testDb.db, marketAdmin(ctx), {
+    reasonFa: 'SYNTHETIC — دلیل آزمایشی',
+    expectedVersion: await policyVersionCount(ctx.testDb.db),
       version: 'SYNTHETIC-RETURN-3',
       windowDays: 7,
       bodyFa: 'SYNTHETIC — نسخه سوم، بدون هیچ استثنایی.',
@@ -541,6 +547,8 @@ test('goods returned opened where only sealed ones were allowed refund nothing',
     });
     const { sku, categoryId } = await sellable(ctx, ctx.first.actor, shop.id, 'SYNTHETIC غذا', 4, 250_000n, 'E-2KG');
     await publishReturnPolicy(ctx.testDb.db, marketAdmin(ctx), {
+    reasonFa: 'SYNTHETIC — دلیل آزمایشی',
+    expectedVersion: await policyVersionCount(ctx.testDb.db),
       version: 'SYNTHETIC-RETURN-SEALED',
       windowDays: 7,
       bodyFa: 'SYNTHETIC — نسخه با محدودیت پلمب برای تست.',

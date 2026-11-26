@@ -25,6 +25,10 @@ import { accounts } from '../db/schema/core.ts';
 import { animals } from '../db/schema/animals.ts';
 import { moderationAppeals, moderationReports, publisherRestrictions } from '../db/schema/moderation.ts';
 import { animalListingMedia, animalListings } from '../db/schema/marketplace.ts';
+import { referenceBreeds } from '../db/schema/core.ts';
+import { cities } from '../db/schema/geography.ts';
+import { profiles } from '../db/schema/identity.ts';
+import { kennels } from '../db/schema/kennels.ts';
 import { inquiryMessages, listingInquiries } from '../db/schema/inquiry.ts';
 import { recordAudit } from '../audit/service.ts';
 import { assertWithinLimit } from '../security/rate-limit.ts';
@@ -153,6 +157,18 @@ export interface ListingQueueEntry {
   readonly status: string;
   readonly sellerAccountId: string;
   readonly sellerMobile: string;
+  /** OWNER or KENNEL, as the listing recorded it. */
+  readonly sellerKind: string;
+  /** The kennel's name for a kennel listing, else the seller's profile name; null when neither exists. */
+  readonly sellerNameFa: string | null;
+  /** The person behind a kennel listing (the profile name), shown under the kennel name. */
+  readonly sellerPersonFa: string | null;
+  readonly priceMode: string | null;
+  readonly priceToman: bigint | null;
+  readonly breedFa: string | null;
+  readonly cityFa: string | null;
+  readonly coverFileId: string | null;
+  readonly coverAltFa: string | null;
   readonly reasonsFa: readonly string[];
   readonly firstReportedAt: Date;
   readonly signals: RiskSignals;
@@ -208,11 +224,33 @@ export async function listingReportQueue(
       status: animalListings.status,
       sellerAccountId: animalListings.sellerAccountId,
       sellerMobile: accounts.mobile,
+      sellerKind: animalListings.sellerKind,
+      kennelNameFa: kennels.nameFa,
+      firstName: profiles.firstName,
+      lastName: profiles.lastName,
+      priceMode: animalListings.priceMode,
+      priceToman: animalListings.priceToman,
+      breedFa: referenceBreeds.nameFa,
+      cityFa: cities.nameFa,
       titleFa: animals.name,
+      coverFileId: sql<string | null>`(
+        select m.file_id from animal_listing_media m
+        where m.listing_id = ${animalListings.id} and m.kind = 'IMAGE'
+        order by m.sort_order asc, m.created_at asc limit 1
+      )`,
+      coverAltFa: sql<string | null>`(
+        select m.alt_fa from animal_listing_media m
+        where m.listing_id = ${animalListings.id} and m.kind = 'IMAGE'
+        order by m.sort_order asc, m.created_at asc limit 1
+      )`,
     })
     .from(animalListings)
     .innerJoin(animals, eq(animals.id, animalListings.animalId))
     .innerJoin(accounts, eq(accounts.id, animalListings.sellerAccountId))
+    .leftJoin(profiles, eq(profiles.accountId, animalListings.sellerAccountId))
+    .leftJoin(kennels, eq(kennels.id, animalListings.kennelId))
+    .leftJoin(referenceBreeds, eq(referenceBreeds.id, animals.breedId))
+    .leftJoin(cities, eq(cities.id, animalListings.cityId))
     .where(inArray(animalListings.id, [...grouped.keys()]));
 
   const entries: ListingQueueEntry[] = [];
@@ -224,6 +262,16 @@ export async function listingReportQueue(
       status: listing.status,
       sellerAccountId: listing.sellerAccountId,
       sellerMobile: listing.sellerMobile,
+      sellerKind: listing.sellerKind,
+      sellerNameFa:
+        listing.sellerKind === 'KENNEL' && listing.kennelNameFa ? listing.kennelNameFa : personName(listing),
+      sellerPersonFa: listing.sellerKind === 'KENNEL' ? personName(listing) : null,
+      priceMode: listing.priceMode,
+      priceToman: listing.priceToman,
+      breedFa: listing.breedFa,
+      cityFa: listing.cityFa,
+      coverFileId: listing.coverFileId,
+      coverAltFa: listing.coverAltFa,
       reasonsFa: [...new Set(bucket.map((r) => r.reason))],
       firstReportedAt: bucket.reduce(
         (earliest, r) => (r.createdAt < earliest ? r.createdAt : earliest),
@@ -241,6 +289,11 @@ export async function listingReportQueue(
       b.signals.openReporters - a.signals.openReporters ||
       a.firstReportedAt.getTime() - b.firstReportedAt.getTime(),
   );
+}
+
+function personName(row: { firstName: string | null; lastName: string | null }): string | null {
+  const name = [row.firstName, row.lastName].filter(Boolean).join(' ').trim();
+  return name === '' ? null : name;
 }
 
 /**

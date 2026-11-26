@@ -5,6 +5,8 @@ import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { riskQueue } from '../../../src/security/risk.ts';
+import { param, QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +29,12 @@ export default async function RiskPage({
 }) {
   const guard = await guardRoute('/market/risk');
   if (!guard.ok) throw guard.denied;
-  const days = Number(String((await searchParams).days ?? '30')) || 30;
+  const search = await searchParams;
+  const days = Number(String(search.days ?? '30')) || 30;
   const rows = await riskQueue(db(), guard.actor, { sinceDays: days });
+  // The service orders by how many signals an account carries; no date to sort by, so that order stands.
+  const query = readQueueQuery({ q: param(search.q) });
+  const page = sliceQueue(rows, query, { text: (row) => row.maskedMobile, at: () => null, name: (row) => row.maskedMobile });
 
   return (
     <OpsShell actor={guard.actor} title="نشانه‌های پرخطر" nav={marketNav(guard.actor)} pathname="/market/risk">
@@ -45,35 +51,51 @@ export default async function RiskPage({
           <EmptyState title="در این بازه نشانه‌ای ثبت نشده است." description="هر شماری که از آستانه‌اش بگذرد، اینجا با توضیحش می‌آید." />
         </div>
       ) : (
-        <CaseList label="حساب‌های دارای نشانه" testId="risk-queue">
-          {rows.map((row) => (
-            <CaseItem
-              key={row.accountId}
-              type="نشانه پرخطر"
-              name={
-                <span data-testid={'risk-account-' + row.accountId}>
-                  {'حساب '}
-                  <bdi dir="ltr">{row.maskedMobile}</bdi>
-                </span>
-              }
-              href={'/market/support?account=' + row.accountId}
-              linkLabel="باز کردن در پشتیبانی"
-              linkTestId={'risk-support-' + row.accountId}
-            >
-              <dl className="hz-kv" data-testid={'risk-signals-' + row.accountId}>
-                {row.signals.map((signal) => (
-                  <div key={signal.kind} className="hz-kv__row">
-                    <dt className="hz-kv__key">
-                      {signal.labelFa}
-                      <span className="block text-caption font-normal text-text-secondary">{signal.noteFa}</span>
-                    </dt>
-                    <dd className="hz-kv__value hz-num">{fa(signal.count)}</dd>
-                  </div>
-                ))}
-              </dl>
-            </CaseItem>
-          ))}
-        </CaseList>
+        <QueueFrame
+          path="/market/risk"
+          params={{ days: search.days ? String(days) : undefined, q: query.q || undefined }}
+          sorts={[]}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="حساب"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="risk-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="حساب‌های دارای نشانه" testId="risk-queue">
+              {page.items.map((row) => (
+                <CaseItem
+                  key={row.accountId}
+                  type="نشانه پرخطر"
+                  name={
+                    <span data-testid={'risk-account-' + row.accountId}>
+                      {'حساب '}
+                      <bdi dir="ltr">{row.maskedMobile}</bdi>
+                    </span>
+                  }
+                  href={'/market/support?account=' + row.accountId}
+                  linkLabel="باز کردن در پشتیبانی"
+                  linkTestId={'risk-support-' + row.accountId}
+                >
+                  <dl className="hz-kv" data-testid={'risk-signals-' + row.accountId}>
+                    {row.signals.map((signal) => (
+                      <div key={signal.kind} className="hz-kv__row">
+                        <dt className="hz-kv__key">
+                          {signal.labelFa}
+                          <span className="block text-caption font-normal text-text-secondary">{signal.noteFa}</span>
+                        </dt>
+                        <dd className="hz-kv__value hz-num">{fa(signal.count)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </CaseItem>
+              ))}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

@@ -353,7 +353,7 @@ test('every callback receipt is recorded once per provider reference', async () 
 
 test('a paid effect that is not implemented yet records the money and issues nothing', async () => {
   await withApproved(async (testDb, member) => {
-    await updateSetting(testDb.db, actorFor(member.operatorId, 'SUPERADMIN'), {
+    await updateSetting(testDb.db, actorFor(member.operatorId, 'SUPERADMIN'), { reason: 'SYNTHETIC — مقدار آزمایشی',
       key: 'fee.kennel_registration_toman',
       value: '120000',
     });

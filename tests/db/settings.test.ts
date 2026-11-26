@@ -114,7 +114,7 @@ test('settings permissions are scoped per group, not per shell', async () => {
     // The association operator sees fees but cannot change them.
     assert.ok((await listSettingsForActor(testDb.db, association)).some((s) => s.key === 'fee.membership_toman'));
     await assert.rejects(
-      () => updateSetting(testDb.db, association, { key: 'fee.membership_toman', value: '1' }),
+      () => updateSetting(testDb.db, association, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.membership_toman', value: '1' }),
       /may not change/,
     );
 
@@ -125,7 +125,7 @@ test('settings permissions are scoped per group, not per shell', async () => {
     await assert.rejects(() => readSettingForActor(testDb.db, genetics, 'referral.validity_days'), /may not read/);
 
     // Reference data is the association operator's own responsibility.
-    const updated = await updateSetting(testDb.db, association, {
+    const updated = await updateSetting(testDb.db, association, { reason: 'SYNTHETIC — مقدار آزمایشی',
       key: 'guide_text.vet_pricing_notice',
       value: 'برای اطلاع دقیق از قیمت‌ها با دامپزشک یا مرکز تماس بگیرید.',
     });
@@ -146,7 +146,7 @@ test('the documented cooldown policy is readable but not writable by anyone', as
     const superadmin = actorFor('SUPERADMIN');
     assert.equal((await readSettingForActor(testDb.db, superadmin, 'cooldown.female_months')).value, 6);
     await assert.rejects(
-      () => updateSetting(testDb.db, superadmin, { key: 'cooldown.female_months', value: 3 }),
+      () => updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'cooldown.female_months', value: 3 }),
       /may not change settings group BREEDING_POLICY/,
     );
     assert.equal(await readInt(testDb.db, 'cooldown.female_months'), 6);
@@ -188,11 +188,20 @@ test('every write bumps the version and records actor, time and before/after', a
 test('a write against a stale version is rejected', async () => {
   await withDb(async (testDb, actorFor) => {
     const superadmin = actorFor('SUPERADMIN');
-    await updateSetting(testDb.db, superadmin, { key: 'referral.validity_days', value: 25 });
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'referral.validity_days', value: 25 });
     await assert.rejects(
-      () => updateSetting(testDb.db, superadmin, { key: 'referral.validity_days', value: 26, expectedVersion: 1 }),
+      () => updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'referral.validity_days', value: 26, expectedVersion: 1 }),
       /changed by someone else/,
     );
+    assert.equal(await readInt(testDb.db, 'referral.validity_days'), 25);
+  });
+});
+
+test('a change without a reason is refused and nothing is stored (P11, KOPS-023)', async () => {
+  await withDb(async (testDb, actorFor) => {
+    const superadmin = actorFor('SUPERADMIN');
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'referral.validity_days', value: 25 });
+    await assert.rejects(() => updateSetting(testDb.db, superadmin, { reason: '   ', key: 'referral.validity_days', value: 30 }), /دلیل تغییر/);
     assert.equal(await readInt(testDb.db, 'referral.validity_days'), 25);
   });
 });
@@ -200,19 +209,19 @@ test('a write against a stale version is rejected', async () => {
 test('values are validated before they are stored', async () => {
   await withDb(async (testDb, actorFor) => {
     const superadmin = actorFor('SUPERADMIN');
-    await assert.rejects(() => updateSetting(testDb.db, superadmin, { key: 'referral.validity_days', value: 0 }), /at least/);
-    await assert.rejects(() => updateSetting(testDb.db, superadmin, { key: 'otp.ttl_seconds', value: 5 }), /at least/);
-    await assert.rejects(() => updateSetting(testDb.db, superadmin, { key: 'fee.pedigree_toman', value: '12.5' }), /integer/);
-    await assert.rejects(() => updateSetting(testDb.db, superadmin, { key: 'fee.pedigree_toman', value: '-1' }), /negative/);
-    await assert.rejects(() => updateSetting(testDb.db, superadmin, { key: 'no.such.key', value: 1 }), /Unknown product setting/);
+    await assert.rejects(() => updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'referral.validity_days', value: 0 }), /at least/);
+    await assert.rejects(() => updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'otp.ttl_seconds', value: 5 }), /at least/);
+    await assert.rejects(() => updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.pedigree_toman', value: '12.5' }), /integer/);
+    await assert.rejects(() => updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.pedigree_toman', value: '-1' }), /negative/);
+    await assert.rejects(() => updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'no.such.key', value: 1 }), /Unknown product setting/);
   });
 });
 
 test('a monetary setting can be cleared back to NOT_CONFIGURED, and that is audited', async () => {
   await withDb(async (testDb, actorFor) => {
     const superadmin = actorFor('SUPERADMIN');
-    await updateSetting(testDb.db, superadmin, { key: 'fee.pedigree_toman', value: '450000' });
-    const cleared = await updateSetting(testDb.db, superadmin, { key: 'fee.pedigree_toman', value: null });
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.pedigree_toman', value: '450000' });
+    const cleared = await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.pedigree_toman', value: null });
     assert.equal(cleared.configured, false);
     assert.equal((await readMoney(testDb.db, 'fee.pedigree_toman')).configured, false);
 
@@ -235,10 +244,10 @@ test('re-running the seed preserves operator-modified values', async () => {
     const accountId = await createTestAccount(testDb.db, '09990000901');
     const superadmin: Actor = { accountId: accountId as AccountId, context: 'SUPERADMIN', activeRoles: [] };
 
-    await updateSetting(testDb.db, superadmin, { key: 'referral.validity_days', value: 30 });
-    await updateSetting(testDb.db, superadmin, { key: 'fee.membership_toman', value: '350000' });
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'referral.validity_days', value: 30 });
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.membership_toman', value: '350000' });
     // Deliberately cleared: a redeploy must not restore the documented baseline.
-    await updateSetting(testDb.db, superadmin, { key: 'fee.membership_toman', value: null });
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.membership_toman', value: null });
 
     const second = await seedBaseline(testDb.db);
     assert.equal(second.settingsInserted.length, 0);

@@ -26,3 +26,5 @@ Where the system lacks something, the closest existing part is used and the gap 
 | 20 | ReasonField internal note (`.hz-reason__add`) | all desks | Not shown: no column stores an internal note. | DEC-0236 |
 | 21 | Case code, assignee («مسئول»), «تخصیص به دیگری», «واگذاری به…» | DeskHead, CaseQueue, BulkActionBar | Not built: no assignment model (product owner, DEC-0235). | DEC-0235, DEC-0236 |
 | 22 | Late / overdue colour on case age | DeskHead, queues | Age shown uncoloured: no review-age threshold setting exists. | DEC-0236 |
+| 23 | Case age from first submission for clubs, membership requests and genetics receipts | CaseQueue | Age from last change: no first-submission timestamp is stored (needs a migration). | DEC-0238 |
+| 24 | Loading skeleton for operational queues | CaseQueue, DataTable | Not built for queues that have server-action forms: a `loading.tsx` beside `page.tsx` suspends the re-render after `revalidatePath` and the form never leaves «در حال ثبت…». Needs the `(list)/` route-group pattern, which moves each page. | DEC-0238 |

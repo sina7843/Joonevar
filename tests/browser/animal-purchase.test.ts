@@ -79,7 +79,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();

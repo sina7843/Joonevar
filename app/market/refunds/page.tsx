@@ -12,6 +12,8 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { refundQueue } from '../../../src/marketplace/refunds.ts';
 import { MAX_AUTOMATIC_REFUND_ATTEMPTS, REFUND_STATUS_FA } from '../../../src/marketplace/cancellation-model.ts';
 import { ManualRefundForm, RetryRefundForm } from '../../../src/marketplace/settlement-forms.tsx';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +28,7 @@ const when = (value: Date) =>
  * and not yet sent. A row leaves this page only when a provider or a named bank
  * reference says it was paid.
  */
-export default async function RefundQueuePage() {
+export default async function RefundQueuePage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/refunds');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
@@ -37,6 +39,12 @@ export default async function RefundQueuePage() {
     if (error instanceof AppError) return <AccessDenied error={error} />;
     throw error;
   }
+  const query = readQueueQuery(await searchParams);
+  const page = sliceQueue(queue, query, {
+    text: (entry) => [entry.animalNameFa, entry.recipientMobile].join(' '),
+    at: (entry) => entry.createdAt,
+    name: (entry) => entry.animalNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="استرداد بیعانه" nav={marketNav(guard.actor)} pathname="/market/refunds">
@@ -61,65 +69,80 @@ export default async function RefundQueuePage() {
           />
         </div>
       ) : (
-        <CaseList label="استردادهای در انتظار" testId="refund-queue">
-          {queue.map((entry) => (
-            <CaseItem
-              key={entry.id}
-              type="استرداد بیعانه"
-              name={<span className="hz-num">{moneyFa(entry.amountToman) + ' تومان'}</span>}
-              sub={
-                <>
-                  {entry.animalNameFa + ' · گیرنده: '}
-                  <bdi dir="ltr">{entry.recipientMobile}</bdi>
-                  {' · تلاش‌ها: ' + entry.attempts.toLocaleString('fa-IR') + ' · ' + when(entry.createdAt) + ' · '}
-                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
-                    معامله
-                  </Link>
-                </>
-              }
-              ageDays={ageInDays(entry.createdAt)}
-              status={{
-                // GAPS #4: no dictionary key for MANUAL_REQUIRED — module label kept.
-                ...keyStatus(entry.status, { tone: 'neutral', label: REFUND_STATUS_FA[entry.status] ?? entry.status }),
-                testId: 'refund-status-' + entry.id,
-              }}
-              owner="SYSTEM"
-              ownerLabel="مالی بازار"
-              ownerIsUs
-            >
-              <CaseDrawer title="پرونده استرداد بیعانه" testId={'open-refund-' + entry.id}>
-                <DeskHead
-                  title={<span className="hz-num">{moneyFa(entry.amountToman) + ' تومان'}</span>}
-                  status={keyStatus(entry.status, { tone: 'neutral', label: REFUND_STATUS_FA[entry.status] ?? entry.status })}
-                  meta={[
-                    entry.animalNameFa,
+        <QueueFrame
+          path="/market/refunds"
+          params={{ q: query.q || undefined, sort: query.sort === 'oldest' ? undefined : query.sort }}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="استرداد"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="refund-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="استردادهای در انتظار" testId="refund-queue">
+              {page.items.map((entry) => (
+                <CaseItem
+                  key={entry.id}
+                  type="استرداد بیعانه"
+                  name={<span className="hz-num">{moneyFa(entry.amountToman) + ' تومان'}</span>}
+                  sub={
                     <>
-                      {'گیرنده: '}
+                      {entry.animalNameFa + ' · گیرنده: '}
                       <bdi dir="ltr">{entry.recipientMobile}</bdi>
-                    </>,
-                    'تلاش‌ها: ' + entry.attempts.toLocaleString('fa-IR'),
-                    when(entry.createdAt),
-                  ]}
+                      {' · تلاش‌ها: ' + entry.attempts.toLocaleString('fa-IR') + ' · ' + when(entry.createdAt) + ' · '}
+                      <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
+                        معامله
+                      </Link>
+                    </>
+                  }
+                  ageDays={ageInDays(entry.createdAt)}
+                  status={{
+                    // GAPS #4: no dictionary key for MANUAL_REQUIRED — module label kept.
+                    ...keyStatus(entry.status, { tone: 'neutral', label: REFUND_STATUS_FA[entry.status] ?? entry.status }),
+                    testId: 'refund-status-' + entry.id,
+                  }}
+                  owner="SYSTEM"
+                  ownerLabel="مالی بازار"
+                  ownerIsUs
                 >
-                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
-                    معامله
-                  </Link>
-                </DeskHead>
-                {entry.lastErrorFa ? (
-                  <Panel title="آخرین تلاش">
-                    <p className="text-caption text-text-secondary" data-testid={'refund-error-' + entry.id}>
-                      آخرین خطا: {entry.lastErrorFa}
-                    </p>
-                  </Panel>
-                ) : null}
-                <Panel title="استرداد">
-                  <RetryRefundForm refundId={entry.id} retryable={entry.retryable} />
-                  <ManualRefundForm refundId={entry.id} />
-                </Panel>
-              </CaseDrawer>
-            </CaseItem>
-          ))}
-        </CaseList>
+                  <CaseDrawer title="پرونده استرداد بیعانه" testId={'open-refund-' + entry.id}>
+                    <DeskHead
+                      title={<span className="hz-num">{moneyFa(entry.amountToman) + ' تومان'}</span>}
+                      status={keyStatus(entry.status, { tone: 'neutral', label: REFUND_STATUS_FA[entry.status] ?? entry.status })}
+                      meta={[
+                        entry.animalNameFa,
+                        <>
+                          {'گیرنده: '}
+                          <bdi dir="ltr">{entry.recipientMobile}</bdi>
+                        </>,
+                        'تلاش‌ها: ' + entry.attempts.toLocaleString('fa-IR'),
+                        when(entry.createdAt),
+                      ]}
+                    >
+                      <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
+                        معامله
+                      </Link>
+                    </DeskHead>
+                    {entry.lastErrorFa ? (
+                      <Panel title="آخرین تلاش">
+                        <p className="text-caption text-text-secondary" data-testid={'refund-error-' + entry.id}>
+                          آخرین خطا: {entry.lastErrorFa}
+                        </p>
+                      </Panel>
+                    ) : null}
+                    <Panel title="استرداد">
+                      <RetryRefundForm refundId={entry.id} retryable={entry.retryable} />
+                      <ManualRefundForm refundId={entry.id} />
+                    </Panel>
+                  </CaseDrawer>
+                </CaseItem>
+              ))}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

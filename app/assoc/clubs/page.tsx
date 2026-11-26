@@ -11,6 +11,8 @@ import { formatInstantFa } from '../../../src/content/model.ts';
 import { ClubOwnershipDecisionForm } from '../../../src/clubs/forms.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { CaseDrawer } from '../case-drawer.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,10 +20,17 @@ export const dynamic = 'force-dynamic';
  * What the association has to decide about clubs — Phase 2.5 §8 (PROMPT-012):
  * the initial verification, and every privileged ownership change (DEC-0198).
  */
-export default async function AssocClubsPage() {
+export default async function AssocClubsPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/assoc/clubs');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
+  const query = readQueueQuery(await searchParams);
   const queue = await clubAuthorityQueue(db(), guard.actor);
+  // No submission timestamp exists on a club; the last change is when it entered the queue.
+  const page = sliceQueue(queue.waiting, query, {
+    text: (club) => club.displayNameFa + ' ' + (club.publicSlug ?? ''),
+    at: (club) => club.updatedAt,
+    name: (club) => club.displayNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="کلاب‌ها" pathname="/assoc/clubs" nav={ASSOC_NAV}>
@@ -38,22 +47,36 @@ export default async function AssocClubsPage() {
         {queue.waiting.length === 0 ? (
           <EmptyState title="کلابی در انتظار بررسی نیست" description="کلاب‌های تازه پس از تکمیل معرفی و راه ارتباطی به این صف می‌آیند." />
         ) : (
-          <CaseList label="کلاب‌های در انتظار تأیید" testId="club-verification-queue">
-            {/* P09: oldest first. */}
-            {[...queue.waiting].reverse().map((club) => (
-              <CaseItem
-                key={club.id}
-                name={club.displayNameFa}
-                href={'/assoc/clubs/' + club.id}
-                linkTestId={'club-queue-' + club.id}
-                sub={'آخرین تغییر: ' + formatInstantFa(club.updatedAt)}
-                ageDays={ageInDays(club.updatedAt)}
-                status={keyStatus('PENDING_VERIFICATION')}
-                owner="ASSOCIATION"
-                ownerIsUs
-              />
-            ))}
-          </CaseList>
+          <QueueFrame
+            path="/assoc/clubs"
+            params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}
+            query={query}
+            page={page}
+            all={page.all}
+            noun="کلاب"
+            searchLabel="جست‌وجوی نام کلاب"
+            testId="club-queue-frame"
+          >
+            {page.total === 0 ? (
+              <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را تغییر دهید یا پاک کنید." />
+            ) : (
+              <CaseList label="کلاب‌های در انتظار تأیید" testId="club-verification-queue">
+                {page.items.map((club) => (
+                  <CaseItem
+                    key={club.id}
+                    name={club.displayNameFa}
+                    href={'/assoc/clubs/' + club.id}
+                    linkTestId={'club-queue-' + club.id}
+                    sub={'آخرین تغییر: ' + formatInstantFa(club.updatedAt)}
+                    ageDays={ageInDays(club.updatedAt)}
+                    status={keyStatus('PENDING_VERIFICATION')}
+                    owner="ASSOCIATION"
+                    ownerIsUs
+                  />
+                ))}
+              </CaseList>
+            )}
+          </QueueFrame>
         )}
       </Panel>
 

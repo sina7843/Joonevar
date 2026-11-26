@@ -1,4 +1,4 @@
-import type { SettingRecord } from '../../../src/settings/service.ts';
+import type { SettingRecord } from './service.ts';
 
 const fa = (value: number) => value.toLocaleString('fa-IR');
 

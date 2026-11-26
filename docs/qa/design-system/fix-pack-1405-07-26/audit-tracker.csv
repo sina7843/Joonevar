@@ -102,47 +102,47 @@ CMPB-016,T05,1,low,code,CMPB,K3,ReasonField · چیپ متن را جایگزین
 KOPS-007,T05,1,low,code,KOPS,K3,برچسب و راهنمای فیلد دلیل، نمایش همیشگی آن و پیام اعتبارسنجی با طراحی نمی‌خواند,K3 · ReasonField,FIXED,,"DEC-0236; internal note GAPS #20, approve reason GAPS #19"
 KOPS-008,T05,1,low,needs decision,KOPS,K3,پرونده بسته: به‌جای «نتیجه نهایی بدون پنل»، پنل «نتیجه» با Alert آبی؛ حالت «تخصیص به دیگری» نیست,K3 · حالت‌های قفل/بسته,FIXED,,DEC-0236
 RTO-008,T05,1,low,code,RTO,,برچسب سه نتیجه یکدست نیست,P10 › Content & data rules «Keep the three labels exactly: تأیید · نیازمند اصلاح · رد»,FIXED,,DEC-0236
-CMPA1-042,T06,1,high,code,CMPA1,,۳۴ صف عملیاتی در دسکتاپ هم کارت‌اند، نه جدول CaseQueue,CaseQueue (P9، حدود ۳۵ صفحه),,,
-CMPB-032,T06,1,high,code,CMPB,K14 K19,SortMenu · صف‌های K14 و K19 کنترل مرتب‌سازی ندارند و بازار حیوان select بومی دارد,SortMenu — صف آگهی‌ها (K14)، صف نمونه‌های ژنتیک (K19)، بازار حیوان عمومی، فروشگاه,,,
-KOPS-015,T06,1,high,code,KOPS,K14,به‌جای جدول ۴۴px با تصویر کوچک، فهرست کارتی با فرم تصمیم درون هر ردیف؛ تصمیم در صف گرفته می‌شود و میز (Drawer) وجود ندارد,K14 · CaseQueue / DataTable (comfortable) + DecisionDesk در Drawer,,,
-KOPS-016,T06,1,high,code,KOPS,K14,نوار ابزار صف (جستجو، SortMenu، چیپ‌های نوع و دامنه، «فیلترها») وجود ندارد,K14 · SearchField + SortMenu + FilterBar,,,
-KOPS-017,T06,1,high,needs decision,KOPS,K14,انتخاب و BulkActionBar («واگذاری به…»، «پنهان‌کردن آگهی‌ها») وجود ندارد,K14 · BulkActionBar (حالت سخت K14 «کنش گروهی»),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-KOPS-034,T06,1,high,code,KOPS,K19,به‌جای جدول dense صف نمونه‌ها، فهرست کارتی با فرم‌های گام درون کارت؛ نام حیوان لینک نیست و راهی برای باز کردن پرونده نیست,K19 · CaseQueue / DataTable dense (موبایل: کارت CaseQueue),,,
-KOPS-035,T06,1,high,needs decision,KOPS,K19,BulkActionBar با «ثبت دریافت نمونه (n)» و «واگذاری به…» (مصوب ۱۱ مهر) وجود ندارد,K19 · BulkActionBar,,,Already decided — Decision 11: «ثبت دریافت نمونه» bulk action on /genetics/samples approved.
-RTO-001,T06,1,high,code,RTO,,صف KYC و Export Pedigree فقط ۲۰ پرونده تازه‌تر را نشان می‌دهند، نه قدیمی‌ترین‌ها,صف احراز هویت و صف Export Pedigree,,,
-RTO-002,T06,1,high,code,RTO,,بیشتر صف‌ها در دسکتاپ هم فهرست کارت‌اند، نه DataTable متراکم,P09 › Collection (`CaseQueue` / `DataTable --dense`),,,
-RTO-003,T06,1,high,code,RTO,,صف‌ها Pagination ندارند و پرونده‌های بعد از صفحه اول در دسترس نیستند,*Pagination* «۱ تا ۲۵ از ۱۸۴ پرونده»,,,
-RTO-004,T06,1,high,code,RTO,,ابزار سر صف (جستجو، مرتب‌سازی، FilterBar نوع و دامنه، ستون «مسئول») تقریباً هیچ‌جا نیست,P09 › Anatomy 4–6 (`SearchField`، `SortMenu`، `FilterBar`، ستون مسئول),,,
-CMPA1-034,T06,1,medium,needs decision,CMPA1,,BulkActionBar و انتخاب چندتایی در صف‌ها وجود ندارد,BulkActionBar (P9),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPA1-043,T06,1,medium,code,CMPA1,,CaseQueue: سرصف، شمارش زنده، جست‌وجو/مرتب‌سازی، ستون «مسئول»، صفحه‌بندی و دکمه باز کردن نیست,CaseQueue,,,
-CMPA2-001,T06,1,medium,code,CMPA2,,DataTable: کامپوننت مشترک وجود ندارد؛ هر صفحه جدول را دستی می‌نویسد,DataTable,,,
-CMPA2-002,T06,1,medium,code,CMPA2,,DataTable زیر 768: به‌جای CardList، خود جدول با CSS محلی «کارت» می‌شود و برچسب ستون‌ها گم می‌شود,DataTable (CardList),,,
-CMPB-093,T06,1,medium,code,CMPB,,Pagination · چهار فهرست صفحه‌بندی‌شده هیچ کنترل صفحه ندارند,Pagination (حالت نبودن),,,
-KOPS-018,T06,1,medium,code,KOPS,K14,صفحه‌بندی «۱ تا ۶ از ۲۴ پرونده» / «نمایش پرونده‌های بیشتر» وجود ندارد,K14 · Pagination,,,
-KOPS-019,T06,1,medium,code,KOPS,K14,قیمت آگهی و حالت «قیمت تعیین‌نشده» در صف نیست,K14 · Price / `hz-price--unset` (حالت سخت K14 «قیمت تعیین‌نشده»),,,
-KOPS-036,T06,1,medium,code,KOPS,K19,مرتب‌سازی، چیپ‌های نوع/دامنه و «فیلترها» نیست؛ جستجو دکمه جدا و متن دیگری دارد,K19 · SearchField + SortMenu + FilterBar,,,
-KOPS-037,T06,1,medium,code,KOPS,K19,«اقدام بعدی با» برای نمونه‌هایی که با دامپزشک‌اند هم `--you` (رنگ نوبت ما) می‌گیرد؛ سن از زمان نمونه‌گیری و بدون دیرکرد,K19 · ActionOwner / age,,,
-KOPS-039,T06,1,medium,code,KOPS,K19,سربرگ صف (شمارنده هشدار، قدیمی‌ترین دیرکرده، «به‌روزشده»، «باز کردن قدیمی‌ترین پرونده») و صفحه‌بندی با طراحی نمی‌خواند؛ Alert اضافه,K19 · PageHeader + Pagination,,,
-RTO-005,T06,1,medium,needs decision,RTO,,BulkActionBar در هیچ صفی نیست,*BulkActionBar*، P09 › 7,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-RTO-015,T06,1,medium,needs decision,RTO,,سن پرونده از «آخرین تغییر» حساب می‌شود و نشانگر دیرکرد هیچ‌جا نیست,P09 › Overdue و Content & data rules «Age = now − first submission»,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #12 approved per proposal (DEC-0235)
-RTO-023,T06,1,medium,code,RTO,,ردیف‌های صف بدون کد، نام متمایز، وضعیت یا «اقدام بعدی با»,P09 › Content & data rules «Every row has `ActionOwner`»، «Case code = the record being decided»، «Animal-centred queues name the animal»,,,
-CMPA2-005,T06,1,low,needs decision,CMPA2,,DataTable: مرتب‌سازی، انتخاب گروهی و ستون‌های کمتر در 768–1023 پیاده نشده است,DataTable (variants: sortable، selectable),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPA2-006,T06,1,low,code,CMPA2,,DataTable: حالت بارگذاری (اسکلت) و خطا برای جدول‌ها وجود ندارد,DataTable (States),,,
-KOPS-021,T06,1,low,code,KOPS,K14,بخش‌های اضافه در صف: Alert «این اعداد نشانه‌اند، نه حکم» و پنل «اعتراض‌ها» در همان صفحه,K14 · ترکیب صفحه,,,
-KOPS-038,T06,1,low,needs decision,KOPS,K19,خط وابستگی «منتظر: SM-…، نمونه مادر» برای پرونده‌های مسدود نیست,K19 · `hz-case__sub` dependency line,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPB-028,T09,1,high,code,CMPB,K15,SettingsPanel · هر ردیف تنظیم فرم ویرایش همیشه‌باز دارد؛ دکمهٔ «ویرایش»، ناحیهٔ `.hz-setting__edit` و حالت «پیش‌نویس» نیست,SettingsPanel — `/admin/settings` (K15)، `/market/settings`,,,
-KOPS-022,T09,1,high,code,KOPS,K15,مدل ویرایش: زیر هر ردیف یک فرم همیشه‌باز است؛ دکمه «ویرایش/تعیین مقدار»، ردیف در حال ویرایش با «پیش‌نویس» و «انصراف» وجود ندارد,K15 · SettingsPanel edit row (حالت سخت K15 «ویرایش نسخه‌دار با دلیل»),,,
-KOPS-023,T09,1,high,code,KOPS,K15,«دلیل تغییر» اجباری نیست (نه در فرم، نه در سرور),K15 · ReasonField در ویرایش تنظیم,,,
-KOPS-025,T09,1,high,code,KOPS,K15,موبایل: گروه‌ها Accordion نیستند، هشدار خلاصه تعیین‌نشده‌ها نیست و صفحه جداگانه ویرایش با نوار چسبان وجود ندارد,K15 · SettingsPanel موبایل + صفحه ویرایش کلید (`K15-settings-edit-M`),,,
-CMPB-021,T09,1,medium,code,CMPB,,Switch · کامپوننت Switch وجود ندارد و ۸ تنظیم بولی با فیلد متنی ویرایش می‌شوند,Switch — `/admin/settings` (کلیدهای `BOOL`)، و تنظیماتی که فوراً اعمال می‌شوند,,,
-CMPB-029,T09,1,medium,code,CMPB,K15,SettingsPanel · ناوبری گروه‌ها پیوند لنگری است و همهٔ گروه‌ها در یک صفحهٔ بلند رندر می‌شوند,SettingsPanel — `/admin/settings` (K15),,,
-CMPB-030,T09,1,medium,code,CMPB,K15,SettingsPanel · نمای موبایل و تبلت (آکاردئون، Select گروه، صفحهٔ ویرایش جدا) پیاده نشده,SettingsPanel — `/admin/settings` در <1024 (K15-M، K15-settings-edit-M),,,
-KOPS-024,T09,1,medium,code,KOPS,K15,چیدمان دسکتاپ: همه ۱۵ گروه پشت سر هم روی یک صفحه؛ گروه جاری، بخش «تعیین‌نشده در گروه‌های دیگر» و دکمه «تعیین مقدار» نیست,K15 · SettingsPanel group nav + group card,,,
-RTO-017,T09,1,medium,code,RTO,,تنظیمات بازار و فرم‌های پیکربندی با الگوی ویرایش P11 نمی‌خوانند,P11 › Anatomy 4–6، Layout و Content rules؛ *SettingsPanel*,,,
-RTO-018,T09,1,medium,needs decision,RTO,,برخی تغییرهای پیکربندی بدون دلیل یا بدون نسخه ذخیره می‌شوند,"P11 › Content & data rules «Every change records `{ key, value, reasonFa, expectedVersion }`»، Don't «save without a version check»",,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPA1-013,T09,1,low,code,CMPA1,K15,گروه‌های تنظیمات روی موبایل آکاردئونی نیستند (`--sm`),Accordion `--sm` (P11، K15),,,
-CMPB-031,T09,1,low,code,CMPB,K15,SettingsPanel · جزئیات ردیف: «تعیین مقدار»، متن hint تعیین‌نشده، نسخهٔ اضافه و چیپ پیوندی,SettingsPanel — `/admin/settings` (K15),,,
-KOPS-027,T09,1,low,code,KOPS,K15,جزئیات سربرگ، جستجو و نام گروه‌ها,K15 · PageHeader / SearchField / group labels,,,
+CMPA1-042,T06,1,high,code,CMPA1,,۳۴ صف عملیاتی در دسکتاپ هم کارت‌اند، نه جدول CaseQueue,CaseQueue (P9، حدود ۳۵ صفحه),FIXED,,DEC-0238
+CMPB-032,T06,1,high,code,CMPB,K14 K19,SortMenu · صف‌های K14 و K19 کنترل مرتب‌سازی ندارند و بازار حیوان select بومی دارد,SortMenu — صف آگهی‌ها (K14)، صف نمونه‌های ژنتیک (K19)، بازار حیوان عمومی، فروشگاه,FIXED,,DEC-0238
+KOPS-015,T06,1,high,code,KOPS,K14,به‌جای جدول ۴۴px با تصویر کوچک، فهرست کارتی با فرم تصمیم درون هر ردیف؛ تصمیم در صف گرفته می‌شود و میز (Drawer) وجود ندارد,K14 · CaseQueue / DataTable (comfortable) + DecisionDesk در Drawer,FIXED,,DEC-0238
+KOPS-016,T06,1,high,code,KOPS,K14,نوار ابزار صف (جستجو، SortMenu، چیپ‌های نوع و دامنه، «فیلترها») وجود ندارد,K14 · SearchField + SortMenu + FilterBar,FIXED,,DEC-0238
+KOPS-017,T06,1,high,needs decision,KOPS,K14,انتخاب و BulkActionBar («واگذاری به…»، «پنهان‌کردن آگهی‌ها») وجود ندارد,K14 · BulkActionBar (حالت سخت K14 «کنش گروهی»),PARTIAL,,پنهان‌کردن گروهی ساخته شد؛ «واگذاری به…» GAPS #21 (DEC-0238)
+KOPS-034,T06,1,high,code,KOPS,K19,به‌جای جدول dense صف نمونه‌ها، فهرست کارتی با فرم‌های گام درون کارت؛ نام حیوان لینک نیست و راهی برای باز کردن پرونده نیست,K19 · CaseQueue / DataTable dense (موبایل: کارت CaseQueue),FIXED,,DEC-0238
+KOPS-035,T06,1,high,needs decision,KOPS,K19,BulkActionBar با «ثبت دریافت نمونه (n)» و «واگذاری به…» (مصوب ۱۱ مهر) وجود ندارد,K19 · BulkActionBar,FIXED,,Already decided — Decision 11: «ثبت دریافت نمونه» bulk action on /genetics/samples approved. DEC-0238
+RTO-001,T06,1,high,code,RTO,,صف KYC و Export Pedigree فقط ۲۰ پرونده تازه‌تر را نشان می‌دهند، نه قدیمی‌ترین‌ها,صف احراز هویت و صف Export Pedigree,FIXED,,DEC-0238
+RTO-002,T06,1,high,code,RTO,,بیشتر صف‌ها در دسکتاپ هم فهرست کارت‌اند، نه DataTable متراکم,P09 › Collection (`CaseQueue` / `DataTable --dense`),FIXED,,DEC-0238
+RTO-003,T06,1,high,code,RTO,,صف‌ها Pagination ندارند و پرونده‌های بعد از صفحه اول در دسترس نیستند,*Pagination* «۱ تا ۲۵ از ۱۸۴ پرونده»,FIXED,,DEC-0238
+RTO-004,T06,1,high,code,RTO,,ابزار سر صف (جستجو، مرتب‌سازی، FilterBar نوع و دامنه، ستون «مسئول») تقریباً هیچ‌جا نیست,P09 › Anatomy 4–6 (`SearchField`، `SortMenu`، `FilterBar`، ستون مسئول),FIXED,,DEC-0238
+CMPA1-034,T06,1,medium,needs decision,CMPA1,,BulkActionBar و انتخاب چندتایی در صف‌ها وجود ندارد,BulkActionBar (P9),FIXED,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235) DEC-0238
+CMPA1-043,T06,1,medium,code,CMPA1,,CaseQueue: سرصف، شمارش زنده، جست‌وجو/مرتب‌سازی، ستون «مسئول»، صفحه‌بندی و دکمه باز کردن نیست,CaseQueue,PARTIAL,,ستون «مسئول» GAPS #21؛ بقیه انجام شد (DEC-0238)
+CMPA2-001,T06,1,medium,code,CMPA2,,DataTable: کامپوننت مشترک وجود ندارد؛ هر صفحه جدول را دستی می‌نویسد,DataTable,FIXED,,DEC-0238
+CMPA2-002,T06,1,medium,code,CMPA2,,DataTable زیر 768: به‌جای CardList، خود جدول با CSS محلی «کارت» می‌شود و برچسب ستون‌ها گم می‌شود,DataTable (CardList),FIXED,,DEC-0238
+CMPB-093,T06,1,medium,code,CMPB,,Pagination · چهار فهرست صفحه‌بندی‌شده هیچ کنترل صفحه ندارند,Pagination (حالت نبودن),FIXED,,DEC-0238
+KOPS-018,T06,1,medium,code,KOPS,K14,صفحه‌بندی «۱ تا ۶ از ۲۴ پرونده» / «نمایش پرونده‌های بیشتر» وجود ندارد,K14 · Pagination,FIXED,,DEC-0238
+KOPS-019,T06,1,medium,code,KOPS,K14,قیمت آگهی و حالت «قیمت تعیین‌نشده» در صف نیست,K14 · Price / `hz-price--unset` (حالت سخت K14 «قیمت تعیین‌نشده»),FIXED,,DEC-0238
+KOPS-036,T06,1,medium,code,KOPS,K19,مرتب‌سازی، چیپ‌های نوع/دامنه و «فیلترها» نیست؛ جستجو دکمه جدا و متن دیگری دارد,K19 · SearchField + SortMenu + FilterBar,FIXED,,DEC-0238
+KOPS-037,T06,1,medium,code,KOPS,K19,«اقدام بعدی با» برای نمونه‌هایی که با دامپزشک‌اند هم `--you` (رنگ نوبت ما) می‌گیرد؛ سن از زمان نمونه‌گیری و بدون دیرکرد,K19 · ActionOwner / age,FIXED,,DEC-0238
+KOPS-039,T06,1,medium,code,KOPS,K19,سربرگ صف (شمارنده هشدار، قدیمی‌ترین دیرکرده، «به‌روزشده»، «باز کردن قدیمی‌ترین پرونده») و صفحه‌بندی با طراحی نمی‌خواند؛ Alert اضافه,K19 · PageHeader + Pagination,PARTIAL,,شمارنده، صفحه‌بندی و Alert اضافه اصلاح شد؛ «قدیمی‌ترین دیرکرده» و «باز کردن قدیمی‌ترین» نه (DEC-0238)
+RTO-005,T06,1,medium,needs decision,RTO,,BulkActionBar در هیچ صفی نیست,*BulkActionBar*، P09 › 7,FIXED,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235) DEC-0238
+RTO-015,T06,1,medium,needs decision,RTO,,سن پرونده از «آخرین تغییر» حساب می‌شود و نشانگر دیرکرد هیچ‌جا نیست,P09 › Overdue و Content & data rules «Age = now − first submission»,PARTIAL,,سن از نخستین ارسال؛ کلاب، عضویت و فیش GAPS #23 (DEC-0238)
+RTO-023,T06,1,medium,code,RTO,,ردیف‌های صف بدون کد، نام متمایز، وضعیت یا «اقدام بعدی با»,P09 › Content & data rules «Every row has `ActionOwner`»، «Case code = the record being decided»، «Animal-centred queues name the animal»,FIXED,,DEC-0238
+CMPA2-005,T06,1,low,needs decision,CMPA2,,DataTable: مرتب‌سازی، انتخاب گروهی و ستون‌های کمتر در 768–1023 پیاده نشده است,DataTable (variants: sortable، selectable),PARTIAL,,انتخاب گروهی و SortMenu انجام شد؛ مرتب‌سازی سرستون و ستون کمتر در 768–1023 نه (DEC-0238)
+CMPA2-006,T06,1,low,code,CMPA2,,DataTable: حالت بارگذاری (اسکلت) و خطا برای جدول‌ها وجود ندارد,DataTable (States),FIXED,,DEC-0238
+KOPS-021,T06,1,low,code,KOPS,K14,بخش‌های اضافه در صف: Alert «این اعداد نشانه‌اند، نه حکم» و پنل «اعتراض‌ها» در همان صفحه,K14 · ترکیب صفحه,FIXED,,DEC-0238
+KOPS-038,T06,1,low,needs decision,KOPS,K19,خط وابستگی «منتظر: SM-…، نمونه مادر» برای پرونده‌های مسدود نیست,K19 · `hz-case__sub` dependency line,FIXED,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235) DEC-0238
+CMPB-028,T09,1,high,code,CMPB,K15,SettingsPanel · هر ردیف تنظیم فرم ویرایش همیشه‌باز دارد؛ دکمهٔ «ویرایش»، ناحیهٔ `.hz-setting__edit` و حالت «پیش‌نویس» نیست,SettingsPanel — `/admin/settings` (K15)، `/market/settings`,FIXED,,DEC-0239
+KOPS-022,T09,1,high,code,KOPS,K15,مدل ویرایش: زیر هر ردیف یک فرم همیشه‌باز است؛ دکمه «ویرایش/تعیین مقدار»، ردیف در حال ویرایش با «پیش‌نویس» و «انصراف» وجود ندارد,K15 · SettingsPanel edit row (حالت سخت K15 «ویرایش نسخه‌دار با دلیل»),FIXED,,DEC-0239
+KOPS-023,T09,1,high,code,KOPS,K15,«دلیل تغییر» اجباری نیست (نه در فرم، نه در سرور),K15 · ReasonField در ویرایش تنظیم,FIXED,,DEC-0239
+KOPS-025,T09,1,high,code,KOPS,K15,موبایل: گروه‌ها Accordion نیستند، هشدار خلاصه تعیین‌نشده‌ها نیست و صفحه جداگانه ویرایش با نوار چسبان وجود ندارد,K15 · SettingsPanel موبایل + صفحه ویرایش کلید (`K15-settings-edit-M`),FIXED,,DEC-0239
+CMPB-021,T09,1,medium,code,CMPB,,Switch · کامپوننت Switch وجود ندارد و ۸ تنظیم بولی با فیلد متنی ویرایش می‌شوند,Switch — `/admin/settings` (کلیدهای `BOOL`)، و تنظیماتی که فوراً اعمال می‌شوند,FIXED,,DEC-0239
+CMPB-029,T09,1,medium,code,CMPB,K15,SettingsPanel · ناوبری گروه‌ها پیوند لنگری است و همهٔ گروه‌ها در یک صفحهٔ بلند رندر می‌شوند,SettingsPanel — `/admin/settings` (K15),FIXED,,DEC-0239
+CMPB-030,T09,1,medium,code,CMPB,K15,SettingsPanel · نمای موبایل و تبلت (آکاردئون، Select گروه، صفحهٔ ویرایش جدا) پیاده نشده,SettingsPanel — `/admin/settings` در <1024 (K15-M، K15-settings-edit-M),FIXED,,DEC-0239
+KOPS-024,T09,1,medium,code,KOPS,K15,چیدمان دسکتاپ: همه ۱۵ گروه پشت سر هم روی یک صفحه؛ گروه جاری، بخش «تعیین‌نشده در گروه‌های دیگر» و دکمه «تعیین مقدار» نیست,K15 · SettingsPanel group nav + group card,FIXED,,DEC-0239
+RTO-017,T09,1,medium,code,RTO,,تنظیمات بازار و فرم‌های پیکربندی با الگوی ویرایش P11 نمی‌خوانند,P11 › Anatomy 4–6، Layout و Content rules؛ *SettingsPanel*,FIXED,,DEC-0239
+RTO-018,T09,1,medium,needs decision,RTO,,برخی تغییرهای پیکربندی بدون دلیل یا بدون نسخه ذخیره می‌شوند,"P11 › Content & data rules «Every change records `{ key, value, reasonFa, expectedVersion }`»، Don't «save without a version check»",FIXED,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235) DEC-0239
+CMPA1-013,T09,1,low,code,CMPA1,K15,گروه‌های تنظیمات روی موبایل آکاردئونی نیستند (`--sm`),Accordion `--sm` (P11، K15),FIXED,,DEC-0239
+CMPB-031,T09,1,low,code,CMPB,K15,SettingsPanel · جزئیات ردیف: «تعیین مقدار»، متن hint تعیین‌نشده، نسخهٔ اضافه و چیپ پیوندی,SettingsPanel — `/admin/settings` (K15),PARTIAL,,«تعیین مقدار» و hint تعیین‌نشده انجام شد؛ چیپ پیوندی و «نسخه اضافه» نه (DEC-0239)
+KOPS-027,T09,1,low,code,KOPS,K15,جزئیات سربرگ، جستجو و نام گروه‌ها,K15 · PageHeader / SearchField / group labels,PARTIAL,,نام گروه‌ها پیشنهادی طراحی است و تأیید نشده؛ سربرگ و جست‌وجو انجام شد (DEC-0239)
 CMPA1-001,T10,1,high,code,CMPA1,,قالب PDF اسناد هنوز پالت فیروزه‌ای قدیمی است و از A4DocumentTemplate پیروی نمی‌کند,A4DocumentTemplate (خروجی PDF همه اسناد: برگه ثبتی، شجره‌نامه، کارت توله، فاکتور، قرارداد),,,
 CMPB-122,T10,1,high,code,CMPB,K18,PedigreeTree · شجره فقط والدین را نشان می‌دهد؛ سه نسل، شاخهٔ جمع‌شده، شناسه‌ها و نمای فهرستی وجود ندارد,PedigreeTree در `/documents/pedigree/[id]` (K18),,,
 FND-016,T10,1,high,code,FND,K18,قالب PDF اسناد رسمی با پالت teal، فونت Vazirmatn/Consolas و جهت فیزیکی,خروجی PDF همهٔ اسناد (`/api/documents/[kind]/[id]/pdf`، فاکتور فروشگاه، قرارداد finder) — A4DocumentTemplate (K18),,,فونت به IRANSansX رفت (DEC-0237)؛ پالت و جهت فیزیکی در T10

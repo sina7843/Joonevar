@@ -241,6 +241,7 @@ export async function createDiscountAction(_p: TrustFormState, form: FormData): 
       usesPerAccount: optionalCount(form, 'usesPerAccount'),
       priority: text(form, 'priority') === '' ? 100 : count(form, 'priority'),
       noteFa: text(form, 'note') || null,
+      reasonFa: text(form, 'reasonFa'),
     });
     revalidatePath('/account/seller/promotions');
     revalidatePath('/market/promotions');
@@ -257,7 +258,12 @@ export async function moveDiscountAction(_p: TrustFormState, form: FormData): Pr
     if (!guard.ok) throw guard.denied;
     const to = text(form, 'to');
     if (to !== 'ACTIVE' && to !== 'PAUSED' && to !== 'ENDED') throw validation('وضعیت معتبر نیست.');
-    await moveDiscountRule(db(), guard.actor, { ruleId: text(form, 'ruleId'), to });
+    const expected = text(form, 'expectedVersion');
+    await moveDiscountRule(db(), guard.actor, {
+      ruleId: text(form, 'ruleId'),
+      to,
+      ...(expected === '' ? {} : { expectedVersion: Number(expected) }),
+    });
     revalidatePath('/account/seller/promotions');
     revalidatePath('/market/promotions');
     return { ok: true, message: 'وضعیت تخفیف ثبت شد.' };

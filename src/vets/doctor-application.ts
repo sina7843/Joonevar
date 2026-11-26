@@ -44,7 +44,8 @@ import {
 import { normalizeCouncilCode } from './onboarding-model.ts';
 import { unifyPersianLetters } from '../breeds/model.ts';
 import { currentVetTag, replaceVetTag } from './professional-tags.ts';
-import { CASE_TARGET, professionalCaseHistory } from './student-application.ts';
+import { CASE_TARGET, firstSubmittedAt, professionalCaseHistory, professionalQueueOrder, professionalSearch } from './student-application.ts';
+import type { QueueSort } from '../domain/queue-query.ts';
 
 const APPLICANT_CONTEXTS: readonly ActorContextName[] = ['USER', 'BREEDER'];
 export const DOCTOR_REVIEWER_CONTEXTS: readonly ActorContextName[] = ['ASSOCIATION_OPERATOR', 'SUPERADMIN'];
@@ -390,26 +391,39 @@ export async function doctorOpenCaseIds(database: DbClient, actor: Actor): Promi
 export async function doctorCaseQueue(
   database: DbClient,
   actor: Actor,
-  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
+  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ) {
   assertReviewer(actor);
   const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
-  const where = and(thisPath, inArray(vetProfessionalCases.status, [...QUEUE[query.view]]));
-  const [[total], rows] = await Promise.all([
-    database.select({ value: count() }).from(vetProfessionalCases).where(where),
+  const inView = and(thisPath, inArray(vetProfessionalCases.status, [...QUEUE[query.view]]));
+  const nameFa = sql`${vetProfessionalSubmissions.payload}->>'displayNameFa'`;
+  const search = professionalSearch(query.q, [nameFa, sql`${vetProfessionalSubmissions.payload}->>'councilCode'`]);
+  const where = search ? and(inView, search) : inView;
+  const countOf = (condition: typeof where) =>
     database
-      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload })
+      .select({ value: count() })
+      .from(vetProfessionalCases)
+      .leftJoin(
+        vetProfessionalSubmissions,
+        and(eq(vetProfessionalSubmissions.caseId, vetProfessionalCases.id), eq(vetProfessionalSubmissions.version, vetProfessionalCases.currentSubmissionVersion)),
+      )
+      .where(condition);
+  const [[total], [all], rows] = await Promise.all([
+    countOf(where),
+    search ? countOf(inView) : Promise.resolve([undefined]),
+    database
+      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload, firstSubmittedAt })
       .from(vetProfessionalCases)
       .leftJoin(
         vetProfessionalSubmissions,
         and(eq(vetProfessionalSubmissions.caseId, vetProfessionalCases.id), eq(vetProfessionalSubmissions.version, vetProfessionalCases.currentSubmissionVersion)),
       )
       .where(where)
-      .orderBy(query.view === 'DECIDED' ? desc(vetProfessionalCases.updatedAt) : asc(vetProfessionalCases.updatedAt))
+      .orderBy(...professionalQueueOrder(query.view, query.sort, nameFa))
       .limit(request.pageSize)
       .offset(offsetOf(request)),
   ]);
-  const items = rows.map(({ row, payload }) => {
+  const items = rows.map(({ row, payload, firstSubmittedAt: first }) => {
     const fields = (payload ?? {}) as Partial<DoctorFields>;
     return {
       id: row.id,
@@ -421,9 +435,10 @@ export async function doctorCaseQueue(
       councilCode: fields.councilCode ?? null,
       practiceScope: (fields.practiceScope ?? null) as VetPracticeScope | null,
       updatedAt: row.updatedAt.toISOString(),
+      firstSubmittedAt: first ? new Date(first).toISOString() : null,
     };
   });
-  return pageOf(items, total?.value ?? 0, request);
+  return { ...pageOf(items, total?.value ?? 0, request), all: all?.value ?? total?.value ?? 0 };
 }
 
 export async function doctorCaseForReview(database: DbClient, actor: Actor, caseId: string) {

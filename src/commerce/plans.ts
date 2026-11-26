@@ -84,7 +84,10 @@ export async function publishPlan(
     commissionPercentBp: number;
     capabilities: PlanCapabilities;
     priceSettingKey: string;
+    /** The reason for this version (P11); kept on the row and in the audit entry. */
     noteFa: string;
+    /** Latest version of this code the operator saw; 0 for a code never published (RTO-018). */
+    expectedVersion: number;
   },
 ): Promise<PlanRow> {
   assertMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE');
@@ -110,6 +113,13 @@ export async function publishPlan(
       .where(eq(sellerPlans.code, input.code))
       .orderBy(desc(sellerPlans.version))
       .limit(1);
+    // Two publishes racing past this check still collide on seller_plan_version_key.
+    if ((previous?.version ?? 0) !== input.expectedVersion) {
+      throw conflict('این پلن در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.', {
+        expectedVersion: input.expectedVersion,
+        actualVersion: previous?.version ?? 0,
+      });
+    }
 
     if (live) {
       await tx
@@ -166,7 +176,7 @@ export async function ensureLaunchPlans(database: Database, actor: Actor): Promi
       .where(eq(sellerPlans.code, plan.code))
       .limit(1);
     if (existing) continue;
-    await publishPlan(database, actor, { ...plan, noteFa: 'نسخه اولیه پلن ' + plan.labelFa });
+    await publishPlan(database, actor, { ...plan, noteFa: 'نسخه اولیه پلن ' + plan.labelFa, expectedVersion: 0 });
     created += 1;
   }
   return created;

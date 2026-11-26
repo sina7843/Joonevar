@@ -11,6 +11,8 @@ import { db } from '../../../src/db/client.ts';
 import { AppError } from '../../../src/domain/errors.ts';
 import { allCategories, mergeTargets, productDetail, productReviewQueue } from '../../../src/commerce/catalog.ts';
 import { ProductDecisionForm, ProductMergeForm } from '../../../src/marketplace/settlement-forms.tsx';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +29,10 @@ const when = (value: Date) =>
  * DS P09/P10: there is no `[id]` route, so each row opens its desk (facts,
  * images, publish / send back, merge) in a wide Drawer.
  */
-export default async function CatalogReviewPage() {
+export default async function CatalogReviewPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/catalog');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
+  const query = readQueueQuery(await searchParams);
 
   let queue;
   let targets;
@@ -45,7 +48,12 @@ export default async function CatalogReviewPage() {
 
   const categories = await allCategories(db());
   const blocked = categories.filter((category) => category.salePolicy !== 'ALLOWED');
-  const details = await Promise.all(queue.map((entry) => productDetail(db(), entry.id)));
+  const page = sliceQueue(queue, query, {
+    text: (entry) => [entry.nameFa, entry.brandFa, entry.barcode, entry.categoryNameFa, entry.sellerNameFa].filter(Boolean).join(' '),
+    at: (entry) => entry.createdAt,
+    name: (entry) => entry.nameFa,
+  });
+  const details = await Promise.all(page.items.map((entry) => productDetail(db(), entry.id)));
 
   return (
     <OpsShell actor={guard.actor} title="بررسی کاتالوگ کالا" nav={marketNav(guard.actor)} pathname="/market/catalog">
@@ -70,79 +78,94 @@ export default async function CatalogReviewPage() {
           />
         </div>
       ) : (
-        <CaseList label="کالاهای در انتظار بررسی" testId="catalog-queue">
-          {queue.map((entry, index) => {
-            const detail = details[index]!;
-            return (
-              <CaseItem
-                key={entry.id}
-                type="کالای پیشنهادی"
-                name={entry.nameFa}
-                sub={[entry.brandFa ?? 'بدون برند', entry.categoryNameFa, entry.sellerNameFa ?? 'کاتالوگ مشترک', when(entry.createdAt)].join(' · ')}
-                ageDays={ageInDays(entry.createdAt)}
-                // PENDING_REVIEW here is the catalogue reviewer's queue, not the association's (dictionary PENDING_REVIEW).
-                status={{ ...keyStatus(entry.status === 'PENDING_REVIEW' ? 'SUBMITTED' : entry.status), testId: 'catalog-status-' + entry.id }}
-                owner="SYSTEM"
-                ownerLabel="بررسی کاتالوگ"
-                ownerIsUs
-              >
-                <CaseDrawer title="پرونده کالای پیشنهادی" testId={'open-product-' + entry.id}>
-                  <DeskHead
-                    title={entry.nameFa}
-                    status={keyStatus(entry.status === 'PENDING_REVIEW' ? 'SUBMITTED' : entry.status)}
-                    meta={[entry.brandFa ?? 'بدون برند', entry.categoryNameFa, entry.sellerNameFa ?? 'کاتالوگ مشترک', when(entry.createdAt)]}
-                  />
-                  <Panel title="مشخصات کالا">
-                    <KeyValueList
-                      twoCol
-                      rows={[
-                        {
-                          key: 'بارکد',
-                          value: entry.barcode ? (
-                            <bdi className="hz-id" dir="ltr">
-                              {entry.barcode}
-                            </bdi>
-                          ) : null,
-                        },
-                        {
-                          key: 'تنوع‌ها',
-                          value: detail.variants.length === 0 ? 'تک‌نوع' : detail.variants.map((variant) => variant.labelFa).join('، '),
-                          testId: 'catalog-variants-' + entry.id,
-                        },
-                        { key: 'مناسب برای', value: detail.speciesCodes.join('، ') || null },
-                      ]}
-                    />
-                  </Panel>
-                  <Panel title="تصویرها" count={detail.media.length.toLocaleString('fa-IR')}>
-                    {detail.media.length === 0 ? (
-                      <p className="text-body-sm text-text-secondary">تصویری بارگذاری نشده است.</p>
-                    ) : (
-                      <div className="hz-desk__docs">
-                        {detail.media.map((image) => (
-                          <DocFrame key={image.id} href={'/api/files/' + image.fileId} label={image.altFa} />
-                        ))}
-                      </div>
-                    )}
-                  </Panel>
-                  <Panel title="تصمیم">
-                    <ProductDecisionForm productId={entry.id} version={entry.version} />
-                    <ProductMergeForm
-                      productId={entry.id}
-                      version={entry.version}
-                      targets={targets
-                        .filter((target) => target.id !== entry.id)
-                        .map((target) => ({
-                          value: target.id,
-                          label: target.nameFa + (target.barcode ? ' — ' + target.barcode : ''),
-                        }))}
-                    />
-                    <DeskVersionNote version={entry.version} />
-                  </Panel>
-                </CaseDrawer>
-              </CaseItem>
-            );
-          })}
-        </CaseList>
+        <QueueFrame
+          path="/market/catalog"
+          params={{ q: query.q || undefined, sort: query.sort === 'oldest' ? undefined : query.sort }}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="کالا"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="catalog-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="کالاهای در انتظار بررسی" testId="catalog-queue">
+              {page.items.map((entry, index) => {
+                const detail = details[index]!;
+                return (
+                  <CaseItem
+                    key={entry.id}
+                    type="کالای پیشنهادی"
+                    name={entry.nameFa}
+                    sub={[entry.brandFa ?? 'بدون برند', entry.categoryNameFa, entry.sellerNameFa ?? 'کاتالوگ مشترک', when(entry.createdAt)].join(' · ')}
+                    ageDays={ageInDays(entry.createdAt)}
+                    // PENDING_REVIEW here is the catalogue reviewer's queue, not the association's (dictionary PENDING_REVIEW).
+                    status={{ ...keyStatus(entry.status === 'PENDING_REVIEW' ? 'SUBMITTED' : entry.status), testId: 'catalog-status-' + entry.id }}
+                    owner="SYSTEM"
+                    ownerLabel="بررسی کاتالوگ"
+                    ownerIsUs
+                  >
+                    <CaseDrawer title="پرونده کالای پیشنهادی" testId={'open-product-' + entry.id}>
+                      <DeskHead
+                        title={entry.nameFa}
+                        status={keyStatus(entry.status === 'PENDING_REVIEW' ? 'SUBMITTED' : entry.status)}
+                        meta={[entry.brandFa ?? 'بدون برند', entry.categoryNameFa, entry.sellerNameFa ?? 'کاتالوگ مشترک', when(entry.createdAt)]}
+                      />
+                      <Panel title="مشخصات کالا">
+                        <KeyValueList
+                          twoCol
+                          rows={[
+                            {
+                              key: 'بارکد',
+                              value: entry.barcode ? (
+                                <bdi className="hz-id" dir="ltr">
+                                  {entry.barcode}
+                                </bdi>
+                              ) : null,
+                            },
+                            {
+                              key: 'تنوع‌ها',
+                              value: detail.variants.length === 0 ? 'تک‌نوع' : detail.variants.map((variant) => variant.labelFa).join('، '),
+                              testId: 'catalog-variants-' + entry.id,
+                            },
+                            { key: 'مناسب برای', value: detail.speciesCodes.join('، ') || null },
+                          ]}
+                        />
+                      </Panel>
+                      <Panel title="تصویرها" count={detail.media.length.toLocaleString('fa-IR')}>
+                        {detail.media.length === 0 ? (
+                          <p className="text-body-sm text-text-secondary">تصویری بارگذاری نشده است.</p>
+                        ) : (
+                          <div className="hz-desk__docs">
+                            {detail.media.map((image) => (
+                              <DocFrame key={image.id} href={'/api/files/' + image.fileId} label={image.altFa} />
+                            ))}
+                          </div>
+                        )}
+                      </Panel>
+                      <Panel title="تصمیم">
+                        <ProductDecisionForm productId={entry.id} version={entry.version} />
+                        <ProductMergeForm
+                          productId={entry.id}
+                          version={entry.version}
+                          targets={targets
+                            .filter((target) => target.id !== entry.id)
+                            .map((target) => ({
+                              value: target.id,
+                              label: target.nameFa + (target.barcode ? ' — ' + target.barcode : ''),
+                            }))}
+                        />
+                        <DeskVersionNote version={entry.version} />
+                      </Panel>
+                    </CaseDrawer>
+                  </CaseItem>
+                );
+              })}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

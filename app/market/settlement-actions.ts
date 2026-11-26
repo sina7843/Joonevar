@@ -306,6 +306,7 @@ export async function publishPlanAction(
       },
       priceSettingKey: text(form, 'priceSettingKey'),
       noteFa: text(form, 'note'),
+      expectedVersion: Number(text(form, 'expectedVersion')) || 0,
     });
     revalidatePath('/market/plans');
     return { ok: true, message: 'نسخه تازه پلن منتشر شد و نسخه قبلی بایگانی شد.' };

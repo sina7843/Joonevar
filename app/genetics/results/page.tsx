@@ -1,4 +1,4 @@
-import { desc, eq, inArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
@@ -9,7 +9,9 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { parentageResults } from '../../../src/db/schema/genetics.ts';
-import { centreSamples, parentResultCheck } from '../../../src/genetics/service.ts';
+import { centreSamplePage, parentResultCheck } from '../../../src/genetics/service.ts';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { RecordResultForm, RefreshResultForm } from '../forms.tsx';
@@ -26,49 +28,77 @@ export const dynamic = 'force-dynamic';
  * second result code. A G1+ animal whose parents are not both complete is
  * recorded as waiting, which is visible and true, rather than as final.
  */
-export default async function GeneticsResultsPage() {
+export default async function GeneticsResultsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string; page?: string }>;
+}) {
   const guard = await guardRoute('/genetics/results');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
-  const processing = await centreSamples(db(), guard.actor, ['PROCESSING']);
+  const query = readQueueQuery(await searchParams);
+  const processing = await centreSamplePage(db(), guard.actor, ['PROCESSING'], query);
   const checks = await Promise.all(
-    processing.map(async (row) => ({ row, parents: await parentResultCheck(db(), row.animalId) })),
+    processing.items.map(async (row) => ({ row, parents: await parentResultCheck(db(), row.animalId) })),
   );
 
-  const waiting = await db()
+  const waitingAll = await db()
     .select()
     .from(parentageResults)
-    .where(eq(parentageResults.status, 'WAITING_PARENT_RESULTS'))
-    .orderBy(desc(parentageResults.createdAt));
-  const waitingAnimals = waiting.length
+    .where(eq(parentageResults.status, 'WAITING_PARENT_RESULTS'));
+  const waitingAnimals = waitingAll.length
     ? await db()
         .select({ id: animals.id, name: animals.name, generation: animals.generation })
         .from(animals)
-        .where(inArray(animals.id, waiting.map((w) => w.animalId)))
+        .where(inArray(animals.id, waitingAll.map((w) => w.animalId)))
     : [];
+  // The same search and order as the processing queue; this side list stays unpaged (one page of up to 100).
+  const waiting = sliceQueue(
+    waitingAll,
+    { ...query, page: 1 },
+    {
+      text: (result) => waitingAnimals.find((a) => a.id === result.animalId)?.name ?? '',
+      at: (result) => result.createdAt,
+      name: (result) => waitingAnimals.find((a) => a.id === result.animalId)?.name ?? '',
+    },
+    100,
+  ).items;
 
   return (
     <OpsShell actor={guard.actor} title="نتایج" pathname="/genetics/results" nav={GENETICS_NAV}>
       <p className="hz-page-header__meta">
-        <span className="hz-page-header__meta-item">{checks.length.toLocaleString('fa-IR') + ' نمونه در حال پردازش'}</span>
-        <span className="hz-page-header__meta-item">{waiting.length.toLocaleString('fa-IR') + ' نتیجه در انتظار والدین'}</span>
+        <span className="hz-page-header__meta-item">{processing.all.toLocaleString('fa-IR') + ' نمونه در حال پردازش'}</span>
+        <span className="hz-page-header__meta-item">{waitingAll.length.toLocaleString('fa-IR') + ' نتیجه در انتظار والدین'}</span>
       </p>
       <Alert tone="info" title="خروجی ژنتیکی فقط Parentage Result است">
         هیچ خروجی موازی با نام DNA Profile و هیچ کد نتیجه دومی ساخته نمی‌شود. ثبت نتیجه به پرداخت صدور سند در
         هم‌زیست وابسته نیست.
       </Alert>
 
-      {checks.length === 0 && waiting.length === 0 ? (
+      {processing.all === 0 && waitingAll.length === 0 ? (
         <EmptyState
           title="کاری در صف نتایج نیست"
           description="پس از شروع پردازش نمونه، ثبت Parentage Result از همین صفحه انجام می‌شود."
         />
       ) : null}
 
-      <Panel title="نمونه‌های در حال پردازش" count={checks.length.toLocaleString('fa-IR')}>
-        {checks.length === 0 ? (
+      <Panel title="نمونه‌های در حال پردازش" count={processing.all.toLocaleString('fa-IR')}>
+        {processing.all === 0 ? (
           <p className="text-body-sm text-text-secondary">نمونه‌ای در حال پردازش نیست.</p>
         ) : (
+          <QueueFrame
+            path="/genetics/results"
+            params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}
+            query={query}
+            page={processing}
+            all={processing.all}
+            noun="نمونه"
+            searchLabel="کد رهگیری نمونه یا نام حیوان"
+            testId="result-queue-frame"
+          >
+          {checks.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="کد رهگیری یا نام حیوان را دوباره بررسی کنید." />
+          ) : (
           <CaseList label="نمونه‌های در حال پردازش" testId="processing-list">
             {checks.map(({ row, parents }) => (
               <CaseItem
@@ -112,11 +142,13 @@ export default async function GeneticsResultsPage() {
               </CaseItem>
             ))}
           </CaseList>
+          )}
+          </QueueFrame>
         )}
       </Panel>
 
       {waiting.length === 0 ? null : (
-        <Panel title="در انتظار تکمیل نتایج والدین" count={waiting.length.toLocaleString('fa-IR')}>
+        <Panel title="در انتظار تکمیل نتایج والدین" count={waiting.length === waitingAll.length ? waiting.length.toLocaleString('fa-IR') : waiting.length.toLocaleString('fa-IR') + ' از ' + waitingAll.length.toLocaleString('fa-IR')}>
           <CaseList label="در انتظار تکمیل نتایج والدین" testId="waiting-list">
             {waiting.map((result) => {
               const animal = waitingAnimals.find((a) => a.id === result.animalId);

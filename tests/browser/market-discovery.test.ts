@@ -82,7 +82,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -544,9 +545,9 @@ test('a report reaches the queue, the decision hides the advert, and the appeal 
   const reviewer = await contextFor(moderatorState);
   try {
     const page = await reviewer.newPage();
-    await page.goto(BASE_URL + '/market/listings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/listings?view=appeals', { waitUntil: 'load' });
     await expectText(page, 'اعتراض‌ها');
-    const rowId = await page.locator('[data-testid="appeal-queue"] li').first().getAttribute('data-testid');
+    const rowId = await page.locator('[data-testid="appeal-queue"] tr[data-testid]').first().getAttribute('data-testid');
     const appealId = rowId!.replace('appeal-row-', '');
     await page.getByTestId('open-appeal-' + appealId).click();
     await page.getByTestId('appeal-outcome-' + appealId).selectOption('OVERTURN');

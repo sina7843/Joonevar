@@ -17,6 +17,8 @@ import {
 } from '../../../src/commerce/fulfilment-model.ts';
 import { BatchMoveForm, LedgerEntryForm, OpenBatchForm } from '../../../src/commerce/finance-forms.tsx';
 import { ledgerEntryAction, moveBatchAction, openBatchAction } from '../../account/orders/finance-actions.ts';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,10 +35,16 @@ const fa = (value: number | bigint): string => value.toLocaleString('fa-IR');
  * money by itself, so a person sends it and writes down the bank's reference,
  * and only that writes the payout into the ledger.
  */
-export default async function SettlementPage() {
+export default async function SettlementPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/settlement');
   if (!guard.ok) throw guard.denied;
   const rows = await settlementQueue(db(), guard.actor);
+  const query = readQueueQuery(await searchParams, 'name');
+  const page = sliceQueue(rows, query, {
+    text: (row) => row.sellerNameFa + ' ' + (row.openBatch?.reference ?? ''),
+    at: () => null,
+    name: (row) => row.sellerNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="تسویه فروشندگان" nav={marketNav(guard.actor)} pathname="/market/settlement">
@@ -56,100 +64,116 @@ export default async function SettlementPage() {
           />
         </div>
       ) : (
-        <CaseList label="تسویه فروشندگان" testId="settlement-queue">
-          {rows.map((row) => (
-            <CaseItem
-              key={row.sellerId}
-              type="تسویه"
-              name={<span data-testid={'settlement-seller-' + row.sellerId}>{row.sellerNameFa}</span>}
-              sub={
-                <span className="hz-num" data-testid={'settlement-available-' + row.sellerId}>
-                  قابل تسویه: {fa(row.availableToman)} تومان
-                  {row.debtToman > 0n ? ' — بدهی: ' + fa(row.debtToman) + ' تومان' : ''}
-                </span>
-              }
-              status={
-                row.openBatch === null
-                  ? undefined
-                  : {
-                      // GAPS #4: no dictionary key for RECONCILED — module label kept.
-                      ...keyStatus(row.openBatch.status, { tone: 'success', label: SETTLEMENT_STATUS_FA[row.openBatch.status as SettlementStatus] }),
-                      testId: 'settlement-batch-status-' + row.sellerId,
-                    }
-              }
-              owner="SYSTEM"
-              ownerLabel="مالی بازار"
-              ownerIsUs
-            >
-              <CaseDrawer title="پرونده تسویه فروشنده" testId={'open-settlement-' + row.sellerId}>
-                <DeskHead
-                  title={row.sellerNameFa}
+        <QueueFrame
+          path="/market/settlement"
+          params={{ q: query.q || undefined }}
+          sorts={[]}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="فروشگاه"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="settlement-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="تسویه فروشندگان" testId="settlement-queue">
+              {page.items.map((row) => (
+                <CaseItem
+                  key={row.sellerId}
+                  type="تسویه"
+                  name={<span data-testid={'settlement-seller-' + row.sellerId}>{row.sellerNameFa}</span>}
+                  sub={
+                    <span className="hz-num" data-testid={'settlement-available-' + row.sellerId}>
+                      قابل تسویه: {fa(row.availableToman)} تومان
+                      {row.debtToman > 0n ? ' — بدهی: ' + fa(row.debtToman) + ' تومان' : ''}
+                    </span>
+                  }
                   status={
                     row.openBatch === null
                       ? undefined
-                      : keyStatus(row.openBatch.status, { tone: 'success', label: SETTLEMENT_STATUS_FA[row.openBatch.status as SettlementStatus] })
+                      : {
+                          // GAPS #4: no dictionary key for RECONCILED — module label kept.
+                          ...keyStatus(row.openBatch.status, { tone: 'success', label: SETTLEMENT_STATUS_FA[row.openBatch.status as SettlementStatus] }),
+                          testId: 'settlement-batch-status-' + row.sellerId,
+                        }
                   }
-                  meta={['قابل تسویه: ' + fa(row.availableToman) + ' تومان', row.debtToman > 0n ? 'بدهی: ' + fa(row.debtToman) + ' تومان' : null]}
-                />
-                <Panel title="تسویه">
-                  {row.blockers.length > 0 ? (
-                    <ul className="list-inside list-disc text-caption text-text-secondary" data-testid={'settlement-blockers-' + row.sellerId}>
-                      {row.blockers.map((blocker) => (
-                        <li key={blocker}>{PAYOUT_BLOCKER_FA[blocker as PayoutBlocker] ?? blocker}</li>
-                      ))}
-                    </ul>
-                  ) : null}
+                  owner="SYSTEM"
+                  ownerLabel="مالی بازار"
+                  ownerIsUs
+                >
+                  <CaseDrawer title="پرونده تسویه فروشنده" testId={'open-settlement-' + row.sellerId}>
+                    <DeskHead
+                      title={row.sellerNameFa}
+                      status={
+                        row.openBatch === null
+                          ? undefined
+                          : keyStatus(row.openBatch.status, { tone: 'success', label: SETTLEMENT_STATUS_FA[row.openBatch.status as SettlementStatus] })
+                      }
+                      meta={['قابل تسویه: ' + fa(row.availableToman) + ' تومان', row.debtToman > 0n ? 'بدهی: ' + fa(row.debtToman) + ' تومان' : null]}
+                    />
+                    <Panel title="تسویه">
+                      {row.blockers.length > 0 ? (
+                        <ul className="list-inside list-disc text-caption text-text-secondary" data-testid={'settlement-blockers-' + row.sellerId}>
+                          {row.blockers.map((blocker) => (
+                            <li key={blocker}>{PAYOUT_BLOCKER_FA[blocker as PayoutBlocker] ?? blocker}</li>
+                          ))}
+                        </ul>
+                      ) : null}
 
-                  {row.openBatch === null ? (
-                    row.blockers.length === 0 ? (
-                      <OpenBatchForm action={openBatchAction} sellerId={row.sellerId} />
-                    ) : null
-                  ) : (
-                    <div className="space-y-sm">
-                      <div data-testid={'settlement-batch-' + row.sellerId}>
-                        <KeyValueList
-                          twoCol
-                          rows={[
-                            {
-                              key: 'دسته تسویه',
-                              value: (
-                                <bdi className="hz-id" dir="ltr">
-                                  {row.openBatch.reference}
-                                </bdi>
-                              ),
-                            },
-                            { key: 'مبلغ', value: fa(row.openBatch.totalToman) + ' تومان' },
-                            {
-                              key: 'شبا',
-                              value: (
-                                <bdi className="hz-id" dir="ltr">
-                                  {row.openBatch.ibanSnapshot}
-                                </bdi>
-                              ),
-                            },
-                            { key: 'به نام', value: row.openBatch.holderNameSnapshot },
-                          ]}
-                        />
-                      </div>
-                      <BatchMoveForm
-                        action={moveBatchAction}
-                        batchId={row.openBatch.id}
-                        moves={settlementMovesFrom(row.openBatch.status as SettlementStatus)}
-                      />
-                    </div>
-                  )}
+                      {row.openBatch === null ? (
+                        row.blockers.length === 0 ? (
+                          <OpenBatchForm action={openBatchAction} sellerId={row.sellerId} />
+                        ) : null
+                      ) : (
+                        <div className="space-y-sm">
+                          <div data-testid={'settlement-batch-' + row.sellerId}>
+                            <KeyValueList
+                              twoCol
+                              rows={[
+                                {
+                                  key: 'دسته تسویه',
+                                  value: (
+                                    <bdi className="hz-id" dir="ltr">
+                                      {row.openBatch.reference}
+                                    </bdi>
+                                  ),
+                                },
+                                { key: 'مبلغ', value: fa(row.openBatch.totalToman) + ' تومان' },
+                                {
+                                  key: 'شبا',
+                                  value: (
+                                    <bdi className="hz-id" dir="ltr">
+                                      {row.openBatch.ibanSnapshot}
+                                    </bdi>
+                                  ),
+                                },
+                                { key: 'به نام', value: row.openBatch.holderNameSnapshot },
+                              ]}
+                            />
+                          </div>
+                          <BatchMoveForm
+                            action={moveBatchAction}
+                            batchId={row.openBatch.id}
+                            moves={settlementMovesFrom(row.openBatch.status as SettlementStatus)}
+                          />
+                        </div>
+                      )}
 
-                  <details>
-                    <summary className="hz-link hz-link--standalone cursor-pointer">ثبت دستی در دفتر این فروشگاه</summary>
-                    <div className="mt-sm">
-                      <LedgerEntryForm action={ledgerEntryAction} sellerId={row.sellerId} />
-                    </div>
-                  </details>
-                </Panel>
-              </CaseDrawer>
-            </CaseItem>
-          ))}
-        </CaseList>
+                      <details>
+                        <summary className="hz-link hz-link--standalone cursor-pointer">ثبت دستی در دفتر این فروشگاه</summary>
+                        <div className="mt-sm">
+                          <LedgerEntryForm action={ledgerEntryAction} sellerId={row.sellerId} />
+                        </div>
+                      </details>
+                    </Panel>
+                  </CaseDrawer>
+                </CaseItem>
+              ))}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

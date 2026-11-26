@@ -164,21 +164,23 @@ test('a managed value is edited with a mandatory reason, and the empty field mea
     await page.goto(BASE_URL + '/market/settings?group=COMMERCE', { waitUntil: 'load' });
     await expectText(page, 'فروشگاه کالا');
 
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill('7');
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
     await expectText(page, 'مقدار ذخیره شد.');
     await page.reload({ waitUntil: 'load' });
-    assert.equal(await page.getByTestId('market-value-' + key).innerText(), '7');
+    // Typed display (P11, RTO-017): Persian digits, not the raw stored form.
+    assert.equal(await page.getByTestId('market-value-' + key).innerText(), '۷');
 
     // Clearing it returns the honest state, not a zero-day return window.
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill('');
     await page.getByTestId('market-setting-reason-' + key).fill(REASON + ' — پاک کردن');
     await page.getByTestId('market-setting-save-' + key).click();
     await expectText(page, 'مقدار پاک شد و به «تعیین‌نشده» برگشت.');
     await page.reload({ waitUntil: 'load' });
-    assert.equal(await page.getByTestId('market-value-' + key).count(), 0);
-    await expectText(page, 'تعیین‌نشده');
+    assert.equal(await page.getByTestId('market-value-' + key).innerText(), 'تعیین‌نشده');
 
     await page.screenshot({ path: path.join(SHOTS, 'market-settings-desktop.png'), fullPage: true });
   } finally {

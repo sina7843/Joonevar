@@ -14,8 +14,8 @@ const SEX_FA: Record<string, string> = { MALE: 'نر', FEMALE: 'ماده' };
  * A negotiable advert shows «قیمت توافقی» and no amount (as before); a missing
  * amount is «تعیین‌نشده», never ۰.
  */
-export function ListingPrice({ mode, amount, size = 'md', testId }: { mode: string | null; amount: bigint | null; size?: 'md' | 'lg'; testId?: string }) {
-  const cls = 'hz-price' + (size === 'lg' ? ' hz-price--lg' : '');
+export function ListingPrice({ mode, amount, size = 'md', testId }: { mode: string | null; amount: bigint | null; size?: 'sm' | 'md' | 'lg'; testId?: string }) {
+  const cls = 'hz-price' + (size === 'md' ? '' : ' hz-price--' + size);
   if (mode === 'NEGOTIABLE') {
     return (
       <div className={cls} data-testid={testId}>

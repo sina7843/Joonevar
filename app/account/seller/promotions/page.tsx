@@ -97,6 +97,7 @@ export default async function SellerPromotionsPage({
                       <MoveDiscountForm
                         action={moveDiscountAction}
                         ruleId={rule.id}
+                        version={rule.version}
                         sellerId={store.id}
                         to="ACTIVE"
                         labelFa="فعال کردن"
@@ -106,6 +107,7 @@ export default async function SellerPromotionsPage({
                       <MoveDiscountForm
                         action={moveDiscountAction}
                         ruleId={rule.id}
+                        version={rule.version}
                         sellerId={store.id}
                         to="PAUSED"
                         labelFa="توقف"

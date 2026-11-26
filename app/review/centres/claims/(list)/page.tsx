@@ -4,7 +4,8 @@ import { OpsShell, REVIEW_NAV } from '../../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, ViewChips } from '../../../../../src/ui/desk.tsx';
 import { ageInDays, keyStatus } from '../../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../../src/ui/states.tsx';
-import { ButtonLink } from '../../../../../src/ui/button.tsx';
+import { QueueFrame, hrefWith, param } from '../../../../../src/ui/queue-head.tsx';
+import { readQueueQuery } from '../../../../../src/domain/queue-query.ts';
 import { db } from '../../../../../src/db/client.ts';
 import { centreClaimQueue } from '../../../../../src/centres/claims.ts';
 import { formatInstantFa } from '../../../../../src/content/model.ts';
@@ -12,7 +13,7 @@ import { formatInstantFa } from '../../../../../src/content/model.ts';
 export const dynamic = 'force-dynamic';
 
 type View = 'OPEN' | 'CORRECTION' | 'DECIDED';
-type Search = Promise<{ view?: string | string[]; page?: string | string[] }>;
+type Search = Promise<{ view?: string | string[]; page?: string | string[]; q?: string | string[]; sort?: string | string[] }>;
 const one = (value: string | string[] | undefined): string => (Array.isArray(value) ? value[0] : value) ?? '';
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 
@@ -28,33 +29,53 @@ export default async function ReviewCentreClaimsPage({ searchParams }: { searchP
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const search = await searchParams;
   const view = (VIEWS.find((entry) => entry.view === one(search.view))?.view ?? 'OPEN') as View;
-  const pageNumber = Number(one(search.page));
-  const page = Number.isInteger(pageNumber) && pageNumber >= 1 ? pageNumber : 1;
-  const result = await centreClaimQueue(db(), guard.actor, { view, page });
-  const href = (target: View, targetPage = 1) =>
-    '/review/centres/claims' + (target === 'OPEN' && targetPage === 1 ? '' : '?view=' + target + (targetPage > 1 ? '&page=' + targetPage : ''));
+  const defaultSort = view === 'DECIDED' ? 'newest' : 'oldest';
+  const query = readQueueQuery({ q: param(search.q), sort: param(search.sort), page: param(search.page) }, defaultSort);
+  const [result, unsearched] = await Promise.all([
+    centreClaimQueue(db(), guard.actor, { view, page: query.page, q: query.q, sort: query.sort }),
+    query.q === '' ? null : centreClaimQueue(db(), guard.actor, { view, page: 1, pageSize: 1 }),
+  ]);
+  const all = unsearched?.total ?? result.total;
+  const params = { view: view === 'OPEN' ? undefined : view, q: query.q, sort: query.sort === defaultSort ? undefined : query.sort };
 
   return (
     <OpsShell actor={guard.actor} title="Claim مراکز" pathname="/review/centres/claims" nav={REVIEW_NAV}>
       <p className="hz-page-header__meta">
-        <span className="hz-page-header__meta-item">{fa(result.total) + ' درخواست مدیریت مرکز'}</span>
+        <span className="hz-page-header__meta-item">{fa(all) + ' درخواست مدیریت مرکز'}</span>
         <span className="hz-page-header__meta-item">
           تأیید، ویرایش آینده مرکز را به درخواست‌دهنده می‌سپارد. تاریخچه ثبت‌شده مرکز منتقل نمی‌شود و همان‌جا می‌ماند.
         </span>
       </p>
-      <ViewChips
-        label="نمای درخواست‌ها"
-        chips={VIEWS.map((entry) => ({
-          key: entry.view,
-          href: href(entry.view),
-          label: entry.label,
-          current: entry.view === view,
-          testId: 'claim-view-' + entry.view,
-        }))}
-      />
 
+      <QueueFrame
+        path="/review/centres/claims"
+        params={params}
+        query={query}
+        page={result}
+        all={all}
+        noun="درخواست"
+        searchLabel="جست‌وجوی نام درخواست‌دهنده یا مرکز"
+        defaultSort={defaultSort}
+        testId="claim-queue-frame"
+        chips={
+        <ViewChips
+          label="نمای درخواست‌ها"
+          chips={VIEWS.map((entry) => ({
+            key: entry.view,
+            href: hrefWith('/review/centres/claims', params, { view: entry.view === 'OPEN' ? undefined : entry.view, page: undefined }),
+            label: entry.label,
+            current: entry.view === view,
+            testId: 'claim-view-' + entry.view,
+          }))}
+        />
+        }
+      >
       {result.items.length === 0 ? (
+        query.q !== '' ? (
+          <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را دوباره بررسی کنید." />
+        ) : (
         <EmptyState title={VIEWS.find((entry) => entry.view === view)!.empty} description="درخواست‌های تازه نماینده‌های مراکز اینجا می‌آیند." />
+        )
       ) : (
         <CaseList label="درخواست‌های مدیریت مرکز" testId="claim-queue">
           {result.items.map((item) => (
@@ -70,7 +91,7 @@ export default async function ReviewCentreClaimsPage({ searchParams }: { searchP
               href={'/review/centres/claims/' + item.id}
               linkTestId={'claim-item-' + item.id}
               sub={[item.roleFa, 'ارسال: ' + formatInstantFa(item.submittedAt)].filter(Boolean).join(' · ')}
-              ageDays={item.status === 'SUBMITTED' ? ageInDays(item.submittedAt) : undefined}
+              ageDays={item.status === 'SUBMITTED' ? ageInDays(item.createdAt) : undefined}
               status={{
                 ...keyStatus(item.status),
               }}
@@ -82,13 +103,7 @@ export default async function ReviewCentreClaimsPage({ searchParams }: { searchP
         </CaseList>
       )}
 
-      {result.totalPages > 1 ? (
-        <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
-          {result.page > 1 ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
-          <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-          {result.page < result.totalPages ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
-        </nav>
-      ) : null}
+      </QueueFrame>
     </OpsShell>
   );
 }

@@ -17,6 +17,7 @@ import {
 } from './actions.ts';
 import type { ContentPanel, ContentStatus } from './model.ts';
 import { BodyEditor } from './body-editor.tsx';
+import { StateChangeForm } from '../ui/state-change-form.tsx';
 
 const EMPTY: ContentFormState = {};
 
@@ -329,16 +330,22 @@ export function CreateCategoryForm({ kinds }: { kinds: ReadonlyArray<{ value: st
   );
 }
 
-export function CategoryStateForm({ categoryId, active }: { categoryId: string; active: boolean }) {
-  const [state, submit, pending] = useActionState(setCategoryActiveAction, EMPTY);
+/** Retiring or restoring one category, with a reason and the version it was decided on (P11, RTO-018). */
+export function CategoryStateForm({ categoryId, active, version }: { categoryId: string; active: boolean; version: number }) {
+  const label = active ? 'کنارگذاشتن از انتخاب‌های تازه' : 'فعال‌سازی دوباره';
   return (
-    <form action={submit} className="space-y-xs">
-      <input type="hidden" name="categoryId" value={categoryId} />
-      <input type="hidden" name="active" value={active ? 'NO' : 'YES'} />
-      <Result state={state} testId={'category-state-result-' + categoryId} />
-      <Button type="submit" tone="ghost" disabled={pending}>
-        {active ? 'کنارگذاشتن از انتخاب‌های تازه' : 'فعال‌سازی دوباره'}
-      </Button>
-    </form>
+    <StateChangeForm
+      action={setCategoryActiveAction}
+      hidden={{ categoryId, active: active ? 'NO' : 'YES' }}
+      version={version}
+      changeFa={label}
+      openLabel={label}
+      ids={{
+        open: 'category-state-' + categoryId,
+        reason: 'category-reason-' + categoryId,
+        save: 'category-state-save-' + categoryId,
+        result: 'category-state-result-' + categoryId,
+      }}
+    />
   );
 }

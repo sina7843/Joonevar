@@ -20,7 +20,7 @@ import { postalRequests } from '../db/schema/pedigree.ts';
 import { vetProfessionalCases } from '../db/schema/vets.ts';
 import { recordAudit } from '../audit/service.ts';
 import { allocateSlug, duplicateCandidates } from '../breeds/service.ts';
-import { forbidden, notFound, validation } from '../domain/errors.ts';
+import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
 
 /** One queue on a panel: what it is, how many wait, and where to open it. */
@@ -535,29 +535,39 @@ export async function addBreedToRegistry(
 export async function setBreedActive(
   database: Database,
   actor: Actor,
-  input: { breedId: string; active: boolean },
+  input: { breedId: string; active: boolean; reasonFa: string; expectedVersion: number },
 ) {
   assertContext(actor, 'SUPERADMIN', 'فهرست نژادها فقط در محیط سوپرادمین مدیریت می‌شود.');
+  const reason = input.reasonFa.trim();
+  if (reason === '') throw validation('دلیل تغییر را بنویسید؛ در تاریخچه تغییرات ثبت می‌شود.');
   const [current] = await database
     .select()
     .from(referenceBreeds)
     .where(eq(referenceBreeds.id, input.breedId))
     .limit(1);
   if (!current) throw notFound('نژاد پیدا نشد.');
+  if (current.version !== input.expectedVersion) {
+    throw conflict('این نژاد در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.', {
+      expectedVersion: input.expectedVersion,
+      actualVersion: current.version,
+    });
+  }
 
   return database.transaction(async (tx) => {
     const [row] = await tx
       .update(referenceBreeds)
-      .set({ isActive: input.active })
-      .where(eq(referenceBreeds.id, current.id))
+      .set({ isActive: input.active, version: current.version + 1, updatedAt: new Date() })
+      .where(and(eq(referenceBreeds.id, current.id), eq(referenceBreeds.version, current.version)))
       .returning();
-    if (!row) throw notFound('نژاد پیدا نشد.');
+    if (!row) throw conflict('این نژاد در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.');
     await recordAudit(tx, actor, {
       action: input.active ? 'REFERENCE_BREED_ENABLED' : 'REFERENCE_BREED_RETIRED',
       targetType: 'PRODUCT_SETTING',
       targetId: row.id,
-      before: { isActive: current.isActive },
-      after: { isActive: row.isActive },
+      targetVersion: row.version,
+      before: { isActive: current.isActive, version: current.version },
+      after: { isActive: row.isActive, version: row.version },
+      reason,
     });
     return row;
   });

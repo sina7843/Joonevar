@@ -593,24 +593,35 @@ export async function createCategory(
 export async function setCategoryActive(
   database: Database,
   actor: Actor,
-  input: { categoryId: string; active: boolean },
+  input: { categoryId: string; active: boolean; reasonFa: string; expectedVersion: number },
 ): Promise<CategoryRow> {
   assertContentAdmin(actor);
+  const reason = input.reasonFa.trim();
+  if (reason === '') throw validation('دلیل تغییر را بنویسید؛ در تاریخچه تغییرات ثبت می‌شود.');
   if (!UUID.test(input.categoryId)) throw notFound('دسته پیدا نشد.');
   return database.transaction(async (tx) => {
     const [current] = await tx.select().from(contentCategories).where(eq(contentCategories.id, input.categoryId)).limit(1);
     if (!current) throw notFound('دسته پیدا نشد.');
+    const stale = () =>
+      conflict('این دسته در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.', {
+        expectedVersion: input.expectedVersion,
+        actualVersion: current.version,
+      });
+    if (current.version !== input.expectedVersion) throw stale();
     const [row] = await tx
       .update(contentCategories)
-      .set({ isActive: input.active, updatedAt: new Date() })
-      .where(eq(contentCategories.id, current.id))
+      .set({ isActive: input.active, version: current.version + 1, updatedAt: new Date() })
+      .where(and(eq(contentCategories.id, current.id), eq(contentCategories.version, current.version)))
       .returning();
+    if (!row) throw stale();
     await recordAudit(tx, actor, {
       action: input.active ? 'CONTENT_CATEGORY_ENABLED' : 'CONTENT_CATEGORY_RETIRED',
       targetType: 'CONTENT_CATEGORY',
       targetId: current.id,
-      before: { isActive: current.isActive },
-      after: { isActive: row!.isActive },
+      targetVersion: row.version,
+      before: { isActive: current.isActive, version: current.version },
+      after: { isActive: row.isActive, version: row.version },
+      reason,
     });
     return row!;
   });

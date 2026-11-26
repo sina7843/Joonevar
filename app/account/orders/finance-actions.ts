@@ -226,6 +226,8 @@ export async function publishReturnPolicyAction(
       windowDays: count(form, 'windowDays'),
       bodyFa: text(form, 'body'),
       exceptions,
+      reasonFa: text(form, 'reasonFa'),
+      expectedVersion: Number(text(form, 'expectedVersion')),
     });
     revalidatePath('/market/returns');
     return { ok: true, message: 'نسخه ' + published.version + ' سیاست مرجوعی منتشر شد.' };

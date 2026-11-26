@@ -14,6 +14,7 @@
  * professional-tags).
  */
 import { and, asc, desc, count, eq, inArray, ne, sql } from 'drizzle-orm';
+import type { QueueSort } from '../domain/queue-query.ts';
 import type { Database, DbClient } from '../db/client.ts';
 import { accountRoles, auditEvents, storedFiles } from '../db/schema/core.ts';
 import { profiles } from '../db/schema/identity.ts';
@@ -39,6 +40,9 @@ import {
 import { currentVetTag, replaceVetTag } from './professional-tags.ts';
 
 export const CASE_TARGET = 'VET_PROFESSIONAL_CASE';
+
+export { firstSubmittedAt, professionalQueueOrder, professionalSearch } from './review-workbench.ts';
+import { firstSubmittedAt, professionalQueueOrder, professionalSearch } from './review-workbench.ts';
 /** Applying is done from the account itself, never from an operational environment. */
 const APPLICANT_CONTEXTS: readonly ActorContextName[] = ['USER', 'BREEDER'];
 export const STUDENT_REVIEWER_CONTEXTS: readonly ActorContextName[] = ['ASSOCIATION_OPERATOR', 'SUPERADMIN'];
@@ -296,15 +300,28 @@ export async function studentOpenCaseIds(database: DbClient, actor: Actor): Prom
 export async function studentCaseQueue(
   database: DbClient,
   actor: Actor,
-  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
+  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ) {
   assertReviewer(actor);
   const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
-  const where = and(eq(vetProfessionalCases.caseType, 'STUDENT'), inArray(vetProfessionalCases.status, [...QUEUE[query.view]]));
-  const [[total], rows] = await Promise.all([
-    database.select({ value: count() }).from(vetProfessionalCases).where(where),
+  const inView = and(eq(vetProfessionalCases.caseType, 'STUDENT'), inArray(vetProfessionalCases.status, [...QUEUE[query.view]]));
+  const nameFa = sql`${vetProfessionalSubmissions.payload}->>'displayNameFa'`;
+  const search = professionalSearch(query.q, [nameFa, sql`${vetProfessionalSubmissions.payload}->>'studentNumber'`, sql`${vetProfessionalSubmissions.payload}->>'universityFa'`]);
+  const where = search ? and(inView, search) : inView;
+  const countOf = (condition: typeof where) =>
     database
-      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload, firstName: profiles.firstName, lastName: profiles.lastName })
+      .select({ value: count() })
+      .from(vetProfessionalCases)
+      .leftJoin(
+        vetProfessionalSubmissions,
+        and(eq(vetProfessionalSubmissions.caseId, vetProfessionalCases.id), eq(vetProfessionalSubmissions.version, vetProfessionalCases.currentSubmissionVersion)),
+      )
+      .where(condition);
+  const [[total], [all], rows] = await Promise.all([
+    countOf(where),
+    search ? countOf(inView) : Promise.resolve([undefined]),
+    database
+      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload, firstName: profiles.firstName, lastName: profiles.lastName, firstSubmittedAt })
       .from(vetProfessionalCases)
       .leftJoin(
         vetProfessionalSubmissions,
@@ -313,11 +330,11 @@ export async function studentCaseQueue(
       .leftJoin(profiles, eq(profiles.accountId, vetProfessionalCases.accountId))
       .where(where)
       // The longest-waiting case first; decided ones newest first.
-      .orderBy(query.view === 'DECIDED' ? desc(vetProfessionalCases.updatedAt) : asc(vetProfessionalCases.updatedAt))
+      .orderBy(...professionalQueueOrder(query.view, query.sort, nameFa))
       .limit(request.pageSize)
       .offset(offsetOf(request)),
   ]);
-  const items = rows.map(({ row, payload, firstName, lastName }) => {
+  const items = rows.map(({ row, payload, firstName, lastName, firstSubmittedAt: first }) => {
     const fields = (payload ?? {}) as Partial<StudentFields>;
     return {
       id: row.id,
@@ -330,9 +347,10 @@ export async function studentCaseQueue(
       universityFa: fields.universityFa ?? null,
       applicantNameFa: firstName ? firstName + ' ' + (lastName ?? '') : null,
       updatedAt: row.updatedAt.toISOString(),
+      firstSubmittedAt: first ? new Date(first).toISOString() : null,
     };
   });
-  return pageOf(items, total?.value ?? 0, request);
+  return { ...pageOf(items, total?.value ?? 0, request), all: all?.value ?? total?.value ?? 0 };
 }
 
 export async function studentCaseForReview(database: DbClient, actor: Actor, caseId: string) {

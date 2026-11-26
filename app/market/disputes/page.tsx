@@ -16,6 +16,8 @@ import {
   type DisputeScope,
 } from '../../../src/marketplace/cancellation-model.ts';
 import { DisputeDecisionForm, ReviewerNoteForm } from '../../../src/marketplace/settlement-forms.tsx';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,9 +36,10 @@ const when = (value: Date) =>
  * DS P09 queue; each row opens its P10 desk in a wide Drawer (no `[id]`
  * route): facts, claim, note, decision.
  */
-export default async function DisputeQueuePage() {
+export default async function DisputeQueuePage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/disputes');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
+  const query = readQueueQuery(await searchParams);
 
   let queue;
   try {
@@ -45,6 +48,11 @@ export default async function DisputeQueuePage() {
     if (error instanceof AppError) return <AccessDenied error={error} />;
     throw error;
   }
+  const page = sliceQueue(queue, query, {
+    text: (entry) => [entry.animalNameFa, DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope, entry.claimFa].join(' '),
+    at: (entry) => entry.createdAt,
+    name: (entry) => entry.animalNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="پرونده‌های اختلاف" nav={marketNav(guard.actor)} pathname="/market/disputes">
@@ -65,57 +73,72 @@ export default async function DisputeQueuePage() {
           />
         </div>
       ) : (
-        <CaseList label="پرونده‌های اختلاف" testId="dispute-queue">
-          {queue.map((entry) => (
-            <CaseItem
-              key={entry.id}
-              type={DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope}
-              name={entry.animalNameFa}
-              sub={
-                <>
-                  {'بیعانه: ' + moneyFa(entry.depositAmountToman) + ' تومان · طرح‌کننده: ' + (entry.openedByParty === 'BUYER' ? 'خریدار' : 'فروشنده') + ' · ' + when(entry.createdAt) + ' · '}
-                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
-                    گفت‌وگوی معامله
-                  </Link>
-                </>
-              }
-              ageDays={ageInDays(entry.createdAt)}
-              status={{ ...keyStatus(entry.status), testId: 'dispute-status-' + entry.id }}
-              owner="SYSTEM"
-              ownerLabel="داور بازار"
-              ownerIsUs
-            >
-              <CaseDrawer title="پرونده اختلاف" testId={'open-dispute-' + entry.id}>
-                <DeskHead
-                  title={entry.animalNameFa}
-                  status={keyStatus(entry.status)}
-                  meta={[
-                    DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope,
-                    'بیعانه: ' + moneyFa(entry.depositAmountToman) + ' تومان',
-                    'طرح‌کننده: ' + (entry.openedByParty === 'BUYER' ? 'خریدار' : 'فروشنده'),
-                    when(entry.createdAt),
-                  ]}
+        <QueueFrame
+          path="/market/disputes"
+          params={{ q: query.q || undefined, sort: query.sort === 'oldest' ? undefined : query.sort }}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="پرونده"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="dispute-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="پرونده‌های اختلاف" testId="dispute-queue">
+              {page.items.map((entry) => (
+                <CaseItem
+                  key={entry.id}
+                  type={DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope}
+                  name={entry.animalNameFa}
+                  sub={
+                    <>
+                      {'بیعانه: ' + moneyFa(entry.depositAmountToman) + ' تومان · طرح‌کننده: ' + (entry.openedByParty === 'BUYER' ? 'خریدار' : 'فروشنده') + ' · ' + when(entry.createdAt) + ' · '}
+                      <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
+                        گفت‌وگوی معامله
+                      </Link>
+                    </>
+                  }
+                  ageDays={ageInDays(entry.createdAt)}
+                  status={{ ...keyStatus(entry.status), testId: 'dispute-status-' + entry.id }}
+                  owner="SYSTEM"
+                  ownerLabel="داور بازار"
+                  ownerIsUs
                 >
-                  <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
-                    گفت‌وگوی معامله
-                  </Link>
-                </DeskHead>
-                <Panel title="ادعا">
-                  <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'dispute-claim-' + entry.id}>
-                    {entry.claimFa}
-                  </blockquote>
-                </Panel>
-                <Panel title="یادداشت و مدرک بررسی">
-                  <ReviewerNoteForm disputeId={entry.id} />
-                </Panel>
-                <Panel title="رأی">
-                  <DisputeDecisionForm disputeId={entry.id} version={entry.version} depositFa={moneyFa(entry.depositAmountToman)} />
-                  <DeskVersionNote version={entry.version} />
-                </Panel>
-              </CaseDrawer>
-            </CaseItem>
-          ))}
-        </CaseList>
+                  <CaseDrawer title="پرونده اختلاف" testId={'open-dispute-' + entry.id}>
+                    <DeskHead
+                      title={entry.animalNameFa}
+                      status={keyStatus(entry.status)}
+                      meta={[
+                        DISPUTE_SCOPE_FA[entry.scope as DisputeScope] ?? entry.scope,
+                        'بیعانه: ' + moneyFa(entry.depositAmountToman) + ' تومان',
+                        'طرح‌کننده: ' + (entry.openedByParty === 'BUYER' ? 'خریدار' : 'فروشنده'),
+                        when(entry.createdAt),
+                      ]}
+                    >
+                      <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
+                        گفت‌وگوی معامله
+                      </Link>
+                    </DeskHead>
+                    <Panel title="ادعا">
+                      <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'dispute-claim-' + entry.id}>
+                        {entry.claimFa}
+                      </blockquote>
+                    </Panel>
+                    <Panel title="یادداشت و مدرک بررسی">
+                      <ReviewerNoteForm disputeId={entry.id} />
+                    </Panel>
+                    <Panel title="رأی">
+                      <DisputeDecisionForm disputeId={entry.id} version={entry.version} depositFa={moneyFa(entry.depositAmountToman)} />
+                      <DeskVersionNote version={entry.version} />
+                    </Panel>
+                  </CaseDrawer>
+                </CaseItem>
+              ))}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

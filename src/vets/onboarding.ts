@@ -10,7 +10,8 @@
  * TRUSTED_VET (DEC-0145) and a claim transfers future control, not the history
  * the audit trail already holds (§10).
  */
-import { and, asc, count, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+import { likeOf, type QueueSort } from '../domain/queue-query.ts';
 import type { Database, DbClient } from '../db/client.ts';
 import { storedFiles } from '../db/schema/core.ts';
 import { profiles } from '../db/schema/identity.ts';
@@ -491,13 +492,21 @@ const QUEUE_STATUSES: Record<'OPEN' | 'CORRECTION' | 'DECIDED', readonly VetAppl
 export async function vetApplicationQueue(
   database: DbClient,
   actor: Actor,
-  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
+  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ) {
   assertReviewer(actor);
   const statuses = [...QUEUE_STATUSES[query.view]];
   // §20: one answer never returns a whole table, however large a page is asked for.
   const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
-  const where = inArray(vetApplications.status, statuses);
+  const term = (query.q ?? '').trim();
+  const where = and(
+    inArray(vetApplications.status, statuses),
+    term === '' ? undefined : or(sql`${vetApplications.displayNameFa} ilike ${likeOf(term)}`, sql`${vetApplications.councilCode} ilike ${likeOf(term)}`),
+  );
+  // P09: waiting applications by first submission (createdAt; submittedAt moves on resubmission), decided ones by decision time.
+  const at = query.view === 'DECIDED' ? vetApplications.updatedAt : vetApplications.createdAt;
+  const sort = query.sort ?? (query.view === 'DECIDED' ? 'newest' : 'oldest');
+  const order = sort === 'name' ? asc(vetApplications.displayNameFa) : sort === 'newest' ? desc(at) : asc(at);
   const [[total], rows] = await Promise.all([
     database.select({ value: count() }).from(vetApplications).where(where),
     database
@@ -506,8 +515,7 @@ export async function vetApplicationQueue(
       .leftJoin(cities, eq(cities.id, vetApplications.cityId))
       .leftJoin(vetProfiles, eq(vetProfiles.id, vetApplications.vetProfileId))
       .where(where)
-      // The oldest waiting application first; decided ones newest first.
-      .orderBy(query.view === 'DECIDED' ? desc(vetApplications.updatedAt) : asc(vetApplications.submittedAt))
+      .orderBy(order, asc(vetApplications.id))
       .limit(request.pageSize)
       .offset(offsetOf(request)),
   ]);

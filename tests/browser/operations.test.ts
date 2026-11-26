@@ -159,7 +159,8 @@ async function setSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-' + key).click();
     await page.getByTestId('setting-value-' + key).fill(value);
     await page.getByTestId('setting-reason-' + key).fill('SYNTHETIC — مقدار آزمایشی اجرای تست ' + RUN);
     await page.getByTestId('save-setting-' + key).click();

@@ -8,6 +8,8 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { postalRequestQueue } from '../../../src/operations/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,11 +24,17 @@ const DOCUMENT_FA: Record<string, string> = {
  * The scope is the request itself. There is no dispatch, no tracking number and
  * no delivery state in this product, and this screen does not invent one.
  */
-export default async function AssocPostalPage() {
+export default async function AssocPostalPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/assoc/postal');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
+  const query = readQueueQuery(await searchParams);
   const rows = await postalRequestQueue(db(), guard.actor);
+  const page = sliceQueue(rows, query, {
+    text: (row) => [row.recipientNameFa, row.cityFa, DOCUMENT_FA[row.documentType] ?? row.documentType].filter(Boolean).join(' '),
+    at: (row) => row.createdAt,
+    name: (row) => row.recipientNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="درخواست‌های پستی" pathname="/assoc/postal" nav={ASSOC_NAV}>
@@ -44,17 +52,32 @@ export default async function AssocPostalPage() {
       ) : (
         <>
           <QueueMeta total={rows.length} noun="درخواست ثبت‌شده" />
-          <CaseList label="درخواست‌های پستی" testId="postal-list">
-            {rows.map((row) => (
-              <CaseItem
-                key={row.id}
-                type={DOCUMENT_FA[row.documentType] ?? row.documentType}
-                name={row.recipientNameFa}
-                sub={(row.cityFa ?? '—') + ' · ' + formatCivilDateFa(row.createdAt.toISOString().slice(0, 10))}
-                ageDays={ageInDays(row.createdAt)}
-              />
-            ))}
-          </CaseList>
+          <QueueFrame
+            path="/assoc/postal"
+            params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}
+            query={query}
+            page={page}
+            all={page.all}
+            noun="درخواست"
+            searchLabel="جست‌وجوی نام گیرنده یا شهر"
+            testId="postal-queue-frame"
+          >
+            {page.total === 0 ? (
+              <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را تغییر دهید یا پاک کنید." />
+            ) : (
+              <CaseList label="درخواست‌های پستی" testId="postal-list">
+                {page.items.map((row) => (
+                  <CaseItem
+                    key={row.id}
+                    type={DOCUMENT_FA[row.documentType] ?? row.documentType}
+                    name={row.recipientNameFa}
+                    sub={(row.cityFa ?? '—') + ' · ' + formatCivilDateFa(row.createdAt.toISOString().slice(0, 10))}
+                    ageDays={ageInDays(row.createdAt)}
+                  />
+                ))}
+              </CaseList>
+            )}
+          </QueueFrame>
         </>
       )}
     </OpsShell>

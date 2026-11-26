@@ -13,7 +13,7 @@
  */
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
-import { kycCases } from '../db/schema/identity.ts';
+import { kycCases, profiles } from '../db/schema/identity.ts';
 import { accounts, storedFiles } from '../db/schema/core.ts';
 import { recordAudit } from '../audit/service.ts';
 import { createNotification } from '../notifications/service.ts';
@@ -21,6 +21,7 @@ import { putPrivateFile } from '../files/storage.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import { offsetOf, pageOf, type Page, type PageRequest } from '../domain/pagination.ts';
 import type { Actor } from '../authz/actor.ts';
+import { likeOf, type QueueSort } from '../domain/queue-query.ts';
 import { findProfile } from './account.ts';
 
 export type KycStatus = 'DRAFT' | 'READY' | 'UNDER_REVIEW' | 'APPROVED' | 'NEEDS_CORRECTION' | 'REJECTED';
@@ -245,9 +246,16 @@ export async function kycQueue(
   actor: Actor,
   request: PageRequest,
   statuses: readonly KycStatus[] = ['UNDER_REVIEW'],
-): Promise<Page<KycQueueItem>> {
+  filter: { readonly q?: string; readonly sort?: QueueSort } = {},
+): Promise<Page<KycQueueItem> & { readonly all: number }> {
   if (actor.context !== 'ASSOCIATION_OPERATOR') throw forbidden('این صف فقط برای اپراتور انجمن است.');
-  const where = inArray(kycCases.status, statuses as KycStatus[]);
+  const inQueue = inArray(kycCases.status, statuses as KycStatus[]);
+  const q = (filter.q ?? '').trim();
+  const name = sql<string>`coalesce(${profiles.firstName} || ' ' || ${profiles.lastName}, '')`;
+  const where = q === '' ? inQueue : and(inQueue, sql`${name} ilike ${likeOf(q)}`);
+  // P09: oldest submission first unless the operator picks another order (RTO-001).
+  const order =
+    filter.sort === 'name' ? [asc(name), asc(kycCases.id)] : filter.sort === 'newest' ? [desc(kycCases.submittedAt), asc(kycCases.id)] : [asc(kycCases.submittedAt), asc(kycCases.id)];
   const rows = await database
     .select({
       id: kycCases.id,
@@ -256,31 +264,40 @@ export async function kycQueue(
       submittedAt: kycCases.submittedAt,
       version: kycCases.version,
       documentFileId: kycCases.documentFileId,
-      mobile: accounts.mobile,
+      firstName: profiles.firstName,
+      lastName: profiles.lastName,
     })
     .from(kycCases)
     .innerJoin(accounts, eq(accounts.id, kycCases.accountId))
+    .leftJoin(profiles, eq(profiles.accountId, kycCases.accountId))
     .where(where)
-    .orderBy(desc(kycCases.submittedAt))
+    .orderBy(...order)
     .limit(request.pageSize)
     .offset(offsetOf(request));
 
-  const [counted] = await database.select({ total: sql<string>`count(*)` }).from(kycCases).where(where);
+  const countOf = async (condition: typeof where) =>
+    Number(
+      (
+        await database
+          .select({ total: sql<string>`count(*)` })
+          .from(kycCases)
+          .innerJoin(accounts, eq(accounts.id, kycCases.accountId))
+          .leftJoin(profiles, eq(profiles.accountId, kycCases.accountId))
+          .where(condition)
+      )[0]?.total ?? 0,
+    );
+  const [total, all] = await Promise.all([countOf(where), q === '' ? Promise.resolve(-1) : countOf(inQueue)]);
 
-  const items: KycQueueItem[] = [];
-  for (const row of rows) {
-    const profile = await findProfile(database, row.accountId);
-    items.push({
-      id: row.id,
-      accountId: row.accountId,
-      status: row.status as KycStatus,
-      submittedAt: row.submittedAt,
-      version: row.version,
-      documentFileId: row.documentFileId,
-      applicantName: profile ? profile.firstName + ' ' + profile.lastName : 'بدون اطلاعات هویتی',
-    });
-  }
-  return pageOf(items, Number(counted?.total ?? 0), request);
+  const items: KycQueueItem[] = rows.map((row) => ({
+    id: row.id,
+    accountId: row.accountId,
+    status: row.status as KycStatus,
+    submittedAt: row.submittedAt,
+    version: row.version,
+    documentFileId: row.documentFileId,
+    applicantName: row.firstName !== null ? row.firstName + ' ' + row.lastName : 'بدون اطلاعات هویتی',
+  }));
+  return { ...pageOf(items, total, request), all: all < 0 ? total : all };
 }
 
 /** Ids of the open queue, oldest submission first — the desk's «پرونده ۲ از ۴» and previous/next. */

@@ -40,6 +40,7 @@ export async function setIssuerActiveAction(_previous: IssuerState, form: FormDa
       issuerId: String(form.get('issuerId') ?? ''),
       isActive: String(form.get('isActive') ?? '') === 'true',
       reasonFa: String(form.get('reasonFa') ?? ''),
+      expectedVersion: Number(form.get('expectedVersion') ?? ''),
     });
     revalidatePath('/assoc/issuers');
     return { ok: true, message: 'وضعیت صادرکننده به‌روزرسانی شد.', tone: 'success' };

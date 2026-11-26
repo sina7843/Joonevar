@@ -7,7 +7,8 @@
  * may edit the centre from now on — it never rewrites the history the audit
  * trail already holds (§10, DEC-0166, DEC-0169).
  */
-import { and, asc, count, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+import { likeOf, type QueueSort } from '../domain/queue-query.ts';
 import type { Database, DbClient } from '../db/client.ts';
 import { profiles } from '../db/schema/identity.ts';
 import { storedFiles } from '../db/schema/core.ts';
@@ -325,20 +326,28 @@ const QUEUE_STATUSES: Record<'OPEN' | 'CORRECTION' | 'DECIDED', readonly VetAppl
 export async function centreClaimQueue(
   database: DbClient,
   actor: Actor,
-  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
+  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ) {
   assertReviewer(actor);
   // §20: one answer never returns a whole table, however large a page is asked for.
   const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
-  const where = inArray(centreClaims.status, [...QUEUE_STATUSES[query.view]]);
+  const term = (query.q ?? '').trim();
+  const where = and(
+    inArray(centreClaims.status, [...QUEUE_STATUSES[query.view]]),
+    term === '' ? undefined : or(sql`${centreClaims.claimantNameFa} ilike ${likeOf(term)}`, sql`${centres.displayNameFa} ilike ${likeOf(term)}`),
+  );
+  // P09: waiting claims by first submission (createdAt; submittedAt moves on resubmission), decided ones by decision time.
+  const at = query.view === 'DECIDED' ? centreClaims.updatedAt : centreClaims.createdAt;
+  const sort = query.sort ?? (query.view === 'DECIDED' ? 'newest' : 'oldest');
+  const order = sort === 'name' ? asc(centreClaims.claimantNameFa) : sort === 'newest' ? desc(at) : asc(at);
   const [[total], rows] = await Promise.all([
-    database.select({ value: count() }).from(centreClaims).where(where),
+    database.select({ value: count() }).from(centreClaims).innerJoin(centres, eq(centres.id, centreClaims.centreId)).where(where),
     database
       .select({ claim: centreClaims, centreNameFa: centres.displayNameFa })
       .from(centreClaims)
       .innerJoin(centres, eq(centres.id, centreClaims.centreId))
       .where(where)
-      .orderBy(query.view === 'DECIDED' ? desc(centreClaims.updatedAt) : asc(centreClaims.submittedAt))
+      .orderBy(order, asc(centreClaims.id))
       .limit(request.pageSize)
       .offset(offsetOf(request)),
   ]);

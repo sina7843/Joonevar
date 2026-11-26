@@ -162,7 +162,8 @@ async function setSheetFee(value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=fee.registration_sheet_toman', { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-fee.registration_sheet_toman').click();
     await page.getByTestId('setting-value-fee.registration_sheet_toman').fill(value);
     await page
       .getByTestId('setting-reason-fee.registration_sheet_toman')

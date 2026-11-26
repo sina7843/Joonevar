@@ -9,6 +9,8 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { foreignQueue, listIssuers } from '../../../src/animals/foreign-pedigree.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
+import { readQueueQuery } from '../../../src/domain/queue-query.ts';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,12 +20,16 @@ export const dynamic = 'force-dynamic';
  * The review basis is the association's own registry of approved issuers, which
  * stays empty until the association enters real names.
  */
-export default async function AssocForeignPedigreePage() {
+export default async function AssocForeignPedigreePage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/assoc/foreign-pedigree');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
-  const page = await foreignQueue(db(), guard.actor, { page: 1, pageSize: 20 });
-  const issuers = await listIssuers(db(), true);
+  const query = readQueueQuery(await searchParams);
+  // P09: the server searches, orders (oldest first by default) and pages.
+  const [page, issuers] = await Promise.all([
+    foreignQueue(db(), guard.actor, { page: query.page, pageSize: 20 }, undefined, query),
+    listIssuers(db(), true),
+  ]);
 
   return (
     <OpsShell actor={guard.actor} title="Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
@@ -38,7 +44,7 @@ export default async function AssocForeignPedigreePage() {
           </Alert>
         ) : null}
 
-        {page.items.length === 0 ? (
+        {page.all === 0 ? (
           <EmptyState
             title="پرونده‌ای در انتظار بررسی نیست"
             description="مدارک ارسال‌شده مالکان در همین صف دیده می‌شوند."
@@ -46,30 +52,42 @@ export default async function AssocForeignPedigreePage() {
         ) : (
           <>
             <QueueMeta
-              total={page.total}
-              oldestDays={Math.max(...page.items.map((item) => ageInDays(item.submittedAt) ?? 0))}
+              total={page.all}
+              oldestDays={query.sort === 'oldest' && query.page === 1 && query.q === '' ? ageInDays(page.items[0]?.submittedAt) : null}
             />
-            <CaseQueue
-              label="صف Export Pedigree"
-              rows={[...page.items]
-                .sort((x, y) => (x.submittedAt?.getTime() ?? 0) - (y.submittedAt?.getTime() ?? 0))
-                .map((item) => ({
-                  id: item.id,
-                  href: '/assoc/foreign-pedigree/' + item.id,
-                  name: item.animalName,
-                  code: item.documentCode,
-                  sub:
-                    'صادرکننده: ' +
-                    (item.issuerName ?? '—') +
-                    ' · ارسال: ' +
-                    (item.submittedAt ? formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : '—'),
-                  ageDays: ageInDays(item.submittedAt),
-                  status: { key: 'UNDER_REVIEW' },
-                  owner: 'ASSOCIATION' as const,
-                  ownerIsUs: true,
-                  testId: 'open-foreign-case',
-                }))}
-            />
+            <QueueFrame
+              path="/assoc/foreign-pedigree"
+              params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}
+              query={query}
+              page={page}
+              all={page.all}
+              searchLabel="جست‌وجوی نام یا کد"
+              testId="foreign-queue-frame"
+            >
+              {page.total === 0 ? (
+                <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را تغییر دهید یا پاک کنید." />
+              ) : (
+                <CaseQueue
+                  label="صف Export Pedigree"
+                  rows={page.items.map((item) => ({
+                    id: item.id,
+                    href: '/assoc/foreign-pedigree/' + item.id,
+                    name: item.animalName,
+                    code: item.documentCode,
+                    sub:
+                      'صادرکننده: ' +
+                      (item.issuerName ?? '—') +
+                      ' · ارسال: ' +
+                      (item.submittedAt ? formatCivilDateFa(item.submittedAt.toISOString().slice(0, 10)) : '—'),
+                    ageDays: ageInDays(item.submittedAt),
+                    status: { key: 'UNDER_REVIEW' },
+                    owner: 'ASSOCIATION' as const,
+                    ownerIsUs: true,
+                    testId: 'open-foreign-case',
+                  }))}
+                />
+              )}
+            </QueueFrame>
           </>
         )}
       </div>

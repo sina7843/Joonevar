@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { readSettingForActor, updateSetting } from '../../../src/settings/service.ts';
-import { displaySetting } from './display.ts';
+import { displaySetting } from '../../../src/settings/display.ts';
 import { SETTING_BY_KEY } from '../../../src/settings/keys.ts';
 import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
@@ -53,7 +53,7 @@ export async function updateSettingAction(
     const saved = await updateSetting(db(), guard.actor, {
       key,
       value,
-      reason: String(form.get('reason') ?? '').trim() || undefined,
+      reason: String(form.get('reason') ?? '').trim(),
       expectedVersion: Number(form.get('version')),
     });
     revalidatePath('/admin/settings');

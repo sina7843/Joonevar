@@ -355,10 +355,16 @@ body {
   .hz-table--stack td.hz-table__lead { order: -1; flex: 1 0 100%; }
   .hz-table--stack td.hz-table__open { position: absolute; inset-block-start: 10px; inset-inline-end: 6px; }
   .hz-table--stack .hz-case__sub { max-width: 100%; white-space: normal; }
+  /* DS CardList keeps each value's name: the column header becomes a muted prefix (CMPA2-002). */
+  .hz-table--stack td[data-label]::before { content: attr(data-label) " a0"; color: var(--text-secondary); font-size: 12px; }
+  .hz-table--stack td.hz-table__check { order: -2; }
+  .hz-table--stack tr[aria-selected="true"] { background: var(--bg-brand-subtle); border-color: var(--border-brand); }
 }
 .hz-table__open { width: 44px; text-align: end; }
 
 /* Below 768 the whole queue card opens the case: the name link stretches over it. */
 @media (max-width: 767.98px) {
   .hz-table--stack .hz-case__name::after { content: ""; position: absolute; inset: 0; }
+  /* A row's own step stays clickable above the stretched link. Only the row's controls lift, never the cell: a z-index on the cell would trap a Drawer rendered inside it under the sticky head. */
+  .hz-table--stack td.hz-table__action :is(.hz-btn, a, input, select, textarea, label):not([role="dialog"] *) { position: relative; z-index: 1; }
 }

@@ -14,6 +14,7 @@ import { markSampleUnusable } from '../../src/clinical/samples.ts';
 import { answerAppeal, takeAppeal } from '../../src/genetics/appeals.ts';
 import { AppError, staleOf } from '../../src/domain/errors.ts';
 import type { UnusableStatus } from '../../src/domain/microchip.ts';
+import type { BulkResultState } from '../../src/ui/bulk-action-bar.tsx';
 
 export interface CentreFormState {
   readonly ok?: boolean;
@@ -66,6 +67,38 @@ export async function receiveSampleAction(
   } catch (error) {
     return failure(error);
   }
+}
+
+/**
+ * «ثبت دریافت نمونه (n)» on K19 (approved decision 11): each selected sample is
+ * received on its own, with the same rules as the one-row button, and reported
+ * per sample. Receiving needs no document, so it may be bulk (P09).
+ */
+export async function bulkReceiveSamplesAction(_previous: BulkResultState, form: FormData): Promise<BulkResultState> {
+  const guard = await guardRoute('/genetics/samples');
+  if (!guard.ok) return { tone: 'error', message: guard.denied.message };
+  if (text(form, 'bulkAction') !== 'receive') return { tone: 'error', message: 'کنش گروهی معتبر نیست.' };
+  const ids = [...new Set(form.getAll('ids').map(String))].slice(0, 100);
+  if (ids.length === 0) return { tone: 'error', message: 'هیچ نمونه‌ای انتخاب نشده است.' };
+  const results: { id: string; label: string; ok: boolean; message?: string }[] = [];
+  for (const sampleId of ids) {
+    const label = text(form, 'code-' + sampleId) || sampleId;
+    try {
+      await receiveSample(db(), guard.actor, sampleId);
+      results.push({ id: sampleId, label: label + ' — دریافت ثبت شد', ok: true });
+    } catch (error) {
+      if (!(error instanceof AppError)) throw error;
+      results.push({ id: sampleId, label, ok: false, message: error.message });
+    }
+  }
+  revalidatePath('/genetics/samples');
+  const done = results.filter((result) => result.ok).length;
+  const fa = (value: number) => value.toLocaleString('fa-IR');
+  return {
+    tone: done === results.length ? 'success' : done === 0 ? 'error' : 'warning',
+    message: 'دریافت ' + fa(done) + ' نمونه از ' + fa(results.length) + ' ثبت شد.',
+    results,
+  };
 }
 
 export async function startProcessingAction(

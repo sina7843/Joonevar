@@ -138,7 +138,8 @@ const textOf = async (page: Page, testId: string): Promise<string> => ((await pa
 
 test('the superadmin places the location, writes the profile and publishes it', async () => {
   await withContext({ viewport: DESKTOP, storageState: adminState }, async (page) => {
-    await page.goto(BASE_URL + '/admin/vets', { waitUntil: 'load' });
+    // The registry pages by 20; search finds this run's veterinarian on any page.
+    await page.goto(BASE_URL + '/admin/vets?q=' + encodeURIComponent(vet.name), { waitUntil: 'load' });
     await Promise.all([
       page.waitForURL((url) => url.pathname === '/admin/vets/' + vet.accountId),
       page.getByTestId('directory-edit-' + vet.accountId).click(),

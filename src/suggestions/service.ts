@@ -7,7 +7,8 @@
  * unowned, with the city and public contact that were suggested, so the people
  * it describes can claim it later (P2-D06, DEC-0169).
  */
-import { and, asc, count, desc, eq, gt, inArray, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, inArray, isNull, sql } from 'drizzle-orm';
+import { likeOf, type QueueSort } from '../domain/queue-query.ts';
 import { randomBytes } from 'node:crypto';
 import type { Database, DbClient } from '../db/client.ts';
 import { accounts } from '../db/schema/core.ts';
@@ -322,12 +323,19 @@ const QUEUE_STATUSES: Record<'OPEN' | 'CORRECTION' | 'DECIDED', readonly VetAppl
 export async function suggestionQueue(
   database: DbClient,
   actor: Actor,
-  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
+  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ) {
   assertReviewer(actor);
   // §20: one answer never returns a whole table, however large a page is asked for.
   const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
-  const where = inArray(directorySuggestions.status, [...QUEUE_STATUSES[query.view]]);
+  const term = (query.q ?? '').trim();
+  const where = and(
+    inArray(directorySuggestions.status, [...QUEUE_STATUSES[query.view]]),
+    term === '' ? undefined : sql`${directorySuggestions.displayNameFa} ilike ${likeOf(term)}`,
+  );
+  const at = query.view === 'DECIDED' ? directorySuggestions.updatedAt : directorySuggestions.createdAt;
+  const sort = query.sort ?? (query.view === 'DECIDED' ? 'newest' : 'oldest');
+  const order = sort === 'name' ? asc(directorySuggestions.displayNameFa) : sort === 'newest' ? desc(at) : asc(at);
   const [[total], rows] = await Promise.all([
     database.select({ value: count() }).from(directorySuggestions).where(where),
     database
@@ -335,7 +343,7 @@ export async function suggestionQueue(
       .from(directorySuggestions)
       .leftJoin(cities, eq(cities.id, directorySuggestions.cityId))
       .where(where)
-      .orderBy(query.view === 'DECIDED' ? desc(directorySuggestions.updatedAt) : asc(directorySuggestions.createdAt))
+      .orderBy(order, asc(directorySuggestions.id))
       .limit(request.pageSize)
       .offset(offsetOf(request)),
   ]);

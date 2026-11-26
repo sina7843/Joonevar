@@ -52,7 +52,7 @@ export default async function IssuersPage() {
                     <StatusBadge status={issuer.isActive ? 'ACTIVE' : 'INACTIVE'} />
                   </div>
                   <div className="col-span-full">
-                    <ToggleIssuerForm issuerId={issuer.id} isActive={issuer.isActive} />
+                    <ToggleIssuerForm issuerId={issuer.id} isActive={issuer.isActive} version={issuer.version} />
                   </div>
                 </li>
               ))}

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
 import { Icon } from './icon.tsx';
 import type { IconName } from './icon-paths.ts';
 import { SectionHeader } from './section-header.tsx';
@@ -48,7 +48,7 @@ export type DeskStatus =
   | { key: string; testId?: string }
   | { tone: StatusTone; label: ReactNode; testId?: string };
 
-function DeskStatusBadge({ status, size }: { status: DeskStatus; size?: 'sm' }) {
+export function DeskStatusBadge({ status, size }: { status: DeskStatus; size?: 'sm' }) {
   if ('key' in status) {
     const badge = <StatusBadge status={status.key} size={size} />;
     return status.testId ? <span data-testid={status.testId}>{badge}</span> : badge;
@@ -378,7 +378,7 @@ export function whenFa(value: Date | null | undefined, withTime = true): string 
   return (withTime ? FA_WHEN : FA_DAY).format(value);
 }
 
-const OWNER_FA: Record<ActionOwnerKind, string> = {
+export const OWNER_FA: Record<ActionOwnerKind, string> = {
   USER: 'متقاضی',
   VET: 'دامپزشک معتمد',
   ASSOCIATION: 'انجمن',
@@ -387,29 +387,18 @@ const OWNER_FA: Record<ActionOwnerKind, string> = {
   SYSTEM: 'همزیست',
 };
 
-/**
- * P09 case card — the restacked form of `CaseQueue`, used where a queue's rows
- * carry their own inline step (a one-button custody step, a claim) or where
- * the row must stay a list item. Same content as a queue row: type + age,
- * name (link to the desk) with code and subline, status, whose move it is.
- */
-export function CaseItem({
-  name,
-  href,
-  linkTestId,
-  linkLabel,
-  code,
-  sub,
-  type,
-  ageDays,
-  age,
-  status,
-  owner,
-  ownerIsUs = false,
-  ownerLabel,
-  testId,
-  children,
-}: {
+/** Which CaseQueue columns a list shows: only facts some row has (P09). */
+interface CaseCols {
+  readonly age: boolean;
+  readonly type: boolean;
+  readonly status: boolean;
+  readonly owner: boolean;
+  readonly action: boolean;
+  /** The BulkSelect form id when the list is selectable. */
+  readonly select?: string;
+}
+
+type CaseItemProps = {
   name: ReactNode;
   href?: string;
   linkTestId?: string;
@@ -427,64 +416,167 @@ export function CaseItem({
   ownerLabel?: string;
   testId?: string;
   children?: ReactNode;
-}) {
+  /** Makes the row selectable for a bulk action: the posted id and the checkbox's accessible name. */
+  select?: { readonly value: string; readonly label: string };
+  /** Set by `CaseList`. */
+  cols?: CaseCols;
+};
+
+/**
+ * One P09 case as a DS *CaseQueue* row: a dense table row from 768, the
+ * system card below it (`.hz-table--stack`). Columns: age · case · type ·
+ * status · next action · step; `CaseList` drops the ones no row uses.
+ */
+export function CaseItem({
+  name,
+  href,
+  linkTestId,
+  linkLabel,
+  code,
+  sub,
+  type,
+  ageDays,
+  age,
+  status,
+  owner,
+  ownerIsUs = false,
+  ownerLabel,
+  testId,
+  children,
+  select,
+  cols = { age: true, type: true, status: true, owner: true, action: true },
+}: CaseItemProps) {
+  const step = hasContent(children) || (href && linkLabel);
   return (
-    <li className="hz-card hz-card--compact" data-testid={testId}>
-      <div className="flex flex-wrap items-start justify-between gap-sm">
-        <div className="flex flex-wrap items-center gap-sm text-caption text-text-secondary">
-          {type ? <span className="hz-tag hz-tag--neutral">{type}</span> : null}
+    <tr data-testid={testId}>
+      {cols.select ? (
+        <td className="hz-table__check">
+          {select ? (
+            <label className="hz-check">
+              <input type="checkbox" name="ids" value={select.value} form={cols.select} aria-label={select.label} />
+            </label>
+          ) : null}
+        </td>
+      ) : null}
+      {cols.age ? (
+        <td data-label="سن پرونده">
           {ageDays !== undefined && ageDays !== null ? (
             <span className={age ? 'hz-age hz-age--' + age : 'hz-age'}>
               <Icon name="clock" size="xs" />
               {ageDays.toLocaleString('fa-IR') + ' روز'}
             </span>
+          ) : (
+            '—'
+          )}
+        </td>
+      ) : null}
+      <td className="hz-table__lead">
+        <div className="hz-case">
+          {href && !linkLabel ? (
+            <Link className="hz-case__name" href={href} data-testid={linkTestId}>
+              {name}
+            </Link>
+          ) : (
+            <span className="hz-case__name">{name}</span>
+          )}
+          {code ? (
+            <bdi className="hz-id" dir="ltr">
+              {code}
+            </bdi>
           ) : null}
+          {sub ? <span className="hz-case__sub">{sub}</span> : null}
         </div>
-        {status ? <DeskStatusBadge status={status} size="sm" /> : null}
-      </div>
-      <div className="hz-case mt-xs">
-        {href && !linkLabel ? (
-          <Link className="hz-case__name" href={href} data-testid={linkTestId}>
-            {name}
-          </Link>
-        ) : (
-          <span className="hz-case__name">{name}</span>
-        )}
-        {code ? (
-          <bdi className="hz-id" dir="ltr">
-            {code}
-          </bdi>
-        ) : null}
-        {sub ? <span className="hz-case__sub">{sub}</span> : null}
-      </div>
-      {owner || (href && linkLabel) ? (
-        <div className="mt-sm flex flex-wrap items-center justify-between gap-sm">
+      </td>
+      {cols.type ? <td data-label="نوع">{type ? <span className="hz-tag hz-tag--neutral">{type}</span> : '—'}</td> : null}
+      {cols.status ? <td data-label="وضعیت">{status ? <DeskStatusBadge status={status} size="sm" /> : '—'}</td> : null}
+      {cols.owner ? (
+        <td data-label="اقدام بعدی با">
           {owner ? (
             <span className={['hz-owner', 'hz-owner--inline', ownerIsUs && owner !== 'USER' && owner !== 'COUNTERPARTY' ? 'hz-owner--you' : ''].join(' ').trim()}>
-              <span>اقدام بعدی با:</span> <span className="hz-owner__who">{ownerLabel ?? OWNER_FA[owner]}</span>
+              <span className="hz-owner__who">{ownerLabel ?? OWNER_FA[owner]}</span>
             </span>
           ) : (
-            <span />
+            '—'
           )}
-          {href && linkLabel ? (
-            <Link className="hz-link hz-link--standalone" href={href} data-testid={linkTestId}>
-              {linkLabel}
-              <Icon name="arrowRight" size="xs" mirror />
-            </Link>
-          ) : null}
-        </div>
+        </td>
       ) : null}
-      {hasContent(children) ? <div className="mt-md">{children}</div> : null}
-    </li>
+      {cols.action ? (
+        <td className="hz-table__action">
+          {step ? (
+            <div className="flex flex-wrap items-center gap-sm">
+              {href && linkLabel ? (
+                <Link className="hz-link hz-link--standalone" href={href} data-testid={linkTestId}>
+                  {linkLabel}
+                  <Icon name="arrowRight" size="xs" mirror />
+                </Link>
+              ) : null}
+              {hasContent(children) ? children : null}
+            </div>
+          ) : null}
+        </td>
+      ) : null}
+    </tr>
   );
 }
 
-/** The list that holds `CaseItem`s (one column; the cards are the rows). */
-export function CaseList({ label, testId, children }: { label: string; testId?: string; children: ReactNode }) {
+const HEAD: ReadonlyArray<[keyof CaseCols | 'name', string]> = [
+  ['age', 'سن پرونده'],
+  ['name', 'پرونده'],
+  ['type', 'نوع'],
+  ['status', 'وضعیت'],
+  ['owner', 'اقدام بعدی با'],
+  ['action', 'اقدام'],
+];
+
+/**
+ * DS *CaseQueue* around `CaseItem`s: a dense table (40px rows, sticky head)
+ * from 768 and the card list below it, from one markup so each row's link and
+ * test id exist once. A column shows only when some row carries that fact.
+ */
+export function CaseList({
+  label,
+  testId,
+  selectForm,
+  children,
+}: {
+  label: string;
+  testId?: string;
+  /** The BulkSelect `formId`: adds the checkbox column to rows with `select`. */
+  selectForm?: string;
+  children: ReactNode;
+}) {
+  const items = Children.toArray(children).filter(isValidElement) as ReactElement<CaseItemProps>[];
+  const some = (pick: (props: CaseItemProps) => unknown) => items.some((item) => hasContent(pick(item.props) as ReactNode));
+  const cols: CaseCols = {
+    age: items.some((item) => item.props.ageDays !== undefined && item.props.ageDays !== null),
+    type: some((props) => props.type),
+    status: some((props) => props.status),
+    owner: some((props) => props.owner),
+    action: items.some((item) => hasContent(item.props.children) || Boolean(item.props.href && item.props.linkLabel)),
+    select: selectForm && items.some((item) => item.props.select) ? selectForm : undefined,
+  };
   return (
-    <ul className="space-y-sm" aria-label={label} data-testid={testId}>
-      {children}
-    </ul>
+    <div className="hz-table-wrap" data-testid={testId}>
+      <table className="hz-table hz-table--dense hz-table--stack hz-queue-table" aria-label={label}>
+        <thead>
+          <tr>
+            {cols.select ? (
+              <th scope="col" className="hz-table__check">
+                <label className="hz-check">
+                  <input type="checkbox" data-select-all aria-label="انتخاب همه ردیف‌های این صفحه" />
+                </label>
+              </th>
+            ) : null}
+            {HEAD.filter(([key]) => key === 'name' || cols[key]).map(([key, header]) => (
+              <th key={key} scope="col">
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>{items.map((item) => cloneElement(item, { cols }))}</tbody>
+      </table>
+    </div>
   );
 }
 

@@ -19,6 +19,9 @@ import { CaseDrawer } from '../case-drawer.tsx';
 import { membershipQueue } from '../../../src/billing/membership.ts';
 import { DecideMembershipForm, IssueNumberForm, MembershipStateForm } from './forms.tsx';
 import { MemberSearch } from './search.tsx';
+import { QUEUE_SORT_FA, QUEUE_SORTS, readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
+import { QueueHead, hrefWith } from '../../../src/ui/queue-head.tsx';
+import { Pagination } from '../../../src/ui/pagination.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,12 +47,15 @@ const NUMBER_FA: Record<string, string> = {
 export default async function AssocMembersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; page?: string }>;
 }) {
   const guard = await guardRoute('/assoc/members');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
-  const term = (await searchParams).q?.trim() ?? '';
+  const params = await searchParams;
+  const term = params.q?.trim() ?? '';
+  // `q` searches the register below, so the queue takes only the order and the page.
+  const query = { ...readQueueQuery(params), q: '' };
   const [rows, withoutMembership, total, waiting, corrections] = await Promise.all([
     memberRecords(db(), guard.actor, { search: term }),
     accountsWithoutMembership(db(), guard.actor),
@@ -58,6 +64,12 @@ export default async function AssocMembersPage({
     membershipQueue(db(), guard.actor, { status: 'NEEDS_CORRECTION' }),
   ]);
   const hidden = Math.max(0, total - rows.length);
+  const queue = sliceQueue([...waiting.items, ...corrections.items], query, {
+    text: (item) => item.statementFa ?? '',
+    at: (item) => new Date(item.updatedAt),
+    name: (item) => item.statementFa ?? '',
+  });
+  const keep = { q: term, sort: query.sort === 'oldest' ? undefined : query.sort };
 
   return (
     <OpsShell actor={guard.actor} title="عضویت" pathname="/assoc/members" nav={ASSOC_NAV}>
@@ -80,41 +92,65 @@ export default async function AssocMembersPage({
             درخواست بازی در صف نیست.
           </p>
         ) : (
-          <CaseList label="صف درخواست عضویت" testId="membership-queue">
-            {waiting.items.map((item) => (
-              <CaseItem
-                key={item.id}
-                type="درخواست عضویت"
-                name={item.statementFa || 'درخواست عضویت'}
-                sub={'آخرین تغییر: ' + formatInstantFa(new Date(item.updatedAt))}
-                ageDays={ageInDays(new Date(item.updatedAt))}
-                status={keyStatus('PENDING_REVIEW')}
-                owner="ASSOCIATION"
-                ownerIsUs
-              >
-                <CaseDrawer title="درخواست عضویت" testId="open-membership-case">
-                  <KeyValueList
-                    rows={[
-                      { key: 'توضیح متقاضی', value: item.statementFa },
-                      { key: 'آخرین تغییر', value: formatInstantFa(new Date(item.updatedAt)) },
-                      { key: 'نسخه', value: item.version.toLocaleString('fa-IR') },
-                    ]}
+          <QueueHead
+            total={queue.all}
+            shown={queue.total}
+            noun="درخواست"
+            sort={{
+              label: 'مرتب‌سازی درخواست‌ها',
+              testId: 'membership-queue-sort',
+              options: QUEUE_SORTS.map((key) => ({
+                key,
+                label: QUEUE_SORT_FA[key],
+                current: key === query.sort,
+                href: hrefWith('/assoc/members', keep, { sort: key === 'oldest' ? undefined : key }),
+              })),
+            }}
+          >
+            <CaseList label="صف درخواست عضویت" testId="membership-queue">
+              {queue.items.map((item) =>
+                item.status === 'NEEDS_CORRECTION' ? (
+                  <CaseItem
+                    key={item.id}
+                    testId="membership-awaiting-correction"
+                    type="درخواست عضویت"
+                    name={'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
+                    status={keyStatus('NEEDS_CORRECTION')}
+                    owner="USER"
                   />
-                  <DecideMembershipForm applicationId={item.id} version={item.version} />
-                </CaseDrawer>
-              </CaseItem>
-            ))}
-            {corrections.items.map((item) => (
-              <CaseItem
-                key={item.id}
-                testId="membership-awaiting-correction"
-                type="درخواست عضویت"
-                name={'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
-                status={keyStatus('NEEDS_CORRECTION')}
-                owner="USER"
-              />
-            ))}
-          </CaseList>
+                ) : (
+                  <CaseItem
+                    key={item.id}
+                    type="درخواست عضویت"
+                    name={item.statementFa || 'درخواست عضویت'}
+                    sub={'آخرین تغییر: ' + formatInstantFa(new Date(item.updatedAt))}
+                    ageDays={ageInDays(new Date(item.updatedAt))}
+                    status={keyStatus('PENDING_REVIEW')}
+                    owner="ASSOCIATION"
+                    ownerIsUs
+                  >
+                    <CaseDrawer title="درخواست عضویت" testId="open-membership-case">
+                      <KeyValueList
+                        rows={[
+                          { key: 'توضیح متقاضی', value: item.statementFa },
+                          { key: 'آخرین تغییر', value: formatInstantFa(new Date(item.updatedAt)) },
+                          { key: 'نسخه', value: item.version.toLocaleString('fa-IR') },
+                        ]}
+                      />
+                      <DecideMembershipForm applicationId={item.id} version={item.version} />
+                    </CaseDrawer>
+                  </CaseItem>
+                ),
+              )}
+            </CaseList>
+            <Pagination
+              page={queue.page}
+              pageSize={queue.pageSize}
+              total={queue.total}
+              totalPages={queue.totalPages}
+              hrefFor={(target) => hrefWith('/assoc/members', keep, { page: target > 1 ? String(target) : undefined })}
+            />
+          </QueueHead>
         )}
       </Panel>
 

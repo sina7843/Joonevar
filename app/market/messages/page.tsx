@@ -11,6 +11,8 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { messageReportQueue } from '../../../src/marketplace/listing-moderation.ts';
 import { REASON_FA, type ReportReason } from '../../../src/moderation/model.ts';
 import { MessageDecisionForm } from '../../../src/marketplace/moderation-forms.tsx';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +27,7 @@ const when = (value: Date) =>
  * note saying the server removed contact details from it, because deciding
  * about a message means reading the message.
  */
-export default async function MessageModerationPage() {
+export default async function MessageModerationPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/messages');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const { actor } = guard;
@@ -37,6 +39,12 @@ export default async function MessageModerationPage() {
     if (error instanceof AppError) return <AccessDenied error={error} />;
     throw error;
   }
+  const query = readQueueQuery(await searchParams);
+  const page = sliceQueue(queue, query, {
+    text: (entry) => [REASON_FA[entry.reason as ReportReason] ?? entry.reason, entry.bodyFa, entry.detailsFa].filter(Boolean).join(' '),
+    at: (entry) => entry.createdAt,
+    name: (entry) => REASON_FA[entry.reason as ReportReason] ?? entry.reason,
+  });
 
   return (
     <OpsShell actor={actor} title="گزارش پیام‌های گفت‌وگوی خرید" nav={marketNav(actor)} pathname="/market/messages">
@@ -57,46 +65,61 @@ export default async function MessageModerationPage() {
           <EmptyState title="گزارشی درباره پیام‌ها باز نیست" description="هر گزارشی که طرفین یک معامله درباره پیام ثبت کنند، اینجا می‌آید." />
         </div>
       ) : (
-        <CaseList label="پیام‌های گزارش‌شده" testId="message-queue">
-          {queue.map((entry) => (
-            <CaseItem
-              key={entry.reportId}
-              type="گزارش پیام"
-              name={REASON_FA[entry.reason as ReportReason] ?? entry.reason}
-              sub={when(entry.createdAt)}
-              ageDays={ageInDays(entry.createdAt)}
-              status={keyStatus(entry.hiddenAt ? 'HIDDEN' : 'SUBMITTED')}
-              owner="SYSTEM"
-              ownerLabel="ناظر آگهی"
-              ownerIsUs
-            >
-              <CaseDrawer title="پرونده گزارش پیام" testId={'open-message-' + entry.reportId}>
-                <DeskHead
-                  title={REASON_FA[entry.reason as ReportReason] ?? entry.reason}
+        <QueueFrame
+          path="/market/messages"
+          params={{ q: query.q || undefined, sort: query.sort === 'oldest' ? undefined : query.sort }}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="گزارش"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="message-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="پیام‌های گزارش‌شده" testId="message-queue">
+              {page.items.map((entry) => (
+                <CaseItem
+                  key={entry.reportId}
+                  type="گزارش پیام"
+                  name={REASON_FA[entry.reason as ReportReason] ?? entry.reason}
+                  sub={when(entry.createdAt)}
+                  ageDays={ageInDays(entry.createdAt)}
                   status={keyStatus(entry.hiddenAt ? 'HIDDEN' : 'SUBMITTED')}
-                  meta={[when(entry.createdAt)]}
-                />
-                <Panel title="پیام گزارش‌شده">
-                  <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'message-body-' + entry.reportId}>
-                    {entry.bodyFa ?? 'این پیام متنی ندارد (پیوست یا رویداد پیشنهاد قیمت).'}
-                  </blockquote>
-                  {entry.redactedNoteFa ? <p className="text-caption text-text-secondary">{entry.redactedNoteFa}</p> : null}
-                  {entry.detailsFa ? (
-                    <p className="text-caption text-text-secondary">توضیح گزارش‌دهنده: {entry.detailsFa}</p>
-                  ) : null}
-                  {entry.hiddenAt ? (
-                    <p className="text-caption text-text-secondary" data-testid={'already-hidden-' + entry.reportId}>
-                      این پیام پیش‌تر پنهان شده است.
-                    </p>
-                  ) : null}
-                </Panel>
-                <Panel title="تصمیم">
-                  <MessageDecisionForm reportId={entry.reportId} />
-                </Panel>
-              </CaseDrawer>
-            </CaseItem>
-          ))}
-        </CaseList>
+                  owner="SYSTEM"
+                  ownerLabel="ناظر آگهی"
+                  ownerIsUs
+                >
+                  <CaseDrawer title="پرونده گزارش پیام" testId={'open-message-' + entry.reportId}>
+                    <DeskHead
+                      title={REASON_FA[entry.reason as ReportReason] ?? entry.reason}
+                      status={keyStatus(entry.hiddenAt ? 'HIDDEN' : 'SUBMITTED')}
+                      meta={[when(entry.createdAt)]}
+                    />
+                    <Panel title="پیام گزارش‌شده">
+                      <blockquote className="hz-card hz-card--subtle text-body-sm" data-testid={'message-body-' + entry.reportId}>
+                        {entry.bodyFa ?? 'این پیام متنی ندارد (پیوست یا رویداد پیشنهاد قیمت).'}
+                      </blockquote>
+                      {entry.redactedNoteFa ? <p className="text-caption text-text-secondary">{entry.redactedNoteFa}</p> : null}
+                      {entry.detailsFa ? (
+                        <p className="text-caption text-text-secondary">توضیح گزارش‌دهنده: {entry.detailsFa}</p>
+                      ) : null}
+                      {entry.hiddenAt ? (
+                        <p className="text-caption text-text-secondary" data-testid={'already-hidden-' + entry.reportId}>
+                          این پیام پیش‌تر پنهان شده است.
+                        </p>
+                      ) : null}
+                    </Panel>
+                    <Panel title="تصمیم">
+                      <MessageDecisionForm reportId={entry.reportId} />
+                    </Panel>
+                  </CaseDrawer>
+                </CaseItem>
+              ))}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

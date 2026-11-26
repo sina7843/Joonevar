@@ -14,7 +14,11 @@
  * «تجهیزات اعلام‌شده». Approval here opens the trusted period payment and
  * nothing else; the trusted tag itself waits for a verified payment (PROMPT-011).
  */
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { boundedRows } from '../privacy/limits.ts';
+import { offsetOf, pageOf } from '../domain/pagination.ts';
+import type { QueueSort } from '../domain/queue-query.ts';
+import { firstSubmittedAt, professionalQueueOrder, professionalSearch } from './student-application.ts';
 import type { Database, DbClient } from '../db/client.ts';
 import {
   vetEquipment,
@@ -386,6 +390,49 @@ export async function trustedCaseQueue(database: Database, actor: Actor, input: 
     submissionVersion: row.currentSubmissionVersion,
     updatedAt: row.updatedAt.toISOString(),
   }));
+}
+
+/** The association's trusted queue as a page (P09: `?q=`, `?sort=`, `?page=`, age from first submission). */
+export async function trustedCaseQueuePage(
+  database: DbClient,
+  actor: Actor,
+  input: { view?: string; q?: string; sort?: QueueSort; page: number; pageSize?: number },
+) {
+  assertReviewer(actor);
+  const request = { page: input.page, pageSize: boundedRows(input.pageSize, 20) };
+  const statuses: readonly VetCaseStatus[] =
+    input.view === 'CORRECTION' ? ['NEEDS_CORRECTION'] : input.view === 'DECIDED' ? ['TRUSTED_APPROVED_AWAITING_PAYMENT', 'REJECTED'] : ['SUBMITTED', 'UNDER_REVIEW'];
+  const inView = and(eq(vetProfessionalCases.caseType, 'TRUSTED'), inArray(vetProfessionalCases.status, [...statuses]));
+  const search = professionalSearch(input.q, [sql`${vetProfiles.displayNameFa}`]);
+  const where = search ? and(inView, search) : inView;
+  const countOf = (condition: typeof where) =>
+    database
+      .select({ value: count() })
+      .from(vetProfessionalCases)
+      .leftJoin(vetProfiles, eq(vetProfiles.id, vetProfessionalCases.vetProfileId))
+      .where(condition);
+  const [[total], [all], rows] = await Promise.all([
+    countOf(where),
+    search ? countOf(inView) : Promise.resolve([undefined]),
+    database
+      .select({ row: vetProfessionalCases, displayNameFa: vetProfiles.displayNameFa, firstSubmittedAt })
+      .from(vetProfessionalCases)
+      .leftJoin(vetProfiles, eq(vetProfiles.id, vetProfessionalCases.vetProfileId))
+      .where(where)
+      .orderBy(...professionalQueueOrder(input.view ?? 'OPEN', input.sort, sql`${vetProfiles.displayNameFa}`))
+      .limit(request.pageSize)
+      .offset(offsetOf(request)),
+  ]);
+  const items = rows.map(({ row, displayNameFa, firstSubmittedAt: first }) => ({
+    id: row.id,
+    status: row.status as VetCaseStatus,
+    statusFa: CASE_STATUS_FA[row.status as VetCaseStatus],
+    displayNameFa,
+    submissionVersion: row.currentSubmissionVersion,
+    updatedAt: row.updatedAt.toISOString(),
+    firstSubmittedAt: first ? new Date(first).toISOString() : null,
+  }));
+  return { ...pageOf(items, total?.value ?? 0, request), all: all?.value ?? total?.value ?? 0 };
 }
 
 /** One trusted case with what was declared and whether the conditions still hold. */

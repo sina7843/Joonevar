@@ -54,11 +54,11 @@ test('entering a real tariff removes it from the not-configured list', async () 
 
     // Start from a tariff the operator has cleared, which is the only way one is
     // unset now that the catalogue ships starting figures.
-    await updateSetting(testDb.db, superadmin, { key: 'fee.puppy_card_toman', value: null });
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.puppy_card_toman', value: null });
     const before = await healthReport(testDb.db, DEV_ENV);
     assert.ok(before.settings.notConfigured.includes('fee.puppy_card_toman'));
 
-    await updateSetting(testDb.db, superadmin, { key: 'fee.puppy_card_toman', value: '150000' });
+    await updateSetting(testDb.db, superadmin, { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'fee.puppy_card_toman', value: '150000' });
 
     const after = await healthReport(testDb.db, DEV_ENV);
     assert.ok(!after.settings.notConfigured.includes('fee.puppy_card_toman'));

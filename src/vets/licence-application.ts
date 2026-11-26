@@ -56,7 +56,8 @@ import {
 import { normalizeCouncilCode } from './onboarding-model.ts';
 import { unifyPersianLetters } from '../breeds/model.ts';
 import { currentVetTag, replaceVetTag } from './professional-tags.ts';
-import { CASE_TARGET, professionalCaseHistory } from './student-application.ts';
+import { CASE_TARGET, firstSubmittedAt, professionalCaseHistory, professionalQueueOrder, professionalSearch } from './student-application.ts';
+import type { QueueSort } from '../domain/queue-query.ts';
 
 const APPLICANT_CONTEXTS: readonly ActorContextName[] = ['USER', 'BREEDER', 'TRUSTED_VET'];
 export const LICENCE_REVIEWER_CONTEXTS: readonly ActorContextName[] = ['ASSOCIATION_OPERATOR', 'SUPERADMIN'];
@@ -418,15 +419,33 @@ export async function licenceOpenCaseIds(database: DbClient, actor: Actor): Prom
 export async function licenceCaseQueue(
   database: DbClient,
   actor: Actor,
-  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number },
+  query: { view: 'OPEN' | 'CORRECTION' | 'DECIDED'; page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ) {
   assertReviewer(actor);
   const request = { page: query.page, pageSize: boundedRows(query.pageSize, 20) };
-  const where = and(eq(vetProfessionalCases.caseType, 'LICENCE'), inArray(vetProfessionalCases.status, [...QUEUE[query.view]]));
-  const [[total], rows] = await Promise.all([
-    database.select({ value: count() }).from(vetProfessionalCases).where(where),
+  const inView = and(eq(vetProfessionalCases.caseType, 'LICENCE'), inArray(vetProfessionalCases.status, [...QUEUE[query.view]]));
+  const nameFa = sql`coalesce(${vetProfiles.displayNameFa}, ${vetProfessionalSubmissions.payload}->>'displayNameFa')`;
+  const search = professionalSearch(query.q, [
+    nameFa,
+    sql`${vetProfessionalSubmissions.payload}->>'licenceCode'`,
+    sql`${vetProfessionalSubmissions.payload}->>'councilCode'`,
+  ]);
+  const where = search ? and(inView, search) : inView;
+  const countOf = (condition: typeof where) =>
     database
-      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload, profileName: vetProfiles.displayNameFa })
+      .select({ value: count() })
+      .from(vetProfessionalCases)
+      .leftJoin(
+        vetProfessionalSubmissions,
+        and(eq(vetProfessionalSubmissions.caseId, vetProfessionalCases.id), eq(vetProfessionalSubmissions.version, vetProfessionalCases.currentSubmissionVersion)),
+      )
+      .leftJoin(vetProfiles, eq(vetProfiles.id, vetProfessionalCases.vetProfileId))
+      .where(condition);
+  const [[total], [all], rows] = await Promise.all([
+    countOf(where),
+    search ? countOf(inView) : Promise.resolve([undefined]),
+    database
+      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload, profileName: vetProfiles.displayNameFa, firstSubmittedAt })
       .from(vetProfessionalCases)
       .leftJoin(
         vetProfessionalSubmissions,
@@ -434,11 +453,11 @@ export async function licenceCaseQueue(
       )
       .leftJoin(vetProfiles, eq(vetProfiles.id, vetProfessionalCases.vetProfileId))
       .where(where)
-      .orderBy(query.view === 'DECIDED' ? desc(vetProfessionalCases.updatedAt) : asc(vetProfessionalCases.updatedAt))
+      .orderBy(...professionalQueueOrder(query.view, query.sort, nameFa))
       .limit(request.pageSize)
       .offset(offsetOf(request)),
   ]);
-  const items = rows.map(({ row, payload, profileName }) => {
+  const items = rows.map(({ row, payload, profileName, firstSubmittedAt: first }) => {
     const fields = (payload ?? {}) as Partial<LicencePayload>;
     return {
       id: row.id,
@@ -450,9 +469,10 @@ export async function licenceCaseQueue(
       councilCode: fields.councilCode ?? null,
       licenceCode: fields.licenceCode ?? null,
       updatedAt: row.updatedAt.toISOString(),
+      firstSubmittedAt: first ? new Date(first).toISOString() : null,
     };
   });
-  return pageOf(items, total?.value ?? 0, request);
+  return { ...pageOf(items, total?.value ?? 0, request), all: all?.value ?? total?.value ?? 0 };
 }
 
 export async function licenceCaseForReview(database: DbClient, actor: Actor, caseId: string) {
