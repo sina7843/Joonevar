@@ -131,6 +131,10 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
                   ]
                 : []),
               ...(listing.publishedAt ? ['منتشرشده ' + DATE_FA.format(listing.publishedAt)] : []),
+              // KPUB-028: how long the advert is still shown, in whole days.
+              ...(listing.expiresAt && listing.expiresAt.getTime() > Date.now()
+                ? [Math.ceil((listing.expiresAt.getTime() - Date.now()) / 86_400_000).toLocaleString('fa-IR') + ' روز تا پایان نمایش']
+                : []),
             ]}
           />
         </div>

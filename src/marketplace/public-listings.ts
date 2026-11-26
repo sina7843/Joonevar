@@ -294,6 +294,8 @@ export interface PublicListingDetail {
   readonly reserved: boolean;
   readonly promoted: boolean;
   readonly publishedAt: Date | null;
+  /** When the advert stops being shown, for «N روز تا پایان نمایش» (KPUB-028). */
+  readonly expiresAt: Date | null;
   readonly handoverFromFa: string | null;
   readonly listingRevision: number;
 }
@@ -331,6 +333,7 @@ export async function publicListing(
       provinceFa: provinces.nameFa,
       cityFa: cities.nameFa,
       publishedAt: animalListings.publishedAt,
+      expiresAt: animalListings.expiresAt,
       nameFa: animals.name,
     })
     .from(animalListings)
@@ -384,6 +387,7 @@ export async function publicListing(
     reserved: row.status === 'RESERVED',
     promoted: promoted.has(row.id),
     publishedAt: row.publishedAt,
+    expiresAt: row.expiresAt,
     handoverFromFa:
       handover.from === null
         ? null
