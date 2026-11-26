@@ -431,6 +431,8 @@ test('managed data is edited from the panel and its history is readable', async 
     assert.equal(await page.getByTestId('breed-state-' + nameEn).innerText(), 'فعال');
 
     await page.getByTestId('toggle-breed-' + nameEn).click();
+    await page.getByTestId('breed-reason-' + nameEn).fill('SYNTHETIC دلیل آزمایشی');
+    await page.getByTestId('breed-state-save-' + nameEn).click();
     await page.waitForFunction(
       (id) => document.querySelector('[data-testid="breed-state-' + id + '"]')?.getAttribute('data-status') === 'INACTIVE',
       nameEn,

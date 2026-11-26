@@ -276,7 +276,7 @@ test('the trusted request is offered only to an active licensed vet, and names t
 
   await as('association', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-trusted', { waitUntil: 'load' });
-    await page.getByTestId('trusted-queue').locator('li').first().getByTestId('open-trusted-case').click();
+    await page.getByTestId('trusted-queue').locator('tbody > tr').first().getByTestId('open-trusted-case').click();
     await page.getByTestId('trusted-declaration').waitFor();
     // Equipment is declared, never verified.
     await waitForText(page, 'trusted-declared-equipment', 'اعلام‌شده');
