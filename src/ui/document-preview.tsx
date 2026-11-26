@@ -24,7 +24,7 @@ export function DocumentPreview({ src, altFa, testId }: { src: string; altFa: st
   const body = (fullscreen: boolean) => (
     <div className={['hz-doc', zoom > 0 ? 'hz-doc--zoomed' : '', fullscreen ? 'hz-doc--full' : ''].join(' ').trim()} tabIndex={zoom > 0 ? 0 : undefined}>
       {state === 'frame' ? (
-        <iframe src={src} title={altFa} className="h-full w-full border-0 bg-bg-surface" />
+        <iframe src={src} title={altFa} className="h-full w-full border-0 bg-bg-surface" data-testid={fullscreen ? undefined : testId} />
       ) : (
         <img
           src={src}

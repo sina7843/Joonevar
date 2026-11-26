@@ -108,7 +108,7 @@ test('the association asks for a correction, and the applicant answers with a ne
   await as('association', DESKTOP, async (page) => {
     await decide(page, 'REQUEST_CORRECTION', 'SYNTHETIC تاریخ روی پروانه خوانا نیست', 'نیازمند اصلاح');
     assert.equal((await page.getByTestId('review-licence-code').textContent())?.trim(), LICENCE_CODE);
-    licencePath = (await page.getByTestId('licence-document-link-PRACTICE_LICENCE').first().getAttribute('href'))!;
+    licencePath = (await page.getByTestId('licence-document-link-PRACTICE_LICENCE').first().getAttribute('src'))!;
     const file = await page.request.get(BASE_URL + licencePath);
     assert.equal(file.status(), 200, 'the association reads the licence file');
     assert.equal(file.headers()['content-type'], 'application/pdf');

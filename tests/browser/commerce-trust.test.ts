@@ -140,6 +140,7 @@ test('a platform code comes off the basket, and points come off what is left', a
     await page.getByTestId('discount-label').fill('SYNTHETIC کد آزمایشی');
     await page.getByTestId('discount-code').fill(CODE);
     await page.getByTestId('discount-percent').fill('1000');
+    await page.getByTestId('discount-reason').fill('SYNTHETIC دلیل آزمایشی');
     await page.getByTestId('discount-save').click();
     await expectText(page, 'تخفیف ثبت شد');
 

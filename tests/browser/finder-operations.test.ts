@@ -144,12 +144,12 @@ test('report with evidence, moderator decision, appeal by the affected owner, an
 
     // The moderator takes it, opens the evidence, and decides with a reason.
     await m.goto(BASE_URL + '/market/finder/reports', { waitUntil: 'load' });
-    const card = m.locator('[data-testid^="finder-report-"]', { hasText: 'مزاحمت یا رفتار نامناسب' }).first();
+    const card = m.locator('[data-testid^="finder-report-"]:not([data-testid$="-frame"])', { hasText: 'مزاحمت یا رفتار نامناسب' }).first();
     await card.waitFor();
     const reportId = ((await card.getAttribute('data-testid')) ?? '').replace('finder-report-', '');
     // The row opens the desk; the evidence is previewed there, never linked out.
     await m.getByTestId('open-finder-report-' + reportId).click();
-    const evidenceHref = await card.getByTestId('finder-evidence-link').first().locator('img, iframe').first().getAttribute('src');
+    const evidenceHref = await m.getByTestId('finder-evidence-link').first().locator('img, iframe').first().getAttribute('src');
     const asModerator = await m.request.get(new URL(evidenceHref!, BASE_URL).toString());
     assert.equal(asModerator.status(), 200);
     const asOwner = await a.request.get(new URL(evidenceHref!, BASE_URL).toString());

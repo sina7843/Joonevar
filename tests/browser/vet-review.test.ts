@@ -92,10 +92,8 @@ test('the reviewer claims the case, a failed check blocks approval, and a correc
     await page.getByTestId('review-claim').click();
     await waitForText(page, 'review-claim-state', 'در دست شماست');
 
-    // The preview loads only when opened, and the file is served for sandboxed viewing.
-    const preview = page.getByTestId('student-document-preview');
-    await preview.locator('summary').click();
-    const src = await preview.locator('iframe').getAttribute('src');
+    // The document previews inside the desk (DocumentPreview); the file is served for sandboxed viewing.
+    const src = await page.getByTestId('student-document-link').getAttribute('src');
     const file = await page.request.get(BASE_URL + src!);
     assert.equal(file.status(), 200);
     assert.match(file.headers()['content-security-policy'] ?? '', /sandbox/);

@@ -147,7 +147,7 @@ test('a veterinarian applies, answers a correction and, once verified, manages a
   await as('association', DESKTOP, async (page) => {
     await decide(page, APPLICANT_NAME, 'REQUEST_CORRECTION', 'SYNTHETIC تصویر کارت خوانا نیست', 'نیازمند اصلاح');
     assert.equal(await textOf(page, 'review-doctor-council-code'), 'SYNBR7' + RUN, 'the council code was normalised');
-    documentPath = (await page.getByTestId('doctor-document-link-COUNCIL_CARD').getAttribute('href'))!;
+    documentPath = (await page.getByTestId('doctor-document-link-COUNCIL_CARD').getAttribute('src'))!;
     const file = await page.request.get(BASE_URL + documentPath);
     assert.equal(file.status(), 200, 'the association reads the council card');
     assert.equal(file.headers()['content-type'], 'image/png');

@@ -108,7 +108,7 @@ test('the invited account accepts from its own screen and is then a manager', as
 
   await as('admin', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/admin/communities/' + communityId, { waitUntil: 'load' });
-    await expectText(page, 'تأییدشده');
+    await expectText(page, 'پذیرفته‌شده');
   });
 });
 
