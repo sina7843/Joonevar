@@ -26,7 +26,7 @@ export default async function AssocKennelsPage({ searchParams }: { searchParams:
   });
 
   return (
-    <OpsShell actor={guard.actor} title="کنل" pathname="/assoc/kennels" nav={ASSOC_NAV}>
+    <OpsShell actor={guard.actor} title="کنل" pathname="/assoc/kennels" nav={ASSOC_NAV} meta={<QueueMeta total={rows.length} oldestDays={Math.max(...rows.map((kennel) => ageInDays(kennel.submittedAt) ?? 0))} />}>
       {rows.length === 0 ? (
         <EmptyState
           title="پرونده کنلی در انتظار بررسی نیست"
@@ -34,7 +34,6 @@ export default async function AssocKennelsPage({ searchParams }: { searchParams:
         />
       ) : (
         <>
-          <QueueMeta total={rows.length} oldestDays={Math.max(...rows.map((kennel) => ageInDays(kennel.submittedAt) ?? 0))} />
           <QueueFrame
             path="/assoc/kennels"
             params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}

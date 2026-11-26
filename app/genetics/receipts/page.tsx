@@ -33,7 +33,7 @@ export default async function GeneticsReceiptsPage({
   });
 
   return (
-    <OpsShell actor={guard.actor} title="فیش‌ها" pathname="/genetics/receipts" nav={GENETICS_NAV}>
+    <OpsShell actor={guard.actor} title="فیش‌ها" pathname="/genetics/receipts" nav={GENETICS_NAV} meta={<QueueMeta total={rows.length} noun="فیش در صف" oldestDays={Math.max(...rows.map((receipt) => ageInDays(receipt.submittedAt) ?? 0))} />}>
       {rows.length === 0 ? (
         <EmptyState
           title="فیشی در انتظار بررسی نیست"
@@ -41,7 +41,6 @@ export default async function GeneticsReceiptsPage({
         />
       ) : (
         <>
-          <QueueMeta total={rows.length} noun="فیش در صف" oldestDays={Math.max(...rows.map((receipt) => ageInDays(receipt.submittedAt) ?? 0))} />
           <QueueFrame
             path="/genetics/receipts"
             params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}

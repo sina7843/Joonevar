@@ -56,12 +56,7 @@ export default async function CatalogReviewPage({ searchParams }: { searchParams
   const details = await Promise.all(page.items.map((entry) => productDetail(db(), entry.id)));
 
   return (
-    <OpsShell actor={guard.actor} title="بررسی کاتالوگ کالا" nav={marketNav(guard.actor)} pathname="/market/catalog">
-      <QueueMeta
-        total={queue.length}
-        noun="کالا در صف بررسی"
-        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null}
-      />
+    <OpsShell actor={guard.actor} title="بررسی کاتالوگ کالا" nav={marketNav(guard.actor)} pathname="/market/catalog" meta={<QueueMeta total={queue.length} noun="کالا در صف بررسی" oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null} />}>
       {blocked.length > 0 ? (
         <Alert tone="info" title="دسته‌های بدون فروش عمومی در این فاز">
           <span data-testid="catalog-blocked-note">

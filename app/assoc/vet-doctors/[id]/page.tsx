@@ -48,8 +48,8 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
   const duplicates = detail.duplicates.profiles.length + detail.duplicates.cases.length;
 
   return (
-    <OpsShell actor={guard.actor} title="بررسی کد نظام دامپزشک" pathname="/assoc/vet-doctors" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی کد نظام دامپزشک" pathname="/assoc/vet-doctors" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'کد نظام دامپزشک · ' + (detail.applicantNameFa ?? latest?.displayNameFa ?? '—')}
         status={keyStatus(vetCaseKey(detail.case.status))}
         position={deskPosition(queueIds, detail.case.id, (caseId) => '/assoc/vet-doctors/' + caseId)}

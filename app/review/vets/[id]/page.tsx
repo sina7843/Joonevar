@@ -50,8 +50,8 @@ export default async function ReviewVetApplicationPage({ params }: { params: Pro
   ]);
   const position = queue ? deskPosition(queue.items.map((item) => item.id), application.id, (other) => '/review/vets/' + other) : null;
   return (
-    <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک" pathname="/review/vets" nav={REVIEW_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک" pathname="/review/vets" nav={REVIEW_NAV} headingInPage>
+      <DeskHead level={1}
         title={APPLICATION_KIND_FA[application.kind] + ' · ' + application.displayNameFa}
         status={{
           ...keyStatus(application.status),

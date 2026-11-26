@@ -52,8 +52,8 @@ export default async function AssocKennelPage({ params }: { params: Promise<{ id
   // Age counts from the first submission (a corrected case keeps its place in time).
   const firstSubmittedAt = steps.filter((step) => step.action === 'KENNEL_SUBMITTED').at(-1)?.at ?? kennel.submittedAt;
   return (
-    <OpsShell actor={guard.actor} title="بررسی کنل" pathname={'/assoc/kennels/' + id} nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی کنل" pathname={'/assoc/kennels/' + id} nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'کنل · ' + (kennel.nameFa ?? 'کنل بدون نام')}
         status={{ ...keyStatus(kennel.status), testId: 'assoc-kennel-status' }}
         position={deskPosition(

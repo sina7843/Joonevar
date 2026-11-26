@@ -47,12 +47,7 @@ export default async function RefundQueuePage({ searchParams }: { searchParams: 
   });
 
   return (
-    <OpsShell actor={guard.actor} title="استرداد بیعانه" nav={marketNav(guard.actor)} pathname="/market/refunds">
-      <QueueMeta
-        total={queue.length}
-        noun="استرداد در انتظار"
-        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null}
-      />
+    <OpsShell actor={guard.actor} title="استرداد بیعانه" nav={marketNav(guard.actor)} pathname="/market/refunds" meta={<QueueMeta total={queue.length} noun="استرداد در انتظار" oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null} />}>
       <Alert tone="info" title="هیچ مبلغی با زدن دکمه «پرداخت‌شده» نمی‌شود">
         <span data-testid="refund-policy-note">
           استرداد فقط وقتی پرداخت‌شده ثبت می‌شود که درگاه شماره پیگیری بدهد یا اپراتور شماره پیگیری بانکی

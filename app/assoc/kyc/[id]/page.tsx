@@ -75,8 +75,8 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
   const nationalIdValid = profile ? isValidNationalId(profile.nationalId) : false;
 
   return (
-    <OpsShell actor={guard.actor} title="بررسی احراز هویت" pathname="/assoc/kyc" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی احراز هویت" pathname="/assoc/kyc" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'احراز هویت · ' + name}
         status={{ key: kycKey(status), testId: 'case-status' }}
         position={deskPosition(queueIds, record.id, (caseId) => '/assoc/kyc/' + caseId)}

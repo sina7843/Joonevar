@@ -323,6 +323,10 @@ body {
   .hz-sidebar--ops .hz-sidebar__section + .hz-sidebar__section { margin-block-start: 6px; padding-block-start: 6px; border-block-start: 1px solid var(--border-subtle); }
   .hz-sidebar--ops .hz-side-item { width: 48px; height: 44px; justify-content: center; padding: 0; }
 }
+/* Dense ops navigation stays 36px for a mouse, 44px under a finger (SHL-012). */
+@media (pointer: coarse) {
+  .hz-side-item--dense { height: 44px; }
+}
 /* The public tab bar must not cover the last card or the focused control. */
 @media (max-width: 1023.98px) {
   html:has(.hz-tabbar) { scroll-padding-block-end: calc(var(--tabbar) + 16px); }

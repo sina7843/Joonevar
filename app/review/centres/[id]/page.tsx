@@ -40,8 +40,8 @@ export default async function ReviewCentrePage({ params }: { params: Promise<{ i
   const history = await caseHistory('CENTRE', centre.id, HISTORY_FA);
 
   return (
-    <OpsShell actor={guard.actor} title="مرکز دامپزشکی" pathname="/review/centres" nav={REVIEW_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="مرکز دامپزشکی" pathname="/review/centres" nav={REVIEW_NAV} headingInPage>
+      <DeskHead level={1}
         title={centre.displayNameFa}
         status={{ key: centre.publicStatus, testId: 'centre-public-status' }}
         meta={[data.facts.typeNameFa, centre.ownerAccountId ? 'دارای مدیر' : 'بدون مالک', 'نسخه ' + centre.version.toLocaleString('fa-IR')]}

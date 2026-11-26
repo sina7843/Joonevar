@@ -52,8 +52,7 @@ export default async function MarketReturnsPage({ searchParams }: { searchParams
   });
 
   return (
-    <OpsShell actor={guard.actor} title="مرجوعی و سیاست آن" nav={marketNav(guard.actor)} pathname="/market/returns">
-      <QueueMeta total={disputes.length} noun="مرجوعی مورد اختلاف" />
+    <OpsShell actor={guard.actor} title="مرجوعی و سیاست آن" nav={marketNav(guard.actor)} pathname="/market/returns" meta={<QueueMeta total={disputes.length} noun="مرجوعی مورد اختلاف" />}>
 
       <Panel title="مرجوعی‌های مورد اختلاف" count={fa(disputes.length)}>
         <p className="text-caption text-text-secondary" data-testid="disputed-hold-note">

@@ -41,8 +41,7 @@ export default async function MarketTrustPage({ searchParams }: { searchParams: 
   });
 
   return (
-    <OpsShell actor={guard.actor} title="نظرها و پرسش‌ها" nav={marketNav(guard.actor)} pathname="/market/trust">
-      <QueueMeta total={questions.length} noun="پرسش در انتظار بررسی" />
+    <OpsShell actor={guard.actor} title="نظرها و پرسش‌ها" nav={marketNav(guard.actor)} pathname="/market/trust" meta={<QueueMeta total={questions.length} noun="پرسش در انتظار بررسی" />}>
       <Alert tone="info" title="امتیاز فروشگاه فقط از نظرها ساخته می‌شود">
         <span data-testid="reputation-note">
           هیچ بسته تبلیغی و هیچ پلنی در محاسبه امتیاز دخالت ندارد؛ تبلیغ جایگاه می‌خرد، نه اعتبار.

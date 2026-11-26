@@ -32,7 +32,7 @@ export default async function AssocForeignPedigreePage({ searchParams }: { searc
   ]);
 
   return (
-    <OpsShell actor={guard.actor} title="Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
+    <OpsShell actor={guard.actor} title="Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV} meta={<QueueMeta total={page.all} oldestDays={query.sort === 'oldest' && query.page === 1 && query.q === '' ? ageInDays(page.items[0]?.submittedAt) : null} />}>
       <div className="space-y-lg">
         {issuers.length === 0 ? (
           <Alert tone="warning" title="فهرست صادرکنندگان موردتأیید خالی است">
@@ -51,10 +51,6 @@ export default async function AssocForeignPedigreePage({ searchParams }: { searc
           />
         ) : (
           <>
-            <QueueMeta
-              total={page.all}
-              oldestDays={query.sort === 'oldest' && query.page === 1 && query.q === '' ? ageInDays(page.items[0]?.submittedAt) : null}
-            />
             <QueueFrame
               path="/assoc/foreign-pedigree"
               params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}

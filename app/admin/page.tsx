@@ -25,23 +25,29 @@ export default async function AdminPage() {
   const unset = report.settings.notConfigured.length;
 
   return (
-    <OpsShell actor={guard.actor} title="مرور" pathname="/admin" nav={ADMIN_NAV}>
-      <div className="flex flex-wrap items-center justify-between gap-sm">
+    <OpsShell
+      actor={guard.actor}
+      title="مرور"
+      pathname="/admin"
+      nav={ADMIN_NAV}
+      meta={
         <p className="hz-page-header__meta">
           <span className="hz-page-header__meta-item">
-            {report.settings.total.toLocaleString('fa-IR') + ' کلید تنظیم · ' + unset.toLocaleString('fa-IR') + ' مورد «تعیین‌نشده»'}
+            {report.settings.total.toLocaleString('fa-IR') + ' کلید تنظیم، ' + unset.toLocaleString('fa-IR') + ' مورد «تعیین‌نشده»'}
           </span>
         </p>
-        <div className="flex flex-wrap gap-sm">
+      }
+      actions={
+        <>
           <ButtonLink tone="secondary" size="sm" href="/admin/settings">
             مدیریت تنظیمات
           </ButtonLink>
           <ButtonLink tone="secondary" size="sm" href="/admin/merge">
             ادغام رکورد تکراری
           </ButtonLink>
-        </div>
-      </div>
-
+        </>
+      }
+    >
       <section className="space-y-md" aria-labelledby="admin-data-title">
         <SectionHeader title="وضعیت داده مدیریتی" size="sm" id="admin-data-title" />
         <StatTiles

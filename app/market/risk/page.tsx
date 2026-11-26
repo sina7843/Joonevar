@@ -37,8 +37,7 @@ export default async function RiskPage({
   const page = sliceQueue(rows, query, { text: (row) => row.maskedMobile, at: () => null, name: (row) => row.maskedMobile });
 
   return (
-    <OpsShell actor={guard.actor} title="نشانه‌های پرخطر" nav={marketNav(guard.actor)} pathname="/market/risk">
-      <QueueMeta total={rows.length} noun={'حساب با نشانه در ' + fa(days) + ' روز گذشته'} />
+    <OpsShell actor={guard.actor} title="نشانه‌های پرخطر" nav={marketNav(guard.actor)} pathname="/market/risk" meta={<QueueMeta total={rows.length} noun={'حساب با نشانه در ' + fa(days) + ' روز گذشته'} />}>
       <Alert tone="info" title="این نشانه‌ها دلیل نگاه‌کردن‌اند، نه حکم">
         <span data-testid="risk-note">
           هیچ‌کدام از این عددها به‌تنهایی تصمیم نیست و این صفحه وضعیت هیچ حسابی را تغییر نمی‌دهد. برای اقدام،

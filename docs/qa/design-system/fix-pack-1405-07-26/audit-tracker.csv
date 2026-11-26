@@ -167,17 +167,17 @@ RTO-014,T07,2,medium,needs decision,RTO,,خانه محیط‌ها QueueTile و �
 SHL-005,T07,2,medium,needs decision,SHL,K3 K13,نقطه هشدار و برچسب «… صف از مهلت گذشته» روی دکمه منوی OpsShell در موبایل نیست,OpsShell top bar <768 — K3، K13 (390),FIXED,DEC-0241,نقطه و برچسب «N صف از مهلت گذشته» روی دکمه منو
 CMPB-118,T07,2,low,needs decision,CMPB,,StatTile · خط تغییر (delta)، حالت‌های loading/error/unset ندارد و یک نسخهٔ دستی دارد,StatTile (`/assoc`، `/admin`، `/market`، `/market/analytics`، `/market/finder`، `/market/support`، `/admin/notifications`),FIXED,DEC-0241,loading/error/unset؛ delta طبق تصمیم نه
 KOPS-014,T07,2,low,code,KOPS,K13,سربرگ صفحه: «به‌روزشده …» و اقدام ثانویه «باز کردن قدیمی‌ترین پرونده» نیست؛ ساختار `hz-page-header` استفاده نشده,K13 · PageHeader (ops),FIXED,DEC-0241,«به‌روزشده …» و «باز کردن قدیمی‌ترین پرونده»؛ ساختار hz-page-header در T08
-CMPB-088,T08,2,high,code,CMPB,K13 K19,PageHeader · OpsShell هدر صفحه ندارد؛ عنوان تنها و meta پراکنده است,PageHeader، گونهٔ «Ops queue / desk»، در همهٔ ۸۷ صفحهٔ OpsShell (کلیدی: `/assoc` K13 و `/genetics/samples` K19),,,
-SHL-004,T08,2,medium,code,SHL,,متن برچسب محیط اشتباه است («محیط عملیاتی اپراتور انجمن»، «محیط عملیاتی سوپرادمین»),OpsShell — `hz-sidebar__env`، زیرعنوان نوار بالای موبایل، `aria-label` سایدبار/Drawer/لوگو,,,
-SHL-006,T08,2,medium,code,SHL,K3 K13,breadcrumbs نوار بالای OpsShell با طراحی نمی‌خواند,OpsShell top bar ≥768 — K3، K13 (1440),,,
-SHL-007,T08,2,medium,code,SHL,K3,نوار بالای موبایل OpsShell دکمه «بازگشت به صف» و زیرعنوان پرونده ندارد,OpsShell top bar <768 در میز تصمیم — K3 (390),,,
-SHL-008,T08,2,medium,code,SHL,K3 K13,OpsShell عنوان h1 ثابت دارد و جایی برای PageHeader صفحه (متا، اقدام‌ها) نیست,OpsShell main — K3، K13,,,
-SHL-009,T08,2,medium,code,SHL,,در تبلت (۷۶۸–۱۰۲۳) ریل OpsShell قابل بازشدن نیست,OpsShell rail,,,
-SHL-010,T08,2,medium,code,SHL,,چگالی OpsShell (متن ۱۴/۲۴) در سطح پوسته اعمال نشده,OpsShell main,,,
-SHL-011,T08,2,low,needs decision,SHL,,وضعیت جمع/باز گروه‌ها و سایدبار ذخیره نمی‌شود و پیش‌فرض «گروه‌های دارای شمارنده» نیست,OpsShell sidebar (۱۵–۲۴ آیتم، بازار),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-SHL-012,T08,2,low,code,SHL,,دسترس‌پذیری ریل و اندازه لمسی آیتم‌های dense,OpsShell rail و sidebar,,,
-SHL-013,T08,2,low,code,SHL,,«کلاب‌ها» در گروه اشتباه سایدبار انجمن,OpsShell — ASSOC_NAV,,,
-SHL-015,T08,2,low,code,SHL,,پایین Drawer ناوبری OpsShell به‌جای ردیف‌ها یک popover دارد,OpsShell Drawer <768,,,
+CMPB-088,T08,2,high,code,CMPB,K13 K19,PageHeader · OpsShell هدر صفحه ندارد؛ عنوان تنها و meta پراکنده است,PageHeader، گونهٔ «Ops queue / desk»، در همهٔ ۸۷ صفحهٔ OpsShell (کلیدی: `/assoc` K13 و `/genetics/samples` K19),PARTIAL,DEC-0242,OpsShell meta/actions؛ QueueMeta (۱۹ صفحه) و سه خانه منتقل؛ حدود ۱۸ صفحه متای خام دارند
+SHL-004,T08,2,medium,code,SHL,,متن برچسب محیط اشتباه است («محیط عملیاتی اپراتور انجمن»، «محیط عملیاتی سوپرادمین»),OpsShell — `hz-sidebar__env`، زیرعنوان نوار بالای موبایل، `aria-label` سایدبار/Drawer/لوگو,FIXED,DEC-0242,نام محیط از خانه nav
+SHL-006,T08,2,medium,code,SHL,K3 K13,breadcrumbs نوار بالای OpsShell با طراحی نمی‌خواند,OpsShell top bar ≥768 — K3، K13 (1440),PARTIAL,DEC-0242,حلقه اول نام محیط + صف؛ حلقه آخر میز عنوان پوسته است نه نام پرونده
+SHL-007,T08,2,medium,code,SHL,K3,نوار بالای موبایل OpsShell دکمه «بازگشت به صف» و زیرعنوان پرونده ندارد,OpsShell top bar <768 در میز تصمیم — K3 (390),FIXED,DEC-0242,«بازگشت به صف» در موبایل میزها؛ زیرعنوان «پرونده N از M» نه
+SHL-008,T08,2,medium,code,SHL,K3 K13,OpsShell عنوان h1 ثابت دارد و جایی برای PageHeader صفحه (متا، اقدام‌ها) نیست,OpsShell main — K3، K13,FIXED,DEC-0242,hz-page-header در پوسته؛ DeskHead h1 با headingInPage
+SHL-009,T08,2,medium,code,SHL,,در تبلت (۷۶۸–۱۰۲۳) ریل OpsShell قابل بازشدن نیست,OpsShell rail,FIXED,DEC-0242,دکمه منو و Drawer کامل در ۷۶۸–۱۰۲۳
+SHL-010,T08,2,medium,code,SHL,,چگالی OpsShell (متن ۱۴/۲۴) در سطح پوسته اعمال نشده,OpsShell main,FIXED,DEC-0242,text-body-sm روی main عملیاتی
+SHL-011,T08,2,low,needs decision,SHL,,وضعیت جمع/باز گروه‌ها و سایدبار ذخیره نمی‌شود و پیش‌فرض «گروه‌های دارای شمارنده» نیست,OpsShell sidebar (۱۵–۲۴ آیتم، بازار),FIXED,DEC-0242,کوکی hz-ops-side-{env} سمت سرور؛ پیش‌فرض گروه‌های دارای شمارنده
+SHL-012,T08,2,low,code,SHL,,دسترس‌پذیری ریل و اندازه لمسی آیتم‌های dense,OpsShell rail و sidebar,FIXED,DEC-0242,aria-label با شمار، ۴۴px در pointer:coarse؛ tooltip با title
+SHL-013,T08,2,low,code,SHL,,«کلاب‌ها» در گروه اشتباه سایدبار انجمن,OpsShell — ASSOC_NAV,FIXED,DEC-0242,کلاب‌ها در «پرورش»
+SHL-015,T08,2,low,code,SHL,,پایین Drawer ناوبری OpsShell به‌جای ردیف‌ها یک popover دارد,OpsShell Drawer <768,FIXED,DEC-0242,foot ردیف‌های مستقیم؛ فوکوس روی نخستین پیوند
 CMPB-041,T11,2,high,code,CMPB,K17,OfferCard · کامپوننت OfferCard وجود ندارد؛ کارت پیشنهاد داخل گفت‌وگو ناقص است,پیام نوع پیشنهاد در رشتهٔ گفت‌وگوی آگهی (K17),,,
 KUSR-037,T11,2,high,code,KUSR,K17,`/account/listings/[id]/requests` فهرست کارتی درخواست‌هاست، نه ConversationList + رشته گفتگو در دو ستون,K17 گفتگوی آگهی · چیدمان کل صفحه (P12),,,
 CMPA1-054,T11,2,medium,needs decision,CMPA1,K17,ConversationList وجود ندارد؛ فهرست درخواست‌های آگهی (K17) کارت تاریخ‌دار است,ConversationList (P12),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)

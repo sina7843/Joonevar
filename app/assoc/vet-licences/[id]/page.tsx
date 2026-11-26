@@ -50,8 +50,8 @@ export default async function AssocVetLicenceCasePage({ params }: { params: Prom
 
   const web = [latest?.websiteUrl, latest?.instagramHandle ? '@' + latest.instagramHandle : null].filter(Boolean).join(' · ');
   return (
-    <OpsShell actor={guard.actor} title="بررسی پروانه فعالیت" pathname="/assoc/vet-licences" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی پروانه فعالیت" pathname="/assoc/vet-licences" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'پروانه فعالیت · ' + (detail.applicantNameFa ?? '—')}
         status={keyStatus(vetCaseKey(detail.case.status))}
         position={deskPosition(queueIds, detail.case.id, (caseId) => '/assoc/vet-licences/' + caseId)}

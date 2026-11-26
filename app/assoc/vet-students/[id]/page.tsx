@@ -45,8 +45,8 @@ export default async function AssocVetStudentCasePage({ params }: { params: Prom
   const duplicates = detail.duplicates.profiles.length + detail.duplicates.cases.length;
 
   return (
-    <OpsShell actor={guard.actor} title="بررسی دانشجوی دامپزشکی" pathname="/assoc/vet-students" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی دانشجوی دامپزشکی" pathname="/assoc/vet-students" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'دانشجوی دامپزشکی · ' + (detail.applicantNameFa ?? latest?.fields.displayNameFa ?? '—')}
         status={keyStatus(vetCaseKey(detail.case.status))}
         position={deskPosition(queueIds, detail.case.id, (caseId) => '/assoc/vet-students/' + caseId)}

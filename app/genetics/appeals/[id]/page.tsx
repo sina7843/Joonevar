@@ -48,8 +48,8 @@ export default async function GeneticsAppealPage({ params }: { params: Promise<{
 
   const answered = appeal.status === 'ANSWERED';
   return (
-    <OpsShell actor={guard.actor} title="بررسی اعتراض" pathname={'/genetics/appeals/' + id} nav={GENETICS_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی اعتراض" pathname={'/genetics/appeals/' + id} nav={GENETICS_NAV} headingInPage>
+      <DeskHead level={1}
         title={'اعتراض به نتیجه · ' + (animal?.name ?? 'بدون نام')}
         // GAPS #4: no dictionary key for ANSWERED — module label kept.
         status={{ ...keyStatus(appeal.status, { tone: 'success', label: APPEAL_STATUS_FA[appeal.status] ?? appeal.status }), testId: 'centre-appeal-status' }}

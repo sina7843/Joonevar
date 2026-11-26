@@ -50,8 +50,8 @@ export default async function ReviewCentreClaimPage({ params }: { params: Promis
   ]);
   const position = queue ? deskPosition(queue.items.map((item) => item.id), claim.id, (other) => '/review/centres/claims/' + other) : null;
   return (
-    <OpsShell actor={guard.actor} title="بررسی Claim مرکز" pathname="/review/centres/claims" nav={REVIEW_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی Claim مرکز" pathname="/review/centres/claims" nav={REVIEW_NAV} headingInPage>
+      <DeskHead level={1}
         title={'Claim مرکز · ' + claim.claimantNameFa}
         status={{
           ...keyStatus(claim.status),

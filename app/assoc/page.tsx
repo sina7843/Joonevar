@@ -69,8 +69,12 @@ export default async function AssocPage() {
   const firstState = first ? ageState(ageInDays(first.at), clock) : undefined;
 
   return (
-    <OpsShell actor={guard.actor} title="صف‌ها" pathname="/assoc" nav={ASSOC_NAV}>
-      <div className="flex flex-wrap items-start justify-between gap-sm">
+    <OpsShell
+      actor={guard.actor}
+      title="صف‌ها"
+      pathname="/assoc"
+      nav={ASSOC_NAV}
+      meta={
         <p className="hz-page-header__meta">
           <span className="hz-page-header__meta-item">محیط عملیاتی انجمن</span>
           <span className="hz-page-header__meta-item">
@@ -78,13 +82,15 @@ export default async function AssocPage() {
           </span>
           <span className="hz-page-header__meta-item">{'به‌روزشده ' + whenFa(new Date())}</span>
         </p>
-        {first ? (
+      }
+      actions={
+        first ? (
           <ButtonLink tone="secondary" size="sm" href={first.href}>
             باز کردن قدیمی‌ترین پرونده
           </ButtonLink>
-        ) : null}
-      </div>
-
+        ) : undefined
+      }
+    >
       <section aria-labelledby="assoc-tiles">
         <h2 className="hz-visually-hidden" id="assoc-tiles">
           صف‌های انجمن

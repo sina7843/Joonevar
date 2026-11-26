@@ -62,8 +62,9 @@ export function DeskStatusBadge({ status, size }: { status: DeskStatus; size?: '
 
 /**
  * Record head of a desk (P10 › 2): title + badge, the meta line (codes, dates,
- * age, version) and whose move it is. The shell already renders the page h1,
- * so the record title is an h2.
+ * age, version) and whose move it is. On a decision desk page the record title
+ * is the page h1 (`level={1}`, with OpsShell `headingInPage`); inside a queue
+ * page's drawer it stays an h2.
  */
 export function DeskHead({
   title,
@@ -73,8 +74,10 @@ export function DeskHead({
   ownerExtra,
   position,
   children,
+  level = 2,
 }: {
   title: ReactNode;
+  level?: 1 | 2;
   status?: DeskStatus;
   meta?: readonly ReactNode[];
   owner?: ActionOwnerKind | null;
@@ -86,7 +89,7 @@ export function DeskHead({
   return (
     <section className="hz-card hz-desk__head">
       <div className="hz-desk__title">
-        <h2 className="hz-h3">{title}</h2>
+        {level === 1 ? <h1 className="hz-h3">{title}</h1> : <h2 className="hz-h3">{title}</h2>}
         {status ? <DeskStatusBadge status={status} /> : null}
         {position ? <DeskNav position={position} /> : null}
       </div>
@@ -336,7 +339,7 @@ export function QueueMeta({ total, oldestDays, noun = 'پرونده در صف' }
   return (
     <p className="hz-page-header__meta">
       <span className="hz-page-header__meta-item">{total.toLocaleString('fa-IR') + ' ' + noun}</span>
-      {oldestDays !== undefined && oldestDays !== null ? (
+      {total > 0 && oldestDays !== undefined && oldestDays !== null && Number.isFinite(oldestDays) ? (
         <span className="hz-page-header__meta-item">{'قدیمی‌ترین: ' + oldestDays.toLocaleString('fa-IR') + ' روز'}</span>
       ) : null}
     </p>

@@ -49,8 +49,7 @@ export default async function GeneticsSamplesPage({
     status === 'IN_CUSTODY' || status === 'SEND_INSTRUCTED' || isUnusable(status as SampleStatusName) ? 'VET' : 'GENETICS_CENTRE';
 
   return (
-    <OpsShell actor={guard.actor} title="نمونه‌ها" pathname="/genetics/samples" nav={GENETICS_NAV}>
-      <QueueMeta total={result.all} noun="نمونه در جریان" />
+    <OpsShell actor={guard.actor} title="نمونه‌ها" pathname="/genetics/samples" nav={GENETICS_NAV} meta={<QueueMeta total={result.all} noun="نمونه در جریان" />}>
       <Alert tone="info" title="مرکز نمونه‌گیری نمی‌کند">
         نمونه تا دستور ارسال نزد دامپزشک می‌ماند و ارسال را همان نگهدارنده ثبت می‌کند. پردازش در این مرکز به
         پرداخت صدور سند در هم‌زیست وابسته نیست.

@@ -49,8 +49,8 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
   // Reporter identities stay hidden from the content admin (DEC-0235): numbered, oldest first.
   const reporterNumber = new Map([...data.open].reverse().map((report, index) => [report.id, index + 1]));
   return (
-    <OpsShell actor={guard.actor} title="بررسی گزارش محتوا" pathname="/content/reports" nav={CONTENT_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی گزارش محتوا" pathname="/content/reports" nav={CONTENT_NAV} headingInPage>
+      <DeskHead level={1}
         title={'گزارش محتوا، ' + item.titleFa}
         status={{ tone: open ? 'info' : 'success', label: open ? 'در حال بررسی' : 'تعیین تکلیف شد' }}
         position={position}

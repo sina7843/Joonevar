@@ -26,12 +26,19 @@ export default async function GeneticsPage() {
   ]);
 
   return (
-    <OpsShell actor={guard.actor} title="داشبورد مرکز ژنتیک" pathname="/genetics" nav={GENETICS_NAV}>
-      <p className="hz-page-header__meta">
-        <span className="hz-page-header__meta-item">
-          {queues.reduce((sum, queue) => sum + queue.waiting, 0).toLocaleString('fa-IR') + ' مورد باز در ' + queues.length.toLocaleString('fa-IR') + ' صف'}
-        </span>
-      </p>
+    <OpsShell
+      actor={guard.actor}
+      title="داشبورد مرکز ژنتیک"
+      pathname="/genetics"
+      nav={GENETICS_NAV}
+      meta={
+        <p className="hz-page-header__meta">
+          <span className="hz-page-header__meta-item">
+            {queues.reduce((sum, queue) => sum + queue.waiting, 0).toLocaleString('fa-IR') + ' مورد باز در ' + queues.length.toLocaleString('fa-IR') + ' صف'}
+          </span>
+        </p>
+      }
+    >
       <Alert tone="info" title="مرکز نمونه‌گیری نمی‌کند">
         <span data-testid="centre-name">
           {centreName.value === null

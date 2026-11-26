@@ -67,8 +67,8 @@ export default async function AssocPermitPage({ params }: { params: Promise<{ id
   const open = permit.status === 'UNDER_REVIEW';
   const firstSubmittedAt = steps.filter((step) => step.action === 'MATING_PERMIT_SUBMITTED').at(-1)?.at ?? permit.submittedAt;
   return (
-    <OpsShell actor={guard.actor} title="بررسی مجوز جفت‌گیری" pathname={'/assoc/permits/' + id} nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی مجوز جفت‌گیری" pathname={'/assoc/permits/' + id} nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'مجوز جفت‌گیری · ' + view.initiatorName + ' و ' + view.counterpartyName}
         status={{ ...keyStatus(permit.status), testId: 'assoc-permit-status' }}
         position={deskPosition(

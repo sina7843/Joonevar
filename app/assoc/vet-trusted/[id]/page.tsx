@@ -49,8 +49,8 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
 
   const standing = detail.case.status === 'ACTIVE_TRUSTED_VET' || detail.case.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT';
   return (
-    <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک معتمد" pathname="/assoc/vet-trusted" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک معتمد" pathname="/assoc/vet-trusted" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'دامپزشک معتمد · ' + (detail.applicantNameFa ?? '—')}
         status={{ ...keyStatus(vetCaseKey(detail.case.status)), testId: 'trusted-case-status' }}
         position={deskPosition(queueIds, detail.case.id, (caseId) => '/assoc/vet-trusted/' + caseId)}

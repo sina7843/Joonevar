@@ -41,7 +41,7 @@ export default async function GeneticsAppealsPage({
   const page = sliceQueue(rows, query, { text: (a) => nameOf(a.animalId), at: (a) => a.createdAt, name: (a) => nameOf(a.animalId) });
 
   return (
-    <OpsShell actor={guard.actor} title="اعتراض‌ها" pathname="/genetics/appeals" nav={GENETICS_NAV}>
+    <OpsShell actor={guard.actor} title="اعتراض‌ها" pathname="/genetics/appeals" nav={GENETICS_NAV} meta={<QueueMeta total={rows.length} noun="اعتراض در صف" oldestDays={Math.max(...rows.map((appeal) => ageInDays(appeal.createdAt) ?? 0))} />}>
       <Alert tone="info" title="اعتراض، اجازه ویرایش نتیجه نیست">
         نتیجه مورد اعتراض حفظ می‌شود؛ اگر اصلاح لازم باشد، نتیجه اصلاحی نسخه جدید است و سند صادرشده قبلی
         بازنویسی نمی‌شود.
@@ -54,7 +54,6 @@ export default async function GeneticsAppealsPage({
         />
       ) : (
         <>
-          <QueueMeta total={rows.length} noun="اعتراض در صف" oldestDays={Math.max(...rows.map((appeal) => ageInDays(appeal.createdAt) ?? 0))} />
           <QueueFrame
             path="/genetics/appeals"
             params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}

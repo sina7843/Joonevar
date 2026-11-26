@@ -47,8 +47,7 @@ export default async function SettlementPage({ searchParams }: { searchParams: P
   });
 
   return (
-    <OpsShell actor={guard.actor} title="تسویه فروشندگان" nav={marketNav(guard.actor)} pathname="/market/settlement">
-      <QueueMeta total={rows.length} noun="فروشگاه با مبلغ در جریان یا قابل تسویه" />
+    <OpsShell actor={guard.actor} title="تسویه فروشندگان" nav={marketNav(guard.actor)} pathname="/market/settlement" meta={<QueueMeta total={rows.length} noun="فروشگاه با مبلغ در جریان یا قابل تسویه" />}>
       <Alert tone="info" title="واریز در این صفحه ثبت می‌شود، نه انجام">
         <span data-testid="settlement-manual-note">
           پرداخت بانکی بیرون از همزیست انجام می‌شود و شماره پیگیری آن اینجا ثبت می‌شود؛ تا ثبت واریز، مبلغ از

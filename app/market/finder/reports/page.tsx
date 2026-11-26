@@ -48,12 +48,7 @@ export default async function FinderReportsPage({ searchParams }: { searchParams
   });
   const canUnlist = hasFinderCapability(actor, 'FINDER_PROFILE_MODERATE');
   return (
-    <OpsShell actor={actor} title="گزارش‌های جفت‌یابی" nav={marketNav(actor)} pathname="/market/finder/reports">
-      <QueueMeta
-        total={queue.length}
-        noun={closed ? 'گزارش تصمیم‌گرفته' : 'گزارش باز'}
-        oldestDays={!closed && queue.length > 0 ? Math.max(...queue.map((r) => ageInDays(r.createdAt) ?? 0)) : null}
-      />
+    <OpsShell actor={actor} title="گزارش‌های جفت‌یابی" nav={marketNav(actor)} pathname="/market/finder/reports" meta={<QueueMeta total={queue.length} noun={closed ? 'گزارش تصمیم‌گرفته' : 'گزارش باز'} oldestDays={!closed && queue.length > 0 ? Math.max(...queue.map((r) => ageInDays(r.createdAt) ?? 0)) : null} />}>
       <ViewChips
         label="نمای گزارش‌ها"
         chips={[

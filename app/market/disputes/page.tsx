@@ -55,12 +55,7 @@ export default async function DisputeQueuePage({ searchParams }: { searchParams:
   });
 
   return (
-    <OpsShell actor={guard.actor} title="پرونده‌های اختلاف" nav={marketNav(guard.actor)} pathname="/market/disputes">
-      <QueueMeta
-        total={queue.length}
-        noun="پرونده باز"
-        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null}
-      />
+    <OpsShell actor={guard.actor} title="پرونده‌های اختلاف" nav={marketNav(guard.actor)} pathname="/market/disputes" meta={<QueueMeta total={queue.length} noun="پرونده باز" oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null} />}>
       <Alert tone="info" title="دامنه داوری">
         <span data-testid="dispute-scope-note">{OUT_OF_SCOPE_FA}</span>
       </Alert>

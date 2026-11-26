@@ -48,8 +48,8 @@ export default async function ReviewSuggestionPage({ params }: { params: Promise
   ]);
   const position = queue ? deskPosition(queue.items.map((item) => item.id), suggestion.id, (other) => '/review/suggestions/' + other) : null;
   return (
-    <OpsShell actor={guard.actor} title="بررسی پیشنهاد" pathname="/review/suggestions" nav={REVIEW_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی پیشنهاد" pathname="/review/suggestions" nav={REVIEW_NAV} headingInPage>
+      <DeskHead level={1}
         title={SUGGESTION_KIND_FA[suggestion.kind as SuggestionKind] + ' · ' + suggestion.displayNameFa}
         status={{
           ...keyStatus(suggestion.status),

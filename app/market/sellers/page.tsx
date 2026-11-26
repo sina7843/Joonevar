@@ -58,12 +58,7 @@ export default async function SellerReviewPage({ searchParams }: { searchParams:
   const details = await Promise.all(page.items.map((entry) => sellerDetail(db(), guard.actor, entry.id)));
 
   return (
-    <OpsShell actor={guard.actor} title="پرونده‌های فروشنده کالا" nav={marketNav(guard.actor)} pathname="/market/sellers">
-      <QueueMeta
-        total={queue.length}
-        noun="پرونده در صف"
-        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.submittedAt) ?? 0)) : null}
-      />
+    <OpsShell actor={guard.actor} title="پرونده‌های فروشنده کالا" nav={marketNav(guard.actor)} pathname="/market/sellers" meta={<QueueMeta total={queue.length} noun="پرونده در صف" oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.submittedAt) ?? 0)) : null} />}>
       <Alert tone="info" title="مدارک کسب‌وکار خصوصی‌اند و هر بازکردنشان ثبت می‌شود">
         <span data-testid="seller-review-note">
           {IBAN_NOTE_FA} تأیید پرونده به‌تنهایی فروشگاه را فعال نمی‌کند؛ فعال‌شدن نتیجه آغاز دوره پلن

@@ -64,8 +64,8 @@ export default async function AssocForeignCasePage({ params }: { params: Promise
   const open = status === 'UNDER_REVIEW';
   const firstSubmittedAt = steps.filter((step) => step.action === 'FOREIGN_PEDIGREE_SUBMITTED').at(-1)?.at ?? record.submittedAt;
   return (
-    <OpsShell actor={guard.actor} title="بررسی Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی Export Pedigree" pathname="/assoc/foreign-pedigree" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'Export Pedigree · ' + (animal?.name ?? 'بدون نام')}
         status={keyStatus(status)}
         position={deskPosition(queueIds, record.id, (caseId) => '/assoc/foreign-pedigree/' + caseId)}

@@ -51,8 +51,7 @@ export default async function HandoverRecoveryPage({ searchParams }: { searchPar
   });
 
   return (
-    <OpsShell actor={guard.actor} title="تحویل‌های متوقف‌مانده" nav={marketNav(guard.actor)} pathname="/market/handovers">
-      <QueueMeta total={queue.length} noun="تحویل متوقف" />
+    <OpsShell actor={guard.actor} title="تحویل‌های متوقف‌مانده" nav={marketNav(guard.actor)} pathname="/market/handovers" meta={<QueueMeta total={queue.length} noun="تحویل متوقف" />}>
       <Alert tone="info" title="ثبت دستی، دور زدن شواهد نیست">
         <span data-testid="handover-recovery-note">
           ثبت دستی تحویل فقط کد یک‌بارمصرف را کنار می‌گذارد. بیعانه تأییدشده، حداقل سن، میکروچیپ ثبت‌شده،

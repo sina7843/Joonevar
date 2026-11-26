@@ -39,8 +39,8 @@ export default async function ReviewCommunityPage({ params }: { params: Promise<
   const history = await caseHistory('COMMUNITY', community.id, HISTORY_FA);
 
   return (
-    <OpsShell actor={guard.actor} title="انجمن و کلاب" pathname="/review/communities" nav={REVIEW_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="انجمن و کلاب" pathname="/review/communities" nav={REVIEW_NAV} headingInPage>
+      <DeskHead level={1}
         title={community.displayNameFa}
         status={{ key: community.publicStatus, testId: 'community-public-status' }}
         meta={[

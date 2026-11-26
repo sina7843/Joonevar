@@ -47,12 +47,7 @@ export default async function MessageModerationPage({ searchParams }: { searchPa
   });
 
   return (
-    <OpsShell actor={actor} title="گزارش پیام‌های گفت‌وگوی خرید" nav={marketNav(actor)} pathname="/market/messages">
-      <QueueMeta
-        total={queue.length}
-        noun="گزارش باز"
-        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null}
-      />
+    <OpsShell actor={actor} title="گزارش پیام‌های گفت‌وگوی خرید" nav={marketNav(actor)} pathname="/market/messages" meta={<QueueMeta total={queue.length} noun="گزارش باز" oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.createdAt) ?? 0)) : null} />}>
       <Alert tone="info" title="این صفحه متن پیام گزارش‌شده را نشان می‌دهد">
         <span data-testid="message-queue-note">
           سیاست حذف اطلاعات تماس پیش از بیعانه، الگوهای متداول را می‌گیرد و ادعای تشخیص کامل ندارد؛ هر

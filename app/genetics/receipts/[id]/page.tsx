@@ -59,8 +59,8 @@ export default async function GeneticsReceiptPage({ params }: { params: Promise<
   const open = receipt.status === 'UNDER_REVIEW';
   const firstSubmittedAt = steps.filter((step) => step.action === 'GENETICS_RECEIPT_SUBMITTED').at(-1)?.at ?? receipt.submittedAt;
   return (
-    <OpsShell actor={guard.actor} title="بررسی فیش" pathname={'/genetics/receipts/' + id} nav={GENETICS_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی فیش" pathname={'/genetics/receipts/' + id} nav={GENETICS_NAV} headingInPage>
+      <DeskHead level={1}
         title="فیش پرداخت مستقیم"
         status={{ ...keyStatus(receipt.status), testId: 'centre-receipt-status' }}
         position={deskPosition(

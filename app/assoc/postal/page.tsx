@@ -37,7 +37,7 @@ export default async function AssocPostalPage({ searchParams }: { searchParams: 
   });
 
   return (
-    <OpsShell actor={guard.actor} title="درخواست‌های پستی" pathname="/assoc/postal" nav={ASSOC_NAV}>
+    <OpsShell actor={guard.actor} title="درخواست‌های پستی" pathname="/assoc/postal" nav={ASSOC_NAV} meta={<QueueMeta total={rows.length} noun="درخواست ثبت‌شده" />}>
       <Alert tone="info" title="این فهرست فقط ثبت درخواست است">
         <span data-testid="postal-scope-note">
           چرخه ارسال، کد رهگیری پستی و وضعیت تحویل در این فاز وجود ندارد و ساخته نشده است.
@@ -51,7 +51,6 @@ export default async function AssocPostalPage({ searchParams }: { searchParams: 
         />
       ) : (
         <>
-          <QueueMeta total={rows.length} noun="درخواست ثبت‌شده" />
           <QueueFrame
             path="/assoc/postal"
             params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}

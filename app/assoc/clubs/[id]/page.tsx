@@ -71,8 +71,8 @@ export default async function AssocClubPage({ params }: { params: Promise<{ id: 
     ) : null;
 
   return (
-    <OpsShell actor={guard.actor} title={club.displayNameFa} pathname="/assoc/clubs" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title={club.displayNameFa} pathname="/assoc/clubs" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'کلاب · ' + club.displayNameFa}
         status={{ ...keyStatus(lifecycle), testId: 'assoc-club-status' }}
         position={deskPosition(queueIds, club.id, (clubId) => '/assoc/clubs/' + clubId)}

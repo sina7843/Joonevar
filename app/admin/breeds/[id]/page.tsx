@@ -36,12 +36,12 @@ export default async function AdminBreedPage({ params }: { params: Promise<{ id:
   const { breed, claims, groups, species, mergeTargets, redirects, primary } = data;
 
   return (
-    <OpsShell actor={guard.actor} title={breed.nameFa} pathname="/admin/breeds" nav={ADMIN_NAV}>
+    <OpsShell actor={guard.actor} title={breed.nameFa} pathname="/admin/breeds" nav={ADMIN_NAV} headingInPage>
       <Link href="/admin/breeds" className="hz-link hz-link--standalone hz-hide-md">
         بازگشت به فهرست نژادها
       </Link>
 
-      <DeskHead
+      <DeskHead level={1}
         title={
           <>
             {breed.nameFa}{' '}

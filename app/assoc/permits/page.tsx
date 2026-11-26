@@ -22,7 +22,7 @@ export default async function AssocPermitsPage({ searchParams }: { searchParams:
   const page = sliceQueue(rows, query, { text: (permit) => permit.id, at: (permit) => permit.submittedAt, name: (permit) => permit.id });
 
   return (
-    <OpsShell actor={guard.actor} title="مجوز جفت‌گیری" pathname="/assoc/permits" nav={ASSOC_NAV}>
+    <OpsShell actor={guard.actor} title="مجوز جفت‌گیری" pathname="/assoc/permits" nav={ASSOC_NAV} meta={<QueueMeta total={rows.length} oldestDays={ageInDays(rows[0]?.submittedAt)} />}>
       {rows.length === 0 ? (
         <EmptyState
           title="پرونده مجوزی در انتظار بررسی نیست"
@@ -30,7 +30,6 @@ export default async function AssocPermitsPage({ searchParams }: { searchParams:
         />
       ) : (
         <>
-          <QueueMeta total={rows.length} oldestDays={ageInDays(rows[0]?.submittedAt)} />
           <QueueFrame
             path="/assoc/permits"
             params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}

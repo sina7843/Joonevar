@@ -26,6 +26,19 @@ export interface ShellNavSection {
   readonly items: readonly ShellNavItem[];
 }
 
+/** Remember one environment's sidebar state for a year (read back on the server, so nothing jumps). */
+function saveSide(cookie: string | undefined, patch: { c?: boolean; g?: readonly string[] }) {
+  if (!cookie) return;
+  let current: { c?: boolean; g?: readonly string[] } = {};
+  try {
+    const raw = document.cookie.split('; ').find((part) => part.startsWith(cookie + '='));
+    if (raw) current = JSON.parse(decodeURIComponent(raw.slice(cookie.length + 1)));
+  } catch {
+    current = {};
+  }
+  document.cookie = cookie + '=' + encodeURIComponent(JSON.stringify({ ...current, ...patch })) + '; path=/; max-age=31536000; samesite=lax';
+}
+
 const isActive = (pathname: string, href: string, all: readonly string[]) => {
   if (pathname !== href && !pathname.startsWith(href + '/')) return false;
   // The longest matching address wins, so «/market» is not current on «/market/orders».
@@ -33,11 +46,14 @@ const isActive = (pathname: string, href: string, all: readonly string[]) => {
 };
 
 function SideItem({ item, current, dense }: { item: ShellNavItem; current: boolean; dense: boolean }) {
+  const countFa = item.count ? item.count.toLocaleString('fa-IR') + ' مورد' + (item.overdue ? '، از مهلت گذشته' : '') : '';
   return (
     <Link
       className={dense ? 'hz-side-item hz-side-item--dense' : 'hz-side-item'}
       href={item.href}
       aria-current={current ? 'page' : undefined}
+      // The rail hides the label, so the link names itself (SHL-012); title is the hover tooltip.
+      aria-label={countFa ? item.label + '، ' + countFa : undefined}
       title={item.label}
     >
       <span className="hz-side-item__icon">
@@ -68,15 +84,27 @@ export function SidebarNav({
   pathname,
   dense,
   label,
+  cookie,
+  initialClosed = null,
 }: {
   sections: readonly ShellNavSection[];
   pathname: string;
   dense: boolean;
   label: string;
+  /** Where the closed groups are remembered per environment (SHL-011). */
+  cookie?: string;
+  /** Saved closed groups; null = first visit: groups with waiting cases open, the rest closed. */
+  initialClosed?: readonly string[] | null;
 }) {
   const all = sections.flatMap((section) => section.items.map((item) => item.href));
   const collapsible = all.length >= 15;
-  const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
+  const [closed, setClosed] = useState<ReadonlySet<string>>(
+    () =>
+      new Set(
+        initialClosed ??
+          sections.filter((section) => section.label && !section.items.some((item) => item.count)).map((section) => section.label!),
+      ),
+  );
 
   return (
     <nav className="hz-sidebar__nav" aria-label={label}>
@@ -98,11 +126,17 @@ export function SidebarNav({
                       const next = new Set(previous);
                       if (next.has(section.label!)) next.delete(section.label!);
                       else next.add(section.label!);
+                      saveSide(cookie, { g: [...next] });
                       return next;
                     })
                   }
                 >
                   <span>{section.label}</span>
+                  {!open && section.items.some((item) => item.overdue) ? (
+                    <span className="hz-count hz-count--alert" aria-label="دارای صف از مهلت گذشته">
+                      {section.items.filter((item) => item.overdue).length.toLocaleString('fa-IR')}
+                    </span>
+                  ) : null}
                   <Icon name="caretDown" size="xs" />
                 </button>
               ) : (
@@ -130,15 +164,16 @@ export function SidebarNav({
 }
 
 /** «جمع‌کردن منو»: the desktop sidebar collapses to the 72px rail (OpsShell). */
-export function SidebarCollapse() {
-  const [collapsed, setCollapsed] = useState(false);
+export function SidebarCollapse({ cookie, initialCollapsed = false }: { cookie?: string; initialCollapsed?: boolean }) {
+  const [collapsed, setCollapsed] = useState(initialCollapsed);
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const aside = ref.current?.closest('.hz-sidebar');
     const app = ref.current?.closest('.hz-app');
     aside?.classList.toggle('hz-sidebar--collapsed', collapsed);
     app?.classList.toggle('hz-app--rail', collapsed);
-  }, [collapsed]);
+    saveSide(cookie, { c: collapsed });
+  }, [collapsed, cookie]);
   return (
     <div className="hz-sidebar__foot hz-show-lg">
       <button
@@ -184,7 +219,7 @@ export function NavDrawer({
 
   useEffect(() => {
     if (!open) return;
-    panel.current?.querySelector<HTMLElement>('a, button')?.focus();
+    (panel.current?.querySelector<HTMLElement>('.hz-sidebar a') ?? panel.current?.querySelector<HTMLElement>('a, button'))?.focus();
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const onKey = (event: KeyboardEvent) => {
