@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { ActionRow, Button, StickyActionBar } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Card } from '../../../src/ui/card.tsx';
@@ -100,25 +100,48 @@ export function OfferForm({ inquiryId }: { inquiryId: string }) {
   );
 }
 
+/**
+ * DS *OfferCard* actions: «پذیرش پیشنهاد» / «رد پیشنهاد». Rejecting is final
+ * for this offer, so it asks once more in place before it is sent (CMPB-043).
+ */
 export function OfferAnswerForm({ inquiryId, offerId }: { inquiryId: string; offerId: string }) {
   const [state, submit, pending] = useActionState(respondToOfferAction, EMPTY);
+  const [confirming, setConfirming] = useState(false);
   return (
-    <form action={submit} className="space-y-sm" data-testid="offer-answer">
+    <form action={submit} className="space-y-sm" data-testid="offer-answer" aria-busy={pending || undefined}>
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <input type="hidden" name="offerId" value={offerId} />
       <Result state={state} />
-      <ActionRow
-        primary={
-          <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="offer-accept">
-            پذیرش این قیمت
-          </Button>
-        }
-        secondary={
-          <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="offer-reject">
-            رد پیشنهاد
-          </Button>
-        }
-      />
+      {confirming ? (
+        <div className="space-y-sm" role="group" aria-label="تأیید رد پیشنهاد">
+          <p className="text-body-sm">این پیشنهاد رد می‌شود و دیگر قابل پذیرش نیست. طرف مقابل می‌تواند پیشنهاد تازه بدهد.</p>
+          <ActionRow
+            primary={
+              <Button type="submit" name="answer" value="REJECT" tone="destructive" disabled={pending} data-testid="offer-reject-confirm">
+                {pending ? 'در حال ثبت…' : 'رد پیشنهاد'}
+              </Button>
+            }
+            secondary={
+              <Button type="button" tone="secondary" disabled={pending} onClick={() => setConfirming(false)}>
+                انصراف
+              </Button>
+            }
+          />
+        </div>
+      ) : (
+        <ActionRow
+          primary={
+            <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="offer-accept">
+              {pending ? 'در حال ثبت…' : 'پذیرش پیشنهاد'}
+            </Button>
+          }
+          secondary={
+            <Button type="button" tone="secondary" disabled={pending} onClick={() => setConfirming(true)} data-testid="offer-reject">
+              رد پیشنهاد
+            </Button>
+          }
+        />
+      )}
     </form>
   );
 }
@@ -207,6 +230,16 @@ export function PayDepositForm({ inquiryId, amountFa }: { inquiryId: string; amo
 export function MessageForm({ inquiryId }: { inquiryId: string }) {
   const [state, submit, pending] = useActionState(postMessageAction, EMPTY);
   const [fileName, setFileName] = useState<string | null>(null);
+  // Nothing to send = the send button stays disabled (CMPB-113).
+  const [text, setText] = useState('');
+  const empty = text.trim() === '' && fileName === null;
+  useEffect(() => {
+    // A sent message clears the composer (the form reset does not clear a controlled field).
+    if (state.ok) {
+      setText('');
+      setFileName(null);
+    }
+  }, [state]);
   return (
     <form action={submit} className="hz-composer" data-testid="message-form">
       <input type="hidden" name="inquiryId" value={inquiryId} />
@@ -235,9 +268,25 @@ export function MessageForm({ inquiryId }: { inquiryId: string }) {
           <label htmlFor="message-body" className="hz-visually-hidden">
             پیام تازه
           </label>
-          <textarea id="message-body" name="body" rows={1} className="hz-composer__input" placeholder="پیام خود را بنویسید" data-testid="message-body" />
+          <textarea
+            id="message-body"
+            name="body"
+            rows={1}
+            className="hz-composer__input"
+            placeholder="پیام خود را بنویسید"
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            data-testid="message-body"
+          />
         </div>
-        <button type="submit" className="hz-composer__send" disabled={pending} aria-busy={pending || undefined} aria-label="ارسال پیام" data-testid="message-submit">
+        <button
+          type="submit"
+          className="hz-composer__send"
+          disabled={pending || empty}
+          aria-busy={pending || undefined}
+          aria-label="ارسال پیام"
+          data-testid="message-submit"
+        >
           {pending ? <span className="hz-spinner" aria-hidden="true" /> : <Icon name="paperPlaneRight" size="md" mirror />}
         </button>
       </div>

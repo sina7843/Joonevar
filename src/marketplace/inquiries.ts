@@ -19,7 +19,7 @@
  * the transaction that verified the deposit, together with closing every other
  * request — never by anyone pressing a button.
  */
-import { and, asc, desc, eq, isNull, lte, ne, or, sql, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, lte, ne, or, sql, type SQL } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { accounts } from '../db/schema/core.ts';
 import { animals } from '../db/schema/animals.ts';
@@ -1137,6 +1137,8 @@ export interface ThreadView {
   readonly inquiry: InquiryRow;
   readonly role: ThreadRole;
   readonly listingTitleFa: string;
+  /** The advert's asking price, for the OfferCard comparison line. */
+  readonly listPriceToman: bigint | null;
   readonly counterpartMobile: string | null;
   readonly liveOffer: OfferRow | null;
   readonly liveHandover: typeof inquiryHandoverProposals.$inferSelect | null;
@@ -1162,7 +1164,7 @@ export async function inquiryThread(
 
   // The name is read from the animal, never copied onto the advert (§10).
   const [listing] = await database
-    .select({ nameFa: animals.name })
+    .select({ nameFa: animals.name, priceToman: animalListings.priceToman })
     .from(animalListings)
     .innerJoin(animals, eq(animals.id, animalListings.animalId))
     .where(eq(animalListings.id, inquiry.listingId))
@@ -1223,6 +1225,7 @@ export async function inquiryThread(
     inquiry,
     role,
     listingTitleFa: listing?.nameFa ?? 'بدون نام',
+    listPriceToman: listing?.priceToman ?? null,
     counterpartMobile,
     liveOffer: liveOffer ?? null,
     liveHandover: liveHandover ?? null,
@@ -1256,11 +1259,13 @@ export interface InquirySummary {
   readonly paymentDeadlineAt: Date | null;
   readonly version: number;
   readonly createdAt: Date;
+  /** The newest message of the thread (ConversationList «آخرین پیام»); null before the first one. */
+  readonly lastMessage: { readonly textFa: string; readonly at: Date; readonly mine: boolean } | null;
 }
 
 /** What this buyer has asked for. */
 export async function buyerInquiries(database: DbClient, actor: Actor): Promise<readonly InquirySummary[]> {
-  return summaries(database, eq(listingInquiries.buyerAccountId, actor.accountId));
+  return summaries(database, eq(listingInquiries.buyerAccountId, actor.accountId), actor.accountId);
 }
 
 /** What has been asked of this seller, newest first, for one advert or all of them. */
@@ -1272,10 +1277,10 @@ export async function sellerInquiries(
   const scope = listingId
     ? and(eq(listingInquiries.sellerAccountId, actor.accountId), eq(listingInquiries.listingId, listingId))!
     : eq(listingInquiries.sellerAccountId, actor.accountId);
-  return summaries(database, scope);
+  return summaries(database, scope, actor.accountId);
 }
 
-async function summaries(database: DbClient, scope: SQL): Promise<readonly InquirySummary[]> {
+async function summaries(database: DbClient, scope: SQL, viewerId: string): Promise<readonly InquirySummary[]> {
   const rows = await database
     .select({
       id: listingInquiries.id,
@@ -1294,7 +1299,42 @@ async function summaries(database: DbClient, scope: SQL): Promise<readonly Inqui
     .where(scope)
     .orderBy(desc(listingInquiries.createdAt));
 
+  // One newest message per thread. A hidden message is named, never quoted (PROMPT-005).
+  const ids = rows.map((row) => row.id);
+  const latest =
+    ids.length === 0
+      ? []
+      : await database
+          .selectDistinctOn([inquiryMessages.inquiryId], {
+            inquiryId: inquiryMessages.inquiryId,
+            kind: inquiryMessages.kind,
+            bodyFa: inquiryMessages.bodyFa,
+            fileId: inquiryMessages.fileId,
+            hiddenAt: inquiryMessages.hiddenAt,
+            senderAccountId: inquiryMessages.senderAccountId,
+            createdAt: inquiryMessages.createdAt,
+          })
+          .from(inquiryMessages)
+          .where(inArray(inquiryMessages.inquiryId, ids))
+          .orderBy(inquiryMessages.inquiryId, desc(inquiryMessages.createdAt));
+  const lastOf = new Map(
+    latest.map((row) => [
+      row.inquiryId,
+      {
+        textFa:
+          row.hiddenAt !== null
+            ? 'پیام با تصمیم ناظر پنهان شد'
+            : row.kind === 'OFFER'
+              ? 'پیشنهاد قیمت'
+              : (row.bodyFa ?? (row.fileId ? 'پیوست' : '')),
+        at: row.createdAt,
+        mine: row.senderAccountId === viewerId,
+      },
+    ]),
+  );
+
   return rows.map((row) => ({
+    lastMessage: lastOf.get(row.id) ?? null,
     id: row.id,
     listingId: row.listingId,
     listingTitleFa: row.titleFa ?? 'بدون نام',

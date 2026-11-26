@@ -10,6 +10,7 @@ import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx
 import { PageCrumbs } from '../../../../src/ui/page-crumbs.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
+import { OfferCard } from '../../../../src/ui/conversation.tsx';
 import { ActionOwner, StatusBadge, type ActionOwnerKind } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { AppError } from '../../../../src/domain/errors.ts';
@@ -274,24 +275,36 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
                 {CONTACT_BLOCKED_FA}
               </span>
             </div>
-            <ul className="hz-thread" data-testid="thread-messages">
+            <ul
+              className="hz-thread"
+              role="log"
+              aria-label={'گفتگو ' + (role === 'BUYER' ? 'با فروشنده' : 'با خریدار') + ' درباره ' + thread.listingTitleFa}
+              data-testid="thread-messages"
+            >
               {thread.messages.length === 0 ? (
                 <li className="hz-msg hz-msg--system">
                   <span className="hz-msg__system">هنوز پیامی نیست. اولین پیام را بنویسید.</span>
                 </li>
               ) : null}
-              {thread.messages.map((message) => {
+              {thread.messages.map((message, index) => {
                 const day = dayFa(message.createdAt);
                 const newDay = day !== lastDay;
                 lastDay = day;
+                // The sender is said once per run of messages, not on every bubble (CMPB-111).
+                const previous = thread.messages[index - 1];
+                const continued = !newDay && previous !== undefined && previous.mine === message.mine;
                 return [
                   newDay ? (
-                    <li key={message.id + '-day'} className="hz-thread__day" aria-hidden="true">
+                    <li key={message.id + '-day'} className="hz-thread__day" role="separator">
                       {day}
                     </li>
                   ) : null,
-                  <li key={message.id} className={message.mine ? 'hz-msg hz-msg--mine' : 'hz-msg'} data-testid={'message-' + message.id}>
-                    <span className="hz-msg__sender">{message.mine ? 'شما' : 'طرف مقابل'}</span>
+                  <li
+                    key={message.id}
+                    className={['hz-msg', message.mine ? 'hz-msg--mine' : '', continued ? 'hz-msg--cont' : ''].join(' ').trim()}
+                    data-testid={'message-' + message.id}
+                  >
+                    <span className="hz-visually-hidden">{(message.mine ? 'شما' : 'طرف مقابل') + ': '}</span>
                     {message.hiddenReasonFa ? (
                       <div className="hz-msg__bubble">
                         <p className="hz-msg__text text-text-secondary" data-testid="message-hidden">
@@ -299,19 +312,20 @@ export default async function InquiryThreadPage({ params }: { params: Promise<{ 
                         </p>
                       </div>
                     ) : message.offerAmountToman !== null ? (
-                      <div className="hz-offer hz-msg__card">
-                        <div className="hz-offer__head">
-                          <Icon name="tag" size="sm" />
-                          <span className="hz-offer__label">پیشنهاد قیمت</span>
-                        </div>
-                        <p className="hz-offer__amount" data-testid="message-offer">
-                          پیشنهاد قیمت: {moneyFa(message.offerAmountToman)} تومان
-                        </p>
-                        {message.bodyFa ? <p className="hz-msg__text">{message.bodyFa}</p> : null}
+                      <>
+                        <OfferCard
+                          amountFa={moneyFa(message.offerAmountToman)}
+                          fromFa={message.mine ? 'شما' : message.offerParty === 'BUYER' ? 'خریدار' : 'فروشنده'}
+                          listPriceFa={thread.listPriceToman !== null ? tomanFa(thread.listPriceToman) : null}
+                          // CMPB-042: an offer's REJECTED is the dictionary's DECLINED.
+                          status={message.offerStatus === 'REJECTED' ? 'DECLINED' : message.offerStatus}
+                          testId="message-offer"
+                          note={message.bodyFa ? <p className="hz-msg__text">{message.bodyFa}</p> : null}
+                        />
                         <div className="hz-msg__meta">
                           <time dateTime={message.createdAt.toISOString()}>{timeFa(message.createdAt)}</time>
                         </div>
-                      </div>
+                      </>
                     ) : (
                       <div className="hz-msg__bubble">
                         {message.bodyFa ? <p className="hz-msg__text">{message.bodyFa}</p> : null}
