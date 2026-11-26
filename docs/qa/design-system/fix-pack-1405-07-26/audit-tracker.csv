@@ -388,7 +388,7 @@ CMPB-116,T28,2,low,code,CMPB,,NotificationItem · زمان اعلان ساعت �
 SHL-020,T28,2,low,code,SHL,,«سفارش‌ها» در سایدبار به مقصد اشتباه می‌رود,PublicShell sidebar › «حساب من»,FIXED,DEC-0254,«سفارش‌ها» → /account/orders؛ «درخواست‌های خرید» جدا
 SHL-022,T28,2,low,needs decision,SHL,,نوار تب دامپزشک معتمد: badge «صف من» و برچسب ناوبری,PublicShell tab bar — VET_TABS,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 SHL-023,T28,2,low,code,SHL,,جزئیات آیکون: تب «درخواست‌ها» و زنگ پرشده,PublicShell tab bar و نوار بالا,,,
-SHL-024,T28,2,low,code,SHL,,جعبه کاربر سایدبار PublicShell شهر را نشان نمی‌دهد,PublicShell sidebar user box,,,
+SHL-024,T28,2,low,code,SHL,,جعبه کاربر سایدبار PublicShell شهر را نشان نمی‌دهد,PublicShell sidebar user box,FIXED,DEC-0255,جعبه کاربر سایدبار «نقش، شهر» (بی‌شهر فقط نقش)
 SHL-026,T28,2,low,code,SHL,,جزئیات دسترس‌پذیری ناوبری گروه‌بندی‌شده دسکتاپ,GroupedNav (≥1024),,,
 SHL-027,T28,2,low,code,SHL,,جزئیات منوی موبایل سایت,GroupedNav mobile Drawer (<1024),,,
 SHL-028,T28,2,low,code,SHL,,سمت باز شدن Drawerهای ناوبری — تناقض در خود طراحی,Drawer ناوبری SiteShell و OpsShell (<1024 / <768),,,

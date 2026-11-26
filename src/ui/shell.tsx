@@ -11,7 +11,7 @@ import { canReadSettingGroup } from '../authz/policy.ts';
 import { hasMarketplaceCapability } from '../marketplace/model.ts';
 import { hasFinderCapability } from '../finder/model.ts';
 import { db } from '../db/client.ts';
-import { findProfile } from '../identity/account.ts';
+import { findProfile, findResidence } from '../identity/account.ts';
 import { signOutAction } from '../identity/sign-out-action.ts';
 import { unreadCount as countUnread } from '../notifications/service.ts';
 import { ageState, associationQueues, countsByHref, geneticsQueues, reviewClock } from '../operations/service.ts';
@@ -61,10 +61,12 @@ async function withCounts(actor: Actor, nav: readonly NavItem[]): Promise<readon
   });
 }
 
-async function who(actor: Actor): Promise<{ name: string; initial: string; role: string }> {
-  const profile = await findProfile(db(), actor.accountId);
+async function who(actor: Actor): Promise<{ name: string; initial: string; role: string; roleCity: string }> {
+  const [profile, residence] = await Promise.all([findProfile(db(), actor.accountId), findResidence(db(), actor.accountId)]);
   const name = profile === null ? 'حساب من' : profile.firstName + ' ' + profile.lastName;
-  return { name, initial: name.trim().charAt(0) || 'ح', role: CONTEXT_LABEL_FA[actor.context as ActorContextName] };
+  const roleFa = CONTEXT_LABEL_FA[actor.context as ActorContextName];
+  // PublicShell user box: «نقش · شهر», the role alone when no city is on file (SHL-024).
+  return { name, initial: name.trim().charAt(0) || 'ح', role: roleFa, roleCity: residence?.city ? roleFa + '، ' + residence.city : roleFa };
 }
 
 /** The account popover's items: the panel, the profile and the way out. */
@@ -215,7 +217,7 @@ export async function PublicShell({
             </Link>
           </div>
           <SidebarNav sections={vet ? VET_SIDEBAR : PUBLIC_SIDEBAR} pathname={pathname} dense={false} label="ناوبری حساب" />
-          <AccountPopover variant="sidebar" name={person.name} role={person.role} initial={person.initial}>
+          <AccountPopover variant="sidebar" name={person.name} role={person.roleCity} initial={person.initial}>
             <AccountItems />
           </AccountPopover>
         </aside>
