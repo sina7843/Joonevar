@@ -531,7 +531,7 @@ test('an operational environment is never reachable from a public session', asyn
 
     for (const href of ['/assoc', '/assoc/members', '/assoc/postal', '/genetics', '/admin', '/admin/audit', '/admin/breeds']) {
       await page.goto(BASE_URL + href, { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN', href);
+      assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', href);
     }
 
     // The public role switcher never offers an operational context either.

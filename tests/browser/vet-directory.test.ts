@@ -279,6 +279,6 @@ test('a hidden profile is not found, and the editor stays in the superadmin envi
   await withContext({ viewport: MOBILE }, async (page) => {
     await signIn(page, AUTHOR);
     await page.goto(BASE_URL + '/admin/vets/' + vet.accountId, { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
   });
 });

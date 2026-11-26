@@ -267,9 +267,9 @@ test('hiding a centre removes its page, and the management environments stay clo
   assert.ok(centreSlug, 'the centre was published by the first test');
   await as('user', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/admin/centres', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
     await page.goto(BASE_URL + '/review/centres', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
     await page.goto(BASE_URL + '/account/centres', { waitUntil: 'load' });
     await page.getByText('هنوز مرکزی به شما سپرده نشده است').waitFor();
   });

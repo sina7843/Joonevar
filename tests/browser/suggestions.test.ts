@@ -225,9 +225,9 @@ test('a representative claims the centre with a document and takes over the same
 test('the review environment and the claim documents stay closed to everyone else', async () => {
   await as('suggester', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/review/suggestions', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
     await page.goto(BASE_URL + '/review/centres/claims', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
   });
   await as('visitor', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/account/suggestions', { waitUntil: 'load' });

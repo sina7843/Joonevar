@@ -124,7 +124,7 @@ test('once verified, the student sees the one student tag and nothing a doctor h
 
     // The trusted veterinarian panel answers with the real denial screen, not an empty page.
     await page.goto(BASE_URL + '/vet', { waitUntil: 'load' });
-    await waitForText(page, 'denial-code', 'FORBIDDEN');
+    await page.locator('[data-testid="denial-code"][data-code="FORBIDDEN"]').waitFor();
 
     // And the dashboard no longer offers a path to an account that has chosen one.
     await page.goto(BASE_URL + '/dashboard', { waitUntil: 'load' });

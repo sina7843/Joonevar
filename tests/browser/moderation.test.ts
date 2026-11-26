@@ -242,7 +242,7 @@ test('the report queue and restrictions belong to the content admin alone', asyn
     await as(who, MOBILE, async (page) => {
       for (const target of ['/content/reports', '/content/restrictions']) {
         await page.goto(BASE_URL + target, { waitUntil: 'load' });
-        assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN', who + ' ' + target);
+        assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', who + ' ' + target);
       }
     });
   }

@@ -336,7 +336,7 @@ CMPB-009,T21,2,low,code,CMPB,,SelectField · اندازهٔ `sm`، گروه‌ب
 CMPB-011,T21,2,low,code,CMPB,,TextAreaField · پیش‌فرض `rows` برابر ۵ است، نه ۳,TextAreaField,,,
 CMPB-020,T21,2,low,needs decision,CMPB,,RadioCard · انتخاب نوع خدمت در درخواست تازه قیمت و حالت «تعیین‌نشده» ندارد,RadioCard — `/requests/new` (نوع خدمت هر حیوان),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 CMPA1-006,T24,2,medium,code,CMPA1,,AccessDenied بیرون از شل رندر می‌شود و سایدبار حذف می‌شود,AccessDenied و RecordNotFound (`<AccessDenied` در ۱۸۴ فایل و `<RecordNotFound` در ۳۳ فایل از `app/`),,,
-CMPA1-007,T24,2,medium,code,CMPA1,,خط «آنچه کم است» کد خطای انگلیسی نشان می‌دهد و نقش لازم را نمی‌گوید,AccessDenied,,,
+CMPA1-007,T24,2,medium,code,CMPA1,,خط «آنچه کم است» کد خطای انگلیسی نشان می‌دهد و نقش لازم را نمی‌گوید,AccessDenied,FIXED,DEC-0253,آنچه کم است به فارسی؛ کد در data-code
 CMPA1-008,T24,2,medium,code,CMPA1,,متن و اکشن‌های AccessDenied با جدول طراحی فرق دارد؛ «تغییر نقش» و `returnTo` نیست,AccessDenied,,,
 CMPB-080,T24,2,medium,code,CMPB,,PageStates · NetworkErrorState فقط در گالری استفاده شده و صفحهٔ خطا با Alert ساخته شده است,خطای بارگذاری صفحه یا بخش,,,
 CMPB-085,T24,2,medium,code,CMPB,,UnsetValue · کامپوننت و formatter مشترک نیست؛ مقدار تهی در دو جا به «۰ تومان» یا عدد ناقص تبدیل می‌شود,حق عضویت کلاب، سبد خرید,,,

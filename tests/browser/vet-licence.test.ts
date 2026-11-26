@@ -146,7 +146,7 @@ test('approval waits for payment: the licensed tag does not appear, and the file
   await as('stranger', DESKTOP, async (page) => {
     assert.equal((await page.request.get(BASE_URL + licencePath)).status(), 403, 'another account cannot read it');
     await page.goto(BASE_URL + '/assoc/vet-licences', { waitUntil: 'load' });
-    assert.equal((await page.getByTestId('denial-code').textContent())?.trim(), 'FORBIDDEN');
+    assert.equal((await page.getByTestId('denial-code').getAttribute('data-code'))?.trim(), 'FORBIDDEN');
   });
   await as('visitor', MOBILE, async (page) => {
     assert.equal((await page.request.get(BASE_URL + licencePath)).status(), 401);

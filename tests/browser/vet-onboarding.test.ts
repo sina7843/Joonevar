@@ -281,7 +281,7 @@ test('the association environment and application documents stay closed to every
   assert.ok(documentPath, 'the first test captured a document address');
   await as('applicant', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-doctors', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
     // The applicant reads their own document.
     assert.equal((await page.request.get(BASE_URL + documentPath)).status(), 200);
   });
@@ -290,7 +290,7 @@ test('the association environment and application documents stay closed to every
   });
   await as('reviewer', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-doctors', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN', 'the Phase 2 review operator does not verify council codes');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', 'the Phase 2 review operator does not verify council codes');
   });
   await as('visitor', MOBILE, async (page) => {
     assert.equal((await page.request.get(BASE_URL + documentPath)).status(), 401);
