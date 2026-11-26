@@ -503,10 +503,10 @@ RTU-006,T30,3,medium,needs decision,RTU,,صفحه‌های بازگشت از د�
 CMPA1-019,T30,3,low,code,CMPA1,,چیدمان tile در AnimalCard نیست و `/animals` نسخه محلی ساخته است,AnimalCard `layout: 'tile'`,,,
 CMPA1-020,T30,3,low,code,CMPA1,,خط meta کارت حیوان ناقص است: نژاد/جنس/پیشرفت پیش‌نویس، «بدون نام» کم‌رنگ و `title`,AnimalCard,,,
 CMPA2-027,T30,3,low,needs decision,CMPA2,,FilterBar: فهرست‌های پنل کاربر و پرداخت‌ها هیچ FilterBar ندارند,FilterBar,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPB-050,T30,3,low,code,CMPB,,PaymentResult · عنوان وضعیت `<h2>` است، فوکوس به آن نمی‌رود و متن عنوان‌ها یکسان نیست,صفحه‌های بازگشت از درگاه,,,
+CMPB-050,T30,3,low,code,CMPB,,PaymentResult · عنوان وضعیت `<h2>` است، فوکوس به آن نمی‌رود و متن عنوان‌ها یکسان نیست,صفحه‌های بازگشت از درگاه,PARTIAL,DEC-0255,فوکوس به عنوان؛ سطح h2 و یکسانی متن عنوان‌ها نه
 CMPB-053,T30,3,low,code,CMPB,,PaymentRow · موبایل، برچسب‌ها و حالت‌ها با طراحی متفاوت‌اند,فهرست پرداخت‌ها,,,
 KUSR-049,T30,3,low,code,KUSR,,`/animals`: کاشی‌ها badge «پرونده اولیه»، متای «G0» و ستون تکی موبایل دارند؛ اقدام اصلی موبایل چسبان نیست,P05 · `/animals` · `AnimalCard` tile,,,
-KUSR-052,T30,3,low,code,KUSR,,صفحه نتیجه پرداخت فوکوس را به عنوان نتیجه نمی‌برد,P08 · `PaymentResult` (همه صفحه‌های `…/return`),,,
+KUSR-052,T30,3,low,code,KUSR,,صفحه نتیجه پرداخت فوکوس را به عنوان نتیجه نمی‌برد,P08 · `PaymentResult` (همه صفحه‌های `…/return`),FIXED,DEC-0255,عنوان نتیجه پرداخت هنگام باز شدن فوکوس می‌گیرد
 RTU-009,T30,3,low,code,RTU,,`/account/complete` شل ندارد و هدر سایت را دستی می‌سازد,`/account/complete`,,,
 RTU-012,T30,3,low,code,RTU,,مسیر صفحه (PageCrumbs) در پرونده‌ها و فرم‌های عمیق نیست,"
   - P06 و P07 بدون `PageCrumbs`/`Breadcrumbs`:
