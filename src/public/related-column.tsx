@@ -45,7 +45,8 @@ export function RelatedColumn({
                         <span className="hz-article__kicker">{item.noteFa}</span>
                       )
                     ) : null}
-                    <span className="hz-article__title text-label-lg">{item.titleFa}</span>
+                    <h3 className="hz-article__title text-label-lg m-0">{item.titleFa}</h3>
+                    {item.metaFa ? <span className="hz-meta__item text-caption text-text-secondary">{item.metaFa}</span> : null}
                   </span>
                   <RecordImage variant="thumb-lg" fileId={item.imageFileId} altFa={item.imageAltFa} />
                 </Link>

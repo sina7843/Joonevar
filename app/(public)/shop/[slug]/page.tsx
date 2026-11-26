@@ -213,7 +213,7 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
         <div className="grid gap-xl lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
           <section aria-labelledby="specs-title" className="space-y-lg">
             <SectionHeader id="specs-title" title="توضیحات و مشخصات" />
-            {/* DS Accordion `--boxed` (K7): description and specifications open, delivery folded. */}
+            {/* DS Accordion `--boxed` (K7): description and specifications, both open. */}
             <div className="hz-accordion hz-accordion--boxed">
               {product.descriptionFa ? (
                 <details className="hz-accordion__item" open>

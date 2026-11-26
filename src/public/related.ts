@@ -8,6 +8,7 @@
 import { and, desc, eq, isNull, lte, ne } from 'drizzle-orm';
 import type { DbClient } from '../db/client.ts';
 import { contentItems } from '../db/schema/content.ts';
+import { readMinutes } from '../content/model.ts';
 import { centres, centreTypes } from '../db/schema/vets.ts';
 
 export interface RelatedItem {
@@ -16,6 +17,8 @@ export interface RelatedItem {
   readonly noteFa: string | null;
   readonly imageFileId: string | null;
   readonly imageAltFa: string | null;
+  /** «۶ دقیقه مطالعه، ۵ مهر ۱۴۰۵» for reading (DS RelatedColumn, CMPB-125). */
+  readonly metaFa?: string | null;
 }
 
 const CONTENT_PATH: Record<string, string> = {
@@ -41,6 +44,7 @@ export async function relatedContent(
       imageFileId: contentItems.imageFileId,
       imageAltFa: contentItems.imageAltFa,
       publishAt: contentItems.publishAt,
+      bodyFa: contentItems.bodyFa,
     })
     .from(contentItems)
     .where(
@@ -60,6 +64,10 @@ export async function relatedContent(
     noteFa: KIND_FA[row.kind] ?? null,
     imageFileId: row.imageFileId,
     imageAltFa: row.imageAltFa,
+    metaFa:
+      readMinutes(row.bodyFa ?? '').toLocaleString('fa-IR') +
+      ' دقیقه مطالعه' +
+      (row.publishAt ? '، ' + new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Tehran' }).format(row.publishAt) : ''),
   }));
 }
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { RichText } from './rich-text.tsx';
 import { RelatedColumn } from '../public/related-column.tsx';
-import { relatedContent, similarCentres } from '../public/related.ts';
+import { relatedContent } from '../public/related.ts';
 import Link from 'next/link';
 import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -242,11 +242,8 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
 
   const { item, state, byline, categoryNameFa, categorySlug, breed } = page;
   const { origin } = site();
-  // The column beside the article: other reading, and centres to look at.
-  const [moreReading, centres] = await Promise.all([
-    relatedContent(db(), { excludeId: item.id, limit: 4 }),
-    similarCentres(db(), { limit: 3 }),
-  ]);
+  // The column beside the article: other reading only (KPUB-019 — no centres group on K4).
+  const moreReading = await relatedContent(db(), { excludeId: item.id, limit: 4 });
   const path = pathOf(kind) + '/' + item.slug;
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -405,7 +402,6 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
               noteAsTag: true,
               link: { href: pathOf(kind), label: 'همه ' + KIND_PLURAL_FA[kind] },
             },
-            { titleFa: 'مراکز دامپزشکی', items: centres, link: { href: '/centers', label: 'همه مراکز' } },
           ]}
         />
       </div>
