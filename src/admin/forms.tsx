@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { Button } from '../ui/button.tsx';
 import { SelectField, TextField } from '../ui/field.tsx';
 import { Result, submitWith } from '../vets/directory-forms.tsx';
@@ -25,6 +25,11 @@ export interface MergeOption {
  */
 export function MergeForm({ kind, options }: { kind: MergeKind; options: readonly MergeOption[] }) {
   const [state, submit, pending] = useActionState(mergeRecordAction, EMPTY);
+  // DS SensitiveConfirm (CMPB-078): a merge redirects the duplicate's public
+  // address for good, so it is confirmed in place, naming both records, first.
+  const [confirming, setConfirming] = useState<{ duplicate: string; primary: string } | null>(null);
+  const form = useRef<HTMLFormElement>(null);
+  const nameOf = (value: string) => options.find((option) => value.startsWith(option.id))?.nameFa ?? '—';
 
   /*
    * The duplicate's expected version travels inside its own option value rather
@@ -32,7 +37,7 @@ export function MergeForm({ kind, options }: { kind: MergeKind; options: readonl
    * the moment a choice is made, and there is no state to be half-applied.
    */
   return (
-    <form onSubmit={submitWith(submit)} className="mt-lg space-y-md" data-testid="merge-form">
+    <form ref={form} onSubmit={submitWith(submit)} className="mt-lg space-y-md" data-testid="merge-form">
       <input type="hidden" name="kind" value={kind} />
       <Result state={state} testId="merge-result" />
 
@@ -58,9 +63,38 @@ export function MergeForm({ kind, options }: { kind: MergeKind; options: readonl
         hint="در تاریخچه می‌ماند و بعداً قابل بازبینی است."
         data-testid="merge-reason"
       />
-      <Button type="submit" disabled={pending} data-testid="merge-submit">
-        ثبت به‌عنوان تکراری
-      </Button>
+      {confirming ? (
+        <div className="hz-alert hz-alert--warning" role="alertdialog" aria-labelledby="merge-confirm-title" data-testid="merge-confirmation">
+          <div className="hz-alert__body">
+            <span className="hz-alert__title" id="merge-confirm-title">
+              {'«' + confirming.duplicate + '» تکراری «' + confirming.primary + '» ثبت شود؟'}
+            </span>
+            <span>نشانی عمومی رکورد تکراری از این پس به رکورد اصلی می‌رود و این کار در تاریخچه با دلیل می‌ماند.</span>
+            <div className="hz-alert__actions">
+              <Button type="submit" tone="destructive" size="sm" disabled={pending} data-testid="merge-confirm">
+                {pending ? 'در حال ثبت…' : 'تأیید ادغام'}
+              </Button>
+              <Button type="button" tone="secondary" size="sm" disabled={pending} onClick={() => setConfirming(null)}>
+                انصراف
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Button
+          type="button"
+          disabled={pending}
+          onClick={() => {
+            const element = form.current;
+            if (!element || !element.reportValidity()) return;
+            const data = new FormData(element);
+            setConfirming({ duplicate: nameOf(String(data.get('duplicate') ?? '')), primary: nameOf(String(data.get('primaryId') ?? '')) });
+          }}
+          data-testid="merge-submit"
+        >
+          ثبت به‌عنوان تکراری
+        </Button>
+      )}
     </form>
   );
 }

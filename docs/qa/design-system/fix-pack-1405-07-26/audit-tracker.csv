@@ -425,7 +425,7 @@ CMPB-034,T23,3,medium,code,CMPB,,PopoverMenu · منوی حساب ناوبری �
 CMPB-074,T23,3,medium,code,CMPB,,Modal · کامپوننت Modal فقط در گالری dev استفاده شده و در هیچ صفحهٔ محصولی به‌کار نرفته است,`Modal` (و `BottomSheet`/`Drawer` هم‌خانواده),,,
 CMPB-075,T23,3,medium,code,CMPB,,Modal · API و دسترس‌پذیری Modal با طراحی فاصله دارد,`Modal`,,,
 CMPB-076,T23,3,medium,code,CMPB,,Toast · ToastRegion و `toast()` وجود ندارند و همهٔ تأییدها Alert درون‌خطی‌اند,پیام‌های کوتاه تأیید یا خطا در همهٔ شل‌ها,,,
-CMPB-078,T23,3,medium,code,CMPB,,SensitiveConfirm · دیالوگ تأیید حساس وجود ندارد و ادغام رکورد بدون دروازهٔ تأیید انجام می‌شود,اقدام‌های برگشت‌ناپذیر اپراتور (ادغام رکورد، ابطال سند/مجوز),,,
+CMPB-078,T23,3,medium,code,CMPB,,SensitiveConfirm · دیالوگ تأیید حساس وجود ندارد و ادغام رکورد بدون دروازهٔ تأیید انجام می‌شود,اقدام‌های برگشت‌ناپذیر اپراتور (ادغام رکورد، ابطال سند/مجوز),PARTIAL,DEC-0254,دروازه تأیید درجا برای ادغام (نام دو رکورد، تأیید destructive)؛ کامپوننت عمومی SensitiveConfirm نه
 CMPA1-029,T23,3,low,code,CMPA1,,BottomSheet: زیرعنوان، `aria-labelledby`، فوکوس اولیه و بستن با کشیدن,BottomSheet,,,
 CMPA2-020,T23,3,low,code,CMPA2,,API کامپوننت Drawer: `side`/`variant` ندارد، عنوانش با `aria-label` است و دکمه‌ی بستن برچسب کلی دارد,Drawer,,,
 CMPB-077,T23,3,low,code,CMPB,,Tooltip · کامپوننت Tooltip وجود ندارد و `title` بومی هنوز استفاده می‌شود,کارت‌های لینک‌دار و جدول audit,,,

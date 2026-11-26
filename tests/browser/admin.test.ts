@@ -102,6 +102,8 @@ test('the superadmin merges a duplicate, and the public list drops it while its 
     await page.getByTestId('merge-duplicate').selectOption({ label: DUPLICATE });
     await page.getByTestId('merge-primary').selectOption({ label: PRIMARY });
     await page.getByTestId('merge-submit').click();
+    // The merge is confirmed in place, naming both records (CMPB-078).
+    await page.getByTestId('merge-confirm').click();
     /*
      * A successful merge revalidates this route, which remounts the form and
      * clears its banner. The proof is therefore the list that stays: the record
