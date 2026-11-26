@@ -372,7 +372,7 @@ FND-025,T27,2,medium,code,FND,,seed نمایشی تصویرهای ساختگی �
 FND-026,T27,2,medium,code,FND,,جعبهٔ خاکستری «بدون تصویر» به‌جای حالت طراحی‌شدهٔ RecordImage,`/vet/requests/[id]` (کارت حیوان در درخواست دامپزشک),,,
 CMPA1-026,T27,2,low,code,CMPA1,,کامپوننت Avatar ساخته نشده؛ حروف اول فقط یک حرف است و `.hz-person` هیچ‌جا به کار نرفته,Avatar (منوی حساب در سایدبار و نوار بالا، بایلاین محتوا، سرصفحه پروفایل‌های دایرکتوری),,,
 CMPA1-027,T27,2,low,code,CMPA1,,`.hz-avatar` برای شماره مرحله و آیکن به کار رفته (کاربرد خارج از نقش),Avatar,,,
-CMPB-072,T27,2,low,code,CMPB,,RecordImage · در قاب‌های کوچک، متن جایگزین تصویرِ نبوده پنهان‌شده رندر نمی‌شود,`RecordImage` با variant‌های `thumb`، `thumb-lg` و `avatar`,,,
+CMPB-072,T27,2,low,code,CMPB,,RecordImage · در قاب‌های کوچک، متن جایگزین تصویرِ نبوده پنهان‌شده رندر نمی‌شود,`RecordImage` با variant‌های `thumb`، `thumb-lg` و `avatar`,FIXED,DEC-0255,متن جایگزین تصویرِ نبوده در قاب کوچک برای صفحه‌خوان
 CMPB-073,T27,2,low,code,CMPB,,RecordImage · حالت خطای بارگذاری، props `fallbackAlt` و `focal`، و پشتیبانی فایل خصوصی وجود ندارند و چند صفحه markup دستی دارند,`RecordImage` و صفحه‌هایی که `.hz-media` را دستی می‌سازند,,,
 FND-027,T27,2,low,code,FND,,RecordImage: حالت «بارگذاری ناموفق»، alt پنهان در قاب‌های کوچک و alt ساختگی,RecordImage در همهٔ کارت‌ها و فهرست‌ها؛ عکس حیوان در `/animals` و `/animals/[id]`,,,
 SHL-002,T28,2,high,needs decision,SHL,K2 K9,فیلد جستجوی نوار بالای PublicShell در دسکتاپ وجود ندارد,PublicShell top bar (≥1024) — K2، K9 و همه ۱۰۷ صفحه PublicShell,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #3 approved per proposal (DEC-0235)
