@@ -23,6 +23,16 @@ import {
 } from '../../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { RenewReferralForm } from './renew-form.tsx';
+import { CaseHistory } from '../../../src/ui/desk.tsx';
+import { auditSteps, historyFromAudit } from '../../assoc/audit-history.ts';
+
+/** What each recorded step of a visit request is called on its timeline (K11 «تاریخچه پرونده»). */
+const REQUEST_STEP_FA: Readonly<Record<string, string>> = {
+  VET_VISIT_REQUEST_CREATED: 'درخواست ثبت شد و کد مراجعه صادر شد',
+  REFERRAL_REISSUED: 'کد مراجعه تازه صادر شد',
+  VET_VISIT_CHECKED_IN: 'پذیرش نزد دامپزشک معتمد',
+  VET_VISIT_SERVICE_CORRECTED: 'خدمت ثبت‌شده اصلاح شد',
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -57,7 +67,9 @@ export default async function RequestPage({
   }
 
   const { request, referral, expired } = view;
-  const sampleRows = await ownerSamples(db(), guard.actor, request.id);
+  // The page has already authorized this request (ownerRequest), so its audit rows are this owner's to read.
+  const [sampleRows, steps] = await Promise.all([ownerSamples(db(), guard.actor, request.id), auditSteps('VET_VISIT_REQUEST', request.id)]);
+  const history = historyFromAudit(steps, REQUEST_STEP_FA, request.status === 'ACTIVE' || request.status === 'CHECKED_IN');
   const usable = referral !== null && referral.status === 'ACTIVE' && !expired;
 
   const title = SERVICE_TYPE_FA[request.serviceType] + ' · ' + (view.animalName ?? 'بدون نام');
@@ -168,6 +180,13 @@ export default async function RequestPage({
               </p>
             </Card>
           ) : null}
+
+          <Card>
+            <SectionHeader size="sm" title="تاریخچه پرونده" />
+            <div className="mt-md" data-testid="request-history">
+              <CaseHistory entries={history} />
+            </div>
+          </Card>
 
           <Card>
             <SectionHeader size="sm" title="جزئیات درخواست" />

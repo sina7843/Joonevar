@@ -252,9 +252,9 @@ KUSR-009,T15,2,low,code,KUSR,K2,سرصفحه داشبورد آواتار ندا�
 KUSR-010,T15,2,low,code,KUSR,K2,هشدار اعلان‌های خوانده‌نشده: متن ثابت به‌جای خلاصه اعلان‌ها، و جای دکمه,K2 · Alert اعلان‌ها,,,
 KUSR-013,T15,2,low,needs decision,KUSR,K2,کارت «مسیر حرفه‌ای دامپزشکی» در طراحی K2 نیست,K2 · بین هشدارها و پرداخت‌ها,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 KUSR-014,T15,2,low,code,KUSR,K2,فاصله ستون‌های حیوان‌ها/درخواست‌ها ۱۶ به‌جای ۲۴,K2 دسکتاپ,FIXED,DEC-0247,gap-xl (۲۴)
-CMPB-102,T16,2,high,code,CMPB,K11,Timeline · صفحه‌های رکورد درخواست، ثبت، مجوز و سفارش «تاریخچه پرونده» ندارند,Timeline در P6 (رکورد)؛ صفحهٔ کلیدی K11 «پیگیری درخواست»,,,
+CMPB-102,T16,2,high,code,CMPB,K11,Timeline · صفحه‌های رکورد درخواست، ثبت، مجوز و سفارش «تاریخچه پرونده» ندارند,Timeline در P6 (رکورد)؛ صفحهٔ کلیدی K11 «پیگیری درخواست»,PARTIAL,DEC-0248,درخواست مراجعه دارد؛ ثبت/مجوز/سفارش نه
 KUSR-016,T16,2,high,code,KUSR,K9,ستون کناری پرونده حیوان «خدمت بعدی»، تعرفه و کارت‌های قفل را ندارد,K9 · aside «وضعیت و اقدام»,,,
-KUSR-029,T16,2,high,code,KUSR,K11,صفحه پیگیری درخواست «تاریخچه پرونده» (Timeline) ندارد,K11 پیگیری درخواست · `Timeline`,,,
+KUSR-029,T16,2,high,code,KUSR,K11,صفحه پیگیری درخواست «تاریخچه پرونده» (Timeline) ندارد,K11 پیگیری درخواست · `Timeline`,FIXED,DEC-0248,«تاریخچه پرونده» از audit درخواست
 KUSR-030,T16,2,high,needs decision,KUSR,K11,`/requests/[id]` فقط درخواست مراجعه دامپزشک است؛ حالت «نیازمند اصلاح» با دلیل و «اصلاح و ارسال دوباره» وجود ندارد,K11 · حالت سخت «نیازمند اصلاح، مهلت گذشته»,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 RTU-011,T16,2,high,code,RTU,,پرونده‌های P06 «اقدام بعدی با» ندارند,"پرونده‌هایی که در اسکن هیچ `ActionOwner`، `WaitingState` یا `NeedsCorrectionState` ندارند:
   - `/registration/[id]`
@@ -274,7 +274,7 @@ RTU-011,T16,2,high,code,RTU,,پرونده‌های P06 «اقدام بعدی ب�
   - `/vet/requests/[id]`",,,
 CMPA1-014,T16,2,medium,code,CMPA1,,«اقدام بعدی با» در فهرست درخواست‌ها برای پرونده‌های بسته هم نشان داده می‌شود و مالک ساختگی دارد,ActionOwner,,,
 CMPB-103,T16,2,medium,code,CMPB,,Timeline · API کامپوننت state ندارد، CTA اجباری است و رویداد آینده یا بازیگر ندارد,Timeline و CaseHistory,,,
-CMPB-104,T16,2,medium,code,CMPB,,"Timeline · نبود `aria-label`، `aria-current=""step""` و `<time datetime>`؛ دو نسخهٔ دستی",Timeline، CaseHistory و markup دستی,,,
+CMPB-104,T16,2,medium,code,CMPB,,"Timeline · نبود `aria-label`، `aria-current=""step""` و `<time datetime>`؛ دو نسخهٔ دستی",Timeline، CaseHistory و markup دستی,FIXED,DEC-0248,aria-label، aria-current=step، time datetime
 KUSR-018,T16,2,medium,code,KUSR,K9,ستون اصلی پرونده حیوان بخش‌های اضافه و placeholder دارد و Tabs ندارد,K9 · ستون اصلی,,,
 KUSR-019,T16,2,medium,needs decision,KUSR,K9,سرصفحه پرونده حیوان: badge «پرونده اولیه» به‌جای وضعیت حیات، شناسه بدون کپی، متای متفاوت,K9 · PageHeader record variant,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 KUSR-021,T16,2,medium,code,KUSR,K9,تاریخچه پرونده حیوان: متن عمومی، بدون بازیگر و بدون رویدادهای صدور سند,K9 · «تاریخچه پرونده» (`Timeline`),,,

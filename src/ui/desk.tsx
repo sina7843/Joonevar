@@ -353,17 +353,20 @@ export interface HistoryEntry {
   readonly status?: string | { tone: StatusTone; label: string };
   readonly body?: ReactNode;
   readonly current?: boolean;
+  /** When it happened, for `<time datetime>`. */
+  readonly at?: Date;
 }
 
 /** «سابقه پرونده» — DS *Timeline*, audit variant: newest first, no CTA per entry. */
-export function CaseHistory({ entries }: { entries: readonly HistoryEntry[] }) {
+export function CaseHistory({ entries, label = 'تاریخچه پرونده' }: { entries: readonly HistoryEntry[]; label?: string }) {
   if (entries.length === 0) return <p className="text-body-sm text-text-secondary">—</p>;
   return (
-    <ol className="hz-timeline">
+    <ol className="hz-timeline" aria-label={label}>
       {entries.map((entry) => (
         <li
           key={entry.id}
           className={'hz-timeline__item ' + (entry.current ? 'hz-timeline__item--current' : 'hz-timeline__item--done')}
+          aria-current={entry.current ? 'step' : undefined}
         >
           <span className="hz-timeline__marker" aria-hidden="true" />
           <div className="hz-timeline__content">
@@ -377,7 +380,9 @@ export function CaseHistory({ entries }: { entries: readonly HistoryEntry[] }) {
                 </StatusBadge>
               )}
             </div>
-            {entry.whenFa ? <div className="hz-timeline__meta">{entry.whenFa}</div> : null}
+            {entry.whenFa ? (
+              <div className="hz-timeline__meta">{entry.at ? <time dateTime={entry.at.toISOString()}>{entry.whenFa}</time> : entry.whenFa}</div>
+            ) : null}
             {entry.body ? <p className="hz-timeline__body">{entry.body}</p> : null}
           </div>
         </li>

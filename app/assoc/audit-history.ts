@@ -68,5 +68,6 @@ export function historyFromAudit(steps: readonly AuditStep[], titles: Readonly<R
       status: stepStatus(step.status),
       body: step.reason ?? undefined,
       current: open && index === 0,
+      at: step.at,
     }));
 }
