@@ -300,16 +300,16 @@ KOPS-030,T19,2,high,code,KOPS,K16,پیش‌نمایش محتوای گزارش‌
 CMPB-119,T19,2,medium,code,CMPB,K16,ReportCard · کامپوننت ReportCard وجود ندارد؛ میز گزارش محتوا کارت خلاصهٔ گزارش ندارد,ReportCard در `/content/reports/[contentId]` (K16)، و صف‌های `/content/reports`، `/content/clubs` و `/market/listings`,,,
 KOPS-031,T19,2,medium,needs decision,KOPS,K16,هویت گزارش‌دهندگان: طراحی آن را (محرمانه) به ادمین محتوا نشان می‌دهد، کد عمداً پنهان می‌کند,K16 · جدول «گزارش‌ها» (حالت سخت K16 «حریم گزارش‌دهنده»),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 KOPS-033,T19,2,low,needs decision,KOPS,K16,«سابقه پرونده» فقط گزارش‌های تصمیم‌گرفته را دارد و پیش از نخستین تصمیم کلاً پنهان است,K16 · Timeline,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPB-003,T20,2,high,code,CMPB,K8,OtpField · کد تأیید یک فیلد متنی است، نه گروه ۶ خانه‌ای `.hz-otp`,OtpField — مرحلهٔ ۲ ورود (K08)، تأیید شمارهٔ جدید در پروفایل,,,
+CMPB-003,T20,2,high,code,CMPB,K8,OtpField · کد تأیید یک فیلد متنی است، نه گروه ۶ خانه‌ای `.hz-otp`,OtpField — مرحلهٔ ۲ ورود (K08)، تأیید شمارهٔ جدید در پروفایل,FIXED,DEC-0251,OtpField شش‌خانه‌ای hz-otp
 CMPB-001,T20,2,medium,code,CMPB,K8,MobileField · ورودی موبایل کامپوننت واحد ندارد و ویژگی‌هایش در هر فرم فرق دارد,MobileField — ورود (K08)، پروفایل، نقش‌ها، فروشنده، مراکز، کلاب‌ها، اعلام جفت‌گیری,,,
-CMPB-004,T20,2,medium,code,CMPB,K8,OtpField · ردیف شمارش معکوس، پیوند «ویرایش شماره» و حالت منقضی وجود ندارد,OtpField — مرحلهٔ ۲ ورود (K08),,,
-KPUB-041,T20,2,medium,code,KPUB,K8,OtpField شش‌خانه‌ای و خطای درون‌فیلد پیاده نشده است,K8 مرحلهٔ ۲ — OtpField,,,
+CMPB-004,T20,2,medium,code,CMPB,K8,OtpField · ردیف شمارش معکوس، پیوند «ویرایش شماره» و حالت منقضی وجود ندارد,OtpField — مرحلهٔ ۲ ورود (K08),PARTIAL,DEC-0251,شمارش معکوس mm:ss و «ویرایش شماره»؛ حالت منقضی جدا نه
+KPUB-041,T20,2,medium,code,KPUB,K8,OtpField شش‌خانه‌ای و خطای درون‌فیلد پیاده نشده است,K8 مرحلهٔ ۲ — OtpField,FIXED,DEC-0251,OtpField و خطای درون‌فیلد
 CMPA1-055,T20,2,low,code,CMPA1,,Countdown ساخته نشده؛ تایمر OTP ثانیه‌شمار است و «n روز مانده»ها تاریخ و حالت ندارند,Countdown,,,
 CMPA2-033,T20,2,low,code,CMPA2,K8,InlineMessage: کامپوننت ندارد و صفحه‌ی ورود پیام را با Tailwind محلی شبیه‌سازی کرده است,InlineMessage (K8),,,
 CMPA2-040,T20,2,low,code,CMPA2,K8,"Logo: نماد 64px در `/login` و `/account/complete` با `alt=""همزیست""` و اندازه‌ی خارج از چهار اندازه‌ی مصوب",Logo (K8),,,
 CMPB-002,T20,2,low,code,CMPB,K8,MobileField · حالت «در حال ارسال» و جای خطای سرور با طراحی فرق دارد,MobileField — مرحلهٔ ۱ ورود (K08),,,
 FND-019,T20,2,low,code,FND,K8,صفحه‌های ورود و تکمیل حساب skip link ندارند,`/login` (K8)، `/account/complete`,,,
-KPUB-042,T20,2,low,needs decision,KPUB,K8,K8: پیوند «ویرایش شماره»، قالب شمارش معکوس و جملهٔ شرایط استفاده,K8 — متن‌ها و پیوندها,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
+KPUB-042,T20,2,low,needs decision,KPUB,K8,K8: پیوند «ویرایش شماره»، قالب شمارش معکوس و جملهٔ شرایط استفاده,K8 — متن‌ها و پیوندها,FIXED,DEC-0251,«ویرایش شماره» و قالب شمارش معکوس
 KPUB-043,T20,2,low,code,KPUB,K8,K8: پیام ضدفیشینگ، متن معرفی و پانویس,K8 — InlineMessage، footer,,,
 CMPA2-034,T21,2,high,code,CMPA2,,"JalaliDateField وجود ندارد؛ ۱۵ ورودی تاریخ بومی میلادی (`type=""date""`/`datetime-local`) باقی است",JalaliDateField (P0),,,
 CMPB-005,T21,2,high,code,CMPB,,MoneyField · مبلغ تومان همه‌جا به‌صورت ورودی LTR با رقم لاتین و بی‌جداکننده گرفته می‌شود,MoneyField — قیمت آگهی، قیمت SKU، پیشنهاد قیمت، کارمزدها و تعرفه‌ها، تخفیف، حق عضویت، فیلتر قیمت بازار,,,

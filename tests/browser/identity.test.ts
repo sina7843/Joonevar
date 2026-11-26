@@ -264,7 +264,7 @@ test('resend is disabled until the interval passes', async () => {
     await requestCode(page, newSyntheticMobile());
     const resend = page.getByTestId('resend-code');
     assert.equal(await resend.isDisabled(), true);
-    assert.match((await resend.textContent()) ?? '', /ثانیه دیگر/);
+    assert.match((await resend.textContent()) ?? '', /ارسال دوباره کد تا [۰-۹]+:[۰-۹]{2}/);
   } finally {
     await context.close();
   }
