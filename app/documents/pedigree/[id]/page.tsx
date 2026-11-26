@@ -185,7 +185,7 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
               نشده‌اند «نامشخص» آمده‌اند.
             </p>
           </div>
-          <div className="hz-a4__qr">
+          <div className="hz-a4__qr max-md:hidden">
             <img src={qrSrc} alt="" width={104} height={104} />
             <span className="hz-a4__qr-cap">استعلام اصالت</span>
           </div>
@@ -236,7 +236,7 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
 
         <section className="hz-a4__section">
           <h3 className="hz-a4__section-title">حیوان و اجداد</h3>
-          <figure className="hz-pedigree m-0" aria-label={'شجره سه‌نسلی ' + name}>
+          <figure className="hz-pedigree m-0 max-md:hidden" aria-label={'شجره سه‌نسلی ' + name}>
             <div className="hz-pedigree__cols" aria-hidden="true">
               <span className="hz-pedigree__col">حیوان</span>
               <span className="hz-pedigree__col">والدین</span>
@@ -254,6 +254,16 @@ export default async function PedigreeDocumentPage({ params }: { params: Promise
               {branch(dam, 'مادری', 5, 'pedigree-dam', [damSire, damDam])}
             </ol>
           </figure>
+          {/* Below 768 the grid would scroll sideways: the same ancestors as a list (DS: compact on phones). */}
+          <ol className="m-0 list-none space-y-sm p-0 md:hidden" aria-label={'اجداد ' + name} data-testid="pedigree-list">
+            {[sire, sireSire, sireDam, dam, damSire, damDam].map((node, index) => (
+              <li key={node.roleFa + index} className={index % 3 === 0 ? 'hz-ped__node' : 'hz-ped__node ms-lg'}>
+                <span className="hz-ped__role">{node.roleFa}</span>{' '}
+                <span className={node.nameFa === null ? 'hz-ped__name text-text-secondary' : 'hz-ped__name'}>{node.nameFa ?? 'نامشخص'}</span>
+                <span className="hz-ped__meta block">{node.nameFa !== null ? node.metaFa : (node.unknownFa ?? 'در همزیست ثبت نشده')}</span>
+              </li>
+            ))}
+          </ol>
         </section>
 
         <div className="hz-a4__sign max-md:grid-cols-1">
