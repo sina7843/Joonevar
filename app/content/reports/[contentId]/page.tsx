@@ -134,21 +134,30 @@ export default async function ContentReportDetailPage({ params }: { params: Prom
           )}
         </Panel>
 
-        {data.decided.length > 0 ? (
-          <Panel title="سابقه پرونده">
-            <div data-testid="decided-reports">
-              <CaseHistory
-                entries={data.decided.map((report) => ({
+        {/* «سابقه پرونده» from the first report on (KOPS-033): received reports, then decisions, newest first. */}
+        <Panel title="سابقه پرونده">
+          <div data-testid={data.decided.length > 0 ? 'decided-reports' : 'case-history'}>
+            <CaseHistory
+              entries={[
+                ...data.decided.map((report) => ({
                   id: report.id,
                   title: REASON_FA[report.reason] + (report.decision ? ' ← ' + DECISION_FA[report.decision] : ''),
                   whenFa: (report.decidedByName ?? 'ادمین محتوا') + (report.decidedAt ? ' · ' + formatInstantFa(report.decidedAt) : ''),
-                  status: { tone: report.status === 'DISMISSED' ? 'neutral' : 'success', label: REPORT_STATUS_FA[report.status] },
+                  status: { tone: report.status === 'DISMISSED' ? ('neutral' as const) : ('success' as const), label: REPORT_STATUS_FA[report.status] },
                   body: report.decisionReason ?? undefined,
-                }))}
-              />
-            </div>
-          </Panel>
-        ) : null}
+                  at: report.decidedAt ?? undefined,
+                })),
+                ...data.open.map((report, index) => ({
+                  id: 'open-' + report.id,
+                  title: 'گزارش دریافت شد: ' + REASON_FA[report.reason],
+                  whenFa: 'گزارش‌دهنده ' + fa(reporterNumber.get(report.id) ?? 0) + ' · ' + formatInstantFa(report.createdAt),
+                  current: index === 0,
+                  at: report.createdAt,
+                })),
+              ].sort((x, y) => (y.at?.getTime() ?? 0) - (x.at?.getTime() ?? 0))}
+            />
+          </div>
+        </Panel>
       </Desk>
     </OpsShell>
   );
