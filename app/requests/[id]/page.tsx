@@ -100,6 +100,8 @@ export default async function RequestPage({
             meta={[
               CONTEXT_FA[request.context],
               view.vetNameFa + ' · ' + view.locationNameFa,
+              // K11: when it was filed (KUSR-033).
+              'ثبت ' + new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Tehran' }).format(request.createdAt),
               expiryFa ? 'مهلت مراجعه تا ' + expiryFa : null,
             ].filter(Boolean)}
           />
