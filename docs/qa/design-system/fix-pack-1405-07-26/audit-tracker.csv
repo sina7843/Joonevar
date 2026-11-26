@@ -384,7 +384,7 @@ SHL-018,T28,2,medium,code,SHL,K2,شمارنده «اعلان‌ها» در سا�
 SHL-019,T28,2,medium,needs decision,SHL,,گروه «پرورش» برای BREEDER و فضاهای مالکیتی «حساب من» در سایدبار نیست,PublicShell sidebar,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 SHL-025,T28,2,medium,needs decision,SHL,K1 K5,فوتر سایت فهرست تماس و نماد اعتماد ندارد,SiteFooter — K1، K5 و همه صفحه‌های عمومی,,,"Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #1, #5 approved per proposal (DEC-0235)"
 CMPB-087,T28,2,low,code,CMPB,,SyntheticNotice · نوار «محیط آزمایشی» بالای هدر رندر نمی‌شود و کامپوننت کاربرد دیگری دارد,همهٔ صفحه‌ها در محیط غیرتولیدی,,,
-CMPB-116,T28,2,low,code,CMPB,,NotificationItem · زمان اعلان ساعت ندارد، تاریخ از روی UTC ساخته می‌شود و فهرست بعد از ۲۰ مورد قطع است,NotificationItem در `/notifications`,,,
+CMPB-116,T28,2,low,code,CMPB,,NotificationItem · زمان اعلان ساعت ندارد، تاریخ از روی UTC ساخته می‌شود و فهرست بعد از ۲۰ مورد قطع است,NotificationItem در `/notifications`,PARTIAL,DEC-0255,زمان با ساعت و Asia/Tehran؛ قطع پس از ۲۰ مورد هنوز (صفحه‌بندی نه)
 SHL-020,T28,2,low,code,SHL,,«سفارش‌ها» در سایدبار به مقصد اشتباه می‌رود,PublicShell sidebar › «حساب من»,FIXED,DEC-0254,«سفارش‌ها» → /account/orders؛ «درخواست‌های خرید» جدا
 SHL-022,T28,2,low,needs decision,SHL,,نوار تب دامپزشک معتمد: badge «صف من» و برچسب ناوبری,PublicShell tab bar — VET_TABS,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 SHL-023,T28,2,low,code,SHL,,جزئیات آیکون: تب «درخواست‌ها» و زنگ پرشده,PublicShell tab bar و نوار بالا,,,
