@@ -205,7 +205,7 @@ KPUB-030,T12,2,medium,code,KPUB,K6 K7,گالری: شبکهٔ ایستا به‌�
 KPUB-039,T12,2,medium,code,KPUB,K7,K7 «نظر خریداران»: خلاصهٔ امتیاز و کارت نظر به‌جای متن خام؛ پرسش و پاسخ جدا,K7 — RatingSummary / Review / Q&A,PARTIAL,DEC-0244,RatingSummary؛ کارت نظر هنوز متن ردیفی
 CMPB-061,T12,2,low,v1.0.4,CMPB,K6 K7,SellerCard · سطح سرفصل نام فروشنده طبق قاعدهٔ v1.0.4 (h2 در buy box، h3 در بخش),buy box آگهی (K6) و محصول (K7),,,
 KPUB-037,T12,2,low,code,KPUB,K7,K7 سرصفحه: مسیر راهنما، برند/دسته به‌صورت پیوند، اندازهٔ h1 و Rating,K7 — Breadcrumbs، عنوان، Rating,PARTIAL,DEC-0244,h1، برند و دسته، Rating؛ پیوند برند/دسته نه
-KPUB-038,T12,2,low,code,KPUB,K7,K7 «توضیحات و مشخصات»: Accordion جعبه‌ای و ردیف‌های مشخصات,K7 — Accordion / KeyValueList,,,
+KPUB-038,T12,2,low,code,KPUB,K7,K7 «توضیحات و مشخصات»: Accordion جعبه‌ای و ردیف‌های مشخصات,K7 — Accordion / KeyValueList,FIXED,DEC-0255,Accordion جعبه‌ای توضیحات و مشخصات
 KPUB-040,T12,2,low,needs decision,KPUB,K7 K1,ProductCard: امتیاز، خط برند و نمایش موجودی,ProductCard (K7 «کالاهای مرتبط»، `/shop`، K1),PARTIAL,DEC-0244,نمایش موجودی؛ امتیاز روی کارت نه
 CMPA2-036,T13,2,high,needs decision,CMPA2,K1 K6,ListingCard: آگهی «توافقی» مبلغ را نشان نمی‌دهد و «قیمت توافقی» جای مبلغ می‌نشیند (K1، K6),ListingCard + PriceDisplay آگهی,FIXED,DEC-0245,7g: مبلغ + قابل مذاکره؛ migration 0060
 CMPB-054,T13,2,high,code,CMPB,K1 K14 K6,PriceDisplay · قیمت آگهی «قیمت توافقی» بدون مبلغ است و «قابل مذاکره» نمایش داده نمی‌شود,کارت آگهی (K1، K14) و جعبهٔ خرید آگهی (K6),FIXED,DEC-0245,ListingPrice مبلغ + تومان + قابل مذاکره

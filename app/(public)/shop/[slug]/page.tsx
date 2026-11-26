@@ -213,33 +213,42 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
         <div className="grid gap-xl lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
           <section aria-labelledby="specs-title" className="space-y-lg">
             <SectionHeader id="specs-title" title="توضیحات و مشخصات" />
-            <div className="hz-card space-y-lg">
+            {/* DS Accordion `--boxed` (K7): description and specifications open, delivery folded. */}
+            <div className="hz-accordion hz-accordion--boxed">
               {product.descriptionFa ? (
-                <div className="space-y-xs">
-                  <h3 className="hz-card__title">درباره این کالا</h3>
-                  <p className="hz-body" data-testid="product-description">
-                    {product.descriptionFa}
+                <details className="hz-accordion__item" open>
+                  <summary className="hz-accordion__trigger">
+                    <span className="hz-accordion__title">توضیحات</span>
+                  </summary>
+                  <div className="hz-accordion__panel">
+                    <p className="hz-body m-0" data-testid="product-description">
+                      {product.descriptionFa}
+                    </p>
+                  </div>
+                </details>
+              ) : null}
+              <details className="hz-accordion__item" open>
+                <summary className="hz-accordion__trigger">
+                  <span className="hz-accordion__title">مشخصات</span>
+                </summary>
+                <div className="hz-accordion__panel space-y-xs">
+                  {Object.keys(product.specifications).length === 0 ? (
+                    <p className="hz-caption">مشخصه‌ای ثبت نشده است.</p>
+                  ) : (
+                    <dl className="hz-kv" data-testid="product-specifications">
+                      {Object.entries(product.specifications).map(([key, value]) => (
+                        <div key={key} className="hz-kv__row">
+                          <dt className="hz-kv__key">{key}</dt>
+                          <dd className="hz-kv__value">{String(value)}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                  <p className="hz-caption" data-testid="product-species">
+                    مناسب برای: {product.speciesCodes.join('، ') || 'اعلام نشده'}
                   </p>
                 </div>
-              ) : null}
-              <div className="space-y-xs">
-                <h3 className="hz-card__title">مشخصات</h3>
-                {Object.keys(product.specifications).length === 0 ? (
-                  <p className="hz-caption">مشخصه‌ای ثبت نشده است.</p>
-                ) : (
-                  <dl className="hz-kv" data-testid="product-specifications">
-                    {Object.entries(product.specifications).map(([key, value]) => (
-                      <div key={key} className="hz-kv__row">
-                        <dt className="hz-kv__key">{key}</dt>
-                        <dd className="hz-kv__value">{String(value)}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-                <p className="hz-caption" data-testid="product-species">
-                  مناسب برای: {product.speciesCodes.join('، ') || 'اعلام نشده'}
-                </p>
-              </div>
+              </details>
             </div>
           </section>
 
