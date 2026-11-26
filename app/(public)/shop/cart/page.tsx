@@ -252,7 +252,8 @@ export default async function CartPage({
                     </div>
                     <div className="hz-summary__row">
                       <dt className="font-bold text-text-primary">جمع این فروشگاه</dt>
-                      <dd>{fa(group.buyerTotalToman)} تومان</dd>
+                      {/* An unknown shipping cost makes the total unknown too, never a smaller number (CMPB-045). */}
+                      <dd>{group.shippingToman === null ? <span className="hz-unset">پس از اعلام هزینه ارسال</span> : fa(group.buyerTotalToman) + ' تومان'}</dd>
                     </div>
                   </dl>
                 </section>
@@ -272,7 +273,13 @@ export default async function CartPage({
                 </div>
                 <div className="hz-summary__row">
                   <dt>جمع هزینه ارسال</dt>
-                  <dd>{fa(cart.shippingTotalToman)} تومان</dd>
+                  <dd>
+                    {cart.groups.some((group) => group.shippingToman === null) ? (
+                      <span className="hz-unset">اعلام نشده</span>
+                    ) : (
+                      fa(cart.shippingTotalToman) + ' تومان'
+                    )}
+                  </dd>
                 </div>
                 {cart.discountTotalToman > 0n ? (
                   <div className="hz-summary__row" data-testid="cart-discount">
@@ -318,6 +325,7 @@ export default async function CartPage({
               <CheckoutForm
                 action={checkoutAction}
                 totalToman={cart.grandTotalToman}
+                totalKnown={cart.groups.every((group) => group.shippingToman !== null)}
                 defaults={{ ...defaults, provinceFa: provinceFa ?? defaults.provinceFa }}
                 blocked={cart.blocked || !checkoutOpen}
                 code={code}

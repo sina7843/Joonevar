@@ -529,7 +529,7 @@ RTU-012,T30,3,low,code,RTU,,مسیر صفحه (PageCrumbs) در پرونده‌�
 CMPA1-051,T31,3,medium,code,CMPA1,,CompareTable با یک جدول Tailwind ساده و اسکرول افقی ساخته شده,CompareTable (`/shop/compare`),,,
 CMPA2-014,T31,3,medium,code,CMPA2,,DeliveryCodeCard وجود ندارد؛ کد تحویل در یک Alert و ورود فروشنده در یک TextField ساده است,DeliveryCodeCard (نمای خریدار و فروشنده),,,
 CMPB-044,T31,3,medium,code,CMPB,,OrderSummary · کامپوننت مشترک وجود ندارد؛ جعبهٔ خلاصه با فرم نشانی ترکیب شده است,سبد خرید، جعبهٔ کناری `.hz-summary`,,,
-CMPB-045,T31,3,medium,code,CMPB,,OrderSummary · وقتی هزینهٔ ارسال یک فروشگاه نامعلوم است، جمع ارسال و مبلغ نهایی عدد نشان می‌دهند,سبد خرید، ردیف‌های ارسال و مبلغ قابل پرداخت,,,
+CMPB-045,T31,3,medium,code,CMPB,,OrderSummary · وقتی هزینهٔ ارسال یک فروشگاه نامعلوم است، جمع ارسال و مبلغ نهایی عدد نشان می‌دهند,سبد خرید، ردیف‌های ارسال و مبلغ قابل پرداخت,FIXED,DEC-0254,هزینه ارسال نامعلوم: جمع فروشگاه، جمع ارسال و مبلغ قابل پرداخت «اعلام نشده»
 CMPB-047,T31,3,medium,code,CMPB,,OrderSummary · حالت‌های به‌روزرسانی/انتقال به درگاه، live region و نوار چسبان موبایل وجود ندارند,سبد خرید، حالت‌ها و موبایل,,,
 CMPB-063,T31,3,medium,code,CMPB,,SubOrderCard · نوار مسیر ارسال (track) پنج‌مرحله‌ای وجود ندارد,جزئیات سفارش، کارت هر زیرسفارش,,,
 CMPB-065,T31,3,medium,code,CMPB,,SubOrderCard · سر سفارش، زیرعنوان «زیرسفارش ۱ از ۲، کرج»، تصویر کالا و ActionOwner طبق طراحی نیستند,جزئیات سفارش,,,

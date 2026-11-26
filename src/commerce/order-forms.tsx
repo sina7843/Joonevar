@@ -141,9 +141,12 @@ export function CheckoutForm({
   chosenMethods,
   code,
   redeemPoints,
+  totalKnown = true,
 }: {
   action: Action;
   totalToman: bigint;
+  /** False while a shop's shipping cost is not announced: no total is shown and payment stays shut. */
+  totalKnown?: boolean;
   defaults: { provinceFa: string | null; cityFa: string | null; addressFa: string | null; postalCode: string | null };
   blocked: boolean;
   /** The delivery each shop's part was quoted under, carried so the server prices the same basket. */
@@ -191,9 +194,9 @@ export function CheckoutForm({
       />
       <TextAreaField label="توضیح برای فروشنده" name="note" rows={2} data-testid="checkout-note" />
       <p className="text-label-lg" data-testid="checkout-total">
-        مبلغ قابل پرداخت: {totalToman.toLocaleString('fa-IR')} تومان
+        {totalKnown ? 'مبلغ قابل پرداخت: ' + totalToman.toLocaleString('fa-IR') + ' تومان' : 'مبلغ قابل پرداخت پس از اعلام هزینه ارسال همه فروشگاه‌ها معلوم می‌شود.'}
       </p>
-      <Button type="submit" disabled={pending || blocked} data-testid="checkout-submit">
+      <Button type="submit" disabled={pending || blocked || !totalKnown} data-testid="checkout-submit">
         تأیید و پرداخت
       </Button>
     </form>
