@@ -42,6 +42,8 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
   if (view === null) notFound();
 
   const status = (view.membership?.status ?? null) as ClubMembershipStatus | null;
+  // The fee frozen on the application, else the published one; none = unset, never ۰ (FND-013).
+  const fee = view.membership?.feeToman ?? view.feeToman ?? null;
   const unmet = view.evaluation?.unmetFa ?? [];
 
   return (
@@ -128,7 +130,7 @@ export default async function ClubJoinPage({ params }: { params: Promise<{ slug:
                   <ClubFeeForm
                     clubId={view.clubId}
                     membershipId={view.membership.id}
-                    amountToman={String(view.membership.feeToman ?? view.feeToman ?? 0)}
+                    amountToman={fee === null || fee === undefined ? null : String(fee)}
                   />
                 </div>
               </Card>

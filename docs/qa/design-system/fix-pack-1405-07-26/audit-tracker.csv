@@ -351,7 +351,7 @@ CMPA1-010,T24,2,low,code,CMPA1,,RecordNotFound با صفحه not-found عموم�
 CMPB-081,T24,2,low,code,CMPB,,PageStates · Skeleton چندشکلی و LoadingState در بیشتر مسیرها وجود ندارند,حالت بارگذاری,,,
 CMPB-082,T24,2,low,code,CMPB,K2,PageStates · markup دستی `.hz-state` و ناهماهنگی API کامپوننت‌های حالت,داشبورد (K2)، خریدها، و API `EmptyState`/`NeedsCorrectionState`,,,
 CMPB-086,T24,2,low,code,CMPB,,UnsetValue · متن و کلاس ناهمگون، و «تعیین‌نشده» برای فیلدهای خالی رکورد,نمایش مقدار تعیین‌نشده در صفحه‌های مختلف,,,
-FND-013,T24,2,low,code,FND,,مبلغ حق عضویت کلاب در نبود مقدار «۰ تومان» می‌شود,`/clubs/[slug]/join` (کارت «حق عضویت»),,,
+FND-013,T24,2,low,code,FND,,مبلغ حق عضویت کلاب در نبود مقدار «۰ تومان» می‌شود,`/clubs/[slug]/join` (کارت «حق عضویت»),FIXED,DEC-0253,حق عضویت بی‌مقدار «تعیین‌نشده» و بدون پرداخت
 RTU-013,T24,2,low,code,RTU,,مقدار نامشخص با «—» به‌جای «تعیین‌نشده» نمایش داده می‌شود,"مسیرهایی که در جدول «—» دارند. بیشترین موارد:
   - `/vet/requests/[id]` (۱۵)
   - `/litters/[id]/allocation` (۷)

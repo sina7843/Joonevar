@@ -236,7 +236,8 @@ export function ClubApplyForm({
 }
 
 /** Opens the club fee checkout and follows the server's own next address. */
-export function ClubFeeForm({ clubId, membershipId, amountToman }: { clubId: string; membershipId: string; amountToman: string }) {
+/** `amountToman` null = the club published no fee: «تعیین‌نشده» and no payment, never «۰ تومان» (FND-013). */
+export function ClubFeeForm({ clubId, membershipId, amountToman }: { clubId: string; membershipId: string; amountToman: string | null }) {
   const [state, submit, pending] = useActionState(startClubFeeAction, EMPTY);
   const router = useRouter();
   useEffect(() => {
@@ -247,11 +248,18 @@ export function ClubFeeForm({ clubId, membershipId, amountToman }: { clubId: str
     <form onSubmit={submitWith(submit)} className="space-y-md" data-testid="club-fee-form">
       <Hidden surface="member" clubId={clubId} />
       <input type="hidden" name="membershipId" value={membershipId} />
-      <p className="text-body-sm">{'حق عضویت این کلاب: ' + Number(amountToman).toLocaleString('fa-IR') + ' تومان'}</p>
+      <p className="text-body-sm">
+        {'حق عضویت این کلاب: '}
+        {amountToman === null ? <span className="hz-unset">تعیین‌نشده</span> : BigInt(amountToman).toLocaleString('fa-IR') + ' تومان'}
+      </p>
       <Result state={state} testId="club-fee-result" />
-      <Button type="submit" disabled={pending} data-testid="club-fee-submit">
-        پرداخت حق عضویت
-      </Button>
+      {amountToman === null ? (
+        <p className="hz-caption">تا کلاب مبلغ را منتشر نکند، پرداخت باز نمی‌شود.</p>
+      ) : (
+        <Button type="submit" disabled={pending} data-testid="club-fee-submit">
+          پرداخت حق عضویت
+        </Button>
+      )}
     </form>
   );
 }
