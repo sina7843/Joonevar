@@ -454,7 +454,7 @@ KPUB-016,T29,3,low,code,KPUB,K4,مسیر راهنما بدون سطح «مجله
 KPUB-018,T29,3,low,needs decision,KPUB,K4,نویسنده: آواتار حروفی به‌جای عکس؛ عکس اصلی بدون زیرنویس و منبع عکس,K4 — byline و `figure.hz-figure`,,,Already decided — Decision 9: article image caption / credit / source approved as data-model additions. Author photo stays the initial avatar until profiles have an image (GAPS #6).
 KPUB-020,T29,3,low,code,KPUB,K4,برچسب‌های پایان مقاله پیوند نیستند,K4 — `hz-content-detail__foot`,,,
 KPUB-044,T29,3,low,code,KPUB,K4 K5 K6 K7,برچسب پیوند بازگشت موبایل: «بازگشت» ثابت در کد، نام والد در key screenها,Breadcrumbs موبایل در همهٔ صفحه‌های P02/P03 (K4، K5، K6، K7 و هم‌خانواده‌ها),,,
-KUSR-046,T30,3,high,code,KUSR,,فهرست `/documents` وجود ندارد؛ لینک «اسناد» سایدبار و «همه اسناد» به صفحه ناموجود می‌رود,P05 · «اسناد من»,,,
+KUSR-046,T30,3,high,code,KUSR,,فهرست `/documents` وجود ندارد؛ لینک «اسناد» سایدبار و «همه اسناد» به صفحه ناموجود می‌رود,P05 · «اسناد من»,FIXED,DEC-0254,/documents «اسناد من» با DocumentCard (برگه ثبتی و شجره)
 RTU-002,T30,3,high,code,RTU,,فهرست‌های P05 نوار فیلتر خانواده وضعیت، صفحه‌بندی و «اقدام بعدی با» ندارند,"همه فهرست‌های P05 این حوزه؛ جزئیات هر مسیر در جدول بالا آمده است.
   - نوار فیلتر فقط در `/account/mating-finder/profiles` هست.
   - `Pagination` فقط در `/payments` هست.
