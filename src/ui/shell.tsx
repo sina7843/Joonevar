@@ -153,7 +153,9 @@ const PUBLIC_SIDEBAR: readonly ShellNavSection[] = [
     label: 'حساب من',
     items: [
       { href: '/account/listings', label: 'آگهی‌های من', icon: 'megaphoneSimple' },
-      { href: '/account/purchases', label: 'سفارش‌ها', icon: 'shoppingBag' },
+      // SHL-020: «سفارش‌ها» is the shop's orders; animal purchase requests keep their own name.
+      { href: '/account/orders', label: 'سفارش‌ها', icon: 'shoppingBag' },
+      { href: '/account/purchases', label: 'درخواست‌های خرید', icon: 'chatCircleDots' },
       { href: '/account/mating-finder', label: 'جفت‌یابی', icon: 'heart' },
       { href: '/account/kyc', label: 'احراز هویت', icon: 'identificationCard' },
     ],
