@@ -234,24 +234,24 @@ CMPA2-028,T14,2,low,code,CMPA2,,FilterBar: chipها لینک‌های `aria-curr
 CMPB-071,T14,2,low,code,CMPB,,VetCard · کامپوننت مشترک وجود ندارد و markup در دو صفحه تکرار شده است,فهرست و پروفایل دامپزشک,,,
 KPUB-025,T14,2,low,code,KPUB,K5,سرصفحهٔ فهرست: مسیر «راهنمای دامپزشکی»، متن meta و پاراگراف اضافه,K5 — PageHeader landing,,,
 KUSR-001,T15,2,high,code,KUSR,K2,جدول «پرداخت‌ها» در داشبورد با PaymentRow طراحی نمی‌خواند (بدون شناسه HZP، تاریخ، StatusBadge و «پرداخت دوباره»),K2 داشبورد · بلوک «پرداخت‌ها» (PaymentRow),,,
-KUSR-005,T15,2,high,code,KUSR,K2,ردیف حیوان: بدون عکس، «G0» به‌جای نژاد و جنس، و badge برای حیوان ثبت‌شده,K2 · «حیوان‌های من» · `AnimalCard` (همان کامپوننت در `/animals`),,,
+KUSR-005,T15,2,high,code,KUSR,K2,ردیف حیوان: بدون عکس، «G0» به‌جای نژاد و جنس، و badge برای حیوان ثبت‌شده,K2 · «حیوان‌های من» · `AnimalCard` (همان کامپوننت در `/animals`),FIXED,DEC-0247,عکس، نژاد و جنس؛ نشان فقط برای پیش‌نویس
 KUSR-007,T15,2,high,needs decision,KUSR,K2,«درخواست‌های فعال» داشبورد فقط مراجعه‌های دامپزشک را دارد؛ RequestCard بدون «به‌روزرسانی»، overdue و aria-label,K2 · «درخواست‌های فعال» · `RequestCard`,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 CMPA2-003,T15,2,medium,code,CMPA2,,جدول پرداخت‌های داشبورد روی موبایل هم جدول می‌ماند و caption ندارد,DataTable,,,
 CMPB-066,T15,2,medium,code,CMPB,K2,ServiceCard · کارت‌های خدمت داشبورد (K2) فوتر تعرفه و واحد ندارند,داشبورد کاربر، بخش «سرویس‌ها»,,,
 CMPB-120,T15,2,medium,code,CMPB,K2,RequestCard · خط «مهلت گذشته»، یادداشت اصلاح و مبلغ وجود ندارد و برچسب وضعیت جایگزین می‌شود,RequestCard در `/dashboard` (K2),,,
 KUSR-002,T15,2,medium,code,KUSR,K2,پرداخت‌های داشبورد در موبایل جدول با اسکرول افقی است، نه CardList,K2 داشبورد موبایل · «پرداخت‌ها»,,,
 KUSR-004,T15,2,medium,code,KUSR,K2,کارت «عضویت انجمن» محتوای طراحی را ندارد و دکمه primary دوم می‌گذارد,K2 · «عضویت انجمن»,,,
-KUSR-006,T15,2,medium,code,KUSR,K2,کارت «حیوان‌های من» دکمه «ثبت حیوان» ندارد و لینک‌های اضافه دارد؛ حالت خالی اقدام ندارد,K2 · «حیوان‌های من»,,,
+KUSR-006,T15,2,medium,code,KUSR,K2,کارت «حیوان‌های من» دکمه «ثبت حیوان» ندارد و لینک‌های اضافه دارد؛ حالت خالی اقدام ندارد,K2 · «حیوان‌های من»,FIXED,DEC-0247,«ثبت حیوان» در کارت و حالت خالی
 KUSR-008,T15,2,medium,code,KUSR,K2,کارت‌های سرویس تعرفه ندارند و سرویس‌های قفل در یک کارت ادغام می‌شوند,K2 · «سرویس‌ها» (`ServiceCard`، `LockedServiceCard`),,,
 KUSR-011,T15,2,medium,code,KUSR,K2,هشدار «حساب شما هنوز کامل نیست»: شرط، مقصد و نوع دکمه,K2 کاربر تازه · Alert هشدار,,,
 KUSR-012,T15,2,medium,needs decision,KUSR,K2,بلوک «محیط‌های عملیاتی شما»، هشدار توقف پذیرش و چیدمان K2-ops,K2 با نقش عملیاتی · RoleSwitcher dashboard card,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 CMPB-067,T15,2,low,code,CMPB,,ServiceCard · کارت با تعرفهٔ تعیین‌نشده همچنان لینک است و دلیل ندارد,`ServiceCard`، حالت fee نامعلوم,,,
 CMPB-121,T15,2,low,code,CMPB,,RequestCard · عنوان heading نیست و «پیگیری» زمینه ندارد,RequestCard,,,
 KUSR-003,T15,2,low,code,KUSR,K2,حالت خالی پرداخت‌ها EmptyState فشرده نیست,K2 · کاربر تازه و نقش عملیاتی · «پرداخت‌ها»,,,
-KUSR-009,T15,2,low,code,KUSR,K2,سرصفحه داشبورد آواتار ندارد و برای کاربر تازه «۰ حیوان / ۰ درخواست فعال» نشان می‌دهد,K2 · PageHeader سلام,,,
+KUSR-009,T15,2,low,code,KUSR,K2,سرصفحه داشبورد آواتار ندارد و برای کاربر تازه «۰ حیوان / ۰ درخواست فعال» نشان می‌دهد,K2 · PageHeader سلام,PARTIAL,DEC-0247,صفرها پنهان؛ آواتار سرصفحه نه
 KUSR-010,T15,2,low,code,KUSR,K2,هشدار اعلان‌های خوانده‌نشده: متن ثابت به‌جای خلاصه اعلان‌ها، و جای دکمه,K2 · Alert اعلان‌ها,,,
 KUSR-013,T15,2,low,needs decision,KUSR,K2,کارت «مسیر حرفه‌ای دامپزشکی» در طراحی K2 نیست,K2 · بین هشدارها و پرداخت‌ها,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-KUSR-014,T15,2,low,code,KUSR,K2,فاصله ستون‌های حیوان‌ها/درخواست‌ها ۱۶ به‌جای ۲۴,K2 دسکتاپ,,,
+KUSR-014,T15,2,low,code,KUSR,K2,فاصله ستون‌های حیوان‌ها/درخواست‌ها ۱۶ به‌جای ۲۴,K2 دسکتاپ,FIXED,DEC-0247,gap-xl (۲۴)
 CMPB-102,T16,2,high,code,CMPB,K11,Timeline · صفحه‌های رکورد درخواست، ثبت، مجوز و سفارش «تاریخچه پرونده» ندارند,Timeline در P6 (رکورد)؛ صفحهٔ کلیدی K11 «پیگیری درخواست»,,,
 KUSR-016,T16,2,high,code,KUSR,K9,ستون کناری پرونده حیوان «خدمت بعدی»، تعرفه و کارت‌های قفل را ندارد,K9 · aside «وضعیت و اقدام»,,,
 KUSR-029,T16,2,high,code,KUSR,K11,صفحه پیگیری درخواست «تاریخچه پرونده» (Timeline) ندارد,K11 پیگیری درخواست · `Timeline`,,,

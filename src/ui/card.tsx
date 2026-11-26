@@ -77,6 +77,7 @@ export function AnimalCard({
   href,
   imageFileId = null,
   imageAltFa = null,
+  imageSrc = null,
 }: {
   name: string;
   speciesBreed: string;
@@ -85,12 +86,14 @@ export function AnimalCard({
   href: string;
   imageFileId?: string | null;
   imageAltFa?: string | null;
+  /** A private photo's own address (`/api/files/…`), used instead of public media. */
+  imageSrc?: string | null;
 }) {
   return (
     <Link href={href} className="hz-animal">
       <div className="hz-media hz-media--thumb-lg">
-        {imageFileId ? (
-          <img src={'/media/' + imageFileId} alt={imageAltFa ?? ''} loading="lazy" width={64} height={64} />
+        {imageSrc || imageFileId ? (
+          <img src={imageSrc ?? '/media/' + imageFileId} alt={imageAltFa ?? ''} loading="lazy" width={64} height={64} />
         ) : (
           <div className="hz-media__empty">
             <img src="/brand/logo/symbol.svg" alt="" />
