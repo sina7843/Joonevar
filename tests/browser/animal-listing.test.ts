@@ -357,7 +357,7 @@ test('the advert is built, refuses to publish until it is complete, and then goe
 
     // Everything is still missing, and it is all said at once.
     const blockers = await page.getByTestId('publication-blockers').innerText();
-    assert.match(blockers, /نوع قیمت/);
+    assert.match(blockers, /مبلغ آگهی/); // Decision 7g: an amount, always negotiable
     assert.match(blockers, /تصویر/);
 
     await page.getByTestId('listing-price').fill('18000000');
