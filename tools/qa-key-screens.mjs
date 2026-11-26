@@ -11,6 +11,12 @@
  *
  * Everything is synthetic; nothing leaves the machine. The database and the
  * private storage are dropped at the end unless KEEP_QA_DB=1.
+ *
+ * Screens whose records the demo seed does not create (K11 request, K18
+ * pedigree) are taken from a database a real flow left behind:
+ *   KEEP_BROWSER_DB=1 node tools/browser-tests.mjs tests/browser/cross-flow.test.ts
+ *   QA_DB=<kept name> QA_STORAGE=<kept dir> node tools/qa-key-screens.mjs --only K11,K18
+ * An existing database is used as it is (no seed) and never dropped.
  */
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
@@ -54,15 +60,17 @@ const run = (args, env) =>
     child.on('exit', (code) => (code === 0 ? resolve() : reject(new Error(args.join(' ') + ' exited with ' + code))));
   });
 
-const name = 'hamzist_qa_' + randomBytes(5).toString('hex');
+const existing = process.env.QA_DB ?? null;
+const name = existing ?? 'hamzist_qa_' + randomBytes(5).toString('hex');
 const url = dbUrl(name);
-const storage = await fsp.mkdtemp(path.join(os.tmpdir(), 'hamzist-qa-storage-'));
+const storage = existing ? process.env.QA_STORAGE : await fsp.mkdtemp(path.join(os.tmpdir(), 'hamzist-qa-storage-'));
+const onlyArg = process.argv.includes('--only') ? ['--only', process.argv[process.argv.indexOf('--only') + 1]] : [];
 const stateDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'hamzist-qa-sessions-'));
 let server = null;
 let exitCode = 1;
 
 try {
-  await admin('create database "' + name + '"');
+  if (!existing) await admin('create database "' + name + '"');
   const { migrateTo } = await import('../src/db/migrate.ts');
   const { createDatabase } = await import('../src/db/client.ts');
   const { loadEnv } = await import('../src/config/env.ts');
@@ -70,17 +78,19 @@ try {
   const { seedDevFixtures } = await import('../src/db/seed/dev-fixtures.ts');
   const { createSession } = await import('../src/identity/session.ts');
 
-  await migrateTo(url);
+  if (!existing) await migrateTo(url);
   const env = { ...process.env, APP_ENV: 'development', INTEGRATION_MODE: 'local', DATABASE_URL: url, PRIVATE_STORAGE_DIR: storage };
   const runEnv = loadEnv(env);
-  const { db, pool } = createDatabase(url);
-  try {
-    await seedBaseline(db);
-    await seedDevFixtures(db, runEnv);
-  } finally {
-    await pool.end();
+  if (!existing) {
+    const { db, pool } = createDatabase(url);
+    try {
+      await seedBaseline(db);
+      await seedDevFixtures(db, runEnv);
+    } finally {
+      await pool.end();
+    }
+    await run([path.join('src', 'db', 'seed', 'demo.ts')], env);
   }
-  await run([path.join('src', 'db', 'seed', 'demo.ts')], env);
 
   const port = await freePort();
   const base = 'http://127.0.0.1:' + port;
@@ -170,7 +180,7 @@ try {
   const configFile = path.join(stateDir, 'key-screen-routes.json');
   fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
   console.log('QA: database ' + name + ', server ' + base);
-  await run(['docs/design-system/qa/compare-key-screens.mjs', '--base', base, '--config', configFile], env);
+  await run(['docs/design-system/qa/compare-key-screens.mjs', '--base', base, '--config', configFile, ...onlyArg], env);
   exitCode = 0;
 } catch (error) {
   console.error(error instanceof Error ? error.stack : error);
@@ -179,7 +189,7 @@ try {
     server.kill();
     await new Promise((r) => server.once('exit', r)).catch(() => undefined);
   }
-  if (process.env.KEEP_QA_DB !== '1') {
+  if (process.env.KEEP_QA_DB !== '1' && !existing) {
     await admin('select pg_terminate_backend(pid) from pg_stat_activity where datname = $1', [name]).catch(() => undefined);
     await admin('drop database if exists "' + name + '"').catch(() => undefined);
     await fsp.rm(storage, { recursive: true, force: true }).catch(() => undefined);
