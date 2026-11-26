@@ -308,7 +308,7 @@ CMPA1-055,T20,2,low,code,CMPA1,,Countdown ساخته نشده؛ تایمر OTP �
 CMPA2-033,T20,2,low,code,CMPA2,K8,InlineMessage: کامپوننت ندارد و صفحه‌ی ورود پیام را با Tailwind محلی شبیه‌سازی کرده است,InlineMessage (K8),,,
 CMPA2-040,T20,2,low,code,CMPA2,K8,"Logo: نماد 64px در `/login` و `/account/complete` با `alt=""همزیست""` و اندازه‌ی خارج از چهار اندازه‌ی مصوب",Logo (K8),,,
 CMPB-002,T20,2,low,code,CMPB,K8,MobileField · حالت «در حال ارسال» و جای خطای سرور با طراحی فرق دارد,MobileField — مرحلهٔ ۱ ورود (K08),,,
-FND-019,T20,2,low,code,FND,K8,صفحه‌های ورود و تکمیل حساب skip link ندارند,`/login` (K8)، `/account/complete`,,,
+FND-019,T20,2,low,code,FND,K8,صفحه‌های ورود و تکمیل حساب skip link ندارند,`/login` (K8)، `/account/complete`,FIXED,DEC-0255,skip link در ورود و تکمیل حساب
 KPUB-042,T20,2,low,needs decision,KPUB,K8,K8: پیوند «ویرایش شماره»، قالب شمارش معکوس و جملهٔ شرایط استفاده,K8 — متن‌ها و پیوندها,FIXED,DEC-0251,«ویرایش شماره» و قالب شمارش معکوس
 KPUB-043,T20,2,low,code,KPUB,K8,K8: پیام ضدفیشینگ، متن معرفی و پانویس,K8 — InlineMessage، footer,,,
 CMPA2-034,T21,2,high,code,CMPA2,,"JalaliDateField وجود ندارد؛ ۱۵ ورودی تاریخ بومی میلادی (`type=""date""`/`datetime-local`) باقی است",JalaliDateField (P0),,,

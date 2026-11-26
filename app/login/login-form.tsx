@@ -47,6 +47,10 @@ export function LoginForm({ next }: { next: string | null }) {
    */
   return (
     <div className="flex min-h-dvh flex-col bg-bg-page">
+      {/* FND-019: the skip link comes first here too. */}
+      <a className="hz-skip-link" href="#main">
+        رفتن به محتوای اصلی
+      </a>
       <header className="hz-site-header">
         <div className="hz-container">
           <div className="hz-site-header__bar">
