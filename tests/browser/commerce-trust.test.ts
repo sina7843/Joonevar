@@ -162,7 +162,6 @@ test('a platform code comes off the basket, and points come off what is left', a
     const href = await openProduct(page);
     const form = page.locator('[data-testid^="add-to-cart-form-"]').first();
     const skuId = (await form.getAttribute('data-testid'))!.replace('add-to-cart-form-', '');
-    await page.getByTestId('add-quantity-' + skuId).selectOption('1');
     await page.getByTestId('add-to-cart-' + skuId).click();
     await expectText(page, 'سبد خرید به‌روز شد');
 
@@ -257,7 +256,7 @@ test('the rating on the product page is built from reviews and says so', async (
     const page = await anonymous.newPage();
     await openProduct(page);
     // (5 + 4 + 3) / 3 = 4
-    assert.match(await page.getByTestId('product-rating').innerText(), /۴ از ۵/);
+    assert.match((await page.getByTestId('product-rating').locator('[role="img"]').getAttribute('aria-label')) ?? '', /۴ از ۵/);
     assert.match(
       await page.getByTestId('product-rating-note').innerText(),
       /نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد/,

@@ -139,7 +139,7 @@ async function addToBasket(page: import('playwright').Page, nameFa: string, quan
   await page.goto(BASE_URL + href, { waitUntil: 'load' });
   const form = page.locator('[data-testid^="add-to-cart-form-"]').first();
   const skuId = (await form.getAttribute('data-testid'))!.replace('add-to-cart-form-', '');
-  await page.getByTestId('add-quantity-' + skuId).selectOption(String(quantity));
+  for (let i = 1; i < quantity; i++) await page.getByTestId('add-quantity-' + skuId + '-more').click();
   await page.getByTestId('add-to-cart-' + skuId).click();
   await expectText(page, 'سبد خرید به‌روز شد');
 }

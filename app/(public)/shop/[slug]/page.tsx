@@ -16,6 +16,8 @@ import { parseShopFilter, publicProduct, shopPage } from '../../../../src/commer
 
 import { OFFER_CONDITION_FA, type OfferCondition } from '../../../../src/commerce/catalog-model.ts';
 import { AddToCartForm } from '../../../../src/commerce/order-forms.tsx';
+import { BuyBox, type BuyVariant } from '../../../../src/commerce/buy-box.tsx';
+import { Rating, RatingSummary } from '../../../../src/ui/rating.tsx';
 import { setCartLineAction } from '../cart/actions.ts';
 import { currentSession } from '../../../../src/authz/request-actor.ts';
 import { productAggregate, reviewsOfProduct } from '../../../../src/commerce/reviews.ts';
@@ -83,6 +85,25 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
   ]);
 
   const cheapest = product.offers.find((offer) => offer.available > 0) ?? product.offers[0] ?? null;
+  // K7 buy box: offers grouped by variant (the server's comparison order kept, so
+  // the first offer of each group is its best), the in-stock ones first.
+  const variants: BuyVariant[] = [];
+  for (const offer of product.offers) {
+    const key = offer.variantLabelFa ?? '';
+    let group = variants.find((candidate) => candidate.key === key);
+    if (!group) variants.push((group = { key, labelFa: offer.variantLabelFa ?? 'پیش‌فرض', offers: [] }));
+    (group.offers as BuyVariant['offers'][number][]).push({
+      offerId: offer.offerId,
+      skuId: offer.skuId,
+      sellerNameFa: offer.sellerNameFa,
+      sellerMetaFa: OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? '',
+      priceFa: fa(offer.priceToman),
+      available: offer.available,
+    });
+  }
+  for (const group of variants) (group.offers as BuyVariant['offers'][number][]).sort((a, b) => Number(b.available > 0) - Number(a.available > 0));
+  // The SKU the buy box opens on: its add form lives there, not twice on the page.
+  const boxSku = (variants.find((variant) => (variant.offers[0]?.available ?? 0) > 0) ?? variants[0])?.offers[0]?.skuId ?? null;
   const origin = site().origin;
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -116,48 +137,39 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
 
           <div className="min-w-0 space-y-lg">
             <header className="space-y-sm border-b border-border-subtle pb-lg">
-              <ul className="hz-tag-list">
-                {product.brandFa ? <li className="hz-tag">{product.brandFa}</li> : null}
-                <li className="hz-tag hz-tag--neutral">{product.categoryNameFa}</li>
-              </ul>
-              <h1 className="hz-h2">{product.nameFa}</h1>
-              {rating.count > 0 ? (
-                <span className="hz-rating" role="img" aria-label={'امتیاز ' + fa(rating.overall) + ' از ۵، ' + fa(rating.count) + ' نظر'}>
-                  <Icon name="star" size="xs" weight="fill" />
-                  {fa(rating.overall)}
-                  <span className="hz-rating__count">{'(' + fa(rating.count) + ' نظر)'}</span>
-                </span>
-              ) : (
-                <span className="hz-caption">هنوز نظری ثبت نشده است</span>
-              )}
+              <div className="flex flex-wrap items-center gap-sm">
+                {product.brandFa ? <span className="hz-body-sm font-bold">{product.brandFa}</span> : null}
+                <span className="hz-tag hz-tag--neutral">{product.categoryNameFa}</span>
+              </div>
+              <h1 className="hz-h1">{product.nameFa}</h1>
+              <Rating value={rating.overall} count={rating.count} href={rating.count > 0 ? '#rating-title' : undefined} size="md" />
             </header>
 
-            <div className="flex flex-wrap items-center gap-md">
-              <div className={cheapest === null ? 'hz-price hz-price--lg hz-price--unset' : 'hz-price hz-price--lg'} data-testid="product-price">
-                {cheapest === null ? (
-                  <span className="hz-price__amount">قیمتی ثبت نشده</span>
-                ) : (
-                  <>
-                    <span className="hz-price__from">از</span> <span className="hz-price__amount">{fa(cheapest.priceToman)}</span>{' '}
-                    <span className="hz-price__unit">تومان</span>
-                  </>
-                )}
+            {cheapest === null ? (
+              <div className="hz-price hz-price--lg hz-price--unset" data-testid="product-price">
+                <span className="hz-price__amount">قیمتی ثبت نشده</span>
               </div>
-              {cheapest ? <StockBadge available={product.offers.reduce((sum, offer) => sum + offer.available, 0)} /> : null}
-            </div>
+            ) : (
+              <BuyBox
+                productNameFa={product.nameFa}
+                variantNameFa="گزینه"
+                variants={variants}
+                signedIn={signedIn}
+                action={setCartLineAction}
+              />
+            )}
 
             <section aria-labelledby="offers-title" className="space-y-md">
-              <SectionHeader size="sm" id="offers-title" title="فروشندگان این کالا" count={fa(product.offers.length)} />
+              <SectionHeader size="sm" id="offers-title" title="همه فروشندگان این کالا" count={fa(product.offers.length)} />
               <ul className="space-y-md" data-testid="product-offers">
                 {product.offers.map((offer) => (
                   <li key={offer.offerId} className="hz-card hz-seller space-y-md" data-testid={'offer-' + offer.offerId}>
                     <div className="flex flex-wrap items-start justify-between gap-sm">
                       <div className="hz-entity">
-                        <RecordImage variant="thumb" fileId={null} altFa={null} />
                         <div className="hz-entity__body">
                           <h3 className="hz-entity__name">{offer.sellerNameFa}</h3>
                           <span className="hz-entity__meta">
-                            {[OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? offer.condition, product.variantLabels[offer.offerId]]
+                            {[OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? offer.condition, offer.variantLabelFa]
                               .filter(Boolean)
                               .join('، ')}
                           </span>
@@ -167,12 +179,10 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
                         <div className="hz-price">
                           <span className="hz-price__amount">{fa(offer.priceToman)}</span> <span className="hz-price__unit">تومان</span>
                         </div>
-                        <StockBadge available={offer.available} size="sm">
-                          {offer.available > 0 ? 'موجود: ' + fa(offer.available) : 'ناموجود'}
-                        </StockBadge>
+                        <StockBadge available={offer.available} size="sm" />
                       </div>
                     </div>
-                    {signedIn ? (
+                    {signedIn && offer.skuId !== boxSku ? (
                       <AddToCartForm action={setCartLineAction} skuId={offer.skuId} available={offer.available} labelFa={offer.sellerNameFa} />
                     ) : null}
                   </li>
@@ -237,11 +247,9 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
             <section aria-labelledby="rating-title" className="space-y-lg">
               <SectionHeader id="rating-title" title="نظر خریداران" />
               <div className="hz-card space-y-md">
-                <p className="hz-h3" data-testid="product-rating">
-                  {rating.count === 0
-                    ? 'هنوز نظری ثبت نشده است.'
-                    : fa(rating.overall) + ' از ۵ — بر پایه ' + fa(rating.count) + ' نظر'}
-                </p>
+                <div data-testid="product-rating">
+                  {rating.count === 0 ? <p className="hz-body">هنوز نظری ثبت نشده است.</p> : <RatingSummary value={rating.overall} count={rating.count} />}
+                </div>
                 <p className="hz-caption" data-testid="product-rating-note">
                   نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد، و امتیاز تنها از همین نظرها ساخته می‌شود.
                 </p>

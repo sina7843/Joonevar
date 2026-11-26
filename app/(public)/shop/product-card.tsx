@@ -33,7 +33,12 @@ export function ProductCard({ item }: { item: ShopCard }) {
             </>
           )}
         </div>
-        <StockBadge available={item.available} size="sm" />
+        {/* DS ProductCard: in stock is the norm and says nothing; only low or out of stock is shown. */}
+        {item.available <= 0 ? (
+          <StockBadge available={0} size="sm" />
+        ) : item.available <= 3 ? (
+          <span className="hz-stock hz-stock--low hz-stock--sm">{'فقط ' + fa(item.available) + ' عدد'}</span>
+        ) : null}
       </div>
     </Link>
   );

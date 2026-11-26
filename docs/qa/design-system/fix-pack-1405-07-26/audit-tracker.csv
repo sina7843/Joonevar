@@ -190,23 +190,23 @@ KUSR-038,T11,2,medium,code,KUSR,K17,کارت خلاصه آگهی (context summar
 KUSR-039,T11,2,medium,code,KUSR,K17,"رشته گفتگو (P12) در `/account/purchases/[id]`: سرِ رشته، `role=""log""`، کارت پیشنهاد و وضعیت ارسال با طراحی فرق دارد",K17 · Thread header، `MessageBubble`، `OfferCard`,PARTIAL,DEC-0243,role=log و OfferCard؛ وضعیت ارسال پیام نه
 KUSR-041,T11,2,medium,v1.0.4,KUSR,K17,موبایل رشته گفتگو: نوار بالای اختصاصی، نوار context و پنهان شدن tab bar نیست,K17 موبایل,,,
 KUSR-040,T11,2,low,code,KUSR,K17,حالت سخت «گفتگوی بسته»: متن و حالت composer با طراحی فرق دارد,K17 · `MessageComposer` بسته,,,
-CMPB-024,T12,2,high,code,CMPB,K7,QuantityStepper · تعداد با SelectField و دکمهٔ «به‌روزرسانی» انتخاب می‌شود، نه گروه `.hz-qty`,QuantityStepper — صفحهٔ محصول (K07، کنار «افزودن به سبد») و ردیف‌های سبد خرید,,,
-CMPB-027,T12,2,high,code,CMPB,K7,VariantPicker · صفحهٔ محصول کاشی‌های انتخاب تنوع ندارد و تنوع فقط به‌صورت meta در کارت هر فروشنده آمده,VariantPicker — صفحهٔ محصول فروشگاه (K07),,,
-KPUB-036,T12,2,high,needs decision,KPUB,K7,K7 جعبهٔ خرید: فهرست «فروشندگان این کالا» به‌جای VariantPicker + قیمت + QuantityStepper + «افزودن به سبد» + یک SellerCard,K7 — offer box / VariantPicker / QuantityStepper / SellerCard,,,Already decided — Decision 9: variant option name approved (VariantPicker). Building the per-variant buy box is UI on existing variants.
-CMPA1-040,T12,2,medium,code,CMPA1,,CartRow: کنترل تعداد +/− نیست؛ انتخاب‌گر و دکمه «به‌روزرسانی» جایش را گرفته,CartRow,,,
+CMPB-024,T12,2,high,code,CMPB,K7,QuantityStepper · تعداد با SelectField و دکمهٔ «به‌روزرسانی» انتخاب می‌شود، نه گروه `.hz-qty`,QuantityStepper — صفحهٔ محصول (K07، کنار «افزودن به سبد») و ردیف‌های سبد خرید,FIXED,DEC-0244,QuantityStepper hz-qty جای Select
+CMPB-027,T12,2,high,code,CMPB,K7,VariantPicker · صفحهٔ محصول کاشی‌های انتخاب تنوع ندارد و تنوع فقط به‌صورت meta در کارت هر فروشنده آمده,VariantPicker — صفحهٔ محصول فروشگاه (K07),FIXED,DEC-0244,VariantPicker رادیو در fieldset
+KPUB-036,T12,2,high,needs decision,KPUB,K7,K7 جعبهٔ خرید: فهرست «فروشندگان این کالا» به‌جای VariantPicker + قیمت + QuantityStepper + «افزودن به سبد» + یک SellerCard,K7 — offer box / VariantPicker / QuantityStepper / SellerCard,FIXED,DEC-0244,BuyBox: VariantPicker+قیمت+Stepper+افزودن+SellerCard؛ فهرست مقایسه زیر آن ماند (§8)
+CMPA1-040,T12,2,medium,code,CMPA1,,CartRow: کنترل تعداد +/− نیست؛ انتخاب‌گر و دکمه «به‌روزرسانی» جایش را گرفته,CartRow,FIXED,DEC-0244,+/− در CartRow، بدون «به‌روزرسانی»
 CMPA1-041,T12,2,medium,code,CMPA1,,CartRow همیشه `--stacked` است و ردیف ناموجود جمع خط و فرم تعداد را نشان می‌دهد,CartRow (`--stacked`، `--unavailable`),,,
-CMPB-022,T12,2,medium,code,CMPB,K7,Rating · نمایش امتیاز نوار پنج‌ستاره، «از ۵»، خلاصهٔ امتیاز و ستاره در ردیف نظرها را ندارد,Rating — صفحهٔ محصول (K07)، کارت محصول,,,
+CMPB-022,T12,2,medium,code,CMPB,K7,Rating · نمایش امتیاز نوار پنج‌ستاره، «از ۵»، خلاصهٔ امتیاز و ستاره در ردیف نظرها را ندارد,Rating — صفحهٔ محصول (K07)، کارت محصول,FIXED,DEC-0244,Rating پنج‌ستاره و RatingSummary
 CMPB-023,T12,2,medium,code,CMPB,,Rating · امتیازدهی با سه SelectField «۱ تا ۵» است، نه ستاره‌های رادیویی `.hz-rating-input`,Rating (Input) — فرم ثبت نظر پس از تحویل,,,
 CMPB-056,T12,2,medium,code,CMPB,K7,ProductCard · امتیاز (`.hz-rating`) روی کارت محصول نیست,کاشی محصول در `/shop` و «محصولات مرتبط» صفحهٔ محصول (K7),,,
-CMPB-057,T12,2,medium,code,CMPB,,ProductCard · نشان موجودی برای کالای موجود هم نمایش داده می‌شود و حالت‌های کم و ناموجود طبق طراحی نیستند,کاشی محصول,,,
-CMPB-059,T12,2,medium,code,CMPB,K7,StockBadge · کامپوننت دوحالته است و `--low`، `--reserved`، `--action` و آستانهٔ تنظیمی ندارد,نشان موجودی در کاشی محصول، صفحهٔ محصول (K7) و پنل فروشنده,,,
-CMPB-060,T12,2,medium,code,CMPB,K7,SellerCard · کارت فروشندهٔ صفحهٔ محصول خطوط ارسال، نوع و شهر فروشنده و لوگوی thumb-lg را ندارد,صفحهٔ محصول (K7)، فهرست «فروشندگان این کالا»,,,
+CMPB-057,T12,2,medium,code,CMPB,,ProductCard · نشان موجودی برای کالای موجود هم نمایش داده می‌شود و حالت‌های کم و ناموجود طبق طراحی نیستند,کاشی محصول,FIXED,DEC-0244,ProductCard فقط کم/ناموجود
+CMPB-059,T12,2,medium,code,CMPB,K7,StockBadge · کامپوننت دوحالته است و `--low`، `--reserved`، `--action` و آستانهٔ تنظیمی ندارد,نشان موجودی در کاشی محصول، صفحهٔ محصول (K7) و پنل فروشنده,PARTIAL,DEC-0244,--low در BuyBox و کارت؛ --reserved/--action و آستانه تنظیمی نه
+CMPB-060,T12,2,medium,code,CMPB,K7,SellerCard · کارت فروشندهٔ صفحهٔ محصول خطوط ارسال، نوع و شهر فروشنده و لوگوی thumb-lg را ندارد,صفحهٔ محصول (K7)، فهرست «فروشندگان این کالا»,PARTIAL,DEC-0244,SellerCard در جعبه خرید؛ خطوط ارسال و شهر نه
 KPUB-030,T12,2,medium,code,KPUB,K6 K7,گالری: شبکهٔ ایستا به‌جای تصویر اصلی + نوار بندانگشتی تعاملی (K6، K7),K6 و K7 — Gallery,,,
-KPUB-039,T12,2,medium,code,KPUB,K7,K7 «نظر خریداران»: خلاصهٔ امتیاز و کارت نظر به‌جای متن خام؛ پرسش و پاسخ جدا,K7 — RatingSummary / Review / Q&A,,,
+KPUB-039,T12,2,medium,code,KPUB,K7,K7 «نظر خریداران»: خلاصهٔ امتیاز و کارت نظر به‌جای متن خام؛ پرسش و پاسخ جدا,K7 — RatingSummary / Review / Q&A,PARTIAL,DEC-0244,RatingSummary؛ کارت نظر هنوز متن ردیفی
 CMPB-061,T12,2,low,v1.0.4,CMPB,K6 K7,SellerCard · سطح سرفصل نام فروشنده طبق قاعدهٔ v1.0.4 (h2 در buy box، h3 در بخش),buy box آگهی (K6) و محصول (K7),,,
-KPUB-037,T12,2,low,code,KPUB,K7,K7 سرصفحه: مسیر راهنما، برند/دسته به‌صورت پیوند، اندازهٔ h1 و Rating,K7 — Breadcrumbs، عنوان، Rating,,,
+KPUB-037,T12,2,low,code,KPUB,K7,K7 سرصفحه: مسیر راهنما، برند/دسته به‌صورت پیوند، اندازهٔ h1 و Rating,K7 — Breadcrumbs، عنوان، Rating,PARTIAL,DEC-0244,h1، برند و دسته، Rating؛ پیوند برند/دسته نه
 KPUB-038,T12,2,low,code,KPUB,K7,K7 «توضیحات و مشخصات»: Accordion جعبه‌ای و ردیف‌های مشخصات,K7 — Accordion / KeyValueList,,,
-KPUB-040,T12,2,low,needs decision,KPUB,K7 K1,ProductCard: امتیاز، خط برند و نمایش موجودی,ProductCard (K7 «کالاهای مرتبط»، `/shop`، K1),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
+KPUB-040,T12,2,low,needs decision,KPUB,K7 K1,ProductCard: امتیاز، خط برند و نمایش موجودی,ProductCard (K7 «کالاهای مرتبط»، `/shop`، K1),PARTIAL,DEC-0244,نمایش موجودی؛ امتیاز روی کارت نه
 CMPA2-036,T13,2,high,needs decision,CMPA2,K1 K6,ListingCard: آگهی «توافقی» مبلغ را نشان نمی‌دهد و «قیمت توافقی» جای مبلغ می‌نشیند (K1، K6),ListingCard + PriceDisplay آگهی,,,Already decided — Decision 7g (11 Mehr 1405): fixed price removed — every listing has an asking amount + «قابل مذاکره». Retire EXACT with a migration; log a DEC citing 7g.
 CMPB-054,T13,2,high,code,CMPB,K1 K14 K6,PriceDisplay · قیمت آگهی «قیمت توافقی» بدون مبلغ است و «قابل مذاکره» نمایش داده نمی‌شود,کارت آگهی (K1، K14) و جعبهٔ خرید آگهی (K6),,,
 KPUB-027,T13,2,high,code,KPUB,K6,K6 ستون کناری: فرم درون‌خطی «درخواست خرید» به‌جای یک دکمهٔ «پیام به فروشنده»,K6 — کارت قیمت و اقدام,,,

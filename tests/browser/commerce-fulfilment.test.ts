@@ -128,7 +128,7 @@ test('a shop states how it delivers, and until it does nothing of its can be bou
     await page.goto(BASE_URL + href, { waitUntil: 'load' });
     const form = page.locator('[data-testid^="add-to-cart-form-"]').first();
     const skuId = (await form.getAttribute('data-testid'))!.replace('add-to-cart-form-', '');
-    await page.getByTestId('add-quantity-' + skuId).selectOption('2');
+    await page.getByTestId('add-quantity-' + skuId + '-more').click(); // 2 in the stepper
     await page.getByTestId('add-to-cart-' + skuId).click();
     await expectText(page, 'سبد خرید به‌روز شد');
 

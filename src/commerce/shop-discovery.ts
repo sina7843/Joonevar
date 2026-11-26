@@ -329,6 +329,7 @@ export async function publicProduct(
       priceToman: offer.priceToman,
       available: Math.max(offer.stockOnHand - offer.stockReserved, 0),
       condition: offer.condition as OfferComparison['condition'],
+      variantLabelFa: offer.variantId ? offer.variantLabelFa : null,
     };
   });
 
