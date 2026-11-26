@@ -81,6 +81,11 @@ export function AnimalWizard({
   const [photoState, uploadPhoto, photoPending] = useActionState(uploadAnimalPhotoAction, EMPTY);
   const [lineageState, resolveLineage, lineagePending] = useActionState(resolveLineageAction, EMPTY);
   const [registerState, register, registerPending] = useActionState(registerAnimalAction, EMPTY);
+  // K10 hard state «خطای اعتبارسنجی نام»: an error summary that takes focus, the
+  // error under the field, and a link from the summary back to it (KUSR-022).
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [breedError, setBreedError] = useState<string | null>(null);
+  const summary = useRef<HTMLDivElement>(null);
   // A genuinely missing parent stores G0, but the owner still chose the
   // internal-lineage route: the panel, the codes and the CTA must survive a
   // reload, otherwise the way back to the missing parent disappears.
@@ -136,14 +141,56 @@ export function AnimalWizard({
           {step === 1 ? (
             <Card>
               <StepHead step={1} />
-              <form action={save} className="space-y-lg" data-testid="step-1">
+              <form
+                action={save}
+                className="space-y-lg"
+                data-testid="step-1"
+                noValidate
+                onSubmit={(event) => {
+                  const data = new FormData(event.currentTarget);
+                  const name = String(data.get('name') ?? '').trim();
+                  const problem = name === '' ? 'نام حیوان را بنویسید.' : name.length > 40 ? 'نام حیوان حداکثر ۴۰ نویسه است.' : null;
+                  const breed = String(data.get('breedId') ?? '') === '' ? 'نژاد را از فهرست انتخاب کنید.' : null;
+                  setNameError(problem);
+                  setBreedError(breed);
+                  if (problem || breed) {
+                    event.preventDefault();
+                    requestAnimationFrame(() => summary.current?.focus());
+                  }
+                }}
+              >
                 <input type="hidden" name="animalId" value={animal.id} />
                 <input type="hidden" name="step" value="2" />
+                {nameError || breedError ? (
+                  <div ref={summary} tabIndex={-1} className="hz-alert hz-alert--error" role="alert" data-testid="step-1-errors">
+                    <div className="hz-alert__body">
+                      <span className="hz-alert__title">{((nameError ? 1 : 0) + (breedError ? 1 : 0)).toLocaleString('fa-IR') + ' مورد را اصلاح کنید'}</span>
+                      <ul className="m-0 list-none p-0">
+                        {breedError ? <li>{'نژاد: ' + breedError}</li> : null}
+                        {nameError ? <li>
+                          <a
+                            className="hz-link"
+                            href="#step-1-name"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              (event.currentTarget.closest('form')?.elements.namedItem('name') as HTMLInputElement | null)?.focus();
+                            }}
+                          >
+                            {'نام حیوان: ' + nameError}
+                          </a>
+                        </li> : null}
+                      </ul>
+                    </div>
+                  </div>
+                ) : null}
                 <TextField
                   label="نام حیوان"
                   name="name"
                   required
+                  maxLength={60}
                   defaultValue={animal.name ?? ''}
+                  error={nameError ?? undefined}
+                  onChange={() => (nameError ? setNameError(null) : undefined)}
                   data-testid="animal-name"
                 />
                 <Field label="گونه" required hint="در حال حاضر فقط ثبت سگ پشتیبانی می‌شود.">
