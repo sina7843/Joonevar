@@ -286,17 +286,17 @@ export async function createInquiry(
   if (risk.blocked) throw conflict(risk.reasonFa!);
 
   const now = new Date();
-  const exact = listing.priceMode === 'EXACT';
-  if (exact && (listing.priceToman === null || listing.priceToman <= 0n)) {
-    throw conflict('قیمت این آگهی معتبر نیست.');
-  }
-
   const opening = input.offerToman ?? null;
   if (opening !== null) {
-    if (exact) throw validation('این آگهی قیمت مقطوع دارد و پیشنهاد قیمت نمی‌پذیرد.');
     const problem = offerProblem(opening);
     if (problem !== null) throw validation(problem);
   }
+  // Decision 7g, DEC-0245: every advert is negotiable. A request without a
+  // counter-offer is a request at the advert's own amount, so that amount is
+  // locked at once (as a fixed price used to be); a request with an opening
+  // offer starts the negotiation and locks nothing until an offer is accepted.
+  // An old advert with no amount can only be negotiated.
+  const exact = opening === null && listing.priceToman !== null && listing.priceToman > 0n;
 
   const messageFa = input.messageFa?.trim() ?? '';
   // The opening message goes through the same policy every later message does.

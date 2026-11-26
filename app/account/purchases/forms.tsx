@@ -53,7 +53,7 @@ function Result({ state }: { state: InquiryFormState }) {
  * A negotiable advert may be opened with a first offer; an exact-price one
  * takes the price from the advert, so there is nothing to type.
  */
-export function AskToBuyForm({ listingId, negotiable }: { listingId: string; negotiable: boolean }) {
+export function AskToBuyForm({ listingId }: { listingId: string }) {
   const [state, submit, pending] = useActionState(createInquiryAction, EMPTY);
   return (
     <Card>
@@ -68,16 +68,14 @@ export function AskToBuyForm({ listingId, negotiable }: { listingId: string; neg
           hint="تا پیش از پرداخت بیعانه، شماره تماس و شماره کارت در گفت‌وگو رد و بدل نمی‌شود."
           data-testid="inquiry-message"
         />
-        {negotiable ? (
-          <TextField
-            label="پیشنهاد قیمت شما (تومان)"
-            name="offerToman"
-            ltr
-            inputMode="numeric"
-            hint="اختیاری. با رقم انگلیسی و بدون جداکننده."
-            data-testid="inquiry-offer"
-          />
-        ) : null}
+        <TextField
+          label="پیشنهاد قیمت شما (تومان)"
+          name="offerToman"
+          ltr
+          inputMode="numeric"
+          hint="اختیاری. بدون پیشنهاد، درخواست با همان مبلغ آگهی ثبت می‌شود. با رقم انگلیسی و بدون جداکننده."
+          data-testid="inquiry-offer"
+        />
         <Button type="submit" disabled={pending} data-testid="ask-to-buy-submit">
           {pending ? 'در حال ثبت…' : 'ثبت درخواست خرید'}
         </Button>

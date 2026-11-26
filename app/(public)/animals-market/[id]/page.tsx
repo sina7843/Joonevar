@@ -187,7 +187,7 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
               </Alert>
             ) : (
               <div id="listing-ask" className="scroll-mt-s96">
-                <AskToBuyForm listingId={listing.id} negotiable={listing.priceMode === 'NEGOTIABLE'} />
+                <AskToBuyForm listingId={listing.id} />
               </div>
             )}
 
@@ -296,7 +296,7 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
         <StickyActionBar
           label="تماس با فروشنده"
           className="md:hidden"
-          context={[listing.titleFa, listing.priceMode === 'NEGOTIABLE' ? 'قابل مذاکره' : null].filter(Boolean).join('، ')}
+          context={listing.titleFa + '، قابل مذاکره'}
           total={listing.priceToman !== null ? listing.priceToman.toLocaleString('fa-IR') + ' تومان' : undefined}
         >
           <ButtonLink href="#listing-ask" size="lg" iconStart="chatCircle">

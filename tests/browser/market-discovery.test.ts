@@ -330,7 +330,6 @@ before(async () => {
     listingId = new URL(page.url()).pathname.split('/').pop()!;
     const listingUrl = BASE_URL + '/account/listings/' + listingId;
 
-    await page.getByTestId('listing-price-mode').selectOption('EXACT');
     await page.getByTestId('listing-price').fill('24000000');
     await page.getByTestId('listing-description').fill(DESCRIPTION);
     await page.getByTestId('listing-reason').fill('SYNTHETIC دلیل فروش آزمایشی');

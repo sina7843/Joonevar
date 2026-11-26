@@ -85,7 +85,8 @@ async function publishedListing(ctx: MatingCtx, nameFa: string, priceMode: 'EXAC
     listingId: listing.id,
     expectedVersion: listing.version,
     priceMode,
-    priceToman: priceMode === 'EXACT' ? String(PRICE) : '',
+    // Decision 7g: every advert has an amount; the mode posted is stored as negotiable.
+    priceToman: String(PRICE),
     descriptionFa: 'SYNTHETIC توضیح آگهی آزمایشی برای آزمون درخواست خرید و مذاکره و رزرو.',
     reasonForSaleFa: 'SYNTHETIC دلیل فروش آزمایشی',
     provinceCode: city!.provinceCode,

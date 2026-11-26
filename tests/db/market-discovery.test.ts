@@ -114,6 +114,15 @@ async function publishedListing(
   return { listingId: listing.id, animalId: animal.animalId };
 }
 
+/**
+ * An advert published before Decision 7g required an amount: no new advert can
+ * be unpriced, so the old row is made the way it really exists in the data.
+ */
+async function legacyUnpriced(ctx: MatingCtx, name: string): Promise<void> {
+  const { listingId } = await publishedListing(ctx, name);
+  await ctx.testDb.db.update(animalListings).set({ priceToman: null }).where(eq(animalListings.id, listingId));
+}
+
 // ── visibility ─────────────────────────────────────────────────────────────
 
 test('the four reasons an advert is hidden all really hide it, and none is distinguishable', async () => {
@@ -214,7 +223,7 @@ test('filters narrow the result and a hostile query string finds nothing unexpec
     await openMarket(ctx);
     await publishedListing(ctx, 'SYNTHETIC سگ ارزان', { priceToman: '5000000' });
     await publishedListing(ctx, 'SYNTHETIC سگ گران', { priceToman: '90000000' });
-    await publishedListing(ctx, 'SYNTHETIC سگ توافقی', { priceMode: 'NEGOTIABLE' });
+    await legacyUnpriced(ctx, 'SYNTHETIC سگ توافقی');
 
     assert.equal((await publicListings(ctx.testDb.db, EMPTY_FILTER)).total, 3);
 
@@ -224,8 +233,9 @@ test('filters narrow the result and a hostile query string finds nothing unexpec
     assert.equal(cheap.total, 1);
     assert.equal(cheap.items[0]!.titleFa, 'SYNTHETIC سگ ارزان');
 
+    // Decision 7g: every advert is negotiable.
     const negotiable = await publicListings(ctx.testDb.db, filterOf({ priceMode: 'NEGOTIABLE' }));
-    assert.equal(negotiable.total, 1);
+    assert.equal(negotiable.total, 3);
 
     // The term is a parameter: the wildcard and the quote are searched for, not
     // interpreted, and the injection attempt simply matches nothing.
@@ -254,7 +264,7 @@ test('sorting is stable and an unpriced advert is neither cheapest nor dearest',
     await openMarket(ctx);
     await publishedListing(ctx, 'SYNTHETIC سگ ۳۰', { priceToman: '30000000' });
     await publishedListing(ctx, 'SYNTHETIC سگ ۱۰', { priceToman: '10000000' });
-    await publishedListing(ctx, 'SYNTHETIC سگ توافقی', { priceMode: 'NEGOTIABLE' });
+    await legacyUnpriced(ctx, 'SYNTHETIC سگ توافقی');
 
     const asc = await publicListings(ctx.testDb.db, filterOf({ sort: 'PRICE_ASC' }));
     assert.deepEqual(asc.items.map((row) => row.titleFa), [

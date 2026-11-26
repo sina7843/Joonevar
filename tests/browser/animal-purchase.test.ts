@@ -239,7 +239,8 @@ async function publishNegotiableListing(page: Page, animalId: string): Promise<s
   const id = new URL(page.url()).pathname.split('/').pop()!;
   const url = BASE_URL + '/account/listings/' + id;
 
-  await page.getByTestId('listing-price-mode').selectOption('NEGOTIABLE');
+  // Decision 7g: every advert has an amount and is negotiable.
+  await page.getByTestId('listing-price').fill('20000000');
   await page
     .getByTestId('listing-description')
     .fill('SYNTHETIC توضیح آگهی آزمایشی که به‌اندازه کافی طولانی است تا شرط حداقل طول را برآورده کند.');
@@ -380,7 +381,9 @@ test('the advert is readable without an account, and the request needs one', asy
     const page = await anonymous.newPage();
     await page.goto(BASE_URL + '/animals-market/' + listingId, { waitUntil: 'load' });
     // Reading is public: the price and the safety note are both there.
-    assert.equal(await page.getByTestId('listing-price').innerText(), 'قیمت توافقی');
+    const priceText = await page.getByTestId('listing-price').innerText();
+    assert.match(priceText, /۲۰٬۰۰۰٬۰۰۰/);
+    assert.match(priceText, /قابل مذاکره/);
     assert.match(await page.getByTestId('listing-safety').innerText(), /بیعانه/);
     await page.getByTestId('ask-to-buy').waitFor();
     await page.screenshot({ path: path.join(SHOTS, 'public-advert-mobile.png'), fullPage: true });

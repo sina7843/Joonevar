@@ -28,8 +28,6 @@ import {
   DELIVERY_METHOD_FA,
   DISCLOSURES,
   NEUTER_FA,
-  PRICE_MODES,
-  PRICE_MODE_FA,
   VACCINATION_FA,
 } from '../../../../src/marketplace/listing-model.ts';
 import { SELLER_KIND_FA } from '../../../../src/marketplace/listing-eligibility.ts';
@@ -120,8 +118,6 @@ export default async function AnimalMarketPage({ searchParams }: { searchParams:
               options={options.provinces.map((row) => ({ value: row.code, label: row.nameFa }))} />
             <FilterSelect id="market-city" form={FORM} name="city" label="شهر" value={filter.cityId} all="همه شهرها" testId="market-filter-city"
               options={cities.map((row) => ({ value: row.id, label: row.nameFa }))} />
-            <FilterSelect id="market-priceMode" form={FORM} name="priceMode" label="نوع قیمت" value={filter.priceMode} all="هر نوع قیمت" testId="market-filter-priceMode"
-              options={PRICE_MODES.map((mode) => ({ value: mode, label: PRICE_MODE_FA[mode] }))} />
             <FilterSelect id="market-sex" form={FORM} name="sex" label="جنسیت" value={filter.sex} all="هر دو" testId="market-filter-sex"
               options={[
                 { value: 'MALE', label: 'نر' },

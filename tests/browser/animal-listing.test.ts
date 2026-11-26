@@ -360,7 +360,6 @@ test('the advert is built, refuses to publish until it is complete, and then goe
     assert.match(blockers, /نوع قیمت/);
     assert.match(blockers, /تصویر/);
 
-    await page.getByTestId('listing-price-mode').selectOption('EXACT');
     await page.getByTestId('listing-price').fill('18000000');
     await page
       .getByTestId('listing-description')

@@ -15,24 +15,20 @@ const SEX_FA: Record<string, string> = { MALE: 'نر', FEMALE: 'ماده' };
  * amount is «تعیین‌نشده», never ۰.
  */
 export function ListingPrice({ mode, amount, size = 'md', testId }: { mode: string | null; amount: bigint | null; size?: 'sm' | 'md' | 'lg'; testId?: string }) {
+  // Decision 7g: always the amount + «قابل مذاکره» (`mode` is kept for old callers).
+  void mode;
   const cls = 'hz-price' + (size === 'md' ? '' : ' hz-price--' + size);
-  if (mode === 'NEGOTIABLE') {
-    return (
-      <div className={cls} data-testid={testId}>
-        <span className="hz-price__amount">قیمت توافقی</span>
-      </div>
-    );
-  }
   if (amount === null) {
     return (
       <div className={cls + ' hz-price--unset'} data-testid={testId}>
-        <span className="hz-price__amount">تعیین‌نشده</span>
+        <span className="hz-price__amount">قیمت ثبت نشده</span>
       </div>
     );
   }
   return (
     <div className={cls} data-testid={testId}>
-      <span className="hz-price__amount">{fa(amount)}</span> <span className="hz-price__unit">تومان</span>
+      <span className="hz-price__amount">{fa(amount)}</span> <span className="hz-price__unit">تومان</span>{' '}
+      <span className="hz-price__mode">قابل مذاکره</span>
     </div>
   );
 }

@@ -240,7 +240,6 @@ async function publishListing(page: Page, animalId: string): Promise<string> {
   const id = new URL(page.url()).pathname.split('/').pop()!;
   const url = BASE_URL + '/account/listings/' + id;
 
-  await page.getByTestId('listing-price-mode').selectOption('EXACT');
   await page.getByTestId('listing-price').fill(PRICE);
   await page
     .getByTestId('listing-description')
