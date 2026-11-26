@@ -8,7 +8,6 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { PageHeader } from '../../../../src/ui/section-header.tsx';
@@ -150,9 +149,6 @@ export default async function ClubsPage({ searchParams }: { searchParams: Promis
                               {club.placeFa}
                             </span>
                           ) : null}
-                          <span className="mt-xs">
-                            <StatusBadge status="APPROVED" size="sm" />
-                          </span>
                         </div>
                       </div>
                       {club.upcomingEvents > 0 ? (

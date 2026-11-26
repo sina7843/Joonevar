@@ -552,5 +552,5 @@ CMPB-110,T33,3,low,code,CMPB,,MergeTool · تب‌های نوع رکورد ViewC
 CMPA1-033,T34,3,medium,code,CMPA1,,پنل «مشخصات نژاد» در داده ناقص پنهان می‌شود و حالت `--unset` با طراحی فرق دارد,BreedCard — Profile panel,,,
 CMPA1-048,T34,3,medium,needs decision,CMPA1,,ClubCard رویداد پیش‌رو را فقط با شمارش نشان می‌دهد و تعداد اعضا ندارد,ClubCard,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
 CMPB-126,T34,3,medium,needs decision,CMPB,,VerificationResult · حالت «باطل‌شده»، جملهٔ نتیجه، فیلدهای عمومی و کنش‌های «پیدا نشد» وجود ندارد,VerificationResult در `/verify` و `/verify/[code]`,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPA1-049,T34,3,low,code,CMPA1,,کارت عمومی کلاب نشان «تأییدشده» و نشان‌های اضافه دارد,ClubCard (public),,,
+CMPA1-049,T34,3,low,code,CMPA1,,کارت عمومی کلاب نشان «تأییدشده» و نشان‌های اضافه دارد,ClubCard (public),FIXED,DEC-0255,نشان وضعیت از کارت عمومی کلاب حذف شد (همه کارت‌های عمومی فعال‌اند)
 CMPB-124,T34,3,low,code,CMPB,,PlaceMap · قاب نقشهٔ تک‌مکان iframe ساده است و حالت «بدون موقعیت» در صفحهٔ عمومی متن نشان می‌دهد,PlaceMap (تک‌مکان) در `/centers/[slug]` و `/veterinarians/[slug]`,,,
