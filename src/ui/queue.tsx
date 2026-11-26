@@ -170,44 +170,71 @@ export function CaseQueue({
   );
 }
 
-/** QueueTile row — DS *QueueTile*: name, count, oldest age, alert when overdue. */
+/**
+ * QueueTile row — DS *QueueTile*: name, count (unit visually hidden, never
+ * hidden from assistive tech), oldest age (`--late` / `--overdue`), and the
+ * alert variant + flag only when the oldest case is past the review deadline.
+ * `countTestId` exposes the raw number as `data-count` for tests.
+ */
 export function QueueTiles({
   tiles,
+  testId,
 }: {
-  tiles: ReadonlyArray<{ href: string; name: string; count: number | null; oldestDays?: number | null; alert?: boolean; testId?: string }>;
+  tiles: ReadonlyArray<{
+    href: string;
+    name: string;
+    count: number | null;
+    oldestDays?: number | null;
+    age?: 'late' | 'overdue';
+    /** Replaces the oldest line when nothing waits on us («همه در انتظار طرف مقابل»). */
+    note?: string;
+    title?: string;
+    testId?: string;
+    countTestId?: string;
+  }>;
+  testId?: string;
 }) {
   return (
-    <div className="hz-queue-tiles">
-      {tiles.map((tile) => (
-        <Link
-          key={tile.href}
-          href={tile.href}
-          className={['hz-queue-tile', 'hz-card--interactive', tile.alert ? 'hz-queue-tile--alert' : '', tile.count === 0 ? 'hz-queue-tile--empty' : '']
-            .join(' ')
-            .trim()}
-          data-testid={tile.testId}
-        >
-          <span className="hz-queue-tile__head">
-            <span className="hz-queue-tile__name">{tile.name}</span>
-            <Icon name="arrowRight" size="xs" mirror />
-          </span>
-          <span className="hz-queue-tile__count hz-num">{tile.count === null ? '—' : tile.count.toLocaleString('fa-IR')}</span>
-          {tile.count === 0 ? (
-            <span className="hz-queue-tile__oldest">صف خالی است</span>
-          ) : tile.oldestDays !== undefined && tile.oldestDays !== null ? (
-            <span className="hz-queue-tile__oldest">
-              قدیمی‌ترین:{' '}
-              <span className={tile.alert ? 'hz-age hz-age--overdue' : 'hz-age'}>{tile.oldestDays.toLocaleString('fa-IR') + ' روز'}</span>
+    <div className="hz-queue-tiles" data-testid={testId}>
+      {tiles.map((tile) => {
+        const alert = tile.age === 'overdue';
+        return (
+          <Link
+            key={tile.href + tile.name}
+            href={tile.href}
+            className={['hz-queue-tile', 'hz-card--interactive', alert ? 'hz-queue-tile--alert' : '', tile.count === 0 ? 'hz-queue-tile--empty' : '']
+              .join(' ')
+              .trim()}
+            data-testid={tile.testId}
+            title={tile.title}
+          >
+            <span className="hz-queue-tile__head">
+              <span className="hz-queue-tile__name">{tile.name}</span>
+              <Icon name="arrowRight" size="xs" mirror />
             </span>
-          ) : null}
-          {tile.alert ? (
-            <span className="hz-queue-tile__flag">
-              <Icon name="warning" size="xs" />
-              از مهلت بررسی گذشته
+            <span className="hz-queue-tile__count hz-num" data-testid={tile.countTestId} data-count={tile.count ?? undefined}>
+              {tile.count === null ? '—' : tile.count.toLocaleString('fa-IR')}
+              <span className="hz-visually-hidden"> پرونده</span>
             </span>
-          ) : null}
-        </Link>
-      ))}
+            {tile.count === 0 ? (
+              <span className="hz-queue-tile__oldest">صف خالی است</span>
+            ) : tile.note ? (
+              <span className="hz-queue-tile__oldest">{tile.note}</span>
+            ) : tile.oldestDays !== undefined && tile.oldestDays !== null ? (
+              <span className="hz-queue-tile__oldest">
+                قدیمی‌ترین:{' '}
+                <span className={tile.age ? 'hz-age hz-age--' + tile.age : 'hz-age'}>{tile.oldestDays.toLocaleString('fa-IR') + ' روز'}</span>
+              </span>
+            ) : null}
+            {alert ? (
+              <span className="hz-queue-tile__flag">
+                <Icon name="warning" size="xs" />
+                از مهلت بررسی گذشته
+              </span>
+            ) : null}
+          </Link>
+        );
+      })}
     </div>
   );
 }

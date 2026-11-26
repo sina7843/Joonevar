@@ -130,7 +130,8 @@ test('opening a notification marks it read and returns to the case', async () =>
 test('the association dashboard counts the Phase 2.5 queues it answers for', async () => {
   await as('assoc', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc', { waitUntil: 'load' });
-    for (const key of ['vet-trusted', 'clubs', 'club-ownership', 'members']) {
+    // K13 groups the four vet queues into «دامپزشکان» and club verification + ownership into «کلاب‌ها».
+    for (const key of ['vets', 'clubs', 'members']) {
       assert.ok((await page.getByTestId('queue-count-' + key).count()) > 0, 'the queue ' + key + ' is missing');
     }
     // Every queue links somewhere that exists.

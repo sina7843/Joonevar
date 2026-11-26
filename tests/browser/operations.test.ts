@@ -383,10 +383,10 @@ test('the queues show real counts and open the case they counted', async () => {
     // Every queue reports a real number, and the KYC count is exactly the
     // number of cases the queue it opens actually lists — not a placeholder.
     for (const key of ['kyc', 'kennels', 'permits', 'foreign', 'postal']) {
-      const value = await page.getByTestId('queue-count-' + key).innerText();
+      const value = (await page.getByTestId('queue-count-' + key).getAttribute('data-count')) ?? '';
       assert.match(value, /^\d+$/, key + ' must report a real number');
     }
-    const kycCount = Number(await page.getByTestId('queue-count-kyc').innerText());
+    const kycCount = Number(await page.getByTestId('queue-count-kyc').getAttribute('data-count'));
     await page.getByTestId('open-queue-kyc').click();
     await page.waitForURL((url) => url.pathname === '/assoc/kyc');
     // The first page of the queue is capped, so the count is checked against
@@ -406,7 +406,7 @@ test('the queues show real counts and open the case they counted', async () => {
     await page.goto(BASE_URL + '/genetics', { waitUntil: 'load' });
     await page.getByTestId('genetics-queues').waitFor();
     for (const key of ['receipts', 'awaiting', 'received', 'processing', 'appeals']) {
-      assert.match(await page.getByTestId('genetics-count-' + key).innerText(), /^\d+$/);
+      assert.match((await page.getByTestId('genetics-count-' + key).getAttribute('data-count')) ?? '', /^\d+$/);
     }
     await page.getByTestId('open-genetics-receipts').click();
     await page.waitForURL((url) => url.pathname === '/genetics/receipts');

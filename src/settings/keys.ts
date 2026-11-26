@@ -41,6 +41,31 @@ export const SETTING_DEFINITIONS: readonly SettingDefinition[] = [
     max: 365,
   },
 
+  // Operational review clock (DS P09 › Overdue, DEC-0241). No figure has been
+  // supplied, so both start unset: until then no queue is marked late/overdue.
+  {
+    key: 'ops.review_late_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'هشدار نزدیک به مهلت بررسی پرونده (روز)',
+    noteFa: 'پرونده‌ای که این تعداد روز در صف بماند «نزدیک به مهلت» نشان داده می‌شود. تا ثبت مقدار، هشداری نشان داده نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 365,
+  },
+  {
+    key: 'ops.review_overdue_days',
+    group: 'DEADLINES',
+    kind: 'INT',
+    source: 'OPERATIONAL_DATA',
+    labelFa: 'مهلت بررسی پرونده در صف عملیاتی (روز)',
+    noteFa: 'پرونده‌ای که بیش از این تعداد روز در صف بماند «از مهلت بررسی گذشته» نشان داده می‌شود. تا ثبت مقدار، هیچ صفی از مهلت گذشته نشان داده نمی‌شود.',
+    seedValue: null,
+    min: 1,
+    max: 365,
+  },
+
   // ── Tariffs ─────────────────────────────────────────────────────────────
   {
     key: 'fee.membership_toman',

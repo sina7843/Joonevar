@@ -259,6 +259,13 @@ export interface StatTileData {
   readonly href?: string;
   readonly testId?: string;
   readonly valueTestId?: string;
+  /**
+   * DS StatTile states: `loading` (three skeleton bars, aria-busy), `error`
+   * («—» + reload line, never ۰) and `unset` («تعیین‌نشده» + `reason`, when the
+   * metric depends on an unset setting).
+   */
+  readonly state?: 'loading' | 'error' | 'unset';
+  readonly reason?: ReactNode;
 }
 
 /** DS *StatTile* row (`.hz-queue-tiles` grid: 2 × 2 below 768, 4 in a row). */
@@ -266,26 +273,40 @@ export function StatTiles({ tiles }: { tiles: readonly StatTileData[] }) {
   return (
     <div className="hz-queue-tiles">
       {tiles.map((tile) => {
+        if (tile.state === 'loading') {
+          return (
+            <div key={tile.label} className="hz-stat-tile" aria-busy="true" data-testid={tile.testId}>
+              <span className="hz-visually-hidden">{tile.label + '، در حال بارگذاری'}</span>
+              <span className="hz-skeleton hz-skeleton--text" style={{ width: '50%' }} aria-hidden="true" />
+              <span className="hz-skeleton hz-skeleton--title" style={{ width: '40%' }} aria-hidden="true" />
+              <span className="hz-skeleton hz-skeleton--text" style={{ width: '70%' }} aria-hidden="true" />
+            </div>
+          );
+        }
+        const muted = tile.value === null || tile.state === 'error' || tile.state === 'unset';
         const value =
-          tile.value === null ? '—' : typeof tile.value === 'number' ? tile.value.toLocaleString('fa-IR') : tile.value;
+          tile.state === 'unset'
+            ? 'تعیین‌نشده'
+            : tile.state === 'error' || tile.value === null
+              ? '—'
+              : typeof tile.value === 'number'
+                ? tile.value.toLocaleString('fa-IR')
+                : tile.value;
+        const sub = tile.state === 'error' ? 'بارگذاری نشد. صفحه را دوباره بار کنید.' : tile.state === 'unset' ? (tile.reason ?? tile.sub) : tile.sub;
         const body = (
           <>
             <span className="hz-stat-tile__label">{tile.label}</span>
             <span
-              className={[
-                'hz-stat-tile__value',
-                tile.unit ? 'hz-stat-tile__value--long' : '',
-                tile.value === null ? 'hz-stat-tile__value--muted' : '',
-              ]
+              className={['hz-stat-tile__value', tile.unit ? 'hz-stat-tile__value--long' : '', muted ? 'hz-stat-tile__value--muted' : '']
                 .join(' ')
                 .trim()}
               data-testid={tile.valueTestId}
             >
               {value}
-              {tile.unit && tile.value !== null ? <span className="hz-stat-tile__unit">{tile.unit}</span> : null}
+              {tile.unit && !muted ? <span className="hz-stat-tile__unit">{tile.unit}</span> : null}
             </span>
-            {tile.sub ? <span className="hz-stat-tile__sub">{tile.sub}</span> : null}
-            {tile.alert ? (
+            {sub ? <span className="hz-stat-tile__sub">{sub}</span> : null}
+            {tile.alert && !tile.state ? (
               <span className="hz-stat-tile__flag">
                 <Icon name="warning" size="xs" />
                 <span>{tile.alert}</span>
@@ -293,7 +314,7 @@ export function StatTiles({ tiles }: { tiles: readonly StatTileData[] }) {
             ) : null}
           </>
         );
-        const className = ['hz-stat-tile', tile.alert ? 'hz-stat-tile--alert' : '', tile.href ? 'hz-card--interactive' : '']
+        const className = ['hz-stat-tile', tile.alert && !tile.state ? 'hz-stat-tile--alert' : '', tile.href ? 'hz-card--interactive' : '']
           .join(' ')
           .trim();
         return tile.href ? (

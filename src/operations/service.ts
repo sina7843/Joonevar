@@ -6,7 +6,7 @@
  * the registries the panels need. Every function checks the context it belongs
  * to, so an operational screen cannot be reached by switching a public role.
  */
-import { and, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, min, or, sql } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import { accounts, auditEvents, referenceBreeds } from '../db/schema/core.ts';
 import { memberships } from '../db/schema/billing.ts';
@@ -19,6 +19,8 @@ import { geneticsReceipts, parentageAppeals, samples } from '../db/schema/index.
 import { postalRequests } from '../db/schema/pedigree.ts';
 import { vetProfessionalCases } from '../db/schema/vets.ts';
 import { recordAudit } from '../audit/service.ts';
+import { readSetting } from '../settings/service.ts';
+import { DETAIL_ROUTE } from '../vets/review-workbench.ts';
 import { allocateSlug, duplicateCandidates } from '../breeds/service.ts';
 import { conflict, forbidden, notFound, validation } from '../domain/errors.ts';
 import type { Actor } from '../authz/actor.ts';
@@ -30,29 +32,82 @@ export interface QueueCount {
   readonly noteFa: string;
   readonly href: string;
   readonly waiting: number;
+  /** When the oldest waiting case entered (or last changed in) this queue; null when empty. */
+  readonly oldestAt: Date | null;
 }
 
 function assertContext(actor: Actor, context: Actor['context'], whatFa: string): void {
   if (actor.context !== context) throw forbidden(whatFa);
 }
 
-async function countRows(database: DbClient, query: Promise<{ value: number }[]>): Promise<number> {
+/** Waiting count and the oldest case's time of one queue, in one query. */
+async function queueStat(
+  query: Promise<{ value: number; oldest: Date | string | null }[]>,
+): Promise<{ waiting: number; oldestAt: Date | null }> {
   const [row] = await query;
-  return Number(row?.value ?? 0);
+  const oldest = row?.oldest ?? null;
+  return { waiting: Number(row?.value ?? 0), oldestAt: oldest === null ? null : new Date(oldest) };
 }
+
+/**
+ * The review clock (DS P09 › Overdue): whole days after which a waiting case is
+ * «نزدیک به مهلت» / «از مهلت بررسی گذشته». Both are managed settings with no
+ * starting figure, so an unset (or not yet seeded) value means no alert at all
+ * rather than an invented deadline (DEC-0241).
+ */
+export interface ReviewClock {
+  readonly lateDays: number | null;
+  readonly overdueDays: number | null;
+}
+
+async function optionalInt(database: DbClient, key: string): Promise<number | null> {
+  try {
+    const row = await readSetting(database, key);
+    return row.value === null ? null : Number(row.value);
+  } catch {
+    return null;
+  }
+}
+
+export async function reviewClock(database: DbClient): Promise<ReviewClock> {
+  const [lateDays, overdueDays] = await Promise.all([
+    optionalInt(database, 'ops.review_late_days'),
+    optionalInt(database, 'ops.review_overdue_days'),
+  ]);
+  return { lateDays, overdueDays };
+}
+
+/** 'overdue' past the deadline, 'late' past the warning, else none. */
+export function ageState(days: number | null, clock: ReviewClock): 'late' | 'overdue' | undefined {
+  if (days === null) return undefined;
+  if (clock.overdueDays !== null && days >= clock.overdueDays) return 'overdue';
+  if (clock.lateDays !== null && days >= clock.lateDays) return 'late';
+  return undefined;
+}
+
+const vetAt = sql<Date | null>`min(${vetProfessionalCases.updatedAt})`;
 
 /**
  * The association's real queues — §21.2, §21.5.
  *
  * The numbers are counted from the same tables the detail screens read, so a
  * queue that shows one waiting case really has one; nothing here is a
- * placeholder.
+ * placeholder. The oldest time uses the same column the queue's own age column
+ * reads (GAPS #23: last change where no first-submission time is stored).
  */
 export async function associationQueues(
   database: DbClient,
   actor: Actor,
 ): Promise<readonly QueueCount[]> {
   assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
+
+  const vetQueue = (caseType: 'STUDENT' | 'LICENCE' | 'TRUSTED') =>
+    queueStat(
+      database
+        .select({ value: count(), oldest: vetAt })
+        .from(vetProfessionalCases)
+        .where(and(eq(vetProfessionalCases.caseType, caseType), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
+    );
 
   const [
     kyc,
@@ -68,43 +123,32 @@ export async function associationQueues(
     clubsWaiting,
     clubOwnership,
   ] = await Promise.all([
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(kycCases.submittedAt) })
         .from(kycCases)
         .where(eq(kycCases.status, 'UNDER_REVIEW')),
     ),
-    countRows(
-      database,
-      database.select({ value: count() }).from(kennels).where(eq(kennels.status, 'UNDER_REVIEW')),
+    queueStat(
+      database.select({ value: count(), oldest: min(kennels.submittedAt) }).from(kennels).where(eq(kennels.status, 'UNDER_REVIEW')),
     ),
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(matingPermits.submittedAt) })
         .from(matingPermits)
         .where(eq(matingPermits.status, 'UNDER_REVIEW')),
     ),
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(foreignPedigreeCases.submittedAt) })
         .from(foreignPedigreeCases)
         .where(eq(foreignPedigreeCases.status, 'UNDER_REVIEW')),
     ),
-    countRows(database, database.select({ value: count() }).from(postalRequests)),
-    countRows(
-      database,
+    queueStat(database.select({ value: count(), oldest: min(postalRequests.createdAt) }).from(postalRequests)),
+    vetQueue('STUDENT'),
+    queueStat(
       database
-        .select({ value: count() })
-        .from(vetProfessionalCases)
-        .where(and(eq(vetProfessionalCases.caseType, 'STUDENT'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
-    ),
-    countRows(
-      database,
-      database
-        .select({ value: count() })
+        .select({ value: count(), oldest: vetAt })
         .from(vetProfessionalCases)
         .where(
           and(
@@ -114,129 +158,258 @@ export async function associationQueues(
           ),
         ),
     ),
-    countRows(
-      database,
+    vetQueue('LICENCE'),
+    vetQueue('TRUSTED'),
+    queueStat(
       database
-        .select({ value: count() })
-        .from(vetProfessionalCases)
-        .where(and(eq(vetProfessionalCases.caseType, 'LICENCE'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
+        .select({ value: count(), oldest: min(memberships.updatedAt) })
+        .from(memberships)
+        .where(eq(memberships.status, 'PENDING_REVIEW')),
     ),
-    // ── Phase 2.5 work the association owns (PROMPT-015) ─────────────────
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
-        .from(vetProfessionalCases)
-        .where(and(eq(vetProfessionalCases.caseType, 'TRUSTED'), inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']))),
-    ),
-    countRows(
-      database,
-      database.select({ value: count() }).from(memberships).where(eq(memberships.status, 'PENDING_REVIEW')),
-    ),
-    countRows(
-      database,
-      database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(communities.updatedAt) })
         .from(communities)
         .where(and(eq(communities.kind, 'CLUB'), eq(communities.lifecycle, 'PENDING_VERIFICATION'))),
     ),
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(communityOwnershipRequests.createdAt) })
         .from(communityOwnershipRequests)
         .where(eq(communityOwnershipRequests.status, 'PENDING')),
     ),
   ]);
 
+  const queue = (key: string, titleFa: string, noteFa: string, href: string, stat: { waiting: number; oldestAt: Date | null }): QueueCount => ({
+    key,
+    titleFa,
+    noteFa,
+    href,
+    waiting: stat.waiting,
+    oldestAt: stat.oldestAt,
+  });
+
   return [
-    {
-      key: 'kyc',
-      titleFa: 'احراز هویت',
-      noteFa: 'پرونده‌های ارسال‌شده برای بررسی مدرک هویتی',
-      href: '/assoc/kyc',
-      waiting: kyc,
-    },
-    {
-      key: 'vet-students',
-      titleFa: 'دانشجویان دامپزشکی',
-      noteFa: 'بررسی دستی شماره دانشجویی و دانشگاه (Phase 2.5)',
-      href: '/assoc/vet-students',
-      waiting: vetStudents,
-    },
-    {
-      key: 'vet-doctors',
-      titleFa: 'کد نظام دامپزشکان',
-      noteFa: 'بررسی دستی کد نظام، عمومی/متخصص و Claim پروفایل بدون مالک (Phase 2.5)',
-      href: '/assoc/vet-doctors',
-      waiting: vetDoctors,
-    },
-    {
-      key: 'vet-licences',
-      titleFa: 'پروانه فعالیت دامپزشکان',
-      noteFa: 'بررسی کد، تاریخ و فایل پروانه؛ تأیید فقط پرداخت دوره را باز می‌کند (Phase 2.5)',
-      href: '/assoc/vet-licences',
-      waiting: vetLicences,
-    },
-    {
-      key: 'vet-trusted',
-      titleFa: 'درخواست‌های دامپزشک معتمد',
-      noteFa: 'صلاحیت و خوداظهاری تجهیزات؛ تأیید تنها پرداخت دوره را باز می‌کند (Phase 2.5)',
-      href: '/assoc/vet-trusted',
-      waiting: trustedCases,
-    },
-    {
-      key: 'members',
-      titleFa: 'عضویت و اطلاعات عضو',
-      // The register used to report zero however many applications were waiting,
-      // which is a dashboard that cannot be trusted (PROMPT-015).
-      noteFa: 'درخواست‌های عضویت در انتظار بررسی، و مدیریت سوابق و شماره عضویت',
-      href: '/assoc/members',
-      waiting: membershipApplications,
-    },
-    {
-      key: 'clubs',
-      titleFa: 'تأیید کلاب‌ها',
-      noteFa: 'کلاب‌های در انتظار تأیید اولیه انجمن (Phase 2.5)',
-      href: '/assoc/clubs',
-      waiting: clubsWaiting,
-    },
-    {
-      key: 'club-ownership',
-      titleFa: 'مالکیت کلاب',
-      noteFa: 'درخواست‌های باز مالکیت و واگذاری کلاب (Phase 2.5)',
-      href: '/assoc/clubs',
-      waiting: clubOwnership,
-    },
-    {
-      key: 'kennels',
-      titleFa: 'کنل',
-      noteFa: 'پرونده‌های کنل که پرداخت و ارسال شده‌اند',
-      href: '/assoc/kennels',
-      waiting: kennelCases,
-    },
-    {
-      key: 'permits',
-      titleFa: 'مجوز جفت‌گیری',
-      noteFa: 'پرونده‌های پرداخت‌شده در انتظار تصمیم عملیاتی',
-      href: '/assoc/permits',
-      waiting: permits,
-    },
-    {
-      key: 'foreign',
-      titleFa: 'Export Pedigree',
-      noteFa: 'بررسی بر اساس فهرست صادرکنندگان موردتأیید انجمن',
-      href: '/assoc/foreign-pedigree',
-      waiting: foreign,
-    },
-    {
-      key: 'postal',
-      titleFa: 'درخواست‌های پستی',
-      noteFa: 'ثبت درخواست است و چرخه ارسال ندارد',
-      href: '/assoc/postal',
-      waiting: postal,
-    },
+    queue('kyc', 'احراز هویت', 'پرونده‌های ارسال‌شده برای بررسی مدرک هویتی', '/assoc/kyc', kyc),
+    queue('vet-students', 'دانشجویان دامپزشکی', 'بررسی دستی شماره دانشجویی و دانشگاه', '/assoc/vet-students', vetStudents),
+    queue('vet-doctors', 'کد نظام دامپزشکان', 'بررسی دستی کد نظام، عمومی یا متخصص، و درخواست مالکیت پروفایل بی‌مالک', '/assoc/vet-doctors', vetDoctors),
+    queue('vet-licences', 'پروانه فعالیت دامپزشکان', 'بررسی کد، تاریخ و فایل پروانه؛ تأیید فقط پرداخت دوره را باز می‌کند', '/assoc/vet-licences', vetLicences),
+    queue('vet-trusted', 'درخواست‌های دامپزشک معتمد', 'صلاحیت و خوداظهاری تجهیزات؛ تأیید فقط پرداخت دوره را باز می‌کند', '/assoc/vet-trusted', trustedCases),
+    // The register used to report zero however many applications were waiting,
+    // which is a dashboard that cannot be trusted (PROMPT-015).
+    queue('members', 'عضویت و اطلاعات عضو', 'درخواست‌های عضویت در انتظار بررسی، و مدیریت سوابق و شماره عضویت', '/assoc/members', membershipApplications),
+    queue('clubs', 'تأیید کلاب‌ها', 'کلاب‌های در انتظار تأیید اولیه انجمن', '/assoc/clubs', clubsWaiting),
+    queue('club-ownership', 'مالکیت کلاب', 'درخواست‌های باز مالکیت و واگذاری کلاب', '/assoc/clubs', clubOwnership),
+    queue('kennels', 'کنل', 'پرونده‌های کنل که پرداخت و ارسال شده‌اند', '/assoc/kennels', kennelCases),
+    queue('permits', 'مجوز جفت‌گیری', 'پرونده‌های پرداخت‌شده در انتظار تصمیم عملیاتی', '/assoc/permits', permits),
+    queue('foreign', 'Export Pedigree', 'بررسی بر اساس فهرست صادرکنندگان موردتأیید انجمن', '/assoc/foreign-pedigree', foreign),
+    queue('postal', 'درخواست‌های پستی', 'ثبت درخواست است و چرخه ارسال ندارد', '/assoc/postal', postal),
   ];
+}
+
+/**
+ * The eight QueueTiles of the association home (K13): the vet queues share one
+ * tile that opens the vet review desk, and club verification and ownership share
+ * the clubs tile. Counts add up; the oldest is the oldest of the group.
+ */
+const ASSOC_TILE_GROUPS: ReadonlyArray<{ key: string; titleFa: string; href: string; members: readonly string[] }> = [
+  { key: 'kyc', titleFa: 'احراز هویت', href: '/assoc/kyc', members: ['kyc'] },
+  { key: 'members', titleFa: 'عضویت', href: '/assoc/members', members: ['members'] },
+  { key: 'vets', titleFa: 'دامپزشکان', href: '/assoc/vet-review', members: ['vet-students', 'vet-doctors', 'vet-licences', 'vet-trusted'] },
+  { key: 'permits', titleFa: 'مجوز جفت‌گیری', href: '/assoc/permits', members: ['permits'] },
+  { key: 'kennels', titleFa: 'کنل', href: '/assoc/kennels', members: ['kennels'] },
+  { key: 'clubs', titleFa: 'کلاب‌ها', href: '/assoc/clubs', members: ['clubs', 'club-ownership'] },
+  { key: 'postal', titleFa: 'درخواست‌های پستی', href: '/assoc/postal', members: ['postal'] },
+  { key: 'foreign', titleFa: 'Export Pedigree', href: '/assoc/foreign-pedigree', members: ['foreign'] },
+];
+
+export function associationTiles(queues: readonly QueueCount[]): QueueCount[] {
+  return ASSOC_TILE_GROUPS.map((group) => {
+    const parts = queues.filter((queue) => group.members.includes(queue.key));
+    const times = parts.map((queue) => queue.oldestAt).filter((at): at is Date => at !== null);
+    return {
+      key: group.key,
+      titleFa: group.titleFa,
+      noteFa: parts.map((queue) => queue.noteFa).join('؛ '),
+      href: group.href,
+      waiting: parts.reduce((sum, queue) => sum + queue.waiting, 0),
+      oldestAt: times.length === 0 ? null : new Date(Math.min(...times.map((at) => at.getTime()))),
+    };
+  });
+}
+
+/** Waiting count per navigation address, for the OpsShell sidebar counters (SHL-003). */
+export function countsByHref(queues: readonly QueueCount[]): Map<string, { waiting: number; oldestAt: Date | null }> {
+  const byHref = new Map<string, { waiting: number; oldestAt: Date | null }>();
+  for (const queue of queues) {
+    const previous = byHref.get(queue.href);
+    const times = [previous?.oldestAt, queue.oldestAt].filter((at): at is Date => at instanceof Date);
+    byHref.set(queue.href, {
+      waiting: (previous?.waiting ?? 0) + queue.waiting,
+      oldestAt: times.length === 0 ? null : new Date(Math.min(...times.map((at) => at.getTime()))),
+    });
+  }
+  return byHref;
+}
+
+/** One open case on the association home's «پرونده‌های قدیمی» table (K13). */
+export interface OldCase {
+  readonly id: string;
+  readonly kindFa: string;
+  readonly href: string;
+  readonly status: string;
+  readonly at: Date;
+  readonly accountId: string | null;
+  readonly nameFa: string | null;
+  readonly owner: 'ASSOCIATION';
+}
+
+/**
+ * The oldest open cases across the association queues — read only, from the
+ * same tables and the same time columns as the queues. Every row here is a
+ * case waiting on the association (status UNDER_REVIEW / SUBMITTED / PENDING),
+ * so the next move is always the association's.
+ */
+export async function associationOldestCases(database: DbClient, actor: Actor, limit = 5): Promise<readonly OldCase[]> {
+  assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
+  const VET_KIND: Record<string, string> = {
+    STUDENT: 'دانشجوی دامپزشکی',
+    COUNCIL: 'کد نظام دامپزشک',
+    LICENCE: 'پروانه فعالیت',
+    TRUSTED: 'دامپزشک معتمد',
+  };
+
+  const [kyc, kennel, permit, foreign, vets, members, clubs] = await Promise.all([
+    database
+      .select({ id: kycCases.id, at: kycCases.submittedAt, status: kycCases.status, accountId: kycCases.accountId })
+      .from(kycCases)
+      .where(eq(kycCases.status, 'UNDER_REVIEW'))
+      .orderBy(asc(kycCases.submittedAt))
+      .limit(limit),
+    database
+      .select({ id: kennels.id, at: kennels.submittedAt, status: kennels.status, accountId: kennels.ownerAccountId })
+      .from(kennels)
+      .where(eq(kennels.status, 'UNDER_REVIEW'))
+      .orderBy(asc(kennels.submittedAt))
+      .limit(limit),
+    database
+      .select({ id: matingPermits.id, at: matingPermits.submittedAt, status: matingPermits.status, accountId: matingPermits.initiatorAccountId })
+      .from(matingPermits)
+      .where(eq(matingPermits.status, 'UNDER_REVIEW'))
+      .orderBy(asc(matingPermits.submittedAt))
+      .limit(limit),
+    database
+      .select({ id: foreignPedigreeCases.id, at: foreignPedigreeCases.submittedAt, status: foreignPedigreeCases.status })
+      .from(foreignPedigreeCases)
+      .where(eq(foreignPedigreeCases.status, 'UNDER_REVIEW'))
+      .orderBy(asc(foreignPedigreeCases.submittedAt))
+      .limit(limit),
+    database
+      .select({
+        id: vetProfessionalCases.id,
+        at: vetProfessionalCases.updatedAt,
+        status: vetProfessionalCases.status,
+        accountId: vetProfessionalCases.accountId,
+        caseType: vetProfessionalCases.caseType,
+      })
+      .from(vetProfessionalCases)
+      .where(
+        and(
+          inArray(vetProfessionalCases.status, ['SUBMITTED', 'UNDER_REVIEW']),
+          inArray(vetProfessionalCases.caseType, ['STUDENT', 'COUNCIL', 'LICENCE', 'TRUSTED']),
+          or(sql`${vetProfessionalCases.caseType} <> 'COUNCIL'`, isNull(vetProfessionalCases.legacyApplicationId)),
+        ),
+      )
+      .orderBy(asc(vetProfessionalCases.updatedAt))
+      .limit(limit),
+    database
+      .select({ id: memberships.accountId, at: memberships.updatedAt, status: memberships.status, accountId: memberships.accountId })
+      .from(memberships)
+      .where(eq(memberships.status, 'PENDING_REVIEW'))
+      .orderBy(asc(memberships.updatedAt))
+      .limit(limit),
+    database
+      .select({ id: communities.id, at: communities.updatedAt, status: communities.lifecycle, accountId: communities.ownerAccountId })
+      .from(communities)
+      .where(and(eq(communities.kind, 'CLUB'), eq(communities.lifecycle, 'PENDING_VERIFICATION')))
+      .orderBy(asc(communities.updatedAt))
+      .limit(limit),
+  ]);
+
+  type Draft = Omit<OldCase, 'nameFa' | 'owner' | 'at'> & { at: Date | null };
+  const all: Draft[] = [
+    ...kyc.map((row) => ({ id: row.id, kindFa: 'احراز هویت', href: '/assoc/kyc/' + row.id, status: row.status, at: row.at, accountId: row.accountId })),
+    ...kennel.map((row) => ({ id: row.id, kindFa: 'کنل', href: '/assoc/kennels/' + row.id, status: row.status, at: row.at, accountId: row.accountId })),
+    ...permit.map((row) => ({ id: row.id, kindFa: 'مجوز جفت‌گیری', href: '/assoc/permits/' + row.id, status: row.status, at: row.at, accountId: row.accountId })),
+    ...foreign.map((row) => ({ id: row.id, kindFa: 'Export Pedigree', href: '/assoc/foreign-pedigree/' + row.id, status: row.status, at: row.at, accountId: null })),
+    ...vets.map((row) => ({
+      id: row.id,
+      kindFa: VET_KIND[row.caseType] ?? 'دامپزشک',
+      href: DETAIL_ROUTE[row.caseType] + row.id,
+      status: row.status,
+      at: row.at,
+      accountId: row.accountId,
+    })),
+    ...members.map((row) => ({ id: 'm-' + row.id, kindFa: 'عضویت', href: '/assoc/members', status: row.status, at: row.at, accountId: row.accountId })),
+    ...clubs.map((row) => ({ id: row.id, kindFa: 'کلاب', href: '/assoc/clubs/' + row.id, status: row.status, at: row.at, accountId: row.accountId })),
+  ];
+  const drafts = all
+    .filter((row): row is Draft & { at: Date } => row.at instanceof Date)
+    .sort((x, y) => x.at.getTime() - y.at.getTime())
+    .slice(0, limit);
+
+  const ids = [...new Set(drafts.map((row) => row.accountId).filter((id): id is string => id !== null))];
+  const names =
+    ids.length === 0
+      ? []
+      : await database
+          .select({ accountId: profiles.accountId, firstName: profiles.firstName, lastName: profiles.lastName })
+          .from(profiles)
+          .where(inArray(profiles.accountId, ids));
+  const nameOf = new Map(names.map((row) => [row.accountId, row.firstName + ' ' + row.lastName]));
+  return drafts.map((row) => ({ ...row, nameFa: row.accountId ? (nameOf.get(row.accountId) ?? null) : null, owner: 'ASSOCIATION' as const }));
+}
+
+/** One recent decision on the association home's «تصمیم‌های اخیر» table (K13). */
+export interface RecentDecision {
+  readonly id: string;
+  readonly at: Date;
+  readonly targetType: string;
+  readonly status: string | null;
+  readonly reason: string | null;
+  readonly actorNameFa: string | null;
+}
+
+/**
+ * The association's latest decisions, newest first — read from the audit log
+ * (rows written in the association context that set a status). Display only.
+ */
+export async function associationRecentDecisions(database: DbClient, actor: Actor, limit = 5): Promise<readonly RecentDecision[]> {
+  assertContext(actor, 'ASSOCIATION_OPERATOR', 'این صفحه فقط در محیط عملیاتی انجمن باز می‌شود.');
+  const rows = await database
+    .select({ event: auditEvents, firstName: profiles.firstName, lastName: profiles.lastName })
+    .from(auditEvents)
+    .leftJoin(profiles, eq(profiles.accountId, auditEvents.actorAccountId))
+    .where(
+      and(
+        eq(auditEvents.actorContext, 'ASSOCIATION_OPERATOR'),
+        sql`(${auditEvents.after} ? 'status' or ${auditEvents.after} ? 'lifecycle')`,
+      ),
+    )
+    .orderBy(desc(auditEvents.occurredAt))
+    .limit(limit);
+  return rows.map(({ event, firstName, lastName }) => {
+    const after = event.after as { status?: unknown; lifecycle?: unknown } | null;
+    const status = typeof after?.status === 'string' ? after.status : typeof after?.lifecycle === 'string' ? after.lifecycle : null;
+    return {
+      id: event.id,
+      at: event.occurredAt,
+      targetType: event.targetType,
+      status,
+      reason: event.reason,
+      actorNameFa: firstName ? firstName + ' ' + lastName : null,
+    };
+  });
 }
 
 /** The genetics centre's real queues — §21.3. */
@@ -244,72 +417,40 @@ export async function geneticsQueues(database: DbClient, actor: Actor): Promise<
   assertContext(actor, 'GENETICS_OPERATOR', 'این صفحه فقط در محیط عملیاتی مرکز ژنتیک باز می‌شود.');
 
   const [receipts, awaiting, received, processing, appeals] = await Promise.all([
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(geneticsReceipts.submittedAt) })
         .from(geneticsReceipts)
         .where(eq(geneticsReceipts.status, 'UNDER_REVIEW')),
     ),
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(samples.collectedAt) })
         .from(samples)
         .where(inArray(samples.status, ['SEND_INSTRUCTED', 'SHIPPED'])),
     ),
-    countRows(database, database.select({ value: count() }).from(samples).where(eq(samples.status, 'RECEIVED'))),
-    countRows(
-      database,
-      database.select({ value: count() }).from(samples).where(eq(samples.status, 'PROCESSING')),
+    queueStat(database.select({ value: count(), oldest: min(samples.collectedAt) }).from(samples).where(eq(samples.status, 'RECEIVED'))),
+    queueStat(
+      database.select({ value: count(), oldest: min(samples.collectedAt) }).from(samples).where(eq(samples.status, 'PROCESSING')),
     ),
-    countRows(
-      database,
+    queueStat(
       database
-        .select({ value: count() })
+        .select({ value: count(), oldest: min(parentageAppeals.createdAt) })
         .from(parentageAppeals)
         .where(inArray(parentageAppeals.status, ['SUBMITTED', 'UNDER_REVIEW'])),
     ),
   ]);
 
   return [
-    {
-      key: 'receipts',
-      titleFa: 'فیش‌های منتظر بررسی',
-      noteFa: 'تأیید فیش، دستور ارسال را به همان دامپزشک نگهدارنده می‌دهد',
-      href: '/genetics/receipts',
-      waiting: receipts,
-    },
-    {
-      key: 'awaiting',
-      titleFa: 'نمونه‌های در انتظار رسیدن',
-      noteFa: 'ارسال را همان نگهدارنده ثبت می‌کند؛ مرکز نمونه‌گیری نمی‌کند',
-      href: '/genetics/samples',
-      waiting: awaiting,
-    },
-    {
-      key: 'received',
-      titleFa: 'دریافت‌شده در مرکز',
-      noteFa: 'در انتظار شروع پردازش یا اعلام عدم اعتبار',
-      href: '/genetics/samples',
-      waiting: received,
-    },
-    {
-      key: 'processing',
-      titleFa: 'در حال پردازش',
-      noteFa: 'ثبت نتیجه نهایی از همین صف انجام می‌شود',
-      href: '/genetics/results',
-      waiting: processing,
-    },
-    {
-      key: 'appeals',
-      titleFa: 'اعتراض‌ها',
-      noteFa: 'اعتراض به نتیجه، همان پرونده و نسخه نتیجه را باز می‌کند',
-      href: '/genetics/appeals',
-      waiting: appeals,
-    },
+    { key: 'receipts', titleFa: 'فیش‌های منتظر بررسی', noteFa: 'تأیید فیش، دستور ارسال را به همان دامپزشک نگهدارنده می‌دهد', href: '/genetics/receipts', ...stat(receipts) },
+    { key: 'awaiting', titleFa: 'نمونه‌های در انتظار رسیدن', noteFa: 'ارسال را همان نگهدارنده ثبت می‌کند؛ مرکز نمونه‌گیری نمی‌کند', href: '/genetics/samples', ...stat(awaiting) },
+    { key: 'received', titleFa: 'دریافت‌شده در مرکز', noteFa: 'در انتظار شروع پردازش یا اعلام عدم اعتبار', href: '/genetics/samples', ...stat(received) },
+    { key: 'processing', titleFa: 'در حال پردازش', noteFa: 'ثبت نتیجه نهایی از همین صف انجام می‌شود', href: '/genetics/results', ...stat(processing) },
+    { key: 'appeals', titleFa: 'اعتراض‌ها', noteFa: 'اعتراض به نتیجه، همان پرونده و نسخه نتیجه را باز می‌کند', href: '/genetics/appeals', ...stat(appeals) },
   ];
 }
+
+const stat = (value: { waiting: number; oldestAt: Date | null }) => ({ waiting: value.waiting, oldestAt: value.oldestAt });
 
 // ── Membership records ────────────────────────────────────────────────────
 

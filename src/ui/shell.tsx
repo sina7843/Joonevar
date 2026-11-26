@@ -13,6 +13,8 @@ import { db } from '../db/client.ts';
 import { findProfile } from '../identity/account.ts';
 import { signOutAction } from '../identity/sign-out-action.ts';
 import { unreadCount as countUnread } from '../notifications/service.ts';
+import { ageState, associationQueues, countsByHref, geneticsQueues, reviewClock } from '../operations/service.ts';
+import { ageInDays } from './queue.tsx';
 
 /**
  * The application shells — DS *Shells*, *PublicShell*, *OpsShell* (v1.0.3).
@@ -30,6 +32,32 @@ export interface NavItem {
   readonly icon: IconName;
   /** Sidebar group label (Shells › OpsShell sidebar, 8 items or more). */
   readonly group?: string;
+  readonly count?: number;
+  readonly overdue?: boolean;
+}
+
+/**
+ * Sidebar counters (SHL-003): the waiting count of each queue the item opens,
+ * from the same queries as the environment home's QueueTiles, flagged when the
+ * oldest case is past the review deadline (unset deadline = never flagged).
+ */
+async function withCounts(actor: Actor, nav: readonly NavItem[]): Promise<readonly NavItem[]> {
+  const context = actor.context as ActorContextName;
+  if (context !== 'ASSOCIATION_OPERATOR' && context !== 'GENETICS_OPERATOR') return nav;
+  const database = db();
+  // A counter is a convenience: if it cannot be read, the navigation still renders without it.
+  const loaded = await Promise.all([
+    context === 'ASSOCIATION_OPERATOR' ? associationQueues(database, actor) : geneticsQueues(database, actor),
+    reviewClock(database),
+  ]).catch(() => null);
+  if (!loaded) return nav;
+  const [queues, clock] = loaded;
+  const byHref = countsByHref(queues);
+  return nav.map((item) => {
+    const entry = byHref.get(item.href);
+    if (!entry || entry.waiting === 0 || item.href === nav[0]?.href) return item;
+    return { ...item, count: entry.waiting, overdue: ageState(ageInDays(entry.oldestAt), clock) === 'overdue' };
+  });
 }
 
 async function who(actor: Actor): Promise<{ name: string; initial: string; role: string }> {
@@ -273,10 +301,11 @@ export async function OpsShell({
   nav: readonly NavItem[];
   children: ReactNode;
 }) {
-  const person = await who(actor);
+  const [person, counted] = await Promise.all([who(actor), withCounts(actor, nav)]);
   const env = environmentFa(actor.context as ActorContextName);
-  const sections = sectionsOf(nav);
+  const sections = sectionsOf(counted);
   const home = nav[0];
+  const overdue = counted.filter((item) => item.overdue).length;
 
   return (
     <>
@@ -326,6 +355,7 @@ export async function OpsShell({
               <NavDrawer
                 label={'ناوبری ' + env}
                 pathname={pathname}
+                overdue={overdue}
                 brand={
                   <>
                     <Logo size="ops" />

@@ -15,6 +15,10 @@ export interface ShellNavItem {
   readonly href: string;
   readonly label: string;
   readonly icon: IconName;
+  /** Waiting cases of the queue this item opens (SHL-003); 0/undefined = no pill. */
+  readonly count?: number;
+  /** The oldest of them is past the review deadline: alert pill + rail dot. */
+  readonly overdue?: boolean;
 }
 export interface ShellNavSection {
   /** No label = the unlabelled home section. */
@@ -38,8 +42,18 @@ function SideItem({ item, current, dense }: { item: ShellNavItem; current: boole
     >
       <span className="hz-side-item__icon">
         <Icon name={item.icon} size="sm" weight={current ? 'fill' : 'regular'} />
+        {item.overdue ? <span className="hz-side-item__dot" aria-hidden="true" /> : null}
       </span>
       <span className="hz-side-item__label">{item.label}</span>
+      {item.count ? (
+        <span
+          className={item.overdue ? 'hz-count hz-count--alert' : 'hz-count'}
+          aria-label={item.count.toLocaleString('fa-IR') + ' مورد' + (item.overdue ? '، از مهلت گذشته' : '')}
+          data-testid={'nav-count-' + item.href}
+        >
+          {item.count.toLocaleString('fa-IR')}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -152,12 +166,15 @@ export function NavDrawer({
   foot,
   children,
   pathname,
+  overdue = 0,
 }: {
   label: string;
   brand: ReactNode;
   foot?: ReactNode;
   children: ReactNode;
   pathname: string;
+  /** Queues past the review deadline: a dot on the menu button and its label (SHL-005). */
+  overdue?: number;
 }) {
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
@@ -203,13 +220,14 @@ export function NavDrawer({
         ref={toggle}
         type="button"
         className="hz-icon-btn"
-        aria-label={label}
+        aria-label={overdue > 0 ? label + '، ' + overdue.toLocaleString('fa-IR') + ' صف از مهلت گذشته' : label}
         aria-expanded={open}
         aria-controls="ops-drawer"
         onClick={() => setOpen(true)}
         data-testid="ops-menu-toggle"
       >
         <Icon name="list" size="md" />
+        {overdue > 0 ? <span className="hz-icon-btn__dot" aria-hidden="true" /> : null}
       </button>
       {open ? (
         <>
