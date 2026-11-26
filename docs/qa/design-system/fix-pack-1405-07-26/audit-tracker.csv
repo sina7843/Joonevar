@@ -143,18 +143,18 @@ RTO-018,T09,1,medium,needs decision,RTO,,برخی تغییرهای پیکربن�
 CMPA1-013,T09,1,low,code,CMPA1,K15,گروه‌های تنظیمات روی موبایل آکاردئونی نیستند (`--sm`),Accordion `--sm` (P11، K15),FIXED,,DEC-0239
 CMPB-031,T09,1,low,code,CMPB,K15,SettingsPanel · جزئیات ردیف: «تعیین مقدار»، متن hint تعیین‌نشده، نسخهٔ اضافه و چیپ پیوندی,SettingsPanel — `/admin/settings` (K15),PARTIAL,,«تعیین مقدار» و hint تعیین‌نشده انجام شد؛ چیپ پیوندی و «نسخه اضافه» نه (DEC-0239)
 KOPS-027,T09,1,low,code,KOPS,K15,جزئیات سربرگ، جستجو و نام گروه‌ها,K15 · PageHeader / SearchField / group labels,PARTIAL,,نام گروه‌ها پیشنهادی طراحی است و تأیید نشده؛ سربرگ و جست‌وجو انجام شد (DEC-0239)
-CMPA1-001,T10,1,high,code,CMPA1,,قالب PDF اسناد هنوز پالت فیروزه‌ای قدیمی است و از A4DocumentTemplate پیروی نمی‌کند,A4DocumentTemplate (خروجی PDF همه اسناد: برگه ثبتی، شجره‌نامه، کارت توله، فاکتور، قرارداد),,,
+CMPA1-001,T10,1,high,code,CMPA1,,قالب PDF اسناد هنوز پالت فیروزه‌ای قدیمی است و از A4DocumentTemplate پیروی نمی‌کند,A4DocumentTemplate (خروجی PDF همه اسناد: برگه ثبتی، شجره‌نامه، کارت توله، فاکتور، قرارداد),FIXED,DEC-0240,قالب A4 جدید در render.ts
 CMPB-122,T10,1,high,code,CMPB,K18,PedigreeTree · شجره فقط والدین را نشان می‌دهد؛ سه نسل، شاخهٔ جمع‌شده، شناسه‌ها و نمای فهرستی وجود ندارد,PedigreeTree در `/documents/pedigree/[id]` (K18),,,
-FND-016,T10,1,high,code,FND,K18,قالب PDF اسناد رسمی با پالت teal، فونت Vazirmatn/Consolas و جهت فیزیکی,خروجی PDF همهٔ اسناد (`/api/documents/[kind]/[id]/pdf`، فاکتور فروشگاه، قرارداد finder) — A4DocumentTemplate (K18),,,فونت به IRANSansX رفت (DEC-0237)؛ پالت و جهت فیزیکی در T10
+FND-016,T10,1,high,code,FND,K18,قالب PDF اسناد رسمی با پالت teal، فونت Vazirmatn/Consolas و جهت فیزیکی,خروجی PDF همهٔ اسناد (`/api/documents/[kind]/[id]/pdf`، فاکتور فروشگاه، قرارداد finder) — A4DocumentTemplate (K18),FIXED,DEC-0240,IRANSansX، پالت برند، RTL منطقی
 KUSR-042,T10,1,high,needs decision,KUSR,K18,شجره‌نامه فقط یک نسل (والدین) دارد؛ حالت سخت «نیای نامشخص در شجره» با «—» به‌جای «نامشخص»,K18 سند شجره‌نامه · `PedigreeTree` داخل `A4DocumentTemplate`,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
-CMPA1-002,T10,1,medium,code,CMPA1,,PDF برچسب‌دار (tagged) نیست و فیلدها `dl` نیستند,A4DocumentTemplate,,,
+CMPA1-002,T10,1,medium,code,CMPA1,,PDF برچسب‌دار (tagged) نیست و فیلدها `dl` نیستند,A4DocumentTemplate,FIXED,DEC-0240,tagged + dl + lang=fa؛ تست StructTreeRoot
 CMPA1-003,T10,1,medium,code,CMPA1,K18,نمای روی صفحه برگه ثبتی و شجره‌نامه بخش‌های قالب A4 را کم دارد,A4DocumentTemplate (K18),,,
-CMPA1-004,T10,1,medium,code,CMPA1,,کارت توله و مجوز جفت‌گیری اصلاً قالب A4 ندارند,A4DocumentTemplate، نوع‌های `PC-` و `MP-`,,,
-CMPA1-005,T10,1,medium,code,CMPA1,,حالت‌های A4 پیاده نشده: نسخه باطل، بدون عکس، صفحه دوم، دکمه چاپ، خلاصه موبایل,A4DocumentTemplate,,,
+CMPA1-004,T10,1,medium,code,CMPA1,,کارت توله و مجوز جفت‌گیری اصلاً قالب A4 ندارند,A4DocumentTemplate، نوع‌های `PC-` و `MP-`,PARTIAL,DEC-0240,کارت توله در قالب A4؛ مجوز جفت‌گیری مسیر PDF ندارد
+CMPA1-005,T10,1,medium,code,CMPA1,,حالت‌های A4 پیاده نشده: نسخه باطل، بدون عکس، صفحه دوم، دکمه چاپ، خلاصه موبایل,A4DocumentTemplate,PARTIAL,DEC-0240,نسخه باطل، صفحه دوم و شماره صفحه در قالب هستند؛ چاپ و خلاصه موبایل در کامیت صفحه‌های روی صفحه
 CMPA2-017,T10,1,medium,code,CMPA2,,DocumentCard: کامپوننت مشترک نیست و پانویس «دریافت PDF» و «استعلام اصالت» ندارد,DocumentCard,,,
 KUSR-017,T10,1,medium,code,KUSR,K9,بخش «اسناد» پرونده حیوان: فقط برگه ثبتی، بدون «دریافت PDF» و «استعلام اصالت»,K9 · «اسناد» · `DocumentCard`,,,
 KUSR-043,T10,1,medium,code,KUSR,K18,سند شجره‌نامه داخل PublicShell است و نوار ابزار سند (چاپ، PDF، استعلام) و پوسته سندی طراحی را ندارد,K18 · پوسته و toolbar,,,
-KUSR-044,T10,1,medium,needs decision,KUSR,K18,برگه A4: QR، نام امضاکنندگان و پانویس صفحه/تاریخ چاپ نیست,K18 · `A4DocumentTemplate` (`hz-a4__titlebar`، `__sign`، `__foot`),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
+KUSR-044,T10,1,medium,needs decision,KUSR,K18,برگه A4: QR، نام امضاکنندگان و پانویس صفحه/تاریخ چاپ نیست,K18 · `A4DocumentTemplate` (`hz-a4__titlebar`، `__sign`، `__foot`),PARTIAL,DEC-0240,QR و پانویس صفحه/تاریخ چاپ انجام شد؛ نام امضاکنندگان در رکورد صدور نیست («—»)
 KUSR-045,T10,1,medium,code,KUSR,K18,موبایل سند شجره‌نامه: کارت‌ها و نوار چسبان «دریافت PDF / چاپ» به‌جای برگه A4 فشرده,K18 موبایل,,,
 CMPB-117,T07,2,high,needs decision,CMPB,K13,QueueTile · کاشی‌های صف خانهٔ انجمن سن قدیمی‌ترین پرونده و حالت هشدار ندارند,QueueTile در `/assoc` (K13)، `/genetics` و `/admin`,,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. Related: GAPS #12 approved per proposal (DEC-0235)
 KOPS-009,T07,2,high,needs decision,KOPS,K13,جدول «پرونده‌های قدیمی» (صف ترکیبی) در خانه انجمن وجود ندارد,K13 · CaseQueue / DataTable (موبایل: کارت‌های CaseQueue),,,Ask first (DECISIONS-NEEDED.md). Build only the UI part that needs no new data. approved per proposal (DEC-0235)
