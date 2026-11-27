@@ -77,7 +77,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -118,7 +119,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -356,10 +357,9 @@ test('the advert is built, refuses to publish until it is complete, and then goe
 
     // Everything is still missing, and it is all said at once.
     const blockers = await page.getByTestId('publication-blockers').innerText();
-    assert.match(blockers, /نوع قیمت/);
+    assert.match(blockers, /مبلغ آگهی/); // Decision 7g: an amount, always negotiable
     assert.match(blockers, /تصویر/);
 
-    await page.getByTestId('listing-price-mode').selectOption('EXACT');
     await page.getByTestId('listing-price').fill('18000000');
     await page
       .getByTestId('listing-description')
@@ -429,9 +429,9 @@ test('the advert is built, refuses to publish until it is complete, and then goe
 
     await page.getByTestId('move-reason-PAUSED').fill(REASON);
     await page.getByTestId('move-PAUSED').click();
-    await page.getByTestId('listing-status').filter({ hasText: 'متوقف‌شده توسط فروشنده' }).waitFor();
+    await page.getByTestId('listing-status').filter({ hasText: 'موقتاً متوقف' }).waitFor();
     await page.goto(listingUrl, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('listing-status').innerText(), 'متوقف‌شده توسط فروشنده');
+    assert.equal(await page.getByTestId('listing-status').innerText(), 'موقتاً متوقف');
     assert.equal(await page.getByTestId('listing-status-reason').innerText(), REASON);
 
     // Back to published, so the later tests see a live advert.

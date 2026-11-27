@@ -29,6 +29,7 @@ import {
   allowedMoves,
   bylineFor,
   canEditContent,
+  readMinutes,
   contentSlugify,
   creatableKinds,
   effectivePublishAt,
@@ -592,24 +593,35 @@ export async function createCategory(
 export async function setCategoryActive(
   database: Database,
   actor: Actor,
-  input: { categoryId: string; active: boolean },
+  input: { categoryId: string; active: boolean; reasonFa: string; expectedVersion: number },
 ): Promise<CategoryRow> {
   assertContentAdmin(actor);
+  const reason = input.reasonFa.trim();
+  if (reason === '') throw validation('دلیل تغییر را بنویسید؛ در تاریخچه تغییرات ثبت می‌شود.');
   if (!UUID.test(input.categoryId)) throw notFound('دسته پیدا نشد.');
   return database.transaction(async (tx) => {
     const [current] = await tx.select().from(contentCategories).where(eq(contentCategories.id, input.categoryId)).limit(1);
     if (!current) throw notFound('دسته پیدا نشد.');
+    const stale = () =>
+      conflict('این دسته در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.', {
+        expectedVersion: input.expectedVersion,
+        actualVersion: current.version,
+      });
+    if (current.version !== input.expectedVersion) throw stale();
     const [row] = await tx
       .update(contentCategories)
-      .set({ isActive: input.active, updatedAt: new Date() })
-      .where(eq(contentCategories.id, current.id))
+      .set({ isActive: input.active, version: current.version + 1, updatedAt: new Date() })
+      .where(and(eq(contentCategories.id, current.id), eq(contentCategories.version, current.version)))
       .returning();
+    if (!row) throw stale();
     await recordAudit(tx, actor, {
       action: input.active ? 'CONTENT_CATEGORY_ENABLED' : 'CONTENT_CATEGORY_RETIRED',
       targetType: 'CONTENT_CATEGORY',
       targetId: current.id,
-      before: { isActive: current.isActive },
-      after: { isActive: row!.isActive },
+      targetVersion: row.version,
+      before: { isActive: current.isActive, version: current.version },
+      after: { isActive: row.isActive, version: row.version },
+      reason,
     });
     return row!;
   });
@@ -740,6 +752,8 @@ export interface ContentCard {
   readonly categoryNameFa: string | null;
   readonly imageFileId: string | null;
   readonly imageAltFa: string | null;
+  readonly byline: string;
+  readonly readMinutes: number;
 }
 
 export async function publicContentList(
@@ -779,9 +793,15 @@ export async function publicContentList(
   );
   const request = { page: query.page, pageSize: query.pageSize ?? 12 };
   const rows = await database
-    .select({ item: contentItems, categoryNameFa: contentCategories.nameFa })
+    .select({
+      item: contentItems,
+      categoryNameFa: contentCategories.nameFa,
+      authorName: profiles.displayName,
+      authorNameVisible: profiles.displayNameVisible,
+    })
     .from(contentItems)
     .leftJoin(contentCategories, eq(contentItems.categoryId, contentCategories.id))
+    .leftJoin(profiles, eq(profiles.accountId, contentItems.authorAccountId))
     .where(where)
     .orderBy(desc(contentItems.publishAt))
     .limit(request.pageSize)
@@ -789,7 +809,7 @@ export async function publicContentList(
   const [counted] = await database.select({ value: count() }).from(contentItems).where(where);
   const [all] = await database.select({ value: count() }).from(contentItems).where(visibleNow(query.kind, now));
 
-  const items: ContentCard[] = rows.map(({ item, categoryNameFa }) => ({
+  const items: ContentCard[] = rows.map(({ item, categoryNameFa, authorName, authorNameVisible }) => ({
     slug: item.slug,
     titleFa: item.titleFa,
     summaryFa: item.summaryFa,
@@ -797,6 +817,8 @@ export async function publicContentList(
     categoryNameFa,
     imageFileId: item.imageFileId,
     imageAltFa: item.imageAltFa,
+    byline: bylineFor(authorNameVisible === null ? null : { displayName: authorName, displayNameVisible: authorNameVisible }),
+    readMinutes: readMinutes(item.bodyFa),
   }));
   return {
     ...pageOf(items, Number(counted?.value ?? 0), request),

@@ -138,7 +138,8 @@ const textOf = async (page: Page, testId: string): Promise<string> => ((await pa
 
 test('the superadmin places the location, writes the profile and publishes it', async () => {
   await withContext({ viewport: DESKTOP, storageState: adminState }, async (page) => {
-    await page.goto(BASE_URL + '/admin/vets', { waitUntil: 'load' });
+    // The registry pages by 20; search finds this run's veterinarian on any page.
+    await page.goto(BASE_URL + '/admin/vets?q=' + encodeURIComponent(vet.name), { waitUntil: 'load' });
     await Promise.all([
       page.waitForURL((url) => url.pathname === '/admin/vets/' + vet.accountId),
       page.getByTestId('directory-edit-' + vet.accountId).click(),
@@ -200,17 +201,19 @@ test('a visitor filters the directory on a phone and reads the profile', async (
     await page.goto(BASE_URL + '/veterinarians', { waitUntil: 'load' });
     await page.getByTestId('vet-search').waitFor();
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
+    // Below 1024 the filters live in a Drawer opened from «فیلترها» (P02, T14).
+    await page.getByTestId('filters-open').click();
     await page.getByTestId('vet-filter-specialty').selectOption('SURGERY');
     await page.getByTestId('vet-filter-province').selectOption('fars');
     await Promise.all([
       page.waitForURL((url) => url.searchParams.get('province') === 'fars'),
-      page.getByTestId('vet-search-submit').click(),
+      page.getByTestId('filters-apply').click(),
     ]);
     const card = page.getByTestId('vet-card-' + slug);
     await card.waitFor();
     const cardText = (await card.textContent()) ?? '';
     assert.match(cardText, /کد نظام تأییدشده/);
-    assert.match(cardText, /معتمد همزیست/);
+    assert.match(cardText, /معتمد/);
     assert.match(cardText, /شیراز/);
     assert.match(cardText, /جراحی/);
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
@@ -276,6 +279,6 @@ test('a hidden profile is not found, and the editor stays in the superadmin envi
   await withContext({ viewport: MOBILE }, async (page) => {
     await signIn(page, AUTHOR);
     await page.goto(BASE_URL + '/admin/vets/' + vet.accountId, { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
   });
 });

@@ -264,7 +264,7 @@ test('resend is disabled until the interval passes', async () => {
     await requestCode(page, newSyntheticMobile());
     const resend = page.getByTestId('resend-code');
     assert.equal(await resend.isDisabled(), true);
-    assert.match((await resend.textContent()) ?? '', /ثانیه دیگر/);
+    assert.match((await resend.textContent()) ?? '', /ارسال دوباره کد تا [۰-۹]+:[۰-۹]{2}/);
   } finally {
     await context.close();
   }
@@ -303,7 +303,7 @@ test('KYC runs end to end: upload, submit, association review, approval', async 
 
     // The association operator reviews it from its own shell.
     const opsPage = await signIn(operator, '09990000004');
-    await opsPage.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await opsPage.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     const opsBody = await opsPage.locator('body').innerText();
     assert.ok(opsBody.includes('نمونه متقاضی آزمایشی'), 'the case is in the association queue');
     await opsPage.screenshot({ path: path.join(SHOTS, 'assoc-kyc-queue.png'), fullPage: true });
@@ -335,7 +335,7 @@ test('KYC runs end to end: upload, submit, association review, approval', async 
     await page.getByTestId('submit-kyc').click();
     await expectText(page, 'پرونده شما در حال بررسی است');
 
-    await opsPage.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await opsPage.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await opsPage.getByTestId('open-case').first().click();
     await opsPage.getByTestId('decision-APPROVED').check();
     await opsPage.getByTestId('submit-review').click();
@@ -349,7 +349,7 @@ test('KYC runs end to end: upload, submit, association review, approval', async 
     assert.ok(!dashboard.includes('برای ثبت حیوان هم‌زیست، احراز هویت لازم است'));
     assert.ok(dashboard.includes('برای این کار عضویت لازم نیست'));
     // Membership is its own timed standing since PROMPT-009; approved KYC does not start it.
-    assert.equal(await page.getByTestId('dashboard-membership-status').textContent(), 'بدون عضویت');
+    assert.equal(await page.getByTestId('dashboard-membership-status').textContent(), 'ثبت‌نشده');
     await page.screenshot({ path: path.join(SHOTS, 'dashboard-kyc-approved.png'), fullPage: true });
 
     // The applicant was notified, and the notification returns to the same case.
@@ -390,9 +390,9 @@ test('a private KYC document is refused to a signed-in stranger', async () => {
     // from the operator's own view, then try to read it as somebody else.
     const operator = await browser.newContext({ viewport: MOBILE, locale: 'fa-IR' });
     const opsPage = await signIn(operator, '09990000004');
-    await opsPage.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await opsPage.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await opsPage.getByTestId('open-case').first().click();
-    const href = await opsPage.getByTestId('kyc-document-link').getAttribute('href');
+    const href = await opsPage.getByTestId('kyc-document-link').getAttribute('src');
     assert.ok(href);
 
     const allowed = await opsPage.request.get(BASE_URL + href!);

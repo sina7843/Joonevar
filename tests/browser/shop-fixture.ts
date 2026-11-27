@@ -43,7 +43,8 @@ export async function setMarketSetting(
   const admin = await contextFor(options.browser, options.adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(options.reasonFa);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -148,7 +149,7 @@ export async function tradingStore(
 
     await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
     await page.getByTestId('submit-seller').click();
-    await page.getByTestId('seller-status').filter({ hasText: 'ارسال‌شده برای بررسی' }).waitFor();
+    await page.getByTestId('seller-status').filter({ hasText: 'در انتظار بررسی' }).waitFor();
   } finally {
     await store.close();
   }
@@ -164,6 +165,7 @@ export async function tradingStore(
     sellerId = (await row.getAttribute('data-testid'))!.replace('seller-row-', '');
     for (const decision of ['UNDER_REVIEW', 'APPROVED'] as const) {
       await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+      await page.getByTestId('open-seller-' + sellerId).click();
       await page.getByTestId('seller-decision-select-' + sellerId).selectOption(decision);
       await page.getByTestId('seller-decide-' + sellerId).click();
       await expectText(page, 'تصمیم ثبت شد');
@@ -172,6 +174,7 @@ export async function tradingStore(
     // nothing can ever be settled to it, so a fixture that stops short of
     // this builds a store that cannot be paid (PROMPT-011).
     await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+    await page.getByTestId('open-seller-' + sellerId).click();
     const verify = page.getByTestId('verify-iban-submit-' + sellerId);
     if ((await verify.count()) > 0) {
       await page.getByTestId('verify-iban-note-' + sellerId).fill(options.reasonFa);
@@ -253,6 +256,7 @@ export async function sellableProduct(
   try {
     const page = await ops.newPage();
     await page.goto(BASE_URL + '/market/catalog', { waitUntil: 'load' });
+    await page.getByTestId('open-product-' + productId).click();
     await page.getByTestId('product-decision-select-' + productId).selectOption('PUBLISHED');
     await page.getByTestId('product-decide-' + productId).click();
     // A decided product leaves the review queue, taking its form — and the
@@ -284,7 +288,7 @@ export async function sellableProduct(
 
     await page.goto(BASE_URL + '/account/seller/catalog', { waitUntil: 'load' });
     await page.getByTestId('offer-move-active-' + offerId).click();
-    await page.getByTestId('offer-status-' + offerId).filter({ hasText: 'در حال فروش' }).waitFor();
+    await page.getByTestId('offer-status-' + offerId).filter({ hasText: 'فعال' }).waitFor();
   } finally {
     await pricing.close();
   }

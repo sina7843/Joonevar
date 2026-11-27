@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { addIssuer, setIssuerActive } from '../../../src/animals/foreign-pedigree.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface IssuerState {
   readonly ok?: boolean;
@@ -29,7 +29,7 @@ export async function addIssuerAction(_previous: IssuerState, form: FormData): P
     revalidatePath('/assoc/issuers');
     return { ok: true, message: 'صادرکننده به فهرست موردتأیید اضافه شد.', tone: 'success' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
     throw error;
   }
 }
@@ -40,11 +40,12 @@ export async function setIssuerActiveAction(_previous: IssuerState, form: FormDa
       issuerId: String(form.get('issuerId') ?? ''),
       isActive: String(form.get('isActive') ?? '') === 'true',
       reasonFa: String(form.get('reasonFa') ?? ''),
+      expectedVersion: Number(form.get('expectedVersion') ?? ''),
     });
     revalidatePath('/assoc/issuers');
     return { ok: true, message: 'وضعیت صادرکننده به‌روزرسانی شد.', tone: 'success' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
     throw error;
   }
 }

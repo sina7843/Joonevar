@@ -1,10 +1,10 @@
-import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { CaseItem, CaseList } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../vet-case-key.ts';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { Button } from '../../../src/ui/button.tsx';
@@ -14,13 +14,16 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { REVIEW_CASE_TYPES, REVIEW_CLAIMS, REVIEW_VIEWS, reviewQueue } from '../../../src/vets/review-workbench.ts';
 import { CASE_TYPE_FA } from '../../../src/vets/professional-profile-model.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
+import { QUEUE_SORT_FA, QUEUE_SORTS, readQueueQuery } from '../../../src/domain/queue-query.ts';
+import { QueueHead, hrefWith } from '../../../src/ui/queue-head.tsx';
+import { Pagination } from '../../../src/ui/pagination.tsx';
 
 export const dynamic = 'force-dynamic';
 
 const VIEW_FA: Record<(typeof REVIEW_VIEWS)[number], string> = { OPEN: 'در انتظار بررسی', CORRECTION: 'منتظر اصلاح متقاضی', DECIDED: 'تصمیم‌گرفته', ALL: 'همه' };
 const CLAIM_FA: Record<(typeof REVIEW_CLAIMS)[number], string> = { ALL: 'همه', MINE: 'در دست من', UNCLAIMED: 'برداشته‌نشده', OTHERS: 'در دست دیگران' };
 
-type Params = { type?: string; view?: string; claim?: string; q?: string; page?: string };
+type Params = { type?: string; view?: string; claim?: string; q?: string; sort?: string; page?: string };
 
 /**
  * The association review workbench — Phase 2.5 PROMPT-007.
@@ -33,12 +36,17 @@ export default async function AssocVetReviewPage({ searchParams }: { searchParam
   const guard = await guardRoute('/assoc/vet-review');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const params = await searchParams;
+  const view = params.view || 'OPEN';
+  // P09: the longest-waiting first while open; otherwise the most recent, unless the operator picks an order.
+  const defaultSort = view === 'OPEN' ? 'oldest' : 'newest';
+  const query = readQueueQuery(params, defaultSort);
   const filters = {
     caseType: params.type || 'ALL',
-    view: params.view || 'OPEN',
+    view,
     claim: params.claim || 'ALL',
-    q: params.q ?? '',
-    page: Math.max(1, Number(params.page) || 1),
+    q: query.q,
+    sort: query.sort,
+    page: query.page,
   };
   let result: Awaited<ReturnType<typeof reviewQueue>> | null = null;
   let problem: string | null = null;
@@ -48,8 +56,13 @@ export default async function AssocVetReviewPage({ searchParams }: { searchParam
     if (!(error instanceof AppError)) throw error;
     problem = error.message;
   }
-  const hrefFor = (page: number) =>
-    '/assoc/vet-review?' + new URLSearchParams({ type: filters.caseType, view: filters.view, claim: filters.claim, q: filters.q, page: String(page) }).toString();
+  const keep = {
+    type: params.type,
+    view: params.view,
+    claim: params.claim,
+    q: query.q,
+    sort: query.sort === defaultSort ? undefined : query.sort,
+  };
 
   return (
     <OpsShell actor={guard.actor} title="میز بررسی دامپزشکان" pathname="/assoc/vet-review" nav={ASSOC_NAV}>
@@ -80,6 +93,7 @@ export default async function AssocVetReviewPage({ searchParams }: { searchParam
               options={REVIEW_CLAIMS.filter((claim) => claim !== 'ALL').map((claim) => ({ value: claim, label: CLAIM_FA[claim] }))}
               data-testid="review-filter-claim"
             />
+            {keep.sort ? <input type="hidden" name="sort" value={keep.sort} /> : null}
             <TextField label="جستجو (نام یا کد)" name="q" defaultValue={filters.q} maxLength={60} data-testid="review-filter-q" />
             <div className="sm:col-span-2 lg:col-span-4">
               <Button type="submit" tone="secondary" size="sm" iconStart="funnelSimple" data-testid="review-filter-submit">
@@ -97,9 +111,20 @@ export default async function AssocVetReviewPage({ searchParams }: { searchParam
 
         {result && result.items.length > 0 ? (
           <>
-            <p className="text-caption text-text-secondary" role="status" data-testid="review-total">
-              {result.total.toLocaleString('fa-IR') + ' پرونده · صفحه ' + result.page.toLocaleString('fa-IR') + ' از ' + result.totalPages.toLocaleString('fa-IR')}
-            </p>
+            <QueueHead
+              total={result.total}
+              shown={result.total}
+              sort={{
+                label: 'مرتب‌سازی پرونده‌ها',
+                testId: 'review-sort',
+                options: QUEUE_SORTS.map((key) => ({
+                  key,
+                  label: QUEUE_SORT_FA[key],
+                  current: key === query.sort,
+                  href: hrefWith('/assoc/vet-review', keep, { sort: key === defaultSort ? undefined : key, page: undefined }),
+                })),
+              }}
+            />
             <CaseList label="صف بررسی دامپزشکان" testId="review-queue">
               {result.items.map((item) => (
                 <CaseItem
@@ -122,32 +147,20 @@ export default async function AssocVetReviewPage({ searchParams }: { searchParam
                       )}
                     </>
                   }
-                  ageDays={ageInDays(new Date(item.updatedAt))}
-                  status={{
-                    tone: item.status === 'SUBMITTED' || item.status === 'UNDER_REVIEW' ? 'info' : item.status === 'NEEDS_CORRECTION' ? 'warning' : 'neutral',
-                    label: item.statusFa,
-                  }}
+                  ageDays={ageInDays(new Date(item.firstSubmittedAt ?? item.updatedAt))}
+                  status={keyStatus(vetCaseKey(item.status))}
                   owner={item.status === 'SUBMITTED' || item.status === 'UNDER_REVIEW' ? 'ASSOCIATION' : item.status === 'NEEDS_CORRECTION' ? 'USER' : null}
                   ownerIsUs
                 />
               ))}
             </CaseList>
-            {result.totalPages > 1 ? (
-              <nav className="flex items-center justify-between gap-md" aria-label="صفحه‌بندی" data-testid="review-pagination">
-                {result.page > 1 ? (
-                  <Link href={hrefFor(result.page - 1)} rel="prev" className="hz-btn hz-btn--secondary hz-btn--sm">
-                    صفحه قبل
-                  </Link>
-                ) : (
-                  <span />
-                )}
-                {result.page < result.totalPages ? (
-                  <Link href={hrefFor(result.page + 1)} rel="next" className="hz-btn hz-btn--secondary hz-btn--sm" data-testid="review-next-page">
-                    صفحه بعد
-                  </Link>
-                ) : null}
-              </nav>
-            ) : null}
+            <Pagination
+              page={result.page}
+              pageSize={result.pageSize}
+              total={result.total}
+              totalPages={result.totalPages}
+              hrefFor={(target) => hrefWith('/assoc/vet-review', keep, { page: target > 1 ? String(target) : undefined })}
+            />
           </>
         ) : null}
       </div>

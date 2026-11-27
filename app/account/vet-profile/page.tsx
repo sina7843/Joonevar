@@ -4,7 +4,7 @@ import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { StatusBadge, type StatusTone } from '../../../src/ui/status.tsx';
+import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { directoryReferenceData, ownVetDirectory } from '../../../src/vets/directory.ts';
 import { myVetApplications } from '../../../src/vets/onboarding.ts';
@@ -23,11 +23,9 @@ import { myCentreInvitations } from '../../../src/centres/service.ts';
 import { CentreInvitationForm } from '../../../src/centres/forms.tsx';
 import {
   APPLICATION_KIND_FA,
-  APPLICATION_STATUS_FA,
   DOCUMENT_KIND_FA,
   canAppeal,
   isOpenApplication,
-  type VetApplicationStatus,
 } from '../../../src/vets/onboarding-model.ts';
 import { DOCUMENT_KIND_FA as PROFESSIONAL_DOCUMENT_FA, type ProfessionalDocumentKind } from '../../../src/vets/professional-profile-model.ts';
 import type { VetCaseStatus } from '../../../src/vets/professional-model.ts';
@@ -46,23 +44,16 @@ import { Icon } from '../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const TONE: Record<VetApplicationStatus, StatusTone> = {
-  SUBMITTED: 'info',
-  NEEDS_CORRECTION: 'warning',
-  APPROVED: 'success',
-  REJECTED: 'error',
-  WITHDRAWN: 'neutral',
+/** Case statuses that differ from a status-dictionary key; the rest are keys as-is. */
+const CASE_KEY: Partial<Record<VetCaseStatus, string>> = {
+  VERIFIED_STUDENT: 'VERIFIED',
+  VERIFIED_NO_LICENSE: 'VERIFIED',
+  LICENSE_APPROVED_AWAITING_PAYMENT: 'AWAITING_PAYMENT',
+  ACTIVE_LICENSED_VET: 'ACTIVE',
+  TRUSTED_APPROVED_AWAITING_PAYMENT: 'AWAITING_PAYMENT',
+  ACTIVE_TRUSTED_VET: 'ACTIVE',
 };
-
-const CASE_TONE: Partial<Record<VetCaseStatus, StatusTone>> = {
-  SUBMITTED: 'info',
-  UNDER_REVIEW: 'info',
-  NEEDS_CORRECTION: 'warning',
-  VERIFIED_STUDENT: 'success',
-  VERIFIED_NO_LICENSE: 'success',
-  LICENSE_APPROVED_AWAITING_PAYMENT: 'info',
-  REJECTED: 'error',
-};
+const caseKey = (status: VetCaseStatus): string => CASE_KEY[status] ?? status;
 
 const OPEN: readonly VetCaseStatus[] = ['SUBMITTED', 'UNDER_REVIEW', 'NEEDS_CORRECTION'];
 const LICENCE_HELD: readonly VetCaseStatus[] = ['LICENSE_APPROVED_AWAITING_PAYMENT', 'ACTIVE_LICENSED_VET', 'EXPIRED', 'SUSPENDED'];
@@ -296,7 +287,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 <SectionHeader title={studentCase.fields?.displayNameFa ?? '—'} size="sm" />
               </div>
               <span data-testid="student-case-status">
-                <StatusBadge tone={CASE_TONE[studentCase.status] ?? 'neutral'}>{studentCase.statusFa}</StatusBadge>
+                <StatusBadge status={caseKey(studentCase.status)} />
               </span>
             </div>
             {studentCase.fields ? (
@@ -331,7 +322,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 <SectionHeader title={doctorCase.fields?.displayNameFa ?? '—'} size="sm" />
               </div>
               <span data-testid="doctor-case-status">
-                <StatusBadge tone={CASE_TONE[doctorCase.status] ?? 'neutral'}>{doctorCase.statusFa}</StatusBadge>
+                <StatusBadge status={caseKey(doctorCase.status)} />
               </span>
             </div>
             {doctorCase.fields ? (
@@ -391,7 +382,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 />
               </div>
               <span data-testid="licence-case-status">
-                <StatusBadge tone={CASE_TONE[licenceCase.status] ?? 'neutral'}>{licenceCase.statusFa}</StatusBadge>
+                <StatusBadge status={caseKey(licenceCase.status)} />
               </span>
             </div>
             {licenceCase.fields ? (
@@ -519,7 +510,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                 <SectionHeader title={latest.displayNameFa} size="sm" />
               </div>
               <span data-testid="vet-application-status">
-                <StatusBadge tone={TONE[latest.status]}>{APPLICATION_STATUS_FA[latest.status]}</StatusBadge>
+                <StatusBadge status={latest.status} />
               </span>
             </div>
             <p className="hz-caption">{'کد نظام ' + latest.councilCode + ' · ارسال: ' + formatInstantFa(latest.submittedAt)}</p>
@@ -571,7 +562,7 @@ export default async function VetProfileAccountPage({ searchParams }: { searchPa
                   data-testid={'path-' + value}
                 >
                   <Icon name={path === value ? 'checkCircle' : value === 'student' ? 'student' : 'stethoscope'} size="sm" className="text-text-brand" />
-                  <span className="text-label-md">{label}</span>
+                  <span className="text-label-sm">{label}</span>
                 </Link>
               ))}
             </div>

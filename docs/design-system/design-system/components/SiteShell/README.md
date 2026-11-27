@@ -53,7 +53,7 @@ Wrap `hz-show-lg` around flex elements (it reverts `display`, which would undo `
 
 - Nav item: default · hover (pointer only, `bg-subtle`) · focus-visible ring · open (`aria-expanded="true"`, `bg-subtle`, caret rotated) · current group (`hz-nav__item--current`, `text-brand` + 700).
 - Footer group <768: collapsed / expanded (caret rotates 180°). Links: hover underline in `text-brand`.
-- Long text: the longest group label «راهنمای دامپزشکی» fits at 1024 with all 5 groups; if an admin-defined label grows, the nav wraps never — reduce item padding to 8px first, then move «استعلام اصالت» into the «خدمات» panel.
+- Long text: at 1024–1279 the nav items use 8px inline padding and the bar gap is 24 (bundle, v1.0.4), so logo, 5 groups, «استعلام اصالت», search and the primary «ورود / ثبت‌نام» fit in one row. If an admin-defined label grows, the nav never wraps — move «استعلام اصالت» into the «خدمات» panel.
 - Missing trust image: the RecordImage empty state with «نماد اعتماد».
 
 ## Mobile ↔ desktop
@@ -88,7 +88,7 @@ Sections and routes from `src/public/sections.ts` (16 sections) plus four off-na
 
 ## Do / Don't
 
-- Do keep the header one row with no dividers; one secondary button only — no primary button in the header.
+- Do keep the header one row with no dividers; one button only — the primary sm «ورود / ثبت‌نام» / «پنل من» (chrome, v1.0.3).
 - Do keep chrome cream and the page white; never put cream behind page content except landing feature cards / band.
 - Don't add a seventh top-level item; extend a group panel instead.
 - Don't hide «استعلام اصالت» on desktop — it is the trust entry point.

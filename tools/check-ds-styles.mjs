@@ -32,7 +32,8 @@ const RULES = [
   {
     name: 'physical direction',
     re: /(?<![\w-])(?:-?(?:ml|mr|pl|pr|left|right|border-l|border-r|rounded-l|rounded-r|rounded-tl|rounded-tr|rounded-bl|rounded-br|scroll-ml|scroll-mr)-[\w[\]().%-]+|text-left|text-right|float-left|float-right)(?![\w-])/g,
-  },
+  },  // FND-004: the type scale has `label` (15/24·700) and `label-sm` (13/20·600); 14/22 is not in the system.
+  { name: 'type style outside the system', re: /(?<![\w-])text-label-md(?![\w-])/g },
 ];
 
 const files = [];

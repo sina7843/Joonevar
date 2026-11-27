@@ -2,6 +2,8 @@
 
 import { useActionState } from 'react';
 import { Button } from '../ui/button.tsx';
+import { Icon } from '../ui/icon.tsx';
+import { QuantityStepper } from '../ui/quantity-stepper.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
 import { SUB_ORDER_STATUS_FA, type SubOrderStatus } from './order-model.ts';
@@ -37,21 +39,41 @@ export function CartLineForm({
   quantity: number;
   max: number;
 }) {
+  // DS CartRow › QuantityStepper: each step is saved at once (no «به‌روزرسانی»
+  // button). The buttons submit the next quantity themselves, so it works
+  // without a client-side counter and the server stays the one source of truth.
   const [state, submit, pending] = useActionState(action, EMPTY);
-  const choices = Array.from({ length: Math.max(Math.min(max, 20), quantity) }, (_, index) => index + 1);
+  const limit = Math.max(max, quantity);
   return (
-    <form action={submit} className="flex flex-wrap items-end gap-sm" data-testid={'cart-line-form-' + skuId}>
+    <form action={submit} className="hz-qty-field" data-testid={'cart-line-form-' + skuId}>
       <input type="hidden" name="skuId" value={skuId} />
-      <SelectField
-        label="تعداد"
-        name="quantity"
-        defaultValue={String(quantity)}
-        options={choices.map((value) => ({ value: String(value), label: value.toLocaleString('fa-IR') }))}
-        data-testid={'cart-quantity-' + skuId}
-      />
-      <Button type="submit" tone="secondary" disabled={pending} data-testid={'cart-update-' + skuId}>
-        به‌روزرسانی
-      </Button>
+      <div className="hz-qty hz-qty--sm" role="group" aria-label="تعداد" aria-busy={pending || undefined} data-testid={'cart-quantity-' + skuId}>
+        <button
+          type="submit"
+          name="quantity"
+          value={quantity + 1}
+          className="hz-icon-btn"
+          aria-label="افزودن یکی"
+          disabled={pending || quantity >= limit}
+          data-testid={'cart-more-' + skuId}
+        >
+          <Icon name="plus" size="sm" />
+        </button>
+        <output className="hz-qty__count" aria-live="polite">
+          {quantity.toLocaleString('fa-IR')}
+        </output>
+        <button
+          type="submit"
+          name="quantity"
+          value={quantity - 1}
+          className="hz-icon-btn"
+          aria-label="کم کردن یکی"
+          disabled={pending || quantity <= 1}
+          data-testid={'cart-less-' + skuId}
+        >
+          <Icon name="minus" size="sm" />
+        </button>
+      </div>
       <Result state={state} testId={'cart-line-result-' + skuId} />
     </form>
   );
@@ -91,16 +113,10 @@ export function AddToCartForm({
       </p>
     );
   }
-  const choices = Array.from({ length: Math.min(available, 20) }, (_, index) => index + 1);
   return (
-    <form action={submit} className="flex flex-wrap items-end gap-sm" data-testid={'add-to-cart-form-' + skuId}>
+    <form action={submit} className="flex flex-wrap items-center gap-sm" data-testid={'add-to-cart-form-' + skuId}>
       <input type="hidden" name="skuId" value={skuId} />
-      <SelectField
-        label="تعداد"
-        name="quantity"
-        options={choices.map((value) => ({ value: String(value), label: value.toLocaleString('fa-IR') }))}
-        data-testid={'add-quantity-' + skuId}
-      />
+      <QuantityStepper name="quantity" max={available} label={'تعداد، ' + labelFa} testId={'add-quantity-' + skuId} />
       <Button type="submit" disabled={pending} data-testid={'add-to-cart-' + skuId}>
         افزودن به سبد
       </Button>
@@ -125,9 +141,12 @@ export function CheckoutForm({
   chosenMethods,
   code,
   redeemPoints,
+  totalKnown = true,
 }: {
   action: Action;
   totalToman: bigint;
+  /** False while a shop's shipping cost is not announced: no total is shown and payment stays shut. */
+  totalKnown?: boolean;
   defaults: { provinceFa: string | null; cityFa: string | null; addressFa: string | null; postalCode: string | null };
   blocked: boolean;
   /** The delivery each shop's part was quoted under, carried so the server prices the same basket. */
@@ -175,9 +194,9 @@ export function CheckoutForm({
       />
       <TextAreaField label="توضیح برای فروشنده" name="note" rows={2} data-testid="checkout-note" />
       <p className="text-label-lg" data-testid="checkout-total">
-        مبلغ قابل پرداخت: {totalToman.toLocaleString('fa-IR')} تومان
+        {totalKnown ? 'مبلغ قابل پرداخت: ' + totalToman.toLocaleString('fa-IR') + ' تومان' : 'مبلغ قابل پرداخت پس از اعلام هزینه ارسال همه فروشگاه‌ها معلوم می‌شود.'}
       </p>
-      <Button type="submit" disabled={pending || blocked} data-testid="checkout-submit">
+      <Button type="submit" disabled={pending || blocked || !totalKnown} data-testid="checkout-submit">
         تأیید و پرداخت
       </Button>
     </form>

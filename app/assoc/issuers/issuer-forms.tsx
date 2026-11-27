@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Button } from '../../../src/ui/button.tsx';
 import { TextField } from '../../../src/ui/field.tsx';
+import { StateChangeForm } from '../../../src/ui/state-change-form.tsx';
 import { addIssuerAction, setIssuerActiveAction, type IssuerState } from './actions.ts';
 
 const EMPTY: IssuerState = {};
@@ -28,17 +29,16 @@ export function AddIssuerForm() {
   );
 }
 
-export function ToggleIssuerForm({ issuerId, isActive }: { issuerId: string; isActive: boolean }) {
-  const [state, submit, pending] = useActionState(setIssuerActiveAction, EMPTY);
+/** Turning one issuer on or off, with a reason and the version it was decided on (P11, RTO-018). */
+export function ToggleIssuerForm({ issuerId, isActive, version }: { issuerId: string; isActive: boolean; version: number }) {
   return (
-    <form action={submit} className="mt-md space-y-md" data-testid={'toggle-issuer-' + issuerId}>
-      <Result state={state} />
-      <input type="hidden" name="issuerId" value={issuerId} />
-      <input type="hidden" name="isActive" value={isActive ? 'false' : 'true'} />
-      <TextField label="دلیل" name="reasonFa" required data-testid="toggle-reason" />
-      <Button tone="secondary" type="submit" disabled={pending} data-testid="toggle-issuer-submit">
-        {isActive ? 'غیرفعال‌کردن' : 'فعال‌کردن'}
-      </Button>
-    </form>
+    <StateChangeForm
+      action={setIssuerActiveAction}
+      hidden={{ issuerId, isActive: isActive ? 'false' : 'true' }}
+      version={version}
+      changeFa={isActive ? 'غیرفعال‌کردن' : 'فعال‌کردن'}
+      alwaysOpen
+      ids={{ form: 'toggle-issuer-' + issuerId, reason: 'toggle-reason', save: 'toggle-issuer-submit' }}
+    />
   );
 }

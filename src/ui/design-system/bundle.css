@@ -2794,3 +2794,81 @@ a.hz-ped__node { color: inherit; text-decoration: none; }
 @media (min-width: 768px) { .hz-verify__foot { padding-inline: 20px; } }
 .hz-verify__private { display: inline-flex; align-items: center; gap: 6px; }
 .hz-verify--loading .hz-verify__head { align-items: center; }
+
+/* ===== Home compositions — P01 editorial home (v1.0.4, approved 22 Mehr 1405) ===== */
+/* Section frame: every home section sits in a rounded frame; frames alternate white / cream; the Hero frame is peach. */
+.hz-frame { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-xl); padding: 20px 16px; }
+.hz-frame--cream { background: var(--bg-feature); }
+.hz-frame--cream .hz-card--feature { background: var(--bg-surface); }
+.hz-frame--peach { background: var(--bg-brand-subtle); }
+.hz-hero.hz-frame { padding: 24px 16px; }
+@media (min-width: 768px) { .hz-frame { padding: 32px; } .hz-hero.hz-frame { padding: 40px; } }
+@media (min-width: 1024px) { .hz-frame { padding: 40px; border-radius: var(--radius-2xl); } .hz-hero.hz-frame { padding: 56px 64px; } }
+.hz-home-stack { display: flex; flex-direction: column; gap: var(--space-16); padding-block: var(--space-16) var(--space-48); }
+@media (min-width: 1024px) { .hz-home-stack { gap: var(--space-32); padding-block: var(--space-32) var(--space-96); } }
+
+/* Sub-heading inside a section (icon + label) */
+.hz-subhead { display: flex; align-items: center; gap: 8px; margin: 24px 0 12px; font-size: 15px; line-height: 24px; font-weight: 700; color: var(--text-primary); }
+.hz-subhead:first-of-type { margin-block-start: 0; }
+.hz-subhead .hz-icon { color: var(--text-brand); }
+@media (min-width: 1024px) { .hz-subhead { margin-block: 32px 16px; font-size: 16px; line-height: 26px; } }
+
+/* Card row: a swipe row on phones, a grid from 768. Columns from --cols (desktop) and --cols-md (tablet). */
+.hz-row { list-style: none; margin: 0; padding: 0 0 4px; display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.hz-row > li { flex: 0 0 var(--row-item, 72%); scroll-snap-align: start; display: flex; }
+.hz-row > li > * { flex: 1 1 auto; min-width: 0; }
+.hz-row--stack { display: grid; grid-template-columns: minmax(0, 1fr); overflow: visible; }
+@media (min-width: 768px) { .hz-row { display: grid; grid-template-columns: repeat(var(--cols-md, 2), minmax(0, 1fr)); gap: 20px; overflow: visible; } }
+@media (min-width: 1024px) { .hz-row { grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: 24px; } }
+
+/* Featured breed: photo + profile (traits use .hz-traits from BreedCard) */
+.hz-breed-feature { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: center; margin-block-end: 16px; }
+.hz-breed-feature__media { margin: 0; aspect-ratio: 16 / 10; border-radius: var(--radius-xl); overflow: hidden; background: var(--bg-media-empty); }
+.hz-breed-feature__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hz-breed-feature__info { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.hz-breed-feature__title { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 24px; line-height: 38px; font-weight: 700; }
+.hz-breed-feature__title .hz-breed__en { font-size: 13px; }
+@media (min-width: 1024px) { .hz-breed-feature { grid-template-columns: 7fr 5fr; gap: 24px; margin-block-end: 24px; } .hz-breed-feature__title { font-size: 32px; line-height: 48px; } }
+
+/* Club card with a cover photo (ClubCard --cover) */
+.hz-club-cover { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.hz-club-cover > .hz-media { border: 0; border-radius: 0; }
+.hz-club-cover__body { display: flex; flex-direction: column; gap: 4px; flex: 1 1 auto; }
+.hz-club-cover .hz-community__event { margin-block-start: 12px; }
+
+/* At a glance: counts + the three steps in one box */
+.hz-glance { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-xl); padding: 20px 16px; }
+.hz-glance__stats { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; padding-block-end: 20px; border-block-end: 1px solid var(--border-default); }
+.hz-glance__stat { display: flex; flex-direction: column; gap: 4px; }
+.hz-glance__value { margin: 0; order: -1; font-size: 32px; line-height: 44px; font-weight: 800; color: var(--text-primary); }
+.hz-glance__label { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+.hz-glance__label .hz-icon { color: var(--text-brand); }
+.hz-glance__steps { list-style: none; margin: 0; padding: 20px 0 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.hz-glance__step { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 16px; align-items: center; }
+.hz-glance__step-media { margin: 0; aspect-ratio: 1 / 1; border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-media-empty); }
+.hz-glance__step-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hz-glance__step-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hz-glance__step-num { font-size: 12px; line-height: 20px; font-weight: 700; color: var(--text-brand); }
+@media (min-width: 1024px) {
+  .hz-glance { padding: 40px; border-radius: var(--radius-2xl); }
+  .hz-glance__stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; padding-block-end: 32px; }
+  .hz-glance__value { font-size: 44px; line-height: 56px; }
+  .hz-glance__steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding-block-start: 32px; }
+  .hz-glance__step { grid-template-columns: 120px minmax(0, 1fr); }
+}
+
+/* CtaBand with a photo (CtaBand --media) */
+.hz-cta--media { display: grid; grid-template-columns: minmax(0, 1fr); padding: 0; gap: 0; overflow: hidden; align-items: stretch; }
+.hz-cta__media { margin: 0; aspect-ratio: 16 / 9; background: var(--bg-media-empty); }
+.hz-cta__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hz-cta--media .hz-cta__content { display: flex; flex-direction: column; gap: 14px; padding: 20px; }
+@media (min-width: 1024px) {
+  .hz-cta--media { grid-template-columns: 7fr 5fr; }
+  .hz-cta--media .hz-cta__media { aspect-ratio: auto; min-height: 320px; order: 2; }
+  .hz-cta--media .hz-cta__content { justify-content: center; gap: 16px; padding: 48px; }
+}
+
+/* SiteShell header at 1024–1279: tighter nav items so logo, 5 groups, «استعلام اصالت», search and «ورود / ثبت‌نام» fit in one row (v1.0.4 QA fix) */
+@media (min-width: 1024px) and (max-width: 1279px) { .hz-nav__item { padding-inline: 8px; } .hz-site-header__bar { gap: 24px; } }
+/* Touch targets on coarse pointers: small buttons, quantity steppers and segmented items reach 44px (v1.0.4 QA fix) */
+@media (pointer: coarse) { .hz-btn--sm { min-height: 44px; } .hz-qty .hz-icon-btn { width: 44px; height: 44px; } .hz-segmented__item { min-height: 44px; } }

@@ -3,14 +3,13 @@
 import { useActionState, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { ActionRow, Button, ButtonLink } from '../../../../src/ui/button.tsx';
+import { Button, ButtonLink, StickyActionBar } from '../../../../src/ui/button.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Field, FileField, SelectField, TextField } from '../../../../src/ui/field.tsx';
 import { Stepper } from '../../../../src/ui/stepper.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { BreedPicker } from '../../../../src/ui/breed-picker.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import {
   registerAnimalAction,
   registerMissingParentAction,
@@ -56,6 +55,8 @@ function Result({ state }: { state: FormState }) {
 }
 
 /** P07: the step heading inside the step card (the eye goes here, not to the Stepper). */
+const stepContext = (step: number): string => 'مرحله ' + step.toLocaleString('fa-IR') + ' از ۶، ' + STEPS[step - 1];
+
 function StepHead({ step }: { step: number }) {
   return (
     <div className="mb-lg">
@@ -80,6 +81,11 @@ export function AnimalWizard({
   const [photoState, uploadPhoto, photoPending] = useActionState(uploadAnimalPhotoAction, EMPTY);
   const [lineageState, resolveLineage, lineagePending] = useActionState(resolveLineageAction, EMPTY);
   const [registerState, register, registerPending] = useActionState(registerAnimalAction, EMPTY);
+  // K10 hard state «خطای اعتبارسنجی نام»: an error summary that takes focus, the
+  // error under the field, and a link from the summary back to it (KUSR-022).
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [breedError, setBreedError] = useState<string | null>(null);
+  const summary = useRef<HTMLDivElement>(null);
   // A genuinely missing parent stores G0, but the owner still chose the
   // internal-lineage route: the panel, the codes and the CTA must survive a
   // reload, otherwise the way back to the missing parent disappears.
@@ -135,14 +141,56 @@ export function AnimalWizard({
           {step === 1 ? (
             <Card>
               <StepHead step={1} />
-              <form action={save} className="space-y-lg" data-testid="step-1">
+              <form
+                action={save}
+                className="space-y-lg"
+                data-testid="step-1"
+                noValidate
+                onSubmit={(event) => {
+                  const data = new FormData(event.currentTarget);
+                  const name = String(data.get('name') ?? '').trim();
+                  const problem = name === '' ? 'نام حیوان را بنویسید.' : name.length > 40 ? 'نام حیوان حداکثر ۴۰ نویسه است.' : null;
+                  const breed = String(data.get('breedId') ?? '') === '' ? 'نژاد را از فهرست انتخاب کنید.' : null;
+                  setNameError(problem);
+                  setBreedError(breed);
+                  if (problem || breed) {
+                    event.preventDefault();
+                    requestAnimationFrame(() => summary.current?.focus());
+                  }
+                }}
+              >
                 <input type="hidden" name="animalId" value={animal.id} />
                 <input type="hidden" name="step" value="2" />
+                {nameError || breedError ? (
+                  <div ref={summary} tabIndex={-1} className="hz-alert hz-alert--error" role="alert" data-testid="step-1-errors">
+                    <div className="hz-alert__body">
+                      <span className="hz-alert__title">{((nameError ? 1 : 0) + (breedError ? 1 : 0)).toLocaleString('fa-IR') + ' مورد را اصلاح کنید'}</span>
+                      <ul className="m-0 list-none p-0">
+                        {breedError ? <li>{'نژاد: ' + breedError}</li> : null}
+                        {nameError ? <li>
+                          <a
+                            className="hz-link"
+                            href="#step-1-name"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              (event.currentTarget.closest('form')?.elements.namedItem('name') as HTMLInputElement | null)?.focus();
+                            }}
+                          >
+                            {'نام حیوان: ' + nameError}
+                          </a>
+                        </li> : null}
+                      </ul>
+                    </div>
+                  </div>
+                ) : null}
                 <TextField
                   label="نام حیوان"
                   name="name"
                   required
+                  maxLength={60}
                   defaultValue={animal.name ?? ''}
+                  error={nameError ?? undefined}
+                  onChange={() => (nameError ? setNameError(null) : undefined)}
                   data-testid="animal-name"
                 />
                 <Field label="گونه" required hint="در حال حاضر فقط ثبت سگ پشتیبانی می‌شود.">
@@ -158,9 +206,11 @@ export function AnimalWizard({
                   )}
                 </Field>
                 <BreedPicker breeds={breeds} defaultValue={animal.breedId} required testId="animal-breed" />
-                <Button type="submit" block disabled={savePending} data-testid="step-1-continue">
-                  ادامه
-                </Button>
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(1)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-1-continue">
+                    ادامه
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -220,18 +270,14 @@ export function AnimalWizard({
                     <span className="hz-check__label">تاریخ تولد تقریبی است</span>
                   </span>
                 </label>
-                <ActionRow
-                  primary={
-                    <Button type="submit" disabled={savePending} data-testid="step-2-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(2)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-2-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -254,18 +300,14 @@ export function AnimalWizard({
                   رنگ و نشانه‌های ظاهری اینجا اختیاری است و اظهار شما ثبت می‌شود. در مراجعه، دامپزشک معتمد همین‌ها را با
                   دیدن حیوان تکمیل یا اصلاح می‌کند و از آن پس رسمی و غیرقابل‌تغییر می‌شوند.
                 </Alert>
-                <ActionRow
-                  primary={
-                    <Button type="submit" disabled={savePending} data-testid="step-3-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(3)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-3-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -284,24 +326,20 @@ export function AnimalWizard({
                   hint="JPG یا PNG تا ۵ مگابایت. این تصویر خصوصی است."
                   testId="animal-photo"
                 />
-                {animal.hasPhoto ? <StatusBadge tone="success">تصویر ذخیره شده است</StatusBadge> : null}
+                {animal.hasPhoto ? <span className="hz-tag hz-tag--neutral">تصویر ذخیره شده است</span> : null}
                 <Button tone="secondary" type="submit" block disabled={photoPending} data-testid="upload-photo">
                   {photoPending ? 'در حال بارگذاری…' : 'بارگذاری تصویر'}
                 </Button>
               </form>
               <div className="mt-lg">
-                <ActionRow
-                  primary={
-                    <Button type="button" onClick={next} data-testid="step-4-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(4)}>
+                  <Button size="lg" type="button" onClick={next} data-testid="step-4-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </div>
             </Card>
           ) : null}
@@ -350,18 +388,14 @@ export function AnimalWizard({
                 <Alert tone="warning" title="این شماره هنوز رسمی نیست">
                   شماره میکروچیپ فقط پس از اسکن و تأیید دامپزشک معتمد رسمی می‌شود.
                 </Alert>
-                <ActionRow
-                  primary={
-                    <Button type="submit" disabled={savePending} data-testid="step-5-continue">
-                      ادامه
-                    </Button>
-                  }
-                  secondary={
-                    <Button tone="secondary" type="button" onClick={back}>
-                      مرحله قبل
-                    </Button>
-                  }
-                />
+                <StickyActionBar label="کنش‌های مرحله" context={stepContext(5)}>
+                  <Button size="lg" type="submit" disabled={savePending} data-testid="step-5-continue">
+                    ادامه
+                  </Button>
+                  <Button size="lg" tone="secondary" type="button" onClick={back}>
+                    مرحله قبل
+                  </Button>
+                </StickyActionBar>
               </form>
             </Card>
           ) : null}
@@ -522,15 +556,15 @@ export function AnimalWizard({
                 <Result state={registerState} />
                 <form action={register} className="mt-lg">
                   <input type="hidden" name="animalId" value={animal.id} />
-                  <Button type="submit" block disabled={registerPending} data-testid="register-animal">
-                    {registerPending ? 'در حال ثبت…' : 'ثبت حیوان هم‌زیست'}
-                  </Button>
+                  <StickyActionBar label="کنش‌های مرحله" context={stepContext(6)}>
+                    <Button size="lg" type="submit" disabled={registerPending} aria-busy={registerPending || undefined} data-testid="register-animal">
+                      {registerPending ? 'در حال ثبت…' : 'ثبت حیوان هم‌زیست'}
+                    </Button>
+                    <Button size="lg" tone="secondary" type="button" onClick={back}>
+                      مرحله قبل
+                    </Button>
+                  </StickyActionBar>
                 </form>
-                <div className="mt-md">
-                  <Button tone="secondary" type="button" block onClick={back}>
-                    مرحله قبل
-                  </Button>
-                </div>
               </Card>
             </div>
           ) : null}

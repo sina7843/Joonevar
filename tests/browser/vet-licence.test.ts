@@ -73,7 +73,7 @@ async function waitForText(page: Page, testId: string, text: string): Promise<vo
 /** A decided case no longer shows its form; the persisted status proves the decision. */
 async function decide(page: Page, decision: 'APPROVE' | 'REQUEST_CORRECTION', reason: string, expectedStatus: string): Promise<void> {
   await page.goto(BASE_URL + '/assoc/vet-licences?view=OPEN', { waitUntil: 'load' });
-  const item = page.locator('[data-testid="licence-queue"] > li', { hasText: LICENCE_CODE });
+  const item = page.locator('[data-testid="licence-queue"] tbody > tr', { hasText: LICENCE_CODE });
   await item.getByTestId('open-licence-case').click();
   await page.getByTestId('licence-decision-form').waitFor();
   await page.getByTestId('licence-decision-' + decision).check();
@@ -98,7 +98,7 @@ test('a licensed doctor submits every mandatory component, and the case waits fo
     await form.getByTestId('lic-clinic').fill('کلینیک آزمایشی ' + RUN);
     await form.getByTestId('lic-service-MICROCHIP_IMPLANT').check();
     await form.getByTestId('submit-licence').click();
-    await waitForText(page, 'licence-case-status', 'ارسال‌شده');
+    await waitForText(page, 'licence-case-status', 'در انتظار بررسی');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= MOBILE.width, 'no sideways scroll on a phone: ' + width);
   });
@@ -108,7 +108,7 @@ test('the association asks for a correction, and the applicant answers with a ne
   await as('association', DESKTOP, async (page) => {
     await decide(page, 'REQUEST_CORRECTION', 'SYNTHETIC تاریخ روی پروانه خوانا نیست', 'نیازمند اصلاح');
     assert.equal((await page.getByTestId('review-licence-code').textContent())?.trim(), LICENCE_CODE);
-    licencePath = (await page.getByTestId('licence-document-link-PRACTICE_LICENCE').first().getAttribute('href'))!;
+    licencePath = (await page.getByTestId('licence-document-link-PRACTICE_LICENCE').first().getAttribute('src'))!;
     const file = await page.request.get(BASE_URL + licencePath);
     assert.equal(file.status(), 200, 'the association reads the licence file');
     assert.equal(file.headers()['content-type'], 'application/pdf');
@@ -122,7 +122,7 @@ test('the association asks for a correction, and the applicant answers with a ne
     const form = page.getByTestId('licence-revision-form');
     await form.getByTestId('lic-date').fill('2023-02-01');
     await form.getByTestId('revise-licence').click();
-    await waitForText(page, 'licence-case-status', 'ارسال‌شده');
+    await waitForText(page, 'licence-case-status', 'در انتظار بررسی');
     await waitForText(page, 'licence-history', 'نیازمند اصلاح');
   });
 });
@@ -146,7 +146,7 @@ test('approval waits for payment: the licensed tag does not appear, and the file
   await as('stranger', DESKTOP, async (page) => {
     assert.equal((await page.request.get(BASE_URL + licencePath)).status(), 403, 'another account cannot read it');
     await page.goto(BASE_URL + '/assoc/vet-licences', { waitUntil: 'load' });
-    assert.equal((await page.getByTestId('denial-code').textContent())?.trim(), 'FORBIDDEN');
+    assert.equal((await page.getByTestId('denial-code').getAttribute('data-code'))?.trim(), 'FORBIDDEN');
   });
   await as('visitor', MOBILE, async (page) => {
     assert.equal((await page.request.get(BASE_URL + licencePath)).status(), 401);
@@ -194,7 +194,7 @@ test('an unpaid gateway trip grants nothing, and a verified payment activates th
 
     await page.goto(BASE_URL + '/account/vet-profile', { waitUntil: 'load' });
     await waitForText(page, 'vet-current-tag', 'دارای پروانه فعالیت');
-    await waitForText(page, 'licence-case-status', 'پروانه فعال');
+    await waitForText(page, 'licence-case-status', 'فعال');
     await waitForText(page, 'licence-period-standing', 'فعال');
     // The next step offered is a renewal, not a second activation.
     await page.getByTestId('renew-licence-period').waitFor();
@@ -247,7 +247,7 @@ test('the trusted request is offered only to an active licensed vet, and names t
     await page.getByTestId('submit-kyc').click();
     await page.getByText('پرونده شما در حال بررسی است').first().waitFor();
     await as('association', DESKTOP, async (ops) => {
-      await ops.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+      await ops.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
       await ops.getByTestId('open-case').first().click();
       await ops.getByTestId('review-form').waitFor();
       await ops.getByTestId('decision-APPROVED').check();
@@ -276,7 +276,7 @@ test('the trusted request is offered only to an active licensed vet, and names t
 
   await as('association', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-trusted', { waitUntil: 'load' });
-    await page.getByTestId('trusted-queue').locator('li').first().getByTestId('open-trusted-case').click();
+    await page.getByTestId('trusted-queue').locator('tbody > tr').first().getByTestId('open-trusted-case').click();
     await page.getByTestId('trusted-declaration').waitFor();
     // Equipment is declared, never verified.
     await waitForText(page, 'trusted-declared-equipment', 'اعلام‌شده');
@@ -285,7 +285,7 @@ test('the trusted request is offered only to an active licensed vet, and names t
     await page.getByTestId('trusted-decision-APPROVE').check();
     await page.getByTestId('trusted-decision-reason').fill('SYNTHETIC شرایط معتمد کامل است');
     await page.getByTestId('submit-trusted-decision').click();
-    await waitForText(page, 'trusted-case-status', 'معتمد تأییدشده، در انتظار پرداخت');
+    await waitForText(page, 'trusted-case-status', 'در انتظار پرداخت');
   });
 
   await as('applicant', MOBILE, async (page) => {

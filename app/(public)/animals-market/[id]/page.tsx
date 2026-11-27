@@ -14,6 +14,7 @@ import { publicListing, publicListings } from '../../../../src/marketplace/publi
 import { PROMOTED_LABEL_FA, parseListingFilter } from '../../../../src/marketplace/discovery-model.ts';
 import { SELLER_KIND_FA } from '../../../../src/marketplace/listing-eligibility.ts';
 import { AskToBuyForm } from '../../../account/purchases/forms.tsx';
+import { ButtonLink, StickyActionBar } from '../../../../src/ui/button.tsx';
 import { ListingCard, ListingPrice } from '../listing-card.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -104,9 +105,9 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
                     </StatusBadge>
                   ) : null}
                   {listing.reserved ? (
-                    <StatusBadge tone="neutral">
-                      <span data-testid="listing-reserved">رزروشده</span>
-                    </StatusBadge>
+                    <span data-testid="listing-reserved">
+                      <StatusBadge status="RESERVED" />
+                    </span>
                   ) : null}
                 </span>
               ) : undefined
@@ -130,6 +131,10 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
                   ]
                 : []),
               ...(listing.publishedAt ? ['منتشرشده ' + DATE_FA.format(listing.publishedAt)] : []),
+              // KPUB-028: how long the advert is still shown, in whole days.
+              ...(listing.expiresAt && listing.expiresAt.getTime() > Date.now()
+                ? [Math.ceil((listing.expiresAt.getTime() - Date.now()) / 86_400_000).toLocaleString('fa-IR') + ' روز تا پایان نمایش']
+                : []),
             ]}
           />
         </div>
@@ -185,7 +190,9 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
                 </span>
               </Alert>
             ) : (
-              <AskToBuyForm listingId={listing.id} negotiable={listing.priceMode === 'NEGOTIABLE'} />
+              <div id="listing-ask" className="scroll-mt-s96">
+                <AskToBuyForm listingId={listing.id} />
+              </div>
             )}
 
             <article className="hz-card hz-seller" aria-label="فروشنده">
@@ -287,6 +294,20 @@ export default async function PublicListingPage({ params }: { params: Promise<{ 
           </ul>
         </section>
       ) : null}
+
+      {/* K6 phones: the one action stays reachable (DS StickyActionBar); from 768 the side column holds it. */}
+      {listing.reserved ? null : (
+        <StickyActionBar
+          label="تماس با فروشنده"
+          className="md:hidden"
+          context={listing.titleFa + '، قابل مذاکره'}
+          total={listing.priceToman !== null ? listing.priceToman.toLocaleString('fa-IR') + ' تومان' : undefined}
+        >
+          <ButtonLink href="#listing-ask" size="lg" iconStart="chatCircle">
+            پیام به فروشنده
+          </ButtonLink>
+        </StickyActionBar>
+      )}
     </div>
   );
 }

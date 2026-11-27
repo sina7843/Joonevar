@@ -335,12 +335,16 @@ export function SellerStandingForm({ sellerId, version }: { sellerId: string; ve
 }
 
 /** Publish a seller plan version — PROMPT-008. Nothing here has a default. */
-export function SellerPlanForm() {
+export function SellerPlanForm({ versions }: { versions: Readonly<Record<string, number>> }) {
   const [state, submit, pending] = useActionState(publishPlanAction, EMPTY);
+  const [code, setCode] = useState('');
+  const seen = versions[code.trim()] ?? 0;
   return (
     <form action={submit} className="space-y-md" data-testid="plan-form">
       <Result state={state} testId="plan-form-result" />
-      <TextField label="کد پلن" name="code" required ltr data-testid="plan-code" />
+      {/* The latest version of this code the operator saw; a publish made meanwhile is refused (RTO-018). */}
+      <input type="hidden" name="expectedVersion" value={seen} />
+      <TextField label="کد پلن" name="code" required ltr value={code} onChange={(event) => setCode(event.target.value)} hint={seen > 0 ? 'نسخه فعلی ' + seen.toLocaleString('fa-IR') + '؛ این انتشار نسخه ' + (seen + 1).toLocaleString('fa-IR') + ' می‌شود.' : 'کد تازه؛ نسخه ۱.'} data-testid="plan-code" />
       <TextField label="نام پلن" name="label" required data-testid="plan-label" />
       <TextField label="مدت دوره (روز)" name="durationDays" required ltr inputMode="numeric" data-testid="plan-duration" />
       <TextField
@@ -379,7 +383,7 @@ export function SellerPlanForm() {
         hint="تعرفه در همان کلید مدیریت‌شده ثبت می‌شود؛ تا ثبت نشدنش، این پلن خریدنی نیست."
         data-testid="plan-price-key"
       />
-      <TextAreaField label="توضیح این نسخه" name="note" rows={2} required data-testid="plan-note" />
+      <TextAreaField label="دلیل این نسخه" name="note" rows={2} required data-testid="plan-note" />
       <Button type="submit" disabled={pending} data-testid="plan-publish">
         {pending ? 'در حال انتشار…' : 'انتشار نسخه پلن'}
       </Button>

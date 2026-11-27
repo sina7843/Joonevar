@@ -15,11 +15,28 @@ export interface ShellNavItem {
   readonly href: string;
   readonly label: string;
   readonly icon: IconName;
+  /** Waiting cases of the queue this item opens (SHL-003); 0/undefined = no pill. */
+  readonly count?: number;
+  /** The oldest of them is past the review deadline: alert pill + rail dot. */
+  readonly overdue?: boolean;
 }
 export interface ShellNavSection {
   /** No label = the unlabelled home section. */
   readonly label?: string;
   readonly items: readonly ShellNavItem[];
+}
+
+/** Remember one environment's sidebar state for a year (read back on the server, so nothing jumps). */
+function saveSide(cookie: string | undefined, patch: { c?: boolean; g?: readonly string[] }) {
+  if (!cookie) return;
+  let current: { c?: boolean; g?: readonly string[] } = {};
+  try {
+    const raw = document.cookie.split('; ').find((part) => part.startsWith(cookie + '='));
+    if (raw) current = JSON.parse(decodeURIComponent(raw.slice(cookie.length + 1)));
+  } catch {
+    current = {};
+  }
+  document.cookie = cookie + '=' + encodeURIComponent(JSON.stringify({ ...current, ...patch })) + '; path=/; max-age=31536000; samesite=lax';
 }
 
 const isActive = (pathname: string, href: string, all: readonly string[]) => {
@@ -29,17 +46,30 @@ const isActive = (pathname: string, href: string, all: readonly string[]) => {
 };
 
 function SideItem({ item, current, dense }: { item: ShellNavItem; current: boolean; dense: boolean }) {
+  const countFa = item.count ? item.count.toLocaleString('fa-IR') + ' مورد' + (item.overdue ? '، از مهلت گذشته' : '') : '';
   return (
     <Link
       className={dense ? 'hz-side-item hz-side-item--dense' : 'hz-side-item'}
       href={item.href}
       aria-current={current ? 'page' : undefined}
+      // The rail hides the label, so the link names itself (SHL-012); title is the hover tooltip.
+      aria-label={countFa ? item.label + '، ' + countFa : undefined}
       title={item.label}
     >
       <span className="hz-side-item__icon">
         <Icon name={item.icon} size="sm" weight={current ? 'fill' : 'regular'} />
+        {item.overdue ? <span className="hz-side-item__dot" aria-hidden="true" /> : null}
       </span>
       <span className="hz-side-item__label">{item.label}</span>
+      {item.count ? (
+        <span
+          className={item.overdue ? 'hz-count hz-count--alert' : 'hz-count'}
+          aria-label={item.count.toLocaleString('fa-IR') + ' مورد' + (item.overdue ? '، از مهلت گذشته' : '')}
+          data-testid={'nav-count-' + item.href}
+        >
+          {item.count.toLocaleString('fa-IR')}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -54,15 +84,27 @@ export function SidebarNav({
   pathname,
   dense,
   label,
+  cookie,
+  initialClosed = null,
 }: {
   sections: readonly ShellNavSection[];
   pathname: string;
   dense: boolean;
   label: string;
+  /** Where the closed groups are remembered per environment (SHL-011). */
+  cookie?: string;
+  /** Saved closed groups; null = first visit: groups with waiting cases open, the rest closed. */
+  initialClosed?: readonly string[] | null;
 }) {
   const all = sections.flatMap((section) => section.items.map((item) => item.href));
   const collapsible = all.length >= 15;
-  const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
+  const [closed, setClosed] = useState<ReadonlySet<string>>(
+    () =>
+      new Set(
+        initialClosed ??
+          sections.filter((section) => section.label && !section.items.some((item) => item.count)).map((section) => section.label!),
+      ),
+  );
 
   return (
     <nav className="hz-sidebar__nav" aria-label={label}>
@@ -84,11 +126,17 @@ export function SidebarNav({
                       const next = new Set(previous);
                       if (next.has(section.label!)) next.delete(section.label!);
                       else next.add(section.label!);
+                      saveSide(cookie, { g: [...next] });
                       return next;
                     })
                   }
                 >
                   <span>{section.label}</span>
+                  {!open && section.items.some((item) => item.overdue) ? (
+                    <span className="hz-count hz-count--alert" aria-label="دارای صف از مهلت گذشته">
+                      {section.items.filter((item) => item.overdue).length.toLocaleString('fa-IR')}
+                    </span>
+                  ) : null}
                   <Icon name="caretDown" size="xs" />
                 </button>
               ) : (
@@ -116,15 +164,16 @@ export function SidebarNav({
 }
 
 /** «جمع‌کردن منو»: the desktop sidebar collapses to the 72px rail (OpsShell). */
-export function SidebarCollapse() {
-  const [collapsed, setCollapsed] = useState(false);
+export function SidebarCollapse({ cookie, initialCollapsed = false }: { cookie?: string; initialCollapsed?: boolean }) {
+  const [collapsed, setCollapsed] = useState(initialCollapsed);
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const aside = ref.current?.closest('.hz-sidebar');
     const app = ref.current?.closest('.hz-app');
     aside?.classList.toggle('hz-sidebar--collapsed', collapsed);
     app?.classList.toggle('hz-app--rail', collapsed);
-  }, [collapsed]);
+    saveSide(cookie, { c: collapsed });
+  }, [collapsed, cookie]);
   return (
     <div className="hz-sidebar__foot hz-show-lg">
       <button
@@ -152,12 +201,15 @@ export function NavDrawer({
   foot,
   children,
   pathname,
+  overdue = 0,
 }: {
   label: string;
   brand: ReactNode;
   foot?: ReactNode;
   children: ReactNode;
   pathname: string;
+  /** Queues past the review deadline: a dot on the menu button and its label (SHL-005). */
+  overdue?: number;
 }) {
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
@@ -167,7 +219,7 @@ export function NavDrawer({
 
   useEffect(() => {
     if (!open) return;
-    panel.current?.querySelector<HTMLElement>('a, button')?.focus();
+    (panel.current?.querySelector<HTMLElement>('.hz-sidebar a') ?? panel.current?.querySelector<HTMLElement>('a, button'))?.focus();
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const onKey = (event: KeyboardEvent) => {
@@ -203,13 +255,14 @@ export function NavDrawer({
         ref={toggle}
         type="button"
         className="hz-icon-btn"
-        aria-label={label}
+        aria-label={overdue > 0 ? label + '، ' + overdue.toLocaleString('fa-IR') + ' صف از مهلت گذشته' : label}
         aria-expanded={open}
         aria-controls="ops-drawer"
         onClick={() => setOpen(true)}
         data-testid="ops-menu-toggle"
       >
         <Icon name="list" size="md" />
+        {overdue > 0 ? <span className="hz-icon-btn__dot" aria-hidden="true" /> : null}
       </button>
       {open ? (
         <>

@@ -170,7 +170,12 @@ export async function createCategoryAction(_previous: ContentFormState, form: Fo
 export async function setCategoryActiveAction(_previous: ContentFormState, form: FormData): Promise<ContentFormState> {
   try {
     const active = text(form, 'active') === 'YES';
-    await setCategoryActive(db(), await actorAt('/content/categories'), { categoryId: text(form, 'categoryId'), active });
+    await setCategoryActive(db(), await actorAt('/content/categories'), {
+      categoryId: text(form, 'categoryId'),
+      active,
+      reasonFa: text(form, 'reasonFa'),
+      expectedVersion: Number(text(form, 'expectedVersion')),
+    });
     revalidatePath('/content/categories');
     return { ok: true, message: active ? 'دسته دوباره فعال شد.' : 'دسته از انتخاب‌های تازه کنار رفت.' };
   } catch (error) {

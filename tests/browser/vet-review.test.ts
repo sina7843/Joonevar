@@ -67,7 +67,7 @@ async function openFromWorkbench(page: Page, claim = ''): Promise<void> {
   if (claim) await page.getByTestId('review-filter-claim').selectOption(claim);
   await page.getByTestId('review-filter-q').fill(STUDENT_NUMBER);
   await Promise.all([page.waitForURL('**/assoc/vet-review?**q=' + STUDENT_NUMBER + '**'), page.getByTestId('review-filter-submit').click()]);
-  const items = page.locator('[data-testid="review-queue"] > li');
+  const items = page.locator('[data-testid="review-queue"] tbody > tr');
   assert.equal(await items.count(), 1, 'the filters find exactly this case');
   await Promise.all([page.waitForURL('**/assoc/vet-students/**'), items.first().getByTestId('open-review-case').click()]);
 }
@@ -81,7 +81,7 @@ test('a student applies, and the case appears in the association workbench', asy
     await page.getByTestId('student-university').fill('دانشگاه آزمایشی');
     await page.getByTestId('student-card').setInputFiles({ name: 'card.png', mimeType: 'image/png', buffer: PNG });
     await page.getByTestId('submit-student').click();
-    await waitForText(page, 'student-case-status', 'ارسال‌شده');
+    await waitForText(page, 'student-case-status', 'در انتظار بررسی');
   });
 });
 
@@ -92,10 +92,8 @@ test('the reviewer claims the case, a failed check blocks approval, and a correc
     await page.getByTestId('review-claim').click();
     await waitForText(page, 'review-claim-state', 'در دست شماست');
 
-    // The preview loads only when opened, and the file is served for sandboxed viewing.
-    const preview = page.getByTestId('student-document-preview');
-    await preview.locator('summary').click();
-    const src = await preview.locator('iframe').getAttribute('src');
+    // The document previews inside the desk (DocumentPreview); the file is served for sandboxed viewing.
+    const src = await page.getByTestId('student-document-link').getAttribute('src');
     const file = await page.request.get(BASE_URL + src!);
     assert.equal(file.status(), 200);
     assert.match(file.headers()['content-security-policy'] ?? '', /sandbox/);

@@ -7,7 +7,9 @@
  * outside its authority and no function here gives it one.
  */
 import { requireOwnedAnimal } from '../animals/service.ts';
-import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
+import { likeOf, type QueueQuery } from '../domain/queue-query.ts';
+import { DEFAULT_PAGE_SIZE, type Page } from '../domain/pagination.ts';
 import type { Database, DbClient } from '../db/client.ts';
 import { animals } from '../db/schema/animals.ts';
 import { sampleEvents as sampleEventsTable, samples } from '../db/schema/clinical.ts';
@@ -743,7 +745,7 @@ function centreSampleFilter(statuses: readonly CentreSampleStatus[], search: str
   const term = search.trim();
   const status = inArray(samples.status, [...statuses]);
   if (term === '') return status;
-  const like = '%' + term + '%';
+  const like = likeOf(term);
   return and(status, or(sql`${samples.trackingCode} ilike ${like}`, sql`coalesce(${animals.name}, '') ilike ${like}`));
 }
 
@@ -781,6 +783,71 @@ export async function centreSamples(
     .where(centreSampleFilter(statuses, options.search ?? ''))
     .orderBy(desc(samples.collectedAt))
     .limit(options.limit ?? CENTRE_SAMPLE_PAGE_SIZE);
+}
+
+/**
+ * One page of the centre's work list in P09 order (oldest sampling first by
+ * default), searched by tracking code or animal name. `all` is the unsearched
+ * size, for «N مورد از M».
+ */
+export async function centreSamplePage(
+  database: DbClient,
+  actor: Actor,
+  statuses: readonly CentreSampleStatus[],
+  query: QueueQuery,
+  pageSize = DEFAULT_PAGE_SIZE,
+): Promise<
+  Page<Awaited<ReturnType<typeof centreSamples>>[number] & { readonly waitingOn: readonly { readonly roleFa: string; readonly code: string | null }[] }> & {
+    readonly all: number;
+  }
+> {
+  const [total, all] = await Promise.all([
+    centreSampleCount(database, actor, statuses, query.q),
+    query.q === '' ? null : centreSampleCount(database, actor, statuses),
+  ]);
+  const totalPages = total === 0 ? 0 : Math.ceil(total / pageSize);
+  const page = Math.min(query.page, Math.max(1, totalPages));
+  const order =
+    query.sort === 'name'
+      ? [asc(animals.name), asc(samples.trackingCode)]
+      : query.sort === 'newest'
+        ? [desc(samples.collectedAt), asc(samples.id)]
+        : [asc(samples.collectedAt), asc(samples.id)];
+  const items = await database
+    .select({ sample: samples, animalId: animals.id, animalName: animals.name, generation: animals.generation })
+    .from(samples)
+    .innerJoin(animals, eq(animals.id, samples.animalId))
+    .where(centreSampleFilter(statuses, query.q))
+    .orderBy(...order)
+    .limit(pageSize)
+    .offset((page - 1) * pageSize);
+  // KOPS-038 (approved, DEC-0235): a G1+ sample waits on a parent without a final result; name that parent's latest sample.
+  const withWait = await Promise.all(
+    items.map(async (item) => ({ ...item, waitingOn: item.generation > 0 ? await parentSampleWaits(database, item.animalId) : [] })),
+  );
+  return { items: withWait, page, pageSize, total, totalPages, all: all ?? total };
+}
+
+/** The parents of an animal that still lack a final result, with each one's latest sample code (null when unsampled). */
+async function parentSampleWaits(database: DbClient, animalId: string): Promise<{ readonly roleFa: string; readonly code: string | null }[]> {
+  const [animal] = await database
+    .select({ sire: animals.sireAnimalId, dam: animals.damAnimalId })
+    .from(animals)
+    .where(eq(animals.id, animalId))
+    .limit(1);
+  if (!animal) return [];
+  const waits: { roleFa: string; code: string | null }[] = [];
+  for (const [roleFa, parentId] of [['پدر', animal.sire], ['مادر', animal.dam]] as const) {
+    if (!parentId || (await finalResultOf(database, parentId))) continue;
+    const [latest] = await database
+      .select({ code: samples.trackingCode })
+      .from(samples)
+      .where(eq(samples.animalId, parentId))
+      .orderBy(desc(samples.collectedAt))
+      .limit(1);
+    waits.push({ roleFa, code: latest?.code ?? null });
+  }
+  return waits;
 }
 
 /** The owner's view of one animal's result, scoped to their own animal. */

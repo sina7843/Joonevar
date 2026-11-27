@@ -2,9 +2,10 @@
 
 import { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '../ui/button.tsx';
+import { ActionRow, Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { ReasonField } from '../ui/decision.tsx';
 import { Result, submitWith } from '../vets/directory-forms.tsx';
 import {
   CLUB_RULE_KINDS,
@@ -159,7 +160,7 @@ export function ClubRulesForm({
         <TextField label="نسخه شرایط" name="termsVersion" maxLength={40} defaultValue={terms.termsVersion ?? ''} hint="مثلاً c1؛ پذیرش عضو روی همین نسخه ثبت می‌شود." data-testid="club-terms-version" />
         <TextField label="حق عضویت (تومان)" name="feeToman" ltr maxLength={12} defaultValue={terms.feeToman ?? ''} data-testid="club-fee" />
         <TextField label="مدت عضویت (روز)" name="membershipDays" ltr maxLength={4} defaultValue={terms.membershipDays ?? ''} hint="خالی یعنی عضویت خودبه‌خود منقضی نمی‌شود." data-testid="club-membership-days" />
-        <TextField label="یادداشت این نسخه" name="noteFa" maxLength={500} defaultValue={terms.noteFa ?? ''} data-testid="club-rules-note" />
+        <ReasonField name="noteFa" label="یادداشت این نسخه" rows={2} audience={null} defaultValue={terms.noteFa ?? ''} testId="club-rules-note" />
       </fieldset>
 
       <Result state={state} testId="club-rules-result" />
@@ -195,7 +196,7 @@ export function ClubReevaluateForm({ clubId, activeMembers }: { clubId: string; 
           activeMembers.toLocaleString('fa-IR') +
           ' عضو فعال دارید.'}
       </Alert>
-      <TextField label="دلیل بازبینی" name="reasonFa" required maxLength={500} data-testid="club-reevaluate-reason" />
+      <ReasonField name="reasonFa" label="دلیل بازبینی" required rows={2} audience={null} testId="club-reevaluate-reason" />
       <Result state={state} testId="club-reevaluate-result" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="club-reevaluate-submit">
         اجرای بازبینی
@@ -235,7 +236,8 @@ export function ClubApplyForm({
 }
 
 /** Opens the club fee checkout and follows the server's own next address. */
-export function ClubFeeForm({ clubId, membershipId, amountToman }: { clubId: string; membershipId: string; amountToman: string }) {
+/** `amountToman` null = the club published no fee: «تعیین‌نشده» and no payment, never «۰ تومان» (FND-013). */
+export function ClubFeeForm({ clubId, membershipId, amountToman }: { clubId: string; membershipId: string; amountToman: string | null }) {
   const [state, submit, pending] = useActionState(startClubFeeAction, EMPTY);
   const router = useRouter();
   useEffect(() => {
@@ -246,11 +248,18 @@ export function ClubFeeForm({ clubId, membershipId, amountToman }: { clubId: str
     <form onSubmit={submitWith(submit)} className="space-y-md" data-testid="club-fee-form">
       <Hidden surface="member" clubId={clubId} />
       <input type="hidden" name="membershipId" value={membershipId} />
-      <p className="text-body-sm">{'حق عضویت این کلاب: ' + Number(amountToman).toLocaleString('fa-IR') + ' تومان'}</p>
+      <p className="text-body-sm">
+        {'حق عضویت این کلاب: '}
+        {amountToman === null ? <span className="hz-unset">تعیین‌نشده</span> : BigInt(amountToman).toLocaleString('fa-IR') + ' تومان'}
+      </p>
       <Result state={state} testId="club-fee-result" />
-      <Button type="submit" disabled={pending} data-testid="club-fee-submit">
-        پرداخت حق عضویت
-      </Button>
+      {amountToman === null ? (
+        <p className="hz-caption">تا کلاب مبلغ را منتشر نکند، پرداخت باز نمی‌شود.</p>
+      ) : (
+        <Button type="submit" disabled={pending} data-testid="club-fee-submit">
+          پرداخت حق عضویت
+        </Button>
+      )}
     </form>
   );
 }
@@ -277,16 +286,20 @@ export function ClubMembershipDecisionForm({ clubId, membershipId, version }: { 
       <Hidden surface="owner" clubId={clubId} />
       <input type="hidden" name="membershipId" value={membershipId} />
       <input type="hidden" name="expectedVersion" value={version} />
-      <TextField label="دلیل تصمیم" name="reasonFa" required maxLength={500} data-testid={'club-membership-reason-' + membershipId} />
+      <ReasonField name="reasonFa" label="دلیل تصمیم" required rows={2} audience={null} testId={'club-membership-reason-' + membershipId} />
       <Result state={state} testId={'club-membership-result-' + membershipId} />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-membership-approve-' + membershipId}>
-          پذیرش عضویت
-        </Button>
-        <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-membership-reject-' + membershipId}>
-          رد درخواست
-        </Button>
-      </div>
+      <ActionRow
+        primary={
+          <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-membership-approve-' + membershipId}>
+            پذیرش عضویت
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-membership-reject-' + membershipId}>
+            رد درخواست
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -309,7 +322,7 @@ export function ClubMemberStandingForm({
       <input type="hidden" name="membershipId" value={membershipId} />
       <input type="hidden" name="expectedVersion" value={version} />
       <input type="hidden" name="to" value={to} />
-      <TextField label="دلیل" name="reasonFa" required maxLength={500} data-testid={'club-member-standing-reason-' + membershipId} />
+      <ReasonField name="reasonFa" label="دلیل" required rows={2} audience={null} testId={'club-member-standing-reason-' + membershipId} />
       <Result state={state} testId={'club-member-standing-result-' + membershipId} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'club-member-standing-submit-' + membershipId}>
         {to === 'SUSPENDED' ? 'تعلیق عضویت' : 'برداشتن تعلیق'}

@@ -151,7 +151,7 @@ export default async function CardCheckoutPage({ searchParams }: { searchParams:
                 className="rounded-lg border border-border-default p-lg"
                 data-testid={'card-row-' + row.tempCode}
               >
-                <p className="text-label-md">
+                <p className="text-label-sm">
                   <Identifier value={row.tempCode} />
                 </p>
                 <p className="mt-2xs text-caption text-text-secondary">{row.nameFa ?? 'بدون نام'}</p>

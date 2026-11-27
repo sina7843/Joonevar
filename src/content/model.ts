@@ -259,3 +259,12 @@ export function bylineFor(profile: { displayName: string | null; displayNameVisi
   const name = profile?.displayName?.trim() ?? '';
   return profile?.displayNameVisible && name !== '' ? name : TEAM_BYLINE;
 }
+
+/**
+ * DS *ReadTime*: minutes to read a body at 200 words a minute, rounded up,
+ * never under one. Computed from the text, so there is nothing to enter.
+ */
+export function readMinutes(body: string): number {
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}

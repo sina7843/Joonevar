@@ -14,25 +14,21 @@ const SEX_FA: Record<string, string> = { MALE: 'نر', FEMALE: 'ماده' };
  * A negotiable advert shows «قیمت توافقی» and no amount (as before); a missing
  * amount is «تعیین‌نشده», never ۰.
  */
-export function ListingPrice({ mode, amount, size = 'md', testId }: { mode: string | null; amount: bigint | null; size?: 'md' | 'lg'; testId?: string }) {
-  const cls = 'hz-price' + (size === 'lg' ? ' hz-price--lg' : '');
-  if (mode === 'NEGOTIABLE') {
-    return (
-      <div className={cls} data-testid={testId}>
-        <span className="hz-price__amount">قیمت توافقی</span>
-      </div>
-    );
-  }
+export function ListingPrice({ mode, amount, size = 'md', testId }: { mode: string | null; amount: bigint | null; size?: 'sm' | 'md' | 'lg'; testId?: string }) {
+  // Decision 7g: always the amount + «قابل مذاکره» (`mode` is kept for old callers).
+  void mode;
+  const cls = 'hz-price' + (size === 'md' ? '' : ' hz-price--' + size);
   if (amount === null) {
     return (
       <div className={cls + ' hz-price--unset'} data-testid={testId}>
-        <span className="hz-price__amount">تعیین‌نشده</span>
+        <span className="hz-price__amount">قیمت ثبت نشده</span>
       </div>
     );
   }
   return (
     <div className={cls} data-testid={testId}>
-      <span className="hz-price__amount">{fa(amount)}</span> <span className="hz-price__unit">تومان</span>
+      <span className="hz-price__amount">{fa(amount)}</span> <span className="hz-price__unit">تومان</span>{' '}
+      <span className="hz-price__mode">قابل مذاکره</span>
     </div>
   );
 }
@@ -50,11 +46,7 @@ export function ListingCard({ card, testId }: { card: PublicListingCard; testId?
                 <span data-testid={'market-ad-label-' + card.id}>{PROMOTED_LABEL_FA}</span>
               </StatusBadge>
             ) : null}
-            {card.reserved ? (
-              <StatusBadge tone="neutral" size="sm">
-                رزروشده
-              </StatusBadge>
-            ) : null}
+            {card.reserved ? <StatusBadge status="RESERVED" size="sm" /> : null}
           </span>
         ) : null}
         <h3 className="hz-listing__title line-clamp-2">{card.titleFa}</h3>

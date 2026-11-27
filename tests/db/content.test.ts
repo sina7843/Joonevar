@@ -382,7 +382,7 @@ test('categories belong to the content admin and to one content type', async () 
   );
   assert.equal(filtered.category?.id, nutrition.id);
 
-  await setCategoryActive(testDb.db, contentAdmin, { categoryId: nutrition.id, active: false });
+  await setCategoryActive(testDb.db, contentAdmin, { categoryId: nutrition.id, active: false, reasonFa: 'SYNTHETIC — دلیل آزمایشی', expectedVersion: nutrition.version });
   assert.equal((await allCategories(testDb.db, contentAdmin)).find((row) => row.id === nutrition.id)?.isActive, false);
   const editing = await contentForEditing(testDb.db, author, categorised.id);
   assert.ok(editing?.categories.some((row) => row.id === nutrition.id), 'a retired category stays selectable where it is already used');

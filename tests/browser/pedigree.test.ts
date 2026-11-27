@@ -116,7 +116,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -168,7 +168,8 @@ async function setSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-' + key).click();
     await page.getByTestId('setting-value-' + key).fill(value);
     await page.getByTestId('setting-reason-' + key).fill('SYNTHETIC — مقدار آزمایشی اجرای تست ' + RUN);
     await page.getByTestId('save-setting-' + key).click();
@@ -365,7 +366,7 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // By id: the shared queue holds other runs' receipts.
   await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
@@ -380,7 +381,7 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
   await expectText(vet, 'ارسال روی همین کد رهگیری ثبت شد');
 
   const centreRow = () =>
-    centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
+    centre.locator('[data-testid="centre-sample-list"] tbody > tr').filter({ hasText: trackingCode });
   // The centre's list is bounded, so a specific sample is reached by its
   // tracking code rather than by scrolling the queue (DEC-0128).
   await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
@@ -393,7 +394,8 @@ async function animalWithResult(owner: Page, vet: Page, centre: Page, name: stri
   await centreRow().getByText('در حال پردازش').waitFor({ timeout: 45_000 });
 
   await centre.goto(BASE_URL + '/genetics/results', { waitUntil: 'load' });
-  const resultRow = centre.locator('[data-testid="processing-list"] > li').filter({ hasText: trackingCode });
+  const resultRow = centre.locator('[data-testid="processing-list"] tbody > tr').filter({ hasText: trackingCode });
+  await resultRow.getByTestId('open-result-case').click();
   await resultRow.getByTestId('result-note').fill('پردازش استاندارد.');
   await resultRow.getByTestId('submit-result').click();
   await expectText(centre, 'نتیجه نهایی ثبت شد');
@@ -559,7 +561,7 @@ test('an appeal is answered by the centre and a correction never rewrites the is
     await centre.goto(BASE_URL + '/genetics/appeals/' + appealId, { waitUntil: 'load' });
     await expectText(centre, 'نتیجه اصلاحی، این سند را بازنویسی یا باطل');
     await centre.getByTestId('take-appeal').click();
-    await expectText(centre, 'در حال بررسی مرکز ژنتیک');
+    await centre.getByTestId('centre-appeal-status').filter({ hasText: 'در حال بررسی' }).waitFor();
     await centre.getByTestId('appeal-response-text').fill('بازبینی انجام شد و نتیجه اصلاح می‌شود.');
     await centre.getByTestId('appeal-correct-toggle').check();
     await centre.getByTestId('appeal-correction-note').fill('نتیجه اصلاحی پس از بازبینی.');

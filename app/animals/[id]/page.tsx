@@ -9,7 +9,7 @@ import { Card } from '../../../src/ui/card.tsx';
 import { SectionHeader, PageHeader } from '../../../src/ui/section-header.tsx';
 import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
-import { ButtonLink } from '../../../src/ui/button.tsx';
+import { ButtonLink, StickyActionBar } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { ActionOwner, Identifier, StatusBadge } from '../../../src/ui/status.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
@@ -25,6 +25,8 @@ import { ownershipHistory } from '../../../src/marketplace/handover.ts';
 import { generationLabel } from '../../../src/domain/lineage.ts';
 import { animalChipView } from '../../../src/clinical/microchip.ts';
 import { SAMPLE_TAKEN_NOTE_FA, sheetOfAnimal } from '../../../src/documents/registration-sheet.ts';
+import { pedigreeOfAnimal } from '../../../src/documents/pedigree.ts';
+import { DocumentCard } from '../../../src/ui/document-card.tsx';
 import { resultOfAnimal, RESULT_STATUS_FA } from '../../../src/genetics/service.ts';
 import { READ_METHOD_FA, SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import { samples } from '../../../src/db/schema/clinical.ts';
@@ -91,6 +93,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   const trail = await auditTrail(db(), { targetType: 'ANIMAL', targetId: animal.id }, { page: 1, pageSize: 20 });
   const { chip, conflicts } = await animalChipView(db(), animal.id);
   const sheet = await sheetOfAnimal(db(), animal.id);
+  const pedigree = await pedigreeOfAnimal(db(), animal.id);
   const parentage = await resultOfAnimal(db(), animal.id);
   const permits = await permitsOfAnimal(db(), animal.id);
   const matingDates = await confirmedDatesOfAnimal(db(), animal.id);
@@ -105,6 +108,19 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
   const sexFa = animal.sex === 'MALE' ? 'نر' : animal.sex === 'FEMALE' ? 'ماده' : null;
   const registered = animal.status === 'REGISTERED';
   const dateFa = (value: Date) => formatCivilDateFa(value.toISOString().slice(0, 10));
+  const subject = (
+    <>
+      {name}
+      {animal.petId ? (
+        <>
+          {'، '}
+          <bdi className="hz-id" dir="ltr">
+            {animal.petId}
+          </bdi>
+        </>
+      ) : null}
+    </>
+  );
 
   return (
     <PublicShell
@@ -122,11 +138,9 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
             aside={
               <>
                 <span className="text-caption text-text-secondary" data-testid="pet-id">
-                  {animal.petId ? <Identifier value={animal.petId} /> : 'شناسه رسمی: — تا صدور برگه ثبتی'}
+                  {animal.petId ? <Identifier value={animal.petId} copy /> : 'شناسه رسمی: — تا صدور برگه ثبتی'}
                 </span>
-                <StatusBadge tone={registered ? 'info' : 'neutral'}>
-                  {registered ? 'پرونده اولیه' : 'پیش‌نویس'}
-                </StatusBadge>
+                <StatusBadge status={animal.status} />
               </>
             }
             meta={[
@@ -235,54 +249,39 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
           </Card>
 
           <section aria-labelledby="animal-documents" className="space-y-lg">
-            <SectionHeader id="animal-documents" title="اسناد" count={sheet ? '۱ سند' : undefined} />
-            {sheet ? (
-              <article className="hz-card hz-document">
-                <div className="hz-document__head">
-                  <span className="hz-document__icon">
-                    <Icon name="fileText" size="md" />
-                  </span>
-                  <div className="hz-document__titles">
-                    <h3 className="hz-document__type">برگه ثبتی</h3>
-                    <span className="hz-document__subject">
-                      {name}
-                      {animal.petId ? (
-                        <>
-                          {'، '}
-                          <bdi className="hz-id" dir="ltr">
-                            {animal.petId}
-                          </bdi>
-                        </>
-                      ) : null}
-                    </span>
-                  </div>
-                </div>
-                <KeyValueList
-                  rows={[
-                    {
-                      key: 'شماره سند',
-                      value: <Identifier value={sheet.sheetNo} />,
-                    },
-                    {
-                      key: 'تاریخ صدور',
-                      value: sheet.issuedAt ? dateFa(sheet.issuedAt) : null,
-                    },
-                  ]}
-                />
-                <p className="mt-sm text-caption text-text-secondary" data-testid="animal-parentage-note">
-                  {SAMPLE_TAKEN_NOTE_FA} برگه ثبتی به معنی نتیجه ژنتیک یا شجره‌نامه نیست.
-                </p>
-                <div className="hz-card__footer">
-                  <Link
-                    href={'/documents/' + sheet.id}
-                    className="hz-btn hz-btn--secondary hz-btn--sm"
-                    data-testid="animal-sheet-link"
-                  >
-                    <Icon name="fileText" size="xs" />
-                    مشاهده سند
-                  </Link>
-                </div>
-              </article>
+            <SectionHeader id="animal-documents" title="اسناد" count={sheet || pedigree ? ((sheet ? 1 : 0) + (pedigree ? 1 : 0)).toLocaleString('fa-IR') + ' سند' : undefined} />
+            {sheet || pedigree ? (
+              <div className="grid gap-lg md:grid-cols-2">
+                {sheet ? (
+                  <DocumentCard
+                    kind="REGISTRATION_SHEET"
+                    number={sheet.sheetNo}
+                    subject={subject}
+                    issuedFa={sheet.issuedAt ? dateFa(sheet.issuedAt) : null}
+                    pdfHref={'/api/documents/registration-sheet/' + sheet.id + '/pdf'}
+                    verifyHref={'/verify?code=' + encodeURIComponent(sheet.sheetNo)}
+                    viewHref={'/documents/' + sheet.id}
+                    viewTestId="animal-sheet-link"
+                    note={
+                      <span data-testid="animal-parentage-note">
+                        {SAMPLE_TAKEN_NOTE_FA} برگه ثبتی به معنی نتیجه ژنتیک یا شجره‌نامه نیست.
+                      </span>
+                    }
+                  />
+                ) : null}
+                {pedigree ? (
+                  <DocumentCard
+                    kind="PEDIGREE"
+                    number={pedigree.pedigreeCode}
+                    subject={subject}
+                    issuedFa={dateFa(pedigree.issuedAt)}
+                    pdfHref={'/api/documents/pedigree/' + pedigree.id + '/pdf'}
+                    verifyHref={'/verify?code=' + encodeURIComponent(pedigree.pedigreeCode)}
+                    viewHref={'/documents/pedigree/' + pedigree.id}
+                    viewTestId="animal-pedigree-link"
+                  />
+                ) : null}
+              </div>
             ) : (
               <div className="hz-card">
                 <p className="text-body-sm text-text-secondary">
@@ -328,7 +327,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                   {sampleRows.map((sample) => (
                     <div key={sample.id} className="hz-kv__row">
                       <dt className="hz-kv__key">
-                        <Identifier value={sample.trackingCode} />
+                        <Identifier value={sample.trackingCode} copy />
                       </dt>
                       <dd className="hz-kv__value">{SAMPLE_STATUS_FA[sample.status]}</dd>
                     </div>
@@ -408,7 +407,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
               )}
               {/* §17.1: only mutually confirmed dates appear as the official history. */}
               <div>
-                <p className="text-label-md">تاریخ‌های جفت‌گیری</p>
+                <p className="text-label-sm">تاریخ‌های جفت‌گیری</p>
                 <p className="mt-2xs text-caption text-text-secondary">
                   فقط تاریخ‌های تأییدشده دوطرفه؛ جدیدترین آن‌ها مبنای فاصله زمانی است.
                 </p>
@@ -522,7 +521,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
           </section>
         </div>
 
-        <aside className="min-w-0 space-y-xl lg:col-span-4" aria-label="وضعیت و اقدام">
+        <aside className="min-w-0 space-y-xl max-lg:order-first lg:col-span-4" aria-label="وضعیت و اقدام">
           <AnimalPhoto fileId={animal.photoFileId} name={name} />
           <Card>
             <SectionHeader size="sm" title="وضعیت پرونده" />
@@ -548,6 +547,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                   {
                     key: 'مشخصات',
                     value: (
+                      // GAPS #4: no dictionary key for the declared/verified identity state
                       <StatusBadge tone={animal.identityVerifiedAt === null ? 'neutral' : 'success'} size="sm">
                         {animal.identityVerifiedAt === null ? 'مشخصات اظهاری' : 'مشخصات رسمی تأییدشده'}
                       </StatusBadge>
@@ -556,6 +556,7 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
                   {
                     key: 'میکروچیپ',
                     value: chip ? (
+                      // GAPS #4: no dictionary key for a registered microchip
                       <StatusBadge tone="success" size="sm">
                         میکروچیپ ثبت‌شده
                       </StatusBadge>
@@ -584,6 +585,21 @@ export default async function AnimalProfilePage({ params }: { params: Promise<{ 
           </Card>
         </aside>
       </div>
+
+      {/* K9 phones: the record's main action stays reachable above the tab bar (DS StickyActionBar). */}
+      {registered && sheet ? null : (
+        <StickyActionBar label="کنش‌های پرونده" overTabs className="md:hidden" context={name}>
+          {registered ? (
+            <ButtonLink href="/registration/new" size="lg" iconStart="stamp">
+              درخواست برگه ثبتی
+            </ButtonLink>
+          ) : (
+            <ButtonLink href={'/animals/' + animal.id + '/edit'} size="lg">
+              ادامه ثبت
+            </ButtonLink>
+          )}
+        </StickyActionBar>
+      )}
     </PublicShell>
   );
 }

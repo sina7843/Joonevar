@@ -4,13 +4,12 @@ import { AppError } from '../../../../src/domain/errors.ts';
 import { PublicShell } from '../../../../src/ui/shell.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { StatusBadge, type StatusTone } from '../../../../src/ui/status.tsx';
+import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { NeedsCorrectionState, WaitingState } from '../../../../src/ui/states.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { requireOwnedAnimal } from '../../../../src/animals/service.ts';
 import {
   findForeignCase,
-  FOREIGN_STATUS_FA,
   listIssuers,
   type ForeignPedigreeStatus,
 } from '../../../../src/animals/foreign-pedigree.ts';
@@ -19,14 +18,6 @@ import { ForeignDetailsForm, ForeignSideForm, ForeignSubmitForm } from './forms.
 import { PageHeader } from '../../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
-
-const TONE: Record<ForeignPedigreeStatus, StatusTone> = {
-  DRAFT: 'neutral',
-  UNDER_REVIEW: 'info',
-  APPROVED: 'success',
-  NEEDS_CORRECTION: 'warning',
-  REJECTED: 'error',
-};
 
 /**
  * Foreign pedigree, owner side — §9.4.
@@ -78,7 +69,7 @@ export default async function ForeignPedigreePage({ params }: { params: Promise<
                 داده نمی‌شود.
               </p>
             </div>
-            <StatusBadge tone={TONE[status]}>{FOREIGN_STATUS_FA[status]}</StatusBadge>
+            <StatusBadge status={status} />
           </div>
         </Card>
 

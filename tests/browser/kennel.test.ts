@@ -109,7 +109,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -161,7 +161,8 @@ async function setSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-' + key).click();
     await page.getByTestId('setting-value-' + key).fill(value);
     await page.getByTestId('setting-reason-' + key).fill('SYNTHETIC — مقدار آزمایشی اجرای تست ' + RUN);
     await page.getByTestId('save-setting-' + key).click();
@@ -350,7 +351,7 @@ test('without a registration sheet the kennel entry is locked with that exact re
     await owner.page.goto(BASE_URL + '/breeder/activate', { waitUntil: 'load' });
     await expectText(owner.page, 'مدرک اضافه‌ای جز همان کارت ملی');
     await expectText(owner.page, 'پرداخت مستقلی با عنوان «فعال‌سازی نقش» وجود ندارد');
-    assert.equal((await owner.page.getByTestId('breeder-status').textContent())?.trim(), 'شروع نشده');
+    assert.equal((await owner.page.getByTestId('breeder-status').textContent())?.trim(), 'ثبت‌نشده');
     await owner.page.screenshot({ path: path.join(SHOTS, 'breeder-activation.png'), fullPage: true });
   } finally {
     await owner.context.close();
@@ -425,13 +426,13 @@ test('the whole kennel path runs: form, breeds, payment, submission and approval
     await owner.page.goto(BASE_URL + '/kennels/' + kennelId, { waitUntil: 'load' });
     assert.equal((await owner.page.getByTestId('kennel-status').textContent())?.trim(), 'آماده ارسال');
     await owner.page.getByTestId('submit-kennel').click();
-    await expectText(owner.page, 'در حال بررسی انجمن');
+    await expectText(owner.page, 'در حال بررسی');
     await owner.page.screenshot({ path: path.join(SHOTS, 'kennel-submitted.png'), fullPage: true });
 
     // The association sends it back once, then approves it.
     await assoc.goto(BASE_URL + '/assoc/kennels', { waitUntil: 'load' });
     await assoc.getByTestId('kennel-queue').waitFor();
-    const caseRow = assoc.locator('[data-testid="kennel-queue"] > li').filter({ hasText: 'کنل نمونه ' + RUN });
+    const caseRow = assoc.locator('[data-testid="kennel-queue"] tbody > tr').filter({ hasText: 'کنل نمونه ' + RUN });
     await caseRow.getByTestId('open-kennel-case').click();
     await assoc.waitForURL('**/assoc/kennels/**');
     // Counts are Persian digits beside the panel title (DS content rules).
@@ -457,7 +458,7 @@ test('the whole kennel path runs: form, breeds, payment, submission and approval
     await expectText(owner.page, 'اطلاعات کنل ذخیره شد');
     await owner.page.goto(BASE_URL + '/kennels/' + kennelId, { waitUntil: 'load' });
     await owner.page.getByTestId('submit-kennel').click();
-    await expectText(owner.page, 'در حال بررسی انجمن');
+    await expectText(owner.page, 'در حال بررسی');
 
     await assoc.goto(BASE_URL + '/assoc/kennels', { waitUntil: 'load' });
     await caseRow.getByTestId('open-kennel-case').click();
@@ -513,11 +514,11 @@ test('breeds are edited after approval with no new payment and no second review'
     await owner.page.waitForURL('**/kennels/**/return**');
     await owner.page.goto(BASE_URL + '/kennels/' + kennelId, { waitUntil: 'load' });
     await owner.page.getByTestId('submit-kennel').click();
-    await expectText(owner.page, 'در حال بررسی انجمن');
+    await expectText(owner.page, 'در حال بررسی');
 
     await assoc.goto(BASE_URL + '/assoc/kennels', { waitUntil: 'load' });
     const caseRow = assoc
-      .locator('[data-testid="kennel-queue"] > li')
+      .locator('[data-testid="kennel-queue"] tbody > tr')
       .filter({ hasText: 'کنل ویرایش ' + RUN });
     await caseRow.getByTestId('open-kennel-case').click();
     await assoc.waitForURL('**/assoc/kennels/**');

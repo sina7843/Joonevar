@@ -7,7 +7,6 @@ import { StatusBadge } from '../../../src/ui/status.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { QueueMeta } from '../../../src/ui/desk.tsx';
 import { operatorOrders, expireUnacceptedSubOrders } from '../../../src/commerce/orders.ts';
-import { ORDER_STATUS_FA, type OrderStatus } from '../../../src/commerce/order-model.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,11 +80,9 @@ export default async function MarketOrdersPage() {
                     {fa(row.order.grandTotalToman)} تومان
                   </td>
                   <td data-label="وضعیت">
-                    <StatusBadge tone={row.order.status === 'PAID' ? 'success' : 'neutral'} size="sm">
-                      <span data-testid={'market-order-status-' + row.order.id}>
-                        {ORDER_STATUS_FA[row.order.status as OrderStatus]}
-                      </span>
-                    </StatusBadge>
+                    <span data-testid={'market-order-status-' + row.order.id} data-status={row.order.status}>
+                      <StatusBadge status={row.order.status} size="sm" />
+                    </span>
                   </td>
                 </tr>
               ))}

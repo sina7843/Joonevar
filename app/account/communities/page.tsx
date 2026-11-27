@@ -9,7 +9,6 @@ import { ActionOwner, StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { manageableCommunities, myCommunityInvitations } from '../../../src/communities/service.ts';
 import { COMMUNITY_KIND_FA, type CommunityKind } from '../../../src/communities/model.ts';
-import { VET_PUBLIC_STATUS_FA, type VetPublicStatus } from '../../../src/vets/directory-model.ts';
 import { CommunityInvitationForm } from '../../../src/communities/forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -78,10 +77,8 @@ export default async function AccountCommunitiesPage() {
                   {row.community.displayNameFa}
                 </Link>
                 <span className="flex flex-wrap gap-xs">
-                  <StatusBadge tone={row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-                    {VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus]}
-                  </StatusBadge>
-                  {row.community.canPublishPosts ? <StatusBadge tone="info">ناشر مجاز</StatusBadge> : null}
+                  <StatusBadge status={row.community.publicStatus} />
+                  {row.community.canPublishPosts ? <span className="hz-tag hz-tag--neutral">ناشر مجاز</span> : null}
                 </span>
               </div>
               <div className="hz-cardlist__row">

@@ -1,3 +1,4 @@
+import { FocusHeading } from './focus-on-mount.tsx';
 import type { ReactNode } from 'react';
 import { Icon } from './icon.tsx';
 import type { IconName } from './icon-paths.ts';
@@ -46,9 +47,9 @@ export function PaymentResult({
           <Icon name={head.icon} size="lg" />
         </div>
         {state === 'UNKNOWN' ? null : <StatusBadge status={state} />}
-        <h2 className="hz-state__title" id="pay-result-title">
+        <FocusHeading className="hz-state__title" id="pay-result-title">
           {title}
-        </h2>
+        </FocusHeading>
         {children ? <div className="hz-state__body">{children}</div> : null}
       </div>
       {facts.length > 0 ? <KeyValueList rows={facts} /> : null}

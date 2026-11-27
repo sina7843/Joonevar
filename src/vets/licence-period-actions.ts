@@ -6,7 +6,7 @@ import { db } from '../db/client.ts';
 import { guardRoute } from '../authz/guard.ts';
 import { currentPaymentGateway, currentPaymentProvider } from '../adapters/current.ts';
 import { cancelAttempt, latestAttempt, startAttempt } from '../billing/payments.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { startLicencePayment } from './licence-period.ts';
 
 const ROUTE = '/account/vet-profile';
@@ -39,7 +39,7 @@ export async function payLicencePeriodAction(_previous: LicencePeriodState): Pro
     );
     destination = attempt.redirectUrl;
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
   redirect(destination);
@@ -56,7 +56,7 @@ export async function cancelLicencePeriodPaymentAction(_previous: LicencePeriodS
     revalidatePath(ROUTE, 'layout');
     return { ok: true, message: 'پرداخت لغو شد؛ مبلغ ثبت‌شده همان است و می‌توانید دوباره تلاش کنید.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

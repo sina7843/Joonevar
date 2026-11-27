@@ -4,28 +4,29 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { Identifier, type StatusTone } from '../../../../src/ui/status.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
-import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, CaseHistory, whenFa } from '../../../../src/ui/desk.tsx';
+import { Identifier } from '../../../../src/ui/status.tsx';
+import { CaseAge, CaseHistory, Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, deskPosition, whenFa } from '../../../../src/ui/desk.tsx';
+import { Icon } from '../../../../src/ui/icon.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { db } from '../../../../src/db/client.ts';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { kycCases } from '../../../../src/db/schema/identity.ts';
-import { findProfile } from '../../../../src/identity/account.ts';
-import { KYC_STATUS_FA, type KycStatus } from '../../../../src/identity/kyc.ts';
+import { accountRoles, accounts } from '../../../../src/db/schema/core.ts';
+import { findProfile, findResidence } from '../../../../src/identity/account.ts';
+import { kycQueueIds, type KycStatus } from '../../../../src/identity/kyc.ts';
+import { isValidNationalId } from '../../../../src/domain/identity.ts';
+import { auditSteps, stepMeta } from '../../audit-history.ts';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { ReviewForm } from '../review-form.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const TONE: Record<KycStatus, StatusTone> = {
-  DRAFT: 'neutral',
-  READY: 'neutral',
-  UNDER_REVIEW: 'info',
-  APPROVED: 'success',
-  NEEDS_CORRECTION: 'warning',
-  REJECTED: 'error',
-};
+/** KYC values whose dictionary key has another name (dictionary READY is a payout state). */
+const kycKey = (status: KycStatus): string => (status === 'READY' ? 'READY_TO_SUBMIT' : status);
+
+const OPTIONAL_EMPTY = '— اختیاری؛ وارد نشده';
+/** Roles that describe the applicant's account; operator roles are not part of it. */
+const ROLE_FA: Partial<Record<string, string>> = { BREEDER: 'پرورش‌دهنده', TRUSTED_VET: 'دامپزشک معتمد' };
 
 /**
  * Case detail (§21.5) — DS P10 / K3 decision desk: record head → documents →
@@ -50,17 +51,35 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
     );
   }
 
-  const profile = await findProfile(db(), record.accountId);
+  const [profile, residence, accountRows, roleRows, steps, queueIds] = await Promise.all([
+    findProfile(db(), record.accountId),
+    findResidence(db(), record.accountId),
+    db().select({ mobile: accounts.mobile }).from(accounts).where(eq(accounts.id, record.accountId)).limit(1),
+    db()
+      .select({ role: accountRoles.role })
+      .from(accountRoles)
+      .where(and(eq(accountRoles.accountId, record.accountId), eq(accountRoles.status, 'ACTIVE'))),
+    auditSteps('KYC_CASE', record.id),
+    kycQueueIds(db(), guard.actor),
+  ]);
+  const mobile = accountRows[0]?.mobile ?? null;
   const status = record.status as KycStatus;
   const name = profile ? profile.firstName + ' ' + profile.lastName : '—';
   const open = status === 'UNDER_REVIEW';
-  const age = ageInDays(record.submittedAt);
+  // Submissions and decisions from the audit trail: one row per version, newest first.
+  const history = steps.filter((step) => step.action === 'KYC_SUBMITTED' || step.action === 'KYC_REVIEWED');
+  const submissions = history.filter((step) => step.action === 'KYC_SUBMITTED');
+  const firstSubmittedAt = submissions.at(-1)?.at ?? record.submittedAt;
+  const resubmitted = submissions.length > 1;
+  const accountType = ['کاربر', ...roleRows.map((row) => ROLE_FA[row.role]).filter(Boolean)].join('، ');
+  const nationalIdValid = profile ? isValidNationalId(profile.nationalId) : false;
 
   return (
-    <OpsShell actor={guard.actor} title="بررسی احراز هویت" pathname="/assoc/kyc" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی احراز هویت" pathname="/assoc/kyc" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'احراز هویت · ' + name}
-        status={{ tone: TONE[status], label: KYC_STATUS_FA[status], testId: 'case-status' }}
+        status={{ key: kycKey(status), testId: 'case-status' }}
+        position={deskPosition(queueIds, record.id, (caseId) => '/assoc/kyc/' + caseId)}
         meta={[
           profile ? (
             <>
@@ -68,14 +87,25 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
               <Identifier value={profile.nationalId} />
             </>
           ) : null,
-          'ارسال: ' + (whenFa(record.submittedAt) ?? '—'),
-          open && age !== null ? (
-            <span className="hz-age">{age.toLocaleString('fa-IR') + ' روز در صف'}</span>
+          mobile ? (
+            <>
+              {'موبایل '}
+              <Identifier value={mobile} />
+            </>
           ) : null,
+          (resubmitted ? 'ارسال دوباره: ' : 'ارسال: ') + (whenFa(record.submittedAt) ?? '—'),
+          open && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null,
           'نسخه ' + record.version.toLocaleString('fa-IR'),
         ]}
         owner={open ? 'ASSOCIATION' : status === 'NEEDS_CORRECTION' ? 'USER' : null}
-      />
+      >
+        {/* A closed case shows its final outcome in the head, with no decision panel (P10 › States). */}
+        {!open ? (
+          <p className="text-body-sm" data-testid="case-final-reason">
+            {'این پرونده در انتظار بررسی نیست' + (record.reasonFa ? '؛ دلیل: ' + record.reasonFa : '.')}
+          </p>
+        ) : null}
+      </DeskHead>
 
       <Desk
         decision={
@@ -84,14 +114,8 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
               <ReviewForm caseId={record.id} version={record.version} />
               <DeskVersionNote version={record.version} />
             </>
-          ) : (
-            <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
-              وضعیت فعلی: {KYC_STATUS_FA[status]}
-              {record.reasonFa ? ' — ' + record.reasonFa : ''}
-            </Alert>
-          )
+          ) : undefined
         }
-        decisionTitle={open ? 'تصمیم' : 'نتیجه'}
       >
         <Panel title="مدارک" aside={<PrivateNote />}>
           <div className="hz-desk__docs">
@@ -105,43 +129,48 @@ export default async function AssocKycCasePage({ params }: { params: Promise<{ i
           </div>
         </Panel>
 
-        <Panel title="اطلاعات اعلام‌شده">
+        <Panel
+          title="اطلاعات اعلام‌شده"
+          aside={
+            profile ? (
+              <span className={nationalIdValid ? 'text-status-success-text' : 'text-status-error-text'}>
+                <Icon name={nationalIdValid ? 'check' : 'warningCircle'} size="xs" />{' '}
+                {nationalIdValid ? 'رقم کنترل کد ملی معتبر است' : 'رقم کنترل کد ملی معتبر نیست'}
+              </span>
+            ) : null
+          }
+        >
           <KeyValueList
             twoCol
             rows={[
               { key: 'نام و نام خانوادگی', value: profile ? name : null },
               { key: 'کد ملی', value: profile ? <Identifier value={profile.nationalId} /> : null },
               { key: 'تاریخ تولد', value: profile ? formatCivilDateFa(profile.birthDate) : null },
-              { key: 'وضعیت', value: KYC_STATUS_FA[status] },
+              { key: 'موبایل', value: mobile ? <Identifier value={mobile} /> : null },
+              { key: 'شهر', value: [residence?.province, residence?.city].filter(Boolean).join('، '), empty: OPTIONAL_EMPTY },
+              { key: 'نوع حساب', value: accountType },
+              { key: 'نخستین ارسال', value: whenFa(firstSubmittedAt, false) },
+              { key: 'نشانی سکونت', value: residence?.address ?? null, empty: OPTIONAL_EMPTY },
             ]}
           />
         </Panel>
 
-        <Panel title="سابقه پرونده">
+        <Panel title="سابقه تصمیم‌ها" aside="جدیدترین بالا، یک ردیف برای هر نسخه">
           <CaseHistory
-            entries={[
-              record.reviewedAt
-                ? {
-                    id: 'decision',
-                    at: record.reviewedAt,
-                    title: 'تصمیم انجمن',
-                    whenFa: whenFa(record.reviewedAt),
-                    status: open ? undefined : { tone: TONE[status], label: KYC_STATUS_FA[status] },
-                    body: record.reasonFa ?? undefined,
-                  }
-                : null,
-              record.submittedAt
-                ? {
-                    id: 'submit',
-                    at: record.submittedAt,
-                    title: 'ارسال درخواست، نسخه ' + record.version.toLocaleString('fa-IR'),
-                    whenFa: whenFa(record.submittedAt),
-                    current: open,
-                  }
-                : null,
-            ]
-              .filter((entry) => entry !== null)
-              .sort((a, b) => b.at.getTime() - a.at.getTime())}
+            entries={history.map((step, index) => {
+              const submit = step.action === 'KYC_SUBMITTED';
+              const first = submit && step === submissions.at(-1);
+              return {
+                id: step.id,
+                title:
+                  (submit ? (first ? 'ارسال درخواست' : 'ارسال دوباره') : 'تصمیم انجمن') +
+                  (step.version !== null ? '، نسخه ' + step.version.toLocaleString('fa-IR') : ''),
+                whenFa: stepMeta(step),
+                status: step.status ? kycKey(step.status as KycStatus) : undefined,
+                body: step.reason ?? undefined,
+                current: open && index === 0,
+              };
+            })}
           />
         </Panel>
       </Desk>

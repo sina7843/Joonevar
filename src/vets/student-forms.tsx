@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
-import { FileField, TextAreaField, TextField } from '../ui/field.tsx';
+import { FileField, TextField } from '../ui/field.tsx';
 import { Result } from './directory-forms.tsx';
-import { STUDENT_DECISIONS, STUDENT_DECISION_FA, type StudentDecision } from './professional-profile-model.ts';
+import { STUDENT_DECISIONS, STUDENT_DECISION_DESC_FA, STUDENT_DECISION_FA } from './professional-profile-model.ts';
+import { DecisionForm } from '../ui/decision.tsx';
 import {
   decideStudentCaseAction,
   resubmitStudentApplicationAction,
@@ -78,36 +79,26 @@ export function StudentApplicationForm({
   );
 }
 
-/** The association admin's decision. Every decision carries a reason the applicant will read. */
+/**
+ * The association admin's decision on a student (DS P10 panel).
+ * The decision service still requires a reason for every outcome (approval
+ * included), so the reason is asked for all three; the consequence sits under
+ * each label (DS DecisionDesk).
+ */
 export function DecideStudentCaseForm({ caseId, version }: { caseId: string; version: number }) {
-  const [state, submit, pending] = useActionState(decideStudentCaseAction, EMPTY);
-  const [decision, setDecision] = useState<StudentDecision>('VERIFY');
   return (
-    <form action={submit} className="space-y-lg" data-testid="student-decision-form">
-      <input type="hidden" name="caseId" value={caseId} />
-      <input type="hidden" name="expectedVersion" value={version} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">نتیجه بررسی</legend>
-        {STUDENT_DECISIONS.map((value) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
-            <input
-              type="radio"
-              name="decision"
-              value={value}
-              checked={decision === value}
-              onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
-              data-testid={'student-decision-' + value}
-            />
-            {STUDENT_DECISION_FA[value]}
-          </label>
-        ))}
-      </fieldset>
-      <TextAreaField label="دلیل" name="reasonFa" required rows={3} maxLength={1000} hint="دلیل برای متقاضی نمایش داده می‌شود." data-testid="student-decision-reason" />
-      <Button type="submit" disabled={pending} data-testid="submit-student-decision">
-        {pending ? 'در حال ثبت…' : 'ثبت نتیجه'}
-      </Button>
-      <Result state={state} testId="student-decision-result" />
-    </form>
+    <DecisionForm
+      action={decideStudentCaseAction}
+      hidden={{ caseId, expectedVersion: version }}
+      formTestId="student-decision-form"
+      submitTestId="submit-student-decision"
+      reasonName="reasonFa"
+      reasonTestId="student-decision-reason"
+      reasonFor={STUDENT_DECISIONS}
+      reasonLabel={(value) => (value === 'REJECT' ? 'دلیل رد' : value === 'REQUEST_CORRECTION' ? 'دلیل اصلاح' : 'دلیل تأیید')}
+      audience="به متقاضی نمایش داده می‌شود"
+      drafts={['تصویر کارت دانشجویی خوانا نیست', 'شماره دانشجویی با کارت نمی‌خواند']}
+      choices={STUDENT_DECISIONS.map((value) => ({ value, label: STUDENT_DECISION_FA[value], desc: STUDENT_DECISION_DESC_FA[value], testId: 'student-decision-' + value }))}
+    />
   );
 }

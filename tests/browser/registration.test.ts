@@ -109,7 +109,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -162,7 +162,8 @@ async function setSheetFee(value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=fee.registration_sheet_toman', { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-fee.registration_sheet_toman').click();
     await page.getByTestId('setting-value-fee.registration_sheet_toman').fill(value);
     await page
       .getByTestId('setting-reason-fee.registration_sheet_toman')
@@ -415,7 +416,7 @@ test('two animals share one payment, and each one is issued or blocked on its ow
     await owner.page.screenshot({ path: path.join(SHOTS, 'sheet-paid.png'), fullPage: true });
 
     await owner.page.goto(BASE_URL + '/registration/' + batchId, { waitUntil: 'load' });
-    assert.equal((await owner.page.getByTestId('batch-status').textContent())?.trim(), 'پرداخت تأییدشده');
+    assert.equal((await owner.page.getByTestId('batch-status').textContent())?.trim(), 'پرداخت‌شده');
     assert.equal((await owner.page.getByTestId('item-state-' + first).textContent())?.trim(), 'صادر شد');
     assert.equal((await owner.page.getByTestId('item-state-' + second).textContent())?.trim(), 'متوقف');
     // The blocked reason is the product's own, naming the missing prerequisite.

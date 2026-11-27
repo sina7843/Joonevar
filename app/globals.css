@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /*
- * Hamzist Design System v1.0.3 (docs/design-system, DEC-0225).
+ * Hamzist Design System v1.0.4 (docs/design-system, DEC-0231).
  *
  * `tokens.css` and `bundle.css` are the system's own files, copied unchanged
  * apart from the font URLs. Components render its `.hz-*` classes. The bundle
@@ -173,9 +173,6 @@
   --text-label-lg: 15px;
   --text-label-lg--line-height: 24px;
   --text-label-lg--font-weight: 700;
-  --text-label-md: 14px;
-  --text-label-md--line-height: 22px;
-  --text-label-md--font-weight: 600;
   --text-label-sm: 13px;
   --text-label-sm--line-height: 20px;
   --text-label-sm--font-weight: 600;
@@ -323,6 +320,10 @@ body {
   .hz-sidebar--ops .hz-sidebar__section + .hz-sidebar__section { margin-block-start: 6px; padding-block-start: 6px; border-block-start: 1px solid var(--border-subtle); }
   .hz-sidebar--ops .hz-side-item { width: 48px; height: 44px; justify-content: center; padding: 0; }
 }
+/* Dense ops navigation stays 36px for a mouse, 44px under a finger (SHL-012). */
+@media (pointer: coarse) {
+  .hz-side-item--dense { height: 44px; }
+}
 /* The public tab bar must not cover the last card or the focused control. */
 @media (max-width: 1023.98px) {
   html:has(.hz-tabbar) { scroll-padding-block-end: calc(var(--tabbar) + 16px); }
@@ -355,10 +356,16 @@ body {
   .hz-table--stack td.hz-table__lead { order: -1; flex: 1 0 100%; }
   .hz-table--stack td.hz-table__open { position: absolute; inset-block-start: 10px; inset-inline-end: 6px; }
   .hz-table--stack .hz-case__sub { max-width: 100%; white-space: normal; }
+  /* DS CardList keeps each value's name: the column header becomes a muted prefix (CMPA2-002). */
+  .hz-table--stack td[data-label]::before { content: attr(data-label) " a0"; color: var(--text-secondary); font-size: 12px; }
+  .hz-table--stack td.hz-table__check { order: -2; }
+  .hz-table--stack tr[aria-selected="true"] { background: var(--bg-brand-subtle); border-color: var(--border-brand); }
 }
 .hz-table__open { width: 44px; text-align: end; }
 
 /* Below 768 the whole queue card opens the case: the name link stretches over it. */
 @media (max-width: 767.98px) {
   .hz-table--stack .hz-case__name::after { content: ""; position: absolute; inset: 0; }
+  /* A row's own step stays clickable above the stretched link. Only the row's controls lift, never the cell: a z-index on the cell would trap a Drawer rendered inside it under the sticky head. */
+  .hz-table--stack td.hz-table__action :is(.hz-btn, a, input, select, textarea, label):not([role="dialog"] *) { position: relative; z-index: 1; }
 }

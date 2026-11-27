@@ -19,7 +19,6 @@ import {
   permitReadiness,
   permitView,
   PERMIT_FEE_KEY,
-  PERMIT_STATUS_FA,
 } from '../../../../src/mating/permits.ts';
 import {
   describeShare,
@@ -101,17 +100,9 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
                 مسیر رسمی هم‌زیست؛ این پرونده با «اعلام توافق شخصی» یکی نیست و شناسه و وضعیت جداگانه دارد.
               </p>
             </div>
-            <StatusBadge
-              tone={
-                permit.status === 'ISSUED'
-                  ? 'success'
-                  : permit.status === 'REJECTED' || permit.status === 'NEEDS_CORRECTION'
-                    ? 'warning'
-                    : 'info'
-              }
-            >
-              <span data-testid="permit-status">{PERMIT_STATUS_FA[permit.status]}</span>
-            </StatusBadge>
+            <span data-testid="permit-status">
+              <StatusBadge status={permit.status} />
+            </span>
           </div>
 
           {permit.permitNo ? (
@@ -196,7 +187,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
 
           {permit.ruleType ? (
             <div className="mt-lg" data-testid="permit-rule-summary">
-              <h3 className="text-label-md">{'توافق تقسیم: ' + RULE_TYPE_FA[permit.ruleType]}</h3>
+              <h3 className="text-label-sm">{'توافق تقسیم: ' + RULE_TYPE_FA[permit.ruleType]}</h3>
               <dl className="hz-kv mt-sm">
                 {(['SIRE_SIDE', 'DAM_SIDE'] as const).map((side) => (
                   <div key={side} className="contents">
@@ -273,7 +264,7 @@ export default async function PermitCasePage({ params }: { params: Promise<{ id:
                 </span>
               </Alert>
             ) : readiness.ready ? (
-              <PayPermitForm permitId={permit.id} batchId={batch?.id ?? null} />
+              <PayPermitForm permitId={permit.id} batchId={batch?.id ?? null} total={feeLabel} />
             ) : (
               <Alert tone="warning" title="برای پرداخت، پرونده کامل نیست">
                 <span data-testid="permit-not-ready">{readiness.reasonFa}</span>

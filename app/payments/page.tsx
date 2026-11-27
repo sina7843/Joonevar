@@ -14,14 +14,6 @@ export const dynamic = 'force-dynamic';
 
 const fa = (value: bigint | number): string => value.toLocaleString('fa-IR');
 
-const TONE: Record<string, 'success' | 'warning' | 'neutral' | 'error'> = {
-  PAID: 'success',
-  AWAITING_PAYMENT: 'warning',
-  DRAFT: 'neutral',
-  FAILED: 'error',
-  CANCELLED: 'neutral',
-};
-
 /**
  * Everything this account has paid for — Phase 2.5 §9 (PROMPT-015), P05
  * DataTable with PaymentRow cells, restacked as cards below 768.
@@ -98,9 +90,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
                     {fa(line.totalToman) + ' تومان'}
                   </td>
                   <td data-label="وضعیت">
-                    <StatusBadge size="sm" tone={TONE[line.status] ?? 'neutral'}>
-                      {line.statusFa}
-                    </StatusBadge>
+                    <StatusBadge size="sm" status={line.status} />
                   </td>
                 </tr>
               ))}

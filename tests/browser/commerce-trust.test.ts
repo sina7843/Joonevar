@@ -140,6 +140,7 @@ test('a platform code comes off the basket, and points come off what is left', a
     await page.getByTestId('discount-label').fill('SYNTHETIC کد آزمایشی');
     await page.getByTestId('discount-code').fill(CODE);
     await page.getByTestId('discount-percent').fill('1000');
+    await page.getByTestId('discount-reason').fill('SYNTHETIC دلیل آزمایشی');
     await page.getByTestId('discount-save').click();
     await expectText(page, 'تخفیف ثبت شد');
 
@@ -149,10 +150,7 @@ test('a platform code comes off the basket, and points come off what is left', a
       .first()
       .getAttribute('data-testid'))!.replace('platform-rule-status-', '');
     await page.getByTestId('move-discount-' + ruleId + '-ACTIVE').click();
-    await page
-      .getByTestId('platform-rule-status-' + ruleId)
-      .filter({ hasText: 'ACTIVE' })
-      .waitFor();
+    await page.locator('[data-testid="platform-rule-status-' + ruleId + '"][data-status="ACTIVE"]').waitFor();
     await page.screenshot({ path: path.join(SHOTS, 'market-promotions-desktop.png'), fullPage: true });
   } finally {
     await ops.close();
@@ -164,7 +162,6 @@ test('a platform code comes off the basket, and points come off what is left', a
     const href = await openProduct(page);
     const form = page.locator('[data-testid^="add-to-cart-form-"]').first();
     const skuId = (await form.getAttribute('data-testid'))!.replace('add-to-cart-form-', '');
-    await page.getByTestId('add-quantity-' + skuId).selectOption('1');
     await page.getByTestId('add-to-cart-' + skuId).click();
     await expectText(page, 'سبد خرید به‌روز شد');
 
@@ -259,7 +256,7 @@ test('the rating on the product page is built from reviews and says so', async (
     const page = await anonymous.newPage();
     await openProduct(page);
     // (5 + 4 + 3) / 3 = 4
-    assert.match(await page.getByTestId('product-rating').innerText(), /۴ از ۵/);
+    assert.match((await page.getByTestId('product-rating').locator('[role="img"]').getAttribute('aria-label')) ?? '', /۴ از ۵/);
     assert.match(
       await page.getByTestId('product-rating-note').innerText(),
       /نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد/,
@@ -312,9 +309,10 @@ test('a question waits for a moderator before anybody reads it', async () => {
     await page.goto(BASE_URL + '/market/trust', { waitUntil: 'load' });
     assert.match(await page.getByTestId('reputation-note').innerText(), /تبلیغ جایگاه می‌خرد، نه اعتبار/);
     const questionId = (await page
-      .locator('[data-testid^="decide-question-select-"]')
+      .locator('[data-testid^="open-question-"]')
       .first()
-      .getAttribute('data-testid'))!.replace('decide-question-select-', '');
+      .getAttribute('data-testid'))!.replace('open-question-', '');
+    await page.getByTestId('open-question-' + questionId).click();
     await page.getByTestId('decide-question-select-' + questionId).selectOption('PUBLISHED');
     await page.getByTestId('decide-question-submit-' + questionId).click();
     // A decided question leaves the queue, taking its form with it.

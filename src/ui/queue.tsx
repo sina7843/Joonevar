@@ -2,6 +2,21 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Icon } from './icon.tsx';
 import { StatusBadge, type ActionOwnerKind, type StatusTone } from './status.tsx';
+import { statusOf } from './status-dictionary.ts';
+
+/** A queue/desk status: a status-dictionary key (preferred) or a legacy tone + label pair. */
+export type RowStatus = { readonly key: string } | { readonly tone: StatusTone; readonly label: string };
+
+/**
+ * Tone + label for a dictionary key, for components that still take the
+ * legacy pair (DeskHeader, CaseItem). A module value with no dictionary key
+ * (GAPS #4) uses `fallback`, else neutral with the raw key.
+ */
+export function keyStatus(key: string, fallback?: { tone: StatusTone; label: string }): { tone: StatusTone; label: string } {
+  const entry = statusOf(key);
+  if (entry?.labelFa) return { tone: entry.tone, label: entry.labelFa };
+  return fallback ?? { tone: 'neutral', label: key };
+}
 
 /**
  * CaseQueue — DS pattern P09 (`.hz-table--dense` + `.hz-case` + inline
@@ -22,7 +37,7 @@ export interface QueueRow {
   readonly ageDays?: number | null;
   /** Only when the clock is ours (P09 › Overdue). */
   readonly age?: 'late' | 'overdue';
-  readonly status?: { tone: StatusTone; label: string };
+  readonly status?: RowStatus;
   readonly owner?: ActionOwnerKind;
   /** The owner is the viewing environment itself. */
   readonly ownerIsUs?: boolean;
@@ -117,9 +132,13 @@ export function CaseQueue({
               {showStatus ? (
                 <td data-label="وضعیت">
                   {row.status ? (
-                    <StatusBadge tone={row.status.tone} size="sm">
-                      {row.status.label}
-                    </StatusBadge>
+                    'key' in row.status ? (
+                      <StatusBadge status={row.status.key} size="sm" />
+                    ) : (
+                      <StatusBadge tone={row.status.tone} size="sm">
+                        {row.status.label}
+                      </StatusBadge>
+                    )
                   ) : (
                     '—'
                   )}
@@ -151,44 +170,71 @@ export function CaseQueue({
   );
 }
 
-/** QueueTile row — DS *QueueTile*: name, count, oldest age, alert when overdue. */
+/**
+ * QueueTile row — DS *QueueTile*: name, count (unit visually hidden, never
+ * hidden from assistive tech), oldest age (`--late` / `--overdue`), and the
+ * alert variant + flag only when the oldest case is past the review deadline.
+ * `countTestId` exposes the raw number as `data-count` for tests.
+ */
 export function QueueTiles({
   tiles,
+  testId,
 }: {
-  tiles: ReadonlyArray<{ href: string; name: string; count: number | null; oldestDays?: number | null; alert?: boolean; testId?: string }>;
+  tiles: ReadonlyArray<{
+    href: string;
+    name: string;
+    count: number | null;
+    oldestDays?: number | null;
+    age?: 'late' | 'overdue';
+    /** Replaces the oldest line when nothing waits on us («همه در انتظار طرف مقابل»). */
+    note?: string;
+    title?: string;
+    testId?: string;
+    countTestId?: string;
+  }>;
+  testId?: string;
 }) {
   return (
-    <div className="hz-queue-tiles">
-      {tiles.map((tile) => (
-        <Link
-          key={tile.href}
-          href={tile.href}
-          className={['hz-queue-tile', 'hz-card--interactive', tile.alert ? 'hz-queue-tile--alert' : '', tile.count === 0 ? 'hz-queue-tile--empty' : '']
-            .join(' ')
-            .trim()}
-          data-testid={tile.testId}
-        >
-          <span className="hz-queue-tile__head">
-            <span className="hz-queue-tile__name">{tile.name}</span>
-            <Icon name="arrowRight" size="xs" mirror />
-          </span>
-          <span className="hz-queue-tile__count hz-num">{tile.count === null ? '—' : tile.count.toLocaleString('fa-IR')}</span>
-          {tile.count === 0 ? (
-            <span className="hz-queue-tile__oldest">صف خالی است</span>
-          ) : tile.oldestDays !== undefined && tile.oldestDays !== null ? (
-            <span className="hz-queue-tile__oldest">
-              قدیمی‌ترین:{' '}
-              <span className={tile.alert ? 'hz-age hz-age--overdue' : 'hz-age'}>{tile.oldestDays.toLocaleString('fa-IR') + ' روز'}</span>
+    <div className="hz-queue-tiles" data-testid={testId}>
+      {tiles.map((tile) => {
+        const alert = tile.age === 'overdue';
+        return (
+          <Link
+            key={tile.href + tile.name}
+            href={tile.href}
+            className={['hz-queue-tile', 'hz-card--interactive', alert ? 'hz-queue-tile--alert' : '', tile.count === 0 ? 'hz-queue-tile--empty' : '']
+              .join(' ')
+              .trim()}
+            data-testid={tile.testId}
+            title={tile.title}
+          >
+            <span className="hz-queue-tile__head">
+              <span className="hz-queue-tile__name">{tile.name}</span>
+              <Icon name="arrowRight" size="xs" mirror />
             </span>
-          ) : null}
-          {tile.alert ? (
-            <span className="hz-queue-tile__flag">
-              <Icon name="warning" size="xs" />
-              از مهلت بررسی گذشته
+            <span className="hz-queue-tile__count hz-num" data-testid={tile.countTestId} data-count={tile.count ?? undefined}>
+              {tile.count === null ? '—' : tile.count.toLocaleString('fa-IR')}
+              <span className="hz-visually-hidden"> پرونده</span>
             </span>
-          ) : null}
-        </Link>
-      ))}
+            {tile.count === 0 ? (
+              <span className="hz-queue-tile__oldest">صف خالی است</span>
+            ) : tile.note ? (
+              <span className="hz-queue-tile__oldest">{tile.note}</span>
+            ) : tile.oldestDays !== undefined && tile.oldestDays !== null ? (
+              <span className="hz-queue-tile__oldest">
+                قدیمی‌ترین:{' '}
+                <span className={tile.age ? 'hz-age hz-age--' + tile.age : 'hz-age'}>{tile.oldestDays.toLocaleString('fa-IR') + ' روز'}</span>
+              </span>
+            ) : null}
+            {alert ? (
+              <span className="hz-queue-tile__flag">
+                <Icon name="warning" size="xs" />
+                از مهلت بررسی گذشته
+              </span>
+            ) : null}
+          </Link>
+        );
+      })}
     </div>
   );
 }

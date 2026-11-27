@@ -347,12 +347,12 @@ test('the finder species gate and the finder settings belong to the superadmin',
     code('FORBIDDEN'),
   );
   await assert.rejects(
-    updateSetting(testDb.db, as(adminId, 'MARKETPLACE_ADMIN'), { key: 'finder.flag.requests', value: true }),
+    updateSetting(testDb.db, as(adminId, 'MARKETPLACE_ADMIN'), { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'finder.flag.requests', value: true }),
     code('FORBIDDEN'),
   );
   // A snapshot taken for a request keeps its value after the managed figure moves.
   const before = await snapshotSetting(testDb.db, 'finder.request.expiry_days');
-  await updateSetting(testDb.db, admin(), { key: 'finder.request.expiry_days', value: 5, expectedVersion: before.version });
+  await updateSetting(testDb.db, admin(), { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'finder.request.expiry_days', value: 5, expectedVersion: before.version });
   assert.equal(before.value, 7);
   assert.equal((await snapshotSetting(testDb.db, 'finder.request.expiry_days')).value, 5);
 });

@@ -3,10 +3,11 @@
 import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
-import { FileField, SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { FileField, TextAreaField, TextField } from '../ui/field.tsx';
+import { DecisionForm, ReasonField } from '../ui/decision.tsx';
 import { Check, PlacePicker, Result, submitWith, type CityOption, type Option } from './directory-forms.tsx';
 import { changeVetPublicStatusAction, type DirectoryEditState } from './directory-actions.ts';
-import { DOCUMENT_KIND_FA, REVIEW_DECISIONS, REVIEW_DECISION_FA, VET_DOCUMENT_KINDS } from './onboarding-model.ts';
+import { DOCUMENT_KIND_FA, REVIEW_DECISIONS, VET_DOCUMENT_KINDS } from './onboarding-model.ts';
 import { VET_PUBLIC_STATUS_FA, type VetPublicStatus } from './directory-model.ts';
 import {
   appealVetApplicationAction,
@@ -24,7 +25,7 @@ const TEN_MB = 10 * 1024 * 1024;
 function DocumentFields({ requireCouncilCard }: { requireCouncilCard: boolean }) {
   return (
     <fieldset className="space-y-md">
-      <legend className="text-label-md">مدارک</legend>
+      <legend className="text-label-sm">مدارک</legend>
       <p className="text-caption text-text-secondary">
         JPG، PNG یا PDF تا ۱۰ مگابایت برای هر فایل و روی هم حداکثر ۱۲ مگابایت. مدارک خصوصی‌اند و فقط شما و اپراتور بررسی آن‌ها را
         می‌بینید.
@@ -162,50 +163,28 @@ export function AppealApplicationForm({ applicationId, version }: { applicationI
 }
 
 /**
- * Stays mounted after the decision (`open` turns false), so the recorded
- * outcome is still shown once the application leaves the queue.
+ * DS DecisionDesk decision panel for an open application (the page shows the
+ * recorded outcome once it is decided). The service asks a reason for every
+ * outcome, approval included, so the reason field follows each choice.
  */
-export function ReviewDecisionForm({ applicationId, version, open }: { applicationId: string; version: number; open: boolean }) {
-  const [state, submit, pending] = useActionState(decideVetApplicationAction, EMPTY);
-  if (!open) {
-    return (
-      <Card>
-        <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
-        <div className="mt-md">
-          <Result state={state} testId="review-decision-result" />
-        </div>
-        <p className="mt-sm text-body-sm text-text-secondary">این درخواست در انتظار بررسی نیست.</p>
-      </Card>
-    );
-  }
+export function ReviewDecisionForm({ applicationId, version }: { applicationId: string; version: number }) {
   return (
-    <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم</span></h2></div>
-      <form onSubmit={submitWith(submit)} className="mt-lg space-y-lg" data-testid="review-decision-form">
-        <input type="hidden" name="applicationId" value={applicationId} />
-        <input type="hidden" name="expectedVersion" value={version} />
-        <Result state={state} testId="review-decision-result" />
-        <SelectField
-          label="تصمیم"
-          name="decision"
-          required
-          options={REVIEW_DECISIONS.map((value) => ({ value, label: REVIEW_DECISION_FA[value] }))}
-          data-testid="review-decision"
-        />
-        <TextAreaField
-          label="دلیل"
-          name="reasonFa"
-          rows={3}
-          required
-          maxLength={1000}
-          hint="برای درخواست‌دهنده نمایش داده و در تاریخچه ثبت می‌شود."
-          data-testid="review-reason"
-        />
-        <Button type="submit" disabled={pending} data-testid="submit-review-decision">
-          ثبت تصمیم
-        </Button>
-      </form>
-    </Card>
+    <DecisionForm
+      action={decideVetApplicationAction}
+      hidden={{ applicationId, expectedVersion: version }}
+      formTestId="review-decision-form"
+      submitTestId="submit-review-decision"
+      reasonName="reasonFa"
+      reasonTestId="review-reason"
+      reasonFor={REVIEW_DECISIONS}
+      reasonLabel={(value) => (value === 'APPROVE' ? 'یادداشت تأیید' : value === 'REJECT' ? 'دلیل رد' : 'دلیل اصلاح')}
+      audience="به درخواست‌دهنده نمایش داده می‌شود"
+      choices={[
+        { value: 'APPROVE', label: 'تأیید', desc: 'پروفایل دامپزشک ساخته یا به درخواست‌دهنده سپرده می‌شود.', testId: 'review-decision-APPROVE' },
+        { value: 'REQUEST_CORRECTION', label: 'نیازمند اصلاح', desc: 'درخواست با دلیل به درخواست‌دهنده برمی‌گردد.', testId: 'review-decision-REQUEST_CORRECTION' },
+        { value: 'REJECT', label: 'رد', desc: 'درخواست بسته می‌شود؛ درخواست‌دهنده یک‌بار می‌تواند تجدیدنظر بخواهد.', testId: 'review-decision-REJECT' },
+      ]}
+    />
   );
 }
 
@@ -227,7 +206,7 @@ export function UnownedVetForm({ provinces, cities }: { provinces: readonly Opti
         <PlacePicker provinces={provinces} cities={cities} required testIdPrefix="unowned-" />
         <TextField label="تماس یا نشانی عمومی" name="contactFa" maxLength={300} data-testid="unowned-contact" />
         <TextField label="منبع اطلاعات" name="sourceFa" required maxLength={300} hint="فقط برای بررسی؛ در صفحه عمومی نمایش داده نمی‌شود." data-testid="unowned-source" />
-        <TextField label="دلیل انتشار" name="reason" required maxLength={500} data-testid="unowned-reason" />
+        <ReasonField name="reason" label="دلیل انتشار" required rows={2} audience={null} hint="در تاریخچه تغییرات ثبت می‌شود." testId="unowned-reason" />
         <Check name="confirmedNotDuplicate" label="پروفایل‌های مشابه را دیده‌ام و این دامپزشک تکراری نیست" defaultChecked={false} testId="unowned-confirm" />
         <Button type="submit" disabled={pending} data-testid="publish-unowned">
           انتشار با برچسب «بدون مالک»
@@ -250,7 +229,7 @@ export function ReviewStatusForm({ profileId, version, publicStatus }: { profile
       <input type="hidden" name="expectedVersion" value={version} />
       <input type="hidden" name="to" value={to} />
       <div className="min-w-[12rem] flex-1">
-        <TextField label="دلیل" name="reason" required maxLength={500} data-testid={'review-status-reason-' + profileId} />
+        <ReasonField name="reason" label="دلیل تغییر" required rows={2} audience={null} testId={'review-status-reason-' + profileId} />
       </div>
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'review-status-submit-' + profileId}>
         {VET_PUBLIC_STATUS_FA[to] === 'پنهان' ? 'پنهان‌کردن' : 'انتشار دوباره'}

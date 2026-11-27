@@ -11,7 +11,7 @@ import { createIssuanceRequest, retryIssuance } from '../../src/documents/pedigr
 import { submitAppeal } from '../../src/genetics/appeals.ts';
 import { createPostalRequest } from '../../src/documents/postal.ts';
 import { startAttempt } from '../../src/billing/payments.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface PedigreeFormState {
   readonly ok?: boolean;
@@ -26,7 +26,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): PedigreeFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

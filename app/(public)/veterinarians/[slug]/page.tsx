@@ -13,7 +13,7 @@ import { JsonLdScript } from '../../../../src/seo/json-ld.tsx';
 import { site } from '../../../../src/public/request.ts';
 import { DUPLICATE_NOTICE_FA } from '../../../../src/admin/merge-model.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { TrustedMark } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import Link from 'next/link';
 import { Alert } from '../../../../src/ui/alert.tsx';
@@ -107,16 +107,16 @@ export default async function VeterinarianPage({ params }: Params) {
             <div className="hz-vet__body gap-xs">
               <h1 className="hz-h2">{page.nameFa}</h1>
               {page.headlineFa ? <p className="hz-body text-text-secondary">{page.headlineFa}</p> : null}
-              {/* Each axis is its own badge; none of them implies another (P2-D05). */}
-              <div className="flex flex-wrap gap-xs" data-testid="vet-axes">
-                {page.verified ? (
-                  <span data-testid="vet-verified">
-                    <StatusBadge tone="info">کد نظام دامپزشکی تأییدشده</StatusBadge>
-                  </span>
-                ) : null}
+              {/* Each axis is shown on its own; none of them implies another (P2-D05). The code check is a fact line, not a status (FND-009). */}
+              <div className="flex flex-wrap items-center gap-xs" data-testid="vet-axes">
                 {page.trusted ? (
                   <span data-testid="vet-trusted">
-                    <StatusBadge tone="success">دامپزشک معتمد همزیست</StatusBadge>
+                    <TrustedMark />
+                  </span>
+                ) : null}
+                {page.verified ? (
+                  <span className="hz-body-sm text-text-secondary" data-testid="vet-verified">
+                    کد نظام دامپزشکی تأییدشده
                   </span>
                 ) : null}
               </div>

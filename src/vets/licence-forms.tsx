@@ -1,11 +1,12 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
-import { FileField, TextAreaField, TextField } from '../ui/field.tsx';
+import { FileField, TextField } from '../ui/field.tsx';
 import { Check, PlacePicker, Result, type CityOption, type Option } from './directory-forms.tsx';
-import { LICENCE_DECISIONS, LICENCE_DECISION_FA, MAX_CERTIFICATES, type LicenceDecision } from './professional-profile-model.ts';
+import { LICENCE_DECISIONS, LICENCE_DECISION_DESC_FA, LICENCE_DECISION_FA, MAX_CERTIFICATES } from './professional-profile-model.ts';
+import { DecisionForm } from '../ui/decision.tsx';
 import { decideLicenceCaseAction, reviseLicenceApplicationAction, submitLicenceApplicationAction, type LicenceState } from './licence-actions.ts';
 
 const EMPTY: LicenceState = {};
@@ -81,7 +82,7 @@ export function LicenceApplicationForm({
           data-testid="lic-council-code"
         />
         <fieldset className="space-y-sm">
-          <legend className="text-label-md">عمومی یا متخصص</legend>
+          <legend className="text-label-sm">عمومی یا متخصص</legend>
           {(
             [
               ['GENERAL', 'دکتر دامپزشک عمومی'],
@@ -118,7 +119,7 @@ export function LicenceApplicationForm({
         {newDoctor ? <PlacePicker provinces={provinces} cities={cities} testIdPrefix="lic-" /> : null}
 
         <fieldset className="space-y-md">
-          <legend className="text-label-md">مدارک</legend>
+          <legend className="text-label-sm">مدارک</legend>
           <p className="text-caption text-text-secondary">
             JPG، PNG یا PDF تا ۱۰ مگابایت برای هر فایل. نوع واقعی فایل بررسی می‌شود. مدارک خصوصی‌اند و فقط شما و ادمین انجمن آن‌ها را می‌بینید؛
             هر مشاهده ثبت می‌شود.
@@ -137,7 +138,7 @@ export function LicenceApplicationForm({
         </fieldset>
 
         <fieldset className="space-y-md">
-          <legend className="text-label-md">اطلاعات حرفه‌ای (اختیاری)</legend>
+          <legend className="text-label-sm">اطلاعات حرفه‌ای (اختیاری)</legend>
           <div className="grid gap-md md:grid-cols-2">
             <TextField label="نام کلینیک" name="clinicNameFa" maxLength={120} defaultValue={defaults.clinicNameFa ?? ''} data-testid="lic-clinic" />
             <TextField label="تلفن حرفه‌ای" name="phone" ltr inputMode="tel" maxLength={20} defaultValue={defaults.phone ?? ''} data-testid="lic-phone" />
@@ -146,7 +147,7 @@ export function LicenceApplicationForm({
           </div>
           {services.length > 0 ? (
             <div>
-              <p className="text-label-md">خدمات</p>
+              <p className="text-label-sm">خدمات</p>
               <div className="mt-sm grid gap-2xs md:grid-cols-2">
                 {services.map((service) => (
                   <Check
@@ -171,36 +172,26 @@ export function LicenceApplicationForm({
   );
 }
 
-/** The association admin's decision on licence documents. Every decision carries a reason. */
+/**
+ * The association admin's decision on licence documents (DS P10 panel).
+ * The decision service still requires a reason for every outcome (approval
+ * included), so the reason is asked for all three; the consequence sits under
+ * each label (DS DecisionDesk).
+ */
 export function DecideLicenceCaseForm({ caseId, version }: { caseId: string; version: number }) {
-  const [state, submit, pending] = useActionState(decideLicenceCaseAction, EMPTY);
-  const [decision, setDecision] = useState<LicenceDecision>('APPROVE');
   return (
-    <form action={submit} className="space-y-lg" data-testid="licence-decision-form">
-      <input type="hidden" name="caseId" value={caseId} />
-      <input type="hidden" name="expectedVersion" value={version} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">نتیجه بررسی</legend>
-        {LICENCE_DECISIONS.map((value) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
-            <input
-              type="radio"
-              name="decision"
-              value={value}
-              checked={decision === value}
-              onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
-              data-testid={'licence-decision-' + value}
-            />
-            {LICENCE_DECISION_FA[value]}
-          </label>
-        ))}
-      </fieldset>
-      <TextAreaField label="دلیل" name="reasonFa" required rows={3} maxLength={1000} hint="دلیل برای متقاضی نمایش داده می‌شود." data-testid="licence-decision-reason" />
-      <Button type="submit" disabled={pending} data-testid="submit-licence-decision">
-        {pending ? 'در حال ثبت…' : 'ثبت نتیجه'}
-      </Button>
-      <Result state={state} testId="licence-decision-result" />
-    </form>
+    <DecisionForm
+      action={decideLicenceCaseAction}
+      hidden={{ caseId, expectedVersion: version }}
+      formTestId="licence-decision-form"
+      submitTestId="submit-licence-decision"
+      reasonName="reasonFa"
+      reasonTestId="licence-decision-reason"
+      reasonFor={LICENCE_DECISIONS}
+      reasonLabel={(value) => (value === 'REJECT' ? 'دلیل رد' : value === 'REQUEST_CORRECTION' ? 'دلیل اصلاح' : 'دلیل تأیید')}
+      audience="به متقاضی نمایش داده می‌شود"
+      drafts={['تصویر پروانه خوانا نیست', 'تاریخ یا شماره پروانه با مدرک نمی‌خواند']}
+      choices={LICENCE_DECISIONS.map((value) => ({ value, label: LICENCE_DECISION_FA[value], desc: LICENCE_DECISION_DESC_FA[value], testId: 'licence-decision-' + value }))}
+    />
   );
 }

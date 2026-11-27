@@ -12,7 +12,7 @@ import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { DUPLICATE_NOTICE_FA } from '../../../../src/admin/merge-model.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { Identifier, StatusBadge } from '../../../../src/ui/status.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 
@@ -95,11 +95,12 @@ export default async function CommunityPage({ params }: Params) {
               {/* Each axis is its own badge; a registration does not verify content and a badge never sells (P2-D05). */}
               <div className="flex flex-wrap gap-xs" data-testid="community-badges">
                 {page.registration ? (
-                  <span data-testid="community-registration">
-                    <StatusBadge tone="info">{page.registration.statusFa + (page.registration.number ? '، ' + page.registration.number : '')}</StatusBadge>
+                  <span className="flex flex-wrap items-center gap-xs" data-testid="community-registration">
+                    <StatusBadge status={page.registration.status} />
+                    {page.registration.number ? <Identifier label="شماره ثبت:" value={page.registration.number} /> : null}
                   </span>
                 ) : null}
-                {page.placeFa ? <StatusBadge tone="neutral">{page.placeFa}</StatusBadge> : null}
+                {page.placeFa ? <span className="hz-tag hz-tag--neutral">{page.placeFa}</span> : null}
               </div>
             </div>
           </header>
@@ -142,10 +143,11 @@ export default async function CommunityPage({ params }: Params) {
                       <div className="flex flex-wrap items-start justify-between gap-sm">
                         <h3 className="hz-card__title">{event.titleFa}</h3>
                         {event.cancelled ? (
-                          <StatusBadge tone="warning">لغو شد</StatusBadge>
+                          <StatusBadge status="CANCELLED" />
                         ) : event.upcoming ? (
-                          <StatusBadge tone="success">پیش‌رو</StatusBadge>
+                          <StatusBadge status="SCHEDULED" />
                         ) : (
+                          // GAPS #4: no dictionary key for a held (past) event
                           <StatusBadge tone="neutral">برگزارشده</StatusBadge>
                         )}
                       </div>

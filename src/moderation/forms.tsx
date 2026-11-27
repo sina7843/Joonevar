@@ -1,10 +1,10 @@
 'use client';
 
-import { startTransition, useActionState, useState } from 'react';
-import { Card } from '../ui/card.tsx';
+import { useActionState, useState } from 'react';
 import { Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
-import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { TextAreaField, TextField } from '../ui/field.tsx';
+import { DecisionForm, ReasonField } from '../ui/decision.tsx';
 import {
   decideReportsAction,
   liftRestrictionAction,
@@ -30,7 +30,7 @@ export function ReportForm({ contentId, backHref }: { contentId: string; backHre
     return (
       <div className="space-y-lg">
         <Result state={state} testId="report-result" />
-        <a href={backHref} className="text-label-md text-text-brand underline underline-offset-4">
+        <a href={backHref} className="text-label-sm text-text-brand underline underline-offset-4">
           بازگشت به مطلب
         </a>
       </div>
@@ -41,7 +41,7 @@ export function ReportForm({ contentId, backHref }: { contentId: string; backHre
       <input type="hidden" name="contentId" value={contentId} />
       <Result state={state} testId="report-result" />
       <fieldset className="space-y-xs">
-        <legend className="mb-sm text-label-md">
+        <legend className="mb-sm text-label-sm">
           دلیل گزارش <span className="text-status-error-text" aria-hidden="true">*</span>
         </legend>
         {REPORT_REASONS.map((reason) => (
@@ -72,68 +72,66 @@ export function ReportForm({ contentId, backHref }: { contentId: string; backHre
   );
 }
 
-export function DecisionForm({
+/** What each moderation outcome does, shown under its option (DS DecisionDesk consequence line). */
+const DECISION_DESC: Record<ModerationDecision, string> = {
+  DISMISS: 'گزارش‌ها بسته می‌شوند و محتوا همان‌طور می‌ماند.',
+  REQUEST_CORRECTION: 'دلیل به نویسنده می‌رسد تا محتوا را اصلاح کند.',
+  HIDE: 'محتوا از سایت پنهان می‌شود؛ نویسنده دلیل را می‌بیند.',
+  SOFT_DELETE: 'محتوا برداشته می‌شود و با سابقه‌اش می‌ماند.',
+  RESTRICT_PUBLISHER: 'نویسنده تا پایان محدودیت نمی‌تواند منتشر کند.',
+};
+
+/** The restriction end as a local date-time; the server receives it as an ISO instant. */
+function RestrictUntilField() {
+  const [local, setLocal] = useState('');
+  return (
+    <>
+      <TextField
+        label="پایان محدودیت"
+        type="datetime-local"
+        ltr
+        value={local}
+        onChange={(event) => setLocal(event.target.value)}
+        hint="خالی یعنی تا وقتی ادمین محتوا آن را بردارد."
+        data-testid="restrict-until"
+      />
+      <input type="hidden" name="restrictUntilIso" value={local === '' ? '' : new Date(local).toISOString()} />
+    </>
+  );
+}
+
+/**
+ * DS DecisionDesk decision panel (K16) over every open report of one item.
+ * Only outcomes that can still apply are offered; each needs a reason, which
+ * the open reports' reasons can prefill.
+ */
+export function ReportDecisionForm({
   contentId,
+  version,
   decisions,
-  hasOpenReports,
+  drafts,
 }: {
   contentId: string;
+  /** The content version on screen; the server refuses a decision on a newer one (KOPS-029). */
+  version: number;
   decisions: readonly ModerationDecision[];
-  hasOpenReports: boolean;
+  drafts: readonly string[];
 }) {
-  const [state, submit, pending] = useActionState(decideReportsAction, EMPTY);
-  const [picked, setPicked] = useState<string>('');
-  const decision = decisions.find((value) => value === picked) ?? '';
-
-  // A decision closes every open report, so the form has nothing left to decide —
-  // but it stays mounted to show the moderator what was recorded.
-  if (!hasOpenReports) return state.message ? <Result state={state} testId="decision-result" /> : null;
-
   return (
-    <Card>
-      <div className="hz-section-header hz-section-header--sm"><h2 className="hz-section-header__title"><span className="hz-section-header__bar" aria-hidden="true" /><span>تصمیم درباره گزارش‌های باز</span></h2></div>
-      <p className="mt-xs text-body-sm text-text-secondary">
-        تصمیم برای همه گزارش‌های باز این محتوا ثبت می‌شود و دلیل آن در تاریخچه می‌ماند.
-      </p>
-      <form
-        onSubmit={(event) => {
-          // No automatic reset: a reset select would fall back to its empty option (DEC-0157).
-          event.preventDefault();
-          const data = new FormData(event.currentTarget);
-          const local = String(data.get('restrictUntilLocal') ?? '');
-          data.set('restrictUntilIso', local === '' ? '' : new Date(local).toISOString());
-          startTransition(() => submit(data));
-        }}
-        className="mt-lg space-y-lg"
-        data-testid="decision-form"
-      >
-        <input type="hidden" name="contentId" value={contentId} />
-        <Result state={state} testId="decision-result" />
-        <SelectField
-          label="تصمیم"
-          name="decision"
-          required
-          value={decision}
-          onChange={(event) => setPicked(event.target.value)}
-          options={decisions.map((value) => ({ value, label: DECISION_FA[value] }))}
-          data-testid="decision"
-        />
-        {decision === 'RESTRICT_PUBLISHER' ? (
-          <TextField
-            label="پایان محدودیت"
-            name="restrictUntilLocal"
-            type="datetime-local"
-            ltr
-            hint="خالی یعنی تا وقتی ادمین محتوا آن را بردارد."
-            data-testid="restrict-until"
-          />
-        ) : null}
-        <TextAreaField label="دلیل" name="reason" rows={3} required data-testid="decision-reason" />
-        <Button type="submit" disabled={pending || decision === ''} data-testid="submit-decision">
-          {pending ? 'در حال ثبت…' : 'ثبت تصمیم'}
-        </Button>
-      </form>
-    </Card>
+    <DecisionForm
+      action={decideReportsAction}
+      hidden={{ contentId, expectedVersion: String(version) }}
+      formTestId="decision-form"
+      submitTestId="submit-decision"
+      reasonName="reason"
+      reasonTestId="decision-reason"
+      reasonFor={decisions}
+      drafts={drafts}
+      audience="به نویسنده نمایش داده می‌شود"
+      choices={decisions.map((value) => ({ value, label: DECISION_FA[value], desc: DECISION_DESC[value], testId: 'decision-' + value }))}
+    >
+      {(value) => (value === 'RESTRICT_PUBLISHER' ? <RestrictUntilField /> : null)}
+    </DecisionForm>
   );
 }
 
@@ -143,7 +141,7 @@ export function LiftRestrictionForm({ restrictionId }: { restrictionId: string }
     <form action={submit} className="mt-md space-y-sm" data-testid={'lift-restriction-form-' + restrictionId}>
       <input type="hidden" name="restrictionId" value={restrictionId} />
       <Result state={state} testId={'lift-restriction-result-' + restrictionId} />
-      <TextField label="دلیل برداشتن محدودیت" name="reason" required data-testid={'lift-reason-' + restrictionId} />
+      <ReasonField name="reason" label="دلیل برداشتن محدودیت" required rows={2} audience={null} testId={'lift-reason-' + restrictionId} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'lift-restriction-' + restrictionId}>
         {pending ? 'در حال ثبت…' : 'برداشتن محدودیت'}
       </Button>

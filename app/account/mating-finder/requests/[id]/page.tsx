@@ -48,6 +48,17 @@ import { Icon } from '../../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
+/** Request statuses that differ from a status-dictionary key; the rest are keys as-is. */
+const REQUEST_KEY: Partial<Record<RequestStatus, string>> = { PRELIMINARILY_ACCEPTED: 'ACCEPTED', CONTRACT_CONFIRMED: 'CONFIRMED' };
+
+function RequestStatusBadge({ status, size }: { status: RequestStatus; size?: 'sm' | 'md' }) {
+  if (status === 'MATING_COMPLETED' || status === 'MATING_NOT_COMPLETED') {
+    // GAPS #4: no dictionary key for MATING_COMPLETED / MATING_NOT_COMPLETED
+    return <StatusBadge tone="info" size={size}>{REQUEST_STATUS_FA[status]}</StatusBadge>;
+  }
+  return <StatusBadge status={REQUEST_KEY[status] ?? status} size={size} />;
+}
+
 /**
  * One mating request — PHASE-4 PROMPT-005: its terms, history, conversation,
  * contract and the commands open to this party right now. The server decides
@@ -107,7 +118,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             back={{ href: '/account/mating-finder/requests' }}
             aside={
               <span data-testid="finder-request-status">
-                <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'}>{REQUEST_STATUS_FA[status]}</StatusBadge>
+                <RequestStatusBadge status={status} />
               </span>
             }
             meta={[ROUTE_FA[request.route], 'اعتبار تا ' + formatInstantFa(request.expiresAt)]}
@@ -166,9 +177,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             <p className="hz-caption">{CONFIRMATION_NAME_FA + '. ' + NOT_A_LEGAL_SIGNATURE_FA}</p>
             <div className="mt-sm flex flex-wrap items-center gap-sm">
               <span data-testid="finder-contract-state">
-                <StatusBadge tone={contract.contract.status === 'CONFIRMED' ? 'success' : contract.contract.status === 'CANCELLED' ? 'neutral' : 'info'}>
-                  {contract.contract.status === 'CONFIRMED' ? 'تأییدشده' : contract.contract.status === 'CANCELLED' ? 'لغوشده' : 'پیش‌نویس'}
-                </StatusBadge>
+                <StatusBadge status={contract.contract.status === 'DRAFTING' ? 'DRAFT' : contract.contract.status} />
               </span>
               <span className="text-caption">{'نسخه ' + fa(contract.current.number) + ' · تأیید شما: ' + (contract.approvedByMe ? 'بله' : 'نه') + ' · تأیید طرف مقابل: ' + (contract.approvedByOther ? 'بله' : 'نه')}</span>
             </div>
@@ -188,7 +197,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             {contract.contract.status === 'DRAFTING' ? (
               <>
                 <details className="mt-md">
-                  <summary className="cursor-pointer text-label-md text-text-brand">ویرایش (نسخه تازه می‌سازد)</summary>
+                  <summary className="cursor-pointer text-label-sm text-text-brand">ویرایش (نسخه تازه می‌سازد)</summary>
                   <EditContractForm
                     requestId={id}
                     contractId={contract.contract.id}
@@ -207,7 +216,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             ) : null}
             {contract.contract.status === 'CONFIRMED' ? (
               <p className="mt-md">
-                <a href={'/api/finder/contracts/' + contract.contract.id + '/pdf'} className="text-label-md text-text-brand underline underline-offset-4" data-testid="finder-contract-pdf">
+                <a href={'/api/finder/contracts/' + contract.contract.id + '/pdf'} className="text-label-sm text-text-brand underline underline-offset-4" data-testid="finder-contract-pdf">
                   دریافت PDF نسخه تأییدشده
                 </a>
               </p>
@@ -359,11 +368,11 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             دیگر پروفایل‌ها و پیام‌های یکدیگر را نمی‌بینید؛ به طرف مقابل گفته نمی‌شود چه کسی مسدود کرده است.
           </p>
           <details className="mt-sm">
-            <summary className="cursor-pointer text-label-md">گزارش این درخواست</summary>
+            <summary className="cursor-pointer text-label-sm">گزارش این درخواست</summary>
             <FinderReportForm target="REQUEST" id={id} testId="finder-report-request" />
           </details>
           <details className="mt-sm">
-            <summary className="cursor-pointer text-label-md">گزارش کاربر مقابل</summary>
+            <summary className="cursor-pointer text-label-sm">گزارش کاربر مقابل</summary>
             <FinderReportForm target="ACCOUNT" id={id} testId="finder-report-account" />
           </details>
           <div className="mt-md">
@@ -393,7 +402,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
           <div className="space-y-md">
             <KeyValueList
               rows={[
-                { key: 'وضعیت', value: <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : 'info'} size="sm">{REQUEST_STATUS_FA[status]}</StatusBadge> },
+                { key: 'وضعیت', value: <RequestStatusBadge status={status} size="sm" /> },
                 { key: 'اعتبار تا', value: formatInstantFa(request.expiresAt) },
               ]}
             />
@@ -407,7 +416,7 @@ export default async function FinderRequestPage({ params }: { params: Promise<{ 
             {can('START_CONTRACT') ? <CommandForm action="start-contract" requestId={id} version={request.version} label="تنظیم قرارداد" tone="primary" testId="finder-start-contract" /> : null}
             {can('PROPOSE_TERMS') ? (
               <details>
-                <summary className="cursor-pointer text-label-md text-text-brand">پیشنهاد شرایط تازه</summary>
+                <summary className="cursor-pointer text-label-sm text-text-brand">پیشنهاد شرایط تازه</summary>
                 <ProposeTermsForm requestId={id} version={request.version} defaults={defaults} />
               </details>
             ) : null}

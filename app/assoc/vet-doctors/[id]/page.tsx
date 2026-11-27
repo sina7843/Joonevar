@@ -1,15 +1,17 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, DocFrame, Panel, PrivateNote, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { CaseAge, Desk, DeskHead, DeskVersionNote, deskPosition, DocFrame, Panel, PrivateNote, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../../vet-case-key.ts';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
-import { doctorCaseForReview } from '../../../../src/vets/doctor-application.ts';
+import { doctorCaseForReview, doctorOpenCaseIds } from '../../../../src/vets/doctor-application.ts';
 import { DecideDoctorCaseForm } from '../../../../src/vets/doctor-forms.tsx';
 import { reviewStateFor } from '../../../../src/vets/review-workbench.ts';
-import { DocumentPreview, ReviewPanel } from '../../../../src/vets/review-forms.tsx';
+import { ReviewPanel } from '../../../../src/vets/review-forms.tsx';
 import { DOCUMENT_KIND_FA, type ProfessionalDocumentKind } from '../../../../src/vets/professional-profile-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 
@@ -26,7 +28,11 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
   const { id } = await params;
   const guard = await guardRoute('/assoc/vet-doctors/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const [detail, review] = await Promise.all([doctorCaseForReview(db(), guard.actor, id), reviewStateFor(db(), guard.actor, id)]);
+  const [detail, review, queueIds] = await Promise.all([
+    doctorCaseForReview(db(), guard.actor, id),
+    reviewStateFor(db(), guard.actor, id),
+    doctorOpenCaseIds(db(), guard.actor),
+  ]);
 
   if (!detail) {
     return (
@@ -37,16 +43,20 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
   }
   const latest = detail.submissions.at(-1)?.fields;
   const waiting = detail.case.status === 'SUBMITTED' || detail.case.status === 'UNDER_REVIEW';
+  // Age in the queue counts from the first submission.
+  const firstSubmittedAt = detail.submissions[0] ? new Date(detail.submissions[0].submittedAt) : null;
   const duplicates = detail.duplicates.profiles.length + detail.duplicates.cases.length;
 
   return (
-    <OpsShell actor={guard.actor} title="بررسی کد نظام دامپزشک" pathname="/assoc/vet-doctors" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی کد نظام دامپزشک" pathname="/assoc/vet-doctors" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'کد نظام دامپزشک · ' + (detail.applicantNameFa ?? latest?.displayNameFa ?? '—')}
-        status={{ tone: waiting ? 'info' : detail.case.status === 'NEEDS_CORRECTION' ? 'warning' : detail.case.status === 'REJECTED' ? 'error' : 'success', label: detail.case.statusFa }}
+        status={keyStatus(vetCaseKey(detail.case.status))}
+        position={deskPosition(queueIds, detail.case.id, (caseId) => '/assoc/vet-doctors/' + caseId)}
         meta={[
           latest?.councilCode ? <Identifier label="کد نظام" value={latest.councilCode} /> : null,
           detail.applicantNationalId ? <Identifier label="کد ملی" value={detail.applicantNationalId} /> : null,
+          waiting && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null,
           'نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR'),
         ]}
         owner={waiting ? 'ASSOCIATION' : detail.case.status === 'NEEDS_CORRECTION' ? 'USER' : null}
@@ -58,7 +68,10 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
           <>
             {review && waiting ? <ReviewPanel review={review} isSuperadmin={guard.actor.context === 'SUPERADMIN'} /> : null}
             {waiting && !review?.claimedByOther ? (
-              <DecideDoctorCaseForm caseId={detail.case.id} version={detail.case.version} />
+              <>
+                <DecideDoctorCaseForm caseId={detail.case.id} version={detail.case.version} />
+                <DeskVersionNote version={detail.case.currentSubmissionVersion} />
+              </>
             ) : waiting ? null : (
               <Alert tone="info" title="این پرونده در انتظار بررسی نیست">
                 {'وضعیت فعلی: ' + detail.case.statusFa}
@@ -90,9 +103,6 @@ export default async function AssocVetDoctorCasePage({ params }: { params: Promi
                     testId={'doctor-document-link-' + document.kind}
                     icon="identificationBadge"
                   >
-                    {document.submissionVersion === detail.case.currentSubmissionVersion ? (
-                      <DocumentPreview fileId={document.fileId} labelFa={DOCUMENT_KIND_FA[document.kind as ProfessionalDocumentKind]} testId={'doctor-document-preview-' + document.kind} />
-                    ) : null}
                   </DocFrame>
                 </li>
               ))}

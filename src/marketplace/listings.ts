@@ -456,9 +456,9 @@ export interface ListingContentInput {
   readonly deliveryMethods: readonly string[];
 }
 
-function parsePrice(mode: string, raw: string): bigint | null {
-  if (mode !== 'EXACT') return null;
+function parsePrice(raw: string): bigint | null {
   const trimmed = raw.trim();
+  if (trimmed === '') return null;
   if (!/^\d+$/.test(trimmed)) throw validation('مبلغ را فقط با رقم و بدون جداکننده وارد کنید.');
   const value = BigInt(trimmed);
   if (value <= 0n) throw validation('مبلغ باید بزرگ‌تر از صفر باشد.');
@@ -490,8 +490,9 @@ export async function saveListing(
     }
   }
 
-  const priceMode = input.priceMode;
-  if (!isPriceMode(priceMode)) throw validation('نوع قیمت معتبر نیست.');
+  // Decision 7g: whatever an old client posts, an advert is stored as negotiable.
+  if (input.priceMode !== '' && !isPriceMode(input.priceMode)) throw validation('نوع قیمت معتبر نیست.');
+  const priceMode = 'NEGOTIABLE' as const;
   const vaccinationStatus = input.vaccinationStatus;
   if (!isDisclosure(vaccinationStatus)) throw validation('وضعیت واکسیناسیون را مشخص کنید.');
   const neuterStatus = input.neuterStatus;
@@ -506,7 +507,7 @@ export async function saveListing(
   const healthNote = input.healthNoteFa.trim();
   if (healthNote.length > 2000) throw validation('یادداشت سلامت بیش از حد طولانی است.');
 
-  const price = parsePrice(priceMode, input.priceToman);
+  const price = parsePrice(input.priceToman);
 
   if (input.cityId !== '') {
     const [city] = await database

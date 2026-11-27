@@ -295,7 +295,8 @@ test('the breed register is managed data, and retiring one keeps existing animal
     );
 
     // Retiring the breed used by a registered animal changes no animal at all.
-    await setBreedActive(ctx.testDb.db, ctx.admin.actor, { breedId: usedBreedId, active: false });
+    const breedVersion = async () => (await ctx.testDb.db.select().from(referenceBreeds).where(eq(referenceBreeds.id, usedBreedId)))[0]!.version;
+    await setBreedActive(ctx.testDb.db, ctx.admin.actor, { breedId: usedBreedId, active: false, reasonFa: 'SYNTHETIC — دلیل آزمایشی', expectedVersion: await breedVersion() });
     const [unchanged] = await ctx.testDb.db.select().from(animals).where(eq(animals.id, animal.animalId));
     assert.equal(unchanged!.breedId, usedBreedId);
     const [retired] = await ctx.testDb.db
@@ -312,7 +313,7 @@ test('the breed register is managed data, and retiring one keeps existing animal
     assert.equal((event!.before as { isActive: boolean }).isActive, true);
 
     // And it can be brought back, which is also recorded.
-    await setBreedActive(ctx.testDb.db, ctx.admin.actor, { breedId: usedBreedId, active: true });
+    await setBreedActive(ctx.testDb.db, ctx.admin.actor, { breedId: usedBreedId, active: true, reasonFa: 'SYNTHETIC — دلیل آزمایشی', expectedVersion: await breedVersion() });
     const enabled = await ctx.testDb.db
       .select()
       .from(auditEvents)

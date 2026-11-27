@@ -30,13 +30,6 @@ export const dynamic = 'force-dynamic';
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 const price = (value: bigint | null): string => (value === null ? 'قیمت هنوز تعیین نشده' : formatTomanFa(configuredMoney(value.toString()))!);
 
-const STATUS_FA: Record<string, string> = {
-  PENDING_PAYMENT: 'در انتظار پرداخت',
-  ACTIVE: 'پرداخت‌شده',
-  SUPERSEDED: 'جایگزین‌شده با خرید تازه‌تر',
-  CANCELLED: 'لغوشده',
-};
-
 /**
  * The account's mating-finder subscription — PHASE-4 PROMPT-002.
  *
@@ -92,9 +85,7 @@ export default async function MatingFinderAccountPage() {
           <div className="flex flex-wrap items-start justify-between gap-md">
             <SectionHeader title="وضعیت فعلی" size="sm" />
             <span data-testid="finder-standing">
-              <StatusBadge tone={standing.state === 'ACTIVE' ? 'success' : standing.state === 'EXPIRED' ? 'warning' : 'neutral'}>
-                {standing.state === 'ACTIVE' ? 'اشتراک فعال' : standing.state === 'EXPIRED' ? 'اشتراک منقضی شده' : 'بدون اشتراک'}
-              </StatusBadge>
+              <StatusBadge status={standing.state} />
             </span>
           </div>
           <KeyValueList
@@ -152,7 +143,7 @@ export default async function MatingFinderAccountPage() {
                       {'طرح ' + FINDER_AUDIENCE_FA[slot.audience] + ' — ' + FINDER_DURATION_FA[slot.durationMonths as FinderDuration]}
                     </p>
                     <p className="text-label-lg">{planRow.titleFa}</p>
-                    <p className={planRow.priceToman === null ? 'hz-unset text-label-md' : 'text-h4'} data-testid={'finder-plan-price-' + testId}>
+                    <p className={planRow.priceToman === null ? 'hz-unset text-label-sm' : 'text-h4'} data-testid={'finder-plan-price-' + testId}>
                       {price(planRow.priceToman)}
                     </p>
                     <p className="mt-xs text-caption text-text-secondary">{'ظرفیت: ' + fa(planRow.activeAnimalCapacity) + ' حیوان فعال'}</p>
@@ -227,9 +218,7 @@ export default async function MatingFinderAccountPage() {
                       ' · نسخه ' + fa(row.planVersion) + ' · ' + price(row.priceToman) +
                       (row.startsAt && row.endsAt ? ' · از ' + formatInstantFa(row.startsAt) + ' تا ' + formatInstantFa(row.endsAt) : '')}
                   </span>
-                  <StatusBadge tone={row.status === 'ACTIVE' ? 'success' : row.status === 'PENDING_PAYMENT' ? 'info' : 'neutral'}>
-                    {row.status === 'ACTIVE' && row.endsAt && row.endsAt.getTime() <= now.getTime() ? 'پایان‌یافته' : STATUS_FA[row.status]}
-                  </StatusBadge>
+                  <StatusBadge status={row.status === 'ACTIVE' && row.endsAt && row.endsAt.getTime() <= now.getTime() ? 'EXPIRED' : row.status} />
                 </li>
               ))}
             </ul>

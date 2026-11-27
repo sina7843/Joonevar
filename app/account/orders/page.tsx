@@ -8,18 +8,11 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { myOrders } from '../../../src/commerce/cart.ts';
-import { ORDER_STATUS_FA, type OrderStatus } from '../../../src/commerce/order-model.ts';
+import { type OrderStatus } from '../../../src/commerce/order-model.ts';
 
 export const dynamic = 'force-dynamic';
 
 const fa = (value: number | bigint): string => value.toLocaleString('fa-IR');
-
-const TONE: Record<OrderStatus, 'success' | 'warning' | 'neutral'> = {
-  PENDING_PAYMENT: 'warning',
-  PAID: 'success',
-  CANCELLED: 'neutral',
-  REFUNDED: 'neutral',
-};
 
 /**
  * Everything this person has ordered from the shop — PROMPT-010. P05: one
@@ -88,9 +81,9 @@ export default async function MyOrdersPage() {
                       </div>
                     </td>
                     <td data-label="وضعیت">
-                      <StatusBadge tone={TONE[status]} size="sm">
-                        <span data-testid={'order-status-' + order.id}>{ORDER_STATUS_FA[status]}</span>
-                      </StatusBadge>
+                      <span data-testid={'order-status-' + order.id}>
+                        <StatusBadge status={status} size="sm" />
+                      </span>
                     </td>
                     <td data-label="اقدام بعدی با">
                       {status === 'PENDING_PAYMENT' ? (

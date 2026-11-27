@@ -1,5 +1,6 @@
 'use client';
 
+import { ReasonField as SharedReasonField } from '../ui/decision.tsx';
 import { useActionState } from 'react';
 import { Card } from '../ui/card.tsx';
 import { Button } from '../ui/button.tsx';
@@ -39,11 +40,12 @@ const Hidden = ({ surface, centreId }: { surface: CentreSurface; centreId?: stri
   </>
 );
 
-function ReasonField({ surface, testId }: { surface: CentreSurface; testId: string }) {
+/** A change note (DS ReasonField, compact): optional for the owner, required with history for staff. */
+function ChangeNoteField({ surface, testId }: { surface: CentreSurface; testId: string }) {
   return surface === 'owner' ? (
-    <TextField label="یادداشت تغییر" name="reason" maxLength={500} data-testid={testId} />
+    <SharedReasonField name="reason" label="یادداشت تغییر" rows={2} audience={null} testId={testId} />
   ) : (
-    <TextField label="دلیل تغییر" name="reason" required maxLength={500} hint="در تاریخچه تغییرات ثبت می‌شود." data-testid={testId} />
+    <SharedReasonField name="reason" label="دلیل تغییر" required rows={2} audience={null} hint="در تاریخچه تغییرات ثبت می‌شود." testId={testId} />
   );
 }
 
@@ -105,7 +107,7 @@ export function CentreCreateForm({
           hint="فقط برای بررسی؛ در صفحه عمومی نمایش داده نمی‌شود."
           data-testid="centre-source"
         />
-        <ReasonField surface={surface} testId="centre-create-reason" />
+        <ChangeNoteField surface={surface} testId="centre-create-reason" />
         <Check name="confirmedNotDuplicate" label="مراکز مشابه را دیده‌ام و این مرکز تکراری نیست" defaultChecked={false} testId="centre-confirm" />
         <Button type="submit" disabled={pending} data-testid="create-centre">
           ثبت مرکز
@@ -156,7 +158,7 @@ export function CentreProfileForm({
         </div>
 
         <fieldset>
-          <legend className="text-label-md">خدمات</legend>
+          <legend className="text-label-sm">خدمات</legend>
           <div className="mt-sm grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
             {services.map((row) => (
               <Check
@@ -171,7 +173,7 @@ export function CentreProfileForm({
           </div>
         </fieldset>
         <fieldset>
-          <legend className="text-label-md">گونه‌هایی که پذیرفته می‌شوند</legend>
+          <legend className="text-label-sm">گونه‌هایی که پذیرفته می‌شوند</legend>
           <div className="mt-sm flex flex-wrap gap-lg">
             {speciesList.map((row) => (
               <Check
@@ -186,7 +188,7 @@ export function CentreProfileForm({
           </div>
         </fieldset>
         <fieldset>
-          <legend className="text-label-md">امکانات</legend>
+          <legend className="text-label-sm">امکانات</legend>
           <div className="mt-sm grid gap-xs sm:grid-cols-2 lg:grid-cols-3">
             {facilities.map((row) => (
               <Check
@@ -201,7 +203,7 @@ export function CentreProfileForm({
           </div>
         </fieldset>
 
-        <ReasonField surface={surface} testId="centre-profile-reason" />
+        <ChangeNoteField surface={surface} testId="centre-profile-reason" />
         <Button type="submit" disabled={pending} data-testid="save-centre-profile">
           ذخیره پرونده مرکز
         </Button>
@@ -290,7 +292,7 @@ export function CentreStatusForm({
               options={targets.map((value) => ({ value, label: CENTRE_STATUS_FA[value] }))}
               data-testid="centre-status-to"
             />
-            <ReasonField surface={surface} testId="centre-status-reason" />
+            <ChangeNoteField surface={surface} testId="centre-status-reason" />
             <Button type="submit" disabled={pending} data-testid="change-centre-status">
               ثبت وضعیت
             </Button>
@@ -353,7 +355,7 @@ const KINDS = [
 function HoursFields({ branch, suffix }: { branch?: EditableBranch; suffix: string }) {
   return (
     <fieldset>
-      <legend className="text-label-md">ساعات اعلام‌شده</legend>
+      <legend className="text-label-sm">ساعات اعلام‌شده</legend>
       <p className="mt-2xs text-caption text-text-secondary">
         روزهایی که خالی بماند اعلام نشده‌اند. این ساعات فقط اطلاع‌رسانی است و نوبت نمی‌دهد.
       </p>
@@ -425,7 +427,7 @@ export function BranchForm({
       <Check name="isOpen24h" label="شبانه‌روزی" defaultChecked={branch?.isOpen24h ?? false} testId={'branch-24h' + suffix} />
       <Check name="isPublic" label="نمایش این شعبه در صفحه عمومی" defaultChecked={branch?.isPublic ?? true} testId={'branch-public' + suffix} />
       {branch ? <Check name="isActive" label="شعبه فعال است" defaultChecked={branch.isActive} testId={'branch-active' + suffix} /> : null}
-      {branch ? <ReasonField surface={surface} testId={'branch-reason' + suffix} /> : null}
+      {branch ? <ChangeNoteField surface={surface} testId={'branch-reason' + suffix} /> : null}
       <Button type="submit" tone="secondary" disabled={pending} data-testid={branch ? 'save-branch-' + branch.id : 'add-branch'}>
         {branch ? 'ذخیره شعبه' : 'افزودن شعبه'}
       </Button>
@@ -481,7 +483,7 @@ export function MemberInviteForm({ surface, centreId }: { surface: CentreSurface
         />
         <TextField label="سمت در مرکز" name="roleFa" maxLength={120} data-testid="member-role" />
       </div>
-      <ReasonField surface={surface} testId="member-reason" />
+      <ChangeNoteField surface={surface} testId="member-reason" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="invite-member">
         فرستادن دعوت
       </Button>
@@ -497,7 +499,7 @@ export function MemberRemoveForm({ surface, member }: { surface: CentreSurface; 
       <input type="hidden" name="memberId" value={member.id} />
       <input type="hidden" name="expectedVersion" value={member.version} />
       <div className="min-w-[12rem] flex-1">
-        <ReasonField surface={surface} testId={'member-remove-reason-' + member.id} />
+        <ChangeNoteField surface={surface} testId={'member-remove-reason-' + member.id} />
       </div>
       <Button type="submit" tone="ghost" disabled={pending} data-testid={'remove-member-' + member.id}>
         برداشتن از فهرست
@@ -514,7 +516,7 @@ export function CentreInvitationForm({ invitation }: { invitation: { id: string;
   const [state, submit, pending] = useActionState(respondToCentreInvitationAction, EMPTY);
   return (
     <div className="rounded-xl border border-border-default p-lg" data-testid={'centre-invitation-' + invitation.id}>
-      <p className="text-label-md">{invitation.centreNameFa}</p>
+      <p className="text-label-sm">{invitation.centreNameFa}</p>
       {invitation.roleFa ? <p className="mt-2xs text-caption text-text-secondary">{'سمت پیشنهادی: ' + invitation.roleFa}</p> : null}
       <p className="mt-xs text-body-sm text-text-secondary">تا وقتی نپذیرید، نام شما در صفحه این مرکز نمایش داده نمی‌شود.</p>
       <Result state={state} testId={'centre-invitation-result-' + invitation.id} />

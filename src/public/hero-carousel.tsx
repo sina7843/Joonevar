@@ -24,8 +24,8 @@ export function HeroCarousel({ slides }: { slides: ReadonlyArray<{ src: string; 
         <img src={slide.src} alt={slide.altFa} width={1200} height={675} fetchPriority={index === 0 ? 'high' : 'auto'} />
       </div>
       {count > 1 ? (
-        <div className="flex items-center justify-between gap-md">
-          <p className="hz-caption">{slide.altFa}</p>
+        <div className="flex items-center justify-between gap-md [&>.hz-carousel]:ms-auto">
+          <p className="hz-caption hz-show-md">{slide.altFa}</p>
           <div className="hz-carousel">
             <button type="button" className="hz-icon-btn hz-icon-btn--outline" aria-label="تصویر قبلی" onClick={() => go(index - 1)}>
               <Icon name="caretLeft" size="sm" mirror />
@@ -35,7 +35,7 @@ export function HeroCarousel({ slides }: { slides: ReadonlyArray<{ src: string; 
                 <button
                   key={item.src}
                   type="button"
-                  aria-label={'تصویر ' + (dot + 1).toLocaleString('fa-IR')}
+                  aria-label={'تصویر ' + (dot + 1).toLocaleString('fa-IR') + ' از ' + count.toLocaleString('fa-IR')}
                   aria-current={dot === index ? 'true' : undefined}
                   onClick={() => setIndex(dot)}
                 />

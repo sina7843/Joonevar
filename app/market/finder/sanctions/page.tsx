@@ -47,6 +47,7 @@ export default async function FinderSanctionsPage() {
                 <li key={s.id} className="space-y-xs py-md first:pt-0 last:pb-0">
                   <div className="flex flex-wrap items-center justify-between gap-sm">
                     <h3 className="text-label-lg">{s.scope === 'ACCOUNT' ? 'محدودیت حساب' : 'تعلیق جفت‌یابی'}</h3>
+                    {/* GAPS #4: no dictionary key for a live/ended sanction (ACTIVE would read as success). */}
                     <StatusBadge tone={live ? 'warning' : 'neutral'} size="sm">
                       {live ? 'فعال' : 'پایان‌یافته'}
                     </StatusBadge>

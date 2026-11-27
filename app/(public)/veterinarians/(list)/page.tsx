@@ -7,7 +7,7 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
+import { StatusBadge, TrustedMark } from '../../../../src/ui/status.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { PageHeader } from '../../../../src/ui/section-header.tsx';
 import { SearchField } from '../../../../src/ui/search-field.tsx';
@@ -159,12 +159,7 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
                         <div className="hz-vet__body">
                           <h3 className="hz-vet__name">
                             {vet.nameFa}
-                            {vet.trusted ? (
-                              <span className="hz-badge hz-badge--success">
-                                <Icon name="shieldCheck" size="xs" />
-                                معتمد همزیست
-                              </span>
-                            ) : null}
+                            {vet.trusted ? <TrustedMark /> : null}
                           </h3>
                           {vet.headlineFa ? <span className="hz-vet__meta">{vet.headlineFa}</span> : null}
                           {vet.specialtiesFa.length > 0 ? <span className="hz-vet__meta">{'تخصص: ' + vet.specialtiesFa.join('، ')}</span> : null}
@@ -174,25 +169,14 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
                               {vet.placesFa.join('، ')}
                             </span>
                           ) : null}
-                          {vet.promoted || !vet.owned || vet.verified ? (
+                          {vet.verified ? <span className="hz-vet__meta">کد نظام تأییدشده</span> : null}
+                          {vet.promoted ? (
                             <span className="mt-xs flex flex-wrap gap-xs">
-                              {vet.promoted ? (
-                                <span data-testid={'promoted-' + vet.slug}>
-                                  <StatusBadge tone="info" size="sm">
-                                    تبلیغ
-                                  </StatusBadge>
-                                </span>
-                              ) : null}
-                              {vet.owned ? null : (
-                                <StatusBadge tone="warning" size="sm">
-                                  بدون مالک
-                                </StatusBadge>
-                              )}
-                              {vet.verified ? (
+                              <span data-testid={'promoted-' + vet.slug}>
                                 <StatusBadge tone="info" size="sm">
-                                  کد نظام تأییدشده
+                                  تبلیغ
                                 </StatusBadge>
-                              ) : null}
+                              </span>
                             </span>
                           ) : null}
                         </div>
@@ -218,11 +202,7 @@ export default async function VeterinariansPage({ searchParams }: { searchParams
           <FilterPanel
             clearHref="/veterinarians"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect
               id="vet-specialty"

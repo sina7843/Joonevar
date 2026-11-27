@@ -293,7 +293,7 @@ test('the breed editor belongs to the superadmin environment alone', async () =>
     // A signed-in ordinary account is refused by the server, not just unlinked.
     await signIn(page, '0999' + String(randomInt(1_000_000, 9_999_999)));
     await page.goto(target, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
   });
 
   // An address that is not a breed id is a 404 inside the shell, not an error page.

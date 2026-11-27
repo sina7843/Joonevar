@@ -4,6 +4,8 @@ An open Hamzist service — name, one-line description and its fee from settings
 
 Use in the dashboard «خدمات» block (PublicShell) and on the home/«خدمات» landing («خدمات همزیست»). Not for paid add-ons inside a flow (show the price on the action button: «پرداخت ۴۰۰٬۰۰۰ تومان»), and not for a service the user cannot use — that is `LockedServiceCard`.
 
+**On public pages (home `/`, `/services`) the card has no footer:** no fee, no unit and no «تعیین‌نشده» (product decision DEC-0186, Acceptance decision 14, 26 Mehr 1405). The fee footer is used only on signed-in pages such as the dashboard; the payment flow shows the amount on its action.
+
 ## Anatomy
 
 1. Card — `.hz-card` (white, `border-default`, `radius-xl`); the whole card is the link when the service is open.

@@ -21,7 +21,7 @@ export function KennelReviewForm({ kennelId, version }: { kennelId: string; vers
       reasonFor={['NEEDS_CORRECTION', 'REJECTED']}
       reasonLabel={(value) => (value === 'REJECTED' ? 'دلیل رد' : 'دلیل اصلاح')}
       choices={[
-        { value: 'APPROVED', label: 'تأیید کنل و فعال‌سازی نقش پرورش‌دهنده', desc: 'نقش پرورش‌دهنده همین حساب فعال می‌شود؛ پرداخت جداگانه‌ای ندارد.', testId: 'kennel-decision-APPROVED' },
+        { value: 'APPROVED', label: 'تأیید', desc: 'کنل ثبت و نقش پرورش‌دهنده همین حساب فعال می‌شود؛ پرداخت جداگانه‌ای ندارد.', testId: 'kennel-decision-APPROVED' },
         { value: 'NEEDS_CORRECTION', label: 'نیازمند اصلاح', desc: 'پرونده با دلیل به مالک کنل برمی‌گردد.', testId: 'kennel-decision-NEEDS_CORRECTION' },
         { value: 'REJECTED', label: 'رد', desc: 'پرونده با دلیل بسته می‌شود.', testId: 'kennel-decision-REJECTED' },
       ]}

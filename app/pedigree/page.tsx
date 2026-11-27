@@ -10,7 +10,6 @@ import { db } from '../../src/db/client.ts';
 import { eligibilityFor } from '../../src/domain/eligibility/service.ts';
 import {
   centreDetails,
-  RECEIPT_STATUS_FA,
   receiptsOfOwner,
   selectableForPedigree,
 } from '../../src/genetics/service.ts';
@@ -123,17 +122,7 @@ export default async function PedigreePage() {
                   <Link href={'/pedigree/receipts/' + receipt.id} className="hz-link">
                     فیش {formatCivilDateFa(receipt.createdAt.toISOString().slice(0, 10))}
                   </Link>
-                  <StatusBadge
-                    tone={
-                      receipt.status === 'APPROVED'
-                        ? 'success'
-                        : receipt.status === 'NEEDS_CORRECTION'
-                          ? 'warning'
-                          : 'info'
-                    }
-                  >
-                    {RECEIPT_STATUS_FA[receipt.status]}
-                  </StatusBadge>
+                  <StatusBadge status={receipt.status} />
                 </li>
               ))}
             </ul>

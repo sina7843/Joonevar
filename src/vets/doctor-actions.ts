@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../db/client.ts';
 import { env } from '../config/env.ts';
 import { guardRoute } from '../authz/guard.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { DOCTOR_DOCUMENT_KINDS } from './professional-profile-model.ts';
 import { decideDoctorCase, resubmitDoctorApplication, submitDoctorApplication, type DoctorDocumentInput } from './doctor-application.ts';
 
@@ -22,7 +22,7 @@ async function actorAt(path: string) {
 }
 
 function failure(error: unknown): DoctorState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 

@@ -83,9 +83,7 @@ export default async function AnimalsPage() {
                   <div className="hz-animal-tile__body">
                     <div className="flex flex-wrap items-center justify-between gap-sm">
                       <span className="hz-animal__name">{name}</span>
-                      <StatusBadge tone={registered ? 'info' : 'neutral'} size="sm">
-                        {registered ? 'پرونده اولیه' : 'پیش‌نویس'}
-                      </StatusBadge>
+                      <StatusBadge status={animal.status} size="sm" />
                     </div>
                     <span className="hz-animal__meta">
                       {'سگ · ' + breedName(animal.breedId) + ' · ' + generationLabel(animal.generation)}

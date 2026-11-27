@@ -611,7 +611,7 @@ test('changing the mobile ends the account other sessions', async () => {
 test('OTP limits come from settings, so changing a setting changes the behaviour', async () => {
   await withDb(async (testDb) => {
     const admin = await signInWithVerifiedMobile(testDb.db, '09123450021');
-    await updateSetting(testDb.db, actorFor(admin.accountId, 'SUPERADMIN'), { key: 'otp.max_attempts', value: 3 });
+    await updateSetting(testDb.db, actorFor(admin.accountId, 'SUPERADMIN'), { reason: 'SYNTHETIC — مقدار آزمایشی', key: 'otp.max_attempts', value: 3 });
 
     const sms = devOutboxSmsSender(testDb.db, DEV);
     const sent = await requestOtp(testDb.db, { rawMobile: '09123450022', purpose: 'LOGIN' }, sms);

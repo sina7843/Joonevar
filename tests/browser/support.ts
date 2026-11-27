@@ -133,7 +133,7 @@ export async function approvedMember(
   });
   try {
     const opsPage = await operatorContext.newPage();
-    await opsPage.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await opsPage.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await opsPage.getByTestId('open-case').first().click();
     await opsPage.getByTestId('review-form').waitFor();
     await opsPage.getByTestId('decision-APPROVED').check();
@@ -189,6 +189,8 @@ export async function approveMembershipApplication(
   try {
     const opsPage = await operatorContext.newPage();
     await opsPage.goto(BASE_URL + '/assoc/members', { waitUntil: 'load' });
+    // The queue row only opens the case; the decision is in its drawer.
+    await opsPage.getByTestId('open-membership-case').first().click();
     const form = opsPage.getByTestId('membership-decision-form').first();
     await form.waitFor();
     await form.getByTestId('membership-decision-APPROVE').check();
@@ -246,7 +248,7 @@ export async function certifyIdentity(page: Page): Promise<void> {
  */
 export async function waitForShippedSample(page: Page, trackingCode: string): Promise<void> {
   const row = () =>
-    page.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
+    page.locator('[data-testid="centre-sample-list"] tbody > tr').filter({ hasText: trackingCode });
   for (let attempt = 0; attempt < 10; attempt += 1) {
     if ((await row().getByText('ارسال‌شده').count()) > 0) return;
     await page.waitForTimeout(1_000);

@@ -107,7 +107,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -338,23 +338,36 @@ test('the Finder is empty until the superadmin records a licensed location', asy
       await page.getByTestId('add-location').click();
       await expectText(page, 'مرکز ثبت شد');
       await page.screenshot({ path: path.join(SHOTS, 'admin-vet-registry.png'), fullPage: true });
-      await expectText(page, 'امکانات اجباری این خدمت در این مرکز کامل نیست');
 
       await owner.page.goto(ownFinder, { waitUntil: 'load' });
       await expectText(owner.page, 'مرکزی با این فیلترها پیدا نشد');
       await owner.page.screenshot({ path: path.join(SHOTS, 'finder-partial-capability.png'), fullPage: true });
 
       // Completing the mandatory facilities is what brings it into Finder.
-      await page.goto(BASE_URL + '/admin/vets', { waitUntil: 'load' });
-      // The page lists every location of this veterinarian, including ones left
-      // by earlier runs, so the form is found by the name it was created with.
-      const locationId = await page.evaluate((name) => {
-        for (const form of document.querySelectorAll('[data-testid^="edit-location-"]')) {
-          const field = form.querySelector('input[name="nameFa"]') as HTMLInputElement | null;
-          if (field?.value === name) return (form.getAttribute('data-testid') ?? '').replace('edit-location-', '');
+      // The registry pages by 20 and keeps each veterinarian's locations in a
+      // drawer: search by name, then open each matching row's drawer until the
+      // location (found by the name it was created with — earlier runs leave
+      // others) is there.
+      await page.goto(BASE_URL + '/admin/vets?q=' + encodeURIComponent(VET_NAME), { waitUntil: 'load' });
+      let locationId = '';
+      const openers = page.locator('[data-testid^="open-vet-locations-"]');
+      for (let index = 0; index < (await openers.count()) && locationId === ''; index++) {
+        await openers.nth(index).click();
+        await page.getByTestId('drawer').waitFor();
+        locationId = await page.evaluate((name) => {
+          for (const form of document.querySelectorAll('[data-testid^="edit-location-"]')) {
+            const field = form.querySelector('input[name="nameFa"]') as HTMLInputElement | null;
+            if (field?.value === name) return (form.getAttribute('data-testid') ?? '').replace('edit-location-', '');
+          }
+          return '';
+        }, LOCATION_NAME);
+        if (locationId === '') {
+          await page.keyboard.press('Escape');
+          await page.getByTestId('drawer').waitFor({ state: 'detached' });
         }
-        return '';
-      }, LOCATION_NAME);
+      }
+      // The registry says why the location is out of the Finder (it sits in the open drawer).
+      await expectText(page, 'امکانات اجباری این خدمت در این مرکز کامل نیست');
       assert.notEqual(locationId, '', 'the location just created must be editable here');
       await page.getByTestId('licence-' + locationId).selectOption('VALID');
       await page.getByTestId('cap-blood-' + locationId).check();

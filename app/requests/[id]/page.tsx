@@ -7,7 +7,8 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { PublicShell } from '../../../src/ui/shell.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { ActionOwner, Identifier, StatusBadge } from '../../../src/ui/status.tsx';
+import { ActionOwner, Identifier } from '../../../src/ui/status.tsx';
+import { ReferralStatusBadge, RequestStatusBadge } from '../status-badges.tsx';
 import { PageHeader, SectionHeader } from '../../../src/ui/section-header.tsx';
 import { PageCrumbs } from '../../../src/ui/page-crumbs.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
@@ -18,14 +19,20 @@ import { SAMPLE_STATUS_FA } from '../../../src/domain/microchip.ts';
 import {
   CONTACT_FOR_PRICE_FA,
   CONTEXT_FA,
-  REFERRAL_STATUS_FA,
-  REQUEST_STATUS_FA,
   SERVICE_TYPE_FA,
-  REQUEST_STATUS_TONE,
-  REFERRAL_STATUS_TONE,
 } from '../../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { RenewReferralForm } from './renew-form.tsx';
+import { CaseHistory } from '../../../src/ui/desk.tsx';
+import { auditSteps, historyFromAudit } from '../../assoc/audit-history.ts';
+
+/** What each recorded step of a visit request is called on its timeline (K11 «تاریخچه پرونده»). */
+const REQUEST_STEP_FA: Readonly<Record<string, string>> = {
+  VET_VISIT_REQUEST_CREATED: 'درخواست ثبت شد و کد مراجعه صادر شد',
+  REFERRAL_REISSUED: 'کد مراجعه تازه صادر شد',
+  VET_VISIT_CHECKED_IN: 'پذیرش نزد دامپزشک معتمد',
+  VET_VISIT_SERVICE_CORRECTED: 'خدمت ثبت‌شده اصلاح شد',
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -60,18 +67,12 @@ export default async function RequestPage({
   }
 
   const { request, referral, expired } = view;
-  const sampleRows = await ownerSamples(db(), guard.actor, request.id);
+  // The page has already authorized this request (ownerRequest), so its audit rows are this owner's to read.
+  const [sampleRows, steps] = await Promise.all([ownerSamples(db(), guard.actor, request.id), auditSteps('VET_VISIT_REQUEST', request.id)]);
+  const history = historyFromAudit(steps, REQUEST_STEP_FA, request.status === 'ACTIVE' || request.status === 'CHECKED_IN');
   const usable = referral !== null && referral.status === 'ACTIVE' && !expired;
 
   const title = SERVICE_TYPE_FA[request.serviceType] + ' · ' + (view.animalName ?? 'بدون نام');
-  const referralState = referral
-    ? expired && referral.status === 'ACTIVE'
-      ? { tone: 'warning' as const, label: 'منقضی' }
-      : {
-          tone: REFERRAL_STATUS_TONE[referral.status]!,
-          label: REFERRAL_STATUS_FA[referral.status],
-        }
-    : null;
   const expiryFa = referral ? formatCivilDateFa(referral.expiresAt.toISOString().slice(0, 10)) : null;
 
   return (
@@ -92,13 +93,15 @@ export default async function RequestPage({
             title={title}
             back={{ href: '/requests' }}
             aside={
-              <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!}>
-                <span data-testid="request-status">{REQUEST_STATUS_FA[request.status]}</span>
-              </StatusBadge>
+              <span data-testid="request-status">
+                <RequestStatusBadge status={request.status} />
+              </span>
             }
             meta={[
               CONTEXT_FA[request.context],
               view.vetNameFa + ' · ' + view.locationNameFa,
+              // K11: when it was filed (KUSR-033).
+              'ثبت ' + new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Tehran' }).format(request.createdAt),
               expiryFa ? 'مهلت مراجعه تا ' + expiryFa : null,
             ].filter(Boolean)}
           />
@@ -117,7 +120,7 @@ export default async function RequestPage({
             <Card>
               <SectionHeader size="sm" title="کد مراجعه" />
               <p className="mt-md text-h3" data-testid="referral-code">
-                <Identifier value={referral.code} />
+                <Identifier value={referral.code} copy />
               </p>
               <p className="mt-sm text-caption text-text-secondary">
                 QR و ورود دستی دو نمایش از همین یک کد هستند؛ کد دومی وجود ندارد.
@@ -128,7 +131,7 @@ export default async function RequestPage({
                     {
                       key: 'وضعیت کد',
                       testId: 'referral-status',
-                      value: <StatusBadge tone={referralState!.tone}>{referralState!.label}</StatusBadge>,
+                      value: <ReferralStatusBadge status={referral.status} expired={expired} />,
                     },
                     {
                       key: 'مهلت مراجعه تا',
@@ -152,7 +155,7 @@ export default async function RequestPage({
                 {sampleRows.map((sample) => (
                   <div key={sample.id} className="hz-kv__row">
                     <dt className="hz-kv__key">
-                      <Identifier label="کد رهگیری:" value={sample.trackingCode} />
+                      <Identifier label="کد رهگیری:" value={sample.trackingCode} copy />
                     </dt>
                     <dd className="hz-kv__value">{SAMPLE_STATUS_FA[sample.status]}</dd>
                   </div>
@@ -181,6 +184,13 @@ export default async function RequestPage({
           ) : null}
 
           <Card>
+            <SectionHeader size="sm" title="تاریخچه پرونده" />
+            <div className="mt-md" data-testid="request-history">
+              <CaseHistory entries={history} />
+            </div>
+          </Card>
+
+          <Card>
             <SectionHeader size="sm" title="جزئیات درخواست" />
             <div className="mt-md">
               <KeyValueList
@@ -197,7 +207,7 @@ export default async function RequestPage({
           </Card>
         </div>
 
-        <aside className="min-w-0 space-y-xl lg:col-span-4" aria-label="وضعیت و اقدام">
+        <aside className="min-w-0 space-y-xl max-lg:order-first lg:col-span-4" aria-label="وضعیت و اقدام">
           <Card>
             <SectionHeader size="sm" title="وضعیت و اقدام" />
             <div className="mt-md space-y-md">
@@ -206,17 +216,13 @@ export default async function RequestPage({
                   {
                     key: 'وضعیت',
                     value: (
-                      <StatusBadge tone={REQUEST_STATUS_TONE[request.status]!} size="sm">
-                        {REQUEST_STATUS_FA[request.status]}
-                      </StatusBadge>
+                      <RequestStatusBadge status={request.status} size="sm" />
                     ),
                   },
                   {
                     key: 'کد مراجعه',
-                    value: referralState ? (
-                      <StatusBadge tone={referralState.tone} size="sm">
-                        {referralState.label}
-                      </StatusBadge>
+                    value: referral ? (
+                      <ReferralStatusBadge status={referral.status} expired={expired} size="sm" />
                     ) : null,
                   },
                 ]}

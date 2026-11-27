@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../../src/db/client.ts';
 import { env } from '../../../../src/config/env.ts';
 import { guardRoute } from '../../../../src/authz/guard.ts';
-import { AppError, validation } from '../../../../src/domain/errors.ts';
+import { AppError, staleOf, validation } from '../../../../src/domain/errors.ts';
 import { addProductImage, addVariant, createProduct, submitProduct } from '../../../../src/commerce/catalog.ts';
 import { addSku, createOffer, moveOffer, recordStockMove } from '../../../../src/commerce/inventory.ts';
 import { addShippingMethod, setSkuWeight } from '../../../../src/commerce/shipping.ts';
@@ -30,7 +30,7 @@ function count(form: FormData, key: string): number {
 }
 
 const failure = (error: unknown): CatalogFormState => {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 };
 

@@ -20,9 +20,15 @@ export const TRUSTED_DECISIONS = ['APPROVE', 'REQUEST_CORRECTION', 'REJECT'] as 
 export type TrustedDecision = (typeof TRUSTED_DECISIONS)[number];
 
 export const TRUSTED_DECISION_FA: Record<TrustedDecision, string> = {
-  APPROVE: 'تأیید؛ پرداخت دوره معتمد باز می‌شود',
-  REQUEST_CORRECTION: 'درخواست اصلاح',
-  REJECT: 'رد درخواست',
+  APPROVE: 'تأیید',
+  REQUEST_CORRECTION: 'نیازمند اصلاح',
+  REJECT: 'رد',
+};
+/** The consequence under each outcome (DS DecisionDesk: the labels stay تأیید · نیازمند اصلاح · رد). */
+export const TRUSTED_DECISION_DESC_FA: Record<TrustedDecision, string> = {
+  APPROVE: 'پرداخت دوره معتمد برای متقاضی باز می‌شود؛ نقش معتمد پس از پرداخت تأییدشده فعال می‌شود.',
+  REQUEST_CORRECTION: 'پرونده با دلیل به متقاضی برمی‌گردد تا همان پرونده را اصلاح کند.',
+  REJECT: 'پرونده با دلیل بسته می‌شود.',
 };
 
 /** Approval opens the trusted period payment and nothing more (PROMPT-011). */

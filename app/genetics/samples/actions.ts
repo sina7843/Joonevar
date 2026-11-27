@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { instructSend } from '../../../src/clinical/samples.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface GeneticsFormState {
   readonly ok?: boolean;
@@ -26,7 +26,7 @@ export async function instructSendAction(
     revalidatePath('/genetics/samples');
     return { ok: true, message: 'دستور ارسال صادر شد. ثبت ارسال روی همان کد رهگیری انجام می‌شود.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

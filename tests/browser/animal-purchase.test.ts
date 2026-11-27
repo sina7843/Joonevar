@@ -79,7 +79,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -120,7 +121,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -238,7 +239,8 @@ async function publishNegotiableListing(page: Page, animalId: string): Promise<s
   const id = new URL(page.url()).pathname.split('/').pop()!;
   const url = BASE_URL + '/account/listings/' + id;
 
-  await page.getByTestId('listing-price-mode').selectOption('NEGOTIABLE');
+  // Decision 7g: every advert has an amount and is negotiable.
+  await page.getByTestId('listing-price').fill('20000000');
   await page
     .getByTestId('listing-description')
     .fill('SYNTHETIC توضیح آگهی آزمایشی که به‌اندازه کافی طولانی است تا شرط حداقل طول را برآورده کند.');
@@ -379,7 +381,9 @@ test('the advert is readable without an account, and the request needs one', asy
     const page = await anonymous.newPage();
     await page.goto(BASE_URL + '/animals-market/' + listingId, { waitUntil: 'load' });
     // Reading is public: the price and the safety note are both there.
-    assert.equal(await page.getByTestId('listing-price').innerText(), 'قیمت توافقی');
+    const priceText = await page.getByTestId('listing-price').innerText();
+    assert.match(priceText, /۲۰٬۰۰۰٬۰۰۰/);
+    assert.match(priceText, /قابل مذاکره/);
     assert.match(await page.getByTestId('listing-safety').innerText(), /بیعانه/);
     await page.getByTestId('ask-to-buy').waitFor();
     await page.screenshot({ path: path.join(SHOTS, 'public-advert-mobile.png'), fullPage: true });
@@ -456,7 +460,7 @@ test('a buyer asks, the two sides agree a price, and the seller accepts one of t
     assert.match(await page.getByTestId('deposit-amount').innerText(), /۵۵۰٬۰۰۰/);
 
     await page.getByTestId('accept-inquiry-button-' + inquiryId).click();
-    await page.getByTestId('inquiry-status').filter({ hasText: 'در انتظار پرداخت بیعانه' }).waitFor();
+    await page.getByTestId('inquiry-status').filter({ hasText: 'پذیرفته‌شده' }).waitFor();
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
     assert.notEqual(await page.getByTestId('payment-deadline').innerText(), '—');
     await page.screenshot({ path: path.join(SHOTS, 'seller-accepted-desktop.png'), fullPage: true });
@@ -481,7 +485,7 @@ test('the verified deposit reserves the animal and opens the contact details', a
     assert.match(await page.getByTestId('deposit-result').innerText(), /رزرو شد/);
 
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('inquiry-status').innerText(), 'بیعانه پرداخت شد و رزرو انجام شد');
+    assert.equal(await page.getByTestId('inquiry-status').innerText(), 'رزروشده');
     // The one moment contact details appear, and they are the real ones.
     assert.match(await page.getByTestId('counterpart-contact').innerText(), /^0999/);
     // The transcript is frozen: a deal is what a dispute is argued from.

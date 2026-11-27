@@ -17,6 +17,17 @@ import { Icon } from '../../../../src/ui/icon.tsx';
 
 export const dynamic = 'force-dynamic';
 
+/** Request statuses that differ from a status-dictionary key; the rest are keys as-is. */
+const REQUEST_KEY: Partial<Record<RequestStatus, string>> = { PRELIMINARILY_ACCEPTED: 'ACCEPTED', CONTRACT_CONFIRMED: 'CONFIRMED' };
+
+function RequestStatusBadge({ status, size }: { status: RequestStatus; size?: 'sm' | 'md' }) {
+  if (status === 'MATING_COMPLETED' || status === 'MATING_NOT_COMPLETED') {
+    // GAPS #4: no dictionary key for MATING_COMPLETED / MATING_NOT_COMPLETED
+    return <StatusBadge tone="info" size={size}>{REQUEST_STATUS_FA[status]}</StatusBadge>;
+  }
+  return <StatusBadge status={REQUEST_KEY[status] ?? status} size={size} />;
+}
+
 /** Incoming and outgoing mating requests — PHASE-4 PROMPT-005. */
 export default async function FinderRequestsPage() {
   const guard = await guardRoute('/account/mating-finder/requests');
@@ -50,15 +61,13 @@ export default async function FinderRequestsPage() {
                     {(snap.sender.nameFa ?? 'بدون نام') + ' ← ' + snap.receiver.nameFa}
                   </Link>
                   <span className="flex flex-wrap items-center gap-xs">
-                    <StatusBadge tone={status === 'CONTRACT_CONFIRMED' ? 'success' : ['REJECTED', 'CANCELLED', 'EXPIRED'].includes(status) ? 'neutral' : 'info'}>
-                      {REQUEST_STATUS_FA[status]}
-                    </StatusBadge>
-                    {r.pausedAt ? <StatusBadge tone="warning">متوقف تا پایان هماهنگی دیگر</StatusBadge> : null}
+                    <RequestStatusBadge status={status} />
+                    {r.pausedAt ? <StatusBadge status="PAUSED" /> : null}
                   </span>
                 </div>
                 <div className="hz-cardlist__row">
                   <span className="hz-cardlist__meta">{'به‌روزشده ' + formatInstantFa(r.updatedAt)}</span>
-                  <Link href={'/account/mating-finder/requests/' + r.id} className="inline-flex items-center gap-xs text-label-md text-text-brand">
+                  <Link href={'/account/mating-finder/requests/' + r.id} className="inline-flex items-center gap-xs text-label-sm text-text-brand">
                     {LIVE_STATUSES.includes(status) ? 'پیگیری' : 'مشاهده'}
                     <Icon name="caretRight" size="sm" mirror />
                   </Link>
@@ -123,7 +132,7 @@ export default async function FinderRequestsPage() {
                   >
                     <span className="hz-cardlist__row">
                       <span className="hz-cardlist__title">پرونده شخصی</span>
-                      <StatusBadge tone={m.status === 'ACTIVE' ? 'info' : 'neutral'}>{m.status === 'ACTIVE' ? 'فعال' : 'لغوشده'}</StatusBadge>
+                      <StatusBadge status={m.status} />
                     </span>
                     <span className="hz-cardlist__meta">{formatInstantFa(m.createdAt)}</span>
                   </Link>

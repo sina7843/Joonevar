@@ -57,6 +57,8 @@ export interface DiscountRuleInput {
   readonly usesPerAccount: number | null;
   readonly priority: number;
   readonly noteFa: string | null;
+  /** Required for a platform rule (P11, RTO-018); a shop's own rule is the shop's business. */
+  readonly reasonFa?: string;
 }
 
 /**
@@ -74,6 +76,10 @@ export async function createDiscountRule(
   if (!DISCOUNT_KINDS.includes(input.kind)) throw validation('نوع تخفیف معتبر نیست.');
   const labelFa = input.labelFa.trim();
   if (labelFa.length < 3) throw validation('نام این تخفیف را بنویسید.');
+  const reason = (input.reasonFa ?? '').trim();
+  if (input.sellerId === null && reason === '') {
+    throw validation('دلیل تغییر را بنویسید؛ در تاریخچه تغییرات ثبت می‌شود.');
+  }
 
   const sellerOwned = input.kind === 'SELLER_DISCOUNT' || input.kind === 'SELLER_CODE';
   if (sellerOwned) {
@@ -143,6 +149,7 @@ export async function createDiscountRule(
         amountToman: input.amountToman?.toString() ?? null,
         bornByPlatform: bornByPlatform(input.kind),
       },
+      reason: reason || null,
     });
     return row!;
   } catch (error) {
@@ -155,7 +162,7 @@ export async function createDiscountRule(
 export async function moveDiscountRule(
   database: Database,
   actor: Actor,
-  input: { ruleId: string; to: 'ACTIVE' | 'PAUSED' | 'ENDED' },
+  input: { ruleId: string; to: 'ACTIVE' | 'PAUSED' | 'ENDED'; expectedVersion?: number },
 ): Promise<DiscountRuleRow> {
   const rule = await loadRule(database, input.ruleId);
   if (rule.sellerId !== null) {
@@ -164,6 +171,12 @@ export async function moveDiscountRule(
     assertMarketplaceCapability(actor, 'MARKET_SETTINGS_WRITE');
   }
   if (rule.status === 'ENDED') throw conflict('این تخفیف پایان یافته است.');
+  if (input.expectedVersion !== undefined && input.expectedVersion !== rule.version) {
+    throw conflict('این تخفیف در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.', {
+      expectedVersion: input.expectedVersion,
+      actualVersion: rule.version,
+    });
+  }
 
   const [updated] = await database
     .update(discountRules)

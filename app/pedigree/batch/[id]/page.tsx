@@ -9,6 +9,7 @@ import { PublicShell } from '../../../../src/ui/shell.tsx';
 import { Card } from '../../../../src/ui/card.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier, StatusBadge } from '../../../../src/ui/status.tsx';
+import { statusOf } from '../../../../src/ui/status-dictionary.ts';
 import { db } from '../../../../src/db/client.ts';
 import { animals } from '../../../../src/db/schema/animals.ts';
 import { pedigrees } from '../../../../src/db/schema/pedigree.ts';
@@ -25,14 +26,6 @@ const STATE_FA = {
   AWAITING_ISSUANCE: 'در انتظار صدور',
   ISSUED: 'صادر شد',
   BLOCKED: 'متوقف',
-} as const;
-
-const BATCH_FA = {
-  DRAFT: 'پیش‌نویس',
-  AWAITING_PAYMENT: 'در انتظار پرداخت',
-  PAID: 'پرداخت تأییدشده',
-  FAILED: 'پرداخت ناموفق',
-  CANCELLED: 'پرداخت لغوشده',
 } as const;
 
 /**
@@ -101,9 +94,9 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
                 <span>مرور هزینه صدور</span>
               </h2>
             </div>
-            <StatusBadge tone={batch.status === 'PAID' ? 'success' : batch.status === 'FAILED' ? 'warning' : 'info'}>
-              <span data-testid="pedigree-batch-status">{BATCH_FA[batch.status]}</span>
-            </StatusBadge>
+            <span data-testid="pedigree-batch-status">
+              <StatusBadge status={batch.status} />
+            </span>
           </div>
           <ul className="mt-lg space-y-sm text-body-sm" data-testid="pedigree-breakdown">
             {items.map((item) => {
@@ -125,7 +118,7 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
           <p className="mt-2xs text-caption text-text-secondary">
             این پرداخت با پرداخت مستقیم به مرکز ژنتیک یکی نیست؛ تأیید فیش مرکز جای این پرداخت را نمی‌گیرد.
           </p>
-          {payable ? <PayIssuanceForm batchId={batch.id} /> : null}
+          {payable ? <PayIssuanceForm batchId={batch.id} total={formatTomanFa(configuredMoney(total))} /> : null}
         </Card>
 
         <Card>
@@ -143,11 +136,14 @@ export default async function PedigreeBatchPage({ params }: { params: Promise<{ 
                 <li key={item.id} className="rounded-lg border border-border-default p-lg">
                   <div className="flex items-start justify-between gap-md">
                     <span className="text-body-sm">{name}</span>
-                    <StatusBadge
-                      tone={item.state === 'ISSUED' ? 'success' : item.state === 'BLOCKED' ? 'warning' : 'info'}
-                    >
-                      <span data-testid={'pedigree-item-state-' + item.animalId}>{STATE_FA[item.state]}</span>
-                    </StatusBadge>
+                    <span data-testid={'pedigree-item-state-' + item.animalId}>
+                      {statusOf(item.state) ? (
+                        <StatusBadge status={item.state} />
+                      ) : (
+                        // GAPS #4: no dictionary key for AWAITING_ISSUANCE, BLOCKED
+                        <StatusBadge tone={item.state === 'BLOCKED' ? 'warning' : 'info'}>{STATE_FA[item.state]}</StatusBadge>
+                      )}
+                    </span>
                   </div>
                   {item.blockedReasonFa ? (
                     <p

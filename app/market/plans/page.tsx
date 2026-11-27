@@ -100,9 +100,7 @@ export default async function SellerPlansPage() {
                     </span>
                   </div>
                   <div className="hz-setting__end">
-                    <StatusBadge tone={plan.status === 'PUBLISHED' ? 'success' : 'neutral'} size="sm">
-                      {plan.status === 'PUBLISHED' ? 'منتشرشده' : plan.status === 'ARCHIVED' ? 'بایگانی' : 'پیش‌نویس'}
-                    </StatusBadge>
+                    <StatusBadge status={plan.status} size="sm" />
                   </div>
                 </li>
               ))}
@@ -110,7 +108,7 @@ export default async function SellerPlansPage() {
           )}
         </Panel>
         <Panel title="انتشار نسخه تازه">
-          <SellerPlanForm />
+          <SellerPlanForm versions={Object.fromEntries(history.map((plan) => [plan.code, plan.version]).sort((a, b) => (a[1] as number) - (b[1] as number)))} />
         </Panel>
       </div>
     </OpsShell>

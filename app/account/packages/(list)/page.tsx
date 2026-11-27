@@ -10,7 +10,6 @@ import { db } from '../../../../src/db/client.ts';
 import { listPlans, livePackage, myTargets, subscriptionsOf } from '../../../../src/advertising/service.ts';
 import {
   AD_PERIOD_FA,
-  AD_STATE_FA,
   AD_TIER_FA,
   adState,
   remainingDays,
@@ -93,9 +92,7 @@ export default async function AccountPackagesPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-xs">
                     <span data-testid={'package-state-' + target.id}>
-                      <StatusBadge tone={liveState === 'ACTIVE' ? 'success' : 'neutral'}>
-                        {liveState === 'ACTIVE' ? 'بسته فعال' : 'بسته فعالی ندارد'}
-                      </StatusBadge>
+                      <StatusBadge status={liveState ?? 'NONE'} />
                     </span>
                     <Link href={target.manageRoute} className="hz-link hz-link--standalone">
                       مدیریت پرونده
@@ -106,7 +103,7 @@ export default async function AccountPackagesPage() {
 
                 {live ? (
                   <div className="hz-card hz-card--subtle" data-testid={'live-package-' + target.id}>
-                    <p className="text-label-md">
+                    <p className="text-label-sm">
                       {'بسته فعال: ' +
                         AD_TIER_FA[history.find((row) => row.id === live.id)?.tier as AdTier] +
                         ' ' +
@@ -143,7 +140,7 @@ export default async function AccountPackagesPage() {
                         return (
                           <li key={entry.plan.id} className="hz-card hz-card--compact flex flex-col gap-xs" data-testid={'plan-card-' + testId}>
                             <p className="text-label-lg">{entry.tierFa + ' ' + entry.periodFa}</p>
-                            <p className={entry.priceFa ? 'text-h4' : 'hz-unset text-label-md'} data-testid={'plan-price-' + testId}>
+                            <p className={entry.priceFa ? 'text-h4' : 'hz-unset text-label-sm'} data-testid={'plan-price-' + testId}>
                               {entry.priceFa ?? 'قیمت ثبت‌نشده'}
                             </p>
                             {entry.plan.featuresFa ? (
@@ -187,19 +184,7 @@ export default async function AccountPackagesPage() {
                               {row.endsAt ? ' تا ' + formatInstantFa(row.endsAt) : ''}
                               {row.cancelReasonFa ? ' · دلیل لغو: ' + row.cancelReasonFa : ''}
                             </span>
-                            <StatusBadge
-                              tone={
-                                state === 'ACTIVE'
-                                  ? 'success'
-                                  : state === 'PENDING_PAYMENT'
-                                    ? 'info'
-                                    : state === 'PAYMENT_FAILED'
-                                      ? 'error'
-                                      : 'neutral'
-                              }
-                            >
-                              {AD_STATE_FA[state]}
-                            </StatusBadge>
+                            <StatusBadge status={state} />
                           </li>
                         );
                       })}

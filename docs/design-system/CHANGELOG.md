@@ -1,5 +1,33 @@
 # Hamzist Design System — changelog
 
+## v1.0.4 decision 14 — 26 Mehr 1405 (18 Oct 2026)
+
+**No fee on public pages** (product owner): the product decision DEC-0186 stays. K1 «خدمات همزیست» cards have no price footer, no «تعیین‌نشده» and no fee note; the section link is «مشاهده همه» to `/services`. Fees appear only on signed-in pages and in the payment flow. Changed: K1 boards (1440, 390) and their images and html, `patterns/P01-editorial-home.md` (item 10, hard cases), `components/ServiceCard/README.md`, `zz-checklist.md` (decision 14). No CSS change.
+
+## Handoff package — 23 Mehr 1405 (15 Oct 2026)
+
+No design change (still v1.0.4). Made the package ready for Claude Code to implement and verify on its own:
+
+1. **`QA-FINAL-RECONCILIATION.md`** — the required final QA: links to the live design system and key screens with their offline copies, then a step-by-step reconciliation of foundations, fonts, brand, all 129 components, all 12 patterns and every route, all key screens, global checks, gap filling and a report template.
+2. **`qa/`** — `ds-inventory.json` (machine-readable list of tokens, fonts, brand files, status keys, icons, photos, components, patterns, key screens), `ds-audit.mjs` (static audit of the code, exit 1 on FAIL) and `compare-key-screens.mjs` (reference vs running app at 390 / 1440 with screenshots and a structural diff).
+3. **`key-screens/html/`** — the exact markup of all 43 key-screen boards and the two brand boards, rendering offline with the package's CSS, photos and logos.
+4. **Rules:** `CLAUDE-CODE-DESIGN-SYSTEM-RULES.md` §1.8 fonts (exact), §1.9 logo and brand files (exact), §1.10 stylesheets in sync, final QA in the definition of done; `START-PROMPT` step 7 runs the final QA. `brand.md` / `zz-checklist.md`: brand source path corrected to `design-system/assets/brand/`. `key-screens/README.md`: only K1–K19 and B01–B02 are approved; the home option boards are not specs.
+
+## v1.0.4 — 22 Mehr 1405 (14 Oct 2026)
+
+Home page redesign, approved by the product owner. Key screen **K1** (1440 and 390) replaced; pattern **P01** rewritten.
+
+1. **Frames, not bands:** every section of `/` sits in a rounded frame (`.hz-frame`), alternating white and cream (`--cream`); the Hero frame is peach (`--peach`). No full-bleed band on `/`.
+2. **Order:** «تازه‌ها» → Hero → «دنبال چه می‌گردید؟» → «نژادهای سگ» (featured breed «نژاد این ماه» with the five trait meters + five tiles) → **«بازار همزیست»** (4 listings + 4 products, new) → **«دامپزشکان و مراکز معتمد»** (4 trusted vets + 3 centres, new) → «انجمن‌ها و کلاب‌ها» (ClubCard `--cover`) → «همزیست در یک نگاه» (counts + the three steps; the separate «روش کار» section is gone) → «خدمات همزیست» → CtaBand `--media` (with a photo).
+3. **Phones:** card rows become swipe rows (`.hz-row`), vets stack, counts 2×2, steps stacked, CtaBand photo on top. Swipe rows stay inside the frame padding: the first and last card never touch the frame edge, and the next card peeks.
+4. **New CSS** in `components/bundle.css`, block «Home compositions»: `.hz-frame` (`--cream`, `--peach`), `.hz-home-stack`, `.hz-subhead`, `.hz-row` (`--cols`, `--cols-md`, `--row-item`, `--stack`), `.hz-breed-feature`, `.hz-club-cover`, `.hz-glance`, `.hz-cta--media`. Semantic tokens and logical properties only.
+5. **Data:** two home settings with fallbacks — the featured breed (fallback: first breed by `sortOrder` with photo, history and all five traits) and the CtaBand photo (fallback: the plain CtaBand). Log both as decisions; no other behaviour changes.
+6. **QA fixes:** SiteShell header fits at 1024–1279 (nav item padding 8, bar gap 24); on coarse pointers `.hz-btn--sm`, quantity steppers and segmented items reach 44px; seller name is an `<h2>` when it is the first heading under the page title (K6, K7); K17 phone has its `<h1>`.
+
+In the app: rebuild `app/(public)/page.tsx` to P01 / K1 using the new classes (or Tailwind equivalents with the same tokens), extend the sample seed so every home section is full (see `demo-content/DEMO-DATA-SPEC.md`, Home row).
+
+Changed files: `design-system/components/bundle.css`, `patterns/P01-editorial-home.md`, `components/CtaBand/*`, `components/SiteShell/README.md`, `components/Button/README.md`, `components/SellerCard/README.md`, `components/ClubCard/*`, `components/BreedCard/README.md`, `01-color.md`, `shells.md`, `zz-checklist.md`, `key-screens/K01-home-1440.png`, `key-screens/K01-home-390.png`, `demo-content/*`.
+
 ## v1.0.3 — 11 Mehr 1405 (3 Oct 2026)
 
 **Package:** added `key-screens/` (images of K1–K19 at 1440 and 390, 3 extra states, 2 brand boards, with an index) and `fonts/` — the full licensed IRANSansX Pro family with `licenses.pdf` and a README (the app still only needs `design-system/fonts/*.woff2`).

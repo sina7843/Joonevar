@@ -103,11 +103,16 @@ export const isPublic = (status: ListingStatus): boolean => PUBLIC_LISTING_STATU
 
 // ── value lists ────────────────────────────────────────────────────────────
 
+/**
+ * Decision 7g (11 Mehr 1405): the fixed price is gone. Every advert carries an
+ * asking amount and is «قابل مذاکره»; `EXACT` survives only as a historical enum
+ * value (migration 0060 moved every row to NEGOTIABLE) and is never written.
+ */
 export const PRICE_MODES = ['EXACT', 'NEGOTIABLE'] as const;
 export type PriceMode = (typeof PRICE_MODES)[number];
 export const PRICE_MODE_FA: Record<PriceMode, string> = {
-  EXACT: 'قیمت مشخص',
-  NEGOTIABLE: 'توافقی',
+  EXACT: 'قابل مذاکره',
+  NEGOTIABLE: 'قابل مذاکره',
 };
 
 export const DELIVERY_METHODS = ['IN_PERSON', 'SELLER_LOCATION', 'VET_CLINIC'] as const;
@@ -171,10 +176,8 @@ export interface ListingContent {
 export function publicationBlockers(content: ListingContent, minimumImages: number): string[] {
   const missing: string[] = [];
 
-  if (!isPriceMode(content.priceMode)) {
-    missing.push('نوع قیمت را انتخاب کنید: مشخص یا توافقی.');
-  } else if (content.priceMode === 'EXACT' && (content.priceToman === null || content.priceToman <= 0n)) {
-    missing.push('برای قیمت مشخص، مبلغ را وارد کنید.');
+  if (content.priceToman === null || content.priceToman <= 0n) {
+    missing.push('مبلغ آگهی را وارد کنید؛ قیمت آگهی همیشه قابل مذاکره است.');
   }
 
   const description = (content.descriptionFa ?? '').trim();

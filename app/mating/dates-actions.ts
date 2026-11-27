@@ -13,7 +13,7 @@ import {
   personalMatingForParty,
   personalSubject,
 } from '../../src/mating/dates.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface DateFormState {
   readonly ok?: boolean;
@@ -44,7 +44,7 @@ async function personal(form: FormData, id: string) {
 }
 
 function failure(error: unknown): DateFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

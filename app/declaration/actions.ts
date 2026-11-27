@@ -12,7 +12,7 @@ import {
   respondToDeclaration,
   startDeclaration,
 } from '../../src/mating/declaration.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface DeclarationFormState {
   readonly ok?: boolean;
@@ -29,7 +29,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): DeclarationFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

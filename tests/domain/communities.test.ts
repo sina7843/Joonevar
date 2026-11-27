@@ -87,7 +87,7 @@ test('completeness counts what the profile says; publishing needs an introductio
 
 test('a registration is shown only as it was recorded', () => {
   assert.equal(publicRegistration('NONE', null), null);
-  assert.deepEqual(publicRegistration('VALID', ' 12-34 '), { statusFa: 'معتبر', number: '12-34' });
-  assert.deepEqual(publicRegistration('EXPIRED', null), { statusFa: 'منقضی', number: null });
-  assert.deepEqual(publicRegistration('NONE', 'A-1'), { statusFa: 'ثبت‌نشده', number: 'A-1' });
+  assert.deepEqual(publicRegistration('VALID', ' 12-34 '), { status: 'VALID', statusFa: 'معتبر', number: '12-34' });
+  assert.deepEqual(publicRegistration('EXPIRED', null), { status: 'EXPIRED', statusFa: 'منقضی', number: null });
+  assert.deepEqual(publicRegistration('NONE', 'A-1'), { status: 'NONE', statusFa: 'ثبت‌نشده', number: 'A-1' });
 });

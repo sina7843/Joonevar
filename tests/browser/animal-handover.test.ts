@@ -80,7 +80,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -121,7 +122,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -239,7 +240,6 @@ async function publishListing(page: Page, animalId: string): Promise<string> {
   const id = new URL(page.url()).pathname.split('/').pop()!;
   const url = BASE_URL + '/account/listings/' + id;
 
-  await page.getByTestId('listing-price-mode').selectOption('EXACT');
   await page.getByTestId('listing-price').fill(PRICE);
   await page
     .getByTestId('listing-description')
@@ -390,7 +390,7 @@ before(async () => {
     const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
     await page.getByTestId('accept-inquiry-button-' + inquiryId).click();
-    await page.getByTestId('inquiry-status').filter({ hasText: 'در انتظار پرداخت بیعانه' }).waitFor();
+    await page.getByTestId('inquiry-status').filter({ hasText: 'پذیرفته‌شده' }).waitFor();
   } finally {
     await seller.close();
   }

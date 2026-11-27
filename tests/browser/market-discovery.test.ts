@@ -82,7 +82,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -123,7 +124,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -329,7 +330,6 @@ before(async () => {
     listingId = new URL(page.url()).pathname.split('/').pop()!;
     const listingUrl = BASE_URL + '/account/listings/' + listingId;
 
-    await page.getByTestId('listing-price-mode').selectOption('EXACT');
     await page.getByTestId('listing-price').fill('24000000');
     await page.getByTestId('listing-description').fill(DESCRIPTION);
     await page.getByTestId('listing-reason').fill('SYNTHETIC دلیل فروش آزمایشی');
@@ -488,6 +488,7 @@ test('a report reaches the queue, the decision hides the advert, and the appeal 
     await page.goto(BASE_URL + '/market/listings', { waitUntil: 'load' });
     await expectText(page, 'آگهی‌های گزارش‌شده');
     assert.match(await page.getByTestId('signals-disclaimer').innerText(), /ثابت نمی‌کند/);
+    await page.getByTestId('open-listing-' + listingId).click();
     const signals = await page.getByTestId('queue-signals-' + listingId).innerText();
     assert.match(signals, /گزارش باز/);
     await page.screenshot({ path: path.join(SHOTS, 'moderation-queue-desktop.png'), fullPage: true });
@@ -543,10 +544,11 @@ test('a report reaches the queue, the decision hides the advert, and the appeal 
   const reviewer = await contextFor(moderatorState);
   try {
     const page = await reviewer.newPage();
-    await page.goto(BASE_URL + '/market/listings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/listings?view=appeals', { waitUntil: 'load' });
     await expectText(page, 'اعتراض‌ها');
-    const rowId = await page.locator('[data-testid="appeal-queue"] li').first().getAttribute('data-testid');
+    const rowId = await page.locator('[data-testid="appeal-queue"] tr[data-testid]').first().getAttribute('data-testid');
     const appealId = rowId!.replace('appeal-row-', '');
+    await page.getByTestId('open-appeal-' + appealId).click();
     await page.getByTestId('appeal-outcome-' + appealId).selectOption('OVERTURN');
     await page.getByTestId('appeal-decision-reason-' + appealId).fill('SYNTHETIC مدرک پذیرفته شد ' + RUN);
     await page.getByTestId('save-appeal-' + appealId).click();

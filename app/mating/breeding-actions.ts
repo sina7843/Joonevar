@@ -6,7 +6,7 @@ import { db } from '../../src/db/client.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
 import { attachPregnancyCheck, declarePregnancy } from '../../src/mating/pregnancy.ts';
 import { correctBirth, recordBirth, recordPuppyDeath, renamePuppy } from '../../src/mating/birth.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface BreedingFormState {
   readonly ok?: boolean;
@@ -32,7 +32,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): BreedingFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

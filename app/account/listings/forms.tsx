@@ -1,6 +1,7 @@
 'use client';
 
 import { useActionState, useState } from 'react';
+import { MoneyField } from '../../../src/ui/money-field.tsx';
 import { ActionRow, Button } from '../../../src/ui/button.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
@@ -18,8 +19,6 @@ import {
   DELIVERY_METHODS,
   DELIVERY_METHOD_FA,
   NEUTER_FA,
-  PRICE_MODES,
-  PRICE_MODE_FA,
   VACCINATION_FA,
   type DeliveryMethod,
   type Disclosure,
@@ -76,7 +75,6 @@ export function ListingContentForm({
 }) {
   const [state, submit, pending] = useActionState(saveListingAction, EMPTY);
   const [province, setProvince] = useState(values.provinceCode);
-  const [priceMode, setPriceMode] = useState(values.priceMode ?? '');
 
   return (
     <form action={submit} className="space-y-lg" data-testid="listing-content-form">
@@ -88,32 +86,17 @@ export function ListingContentForm({
         </div>
       ) : null}
 
-      <div className="grid gap-lg md:grid-cols-2">
-        <SelectField
-          label="نوع قیمت"
-          name="priceMode"
-          required
-          defaultValue={values.priceMode ?? ''}
-          onChange={(event) => setPriceMode(event.target.value)}
-          options={PRICE_MODES.map((mode) => ({ value: mode, label: PRICE_MODE_FA[mode] }))}
-          disabled={disabled}
-          data-testid="listing-price-mode"
-        />
-        <TextField
-          label="مبلغ (تومان)"
-          name="priceToman"
-          ltr
-          inputMode="numeric"
-          defaultValue={values.priceToman}
-          hint={
-            priceMode === 'NEGOTIABLE'
-              ? 'در قیمت توافقی مبلغ خالی می‌ماند و قیمت نهایی در مذاکره قفل می‌شود.'
-              : 'فقط رقم، بدون جداکننده.'
-          }
-          disabled={disabled || priceMode === 'NEGOTIABLE'}
-          data-testid="listing-price"
-        />
-      </div>
+      {/* Decision 7g: every advert is an amount + «قابل مذاکره»; there is no price type to choose. */}
+      <input type="hidden" name="priceMode" value="NEGOTIABLE" />
+      <MoneyField
+        label="مبلغ آگهی"
+        name="priceToman"
+        required
+        defaultValue={values.priceToman}
+        hint="قیمت آگهی همیشه قابل مذاکره است؛ خریدار می‌تواند پیشنهاد قیمت بدهد."
+        disabled={disabled}
+        testId="listing-price"
+      />
 
       <TextAreaField
         label="توضیح آگهی"

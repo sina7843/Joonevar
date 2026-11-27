@@ -61,7 +61,7 @@ Logo at the start. Money in Persian digits with «٬» and always «تومان»
 
 ## Accessibility
 
-- `<article>` with the name as `<h3>` link; the logo is decorative (`alt=""`) — the seller page uses `logo.altFa`.
+- `<article>` with the name as a heading link — `<h3>` inside a section, `<h2>` when the card is the first block under the page `<h1>` (product and listing buy box), so heading levels never skip; the logo is decorative (`alt=""`) — the seller page uses `logo.altFa`.
 - Status text in the badge; shipping lines are plain text (icons `aria-hidden`).
 
 ## Data

@@ -85,13 +85,19 @@ export default async function SellerPromotionsPage({
                     {rule.amountToman !== null ? ' — ' + fa(rule.amountToman) + ' تومان' : ''}
                   </span>
                   <span className="flex items-center gap-sm">
-                    <StatusBadge tone={rule.status === 'ACTIVE' ? 'success' : 'neutral'}>
-                      <span data-testid={'seller-rule-status-' + rule.id}>{rule.status}</span>
-                    </StatusBadge>
+                    <span data-testid={'seller-rule-status-' + rule.id}>
+                      {rule.status === 'ENDED' ? (
+                        // GAPS #4: no dictionary key for ENDED
+                        <StatusBadge tone="neutral">{rule.status}</StatusBadge>
+                      ) : (
+                        <StatusBadge status={rule.status} />
+                      )}
+                    </span>
                     {rule.status === 'DRAFT' || rule.status === 'PAUSED' ? (
                       <MoveDiscountForm
                         action={moveDiscountAction}
                         ruleId={rule.id}
+                        version={rule.version}
                         sellerId={store.id}
                         to="ACTIVE"
                         labelFa="فعال کردن"
@@ -101,6 +107,7 @@ export default async function SellerPromotionsPage({
                       <MoveDiscountForm
                         action={moveDiscountAction}
                         ruleId={rule.id}
+                        version={rule.version}
                         sellerId={store.id}
                         to="PAUSED"
                         labelFa="توقف"

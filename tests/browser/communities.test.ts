@@ -89,7 +89,7 @@ test('the superadmin records a club, writes its profile and invites a manager', 
     await page.getByTestId('manager-role').fill('دبیر کلاب');
     await page.getByTestId('manager-invite-reason').fill('مدیر معرفی‌شده');
     await page.getByTestId('invite-manager').click();
-    await expectText(page, 'در انتظار پذیرش');
+    await expectText(page, 'در انتظار پاسخ');
     await page.screenshot({ path: path.join(SHOTS, 'admin-community.png'), fullPage: true });
     return id;
   });
@@ -108,7 +108,7 @@ test('the invited account accepts from its own screen and is then a manager', as
 
   await as('admin', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/admin/communities/' + communityId, { waitUntil: 'load' });
-    await expectText(page, 'تأییدشده');
+    await expectText(page, 'پذیرفته‌شده');
   });
 });
 
@@ -178,6 +178,7 @@ test('the review operator hides the page and the address then answers a real 404
     await expectText(page, NAME);
     await page.getByRole('link', { name: NAME }).click();
     await page.getByTestId('community-status-form').waitFor();
+    await page.getByTestId('community-status-to-HIDDEN').check();
     await page.getByTestId('community-status-reason').fill('گزارش اطلاعات نادرست');
     await page.getByTestId('change-community-status').click();
     await expectText(page, 'پنهان');

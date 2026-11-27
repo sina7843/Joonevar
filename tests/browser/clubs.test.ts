@@ -98,7 +98,7 @@ test('the association verifies the club and the owner publishes it', async () =>
     await page.getByTestId('club-queue-' + clubId).click();
     await page.getByTestId('club-verification-reason').fill('معرفی و راه ارتباطی کامل است.');
     await page.getByTestId('club-verify').click();
-    await expectText(page, 'فعال و تأییدشده');
+    await page.getByTestId('assoc-club-status').filter({ hasText: 'فعال' }).waitFor();
     await page.screenshot({ path: path.join(SHOTS, 'club-verification-desktop.png'), fullPage: true });
   });
 

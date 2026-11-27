@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { reviewPermit } from '../../../src/mating/permits.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface PermitReviewState {
   readonly ok?: boolean;
@@ -35,7 +35,7 @@ export async function reviewPermitAction(
     revalidatePath('/assoc/permits/' + permitId);
     return { ok: true, message: 'تصمیم ثبت شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

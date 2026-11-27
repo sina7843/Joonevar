@@ -120,7 +120,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -172,7 +172,8 @@ async function setSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-' + key).click();
     await page.getByTestId('setting-value-' + key).fill(value);
     await page.getByTestId('setting-reason-' + key).fill('SYNTHETIC — مقدار آزمایشی اجرای تست ' + RUN);
     await page.getByTestId('save-setting-' + key).click();
@@ -300,7 +301,7 @@ async function pedigreedAnimal(
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // Straight to this receipt: the shared development queue also holds rows left
   // by earlier runs.
@@ -316,7 +317,7 @@ async function pedigreedAnimal(
   await expectText(vet, 'ارسال روی همین کد رهگیری ثبت شد');
 
   const centreRow = () =>
-    centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
+    centre.locator('[data-testid="centre-sample-list"] tbody > tr').filter({ hasText: trackingCode });
   // The centre's list is bounded, so a specific sample is reached by its
   // tracking code rather than by scrolling the queue (DEC-0128).
   await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
@@ -329,7 +330,8 @@ async function pedigreedAnimal(
   await centreRow().getByText('در حال پردازش').waitFor({ timeout: 45_000 });
 
   await centre.goto(BASE_URL + '/genetics/results', { waitUntil: 'load' });
-  const resultRow = centre.locator('[data-testid="processing-list"] > li').filter({ hasText: trackingCode });
+  const resultRow = centre.locator('[data-testid="processing-list"] tbody > tr').filter({ hasText: trackingCode });
+  await resultRow.getByTestId('open-result-case').click();
   await resultRow.getByTestId('result-note').fill('پردازش استاندارد.');
   await resultRow.getByTestId('submit-result').click();
   await expectText(centre, 'نتیجه نهایی ثبت شد');
@@ -502,7 +504,7 @@ test('one journey: identity, animal, membership, visit, sheet, genetics and pedi
     }
 
     await sire.page.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
-    assert.equal(await sire.page.getByTestId('permit-status').innerText(), 'مجوز صادر شد');
+    assert.equal(await sire.page.getByTestId('permit-status').innerText(), 'صادر شد');
     await sire.page.screenshot({ path: path.join(SHOTS, 'journey-permit.png'), fullPage: true });
   } finally {
     await vet.close();
@@ -556,7 +558,7 @@ test('the same journey continues: dates, birth, allocation and the card', async 
   await dam.page.getByTestId('allocation-decision-APPROVE').check();
   await dam.page.getByTestId('submit-allocation-response').click();
   await dam.page.waitForFunction(
-    () => document.querySelector('[data-testid="allocation-status"]')?.textContent?.includes('نهایی‌شده'),
+    () => document.querySelector('[data-testid="allocation-status"]')?.textContent?.includes('نتیجه نهایی'),
     undefined,
     { timeout: 20_000 },
   );

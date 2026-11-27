@@ -27,14 +27,9 @@ export default async function NotificationsPage() {
     unreadCount(db(), actor),
   ]);
 
+  // Tehran time with the hour (CMPB-116): a UTC date put a late-evening notice on the wrong day.
   const dateFa = (at: Date) =>
-    formatCivilDateFa(
-      [
-        at.getUTCFullYear(),
-        String(at.getUTCMonth() + 1).padStart(2, '0'),
-        String(at.getUTCDate()).padStart(2, '0'),
-      ].join('-'),
-    );
+    new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tehran' }).format(at);
 
   return (
     <PublicShell

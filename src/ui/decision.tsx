@@ -1,9 +1,11 @@
 'use client';
 
-import { useActionState, useId, useState, type ReactNode } from 'react';
+import { useActionState, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { Icon } from './icon.tsx';
 import { Alert } from './alert.tsx';
 import { Button } from './button.tsx';
+import { BottomSheet, Modal } from './overlay.tsx';
 
 /**
  * DS *DecisionDesk* outcome cards (`.hz-option` radios with a one-line
@@ -66,6 +68,9 @@ export function ReasonField({
   maxLength = 500,
   defaultValue = '',
   hint,
+  error,
+  disabled = false,
+  rows = 4,
 }: {
   name: string;
   label?: string;
@@ -77,13 +82,23 @@ export function ReasonField({
   maxLength?: number;
   defaultValue?: string;
   hint?: string;
+  /** Shown under the field with `aria-invalid` (DS ReasonField › Error). */
+  error?: string | null;
+  disabled?: boolean;
+  rows?: number;
 }) {
   const id = useId();
   const [text, setText] = useState(defaultValue);
   const near = text.length >= maxLength * 0.9;
+  // A chip fills an empty field, or adds its sentence after what is already written; it never erases.
+  const addDraft = (draft: string) =>
+    setText((current) => (current.trim() === '' ? draft : (current.trimEnd() + ' ' + draft).slice(0, maxLength)));
+  const describedBy = [audience ? id + '-aud' : null, hint ? id + '-hint' : null, error ? id + '-err' : null, id + '-count']
+    .filter(Boolean)
+    .join(' ');
   return (
     <div className="hz-reason">
-      <div className="hz-field">
+      <div className={error ? 'hz-field hz-field--error' : 'hz-field'}>
         <div className="hz-field__label-row">
           <label className="hz-field__label" htmlFor={id}>
             {label}
@@ -109,8 +124,9 @@ export function ReasonField({
                 key={draft}
                 type="button"
                 className="hz-chip"
-                aria-pressed={text === draft}
-                onClick={() => setText(draft)}
+                aria-pressed={text.includes(draft)}
+                disabled={disabled}
+                onClick={() => addDraft(draft)}
               >
                 {draft}
               </button>
@@ -121,21 +137,32 @@ export function ReasonField({
           id={id}
           name={name}
           className="hz-textarea"
-          rows={3}
+          rows={rows}
           required={required}
           aria-required={required || undefined}
+          aria-invalid={error ? true : undefined}
           maxLength={maxLength}
           value={text}
+          disabled={disabled}
           onChange={(event) => setText(event.target.value)}
-          aria-describedby={(audience ? id + '-aud ' : '') + id + '-count'}
+          aria-describedby={describedBy}
           data-testid={testId}
         />
+        {error ? (
+          <p className="hz-field__error" id={id + '-err'}>
+            <Icon name="warningCircle" size="xs" />
+            {error}
+          </p>
+        ) : null}
         <div className="hz-field__foot">
-          <span className="hz-field__hint">{hint ?? ''}</span>
+          <span className="hz-field__hint" id={hint ? id + '-hint' : undefined}>
+            {hint ?? ''}
+          </span>
+          {/* Announced only near the limit, not on every key. */}
           <span
             className={near ? 'hz-field__counter hz-field__counter--near' : 'hz-field__counter'}
             id={id + '-count'}
-            aria-live="polite"
+            aria-live={near ? 'polite' : 'off'}
           >
             {text.length.toLocaleString('fa-IR') + ' از ' + maxLength.toLocaleString('fa-IR') + ' نویسه'}
           </span>
@@ -149,13 +176,56 @@ export interface DecisionFormState {
   readonly ok?: boolean;
   readonly message?: string;
   readonly tone?: 'success' | 'error';
+  /** The record changed after the page was opened (DS DecisionDesk › Stale); see `staleOf`. */
+  readonly stale?: boolean;
 }
+
+/** DS DecisionDesk › Stale: warning, nothing was saved; reloading keeps the typed reason. */
+export function StaleAlert() {
+  const router = useRouter();
+  const ref = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => ref.current?.focus(), []);
+  return (
+    <Alert
+      tone="warning"
+      title="تصمیم ثبت نشد"
+      action={
+        <button ref={ref} type="button" className="hz-btn hz-btn--secondary hz-btn--sm" onClick={() => router.refresh()} data-testid="stale-reload">
+          <Icon name="arrowClockwise" size="xs" />
+          بارگذاری دوباره
+        </button>
+      }
+    >
+      این پرونده پس از باز کردن شما تغییر کرده است. صفحه را دوباره بار کنید و سپس تصمیم بگیرید.
+    </Alert>
+  );
+}
+
+const WIDE = '(min-width: 1024px)';
+/** Desktop (≥1024) or not; the server renders the desktop panel. */
+function useWide(): boolean {
+  return useSyncExternalStore(
+    (notify) => {
+      const list = window.matchMedia(WIDE);
+      list.addEventListener('change', notify);
+      return () => list.removeEventListener('change', notify);
+    },
+    () => window.matchMedia(WIDE).matches,
+    () => true,
+  );
+}
+
+const isRejection = (value: string): boolean => /REJECT|DECLINE|REMOVE|DELETE/.test(value);
 
 /**
  * The whole decision panel of a desk: outcome cards → reason (required for any
  * outcome listed in `reasonFor`) → one primary whose label follows the choice.
  * No outcome is preselected (P10 › Default). The module's own server action,
  * hidden fields and test ids are passed in unchanged.
+ *
+ * Below 1024 the same form is the DS mobile bar (`.hz-desk__bar`, one button per
+ * outcome): choosing one opens a bottom sheet (<768) or a modal (768–1023) with
+ * the reason and the submit; focus returns to the bar on close.
  */
 export function DecisionForm<V extends string>({
   action,
@@ -194,41 +264,98 @@ export function DecisionForm<V extends string>({
     {} as DecisionFormState,
   );
   const [value, setValue] = useState<V | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const wide = useWide();
   const needsReason = value !== null && reasonFor.includes(value);
   const chosen = choices.find((choice) => choice.value === value);
+  const rejecting = value !== null && isRejection(value);
+
+  const reason = needsReason ? (
+    <ReasonField
+      key={value}
+      name={reasonName}
+      label={reasonLabel ? reasonLabel(value) : 'دلیل'}
+      required
+      testId={reasonTestId}
+      drafts={drafts}
+      audience={audience}
+      disabled={pending}
+    />
+  ) : null;
+  const primary = (
+    <Button
+      type="submit"
+      size="lg"
+      block
+      wrap
+      tone={!wide && rejecting ? 'destructive' : 'primary'}
+      disabled={pending || value === null}
+      loading={pending}
+      loadingLabel="در حال ثبت…"
+      data-testid={submitTestId}
+    >
+      {chosen ? 'ثبت تصمیم: ' + chosen.label : 'یک تصمیم انتخاب کنید'}
+    </Button>
+  );
+  const notice = state.stale ? (
+    <StaleAlert />
+  ) : state.message ? (
+    <Alert tone={state.ok || state.tone === 'success' ? 'success' : 'error'} title={state.message} />
+  ) : null;
+
+  if (!wide) {
+    const Overlay = window.matchMedia('(min-width: 768px)').matches ? Modal : BottomSheet;
+    return (
+      <form action={submit} className="flex flex-col gap-lg" data-testid={formTestId}>
+        {Object.entries(hidden).map(([key, val]) => (
+          <input key={key} type="hidden" name={key} value={val} />
+        ))}
+        {sheetOpen ? null : notice}
+        {value !== null ? <input type="hidden" name={name} value={value} /> : null}
+        <div className="hz-desk__bar max-md:fixed max-md:inset-x-0 max-md:[inset-block-end:0]" role="region" aria-label="تصمیم">
+          <div className="hz-desk__bar-actions" style={{ gridTemplateColumns: 'repeat(' + choices.length + ', minmax(0, 1fr))' }}>
+            {choices.map((choice, index) => (
+              <Button
+                key={choice.value}
+                type="button"
+                size="lg"
+                wrap
+                tone={isRejection(choice.value) ? 'destructive-outline' : index === 0 ? 'primary' : 'secondary'}
+                disabled={pending}
+                onClick={() => {
+                  setValue(choice.value);
+                  setSheetOpen(true);
+                }}
+                data-testid={choice.testId ? choice.testId + '-bar' : undefined}
+              >
+                {choice.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+        <Overlay open={sheetOpen && chosen !== undefined} onClose={() => setSheetOpen(false)} title={chosen ? chosen.label : 'تصمیم'}>
+          <div className="flex flex-col gap-lg">
+            {notice}
+            {chosen?.desc ? <p className="hz-body-sm text-text-secondary">{chosen.desc}</p> : null}
+            {reason}
+            {children ? children(value) : null}
+            {primary}
+          </div>
+        </Overlay>
+      </form>
+    );
+  }
+
   return (
     <form action={submit} className="flex flex-col gap-lg" data-testid={formTestId}>
       {Object.entries(hidden).map(([key, val]) => (
         <input key={key} type="hidden" name={key} value={val} />
       ))}
-      {state.message ? (
-        <Alert tone={state.ok || state.tone === 'success' ? 'success' : 'error'} title={state.message} />
-      ) : null}
+      {notice}
       <DecisionOptions name={name} choices={choices} value={value} onChange={setValue} disabled={pending} />
-      {needsReason ? (
-        <ReasonField
-          key={value}
-          name={reasonName}
-          label={reasonLabel ? reasonLabel(value) : 'دلیل'}
-          required
-          testId={reasonTestId}
-          drafts={drafts}
-          audience={audience}
-        />
-      ) : null}
+      {reason}
       {children ? children(value) : null}
-      <Button
-        type="submit"
-        size="lg"
-        block
-        wrap
-        disabled={pending || value === null}
-        loading={pending}
-        loadingLabel="در حال ثبت…"
-        data-testid={submitTestId}
-      >
-        {chosen ? 'ثبت تصمیم: ' + chosen.label : 'یک تصمیم انتخاب کنید'}
-      </Button>
+      {primary}
     </form>
   );
 }

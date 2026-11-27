@@ -1,10 +1,14 @@
 # Key screens K1–K19 — exported images
 
-Exported on 11 Mehr 1405 (3 Oct 2026) from the key-screens canvas, design system **v1.0.3**. These are the visual reference for close fidelity (DEC-0259): same structure, order, components, density and states. Desktop images are 1440 px wide at 1×; phone images are 390 px wide at 2× (780 px files) so small text stays readable.
+Exported from the key-screens canvas, design system **v1.0.4** (K1 home re-exported 26 Mehr 1405 / 18 Oct 2026; the others 11 Mehr 1405). These are the visual reference for close fidelity (DEC-0259): same structure, order, components, density and states. Desktop images are 1440 px wide at 1×; phone images are 390 px wide at 2× (780 px files) so small text stays readable.
+
+**`html/` — the exact markup of every board** (43 files, `K01-home-D.html` = desktop 1440, `-M` = phone 390, `B01`/`B02` = brand boards). Each one is the canvas board's own HTML with only `design-system/tokens.css` + `components/bundle.css` and the package's photos and logo files, so it renders offline exactly like the image. Use it to read which `.hz-*` classes, landmarks, headings and order a page uses, and as the reference side of `qa/compare-key-screens.mjs`. Open it at its width (sticky bars stick to the bottom of the viewport). The page-local `k-*` rules in each file's `<style>` are composition helpers for that board, not components: reproduce their effect with tokens, never copy hex or new colours from them.
+
+Only the boards on the canvas pages «۱۸ صفحه کلیدی × ۲ اندازه» (K1–K19) and «برند و آیکون اپ» (B01–B02) are approved. The pages «خانه — واریانت‌ها و گزینه‌ها» and «خانه — ترکیب برای مقایسه» keep the home-page option boards (optA/B/C, v1–v5, mix) for the record only; **they are not specs — never build them.** The approved home is K1 (`K01-home-D`, `K01-home-M`).
 
 | Screen | Route · role | Shell · pattern | Hard case shown | Files |
 |---|---|---|---|---|
-| K1 خانه | `/` · visitor | SiteShell · P01 | announcement without image and long title; service with unset fee | `K01-home-1440.png`, `K01-home-390.png` |
+| K1 خانه | `/` · visitor | SiteShell · P01 | announcement without image and long title; services without fees (decision 14) | `K01-home-1440.png`, `K01-home-390.png` |
 | K2 داشبورد کاربر | `/dashboard` · user | PublicShell · P04 | active user, brand-new user (all empty), user with an operator role | `K02-dashboard-1440.png`, `K02-dashboard-390.png`, `K02-dashboard-new-user-390.png`, `K02-dashboard-ops-role-1440.png` |
 | K3 میز تصمیم KYC | `/assoc/kyc/[id]` · association operator | OpsShell · P10 | stale decision, 12-day case, private documents | `K03-kyc-desk-1440.png`, `K03-kyc-desk-390.png` |
 | K4 مقاله | `/articles/[slug]` · visitor | SiteShell · P03 | related item without image, long title | `K04-article-1440.png`, `K04-article-390.png` |

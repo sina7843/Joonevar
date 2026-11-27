@@ -2,11 +2,13 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
+import { QueueFrame } from '../../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../../src/domain/queue-query.ts';
 import { db } from '../../../../src/db/client.ts';
 import { manageableCommunities } from '../../../../src/communities/service.ts';
 import { COMMUNITY_KIND_FA, COMMUNITY_SCOPE_FA, type CommunityKind, type CommunityScope } from '../../../../src/communities/model.ts';
-import { VET_PUBLIC_STATUS_FA, type VetPublicStatus } from '../../../../src/vets/directory-model.ts';
 import { CommunityCreateForm } from '../../../../src/communities/forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -16,10 +18,16 @@ export const dynamic = 'force-dynamic';
  * The reviewer records a registration and publishes or hides; the content of a
  * record with a manager belongs to that manager.
  */
-export default async function ReviewCommunitiesPage() {
+export default async function ReviewCommunitiesPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/review/communities');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const rows = await manageableCommunities(db(), guard.actor);
+  const query = readQueueQuery(await searchParams, 'name');
+  const page = sliceQueue(rows, query, {
+    text: (row) => row.community.displayNameFa,
+    at: (row) => row.community.createdAt,
+    name: (row) => row.community.displayNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="انجمن و کلاب" pathname="/review/communities" nav={REVIEW_NAV}>
@@ -34,8 +42,22 @@ export default async function ReviewCommunitiesPage() {
           {rows.length === 0 ? (
             <EmptyState title="رکوردی ثبت نشده است" description="با فرم ثبت، انجمن یا کلاب بررسی‌شده را ثبت کنید." />
           ) : (
+            <QueueFrame
+              path="/review/communities"
+              params={{ q: query.q, sort: query.sort === 'name' ? undefined : query.sort }}
+              query={query}
+              page={page}
+              all={page.all}
+              noun="رکورد"
+              searchLabel="جست‌وجوی نام"
+              defaultSort="name"
+              testId="community-queue-frame"
+            >
+              {page.items.length === 0 ? (
+                <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را دوباره بررسی کنید." />
+              ) : (
             <CaseList label="انجمن‌ها و کلاب‌ها" testId="community-list">
-              {rows.map((row) => (
+              {page.items.map((row) => (
                 <CaseItem
                   key={row.community.id}
                   type={COMMUNITY_KIND_FA[row.community.kind as CommunityKind] + (row.community.ownerAccountId ? '' : ' · بدون مالک')}
@@ -45,13 +67,12 @@ export default async function ReviewCommunitiesPage() {
                   sub={['حوزه ' + COMMUNITY_SCOPE_FA[row.community.scope as CommunityScope], row.community.sourceFa ? 'منبع: ' + row.community.sourceFa : null]
                     .filter(Boolean)
                     .join(' · ')}
-                  status={{
-                    tone: row.community.publicStatus === 'PUBLISHED' ? 'success' : row.community.publicStatus === 'HIDDEN' ? 'warning' : 'neutral',
-                    label: VET_PUBLIC_STATUS_FA[row.community.publicStatus as VetPublicStatus],
-                  }}
+                  status={keyStatus(row.community.publicStatus)}
                 />
               ))}
             </CaseList>
+              )}
+            </QueueFrame>
           )}
         </Panel>
         <CommunityCreateForm surface="review" />

@@ -15,7 +15,7 @@ import {
   startKennelPayment,
   submitKennel,
 } from '../../src/kennels/service.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 
 export interface KennelFormState {
   readonly ok?: boolean;
@@ -30,7 +30,7 @@ async function requireActor(pathname: string) {
 }
 
 function failure(error: unknown): KennelFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+  if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
   throw error;
 }
 

@@ -13,7 +13,7 @@
  * comes to is decided when the goods are seen, not when they are asked for.
  */
 import { randomBytes } from 'node:crypto';
-import { and, asc, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull } from 'drizzle-orm';
 import type { Database, DbClient } from '../db/client.ts';
 import {
   categoryReturnRules,
@@ -76,6 +76,16 @@ export interface PublishPolicyInput {
     windowDays: number | null;
     reasonFa: string;
   }[];
+  /** Why this version replaces the last one; kept in the audit entry (P11, RTO-018). */
+  readonly reasonFa: string;
+  /** How many versions the operator saw published; 0 before the first (RTO-018). */
+  readonly expectedVersion: number;
+}
+
+/** Published versions so far: the ordinal the next one is saved as, minus one. */
+export async function policyVersionCount(database: DbClient): Promise<number> {
+  const [row] = await database.select({ value: count() }).from(returnPolicyVersions);
+  return Number(row?.value ?? 0);
 }
 
 /**
@@ -95,6 +105,8 @@ export async function publishReturnPolicy(
   const bodyFa = input.bodyFa.trim();
   if (version.length < 3) throw validation('شناسه نسخه سیاست مرجوعی را بنویسید.');
   if (bodyFa.length < 20) throw validation('متن سیاست مرجوعی را کامل بنویسید؛ خریدار همین را می‌خواند.');
+  const reason = input.reasonFa.trim();
+  if (reason === '') throw validation('دلیل تغییر را بنویسید؛ در تاریخچه تغییرات ثبت می‌شود.');
   if (!Number.isInteger(input.windowDays) || input.windowDays < 0 || input.windowDays > 365) {
     throw validation('مهلت مرجوعی باید عددی بین صفر تا ۳۶۵ روز باشد.');
   }
@@ -114,6 +126,15 @@ export async function publishReturnPolicy(
 
   const now = new Date();
   return database.transaction(async (tx) => {
+    // Locking the live row serialises publishers; the count then sees whatever the other one committed.
+    await tx.select({ id: returnPolicyVersions.id }).from(returnPolicyVersions).where(isNull(returnPolicyVersions.supersededAt)).for('update');
+    const actual = await policyVersionCount(tx);
+    if (actual !== input.expectedVersion) {
+      throw conflict('سیاست مرجوعی در این فاصله تغییر کرده است؛ صفحه را دوباره باز کنید.', {
+        expectedVersion: input.expectedVersion,
+        actualVersion: actual,
+      });
+    }
     await tx
       .update(returnPolicyVersions)
       .set({ supersededAt: now })
@@ -145,7 +166,9 @@ export async function publishReturnPolicy(
       action: 'COMMERCE_RETURN_POLICY_PUBLISHED',
       targetType: 'PRODUCT_SETTING',
       targetId: row!.id,
+      targetVersion: actual + 1,
       after: { version, windowDays: input.windowDays, exceptions: input.exceptions.length },
+      reason,
     });
     return row!;
   });

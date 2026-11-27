@@ -3,13 +3,15 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { GENETICS_NAV, OpsShell } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
 import { animals } from '../../../src/db/schema/animals.ts';
 import { APPEAL_STATUS_FA, appealQueue } from '../../../src/genetics/appeals.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +21,11 @@ export const dynamic = 'force-dynamic';
  * The appeal is answered here, in the same environment that recorded the
  * result. Nothing on this page changes ownership, a microchip or a permit.
  */
-export default async function GeneticsAppealsPage() {
+export default async function GeneticsAppealsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string; page?: string }>;
+}) {
   const guard = await guardRoute('/genetics/appeals');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
@@ -30,9 +36,12 @@ export default async function GeneticsAppealsPage() {
         .from(animals)
         .where(inArray(animals.id, rows.map((r) => r.animalId)))
     : [];
+  const nameOf = (animalId: string) => animalRows.find((a) => a.id === animalId)?.name ?? 'بدون نام';
+  const query = readQueueQuery(await searchParams);
+  const page = sliceQueue(rows, query, { text: (a) => nameOf(a.animalId), at: (a) => a.createdAt, name: (a) => nameOf(a.animalId) });
 
   return (
-    <OpsShell actor={guard.actor} title="اعتراض‌ها" pathname="/genetics/appeals" nav={GENETICS_NAV}>
+    <OpsShell actor={guard.actor} title="اعتراض‌ها" pathname="/genetics/appeals" nav={GENETICS_NAV} meta={<QueueMeta total={rows.length} noun="اعتراض در صف" oldestDays={Math.max(...rows.map((appeal) => ageInDays(appeal.createdAt) ?? 0))} />}>
       <Alert tone="info" title="اعتراض، اجازه ویرایش نتیجه نیست">
         نتیجه مورد اعتراض حفظ می‌شود؛ اگر اصلاح لازم باشد، نتیجه اصلاحی نسخه جدید است و سند صادرشده قبلی
         بازنویسی نمی‌شود.
@@ -45,24 +54,39 @@ export default async function GeneticsAppealsPage() {
         />
       ) : (
         <>
-          <QueueMeta total={rows.length} noun="اعتراض در صف" oldestDays={Math.max(...rows.map((appeal) => ageInDays(appeal.createdAt) ?? 0))} />
+          <QueueFrame
+            path="/genetics/appeals"
+            params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}
+            query={query}
+            page={page}
+            all={page.all}
+            noun="اعتراض"
+            searchLabel="جست‌وجوی نام حیوان"
+            testId="appeal-queue-frame"
+          >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="نام حیوان را دوباره بررسی کنید." />
+          ) : (
           <CaseList label="صف اعتراض‌ها" testId="appeal-queue">
-            {rows.map((appeal) => (
+            {page.items.map((appeal) => (
               <CaseItem
                 key={appeal.id}
                 type="اعتراض به نتیجه"
-                name={animalRows.find((a) => a.id === appeal.animalId)?.name ?? 'بدون نام'}
+                name={nameOf(appeal.animalId)}
                 href={'/genetics/appeals/' + appeal.id}
                 linkLabel="بررسی اعتراض"
                 linkTestId="open-appeal"
                 sub={'ثبت: ' + formatCivilDateFa(appeal.createdAt.toISOString().slice(0, 10))}
                 ageDays={ageInDays(appeal.createdAt)}
-                status={{ tone: 'info', label: APPEAL_STATUS_FA[appeal.status] }}
+                // GAPS #4: no dictionary key for ANSWERED — module label kept.
+                status={keyStatus(appeal.status, { tone: 'success', label: APPEAL_STATUS_FA[appeal.status] ?? appeal.status })}
                 owner="GENETICS_CENTRE"
                 ownerIsUs
               />
             ))}
           </CaseList>
+          )}
+          </QueueFrame>
         </>
       )}
     </OpsShell>

@@ -46,7 +46,7 @@ export function BuyPlanForm({
           {disabledReasonFa}
         </p>
       ) : (
-        <Button type="submit" disabled={pending} data-testid={'finder-buy-' + testId}>
+        <Button type="submit" size="lg" block disabled={pending} aria-busy={pending || undefined} data-testid={'finder-buy-' + testId}>
           {pending ? 'در حال انتقال به درگاه…' : label}
         </Button>
       )}

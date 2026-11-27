@@ -381,6 +381,8 @@ export const pedigreeIssuers = pgTable(
     isActive: boolean('is_active').notNull().default(true),
     approvedAt: timestamp('approved_at', { withTimezone: true }),
     noteFa: text('note_fa'),
+    /** Optimistic concurrency: a state change names the version it was made against (RTO-018). */
+    version: integer('version').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(now),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(now),
   },

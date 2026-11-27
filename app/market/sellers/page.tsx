@@ -1,8 +1,9 @@
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, DocFrame, QueueMeta } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { CaseItem, CaseList, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../src/ui/key-value.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
@@ -12,7 +13,6 @@ import { sellerDetail, sellerReviewQueue } from '../../../src/commerce/sellers.t
 import {
   IBAN_NOTE_FA,
   SELLER_KIND_FA,
-  SELLER_STATUS_FA,
   type SellerKind,
   type SellerStatus,
 } from '../../../src/commerce/seller-model.ts';
@@ -21,6 +21,8 @@ import {
   SellerStandingForm,
   VerifyIbanForm,
 } from '../../../src/marketplace/settlement-forms.tsx';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,9 +37,10 @@ const when = (value: Date | null) =>
  * not pictures of products. Approving does not open a store; a plan period
  * does, and that needs a payment this server verified.
  */
-export default async function SellerReviewPage() {
+export default async function SellerReviewPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/sellers');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
+  const query = readQueueQuery(await searchParams);
 
   let queue;
   try {
@@ -47,15 +50,15 @@ export default async function SellerReviewPage() {
     throw error;
   }
 
-  const details = await Promise.all(queue.map((entry) => sellerDetail(db(), guard.actor, entry.id)));
+  const page = sliceQueue(queue, query, {
+    text: (entry) => [entry.displayNameFa, entry.legalNameFa].filter(Boolean).join(' '),
+    at: (entry) => entry.submittedAt,
+    name: (entry) => entry.displayNameFa,
+  });
+  const details = await Promise.all(page.items.map((entry) => sellerDetail(db(), guard.actor, entry.id)));
 
   return (
-    <OpsShell actor={guard.actor} title="پرونده‌های فروشنده کالا" nav={marketNav(guard.actor)} pathname="/market/sellers">
-      <QueueMeta
-        total={queue.length}
-        noun="پرونده در صف"
-        oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.submittedAt) ?? 0)) : null}
-      />
+    <OpsShell actor={guard.actor} title="پرونده‌های فروشنده کالا" nav={marketNav(guard.actor)} pathname="/market/sellers" meta={<QueueMeta total={queue.length} noun="پرونده در صف" oldestDays={queue.length > 0 ? Math.max(...queue.map((entry) => ageInDays(entry.submittedAt) ?? 0)) : null} />}>
       <Alert tone="info" title="مدارک کسب‌وکار خصوصی‌اند و هر بازکردنشان ثبت می‌شود">
         <span data-testid="seller-review-note">
           {IBAN_NOTE_FA} تأیید پرونده به‌تنهایی فروشگاه را فعال نمی‌کند؛ فعال‌شدن نتیجه آغاز دوره پلن
@@ -71,77 +74,102 @@ export default async function SellerReviewPage() {
           />
         </div>
       ) : (
-        <CaseList label="پرونده‌های فروشنده" testId="seller-queue">
-          {queue.map((entry, index) => {
-            const detail = details[index]!;
-            const status = entry.status as SellerStatus;
-            return (
-              <CaseItem
-                key={entry.id}
-                testId={'seller-row-' + entry.id}
-                type={SELLER_KIND_FA[entry.kind as SellerKind]}
-                name={entry.displayNameFa}
-                sub={(entry.legalNameFa ?? '—') + ' · ارسال: ' + when(entry.submittedAt)}
-                ageDays={ageInDays(entry.submittedAt)}
-                status={{ tone: status === 'APPROVED' ? 'success' : 'info', label: SELLER_STATUS_FA[status], testId: 'seller-status-' + entry.id }}
-                owner="SYSTEM"
-                ownerLabel="بررسی فروشندگان"
-                ownerIsUs
-              >
-                <div className="space-y-md">
-                  <KeyValueList
-                    twoCol
-                    rows={[
-                      {
-                        key: 'شناسه ملی',
-                        value: detail.seller.nationalIdentifier ? (
-                          <bdi className="hz-id" dir="ltr">
-                            {detail.seller.nationalIdentifier}
-                          </bdi>
-                        ) : null,
-                      },
-                      {
-                        key: 'حساب تسویه',
-                        testId: 'seller-iban-' + entry.id,
-                        value: (
-                          <>
-                            <bdi className="hz-id" dir="ltr">
-                              {detail.maskedIban ?? '—'}
-                            </bdi>
-                            {entry.ibanVerifiedAt ? ' — تأییدشده' : ' — تأیید نشده'}
-                          </>
-                        ),
-                      },
-                      { key: 'مجوز اعلام‌شده', value: detail.seller.licenceKindFa ?? 'اعلام نشده' },
-                      { key: 'نشانی', value: detail.placeFa },
-                    ]}
-                  />
-
-                  <div className="space-y-sm">
-                    {detail.documents.length > 0 ? (
-                      <div className="grid gap-md sm:grid-cols-2 lg:grid-cols-3" data-testid={'seller-docs-' + entry.id}>
-                        {detail.documents.map((document) => (
-                          <DocFrame
-                            key={document.id}
-                            href={'/api/files/' + document.fileId}
-                            label={document.kind}
-                            linkLabel={'مشاهده ' + document.kind}
-                            meta={document.noteFa ?? undefined}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-caption text-text-secondary">مدرکی بارگذاری نشده است.</p>
-                    )}
-                  </div>
-
-                  <VerifyIbanForm sellerId={entry.id} />
-                  <SellerDecisionForm sellerId={entry.id} version={entry.version} />
-                </div>
-              </CaseItem>
-            );
-          })}
-        </CaseList>
+        <QueueFrame
+          path="/market/sellers"
+          params={{ q: query.q || undefined, sort: query.sort === 'oldest' ? undefined : query.sort }}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="پرونده"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="seller-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="پرونده‌های فروشنده" testId="seller-queue">
+              {page.items.map((entry, index) => {
+                const detail = details[index]!;
+                const status = entry.status as SellerStatus;
+                return (
+                  <CaseItem
+                    key={entry.id}
+                    testId={'seller-row-' + entry.id}
+                    type={SELLER_KIND_FA[entry.kind as SellerKind]}
+                    name={entry.displayNameFa}
+                    sub={(entry.legalNameFa ?? '—') + ' · ارسال: ' + when(entry.submittedAt)}
+                    ageDays={ageInDays(entry.submittedAt)}
+                    status={{ ...keyStatus(status), testId: 'seller-status-' + entry.id }}
+                    owner="SYSTEM"
+                    ownerLabel="بررسی فروشندگان"
+                    ownerIsUs
+                  >
+                    <CaseDrawer title="پرونده فروشنده کالا" testId={'open-seller-' + entry.id}>
+                      <DeskHead
+                        title={entry.displayNameFa}
+                        status={keyStatus(status)}
+                        meta={[SELLER_KIND_FA[entry.kind as SellerKind], entry.legalNameFa ?? '—', 'ارسال: ' + when(entry.submittedAt)]}
+                      />
+                      <Panel title="مشخصات کسب‌وکار">
+                        <KeyValueList
+                          twoCol
+                          rows={[
+                            {
+                              key: 'شناسه ملی',
+                              value: detail.seller.nationalIdentifier ? (
+                                <bdi className="hz-id" dir="ltr">
+                                  {detail.seller.nationalIdentifier}
+                                </bdi>
+                              ) : null,
+                            },
+                            {
+                              key: 'حساب تسویه',
+                              testId: 'seller-iban-' + entry.id,
+                              value: (
+                                <>
+                                  <bdi className="hz-id" dir="ltr">
+                                    {detail.maskedIban ?? '—'}
+                                  </bdi>
+                                  {entry.ibanVerifiedAt ? ' — تأییدشده' : ' — تأیید نشده'}
+                                </>
+                              ),
+                            },
+                            { key: 'مجوز اعلام‌شده', value: detail.seller.licenceKindFa ?? 'اعلام نشده' },
+                            { key: 'نشانی', value: detail.placeFa },
+                          ]}
+                        />
+                      </Panel>
+                      <Panel title="مدارک" count={detail.documents.length.toLocaleString('fa-IR')} aside={<PrivateNote />}>
+                        {detail.documents.length > 0 ? (
+                          <div className="hz-desk__docs" data-testid={'seller-docs-' + entry.id}>
+                            {detail.documents.map((document) => (
+                              <DocFrame
+                                key={document.id}
+                                href={'/api/files/' + document.fileId}
+                                label={document.kind}
+                                linkLabel={'مشاهده ' + document.kind}
+                                meta={document.noteFa ?? undefined}
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-caption text-text-secondary">مدرکی بارگذاری نشده است.</p>
+                        )}
+                      </Panel>
+                      <Panel title="مالکیت حساب تسویه">
+                        <VerifyIbanForm sellerId={entry.id} />
+                      </Panel>
+                      <Panel title="تصمیم">
+                        <SellerDecisionForm sellerId={entry.id} version={entry.version} />
+                        <DeskVersionNote version={entry.version} />
+                      </Panel>
+                    </CaseDrawer>
+                  </CaseItem>
+                );
+              })}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

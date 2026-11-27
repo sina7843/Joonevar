@@ -103,6 +103,7 @@ export default async function PermitDatesPage({ params }: { params: Promise<{ id
                 </Link>
               </p>
             </div>
+            {/* GAPS #4: no dictionary key for the derived official-basis state */}
             <StatusBadge tone={basis ? 'success' : 'info'}>
               <span data-testid="official-basis">
                 {basis ? 'مبنای رسمی: ' + formatCivilDateFa(basis) : 'هنوز تاریخ تأییدشده‌ای نیست'}

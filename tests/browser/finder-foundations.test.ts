@@ -15,7 +15,7 @@ import { randomInt } from 'node:crypto';
 import { sql } from 'drizzle-orm';
 import { chromium, type Browser, type BrowserContext } from 'playwright';
 import { createDatabase } from '../../src/db/client.ts';
-import { BASE_URL, DATABASE_URL, DESKTOP, MOBILE, clearSyntheticOtp, expectText, setPaymentMode, signIn } from './support.ts';
+import { BASE_URL, DATABASE_URL, DESKTOP, MOBILE, clearSyntheticOtp, setPaymentMode, signIn } from './support.ts';
 
 const SHOTS = path.join('docs', 'reports', 'screenshots', 'phase-4', 'prompt-002');
 const SUPERADMIN = '09990000006';
@@ -118,7 +118,7 @@ test('an owner is told the purchase is closed, then buys through the verified pa
     const page = await context.newPage();
     await page.goto(BASE_URL + '/account/mating-finder', { waitUntil: 'load' });
     await page.getByTestId('finder-purchase-closed').waitFor();
-    assert.match(await page.getByTestId('finder-standing').innerText(), /بدون اشتراک/);
+    assert.match(await page.getByTestId('finder-standing').innerText(), /ثبت‌نشده/);
 
     await setting('finder.flag.subscription_purchase', true);
     await page.reload({ waitUntil: 'load' });
@@ -131,10 +131,10 @@ test('an owner is told the purchase is closed, then buys through the verified pa
     await page.getByTestId('gateway-pay').click();
     await page.getByTestId('finder-paid').waitFor({ timeout: 20_000 });
     await page.getByTestId('back-to-finder').click();
-    await expectText(page, 'اشتراک فعال');
+    await page.getByTestId('finder-standing').filter({ hasText: 'فعال' }).waitFor();
     assert.match(await page.getByTestId('finder-capacity').innerText(), /۳/);
     assert.equal(await page.locator('[data-testid^="finder-history-"]').count(), 1, 'one paid period');
-    assert.match(await page.getByTestId('finder-history').innerText(), /پرداخت‌شده/);
+    assert.match(await page.getByTestId('finder-history').innerText(), /فعال/);
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert.ok(overflow <= 0, 'no horizontal scroll at 360px');

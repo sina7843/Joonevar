@@ -148,10 +148,11 @@ export function communityPublishBlockers(input: CommunityCompletenessInput): str
 export const publicRegistration = (
   licenceStatus: string,
   registrationNumber: string | null,
-): { statusFa: string; number: string | null } | null =>
+): { status: string; statusFa: string; number: string | null } | null =>
   licenceStatus === 'NONE' && !hasText(registrationNumber)
     ? null
     : {
+        status: licenceStatus,
         statusFa: { NONE: 'ثبت‌نشده', VALID: 'معتبر', EXPIRED: 'منقضی', REVOKED: 'باطل‌شده' }[licenceStatus] ?? licenceStatus,
         number: hasText(registrationNumber) ? registrationNumber!.trim() : null,
       };

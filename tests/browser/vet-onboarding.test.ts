@@ -112,7 +112,7 @@ const textOf = async (page: Page, testId: string): Promise<string> => ((await pa
  */
 async function decide(page: Page, name: string, decision: string, reason: string, expectedStatus: string): Promise<void> {
   await page.goto(BASE_URL + '/assoc/vet-doctors?view=OPEN', { waitUntil: 'load' });
-  const item = page.locator('[data-testid="doctor-queue"] > li', { hasText: name });
+  const item = page.locator('[data-testid="doctor-queue"] tbody > tr', { hasText: name });
   await item.waitFor();
   await Promise.all([page.waitForURL((url) => /^\/assoc\/vet-doctors\/[0-9a-f-]{36}$/.test(url.pathname)), item.getByTestId('open-doctor-case').click()]);
   await page.getByTestId('doctor-decision-form').waitFor();
@@ -138,7 +138,7 @@ test('a veterinarian applies, answers a correction and, once verified, manages a
     await page.getByTestId('app-city').selectOption({ label: 'تهران' });
     await page.getByTestId('app-doc-COUNCIL_CARD').setInputFiles(card('council-card.png'));
     await page.getByTestId('submit-doctor-application').click();
-    await waitForText(page, 'doctor-case-status', 'ارسال‌شده');
+    await waitForText(page, 'doctor-case-status', 'در انتظار بررسی');
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= MOBILE.width, 'no sideways scroll on a phone: ' + width);
     await page.screenshot({ path: path.join(SHOTS, 'application-submitted-mobile.png'), fullPage: true });
@@ -147,7 +147,7 @@ test('a veterinarian applies, answers a correction and, once verified, manages a
   await as('association', DESKTOP, async (page) => {
     await decide(page, APPLICANT_NAME, 'REQUEST_CORRECTION', 'SYNTHETIC تصویر کارت خوانا نیست', 'نیازمند اصلاح');
     assert.equal(await textOf(page, 'review-doctor-council-code'), 'SYNBR7' + RUN, 'the council code was normalised');
-    documentPath = (await page.getByTestId('doctor-document-link-COUNCIL_CARD').getAttribute('href'))!;
+    documentPath = (await page.getByTestId('doctor-document-link-COUNCIL_CARD').getAttribute('src'))!;
     const file = await page.request.get(BASE_URL + documentPath);
     assert.equal(file.status(), 200, 'the association reads the council card');
     assert.equal(file.headers()['content-type'], 'image/png');
@@ -163,7 +163,7 @@ test('a veterinarian applies, answers a correction and, once verified, manages a
     await form.getByTestId('app-statement').fill('SYNTHETIC کارت خوانا دوباره پیوست شد');
     await form.getByTestId('app-doc-IDENTITY').setInputFiles(card('identity.png'));
     await form.getByTestId('resubmit-doctor-application').click();
-    await waitForText(page, 'doctor-case-status', 'ارسال‌شده');
+    await waitForText(page, 'doctor-case-status', 'در انتظار بررسی');
   });
 
   await as('association', DESKTOP, async (page) => {
@@ -254,7 +254,7 @@ test('a reviewer publishes an unowned profile, and a veterinarian claims it and 
 
   await as('association', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-doctors?view=OPEN', { waitUntil: 'load' });
-    const item = page.locator('[data-testid="doctor-queue"] > li', { hasText: unownedName });
+    const item = page.locator('[data-testid="doctor-queue"] tbody > tr', { hasText: unownedName });
     await item.waitFor();
     assert.match((await item.textContent()) ?? '', /Claim/);
     await decide(page, unownedName, 'VERIFY', 'SYNTHETIC هویت و کارت نظام تطبیق داده شد', 'کد نظام تأییدشده');
@@ -281,7 +281,7 @@ test('the association environment and application documents stay closed to every
   assert.ok(documentPath, 'the first test captured a document address');
   await as('applicant', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-doctors', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
     // The applicant reads their own document.
     assert.equal((await page.request.get(BASE_URL + documentPath)).status(), 200);
   });
@@ -290,7 +290,7 @@ test('the association environment and application documents stay closed to every
   });
   await as('reviewer', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/assoc/vet-doctors', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN', 'the Phase 2 review operator does not verify council codes');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', 'the Phase 2 review operator does not verify council codes');
   });
   await as('visitor', MOBILE, async (page) => {
     assert.equal((await page.request.get(BASE_URL + documentPath)).status(), 401);

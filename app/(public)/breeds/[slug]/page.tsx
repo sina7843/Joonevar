@@ -25,6 +25,7 @@ import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { PageHeader, SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { CtaBand } from '../../public-ui.tsx';
+import { BreedTraits } from '../../../../src/public/breed-traits.tsx';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -114,8 +115,6 @@ export default async function BreedPageView({ params }: Params) {
   ]);
 
   const basics = facts.filter((fact) => !LEVEL_ATTRIBUTES.some((attribute) => attribute.labelFa === fact.label));
-  const traits = LEVEL_ATTRIBUTES.map(({ key, labelFa }) => ({ labelFa, level: breed[key] }));
-  const STEPS = { LOW: 1, MODERATE: 2, HIGH: 3 } as const;
 
   return (
     <div className="space-y-xl">
@@ -177,23 +176,7 @@ export default async function BreedPageView({ params }: Params) {
                     </div>
                   ))}
                 </dl>
-                <dl className="hz-traits">
-                  {traits.map((trait) => (
-                    <div key={trait.labelFa} className={trait.level ? 'hz-trait' : 'hz-trait hz-trait--unset'}>
-                      <dt className="hz-trait__name">{trait.labelFa}</dt>
-                      <dd className="hz-trait__value">
-                        {trait.level ? (
-                          <span className="hz-meter3" aria-hidden="true">
-                            {[1, 2, 3].map((step) => (
-                              <span key={step} className={step <= STEPS[trait.level!] ? 'hz-meter3__step hz-meter3__step--on' : 'hz-meter3__step'} />
-                            ))}
-                          </span>
-                        ) : null}
-                        <span className="hz-trait__label">{trait.level ? LEVEL_FA[trait.level] : 'تعیین‌نشده'}</span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                <BreedTraits breed={breed} />
               </div>
             </section>
           ) : null}

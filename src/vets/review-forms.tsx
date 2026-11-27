@@ -67,7 +67,7 @@ export function ReviewPanel({ review, isSuperadmin }: { review: ReviewPanelState
           <p className="text-caption text-text-secondary">{'بررسی‌ها برای نسخه ' + review.submissionVersion.toLocaleString('fa-IR') + ' ثبت می‌شوند. برای موردی که درست نیست توضیح لازم است.'}</p>
           {review.checks.map((check) => (
             <fieldset key={check.code} className="space-y-xs rounded-lg border border-border-default p-md" data-testid={'review-check-' + check.code}>
-              <legend className="px-2xs text-label-md">{check.labelFa}</legend>
+              <legend className="px-2xs text-label-sm">{check.labelFa}</legend>
               <div className="flex flex-wrap gap-md">
                 {REVIEW_CHECK_RESULTS.map((result) => (
                   <label key={result} className="flex items-center gap-xs text-body-sm">
@@ -113,22 +113,3 @@ export function ReviewPanel({ review, isSuperadmin }: { review: ReviewPanelState
   );
 }
 
-/**
- * An inline preview of a private document. Nothing loads until the reviewer opens
- * it, so the audited view records an actual look. The file route answers with a
- * sandboxing policy and refuses framing by any other site.
- */
-export function DocumentPreview({ fileId, labelFa, testId }: { fileId: string; labelFa: string; testId: string }) {
-  return (
-    <details className="rounded-lg border border-border-default p-sm" data-testid={testId}>
-      <summary className="cursor-pointer text-label-md">{'پیش‌نمایش ' + labelFa}</summary>
-      <iframe
-        src={'/api/files/' + fileId}
-        title={'پیش‌نمایش ' + labelFa}
-        loading="lazy"
-        referrerPolicy="no-referrer"
-        className="mt-sm h-[28rem] w-full rounded-sm bg-surface-subtle"
-      />
-    </details>
-  );
-}

@@ -29,11 +29,7 @@ import {
 import { offersOfSeller, sellerCatalogue } from '../../../../src/commerce/inventory.ts';
 import {
   variantAxes,
-  OFFER_STATUS_FA,
-  PRODUCT_STATUS_FA,
   type AttributeDefinition,
-  type CommerceOfferStatus,
-  type ProductStatus,
 } from '../../../../src/commerce/catalog-model.ts';
 import {
   NewOfferForm,
@@ -196,11 +192,9 @@ export default async function SellerCatalogPage() {
               {products.map((product) => (
                 <li key={product.id} className="hz-cardlist__item">
                   <div className="flex flex-wrap items-center gap-sm">
-                    <StatusBadge tone={product.status === 'PUBLISHED' ? 'success' : 'neutral'}>
-                      <span data-testid={'product-status-' + product.id}>
-                        {PRODUCT_STATUS_FA[product.status as ProductStatus] ?? product.status}
-                      </span>
-                    </StatusBadge>
+                    <span data-testid={'product-status-' + product.id}>
+                      <StatusBadge status={product.status} />
+                    </span>
                     <span className="text-label-lg">{product.nameFa}</span>
                     <span className="text-caption text-text-secondary">{product.categoryNameFa}</span>
                   </div>
@@ -234,11 +228,9 @@ export default async function SellerCatalogPage() {
               {offers.map((offer) => (
                 <li key={offer.id} className="hz-cardlist__item">
                   <div className="flex flex-wrap items-center gap-sm">
-                    <StatusBadge tone={offer.status === 'ACTIVE' ? 'success' : 'neutral'}>
-                      <span data-testid={'offer-status-' + offer.id}>
-                        {OFFER_STATUS_FA[offer.status as CommerceOfferStatus] ?? offer.status}
-                      </span>
-                    </StatusBadge>
+                    <span data-testid={'offer-status-' + offer.id}>
+                      <StatusBadge status={offer.status} />
+                    </span>
                     <span className="text-body-sm">{offer.productNameFa}</span>
                   </div>
                   <SkuForm offerId={offer.id} variants={variantsByProduct.get(offer.productId) ?? []} />

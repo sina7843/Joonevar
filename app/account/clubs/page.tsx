@@ -8,20 +8,10 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { ActionOwner, StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { myClubs } from '../../../src/clubs/service.ts';
-import { CLUB_LIFECYCLE_FA, CLUB_ROLE_FA, type ClubLifecycle, type ClubRole } from '../../../src/clubs/model.ts';
+import { CLUB_ROLE_FA, type ClubLifecycle, type ClubRole } from '../../../src/clubs/model.ts';
 import { ClubCreateForm } from '../../../src/clubs/forms.tsx';
 
 export const dynamic = 'force-dynamic';
-
-const TONE: Record<ClubLifecycle, 'success' | 'warning' | 'neutral' | 'error'> = {
-  DRAFT: 'neutral',
-  PENDING_VERIFICATION: 'warning',
-  NEEDS_CORRECTION: 'warning',
-  ACTIVE: 'success',
-  SUSPENDED: 'error',
-  REJECTED: 'error',
-  ARCHIVED: 'neutral',
-};
 
 /** Who moves a club next, from its lifecycle alone (no owner for settled states). */
 const NEXT: Partial<Record<ClubLifecycle, 'USER' | 'ASSOCIATION'>> = {
@@ -74,8 +64,8 @@ export default async function AccountClubsPage() {
                     {row.club.displayNameFa}
                   </Link>
                   <span className="flex flex-wrap gap-xs">
-                    <StatusBadge tone={TONE[lifecycle]}>{CLUB_LIFECYCLE_FA[lifecycle]}</StatusBadge>
-                    {row.club.publicStatus === 'PUBLISHED' ? <StatusBadge tone="info">منتشرشده</StatusBadge> : null}
+                    <StatusBadge status={lifecycle} />
+                    {row.club.publicStatus === 'PUBLISHED' ? <StatusBadge status="PUBLISHED" /> : null}
                   </span>
                 </div>
                 <span className="hz-cardlist__meta">{'نقش شما: ' + (CLUB_ROLE_FA[row.role as ClubRole] ?? row.role)}</span>

@@ -4,6 +4,7 @@ import { useActionState } from 'react';
 import { Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { ReasonField } from '../ui/decision.tsx';
 import { DISCOUNT_KINDS, DISCOUNT_KIND_FA, type DiscountKind } from './trust-model.ts';
 
 interface FormState {
@@ -116,7 +117,7 @@ export function ModerateReviewForm({ action, reviewId }: { action: Action; revie
         ]}
         data-testid={'moderate-select-' + reviewId}
       />
-      <TextAreaField label="دلیل" name="reason" required rows={2} data-testid={'moderate-reason-' + reviewId} />
+      <ReasonField name="reason" label="دلیل" required rows={2} audience={null} testId={'moderate-reason-' + reviewId} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'moderate-submit-' + reviewId}>
         ثبت
       </Button>
@@ -186,7 +187,7 @@ export function DecideQuestionForm({ action, questionId }: { action: Action; que
         ]}
         data-testid={'decide-question-select-' + questionId}
       />
-      <TextField label="دلیل" name="reason" data-testid={'decide-question-reason-' + questionId} />
+      <ReasonField name="reason" label="دلیل" rows={2} audience={null} testId={'decide-question-reason-' + questionId} />
       <Button type="submit" tone="secondary" disabled={pending} data-testid={'decide-question-submit-' + questionId}>
         ثبت
       </Button>
@@ -348,8 +349,19 @@ export function DiscountForm({
       <TextField label="آغاز" name="startsAt" ltr data-testid="discount-starts" />
       <TextField label="پایان" name="endsAt" ltr data-testid="discount-ends" />
       <TextAreaField label="توضیح" name="note" rows={2} data-testid="discount-note" />
+      {/* A platform rule is Hamzist's money: P11 asks why, and it starts as version 1 (RTO-018). */}
+      {sellerId ? null : (
+        <ReasonField
+          name="reasonFa"
+          label="دلیل تغییر"
+          required
+          rows={2}
+          audience="در تاریخچه با نام شما ثبت می‌شود"
+          testId="discount-reason"
+        />
+      )}
       <Button type="submit" disabled={pending} data-testid="discount-save">
-        ثبت تخفیف
+        {sellerId ? 'ثبت تخفیف' : 'ذخیره به‌عنوان نسخه ۱'}
       </Button>
     </form>
   );
@@ -361,18 +373,22 @@ export function MoveDiscountForm({
   sellerId,
   to,
   labelFa,
+  version,
 }: {
   action: Action;
   ruleId: string;
   sellerId?: string;
   to: 'ACTIVE' | 'PAUSED' | 'ENDED';
   labelFa: string;
+  /** The version the button was rendered for; a stale click is refused. */
+  version?: number;
 }) {
   const [state, submit, pending] = useActionState(action, EMPTY);
   return (
     <form action={submit} className="inline" data-testid={'move-discount-form-' + ruleId + '-' + to}>
       <input type="hidden" name="ruleId" value={ruleId} />
       <input type="hidden" name="to" value={to} />
+      {version === undefined ? null : <input type="hidden" name="expectedVersion" value={version} />}
       {sellerId ? <input type="hidden" name="sellerId" value={sellerId} /> : null}
       <Result state={state} testId={'move-discount-result-' + ruleId} />
       <Button type="submit" tone="ghost" disabled={pending} data-testid={'move-discount-' + ruleId + '-' + to}>

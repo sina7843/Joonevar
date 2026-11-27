@@ -14,7 +14,6 @@ import {
   breedsOfKennel,
   kennelBatch,
   KENNEL_FEE_KEY,
-  KENNEL_STATUS_FA,
   requireOwnKennel,
   searchBreeds,
   submitReadiness,
@@ -89,17 +88,9 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
                 </p>
               ) : null}
             </div>
-            <StatusBadge
-              tone={
-                kennel.status === 'APPROVED'
-                  ? 'success'
-                  : kennel.status === 'NEEDS_CORRECTION' || kennel.status === 'REJECTED'
-                    ? 'warning'
-                    : 'info'
-              }
-            >
-              <span data-testid="kennel-status">{KENNEL_STATUS_FA[kennel.status]}</span>
-            </StatusBadge>
+            <span data-testid="kennel-status">
+              <StatusBadge status={kennel.status} />
+            </span>
           </div>
 
           {kennel.reasonFa ? (
@@ -159,7 +150,12 @@ export default async function KennelPage({ params }: { params: Promise<{ id: str
                 </span>
               </Alert>
             ) : readiness.ready ? (
-              <PayKennelForm kennelId={kennel.id} batchId={batch?.id ?? null} />
+              <PayKennelForm
+                kennelId={kennel.id}
+                batchId={batch?.id ?? null}
+                context={'ثبت کنل، ' + (kennel.nameFa ?? 'کنل بدون نام')}
+                total={feeLabel}
+              />
             ) : (
               <Alert tone="warning" title="برای پرداخت و ارسال، اطلاعات کامل نیست">
                 <span data-testid="kennel-not-ready">{readiness.reasonFa}</span>

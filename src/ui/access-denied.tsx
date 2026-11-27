@@ -27,8 +27,9 @@ export function AccessDenied({ error }: { error: AppError }) {
               ? 'برای دیدن این صفحه باید وارد حساب خود شوید.'
               : 'این صفحه در نقش فعلی شما در دسترس نیست. محیط‌های عملیاتی انجمن، مرکز ژنتیک و سوپرادمین جدا هستند و با تغییر نقش عمومی باز نمی‌شوند.'}
           </p>
-          <p className="hz-state__missing" data-testid="denial-code">
-            <bdi dir="ltr">{error.code}</bdi>
+          {/* What is missing, in words; the machine code stays out of sight for tests (CMPA1-007). */}
+          <p className="hz-state__missing" data-testid="denial-code" data-code={error.code}>
+            آنچه کم است: <b>{unauthenticated ? 'ورود به حساب' : 'نقش یا محیط عملیاتی لازم برای این صفحه'}</b>
           </p>
           <div className="hz-state__actions">
             {unauthenticated ? (
@@ -69,8 +70,8 @@ export function RecordNotFound({ error }: { error: AppError }) {
           <p className="hz-state__body">
             اگر فکر می‌کنید این پرونده باید در دسترس شما باشد، از فهرست حیوان‌های خود وارد شوید.
           </p>
-          <p className="hz-state__missing" data-testid="denial-code">
-            <bdi dir="ltr">{error.code}</bdi>
+          <p className="hz-state__missing" data-testid="denial-code" data-code={error.code}>
+            این پرونده برای این حساب در دسترس نیست
           </p>
           <div className="hz-state__actions">
             <Link href="/animals" className="hz-btn hz-btn--secondary">

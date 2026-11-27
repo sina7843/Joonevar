@@ -5,7 +5,8 @@ import { Alert } from '../ui/alert.tsx';
 import { Button } from '../ui/button.tsx';
 import { TextAreaField } from '../ui/field.tsx';
 import { Check, Result } from './directory-forms.tsx';
-import { TRUSTED_DECISIONS, TRUSTED_DECISION_FA, type TrustedDecision } from './trusted-model.ts';
+import { TRUSTED_DECISIONS, TRUSTED_DECISION_DESC_FA, TRUSTED_DECISION_FA } from './trusted-model.ts';
+import { DecisionForm } from '../ui/decision.tsx';
 import { decideTrustedCaseAction, reviseTrustedApplicationAction, submitTrustedApplicationAction, type TrustedState } from './trusted-actions.ts';
 
 const EMPTY: TrustedState = {};
@@ -86,7 +87,7 @@ export function TrustedApplicationForm({
         </label>
         {equipment.length > 0 ? (
           <fieldset className="space-y-2xs">
-            <legend className="text-label-md">سایر تجهیزات اعلام‌شده (اختیاری)</legend>
+            <legend className="text-label-sm">سایر تجهیزات اعلام‌شده (اختیاری)</legend>
             {equipment.map((item) => (
               <Check key={item.code} name="equipmentCodes" value={item.code} label={item.nameFa} defaultChecked={false} testId={'trusted-equipment-' + item.code} />
             ))}
@@ -107,36 +108,26 @@ export function TrustedApplicationForm({
   );
 }
 
-/** The association's decision on one trusted application, always with a reason. */
+/**
+ * The association's decision on one trusted application (DS P10 panel).
+ * The decision service still requires a reason for every outcome (approval
+ * included), so the reason is asked for all three; the consequence sits under
+ * each label (DS DecisionDesk).
+ */
 export function DecideTrustedCaseForm({ caseId, version }: { caseId: string; version: number }) {
-  const [state, submit, pending] = useActionState(decideTrustedCaseAction, EMPTY);
-  const [decision, setDecision] = useState<TrustedDecision>('APPROVE');
   return (
-    <form action={submit} className="space-y-lg" data-testid="trusted-decision-form">
-      <input type="hidden" name="caseId" value={caseId} />
-      <input type="hidden" name="expectedVersion" value={version} />
-      <fieldset className="space-y-sm">
-        <legend className="text-label-md">نتیجه بررسی</legend>
-        {TRUSTED_DECISIONS.map((value) => (
-          <label key={value} className="flex items-center gap-sm text-body-sm">
-            <input
-              type="radio"
-              name="decision"
-              value={value}
-              checked={decision === value}
-              onChange={() => setDecision(value)}
-              className="size-[var(--size-selection-md)]"
-              data-testid={'trusted-decision-' + value}
-            />
-            {TRUSTED_DECISION_FA[value]}
-          </label>
-        ))}
-      </fieldset>
-      <TextAreaField label="دلیل" name="reasonFa" required rows={3} maxLength={1000} hint="برای متقاضی نمایش داده می‌شود." data-testid="trusted-decision-reason" />
-      <Button type="submit" disabled={pending} data-testid="submit-trusted-decision">
-        {pending ? 'در حال ثبت…' : 'ثبت نتیجه'}
-      </Button>
-      <Result state={state} testId="trusted-decision-result" />
-    </form>
+    <DecisionForm
+      action={decideTrustedCaseAction}
+      hidden={{ caseId, expectedVersion: version }}
+      formTestId="trusted-decision-form"
+      submitTestId="submit-trusted-decision"
+      reasonName="reasonFa"
+      reasonTestId="trusted-decision-reason"
+      reasonFor={TRUSTED_DECISIONS}
+      reasonLabel={(value) => (value === 'REJECT' ? 'دلیل رد' : value === 'REQUEST_CORRECTION' ? 'دلیل اصلاح' : 'دلیل تأیید')}
+      audience="به متقاضی نمایش داده می‌شود"
+      drafts={['تعهدنامه یا خوداظهاری تجهیزات کامل نیست', 'پروانه یا عضویت معتبر نیست']}
+      choices={TRUSTED_DECISIONS.map((value) => ({ value, label: TRUSTED_DECISION_FA[value], desc: TRUSTED_DECISION_DESC_FA[value], testId: 'trusted-decision-' + value }))}
+    />
   );
 }

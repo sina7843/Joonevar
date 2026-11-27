@@ -3,7 +3,6 @@ import { StatusBadge } from '../ui/status.tsx';
 import { Icon } from '../ui/icon.tsx';
 import { KeyValueList } from '../ui/key-value.tsx';
 import { formatCivilDateFa } from '../domain/calendar.ts';
-import { VERIFICATION_STATE_FA } from './model.ts';
 import type { VerificationAnswer } from './service.ts';
 
 /** The footer every outcome carries: what this answer never shows. */
@@ -78,7 +77,7 @@ export function VerificationResult({ answer }: { answer: VerificationAnswer }) {
         </span>
         <div className="hz-verify__text">
           <span data-testid="verify-state">
-            <StatusBadge tone={valid ? 'success' : 'neutral'}>{VERIFICATION_STATE_FA[answer.state]}</StatusBadge>
+            <StatusBadge status={valid ? 'VALID' : 'SUPERSEDED'} />
           </span>
           <h2 className="hz-verify__title" id="verify-title">
             {answer.kindFa}

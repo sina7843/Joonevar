@@ -4,7 +4,8 @@ import { useActionState } from 'react';
 import { Card } from '../../../src/ui/card.tsx';
 import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
-import { SelectField, TextAreaField, TextField } from '../../../src/ui/field.tsx';
+import { SelectField, TextField } from '../../../src/ui/field.tsx';
+import { ReasonField } from '../../../src/ui/decision.tsx';
 import { setContentRoleAction, setMarketplaceRoleAction, type RoleFormState } from './actions.ts';
 import { MARKETPLACE_ROLES, MARKETPLACE_ROLE_FA } from '../../../src/marketplace/roles.ts';
 
@@ -48,7 +49,7 @@ export function ContentRoleForm() {
             data-testid="role-action"
           />
         </div>
-        <TextAreaField label="دلیل" name="reason" rows={2} required data-testid="role-reason" />
+        <ReasonField name="reason" label="دلیل" required rows={2} audience={null} testId="role-reason" />
         <Button type="submit" disabled={pending} data-testid="save-content-role">
           {pending ? 'در حال ثبت…' : 'ثبت'}
         </Button>
@@ -101,7 +102,7 @@ export function MarketplaceRoleForm() {
             data-testid="market-role-action"
           />
         </div>
-        <TextAreaField label="دلیل" name="reason" rows={2} required data-testid="market-role-reason" />
+        <ReasonField name="reason" label="دلیل" required rows={2} audience={null} testId="market-role-reason" />
         <Button type="submit" tone="secondary" disabled={pending} data-testid="save-marketplace-role">
           {pending ? 'در حال ثبت…' : 'ثبت'}
         </Button>

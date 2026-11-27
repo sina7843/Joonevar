@@ -2,7 +2,7 @@
 
 The call-to-action box «هویت حیوانت را ثبت کن» — a title, one line of support, and two actions: «ثبت حیوان» (primary, start) and «استعلام اصالت سند» (secondary, end).
 
-Use once on an editorial or landing page in SiteShell (home, after «روش کار» or under the Hero row). Not inside PublicShell dashboards (they have their own primary action), and never twice on a page.
+Use once on an editorial or landing page in SiteShell (home: last section, as `--media` since v1.0.4). Not inside PublicShell dashboards (they have their own primary action), and never twice on a page.
 
 ## Anatomy
 
@@ -37,6 +37,10 @@ Additions (`css-additions/CtaBand.css`): `.hz-cta__text` (groups title + body so
 - **Horizontal** (≥1024) — text at the start, buttons in a row at the end, padding 32/36.
 - **Stacked** (<1024, or `--stacked`) — text, then full-width 48px buttons, primary first; padding 22/20.
 - Copy is fixed by the brief; the body line is optional.
+
+### `--media` (home, v1.0.4)
+
+`section.hz-cta.hz-cta--media` > `figure.hz-cta__media` (photo) + `div.hz-cta__content` (title, body, actions). Phones: photo 16:9 on top, then the text and full-width buttons. ≥1024: text 7/12 at the start, photo 5/12 at the end, min-height 320. Same tokens as the default band (`bg-brand-subtle`, `border-default`, `radius-2xl`). The photo is decorative content from the home settings (`imageFileId` + `imageAltFa`); without a photo use the default CtaBand.
 
 ## States
 

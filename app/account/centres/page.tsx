@@ -8,7 +8,6 @@ import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
 import { manageableCentres } from '../../../src/centres/service.ts';
-import { CENTRE_STATUS_FA, type CentreStatus } from '../../../src/centres/model.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,9 +61,7 @@ export default async function AccountCentresPage() {
                 >
                   {row.centre.displayNameFa}
                 </Link>
-                <StatusBadge tone={row.centre.publicStatus === 'PUBLISHED' ? 'success' : row.centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}>
-                  {CENTRE_STATUS_FA[row.centre.publicStatus as CentreStatus]}
-                </StatusBadge>
+                <StatusBadge status={row.centre.publicStatus} />
               </div>
               <div className="hz-cardlist__row">
                 <span className="hz-cardlist__meta">{[row.typeNameFa, row.cityNameFa].filter(Boolean).join(' · ') || 'تعیین‌نشده'}</span>

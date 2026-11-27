@@ -5,17 +5,24 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { GENETICS_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, whenFa } from '../../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { CaseAge, CaseHistory, Desk, DeskHead, DeskVersionNote, DocFrame, Panel, PrivateNote, deskPosition, whenFa } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
+import { auditSteps, historyFromAudit } from '../../../assoc/audit-history.ts';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { animals } from '../../../../src/db/schema/animals.ts';
 import { samples } from '../../../../src/db/schema/clinical.ts';
-import { findReceipt, receiptItems, RECEIPT_STATUS_FA } from '../../../../src/genetics/service.ts';
+import { findReceipt, receiptItems, receiptQueue, RECEIPT_STATUS_FA } from '../../../../src/genetics/service.ts';
 import { ReceiptReviewForm } from '../../forms.tsx';
 
 export const dynamic = 'force-dynamic';
+
+const HISTORY_FA: Record<string, string> = {
+  GENETICS_RECEIPT_CREATED: 'ثبت فیش',
+  GENETICS_RECEIPT_SUBMITTED: 'ارسال برای بررسی',
+  GENETICS_RECEIPT_REVIEWED: 'تصمیم مرکز',
+};
 
 /**
  * One receipt at the centre — §14.1, §14.2.
@@ -34,7 +41,11 @@ export default async function GeneticsReceiptPage({ params }: { params: Promise<
   const receipt = await findReceipt(db(), id);
   if (!receipt) return <RecordNotFound error={notFoundError('فیش پیدا نشد.')} />;
 
-  const items = await receiptItems(db(), receipt.id);
+  const [items, steps, queue] = await Promise.all([
+    receiptItems(db(), receipt.id),
+    auditSteps('GENETICS_RECEIPT', receipt.id),
+    receiptQueue(db(), guard.actor),
+  ]);
   const animalRows = items.length
     ? await db()
         .select({ id: animals.id, name: animals.name, generation: animals.generation })
@@ -46,19 +57,20 @@ export default async function GeneticsReceiptPage({ params }: { params: Promise<
     : [];
 
   const open = receipt.status === 'UNDER_REVIEW';
-  const age = ageInDays(receipt.submittedAt);
+  const firstSubmittedAt = steps.filter((step) => step.action === 'GENETICS_RECEIPT_SUBMITTED').at(-1)?.at ?? receipt.submittedAt;
   return (
-    <OpsShell actor={guard.actor} title="بررسی فیش" pathname={'/genetics/receipts/' + id} nav={GENETICS_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی فیش" pathname={'/genetics/receipts/' + id} nav={GENETICS_NAV} headingInPage>
+      <DeskHead level={1}
         title="فیش پرداخت مستقیم"
-        status={{
-          tone: open ? 'info' : receipt.status === 'APPROVED' ? 'success' : receipt.status === 'REJECTED' ? 'error' : 'warning',
-          label: RECEIPT_STATUS_FA[receipt.status],
-          testId: 'centre-receipt-status',
-        }}
+        status={{ ...keyStatus(receipt.status), testId: 'centre-receipt-status' }}
+        position={deskPosition(
+          queue.map((row) => row.id),
+          receipt.id,
+          (receiptId) => '/genetics/receipts/' + receiptId,
+        )}
         meta={[
           'ارسال: ' + (whenFa(receipt.submittedAt) ?? '—'),
-          open && age !== null ? <span className="hz-age">{age.toLocaleString('fa-IR') + ' روز در صف'}</span> : null,
+          open && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null,
           'نسخه ' + receipt.version.toLocaleString('fa-IR'),
         ]}
         owner={open ? 'GENETICS_CENTRE' : receipt.status === 'NEEDS_CORRECTION' ? 'USER' : null}
@@ -109,6 +121,9 @@ export default async function GeneticsReceiptPage({ params }: { params: Promise<
               );
             })}
           </ul>
+        </Panel>
+        <Panel title="سابقه پرونده">
+          <CaseHistory entries={historyFromAudit(steps, HISTORY_FA, open)} />
         </Panel>
       </Desk>
     </OpsShell>

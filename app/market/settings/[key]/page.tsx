@@ -6,11 +6,19 @@ import { Panel } from '../../../../src/ui/desk.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
+import { DataTable } from '../../../../src/ui/data-table.tsx';
+import { Pagination } from '../../../../src/ui/pagination.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { AppError } from '../../../../src/domain/errors.ts';
 import { settingHistory } from '../../../../src/marketplace/operations.ts';
 import { SETTING_BY_KEY } from '../../../../src/settings/keys.ts';
 import { parsePageRequest } from '../../../../src/domain/pagination.ts';
+import { readSettingForActor } from '../../../../src/settings/service.ts';
+import { displaySetting } from '../../../../src/settings/display.ts';
+import { canWriteSettingGroup, type SettingGroupName } from '../../../../src/authz/policy.ts';
+import { isMarketSettingGroup } from '../../../../src/marketplace/operations.ts';
+import { SettingRow } from '../../../../src/ui/setting-row.tsx';
+import { updateMarketSettingAction } from '../../actions.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,32 +57,37 @@ export default async function MarketSettingHistoryPage({
           description="این مقدار از زمان نصب دست نخورده است؛ اولین تغییر همین‌جا با نام، زمان و دلیل ثبت می‌شود."
         />
       ) : (
-        <div className="hz-table-wrap">
-          <table className="hz-table hz-table--stack" data-testid="setting-history">
-            <caption className="hz-visually-hidden">تاریخچه تغییرات، تازه‌ترین در بالا</caption>
-            <thead>
-              <tr>
-                <th scope="col">زمان</th>
-                <th scope="col">انجام‌دهنده</th>
-                <th scope="col">قبل ← بعد</th>
-                <th scope="col">دلیل</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.items.map((row) => (
-                <tr key={row.id} className="hz-audit-row" data-testid={'history-' + row.id}>
-                  <td className="hz-table__lead">
-                    <span className="hz-audit-when">{formatted(row.occurredAt)}</span>
-                  </td>
-                  <td data-label="انجام‌دهنده">
+        <>
+          <div data-testid="setting-history">
+            <DataTable
+              label="تاریخچه تغییرات، تازه‌ترین در بالا"
+              rows={history.items}
+              rowKey={(row) => row.id}
+              rowTestId={(row) => 'history-' + row.id}
+              rowClassName="hz-audit-row"
+              columns={[
+                {
+                  key: 'when',
+                  header: 'زمان',
+                  lead: true,
+                  cell: (row) => <span className="hz-audit-when">{formatted(row.occurredAt)}</span>,
+                },
+                {
+                  key: 'who',
+                  header: 'انجام‌دهنده',
+                  cell: (row) => (
                     <span className={row.actorContext ? 'hz-audit-who' : 'hz-audit-who hz-audit-who--system'}>
                       <span className="hz-audit-who__name">
                         <bdi dir="auto">{row.actorContext ?? 'سیستم'}</bdi>
                       </span>
                     </span>
-                  </td>
-                  <td data-label="قبل ← بعد" className="max-w-md">
-                    <div className="hz-audit-change">
+                  ),
+                },
+                {
+                  key: 'change',
+                  header: 'قبل ← بعد',
+                  cell: (row) => (
+                    <div className="hz-audit-change max-w-md">
                       <span className="hz-visually-hidden">از</span>
                       <bdi className="hz-audit-change__before [overflow-wrap:anywhere]" dir="ltr" data-testid={'history-before-' + row.id}>
                         {row.beforeValue}
@@ -85,19 +98,33 @@ export default async function MarketSettingHistoryPage({
                         {row.afterValue}
                       </bdi>
                     </div>
-                  </td>
-                  <td data-label="دلیل" className="min-w-48">
-                    {row.reason ? (
-                      <p className="hz-audit-reason">دلیل: {row.reason}</p>
-                    ) : (
-                      <p className="hz-audit-reason hz-audit-reason--none">— بدون دلیل ثبت‌شده</p>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  ),
+                },
+                {
+                  key: 'reason',
+                  header: 'دلیل',
+                  cell: (row) => (
+                    <div className="min-w-48">
+                      {row.reason ? (
+                        <p className="hz-audit-reason">دلیل: {row.reason}</p>
+                      ) : (
+                        <p className="hz-audit-reason hz-audit-reason--none">— بدون دلیل ثبت‌شده</p>
+                      )}
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </div>
+          <Pagination
+            page={history.page}
+            pageSize={history.pageSize}
+            total={history.total}
+            totalPages={history.totalPages}
+            hrefFor={(n) => '/market/settings/' + encodeURIComponent(key) + '?page=' + n}
+            label="صفحه‌بندی تاریخچه"
+          />
+        </>
       );
   } catch (error) {
     if (!(error instanceof AppError)) throw error;
@@ -108,11 +135,41 @@ export default async function MarketSettingHistoryPage({
     );
   }
 
+  // P11 below 768: this page is also the key's edit page — the row open on top, its history under it.
+  const setting = definition && isMarketSettingGroup(definition.group) ? await readSettingForActor(db(), actor, key).catch(() => null) : null;
+  const writable = setting ? canWriteSettingGroup(actor, setting.group as SettingGroupName) : false;
+
   return (
     <OpsShell actor={actor} title="تاریخچه مقدار" pathname="/market/settings" nav={marketNav(actor)}>
       <Link href="/market/settings" className="hz-link hz-link--standalone" data-testid="back-to-settings">
         بازگشت به تنظیمات بازار
       </Link>
+      {setting ? (
+        <section className="hz-card">
+          <SettingRow
+            setting={{
+              key: setting.key,
+              labelFa: setting.labelFa,
+              kind: setting.kind,
+              configured: setting.configured,
+              raw: setting.configured ? (typeof setting.value === 'object' ? JSON.stringify(setting.value) : String(setting.value)) : '',
+              display: displaySetting(setting),
+              version: setting.version,
+            }}
+            writable={writable}
+            startOpen={writable}
+            action={updateMarketSettingAction}
+            ids={{
+              value: 'market-setting-value-' + key,
+              reason: 'market-setting-reason-' + key,
+              save: 'market-setting-save-' + key,
+              edit: 'market-setting-edit-' + key,
+              form: 'market-setting-form-' + key,
+              display: 'market-value-' + key,
+            }}
+          />
+        </section>
+      ) : null}
       <Panel
         title={definition?.labelFa ?? key}
         aside={

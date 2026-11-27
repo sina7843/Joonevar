@@ -107,7 +107,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -159,7 +159,8 @@ async function setSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-' + key).click();
     await page.getByTestId('setting-value-' + key).fill(value);
     await page.getByTestId('setting-reason-' + key).fill('SYNTHETIC — مقدار آزمایشی اجرای تست ' + RUN);
     await page.getByTestId('save-setting-' + key).click();
@@ -382,10 +383,10 @@ test('the queues show real counts and open the case they counted', async () => {
     // Every queue reports a real number, and the KYC count is exactly the
     // number of cases the queue it opens actually lists — not a placeholder.
     for (const key of ['kyc', 'kennels', 'permits', 'foreign', 'postal']) {
-      const value = await page.getByTestId('queue-count-' + key).innerText();
+      const value = (await page.getByTestId('queue-count-' + key).getAttribute('data-count')) ?? '';
       assert.match(value, /^\d+$/, key + ' must report a real number');
     }
-    const kycCount = Number(await page.getByTestId('queue-count-kyc').innerText());
+    const kycCount = Number(await page.getByTestId('queue-count-kyc').getAttribute('data-count'));
     await page.getByTestId('open-queue-kyc').click();
     await page.waitForURL((url) => url.pathname === '/assoc/kyc');
     // The first page of the queue is capped, so the count is checked against
@@ -405,7 +406,7 @@ test('the queues show real counts and open the case they counted', async () => {
     await page.goto(BASE_URL + '/genetics', { waitUntil: 'load' });
     await page.getByTestId('genetics-queues').waitFor();
     for (const key of ['receipts', 'awaiting', 'received', 'processing', 'appeals']) {
-      assert.match(await page.getByTestId('genetics-count-' + key).innerText(), /^\d+$/);
+      assert.match((await page.getByTestId('genetics-count-' + key).getAttribute('data-count')) ?? '', /^\d+$/);
     }
     await page.getByTestId('open-genetics-receipts').click();
     await page.waitForURL((url) => url.pathname === '/genetics/receipts');
@@ -430,8 +431,10 @@ test('managed data is edited from the panel and its history is readable', async 
     assert.equal(await page.getByTestId('breed-state-' + nameEn).innerText(), 'فعال');
 
     await page.getByTestId('toggle-breed-' + nameEn).click();
+    await page.getByTestId('breed-reason-' + nameEn).fill('SYNTHETIC دلیل آزمایشی');
+    await page.getByTestId('breed-state-save-' + nameEn).click();
     await page.waitForFunction(
-      (id) => document.querySelector('[data-testid="breed-state-' + id + '"]')?.textContent?.includes('کنارگذاشته'),
+      (id) => document.querySelector('[data-testid="breed-state-' + id + '"]')?.getAttribute('data-status') === 'INACTIVE',
       nameEn,
       { timeout: 20_000 },
     );
@@ -465,7 +468,7 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
       waitUntil: 'load',
     });
     await page.getByTestId('member-list').waitFor();
-    const vetRow = page.locator('[data-testid="member-list"] > li').filter({ hasText: 'دامپزشک آزمایشی' });
+    const vetRow = page.locator('[data-testid="member-list"] tbody > tr').filter({ hasText: 'دامپزشک آزمایشی' });
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
     await vetRow.locator('[data-testid^="membership-reason-"]').fill('بررسی عملیاتی آزمایشی ' + RUN);
     await vetRow.locator('[data-testid^="submit-membership-"]').click();
@@ -511,7 +514,7 @@ test('a lapsed membership keeps the assigned work and closes new assignment', as
     await page.goto(BASE_URL + '/assoc/members?q=' + encodeURIComponent('دامپزشک آزمایشی'), {
       waitUntil: 'load',
     });
-    const vetRow = page.locator('[data-testid="member-list"] > li').filter({ hasText: 'دامپزشک آزمایشی' });
+    const vetRow = page.locator('[data-testid="member-list"] tbody > tr').filter({ hasText: 'دامپزشک آزمایشی' });
     await vetRow.locator('[data-testid^="toggle-membership-"]').click();
     await vetRow.locator('[data-testid^="membership-reason-"]').fill('بازگردانی وضعیت آزمایشی ' + RUN);
     await vetRow.locator('[data-testid^="submit-membership-"]').click();
@@ -528,7 +531,7 @@ test('an operational environment is never reachable from a public session', asyn
 
     for (const href of ['/assoc', '/assoc/members', '/assoc/postal', '/genetics', '/admin', '/admin/audit', '/admin/breeds']) {
       await page.goto(BASE_URL + href, { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN', href);
+      assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', href);
     }
 
     // The public role switcher never offers an operational context either.

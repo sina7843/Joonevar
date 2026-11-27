@@ -1,12 +1,14 @@
 import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, Panel, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { CaseAge, Desk, DeskHead, DeskVersionNote, deskPosition, Panel, CaseHistory } from '../../../../src/ui/desk.tsx';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
+import { vetCaseKey } from '../../vet-case-key.ts';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { db } from '../../../../src/db/client.ts';
-import { trustedCaseForReview } from '../../../../src/vets/trusted-application.ts';
+import { trustedCaseForReview, trustedCaseQueue } from '../../../../src/vets/trusted-application.ts';
 import { reviewStateFor } from '../../../../src/vets/review-workbench.ts';
 import { ReviewPanel } from '../../../../src/vets/review-forms.tsx';
 import { DecideTrustedCaseForm } from '../../../../src/vets/trusted-forms.tsx';
@@ -27,7 +29,11 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
   const { id } = await params;
   const guard = await guardRoute('/assoc/vet-trusted/' + id);
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
-  const [detail, review] = await Promise.all([trustedCaseForReview(db(), guard.actor, id), reviewStateFor(db(), guard.actor, id)]);
+  const [detail, review, queueIds] = await Promise.all([
+    trustedCaseForReview(db(), guard.actor, id),
+    reviewStateFor(db(), guard.actor, id),
+    trustedCaseQueue(db(), guard.actor, { view: 'OPEN' }).then((rows) => rows.map((row) => row.id)),
+  ]);
 
   if (!detail) {
     return (
@@ -37,19 +43,18 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
     );
   }
   const waiting = detail.case.status === 'SUBMITTED' || detail.case.status === 'UNDER_REVIEW';
+  // Age in the queue counts from the first submission.
+  const firstSubmittedAt = detail.submissions[0] ? new Date(detail.submissions[0].submittedAt) : null;
   const current = detail.declarations.find((declaration) => declaration.submissionVersion === detail.case.currentSubmissionVersion);
 
   const standing = detail.case.status === 'ACTIVE_TRUSTED_VET' || detail.case.status === 'TRUSTED_APPROVED_AWAITING_PAYMENT';
   return (
-    <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک معتمد" pathname="/assoc/vet-trusted" nav={ASSOC_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی درخواست دامپزشک معتمد" pathname="/assoc/vet-trusted" nav={ASSOC_NAV} headingInPage>
+      <DeskHead level={1}
         title={'دامپزشک معتمد · ' + (detail.applicantNameFa ?? '—')}
-        status={{
-          tone: waiting ? 'info' : detail.case.status === 'NEEDS_CORRECTION' ? 'warning' : detail.case.status === 'REJECTED' ? 'error' : 'success',
-          label: detail.case.statusFa,
-          testId: 'trusted-case-status',
-        }}
-        meta={['نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR')]}
+        status={{ ...keyStatus(vetCaseKey(detail.case.status)), testId: 'trusted-case-status' }}
+        position={deskPosition(queueIds, detail.case.id, (caseId) => '/assoc/vet-trusted/' + caseId)}
+        meta={[waiting && firstSubmittedAt ? <CaseAge since={firstSubmittedAt} /> : null, 'نسخه ' + detail.case.currentSubmissionVersion.toLocaleString('fa-IR')]}
         owner={waiting ? 'ASSOCIATION' : detail.case.status === 'NEEDS_CORRECTION' ? 'USER' : null}
         ownerExtra={review?.claimedByOther ? 'در دست ' + (review.claimerNameFa ?? 'بررسی‌کننده دیگر') : undefined}
       />
@@ -62,6 +67,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
               <>
                 <p className="text-caption text-text-secondary">تأیید فقط پرداخت دوره معتمد را باز می‌کند؛ Tag معتمد با پرداخت تأییدشده سرور فعال می‌شود.</p>
                 <DecideTrustedCaseForm caseId={detail.case.id} version={detail.case.version} />
+                <DeskVersionNote version={detail.case.currentSubmissionVersion} />
               </>
             ) : null}
             {standing ? (
@@ -124,7 +130,7 @@ export default async function AssocVetTrustedCasePage({ params }: { params: Prom
           ) : (
             <p className="text-body-sm text-text-secondary">خوداظهاری این نسخه ثبت نشده است.</p>
           )}
-          <h3 className="text-label-md">{DECLARED_EQUIPMENT_FA}</h3>
+          <h3 className="text-label-sm">{DECLARED_EQUIPMENT_FA}</h3>
           <ul className="space-y-2xs text-body-sm" data-testid="trusted-declared-equipment">
             {detail.declaredEquipment.length === 0 ? (
               <li className="text-text-secondary">تجهیزی اعلام نشده است.</li>

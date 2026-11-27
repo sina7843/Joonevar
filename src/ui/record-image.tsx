@@ -7,6 +7,8 @@
  * system's designed placeholder (symbol at 40% + the Persian alt text), never an
  * empty grey box (DS rule 4).
  */
+import type { ReactNode } from 'react';
+
 export type RecordImageVariant = 'banner' | '4x3' | '3x2' | '1x1' | 'thumb' | 'thumb-lg' | 'avatar';
 
 const FRAME: Record<RecordImageVariant, { cls: string; width: number; height: number }> = {
@@ -25,6 +27,7 @@ export function RecordImage({
   priority = false,
   variant = 'banner',
   className = '',
+  children,
 }: {
   fileId: string | null;
   altFa: string | null;
@@ -32,6 +35,8 @@ export function RecordImage({
   priority?: boolean;
   variant?: RecordImageVariant;
   className?: string;
+  /** Overlays inside the frame — only the DS tag pill (`.hz-tag--on-media`) may sit on a photo. */
+  children?: ReactNode;
 }) {
   const frame = FRAME[variant];
   const small = variant === 'thumb' || variant === 'thumb-lg' || variant === 'avatar';
@@ -40,7 +45,8 @@ export function RecordImage({
       {fileId === null ? (
         <div className="hz-media__empty" data-testid="record-image-empty">
           <img src="/brand/logo/symbol.svg" alt="" />
-          {small ? null : <span className="hz-media__alt">{altFa ?? 'تصویر ثبت نشده'}</span>}
+          {/* A small frame has no room for the text, but a screen reader still hears it (CMPB-072). */}
+          <span className={small ? 'hz-visually-hidden' : 'hz-media__alt'}>{altFa ?? 'تصویر ثبت نشده'}</span>
         </div>
       ) : (
         <img
@@ -54,6 +60,7 @@ export function RecordImage({
           data-testid="record-image"
         />
       )}
+      {children}
     </div>
   );
 }

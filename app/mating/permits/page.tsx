@@ -7,7 +7,7 @@ import { ButtonLink } from '../../../src/ui/button.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../src/ui/status.tsx';
 import { db } from '../../../src/db/client.ts';
-import { permitEntry, PERMIT_STATUS_FA } from '../../../src/mating/permits.ts';
+import { permitEntry } from '../../../src/mating/permits.ts';
 import { PageHeader } from '../../../src/ui/section-header.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -66,24 +66,14 @@ export default async function PermitsPage() {
                 <Card>
                   <div className="flex items-start justify-between gap-md">
                     <div className="min-w-0">
-                      <h3 className="text-label-md">{permit.permitNo ?? 'پرونده مجوز'}</h3>
+                      <h3 className="text-label-sm">{permit.permitNo ?? 'پرونده مجوز'}</h3>
                       <p className="mt-2xs text-caption text-text-secondary">
                         {permit.initiatorAccountId === guard.actor.accountId
                           ? 'آغازکننده: شما'
                           : 'شما طرف مقابل این پرونده هستید'}
                       </p>
                     </div>
-                    <StatusBadge
-                      tone={
-                        permit.status === 'ISSUED'
-                          ? 'success'
-                          : permit.status === 'REJECTED' || permit.status === 'NEEDS_CORRECTION'
-                            ? 'warning'
-                            : 'info'
-                      }
-                    >
-                      {PERMIT_STATUS_FA[permit.status]}
-                    </StatusBadge>
+                    <StatusBadge status={permit.status} />
                   </div>
                   <p className="mt-lg text-body-sm">
                     <Link href={'/mating/permits/' + permit.id} className="hz-link" data-testid="open-permit">

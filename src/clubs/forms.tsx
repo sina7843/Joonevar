@@ -2,8 +2,9 @@
 
 import { useActionState } from 'react';
 import { Card, CardHeader } from '../ui/card.tsx';
-import { Button } from '../ui/button.tsx';
+import { ActionRow, Button } from '../ui/button.tsx';
 import { SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { ReasonField } from '../ui/decision.tsx';
 import { Result, submitWith } from '../vets/directory-forms.tsx';
 import { COMMUNITY_SCOPES, COMMUNITY_SCOPE_FA } from '../communities/model.ts';
 import { REASON_FA, REPORT_REASONS } from '../moderation/model.ts';
@@ -89,7 +90,7 @@ export function ClubPublicationForm({ clubId, version, published }: { clubId: st
       <Hidden surface="owner" clubId={clubId} />
       <input type="hidden" name="expectedVersion" value={version} />
       <input type="hidden" name="publish" value={published ? 'false' : 'true'} />
-      <TextField label="یادداشت" name="reasonFa" maxLength={500} data-testid="club-publication-note" />
+      <ReasonField name="reasonFa" label="یادداشت تغییر" rows={2} audience={null} testId="club-publication-note" />
       <Result state={state} testId="club-publication-result" />
       <Button type="submit" tone={published ? 'secondary' : 'primary'} disabled={pending} data-testid="club-publication-submit">
         {published ? 'پنهان‌کردن صفحه عمومی' : 'انتشار صفحه عمومی'}
@@ -113,7 +114,7 @@ export function ClubRoleForm({ clubId, roles }: { clubId: string; roles: readonl
         hint="این نقش فقط در همین کلاب کار می‌کند."
         data-testid="club-role-select"
       />
-      <TextField label="یادداشت" name="reasonFa" maxLength={500} data-testid="club-role-note" />
+      <ReasonField name="reasonFa" label="یادداشت تغییر" rows={2} audience={null} testId="club-role-note" />
       <Result state={state} testId="club-role-result" />
       <Button type="submit" disabled={pending} data-testid="club-role-submit">
         ثبت نقش
@@ -184,19 +185,24 @@ export function ClubVerificationDecisionForm({ clubId, version }: { clubId: stri
     <form onSubmit={submitWith(submit)} className="space-y-md" data-testid="club-verification-form">
       <Hidden surface="assoc" clubId={clubId} />
       <input type="hidden" name="expectedVersion" value={version} />
-      <TextAreaField label="دلیل تصمیم" name="reasonFa" rows={3} required maxLength={500} data-testid="club-verification-reason" />
+      <ReasonField name="reasonFa" label="دلیل تصمیم" required audience={null} testId="club-verification-reason" />
       <Result state={state} testId="club-verification-result" />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" name="outcome" value="VERIFY" disabled={pending} data-testid="club-verify">
-          تأیید کلاب
-        </Button>
-        <Button type="submit" tone="secondary" name="outcome" value="NEEDS_CORRECTION" disabled={pending} data-testid="club-needs-correction">
-          درخواست اصلاح
-        </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" name="outcome" value="VERIFY" disabled={pending} data-testid="club-verify">
+            تأیید کلاب
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="outcome" value="NEEDS_CORRECTION" disabled={pending} data-testid="club-needs-correction">
+            درخواست اصلاح
+          </Button>
+        }
+      >
         <Button type="submit" tone="secondary" name="outcome" value="REJECT" disabled={pending} data-testid="club-reject">
           رد درخواست
         </Button>
-      </div>
+      </ActionRow>
     </form>
   );
 }
@@ -209,7 +215,7 @@ export function ClubStandingForm({ clubId, version, surface, to }: { clubId: str
       <Hidden surface={surface} clubId={clubId} />
       <input type="hidden" name="expectedVersion" value={version} />
       <input type="hidden" name="to" value={to} />
-      <TextField label="دلیل" name="reasonFa" required maxLength={500} data-testid={'club-standing-reason-' + to.toLowerCase()} />
+      <ReasonField name="reasonFa" label="دلیل" required rows={2} audience={null} testId={'club-standing-reason-' + to.toLowerCase()} />
       <Result state={state} testId={'club-standing-result-' + to.toLowerCase()} />
       <Button type="submit" tone={to === 'ACTIVE' ? 'primary' : 'secondary'} disabled={pending} data-testid={'club-standing-submit-' + to.toLowerCase()}>
         {labelFa}
@@ -225,16 +231,20 @@ export function ClubOwnershipDecisionForm({ requestId, version }: { requestId: s
       <Hidden surface="assoc" />
       <input type="hidden" name="requestId" value={requestId} />
       <input type="hidden" name="expectedVersion" value={version} />
-      <TextAreaField label="دلیل تصمیم" name="reasonFa" rows={2} required maxLength={500} data-testid={'club-ownership-decision-reason-' + requestId} />
+      <ReasonField name="reasonFa" label="دلیل تصمیم" required rows={2} audience={null} testId={'club-ownership-decision-reason-' + requestId} />
       <Result state={state} testId={'club-ownership-decision-result-' + requestId} />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-ownership-approve-' + requestId}>
-          تأیید مالکیت
-        </Button>
-        <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-ownership-reject-' + requestId}>
-          رد درخواست
-        </Button>
-      </div>
+      <ActionRow
+        primary={
+          <Button type="submit" name="approve" value="true" disabled={pending} data-testid={'club-ownership-approve-' + requestId}>
+            تأیید مالکیت
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="approve" value="false" disabled={pending} data-testid={'club-ownership-reject-' + requestId}>
+            رد درخواست
+          </Button>
+        }
+      />
     </form>
   );
 }
@@ -265,19 +275,24 @@ export function ClubModerationForm({ clubId }: { clubId: string }) {
   return (
     <form onSubmit={submitWith(submit)} className="space-y-md" data-testid={'club-moderation-' + clubId}>
       <Hidden surface="moderation" clubId={clubId} />
-      <TextAreaField label="دلیل تصمیم" name="reasonFa" rows={2} required maxLength={500} data-testid={'club-moderation-reason-' + clubId} />
+      <ReasonField name="reasonFa" label="دلیل تصمیم" required rows={2} audience={null} testId={'club-moderation-reason-' + clubId} />
       <Result state={state} testId={'club-moderation-result-' + clubId} />
-      <div className="flex flex-wrap gap-sm">
-        <Button type="submit" tone="secondary" name="decision" value="DISMISS" disabled={pending} data-testid={'club-moderation-dismiss-' + clubId}>
-          رد گزارش‌ها
-        </Button>
-        <Button type="submit" name="decision" value="HIDE" disabled={pending} data-testid={'club-moderation-hide-' + clubId}>
-          پنهان‌کردن صفحه
-        </Button>
+      <ActionRow
+        primary={
+          <Button type="submit" name="decision" value="HIDE" disabled={pending} data-testid={'club-moderation-hide-' + clubId}>
+            پنهان‌کردن صفحه
+          </Button>
+        }
+        secondary={
+          <Button type="submit" tone="secondary" name="decision" value="DISMISS" disabled={pending} data-testid={'club-moderation-dismiss-' + clubId}>
+            رد گزارش‌ها
+          </Button>
+        }
+      >
         <Button type="submit" tone="secondary" name="decision" value="SOFT_DELETE" disabled={pending} data-testid={'club-moderation-remove-' + clubId}>
           خارج‌کردن از دسترس عمومی
         </Button>
-      </div>
+      </ActionRow>
     </form>
   );
 }

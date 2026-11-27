@@ -120,7 +120,7 @@ test('a manager buys a package through the real checkout and it is active only a
   await as('user', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/account/packages', { waitUntil: 'load' });
     await expectText(page, CLUB);
-    await expectText(page, 'بسته فعالی ندارد');
+    await expectText(page, 'ثبت‌نشده');
     await expectText(page, '۵۰۰٬۰۰۰ تومان');
     await page.screenshot({ path: path.join(SHOTS, 'packages-mobile.png'), fullPage: true });
 

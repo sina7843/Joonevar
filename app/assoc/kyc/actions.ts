@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { reviewKyc, type KycDecision } from '../../../src/identity/kyc.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface ReviewState {
   readonly ok?: boolean;
@@ -30,7 +30,7 @@ export async function reviewKycAction(_previous: ReviewState, form: FormData): P
     revalidatePath('/assoc/kyc');
     return { ok: true, message: 'نتیجه بررسی ثبت شد و به کاربر اعلام شد.', tone: 'success' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error' };
+    if (error instanceof AppError) return { ok: false, message: error.message, tone: 'error', ...staleOf(error) };
     throw error;
   }
 }

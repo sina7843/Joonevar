@@ -46,7 +46,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -189,7 +190,7 @@ test('the seller completes the file, accepts the versioned agreement and sends i
 
     await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
     await page.getByTestId('submit-seller').click();
-    await page.getByTestId('seller-status').filter({ hasText: 'ارسال‌شده برای بررسی' }).waitFor();
+    await page.getByTestId('seller-status').filter({ hasText: 'در انتظار بررسی' }).waitFor();
   } finally {
     await context.close();
   }
@@ -204,9 +205,10 @@ test('a reviewer verifies the account, approves, and the store still does not tr
     assert.match(await page.getByTestId('seller-review-note').innerText(), /پرداخت تأییدشده/);
 
     const sellerId = (await page
-      .locator('[data-testid^="seller-decision-select-"]')
+      .locator('[data-testid^="open-seller-"]')
       .first()
-      .getAttribute('data-testid'))!.replace('seller-decision-select-', '');
+      .getAttribute('data-testid'))!.replace('open-seller-', '');
+    await page.getByTestId('open-seller-' + sellerId).click();
 
     // The settlement account is masked on the queue, never shown whole.
     const iban = await page.getByTestId('seller-iban-' + sellerId).innerText();
@@ -218,11 +220,13 @@ test('a reviewer verifies the account, approves, and the store still does not tr
     await expectText(page, 'مالکیت حساب تسویه تأیید و ثبت شد');
 
     await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+    await page.getByTestId('open-seller-' + sellerId).click();
     await page.getByTestId('seller-decision-select-' + sellerId).selectOption('UNDER_REVIEW');
     await page.getByTestId('seller-decide-' + sellerId).click();
     await expectText(page, 'تصمیم ثبت شد');
 
     await page.goto(BASE_URL + '/market/sellers', { waitUntil: 'load' });
+    await page.getByTestId('open-seller-' + sellerId).click();
     await page.getByTestId('seller-decision-select-' + sellerId).selectOption('APPROVED');
     await page.getByTestId('seller-decide-' + sellerId).click();
     await expectText(page, 'تصمیم ثبت شد');
@@ -236,7 +240,7 @@ test('a reviewer verifies the account, approves, and the store still does not tr
     const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/seller', { waitUntil: 'load' });
     // Approved, and still not trading: that needs a plan period.
-    assert.equal(await page.getByTestId('seller-status').innerText(), 'تأییدشده، در انتظار فعال‌سازی');
+    assert.equal(await page.getByTestId('seller-status').innerText(), 'تأییدشده');
     assert.match(await page.getByTestId('plan-note').innerText(), /پرداخت تأییدشده/);
   } finally {
     await seller.close();

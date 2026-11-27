@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { RichText } from './rich-text.tsx';
 import { RelatedColumn } from '../public/related-column.tsx';
-import { relatedContent, similarCentres } from '../public/related.ts';
+import { relatedContent } from '../public/related.ts';
 import Link from 'next/link';
 import { cache } from 'react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { db } from '../db/client.ts';
 import { publicContentBySlug, publicContentList } from './service.ts';
-import { KIND_FA, KIND_PATH, KIND_PLURAL_FA, TEAM_BYLINE } from './model.ts';
+import { KIND_FA, KIND_PATH, KIND_PLURAL_FA, TEAM_BYLINE, readMinutes } from './model.ts';
 import { EXTERNAL_BODY_NOTICE_FA, isExternalBodyCategory } from './taxonomy.ts';
 import { formatCivilDateFa } from '../domain/calendar.ts';
 import { buildMetadata } from '../seo/metadata.ts';
@@ -242,11 +242,8 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
 
   const { item, state, byline, categoryNameFa, categorySlug, breed } = page;
   const { origin } = site();
-  // The column beside the article: other reading, and centres to look at.
-  const [moreReading, centres] = await Promise.all([
-    relatedContent(db(), { excludeId: item.id, limit: 4 }),
-    similarCentres(db(), { limit: 3 }),
-  ]);
+  // The column beside the article: other reading only (KPUB-019 — no centres group on K4).
+  const moreReading = await relatedContent(db(), { excludeId: item.id, limit: 4 });
   const path = pathOf(kind) + '/' + item.slug;
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -308,10 +305,14 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
                 <span className="hz-content-detail__author-role">{byline === TEAM_BYLINE ? 'ناشر' : 'نویسنده'}</span>
               </span>
             </span>
+            {/* DS ContentDetail meta: «۶ دقیقه مطالعه · ۵ مهر ۱۴۰۵» (ReadTime from the body, KPUB-017). */}
             <div className="hz-meta">
+              <span className="hz-meta__item" data-testid="read-time">
+                <Icon name="clock" size="xs" />
+                {readMinutes(item.bodyFa ?? '').toLocaleString('fa-IR') + ' دقیقه مطالعه'}
+              </span>
               <time className="hz-meta__item" dateTime={item.publishAt!.toISOString()}>
-                <Icon name="calendarBlank" size="xs" />
-                {'انتشار: ' + DATE_FA.format(item.publishAt!)}
+                {DATE_FA.format(item.publishAt!)}
               </time>
             </div>
           </div>
@@ -342,7 +343,7 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
           <RichText source={item.bodyFa} />
           {item.sources.length > 0 ? (
             <div className="hz-prose__source mt-s32 border-t border-border-subtle pt-lg" data-testid="content-sources">
-              <h2 id="content-sources-title" className="text-label-md text-text-secondary">
+              <h2 id="content-sources-title" className="text-label-sm text-text-secondary">
                 منابع
               </h2>
               <ol className="mt-xs list-decimal space-y-2xs ps-xl" aria-labelledby="content-sources-title">
@@ -401,7 +402,6 @@ export async function ContentDetail({ kind, rawSlug }: { kind: PublicKind; rawSl
               noteAsTag: true,
               link: { href: pathOf(kind), label: 'همه ' + KIND_PLURAL_FA[kind] },
             },
-            { titleFa: 'مراکز دامپزشکی', items: centres, link: { href: '/centers', label: 'همه مراکز' } },
           ]}
         />
       </div>

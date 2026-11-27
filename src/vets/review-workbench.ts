@@ -14,7 +14,8 @@
  * payment: association reviewers cannot mark one successful, and the licensed and
  * trusted tags accept only the server (professional-tags.ts).
  */
-import { and, asc, count, desc, eq, inArray, isNotNull, isNull, ne, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNotNull, isNull, ne, or, sql, type SQL } from 'drizzle-orm';
+import { likeOf, type QueueSort } from '../domain/queue-query.ts';
 import type { Database, DbClient } from '../db/client.ts';
 import { profiles } from '../db/schema/identity.ts';
 import { vetCaseReviewChecks, vetProfessionalCases, vetProfessionalSubmissions, vetProfiles } from '../db/schema/vets.ts';
@@ -65,6 +66,23 @@ export const DETAIL_ROUTE: Record<VetCaseType, string> = {
 
 export type CaseRow = typeof vetProfessionalCases.$inferSelect;
 
+/**
+ * When the case was first sent (version 1), so a correction round does not
+ * reset its age (P09 › age from first submission, RTO-015).
+ */
+export const firstSubmittedAt = sql<Date>`(select min(${vetProfessionalSubmissions.submittedAt}) from ${vetProfessionalSubmissions} where ${vetProfessionalSubmissions.caseId} = ${vetProfessionalCases.id})`;
+
+/** Queue order: the operator's `?sort=`, else oldest first (decided ones newest first). */
+export function professionalQueueOrder(view: string, sort: QueueSort | undefined, name: SQL) {
+  if (sort === 'name') return [asc(name), asc(vetProfessionalCases.id)];
+  if (sort === 'newest' || (sort === undefined && view === 'DECIDED')) return [desc(firstSubmittedAt), asc(vetProfessionalCases.id)];
+  return [asc(firstSubmittedAt), asc(vetProfessionalCases.id)];
+}
+
+/** `?q=` over the given text columns of a professional case. */
+export const professionalSearch = (q: string | undefined, fields: readonly SQL[]): SQL | undefined =>
+  (q ?? '').trim() === '' ? undefined : sql`(${sql.join(fields.map((field) => sql`coalesce(${field}, '') ilike ${likeOf((q ?? '').trim())}`), sql` or `)})`;
+
 export function assertReviewer(actor: Actor): void {
   if (!REVIEW_CONTEXTS.includes(actor.context)) throw forbidden('میز بررسی دامپزشکان فقط در محیط انجمن باز می‌شود.');
 }
@@ -83,11 +101,10 @@ export interface ReviewFilters {
   readonly view?: string | null;
   readonly claim?: string | null;
   readonly q?: string | null;
+  readonly sort?: QueueSort;
   readonly page: number;
   readonly pageSize?: number;
 }
-
-const escapeLike = (value: string): string => value.replace(/[\\%_]/g, (ch) => '\\' + ch);
 
 export async function reviewQueue(database: DbClient, actor: Actor, filters: ReviewFilters) {
   assertReviewer(actor);
@@ -100,7 +117,7 @@ export async function reviewQueue(database: DbClient, actor: Actor, filters: Rev
   const q = (filters.q ?? '').trim().slice(0, 60);
   const request = { page: Math.max(1, filters.page || 1), pageSize: boundedRows(filters.pageSize, 20) };
 
-  const like = '%' + escapeLike(q) + '%';
+  const like = likeOf(q);
   const where = and(
     isNull(vetProfessionalCases.legacyApplicationId),
     caseType === 'ALL' ? inArray(vetProfessionalCases.caseType, [...REVIEW_CASE_TYPES]) : eq(vetProfessionalCases.caseType, caseType as VetCaseType),
@@ -120,7 +137,7 @@ export async function reviewQueue(database: DbClient, actor: Actor, filters: Rev
   );
   const base = () =>
     database
-      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload, profileName: vetProfiles.displayNameFa, firstName: profiles.firstName, lastName: profiles.lastName })
+      .select({ row: vetProfessionalCases, payload: vetProfessionalSubmissions.payload, profileName: vetProfiles.displayNameFa, firstName: profiles.firstName, lastName: profiles.lastName, firstSubmittedAt })
       .from(vetProfessionalCases)
       .leftJoin(
         vetProfessionalSubmissions,
@@ -141,13 +158,13 @@ export async function reviewQueue(database: DbClient, actor: Actor, filters: Rev
       .where(where),
     base()
       .where(where)
-      // The longest-waiting case first while it waits; otherwise the most recent.
-      .orderBy(view === 'OPEN' ? asc(vetProfessionalCases.updatedAt) : desc(vetProfessionalCases.updatedAt))
+      // P09: the operator's order; by default the longest-waiting first while it waits, otherwise the most recent.
+      .orderBy(...professionalQueueOrder(view === 'OPEN' ? 'OPEN' : 'DECIDED', filters.sort, sql`coalesce(${vetProfiles.displayNameFa}, ${vetProfessionalSubmissions.payload}->>'displayNameFa')`))
       .limit(request.pageSize)
       .offset(offsetOf(request)),
   ]);
 
-  const items = rows.map(({ row, payload, profileName, firstName, lastName }) => {
+  const items = rows.map(({ row, payload, profileName, firstName, lastName, firstSubmittedAt: first }) => {
     const fields = (payload ?? {}) as Record<string, unknown>;
     const type = row.caseType as VetCaseType;
     return {
@@ -163,6 +180,7 @@ export async function reviewQueue(database: DbClient, actor: Actor, filters: Rev
       claimedByOther: row.claimedByAccountId !== null && row.claimedByAccountId !== actor.accountId,
       claimedAt: row.claimedAt ? row.claimedAt.toISOString() : null,
       updatedAt: row.updatedAt.toISOString(),
+      firstSubmittedAt: first ? new Date(first).toISOString() : null,
       detailHref: DETAIL_ROUTE[type] + row.id,
     };
   });

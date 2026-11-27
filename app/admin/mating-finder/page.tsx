@@ -111,6 +111,7 @@ export default async function AdminMatingFinderPage() {
                     </bdi>
                   </div>
                   <div className="hz-setting__end">
+                    {/* GAPS #4: no dictionary key for an open/closed flow flag. */}
                     <span data-testid={'finder-flag-' + flag.key}>
                       <StatusBadge tone={flag.enabled ? 'success' : 'neutral'} size="sm">
                         {flag.enabled ? 'باز' : 'بسته'}
@@ -135,6 +136,7 @@ export default async function AdminMatingFinderPage() {
                     </bdi>
                   </div>
                   <div className="hz-setting__end">
+                    {/* GAPS #4: no dictionary key for an open/closed flow flag. */}
                     <StatusBadge tone={row.enabled ? 'success' : 'neutral'} size="sm">
                       {row.enabled ? 'باز' : 'بسته'}
                     </StatusBadge>
@@ -176,6 +178,7 @@ export default async function AdminMatingFinderPage() {
                       )}
                     </div>
                     <div className="hz-setting__end">
+                      {/* GAPS #4: no dictionary key for a plan slot's sale state (version + on sale / not sold). */}
                       <span data-testid={'finder-slot-state-' + testId}>
                         <StatusBadge tone={current ? (slot.problemFa ? 'warning' : 'success') : 'neutral'} size="sm">
                           {current ? 'نسخه ' + fa(current.version) + (slot.problemFa ? ' — فروخته نمی‌شود' : ' — در فروش') : 'منتشر نشده'}
@@ -225,9 +228,7 @@ export default async function AdminMatingFinderPage() {
                       </span>
                     </div>
                     <div className="hz-setting__end">
-                      <StatusBadge tone={row.status === 'PUBLISHED' ? 'success' : 'neutral'} size="sm">
-                        {row.status === 'PUBLISHED' ? 'منتشرشده' : 'بایگانی'}
-                      </StatusBadge>
+                      <StatusBadge status={row.status} size="sm" />
                     </div>
                   </li>
                 ))}

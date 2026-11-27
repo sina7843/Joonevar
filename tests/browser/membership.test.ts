@@ -73,7 +73,7 @@ test('membership shows the fee from managed data and stays inactive before payme
     await approveMembershipApplication(browser, page, operatorState);
     body = await page.locator('body').innerText();
     assert.ok(body.includes('مرور هزینه عضویت'));
-    assert.equal(await page.getByTestId('membership-status').textContent(), 'تأییدشده، در انتظار پرداخت');
+    assert.equal(await page.getByTestId('membership-status').textContent(), 'در انتظار پرداخت');
     assert.equal(await page.getByTestId('membership-fee').textContent(), '۳۰۰٬۰۰۰ تومان');
     await page.screenshot({ path: path.join(SHOTS, 'membership-before-payment.png'), fullPage: true });
   } finally {

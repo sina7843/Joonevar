@@ -362,15 +362,15 @@ test('a moved address redirects, an archived page keeps its notice, and each env
     await signIn(page, '0999' + String(randomInt(1_000_000, 9_999_999)));
     for (const target of ['/author', '/content', '/author/content/' + article.id]) {
       await page.goto(BASE_URL + target, { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN', target);
+      assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', target);
     }
   });
   await as('author', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/content/' + article.id, { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN', 'an author is not a content admin');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', 'an author is not a content admin');
   });
   await as('contentAdmin', MOBILE, async (page) => {
     await page.goto(BASE_URL + '/author', { waitUntil: 'load' });
-    assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN', 'a content admin is not an author');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', 'a content admin is not an author');
   });
 });

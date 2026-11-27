@@ -6,7 +6,7 @@ import { db } from '../db/client.ts';
 import { guardRoute } from '../authz/guard.ts';
 import { currentPaymentGateway, currentPaymentProvider } from '../adapters/current.ts';
 import { cancelAttempt, latestAttempt, startAttempt } from '../billing/payments.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { startTrustedPayment, suspendTrustedStanding } from './trusted-period.ts';
 
 const ROUTE = '/account/vet-profile';
@@ -25,7 +25,7 @@ async function actorAt(path: string) {
 }
 
 function failure(error: unknown): TrustedPeriodState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 

@@ -5,7 +5,9 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied, RecordNotFound } from '../../../../src/ui/access-denied.tsx';
 import { notFound as notFoundError } from '../../../../src/domain/errors.ts';
 import { GENETICS_NAV, OpsShell } from '../../../../src/ui/shell.tsx';
-import { Desk, DeskHead, Panel, whenFa } from '../../../../src/ui/desk.tsx';
+import { CaseAge, CaseHistory, Desk, DeskHead, DeskVersionNote, Panel, deskPosition, whenFa } from '../../../../src/ui/desk.tsx';
+import { auditSteps, historyFromAudit } from '../../../assoc/audit-history.ts';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { KeyValueList } from '../../../../src/ui/key-value.tsx';
 import { Alert } from '../../../../src/ui/alert.tsx';
 import { Identifier } from '../../../../src/ui/status.tsx';
@@ -13,12 +15,17 @@ import { db } from '../../../../src/db/client.ts';
 import { animals } from '../../../../src/db/schema/animals.ts';
 import { parentageResults } from '../../../../src/db/schema/genetics.ts';
 import { pedigrees } from '../../../../src/db/schema/pedigree.ts';
-import { APPEAL_STATUS_FA, findAppeal } from '../../../../src/genetics/appeals.ts';
+import { APPEAL_STATUS_FA, appealQueue, findAppeal } from '../../../../src/genetics/appeals.ts';
 import { RESULT_STATUS_FA } from '../../../../src/genetics/service.ts';
 import { generationLabel } from '../../../../src/domain/lineage.ts';
 import { AnswerAppealForm, TakeAppealForm } from '../../forms.tsx';
 
 export const dynamic = 'force-dynamic';
+
+const HISTORY_FA: Record<string, string> = {
+  PARENTAGE_APPEAL_TAKEN: 'بررسی اعتراض آغاز شد',
+  PARENTAGE_APPEAL_ANSWERED: 'پاسخ مرکز',
+};
 
 /** One appeal at the centre — §14.5, D19. */
 export default async function GeneticsAppealPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,14 +44,26 @@ export default async function GeneticsAppealPage({ params }: { params: Promise<{
     .from(parentageResults)
     .where(eq(parentageResults.id, appeal.resultId));
   const [document] = await db().select().from(pedigrees).where(eq(pedigrees.animalId, appeal.animalId));
+  const [steps, queue] = await Promise.all([auditSteps('PARENTAGE_APPEAL', appeal.id), appealQueue(db(), guard.actor)]);
 
   const answered = appeal.status === 'ANSWERED';
   return (
-    <OpsShell actor={guard.actor} title="بررسی اعتراض" pathname={'/genetics/appeals/' + id} nav={GENETICS_NAV}>
-      <DeskHead
+    <OpsShell actor={guard.actor} title="بررسی اعتراض" pathname={'/genetics/appeals/' + id} nav={GENETICS_NAV} headingInPage>
+      <DeskHead level={1}
         title={'اعتراض به نتیجه · ' + (animal?.name ?? 'بدون نام')}
-        status={{ tone: answered ? 'success' : 'info', label: APPEAL_STATUS_FA[appeal.status], testId: 'centre-appeal-status' }}
-        meta={[generationLabel(animal?.generation ?? 0), 'ثبت: ' + (whenFa(appeal.createdAt) ?? '—'), 'نسخه ' + appeal.version.toLocaleString('fa-IR')]}
+        // GAPS #4: no dictionary key for ANSWERED — module label kept.
+        status={{ ...keyStatus(appeal.status, { tone: 'success', label: APPEAL_STATUS_FA[appeal.status] ?? appeal.status }), testId: 'centre-appeal-status' }}
+        position={deskPosition(
+          queue.map((row) => row.id),
+          appeal.id,
+          (appealId) => '/genetics/appeals/' + appealId,
+        )}
+        meta={[
+          generationLabel(animal?.generation ?? 0),
+          'ثبت: ' + (whenFa(appeal.createdAt) ?? '—'),
+          answered ? null : <CaseAge since={appeal.createdAt} />,
+          'نسخه ' + appeal.version.toLocaleString('fa-IR'),
+        ]}
         owner={answered ? null : 'GENETICS_CENTRE'}
       />
       <Desk
@@ -57,7 +76,10 @@ export default async function GeneticsAppealPage({ params }: { params: Promise<{
                 {appeal.responseFa}
               </Alert>
             ) : (
-              <AnswerAppealForm appealId={appeal.id} version={appeal.version} />
+              <>
+                <AnswerAppealForm appealId={appeal.id} version={appeal.version} />
+                <DeskVersionNote version={appeal.version} />
+              </>
             )}
           </>
         }
@@ -81,6 +103,14 @@ export default async function GeneticsAppealPage({ params }: { params: Promise<{
               نمی‌کند و فقط یادداشت کنار آن ثبت می‌شود.
             </p>
           ) : null}
+        </Panel>
+        <Panel title="سابقه پرونده">
+          <CaseHistory
+            entries={[
+              ...historyFromAudit(steps, HISTORY_FA, !answered),
+              { id: 'created', title: 'ثبت اعتراض', whenFa: whenFa(appeal.createdAt), current: !answered && steps.length === 0 },
+            ]}
+          />
         </Panel>
       </Desk>
     </OpsShell>

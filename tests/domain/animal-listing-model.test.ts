@@ -28,7 +28,7 @@ import {
 } from '../../src/marketplace/listing-model.ts';
 
 const complete: ListingContent = {
-  priceMode: 'EXACT',
+  priceMode: 'NEGOTIABLE',
   priceToman: 12_000_000n,
   descriptionFa: 'ت'.repeat(DESCRIPTION_MIN),
   reasonForSaleFa: 'نقل مکان به شهر دیگر',
@@ -124,7 +124,7 @@ test('every missing requirement is reported at once, not one per attempt', () =>
   );
   // Price mode, description, reason, place, two disclosures, delivery, images.
   assert.equal(blockers.length, 8);
-  assert.ok(blockers.some((b) => b.includes('نوع قیمت')));
+  assert.ok(blockers.some((b) => b.includes('مبلغ آگهی')));
   assert.ok(blockers.some((b) => b.includes('دلیل فروش')));
   assert.ok(blockers.some((b) => b.includes('استان و شهر')));
   assert.ok(blockers.some((b) => b.includes('واکسیناسیون')));
@@ -139,8 +139,7 @@ test('the minimum number of photos is whatever the managed setting says', () => 
   assert.equal(publicationBlockers({ ...complete, imageCount: 4 }, 5).length, 1);
 });
 
-test('an exact price needs a figure and a negotiable one does not', () => {
-  assert.deepEqual(publicationBlockers({ ...complete, priceMode: 'NEGOTIABLE', priceToman: null }, 3), []);
+test('every advert needs an amount, because every price is negotiable (Decision 7g)', () => {
   const blockers = publicationBlockers({ ...complete, priceToman: null }, 3);
   assert.equal(blockers.length, 1);
   assert.ok(blockers[0]!.includes('مبلغ'));

@@ -1,21 +1,28 @@
 'use client';
 
 import { useActionState } from 'react';
-import { Button } from '../../../src/ui/button.tsx';
+import { Button, StickyActionBar } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { cancelSheetPaymentAction, paySheetBatchAction, retryIssuanceAction, type SheetFormState } from '../actions.ts';
 
 const EMPTY: SheetFormState = {};
 
-export function PaySheetBatchForm({ batchId }: { batchId: string }) {
+export function PaySheetBatchForm({ batchId, total }: { batchId: string; /** Frozen batch total, null when unset. */ total?: string | null }) {
   const [state, submit, pending] = useActionState(paySheetBatchAction, EMPTY);
   return (
     <form action={submit} className="mt-lg space-y-lg" data-testid="pay-sheet-form">
       <input type="hidden" name="batchId" value={batchId} />
       {state.message ? <Alert tone="error" title={state.message} /> : null}
-      <Button type="submit" block disabled={pending} data-testid="pay-sheet-batch">
-        {pending ? 'در حال انتقال به درگاه…' : 'پرداخت گروهی'}
-      </Button>
+      <StickyActionBar
+        label="پرداخت"
+        context="برگه ثبتی"
+        total={total === undefined ? undefined : (total ?? 'تعیین‌نشده')}
+        totalUnset={total === null}
+      >
+        <Button type="submit" size="lg" disabled={pending} aria-busy={pending || undefined} data-testid="pay-sheet-batch">
+          {pending ? 'در حال انتقال به درگاه…' : 'پرداخت گروهی'}
+        </Button>
+      </StickyActionBar>
     </form>
   );
 }

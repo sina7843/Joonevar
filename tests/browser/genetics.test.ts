@@ -114,7 +114,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -167,7 +167,8 @@ async function setSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-' + key).click();
     await page.getByTestId('setting-value-' + key).fill(value);
     await page.getByTestId('setting-reason-' + key).fill('SYNTHETIC — مقدار آزمایشی اجرای تست ' + RUN);
     await page.getByTestId('save-setting-' + key).click();
@@ -410,7 +411,7 @@ test('a receipt is corrected in place, then approved, and the custodian ships', 
     await owner.page.getByTestId('upload-receipt').click();
     await expectText(owner.page, 'تصویر فیش بارگذاری شد');
     await owner.page.getByTestId('submit-receipt').click();
-    await expectText(owner.page, 'در حال بررسی مرکز');
+    await expectText(owner.page, 'در حال بررسی');
     await owner.page.screenshot({ path: path.join(SHOTS, 'receipt-submitted.png'), fullPage: true });
 
     // The centre sends it back with a reason.
@@ -439,7 +440,7 @@ test('a receipt is corrected in place, then approved, and the custodian ships', 
     await owner.page.getByTestId('upload-receipt').click();
     await expectText(owner.page, 'تصویر فیش بارگذاری شد');
     await owner.page.getByTestId('submit-receipt').click();
-    await expectText(owner.page, 'در حال بررسی مرکز');
+    await expectText(owner.page, 'در حال بررسی');
 
     // By id: the shared queue holds other runs' receipts.
     await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
@@ -488,7 +489,7 @@ test('the centre receives, processes and records a result without any issuance p
     await owner.page.getByTestId('upload-receipt').click();
     await expectText(owner.page, 'تصویر فیش بارگذاری شد');
     await owner.page.getByTestId('submit-receipt').click();
-    await expectText(owner.page, 'در حال بررسی مرکز');
+    await expectText(owner.page, 'در حال بررسی');
 
     // By id: the shared queue holds other runs' receipts.
     await centre.goto(BASE_URL + '/genetics/receipts/' + receiptId, { waitUntil: 'load' });
@@ -504,7 +505,7 @@ test('the centre receives, processes and records a result without any issuance p
     // The centre records arrival and starts processing, on the same code.
     // Other runs leave samples in this queue, so the row is found by its code.
     const centreRow = () =>
-      centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: animal.trackingCode });
+      centre.locator('[data-testid="centre-sample-list"] tbody > tr').filter({ hasText: animal.trackingCode });
 
     await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(animal.trackingCode), {
       waitUntil: 'load',
@@ -527,8 +528,9 @@ test('the centre receives, processes and records a result without any issuance p
     await expectText(centre, 'حیوان G0: نتیجه مستقیم به همین حیوان نسبت داده می‌شود');
     await expectText(centre, 'هیچ خروجی موازی با نام DNA Profile');
     const resultRow = centre
-      .locator('[data-testid="processing-list"] > li')
+      .locator('[data-testid="processing-list"] tbody > tr')
       .filter({ hasText: animal.trackingCode });
+    await resultRow.getByTestId('open-result-case').click();
     await resultRow.getByTestId('result-note').fill('پردازش استاندارد.');
     await resultRow.getByTestId('submit-result').click();
     await expectText(centre, 'نتیجه نهایی ثبت شد');

@@ -120,18 +120,86 @@ export function ButtonLink({
 export function ActionRow({
   primary,
   secondary,
+  children,
   sticky = false,
   className = '',
 }: {
   primary: ReactNode;
   secondary?: ReactNode;
+  /** Further actions after the secondary (e.g. a destructive outline last). */
+  children?: ReactNode;
   sticky?: boolean;
   className?: string;
 }) {
   return (
-    <div className={['hz-action-row', sticky ? 'hz-action-row--sticky' : '', 'pt-lg', className].join(' ')}>
+    <div className={['hz-action-row', sticky ? 'hz-action-row--sticky max-md:fixed max-md:inset-x-0 max-md:[inset-block-end:0]' : 'pt-lg', className].join(' ')}>
       {primary}
       {secondary}
+      {children}
+    </div>
+  );
+}
+
+/**
+ * DS *StickyActionBar*: the step's or payment's main action pinned to the
+ * bottom of a phone screen, with an optional summary (where you are, what you
+ * pay) and a note for a disabled primary. From 768 it is an in-content block.
+ * The shell hides its tab bar while one is on the page (never two bars).
+ */
+export function StickyActionBar({
+  context,
+  total,
+  totalUnset = false,
+  note,
+  noteId,
+  label = 'کنش‌های اصلی',
+  overTabs = false,
+  className = '',
+  children,
+}: {
+  context?: ReactNode;
+  total?: ReactNode;
+  /** The total is «تعیین‌نشده»: muted, never «۰ تومان». */
+  totalUnset?: boolean;
+  note?: ReactNode;
+  /** Referenced by a disabled primary's `aria-describedby`. */
+  noteId?: string;
+  label?: string;
+  /**
+   * Record pages (K9, K11) keep the tab bar and sit just above it; wizards and
+   * payments (the default) hide the tab bar instead.
+   */
+  overTabs?: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={[
+        // Below 768 the bar is pinned to the viewport rather than to its parent (often a short form), so it
+        // really stays reachable; <html> reserves the space (app/layout.tsx).
+        'hz-sticky-bar max-md:fixed max-md:inset-x-0',
+        overTabs ? 'max-md:[inset-block-end:var(--tabbar)]' : 'max-md:[inset-block-end:0]',
+        className,
+      ]
+        .join(' ')
+        .trim()}
+      data-over-tabs={overTabs || undefined}
+      role="region"
+      aria-label={label}
+    >
+      {context || total ? (
+        <div className="hz-sticky-bar__summary">
+          {context ? <span className="hz-sticky-bar__context">{context}</span> : <span />}
+          {total ? <span className={totalUnset ? 'hz-sticky-bar__total hz-sticky-bar__total--unset' : 'hz-sticky-bar__total'}>{total}</span> : null}
+        </div>
+      ) : null}
+      <div className="hz-sticky-bar__actions">{children}</div>
+      {note ? (
+        <p className="hz-sticky-bar__note" id={noteId}>
+          {note}
+        </p>
+      ) : null}
     </div>
   );
 }

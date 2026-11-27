@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
+import { cookies } from 'next/headers';
 import { Logo } from './logo.tsx';
 import { Icon } from './icon.tsx';
 import type { IconName } from './icon-paths.ts';
@@ -10,9 +11,11 @@ import { canReadSettingGroup } from '../authz/policy.ts';
 import { hasMarketplaceCapability } from '../marketplace/model.ts';
 import { hasFinderCapability } from '../finder/model.ts';
 import { db } from '../db/client.ts';
-import { findProfile } from '../identity/account.ts';
+import { findProfile, findResidence } from '../identity/account.ts';
 import { signOutAction } from '../identity/sign-out-action.ts';
 import { unreadCount as countUnread } from '../notifications/service.ts';
+import { ageState, associationQueues, countsByHref, geneticsQueues, reviewClock } from '../operations/service.ts';
+import { ageInDays } from './queue.tsx';
 
 /**
  * The application shells — DS *Shells*, *PublicShell*, *OpsShell* (v1.0.3).
@@ -30,34 +33,64 @@ export interface NavItem {
   readonly icon: IconName;
   /** Sidebar group label (Shells › OpsShell sidebar, 8 items or more). */
   readonly group?: string;
+  readonly count?: number;
+  readonly overdue?: boolean;
 }
 
-async function who(actor: Actor): Promise<{ name: string; initial: string; role: string }> {
-  const profile = await findProfile(db(), actor.accountId);
+/**
+ * Sidebar counters (SHL-003): the waiting count of each queue the item opens,
+ * from the same queries as the environment home's QueueTiles, flagged when the
+ * oldest case is past the review deadline (unset deadline = never flagged).
+ */
+async function withCounts(actor: Actor, nav: readonly NavItem[]): Promise<readonly NavItem[]> {
+  const context = actor.context as ActorContextName;
+  if (context !== 'ASSOCIATION_OPERATOR' && context !== 'GENETICS_OPERATOR') return nav;
+  const database = db();
+  // A counter is a convenience: if it cannot be read, the navigation still renders without it.
+  const loaded = await Promise.all([
+    context === 'ASSOCIATION_OPERATOR' ? associationQueues(database, actor) : geneticsQueues(database, actor),
+    reviewClock(database),
+  ]).catch(() => null);
+  if (!loaded) return nav;
+  const [queues, clock] = loaded;
+  const byHref = countsByHref(queues);
+  return nav.map((item) => {
+    const entry = byHref.get(item.href);
+    if (!entry || entry.waiting === 0 || item.href === nav[0]?.href) return item;
+    return { ...item, count: entry.waiting, overdue: ageState(ageInDays(entry.oldestAt), clock) === 'overdue' };
+  });
+}
+
+async function who(actor: Actor): Promise<{ name: string; initial: string; role: string; roleCity: string }> {
+  const [profile, residence] = await Promise.all([findProfile(db(), actor.accountId), findResidence(db(), actor.accountId)]);
   const name = profile === null ? 'حساب من' : profile.firstName + ' ' + profile.lastName;
-  return { name, initial: name.trim().charAt(0) || 'ح', role: CONTEXT_LABEL_FA[actor.context as ActorContextName] };
+  const roleFa = CONTEXT_LABEL_FA[actor.context as ActorContextName];
+  // PublicShell user box: «نقش · شهر», the role alone when no city is on file (SHL-024).
+  return { name, initial: name.trim().charAt(0) || 'ح', role: roleFa, roleCity: residence?.city ? roleFa + '، ' + residence.city : roleFa };
 }
 
 /** The account popover's items: the panel, the profile and the way out. */
-function AccountItems() {
+function AccountItems({ flat = false }: { flat?: boolean }) {
+  // `flat`: plain rows in the navigation drawer's foot, not menu items of a popover.
+  const role = flat ? undefined : 'menuitem';
   return (
     <ul className="hz-menu__list">
       <li>
-        <Link className="hz-menu__action" href="/dashboard" role="menuitem">
+        <Link className="hz-menu__action" href="/dashboard" role={role}>
           <Icon name="house" size="sm" />
           <span className="hz-menu__action-label">پنل من</span>
         </Link>
       </li>
       <li>
-        <Link className="hz-menu__action" href="/account/profile" role="menuitem">
+        <Link className="hz-menu__action" href="/account/profile" role={role}>
           <Icon name="user" size="sm" />
           <span className="hz-menu__action-label">پروفایل</span>
         </Link>
       </li>
-      <li className="hz-menu__sep" role="separator" />
+      <li className="hz-menu__sep" role={flat ? undefined : 'separator'} />
       <li>
         <form action={signOutAction}>
-          <button type="submit" className="hz-menu__action" role="menuitem" data-testid="header-sign-out">
+          <button type="submit" className="hz-menu__action" role={role} data-testid="header-sign-out">
             <Icon name="signOut" size="sm" mirror />
             <span className="hz-menu__action-label">خروج از حساب</span>
           </button>
@@ -122,7 +155,9 @@ const PUBLIC_SIDEBAR: readonly ShellNavSection[] = [
     label: 'حساب من',
     items: [
       { href: '/account/listings', label: 'آگهی‌های من', icon: 'megaphoneSimple' },
-      { href: '/account/purchases', label: 'سفارش‌ها', icon: 'shoppingBag' },
+      // SHL-020: «سفارش‌ها» is the shop's orders; animal purchase requests keep their own name.
+      { href: '/account/orders', label: 'سفارش‌ها', icon: 'shoppingBag' },
+      { href: '/account/purchases', label: 'درخواست‌های خرید', icon: 'chatCircleDots' },
       { href: '/account/mating-finder', label: 'جفت‌یابی', icon: 'heart' },
       { href: '/account/kyc', label: 'احراز هویت', icon: 'identificationCard' },
     ],
@@ -182,7 +217,7 @@ export async function PublicShell({
             </Link>
           </div>
           <SidebarNav sections={vet ? VET_SIDEBAR : PUBLIC_SIDEBAR} pathname={pathname} dense={false} label="ناوبری حساب" />
-          <AccountPopover variant="sidebar" name={person.name} role={person.role} initial={person.initial}>
+          <AccountPopover variant="sidebar" name={person.name} role={person.roleCity} initial={person.initial}>
             <AccountItems />
           </AccountPopover>
         </aside>
@@ -210,7 +245,7 @@ export async function PublicShell({
             <div className="space-y-xl">{children}</div>
           </main>
 
-          <nav className="hz-tabbar" aria-label="ناوبری اصلی">
+          <nav className="hz-tabbar [.hz-app:has(.hz-action-row--sticky)_&]:max-md:hidden [.hz-app:has(.hz-sticky-bar:not([data-over-tabs]))_&]:max-md:hidden" aria-label="ناوبری اصلی">
             {tabs.map((tab) => {
               const active = isCurrent(pathname, tab.href);
               return (
@@ -235,8 +270,39 @@ export async function PublicShell({
 /* ──────────────────────────────── OpsShell ───────────────────────────────── */
 
 /** Environment label per context, shown under the logo (`hz-sidebar__env`). */
-function environmentFa(context: ActorContextName): string {
-  return 'محیط عملیاتی ' + CONTEXT_LABEL_FA[context];
+/**
+ * The environment is named by where it lives, not by the role (SHL-004): every
+ * marketplace role and the superadmin share «بازار» under /market.
+ */
+const ENV_BY_HOME: Readonly<Record<string, string>> = {
+  '/assoc': 'انجمن',
+  '/genetics': 'مرکز ژنتیک',
+  '/admin': 'مدیریت سامانه',
+  '/market': 'بازار',
+  '/content': 'محتوا',
+  '/author': 'نویسندگی',
+  '/review/vets': 'بررسی',
+};
+
+function environmentShort(nav: readonly NavItem[], context: ActorContextName): string {
+  return ENV_BY_HOME[nav[0]?.href ?? ''] ?? CONTEXT_LABEL_FA[context];
+}
+
+const SIDEBAR_COOKIE = 'hz-ops-side';
+
+/** The saved sidebar state per environment (SHL-011): rail or full, and the closed groups. */
+async function savedSidebar(envKey: string): Promise<{ collapsed: boolean; closed: readonly string[] | null }> {
+  try {
+    const raw = (await cookies()).get(SIDEBAR_COOKIE + '-' + envKey)?.value;
+    if (!raw) return { collapsed: false, closed: null };
+    const parsed = JSON.parse(decodeURIComponent(raw)) as { c?: unknown; g?: unknown };
+    return {
+      collapsed: parsed.c === true,
+      closed: Array.isArray(parsed.g) ? parsed.g.filter((value): value is string => typeof value === 'string') : null,
+    };
+  } catch {
+    return { collapsed: false, closed: null };
+  }
 }
 
 /**
@@ -266,23 +332,48 @@ export async function OpsShell({
   pathname,
   nav,
   children,
+  meta,
+  actions,
+  headingInPage = false,
+  subtitle,
 }: {
   actor: Actor;
   title: string;
   pathname: string;
   nav: readonly NavItem[];
   children: ReactNode;
+  /** PageHeader meta row (counts, oldest age, «به‌روزشده …») — CMPB-088. */
+  meta?: ReactNode;
+  /** PageHeader actions (secondary sm buttons; never a primary). */
+  actions?: ReactNode;
+  /**
+   * The page renders its own h1 (a decision desk's DeskHead `level={1}`): the
+   * shell keeps `title` for the top bar and the trail, and the mobile top bar
+   * gets «بازگشت به {queue}» back to `pathname` (SHL-007).
+   */
+  headingInPage?: boolean;
+  /** Second line of the mobile top bar (default: the environment). */
+  subtitle?: string;
 }) {
-  const person = await who(actor);
-  const env = environmentFa(actor.context as ActorContextName);
-  const sections = sectionsOf(nav);
+  const short = environmentShort(nav, actor.context as ActorContextName);
+  const envKey = (nav[0]?.href ?? '/').replace(/[^a-z]/g, '') || 'ops';
+  const [person, counted, saved] = await Promise.all([who(actor), withCounts(actor, nav), savedSidebar(envKey)]);
+  const env = 'محیط عملیاتی ' + short;
+  const sections = sectionsOf(counted);
   const home = nav[0];
+  const overdue = counted.filter((item) => item.overdue).length;
+  // Trail (SHL-006): the environment's short name → home, the queue this page belongs to, then the page.
+  const section = nav.find((item) => item.href === pathname && item.href !== home?.href);
+  const trail: { href?: string; label: string }[] = [{ href: home?.href, label: short }];
+  if (section) trail.push(headingInPage || section.label !== title ? { href: section.href, label: section.label } : { label: section.label });
+  if (!section || headingInPage || section.label !== title) trail.push({ label: title });
+  const back = headingInPage && section ? { href: section.href, label: 'بازگشت به ' + section.label } : null;
 
   return (
     <>
       <SkipLink />
-      <div className="hz-app hz-app--ops min-h-dvh">
-        <aside className="hz-sidebar hz-sidebar--ops" aria-label={'ناوبری ' + env}>
+      <div className={saved.collapsed ? 'hz-app hz-app--ops hz-app--rail min-h-dvh' : 'hz-app hz-app--ops min-h-dvh'}>
+        <aside className={saved.collapsed ? 'hz-sidebar hz-sidebar--ops hz-sidebar--collapsed' : 'hz-sidebar hz-sidebar--ops'} aria-label={'ناوبری ' + env}>
           <div className="hz-sidebar__head">
             <Link href={home?.href ?? '/'} aria-label={'همزیست — ' + env}>
               <Logo size="ops" className="hz-ops-logo" />
@@ -290,31 +381,48 @@ export async function OpsShell({
             </Link>
             <p className="hz-sidebar__env">{env}</p>
           </div>
-          <SidebarNav sections={sections} pathname={pathname} dense={nav.length >= 8} label={env} />
-          <SidebarCollapse />
+          <SidebarNav
+            sections={sections}
+            pathname={pathname}
+            dense={nav.length >= 8}
+            label={env}
+            cookie={SIDEBAR_COOKIE + '-' + envKey}
+            initialClosed={saved.closed}
+          />
+          <SidebarCollapse cookie={SIDEBAR_COOKIE + '-' + envKey} initialCollapsed={saved.collapsed} />
         </aside>
 
         <div className="hz-main flex min-h-dvh flex-col">
           <header className="hz-topbar">
-            <div className="hz-topbar__title hz-hide-md">
+            {back ? (
+              <Link className="hz-icon-btn hz-hide-md" href={back.href} aria-label={back.label} data-testid="ops-back">
+                <Icon name="arrowRight" size="md" mirror />
+              </Link>
+            ) : null}
+            <div className="hz-topbar__title hz-hide-md" style={back ? { paddingInlineStart: 0 } : undefined}>
               <span className="hz-topbar__primary">{title}</span>
-              <span className="hz-topbar__sub">{env}</span>
+              <span className="hz-topbar__sub">{subtitle ?? env}</span>
             </div>
             <nav className="hz-topbar__crumbs hz-show-md" aria-label="مسیر">
               <ol className="hz-breadcrumbs">
-                {home && home.href !== pathname ? (
-                  <>
+                {trail.map((crumb, index) => (
+                  <Fragment key={index}>
+                    {index > 0 ? (
+                      <li className="hz-breadcrumbs__sep" aria-hidden="true">
+                        /
+                      </li>
+                    ) : null}
                     <li>
-                      <Link href={home.href}>{home.label}</Link>
+                      {index === trail.length - 1 ? (
+                        <span aria-current="page">{crumb.label}</span>
+                      ) : crumb.href ? (
+                        <Link href={crumb.href}>{crumb.label}</Link>
+                      ) : (
+                        <span>{crumb.label}</span>
+                      )}
                     </li>
-                    <li className="hz-breadcrumbs__sep" aria-hidden="true">
-                      /
-                    </li>
-                  </>
-                ) : null}
-                <li>
-                  <span aria-current="page">{title}</span>
-                </li>
+                  </Fragment>
+                ))}
               </ol>
             </nav>
             <span className="hz-show-md">
@@ -322,10 +430,11 @@ export async function OpsShell({
                 <AccountItems />
               </AccountPopover>
             </span>
-            <span className="hz-hide-md">
+            <span className="hz-hide-lg">
               <NavDrawer
                 label={'ناوبری ' + env}
                 pathname={pathname}
+                overdue={overdue}
                 brand={
                   <>
                     <Logo size="ops" />
@@ -333,17 +442,34 @@ export async function OpsShell({
                   </>
                 }
                 foot={
-                  <AccountPopover variant="sidebar" name={person.name} role={person.role} initial={person.initial}>
-                    <AccountItems />
-                  </AccountPopover>
+                  <>
+                    <div className="hz-sidebar__user">
+                      <span className="hz-avatar hz-avatar--sm" aria-hidden="true">
+                        {person.initial}
+                      </span>
+                      <span className="hz-sidebar__user-text">
+                        <span className="hz-sidebar__user-name">{person.name}</span>
+                        <span className="hz-sidebar__user-role">{person.role}</span>
+                      </span>
+                    </div>
+                    <AccountItems flat />
+                  </>
                 }
               >
                 <SidebarNav sections={sections} pathname={pathname} dense={false} label={env} />
               </NavDrawer>
             </span>
           </header>
-          <main id="main" tabIndex={-1} className="hz-main__inner hz-main__inner--ops flex-1 outline-none">
-            <h1 className="text-h3">{title}</h1>
+          <main id="main" tabIndex={-1} className="hz-main__inner hz-main__inner--ops text-body-sm flex-1 outline-none">
+            {headingInPage ? null : (
+              <header className="hz-page-header mb-lg">
+                <div className="hz-page-header__text">
+                  <h1 className="hz-h3">{title}</h1>
+                  {meta /* a `.hz-page-header__meta` row, e.g. QueueMeta */}
+                </div>
+                {actions ? <div className="hz-page-header__actions">{actions}</div> : null}
+              </header>
+            )}
             <div className="space-y-lg">{children}</div>
           </main>
         </div>
@@ -359,12 +485,12 @@ export const ASSOC_NAV: readonly NavItem[] = [
   { href: '/assoc', label: 'صف‌ها', icon: 'tray' },
   { href: '/assoc/kyc', label: 'احراز هویت', icon: 'identificationCard', group: 'هویت و عضویت' },
   { href: '/assoc/members', label: 'عضویت', icon: 'users', group: 'هویت و عضویت' },
-  { href: '/assoc/clubs', label: 'کلاب‌ها', icon: 'usersThree', group: 'هویت و عضویت' },
   { href: '/assoc/vet-students', label: 'دانشجویان دامپزشکی', icon: 'student', group: 'دامپزشکان' },
   { href: '/assoc/vet-doctors', label: 'کد نظام دامپزشکان', icon: 'identificationBadge', group: 'دامپزشکان' },
   { href: '/assoc/vet-licences', label: 'پروانه فعالیت', icon: 'stamp', group: 'دامپزشکان' },
   { href: '/assoc/vet-review', label: 'میز بررسی دامپزشکان', icon: 'stethoscope', group: 'دامپزشکان' },
   { href: '/assoc/vet-trusted', label: 'دامپزشک معتمد', icon: 'sealCheck', group: 'دامپزشکان' },
+  { href: '/assoc/clubs', label: 'کلاب‌ها', icon: 'usersThree', group: 'پرورش' },
   { href: '/assoc/kennels', label: 'کنل', icon: 'house', group: 'پرورش' },
   { href: '/assoc/permits', label: 'مجوز جفت‌گیری', icon: 'certificate', group: 'پرورش' },
   { href: '/assoc/postal', label: 'درخواست‌های پستی', icon: 'package', group: 'اسناد و ارسال' },

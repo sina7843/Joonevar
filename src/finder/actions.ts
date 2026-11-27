@@ -7,7 +7,7 @@ import { guardRoute } from '../authz/guard.ts';
 import { currentPaymentGateway, currentPaymentProvider } from '../adapters/current.ts';
 import { startAttempt } from '../billing/payments.ts';
 import { setSpeciesEnabled } from '../marketplace/species.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { publishPlan, withdrawPlan } from './plans.ts';
 import { publishRule } from './rules.ts';
 import { ACCOUNT_ROUTE, startFinderSubscription } from './subscriptions.ts';
@@ -30,7 +30,7 @@ const optionalDate = (form: FormData, name: string): Date | null => {
 };
 
 function failure(error: unknown): FinderFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 

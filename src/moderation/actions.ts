@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../db/client.ts';
 import { guardRoute } from '../authz/guard.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { decideContentReports, liftRestriction, submitContentReport } from './service.ts';
 import { DECISION_FA } from './model.ts';
 
@@ -21,7 +21,7 @@ async function actorAt(path: string) {
 }
 
 function failure(error: unknown): ModerationFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 
@@ -50,6 +50,7 @@ export async function decideReportsAction(_previous: ModerationFormState, form: 
       decision: text(form, 'decision'),
       reason: text(form, 'reason'),
       restrictUntil: until,
+      expectedVersion: text(form, 'expectedVersion') === '' ? undefined : Number(text(form, 'expectedVersion')),
     });
     revalidatePath('/content/reports');
     revalidatePath(path);

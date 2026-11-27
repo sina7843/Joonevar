@@ -4,6 +4,8 @@ import { OpsShell, CONTENT_NAV } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList } from '../../../src/ui/desk.tsx';
 import { ageInDays } from '../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 import { db } from '../../../src/db/client.ts';
 import { clubReportQueue } from '../../../src/clubs/service.ts';
 import { REASON_FA, type ReportReason } from '../../../src/moderation/model.ts';
@@ -20,10 +22,16 @@ const fa = (value: number): string => value.toLocaleString('fa-IR');
  * are decided together: dismissed, the page hidden, or the club taken out of
  * public life. Nothing is deleted and the reporters are never named.
  */
-export default async function ContentClubsPage() {
+export default async function ContentClubsPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/content/clubs');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const groups = await clubReportQueue(db(), guard.actor);
+  const query = readQueueQuery(await searchParams);
+  const page = sliceQueue(groups, query, {
+    text: (group) => group.club.displayNameFa,
+    at: (group) => group.firstReportedAt,
+    name: (group) => group.club.displayNameFa,
+  });
 
   return (
     <OpsShell actor={guard.actor} title="گزارش کلاب‌ها" pathname="/content/clubs" nav={CONTENT_NAV}>
@@ -37,8 +45,22 @@ export default async function ContentClubsPage() {
       {groups.length === 0 ? (
         <EmptyState title="گزارش بازی درباره کلاب‌ها نیست" description="گزارش تازه کاربران در همین صفحه می‌آید." />
       ) : (
+            <QueueFrame
+              path="/content/clubs"
+              params={{ q: query.q, sort: query.sort === 'oldest' ? undefined : query.sort }}
+              query={query}
+              page={page}
+              all={page.all}
+              noun="کلاب"
+              searchLabel="جست‌وجوی نام کلاب"
+              defaultSort="oldest"
+              testId="club-report-queue-frame"
+            >
+              {page.items.length === 0 ? (
+                <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را دوباره بررسی کنید." />
+              ) : (
         <CaseList label="گزارش‌های کلاب" testId="club-report-queue">
-          {groups.map((group) => (
+          {page.items.map((group) => (
             <CaseItem
               key={group.club.id}
               type={CLUB_LIFECYCLE_FA[group.club.lifecycle as ClubLifecycle]}
@@ -64,6 +86,8 @@ export default async function ContentClubsPage() {
             </CaseItem>
           ))}
         </CaseList>
+              )}
+            </QueueFrame>
       )}
     </OpsShell>
   );

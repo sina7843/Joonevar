@@ -1,5 +1,7 @@
+import { CopyButton } from './copy-button.tsx';
 import type { ReactNode } from 'react';
 import { statusOf } from './status-dictionary.ts';
+import { Icon } from './icon.tsx';
 
 export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'error';
 
@@ -25,7 +27,8 @@ export function StatusBadge({
   if (status !== undefined) {
     const entry = statusOf(status);
     if (entry !== null && entry.labelFa === null) return null;
-    // Unknown key (data drift): neutral with the raw key, never a guessed tone.
+    // Unknown key (data drift): neutral with the raw key, never a guessed tone — and said out loud.
+    if (entry === null) console.warn('StatusBadge: unknown status key', status);
     tone = entry?.tone ?? 'neutral';
     children = entry?.labelFa ?? <bdi dir="ltr">{status}</bdi>;
   }
@@ -41,13 +44,14 @@ export function StatusBadge({
  * An identifier stays left-to-right inside Persian text — DS *Identifier*:
  * `<bdi dir="ltr">`, 13/20 · 600, never wraps (§24.3).
  */
-export function Identifier({ value, label }: { value: string; label?: string }) {
+export function Identifier({ value, label, copy = false }: { value: string; label?: string; copy?: boolean }) {
   return (
     <span className="hz-identifier">
       {label ? <span className="hz-identifier__label">{label}</span> : null}
       <bdi dir="ltr" data-testid="identifier">
         {value}
       </bdi>
+      {copy ? <CopyButton value={value} /> : null}
     </span>
   );
 }
@@ -72,18 +76,37 @@ export function ActionOwner({
   owner,
   extra,
   stack = false,
+  label,
+  you,
 }: {
   owner: ActionOwnerKind;
   /** Deadline, amount or a short note at the inline end. */
   extra?: ReactNode;
   stack?: boolean;
+  /** A named desk role instead of the owner's generic label (e.g. «ادمین محتوا»). */
+  label?: string;
+  /** The viewer is the one who acts (warning strip); defaults to `owner === 'USER'`. */
+  you?: boolean;
 }) {
   return (
-    <div className={['hz-owner', owner === 'USER' ? 'hz-owner--you' : '', stack ? 'hz-owner--stack' : ''].join(' ').trim()}>
+    <div className={['hz-owner', (you ?? owner === 'USER') ? 'hz-owner--you' : '', stack ? 'hz-owner--stack' : ''].join(' ').trim()}>
       <span>
-        اقدام بعدی با: <b className="hz-owner__who">{OWNER_FA[owner]}</b>
+        اقدام بعدی با: <b className="hz-owner__who">{label ?? OWNER_FA[owner]}</b>
       </span>
       {extra ? <span className="hz-owner__extra">{extra}</span> : null}
     </div>
+  );
+}
+
+/**
+ * DS status `TRUSTED` — the «معتمد» mark: success badge with `shield-check`
+ * instead of the dot. Never has an opposite: an untrusted record shows nothing.
+ */
+export function TrustedMark() {
+  return (
+    <span className="hz-badge hz-badge--success">
+      <Icon name="shieldCheck" size="xs" />
+      معتمد
+    </span>
   );
 }

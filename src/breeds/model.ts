@@ -52,7 +52,7 @@ export const CLAIM_KIND_FA: Record<BreedClaimKind, string> = {
 export const LEVEL_ATTRIBUTES = [
   { key: 'energy', labelFa: 'انرژی' },
   { key: 'trainability', labelFa: 'آموزش‌پذیری' },
-  { key: 'careNeed', labelFa: 'نیاز نگهداری' },
+  { key: 'careNeed', labelFa: 'نیاز به مراقبت' },
   { key: 'withChildren', labelFa: 'سازگاری با کودکان' },
   { key: 'withOtherAnimals', labelFa: 'سازگاری با حیوانات دیگر' },
 ] as const;

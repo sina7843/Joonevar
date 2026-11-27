@@ -8,7 +8,8 @@ import { Alert } from '../../../../src/ui/alert.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { breedForEditing } from '../../../../src/breeds/service.ts';
-import { CLAIM_KIND_FA, STATUS_FA } from '../../../../src/breeds/model.ts';
+import { CLAIM_KIND_FA } from '../../../../src/breeds/model.ts';
+import { keyStatus } from '../../../../src/ui/queue.tsx';
 import { formatCivilDateFa } from '../../../../src/domain/calendar.ts';
 import { ArchiveClaimForm, BreedProfileForm, BreedStatusForm, DuplicateForm, MedicalClaimForm } from './forms.tsx';
 
@@ -35,12 +36,12 @@ export default async function AdminBreedPage({ params }: { params: Promise<{ id:
   const { breed, claims, groups, species, mergeTargets, redirects, primary } = data;
 
   return (
-    <OpsShell actor={guard.actor} title={breed.nameFa} pathname="/admin/breeds" nav={ADMIN_NAV}>
+    <OpsShell actor={guard.actor} title={breed.nameFa} pathname="/admin/breeds" nav={ADMIN_NAV} headingInPage>
       <Link href="/admin/breeds" className="hz-link hz-link--standalone hz-hide-md">
         بازگشت به فهرست نژادها
       </Link>
 
-      <DeskHead
+      <DeskHead level={1}
         title={
           <>
             {breed.nameFa}{' '}
@@ -50,8 +51,9 @@ export default async function AdminBreedPage({ params }: { params: Promise<{ id:
           </>
         }
         status={{
-          tone: breed.profileStatus === 'PUBLISHED' ? 'info' : 'neutral',
-          label: 'صفحه: ' + STATUS_FA[breed.profileStatus],
+          tone: keyStatus(breed.profileStatus).tone,
+          // Dictionary label; the prefix only says which axis this is (page vs. form choice).
+          label: 'صفحه: ' + keyStatus(breed.profileStatus).label,
         }}
         meta={[
           'نسخه ' + breed.version.toLocaleString('fa-IR'),
@@ -65,9 +67,10 @@ export default async function AdminBreedPage({ params }: { params: Promise<{ id:
               <bdi dir="ltr">{redirects.map((row) => row.slug).join(', ')}</bdi>
             </>
           ) : null,
-          <StatusBadge key="active" tone={breed.isActive ? 'success' : 'neutral'} size="sm">
-            {breed.isActive ? 'در انتخاب‌های فرم' : 'کنارگذاشته از انتخاب‌ها'}
-          </StatusBadge>,
+          <span key="active" className="inline-flex items-center gap-xs">
+            {'انتخاب در فرم‌ها: '}
+            <StatusBadge status={breed.isActive ? 'ACTIVE' : 'INACTIVE'} size="sm" />
+          </span>,
         ]}
       >
         {breed.profileStatus !== 'DRAFT' ? (
@@ -127,9 +130,7 @@ export default async function AdminBreedPage({ params }: { params: Promise<{ id:
                         <h3 className="hz-card__title">{claim.titleFa}</h3>
                       </div>
                       {claim.archivedAt ? (
-                        <StatusBadge tone="neutral" size="sm">
-                          برداشته‌شده
-                        </StatusBadge>
+                        <StatusBadge status="REMOVED" size="sm" />
                       ) : null}
                     </div>
                     <p className="mt-xs text-caption text-text-secondary">

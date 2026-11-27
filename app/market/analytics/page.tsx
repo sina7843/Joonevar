@@ -22,7 +22,7 @@ function Breakdown({
 }) {
   return (
     <div className="min-w-0">
-      <h3 className="text-label-md">{titleFa}</h3>
+      <h3 className="text-label-sm">{titleFa}</h3>
       {rows.length === 0 ? (
         <p className="mt-2xs text-caption text-text-secondary">—</p>
       ) : (
@@ -105,7 +105,7 @@ export default async function AnalyticsPage({
         </div>
 
         <div>
-          <h3 className="text-label-md">قیف معامله</h3>
+          <h3 className="text-label-sm">قیف معامله</h3>
           <dl className="hz-kv mt-2xs" data-testid="analytics-funnel">
             {view.animals.funnel.map((step) => (
               <div key={step.labelFa} className="hz-kv__row">

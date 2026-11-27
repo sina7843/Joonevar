@@ -115,7 +115,7 @@ export default async function MatingFinderSearchPage({ searchParams }: { searchP
               <Select name="breed" label="نژاد" value={f.breedId ?? ''} options={[['', 'همه نژادها'], ...breeds.map((b) => [b.id, b.nameFa] as [string, string])]} testId="finder-filter-breed" />
               <Select name="sex" label="جنس" value={f.sex ?? ''} options={[['', 'هر دو'], ['MALE', 'نر'], ['FEMALE', 'ماده']]} testId="finder-filter-sex" />
               <details className="group border-t border-border-subtle pt-md" open={advanced}>
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-sm text-label-md text-text-brand" data-testid="finder-more-filters">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-sm text-label-sm text-text-brand" data-testid="finder-more-filters">
                   فیلترهای بیشتر
                   <Icon name="caretDown" size="sm" className="transition-transform group-open:rotate-180" />
                 </summary>

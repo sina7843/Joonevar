@@ -5,7 +5,7 @@ import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { setContentRole } from '../../../src/content/roles.ts';
 import { setMarketplaceRole } from '../../../src/marketplace/roles.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface RoleFormState {
   readonly ok?: boolean;
@@ -28,7 +28,7 @@ export async function setContentRoleAction(_previous: RoleFormState, form: FormD
     revalidatePath('/admin/roles');
     return { ok: true, message: active ? 'نقش فعال شد.' : 'نقش تعلیق شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -54,7 +54,7 @@ export async function setMarketplaceRoleAction(_previous: RoleFormState, form: F
     revalidatePath('/admin/roles');
     return { ok: true, message: active ? 'نقش فعال شد.' : 'نقش تعلیق شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

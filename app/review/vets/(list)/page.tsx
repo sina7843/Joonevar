@@ -2,18 +2,19 @@ import { guardRoute } from '../../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../../src/ui/access-denied.tsx';
 import { OpsShell, REVIEW_NAV } from '../../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, ViewChips } from '../../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../../src/ui/queue.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { QueueFrame, hrefWith, param } from '../../../../src/ui/queue-head.tsx';
+import { readQueueQuery } from '../../../../src/domain/queue-query.ts';
 import { db } from '../../../../src/db/client.ts';
 import { vetApplicationQueue } from '../../../../src/vets/onboarding.ts';
-import { APPLICATION_KIND_FA, APPLICATION_STATUS_FA } from '../../../../src/vets/onboarding-model.ts';
+import { APPLICATION_KIND_FA } from '../../../../src/vets/onboarding-model.ts';
 import { formatInstantFa } from '../../../../src/content/model.ts';
 
 export const dynamic = 'force-dynamic';
 
 type View = 'OPEN' | 'CORRECTION' | 'DECIDED';
-type Search = Promise<{ view?: string | string[]; page?: string | string[] }>;
+type Search = Promise<{ view?: string | string[]; page?: string | string[]; q?: string | string[]; sort?: string | string[] }>;
 const one = (value: string | string[] | undefined): string => (Array.isArray(value) ? value[0] : value) ?? '';
 const fa = (value: number): string => value.toLocaleString('fa-IR');
 
@@ -29,33 +30,53 @@ export default async function ReviewVetsPage({ searchParams }: { searchParams: S
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
   const search = await searchParams;
   const view = (VIEWS.find((v) => v.view === one(search.view))?.view ?? 'OPEN') as View;
-  const pageNumber = Number(one(search.page));
-  const page = Number.isInteger(pageNumber) && pageNumber >= 1 ? pageNumber : 1;
-  const result = await vetApplicationQueue(db(), guard.actor, { view, page });
-  const href = (target: View, targetPage = 1) =>
-    '/review/vets' + (target === 'OPEN' && targetPage === 1 ? '' : '?view=' + target + (targetPage > 1 ? '&page=' + targetPage : ''));
+  const defaultSort = view === 'DECIDED' ? 'newest' : 'oldest';
+  const query = readQueueQuery({ q: param(search.q), sort: param(search.sort), page: param(search.page) }, defaultSort);
+  const [result, unsearched] = await Promise.all([
+    vetApplicationQueue(db(), guard.actor, { view, page: query.page, q: query.q, sort: query.sort }),
+    query.q === '' ? null : vetApplicationQueue(db(), guard.actor, { view, page: 1, pageSize: 1 }),
+  ]);
+  const all = unsearched?.total ?? result.total;
+  const params = { view: view === 'OPEN' ? undefined : view, q: query.q, sort: query.sort === defaultSort ? undefined : query.sort };
 
   return (
     <OpsShell actor={guard.actor} title="درخواست‌های دامپزشک" pathname="/review/vets" nav={REVIEW_NAV}>
       <p className="hz-page-header__meta">
-        <span className="hz-page-header__meta-item">{fa(result.total) + ' درخواست'}</span>
+        <span className="hz-page-header__meta-item">{fa(all) + ' درخواست'}</span>
         <span className="hz-page-header__meta-item">
           ساخت پروفایل و Claim با کد نظام و مدارک. تأیید، نقش دامپزشک معتمد خدمات همزیست را نمی‌دهد.
         </span>
       </p>
-      <ViewChips
-        label="نمای درخواست‌ها"
-        chips={VIEWS.map((entry) => ({
-          key: entry.view,
-          href: href(entry.view),
-          label: entry.label,
-          current: entry.view === view,
-          testId: 'review-view-' + entry.view,
-        }))}
-      />
 
+      <QueueFrame
+        path="/review/vets"
+        params={params}
+        query={query}
+        page={result}
+        all={all}
+        noun="درخواست"
+        searchLabel="جست‌وجوی نام یا کد نظام"
+        defaultSort={defaultSort}
+        testId="review-queue-frame"
+        chips={
+        <ViewChips
+          label="نمای درخواست‌ها"
+          chips={VIEWS.map((entry) => ({
+            key: entry.view,
+            href: hrefWith('/review/vets', params, { view: entry.view === 'OPEN' ? undefined : entry.view, page: undefined }),
+            label: entry.label,
+            current: entry.view === view,
+            testId: 'review-view-' + entry.view,
+          }))}
+        />
+        }
+      >
       {result.items.length === 0 ? (
+        query.q !== '' ? (
+          <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را دوباره بررسی کنید." />
+        ) : (
         <EmptyState title={VIEWS.find((v) => v.view === view)!.empty} description="درخواست‌های تازه دامپزشکان اینجا نشان داده می‌شوند." />
+        )
       ) : (
         <CaseList label="درخواست‌های دامپزشک" testId="review-queue">
           {result.items.map((item) => (
@@ -73,10 +94,9 @@ export default async function ReviewVetsPage({ searchParams }: { searchParams: S
               ]
                 .filter(Boolean)
                 .join(' · ')}
-              ageDays={item.status === 'SUBMITTED' ? ageInDays(item.submittedAt) : undefined}
+              ageDays={item.status === 'SUBMITTED' ? ageInDays(item.createdAt) : undefined}
               status={{
-                tone: item.status === 'APPROVED' ? 'success' : item.status === 'SUBMITTED' ? 'info' : 'neutral',
-                label: APPLICATION_STATUS_FA[item.status],
+                ...keyStatus(item.status),
               }}
               owner={item.status === 'SUBMITTED' ? 'SYSTEM' : null}
               ownerLabel="اپراتور بررسی"
@@ -86,13 +106,7 @@ export default async function ReviewVetsPage({ searchParams }: { searchParams: S
         </CaseList>
       )}
 
-      {result.totalPages > 1 ? (
-        <nav aria-label="صفحه‌بندی" className="flex items-center justify-between gap-md">
-          {result.page > 1 ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page - 1)}>صفحه قبل</ButtonLink> : <span />}
-          <span className="text-body-sm text-text-secondary">{'صفحه ' + fa(result.page) + ' از ' + fa(result.totalPages)}</span>
-          {result.page < result.totalPages ? <ButtonLink tone="secondary" size="sm" href={href(view, result.page + 1)}>صفحه بعد</ButtonLink> : <span />}
-        </nav>
-      ) : null}
+      </QueueFrame>
     </OpsShell>
   );
 }

@@ -65,17 +65,22 @@ export default async function MarketPromotionsPage() {
                   </span>
                 </div>
                 <div className="hz-setting__end">
-                  {/* The machine status stays as written: operators and checks read the same word. */}
-                  <StatusBadge tone={rule.status === 'ACTIVE' ? 'success' : 'neutral'} size="sm">
-                    <bdi dir="ltr" data-testid={'platform-rule-status-' + rule.id}>
-                      {rule.status}
-                    </bdi>
-                  </StatusBadge>
+                  {/* The stored value stays readable to checks on data-status; people read the dictionary label. */}
+                  <span data-testid={'platform-rule-status-' + rule.id} data-status={rule.status}>
+                    {rule.status === 'ENDED' ? (
+                      // GAPS #4: no dictionary key for ENDED.
+                      <StatusBadge tone="neutral" size="sm">
+                        پایان‌یافته
+                      </StatusBadge>
+                    ) : (
+                      <StatusBadge status={rule.status} size="sm" />
+                    )}
+                  </span>
                   {rule.status === 'DRAFT' || rule.status === 'PAUSED' ? (
-                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="ACTIVE" labelFa="فعال کردن" />
+                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} version={rule.version} to="ACTIVE" labelFa="فعال کردن" />
                   ) : null}
                   {rule.status === 'ACTIVE' ? (
-                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} to="PAUSED" labelFa="توقف" />
+                    <MoveDiscountForm action={moveDiscountAction} ruleId={rule.id} version={rule.version} to="PAUSED" labelFa="توقف" />
                   ) : null}
                 </div>
               </li>

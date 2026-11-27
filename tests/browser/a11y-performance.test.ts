@@ -81,7 +81,13 @@ test('a keyboard reaches the content, the navigation and the first action of a p
         const box = active.getBoundingClientRect();
         return {
           tag: active.tagName,
-          label: (active.getAttribute('aria-label') ?? active.textContent ?? '').trim().slice(0, 40),
+          // Accessible name: aria-label, the control's own words, or its <label for>.
+          label: (
+            active.getAttribute('aria-label') ??
+            ((active.textContent ?? '').trim() || ((active as HTMLInputElement).labels?.[0]?.textContent ?? ''))
+          )
+            .trim()
+            .slice(0, 40),
           hidden: style.visibility === 'hidden' || style.display === 'none',
           sized: box.width > 0 && box.height > 0,
         };

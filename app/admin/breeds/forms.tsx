@@ -6,6 +6,7 @@ import { Button } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { TextField } from '../../../src/ui/field.tsx';
 import { SectionHeader } from '../../../src/ui/section-header.tsx';
+import { StateChangeForm } from '../../../src/ui/state-change-form.tsx';
 import { addBreedAction, setBreedActiveAction, type BreedFormState } from './actions.ts';
 
 const EMPTY: BreedFormState = {};
@@ -34,25 +35,32 @@ export function AddBreedForm() {
   );
 }
 
-/** Retiring or restoring one breed; every change is audited with its actor. */
+/** Retiring or restoring one breed, with a reason and the version it was decided on (P11, RTO-018). */
 export function BreedStateForm({
   breedId,
   active,
+  version,
   suffix,
 }: {
   breedId: string;
   active: boolean;
+  version: number;
   suffix: string;
 }) {
-  const [state, submit, pending] = useActionState(setBreedActiveAction, EMPTY);
+  const label = active ? 'کنارگذاشتن از انتخاب‌های جدید' : 'فعال‌سازی دوباره';
   return (
-    <form action={submit} className="space-y-xs" data-testid={'breed-state-form-' + suffix}>
-      <input type="hidden" name="breedId" value={breedId} />
-      <input type="hidden" name="active" value={active ? 'NO' : 'YES'} />
-      <Result state={state} />
-      <Button type="submit" tone="ghost" size="sm" disabled={pending} data-testid={'toggle-breed-' + suffix}>
-        {pending ? 'در حال ثبت…' : active ? 'کنارگذاشتن از انتخاب‌های جدید' : 'فعال‌سازی دوباره'}
-      </Button>
-    </form>
+    <StateChangeForm
+      action={setBreedActiveAction}
+      hidden={{ breedId, active: active ? 'NO' : 'YES' }}
+      version={version}
+      changeFa={label}
+      openLabel={label}
+      ids={{
+        form: 'breed-state-form-' + suffix,
+        open: 'toggle-breed-' + suffix,
+        reason: 'breed-reason-' + suffix,
+        save: 'breed-state-save-' + suffix,
+      }}
+    />
   );
 }

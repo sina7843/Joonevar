@@ -226,7 +226,7 @@ test('route access is enforced by the server, not by hiding navigation', async (
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + url, { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN', url + ' must be refused');
+      assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN', url + ' must be refused');
     } finally {
       await context.close();
     }
@@ -238,7 +238,7 @@ test('route access is enforced by the server, not by hiding navigation', async (
     const page = await context.newPage();
     try {
       await page.goto(BASE_URL + '/assoc', { waitUntil: 'load' });
-      assert.equal(await page.getByTestId('denial-code').textContent(), 'FORBIDDEN');
+      assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
       await page.screenshot({ path: path.join(SHOTS, 'denied-wrong-shell.png'), fullPage: true });
     } finally {
       await context.close();

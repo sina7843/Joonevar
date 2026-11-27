@@ -120,7 +120,7 @@ test('request, acceptance, a masked message, a two-sided contract confirmed with
     await a.getByTestId('req-message').fill('SYNTHETIC سلام، برای جفت‌گیری آماده‌ایم');
     await Promise.all([a.waitForURL('**/account/mating-finder/requests/**'), a.getByTestId('req-submit').click()]);
     const requestUrl = a.url();
-    assert.match(await a.getByTestId('finder-request-status').innerText(), /در انتظار بررسی/);
+    assert.match(await a.getByTestId('finder-request-status').innerText(), /درخواست ارسال‌شده/);
 
     await b.goto(requestUrl, { waitUntil: 'load' });
     await b.getByTestId('finder-accept').click();
@@ -145,7 +145,7 @@ test('request, acceptance, a masked message, a two-sided contract confirmed with
       await expectText(page, 'تأیید شما: بله');
     }
     await a.reload({ waitUntil: 'load' });
-    assert.match(await a.getByTestId('finder-request-status').innerText(), /قرارداد تأییدشده/);
+    assert.match(await a.getByTestId('finder-request-status').innerText(), /وجود توافق تأیید شد/);
     assert.match(await a.getByTestId('finder-contact-hidden').innerText(), /پنهان/);
     const overflow = await a.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     assert.ok(overflow <= 0, 'no horizontal scroll at 360px');

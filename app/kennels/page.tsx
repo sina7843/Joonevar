@@ -6,7 +6,7 @@ import { Card, LockedServiceCard } from '../../src/ui/card.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { StatusBadge } from '../../src/ui/status.tsx';
 import { db } from '../../src/db/client.ts';
-import { kennelEntry, KENNEL_STATUS_FA } from '../../src/kennels/service.ts';
+import { kennelEntry } from '../../src/kennels/service.ts';
 import { StartKennelForm } from './forms.tsx';
 import { PageHeader } from '../../src/ui/section-header.tsx';
 
@@ -53,17 +53,9 @@ export default async function KennelsPage({ searchParams }: { searchParams: Prom
                   {[kennel.provinceFa, kennel.cityFa].filter(Boolean).join(' · ') || 'نشانی ثبت نشده'}
                 </p>
               </div>
-              <StatusBadge
-                tone={
-                  kennel.status === 'APPROVED'
-                    ? 'success'
-                    : kennel.status === 'NEEDS_CORRECTION' || kennel.status === 'REJECTED'
-                      ? 'warning'
-                      : 'info'
-                }
-              >
-                <span data-testid="kennel-entry-status">{KENNEL_STATUS_FA[kennel.status]}</span>
-              </StatusBadge>
+              <span data-testid="kennel-entry-status">
+                <StatusBadge status={kennel.status} />
+              </span>
             </div>
             <p className="mt-lg text-body-sm">
               <Link href={'/kennels/' + kennel.id} className="hz-link" data-testid="open-kennel">

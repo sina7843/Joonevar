@@ -136,11 +136,14 @@ export default async function SellerFinancePage({
                     {batch.reference} — {fa(batch.totalToman)} تومان
                     {batch.bankReference ? ' — پیگیری ' + batch.bankReference : ''}
                   </span>
-                  <StatusBadge tone={batch.status === 'RECONCILED' ? 'success' : 'neutral'}>
-                    <span data-testid={'batch-status-' + batch.id}>
-                      {SETTLEMENT_STATUS_FA[batch.status as SettlementStatus]}
-                    </span>
-                  </StatusBadge>
+                  <span data-testid={'batch-status-' + batch.id}>
+                    {batch.status === 'RECONCILED' ? (
+                      // GAPS #4: no dictionary key for RECONCILED
+                      <StatusBadge tone="success">{SETTLEMENT_STATUS_FA[batch.status as SettlementStatus]}</StatusBadge>
+                    ) : (
+                      <StatusBadge status={batch.status} />
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>

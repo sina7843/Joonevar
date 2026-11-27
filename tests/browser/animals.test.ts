@@ -149,7 +149,7 @@ async function approvedOwner(): Promise<{ context: BrowserContext; page: Page; m
 
   const ops = await operatorPage();
   try {
-    await ops.page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await ops.page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await ops.page.getByTestId('open-case').first().click();
     await ops.page.getByTestId('review-form').waitFor();
     await ops.page.getByTestId('decision-APPROVED').check();

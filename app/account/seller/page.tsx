@@ -19,7 +19,6 @@ import {
   roleAllows,
   SELLER_KIND_FA,
   SELLER_ROLE_FA,
-  SELLER_STATUS_FA,
   type SellerKind,
   type SellerRole,
   type SellerStatus,
@@ -106,7 +105,6 @@ export default async function SellerPage() {
     currentSubscription(db(), seller.id),
     publishedPlans(db()),
   ]);
-  const statusTone = status === 'ACTIVE' ? 'success' : status === 'SUSPENDED' ? 'warning' : 'neutral';
   const canSubmit = isSellerEditable(status) && roleAllows(role, 'STORE_SUBMIT');
 
   return (
@@ -119,9 +117,9 @@ export default async function SellerPage() {
           title={seller.displayNameFa ?? 'فروشگاه بدون نام'}
           back={{ href: '/dashboard' }}
           aside={
-            <StatusBadge tone={statusTone}>
-              <span data-testid="seller-status">{SELLER_STATUS_FA[status]}</span>
-            </StatusBadge>
+            <span data-testid="seller-status">
+              <StatusBadge status={status} />
+            </span>
           }
           meta={[
             SELLER_KIND_FA[seller.kind as SellerKind],
@@ -303,12 +301,8 @@ export default async function SellerPage() {
                         {member.mobile}
                       </bdi>
                       <span className="flex flex-wrap gap-xs">
-                        <StatusBadge tone="neutral" size="sm">
-                          {SELLER_ROLE_FA[member.role as SellerRole]}
-                        </StatusBadge>
-                        <StatusBadge tone={member.status === 'ACTIVE' ? 'success' : 'neutral'} size="sm">
-                          {member.status === 'ACTIVE' ? 'فعال' : 'حذف‌شده'}
-                        </StatusBadge>
+                        <span className="hz-tag hz-tag--neutral">{SELLER_ROLE_FA[member.role as SellerRole]}</span>
+                        <StatusBadge status={member.status} size="sm" />
                       </span>
                     </div>
                     {member.role !== 'OWNER' && member.status === 'ACTIVE' ? (

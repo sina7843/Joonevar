@@ -108,11 +108,7 @@ export default async function CentersPage({ searchParams }: { searchParams: Prom
           <FilterPanel
             clearHref="/centers"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect id="centre-type" form={FORM} name="type" label="نوع مرکز" all="همه انواع" value={query.type} testId="centre-filter-type"
               options={reference.types.map((row) => ({ value: row.code, label: row.nameFa }))} />
@@ -210,34 +206,19 @@ export default async function CentersPage({ searchParams }: { searchParams: Prom
                               </span>
                             ) : null}
                             {centre.owned ? null : (
+                              // GAPS #4: no dictionary key for UNOWNED (ownership axis)
                               <StatusBadge tone="warning" size="sm">
                                 بدون مالک
                               </StatusBadge>
                             )}
-                            {centre.open24h ? (
-                              <StatusBadge tone="neutral" size="sm">
-                                شبانه‌روزی
-                              </StatusBadge>
-                            ) : null}
-                            {centre.serves ? (
-                              <StatusBadge tone="success" size="sm">
-                                همکار خدمات همزیست
-                              </StatusBadge>
-                            ) : null}
+                            {centre.open24h ? <span className="hz-tag hz-tag--neutral">شبانه‌روزی</span> : null}
+                            {centre.serves ? <span className="hz-tag hz-tag--neutral">همکار خدمات همزیست</span> : null}
                           </span>
                         ) : null}
                       </div>
                       <div className="hz-card__section hz-centre__foot">
                         پروانه فعالیت
-                        {centre.verified ? (
-                          <StatusBadge tone="success" size="sm">
-                            مجوز معتبر
-                          </StatusBadge>
-                        ) : (
-                          <StatusBadge tone="neutral" size="sm">
-                            ثبت نشده
-                          </StatusBadge>
-                        )}
+                        <StatusBadge status={centre.verified ? 'VALID' : 'NONE'} size="sm" />
                       </div>
                     </Link>
                   </li>

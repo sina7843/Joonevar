@@ -9,7 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../db/client.ts';
 import { env } from '../config/env.ts';
 import { guardRoute } from '../authz/guard.ts';
-import { AppError, notFound } from '../domain/errors.ts';
+import { AppError, staleOf, notFound } from '../domain/errors.ts';
 import { accounts } from '../db/schema/core.ts';
 import { eq } from 'drizzle-orm';
 import { submitFinderReport, takeReport, decideFinderReport, appealFinderDecision, decideFinderAppeal } from './reports.ts';
@@ -37,7 +37,7 @@ async function run(paths: readonly string[], work: () => Promise<string>): Promi
     for (const p of paths) revalidatePath(p);
     return { ok: true, message };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

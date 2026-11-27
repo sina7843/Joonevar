@@ -2,7 +2,7 @@ import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { OpsShell, ASSOC_NAV } from '../../../src/ui/shell.tsx';
 import { CaseItem, CaseList, Panel } from '../../../src/ui/desk.tsx';
-import { ageInDays } from '../../../src/ui/queue.tsx';
+import { ageInDays, keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -14,24 +14,21 @@ import {
 } from '../../../src/operations/service.ts';
 import { formatCivilDateFa } from '../../../src/domain/calendar.ts';
 import { formatInstantFa } from '../../../src/content/model.ts';
+import { KeyValueList } from '../../../src/ui/key-value.tsx';
+import { CaseDrawer } from '../case-drawer.tsx';
 import { membershipQueue } from '../../../src/billing/membership.ts';
-import { MEMBERSHIP_STATUS_FA, type MembershipStatus } from '../../../src/billing/membership-model.ts';
 import { DecideMembershipForm, IssueNumberForm, MembershipStateForm } from './forms.tsx';
 import { MemberSearch } from './search.tsx';
+import { QUEUE_SORT_FA, QUEUE_SORTS, readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
+import { QueueHead, hrefWith } from '../../../src/ui/queue-head.tsx';
+import { Pagination } from '../../../src/ui/pagination.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const STATUS_FA: Record<string, string> = MEMBERSHIP_STATUS_FA;
-
-const STATUS_TONE: Partial<Record<MembershipStatus, 'success' | 'info' | 'warning' | 'error' | 'neutral'>> = {
-  ACTIVE: 'success',
-  APPROVED_AWAITING_PAYMENT: 'info',
-  PENDING_REVIEW: 'info',
-  NEEDS_CORRECTION: 'warning',
-  EXPIRED: 'warning',
-  SUSPENDED: 'error',
-  REVOKED: 'error',
-  REJECTED: 'error',
+/** Membership values whose dictionary key has another name; the rest share the name. */
+const MEMBERSHIP_KEY: Record<string, string> = {
+  APPROVED_AWAITING_PAYMENT: 'AWAITING_PAYMENT',
+  PAYMENT_PENDING: 'PENDING_PAYMENT',
 };
 
 const NUMBER_FA: Record<string, string> = {
@@ -50,12 +47,15 @@ const NUMBER_FA: Record<string, string> = {
 export default async function AssocMembersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; sort?: string; page?: string }>;
 }) {
   const guard = await guardRoute('/assoc/members');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
-  const term = (await searchParams).q?.trim() ?? '';
+  const params = await searchParams;
+  const term = params.q?.trim() ?? '';
+  // `q` searches the register below, so the queue takes only the order and the page.
+  const query = { ...readQueueQuery(params), q: '' };
   const [rows, withoutMembership, total, waiting, corrections] = await Promise.all([
     memberRecords(db(), guard.actor, { search: term }),
     accountsWithoutMembership(db(), guard.actor),
@@ -64,6 +64,12 @@ export default async function AssocMembersPage({
     membershipQueue(db(), guard.actor, { status: 'NEEDS_CORRECTION' }),
   ]);
   const hidden = Math.max(0, total - rows.length);
+  const queue = sliceQueue([...waiting.items, ...corrections.items], query, {
+    text: (item) => item.statementFa ?? '',
+    at: (item) => new Date(item.updatedAt),
+    name: (item) => item.statementFa ?? '',
+  });
+  const keep = { q: term, sort: query.sort === 'oldest' ? undefined : query.sort };
 
   return (
     <OpsShell actor={guard.actor} title="عضویت" pathname="/assoc/members" nav={ASSOC_NAV}>
@@ -86,32 +92,65 @@ export default async function AssocMembersPage({
             درخواست بازی در صف نیست.
           </p>
         ) : (
-          <CaseList label="صف درخواست عضویت" testId="membership-queue">
-            {waiting.items.map((item) => (
-              <CaseItem
-                key={item.id}
-                type="درخواست عضویت"
-                name={item.statementFa || 'درخواست عضویت'}
-                sub={'آخرین تغییر: ' + formatInstantFa(new Date(item.updatedAt))}
-                ageDays={ageInDays(new Date(item.updatedAt))}
-                status={{ tone: 'info', label: 'در انتظار بررسی انجمن' }}
-                owner="ASSOCIATION"
-                ownerIsUs
-              >
-                <DecideMembershipForm applicationId={item.id} version={item.version} />
-              </CaseItem>
-            ))}
-            {corrections.items.map((item) => (
-              <CaseItem
-                key={item.id}
-                testId="membership-awaiting-correction"
-                type="درخواست عضویت"
-                name={'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
-                status={{ tone: 'warning', label: 'نیازمند اصلاح' }}
-                owner="USER"
-              />
-            ))}
-          </CaseList>
+          <QueueHead
+            total={queue.all}
+            shown={queue.total}
+            noun="درخواست"
+            sort={{
+              label: 'مرتب‌سازی درخواست‌ها',
+              testId: 'membership-queue-sort',
+              options: QUEUE_SORTS.map((key) => ({
+                key,
+                label: QUEUE_SORT_FA[key],
+                current: key === query.sort,
+                href: hrefWith('/assoc/members', keep, { sort: key === 'oldest' ? undefined : key }),
+              })),
+            }}
+          >
+            <CaseList label="صف درخواست عضویت" testId="membership-queue">
+              {queue.items.map((item) =>
+                item.status === 'NEEDS_CORRECTION' ? (
+                  <CaseItem
+                    key={item.id}
+                    testId="membership-awaiting-correction"
+                    type="درخواست عضویت"
+                    name={'در انتظار اصلاح متقاضی · ' + formatInstantFa(new Date(item.updatedAt)) + (item.reviewNoteFa ? ' — ' + item.reviewNoteFa : '')}
+                    status={keyStatus('NEEDS_CORRECTION')}
+                    owner="USER"
+                  />
+                ) : (
+                  <CaseItem
+                    key={item.id}
+                    type="درخواست عضویت"
+                    name={item.statementFa || 'درخواست عضویت'}
+                    sub={'آخرین تغییر: ' + formatInstantFa(new Date(item.updatedAt))}
+                    ageDays={ageInDays(new Date(item.updatedAt))}
+                    status={keyStatus('PENDING_REVIEW')}
+                    owner="ASSOCIATION"
+                    ownerIsUs
+                  >
+                    <CaseDrawer title="درخواست عضویت" testId="open-membership-case">
+                      <KeyValueList
+                        rows={[
+                          { key: 'توضیح متقاضی', value: item.statementFa },
+                          { key: 'آخرین تغییر', value: formatInstantFa(new Date(item.updatedAt)) },
+                          { key: 'نسخه', value: item.version.toLocaleString('fa-IR') },
+                        ]}
+                      />
+                      <DecideMembershipForm applicationId={item.id} version={item.version} />
+                    </CaseDrawer>
+                  </CaseItem>
+                ),
+              )}
+            </CaseList>
+            <Pagination
+              page={queue.page}
+              pageSize={queue.pageSize}
+              total={queue.total}
+              totalPages={queue.totalPages}
+              hrefFor={(target) => hrefWith('/assoc/members', keep, { page: target > 1 ? String(target) : undefined })}
+            />
+          </QueueHead>
         )}
       </Panel>
 
@@ -149,11 +188,7 @@ export default async function AssocMembersPage({
                     {row.activatedAt ? ' · فعال از ' + formatCivilDateFa(row.activatedAt.toISOString().slice(0, 10)) : ''}
                   </>
                 }
-                status={{
-                  tone: STATUS_TONE[row.status as MembershipStatus] ?? 'neutral',
-                  label: STATUS_FA[row.status] ?? row.status,
-                  testId: 'member-status-' + row.accountId,
-                }}
+                status={{ ...keyStatus(MEMBERSHIP_KEY[row.status] ?? row.status), testId: 'member-status-' + row.accountId }}
               >
                 {row.membershipNo === null ? <IssueNumberForm accountId={row.accountId} suffix={row.accountId} /> : null}
                 {row.status === 'ACTIVE' || row.status === 'SUSPENDED' || row.status === 'EXPIRED' ? (

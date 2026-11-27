@@ -52,7 +52,7 @@ export default async function DevSmsPage() {
             <li key={row.id}>
               <Card>
                 <div className="flex flex-row items-baseline justify-between gap-md">
-                  <bdi className="hz-ltr font-mono text-label-md">{row.toMobile}</bdi>
+                  <bdi className="hz-ltr font-mono text-label-sm">{row.toMobile}</bdi>
                   <span className="text-caption text-text-secondary">
                     {row.createdAt.toLocaleString('fa-IR')}
                   </span>

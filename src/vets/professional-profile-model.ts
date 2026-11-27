@@ -194,9 +194,15 @@ export const STUDENT_DECISION_OUTCOME: Record<StudentDecision, VetCaseStatus> = 
   REJECT: 'REJECTED',
 };
 export const STUDENT_DECISION_FA: Record<StudentDecision, string> = {
-  VERIFY: 'تأیید دانشجو',
-  REQUEST_CORRECTION: 'درخواست اصلاح',
+  VERIFY: 'تأیید',
+  REQUEST_CORRECTION: 'نیازمند اصلاح',
   REJECT: 'رد',
+};
+/** The consequence under each outcome (DS DecisionDesk: the labels stay تأیید · نیازمند اصلاح · رد). */
+export const STUDENT_DECISION_DESC_FA: Record<StudentDecision, string> = {
+  VERIFY: 'دانشجوی دامپزشکی بودن متقاضی تأیید می‌شود.',
+  REQUEST_CORRECTION: 'پرونده با دلیل به متقاضی برمی‌گردد تا همان پرونده را اصلاح کند.',
+  REJECT: 'پرونده با دلیل بسته می‌شود.',
 };
 export const isStudentDecision = oneOf(STUDENT_DECISIONS);
 
@@ -247,9 +253,14 @@ export const DOCTOR_DECISION_OUTCOME: Record<DoctorDecision, VetCaseStatus> = {
   REJECT: 'REJECTED',
 };
 export const DOCTOR_DECISION_FA: Record<DoctorDecision, string> = {
-  VERIFY: 'تأیید کد نظام (بدون پروانه فعالیت)',
-  REQUEST_CORRECTION: 'درخواست اصلاح',
+  VERIFY: 'تأیید',
+  REQUEST_CORRECTION: 'نیازمند اصلاح',
   REJECT: 'رد',
+};
+export const DOCTOR_DECISION_DESC_FA: Record<DoctorDecision, string> = {
+  VERIFY: 'کد نظام تأیید می‌شود و نشان «دکتر دامپزشک — بدون پروانه فعالیت» فعال می‌شود؛ پروانه فعالیت مسیر جداست.',
+  REQUEST_CORRECTION: 'پرونده با دلیل به متقاضی برمی‌گردد تا همان پرونده را اصلاح کند.',
+  REJECT: 'پرونده با دلیل بسته می‌شود.',
 };
 export const isDoctorDecision = oneOf(DOCTOR_DECISIONS);
 
@@ -321,9 +332,14 @@ export const LICENCE_DECISION_OUTCOME: Record<LicenceDecision, VetCaseStatus> = 
   REJECT: 'REJECTED',
 };
 export const LICENCE_DECISION_FA: Record<LicenceDecision, string> = {
-  APPROVE: 'تأیید مدارک پروانه (در انتظار پرداخت)',
-  REQUEST_CORRECTION: 'درخواست اصلاح',
+  APPROVE: 'تأیید',
+  REQUEST_CORRECTION: 'نیازمند اصلاح',
   REJECT: 'رد',
+};
+export const LICENCE_DECISION_DESC_FA: Record<LicenceDecision, string> = {
+  APPROVE: 'مدارک پروانه تأیید و پرداخت دوره فعالیت برای متقاضی باز می‌شود؛ نشان پروانه پس از پرداخت تأییدشده فعال می‌شود.',
+  REQUEST_CORRECTION: 'پرونده با دلیل به متقاضی برمی‌گردد تا همان پرونده را اصلاح کند.',
+  REJECT: 'پرونده با دلیل بسته می‌شود.',
 };
 export const isLicenceDecision = oneOf(LICENCE_DECISIONS);
 

@@ -87,6 +87,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                 </Link>
               </p>
             </div>
+            {/* GAPS #4: no dictionary key for the derived litter-recorded state */}
             <StatusBadge tone={view.litter ? 'info' : 'neutral'}>
               <span data-testid="birth-status">{view.litter ? 'زایمان ثبت شده' : 'هنوز ثبت نشده'}</span>
             </StatusBadge>
@@ -181,7 +182,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                   >
                     <div className="flex items-start justify-between gap-md">
                       <div className="min-w-0">
-                        <p className="text-label-md">
+                        <p className="text-label-sm">
                           <Identifier value={puppy.tempCode} />
                         </p>
                         <p className="mt-2xs text-caption text-text-secondary">
@@ -198,13 +199,14 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                           </p>
                         ) : null}
                       </div>
-                      <StatusBadge
-                        tone={
-                          puppy.status === 'ALIVE' ? 'success' : puppy.status === 'DECEASED' ? 'warning' : 'neutral'
-                        }
-                      >
-                        <span data-testid={'puppy-status-' + puppy.tempCode}>{PUPPY_STATUS_FA[puppy.status]}</span>
-                      </StatusBadge>
+                      <span data-testid={'puppy-status-' + puppy.tempCode}>
+                        {puppy.status === 'WITHDRAWN' ? (
+                          // GAPS #4: dictionary WITHDRAWN («پس گرفته شد») does not describe a puppy removed by a birth-report correction
+                          <StatusBadge tone="neutral">{PUPPY_STATUS_FA[puppy.status]}</StatusBadge>
+                        ) : (
+                          <StatusBadge status={puppy.status} />
+                        )}
+                      </span>
                     </div>
 
                     {puppy.status === 'ALIVE' ? (
@@ -260,7 +262,7 @@ export default async function BirthPage({ params }: { params: Promise<{ id: stri
                   className="rounded-lg border border-border-default p-lg"
                   data-testid={'birth-version-' + row.version}
                 >
-                  <p className="text-label-md">
+                  <p className="text-label-sm">
                     نسخه {row.version} · {row.liveCount} زنده · {row.deadCount} مرده ·{' '}
                     {row.kind === 'INITIAL' ? 'گزارش اولیه' : 'اصلاح'}
                   </p>

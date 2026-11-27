@@ -193,16 +193,17 @@ test('the review operator records the licence, and a visitor reads the centre on
     await page.goto(BASE_URL + '/centers', { waitUntil: 'load' });
     await page.getByTestId('centre-search').waitFor();
     assert.equal(await page.getAttribute('html', 'dir'), 'rtl');
+    await page.getByTestId('filters-open').click();
     await page.getByTestId('centre-filter-type').selectOption('HOSPITAL');
     await page.getByTestId('centre-filter-verified').check();
     await Promise.all([
       page.waitForURL((url) => url.searchParams.get('verified') === '1'),
-      page.getByTestId('centre-search-submit').click(),
+      page.getByTestId('filters-apply').click(),
     ]);
     const card = page.getByTestId('centre-card-' + centreSlug);
     await card.waitFor();
     const cardText = (await card.textContent()) ?? '';
-    assert.match(cardText, /مجوز معتبر/);
+    assert.match(cardText, /پروانه فعالیت\s*معتبر/);
     assert.match(cardText, /تهران/);
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(width <= MOBILE.width, 'no sideways scroll on a phone: ' + width);
@@ -235,7 +236,7 @@ test('a veterinarian joins the team only after accepting the invitation', async 
     await page.getByTestId('member-reason').fill('SYNTHETIC دعوت به تیم');
     await page.getByTestId('invite-member').click();
     await waitForText(page, 'member-invite-result', 'دعوت فرستاده شد');
-    await waitForText(page, 'centre-members', 'در انتظار پذیرش');
+    await waitForText(page, 'centre-members', 'در انتظار پاسخ');
   });
 
   await as('visitor', MOBILE, async (page) => {
@@ -266,9 +267,9 @@ test('hiding a centre removes its page, and the management environments stay clo
   assert.ok(centreSlug, 'the centre was published by the first test');
   await as('user', DESKTOP, async (page) => {
     await page.goto(BASE_URL + '/admin/centres', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
     await page.goto(BASE_URL + '/review/centres', { waitUntil: 'load' });
-    assert.equal(await textOf(page, 'denial-code'), 'FORBIDDEN');
+    assert.equal(await page.getByTestId('denial-code').getAttribute('data-code'), 'FORBIDDEN');
     await page.goto(BASE_URL + '/account/centres', { waitUntil: 'load' });
     await page.getByText('هنوز مرکزی به شما سپرده نشده است').waitFor();
   });
@@ -277,10 +278,10 @@ test('hiding a centre removes its page, and the management environments stay clo
     await page.goto(BASE_URL + '/review/centres', { waitUntil: 'load' });
     const row = page.locator('[data-testid^="centre-row-"]', { hasText: CENTRE_NAME });
     await Promise.all([page.waitForURL((url) => /^\/review\/centres\/[0-9a-f-]{36}$/.test(url.pathname)), row.click()]);
-    await page.getByTestId('centre-status-to').selectOption('HIDDEN');
+    await page.getByTestId('centre-status-to-HIDDEN').check();
     await page.getByTestId('centre-status-reason').fill('SYNTHETIC پنهان‌سازی آزمایشی');
     await page.getByTestId('change-centre-status').click();
-    await waitForText(page, 'centre-status-result', 'مرکز پنهان شد');
+    await waitForText(page, 'centre-public-status', 'پنهان');
   });
 
   await as('visitor', MOBILE, async (page) => {

@@ -7,7 +7,7 @@ import { Icon } from '../ui/icon.tsx';
 import { DeskHead, Panel } from '../ui/desk.tsx';
 import { Pagination } from '../ui/pagination.tsx';
 import { SelectField } from '../ui/field.tsx';
-import { Button } from '../ui/button.tsx';
+import { ActionRow, Button } from '../ui/button.tsx';
 import { Alert } from '../ui/alert.tsx';
 import { StatusBadge, type StatusTone } from '../ui/status.tsx';
 import { EmptyState } from '../ui/states.tsx';
@@ -41,20 +41,28 @@ const TITLE: Record<ContentPanel, string> = { author: 'نوشته‌های من'
 const NEW_TITLE: Record<ContentPanel, string> = { author: 'نوشته تازه', content: 'محتوای تازه' };
 const NAV = { author: AUTHOR_NAV, content: CONTENT_NAV } as const;
 
-const STATE_TONE: Record<PublicState, StatusTone> = {
+// GAPS #4: no dictionary key for the public-visibility axis VISIBLE / ARCHIVED («نشانی باز است») / NOT_PUBLIC;
+// SCHEDULED is a dictionary key. The content status itself is always a key.
+const STATE_TONE: Record<Exclude<PublicState, 'SCHEDULED'>, StatusTone> = {
   VISIBLE: 'success',
-  SCHEDULED: 'info',
   ARCHIVED: 'neutral',
   NOT_PUBLIC: 'neutral',
 };
 
-const STATUS_TONE: Record<ContentStatus, StatusTone> = {
-  DRAFT: 'neutral',
-  PUBLISHED: 'success',
-  HIDDEN: 'warning',
-  ARCHIVED: 'neutral',
-  DELETED: 'error',
-};
+function PublicStateBadge({ state, testId }: { state: PublicState; testId: string }) {
+  if (state === 'SCHEDULED') {
+    return (
+      <span data-testid={testId}>
+        <StatusBadge status="SCHEDULED" size="sm" />
+      </span>
+    );
+  }
+  return (
+    <StatusBadge tone={STATE_TONE[state]} size="sm">
+      <span data-testid={testId}>{PUBLIC_STATE_FA[state]}</span>
+    </StatusBadge>
+  );
+}
 
 type Search = { status?: string | string[]; kind?: string | string[]; page?: string | string[] };
 const one = (value: string | string[] | undefined): string => (Array.isArray(value) ? value[0] : value) ?? '';
@@ -113,16 +121,20 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
             />
           </div>
         ) : null}
-        <div className="hz-action-row">
-          <Button type="submit" tone="secondary">
-            فیلتر
-          </Button>
-          {status || kind ? (
-            <ButtonLink tone="ghost" href={base}>
-              همه
-            </ButtonLink>
-          ) : null}
-        </div>
+        <ActionRow
+          primary={
+            <Button type="submit" tone="secondary">
+              فیلتر
+            </Button>
+          }
+          secondary={
+            status || kind ? (
+              <ButtonLink tone="ghost" href={base}>
+                همه
+              </ButtonLink>
+            ) : null
+          }
+        />
       </form>
 
       {result.items.length === 0 ? (
@@ -169,14 +181,10 @@ export async function ContentPanelList({ actor, panel, search }: { actor: Actor;
                     </td>
                     <td data-label="نوع">{KIND_FA[item.kind]}</td>
                     <td data-label="وضعیت">
-                      <StatusBadge tone={STATUS_TONE[item.status]} size="sm">
-                        {STATUS_FA[item.status]}
-                      </StatusBadge>
+                      <StatusBadge status={item.status} size="sm" />
                     </td>
                     <td data-label="نمایش عمومی">
-                      <StatusBadge tone={STATE_TONE[item.publicState]} size="sm">
-                        <span data-testid={'panel-item-state-' + item.id}>{PUBLIC_STATE_FA[item.publicState]}</span>
-                      </StatusBadge>
+                      <PublicStateBadge state={item.publicState} testId={'panel-item-state-' + item.id} />
                     </td>
                     <td className="hz-table__open">
                       <Link className="hz-icon-btn hz-icon-btn--sm" href={editorPathFor(panel, item.id)} aria-hidden="true" tabIndex={-1}>
@@ -239,14 +247,12 @@ export async function ContentEditorView({ actor, panel, contentId }: { actor: Ac
 
       <DeskHead
         title={KIND_FA[row.kind]}
-        status={{ tone: STATUS_TONE[row.status], label: STATUS_FA[row.status], testId: 'content-status' }}
+        status={{ key: row.status, testId: 'content-status' }}
         meta={[
           'نسخه ' + fa(row.revisionNumber),
           'امضای عمومی: ' + data.byline,
           row.publishAt ? 'زمان انتشار: ' + formatInstantFa(row.publishAt) : null,
-          <StatusBadge key="public" tone={STATE_TONE[data.publicState]} size="sm">
-            <span data-testid="content-public-state">{PUBLIC_STATE_FA[data.publicState]}</span>
-          </StatusBadge>,
+          <PublicStateBadge key="public" state={data.publicState} testId="content-public-state" />,
         ]}
       >
         {publicPath && (data.publicState === 'VISIBLE' || data.publicState === 'ARCHIVED') ? (
@@ -311,7 +317,7 @@ export async function ContentEditorView({ actor, panel, contentId }: { actor: Ac
               {data.revisions.map((revision) => (
                 <li key={revision.number} className="flex flex-wrap items-center justify-between gap-sm py-sm first:pt-0 last:pb-0">
                   <div className="min-w-0">
-                    <p className="text-label-md">
+                    <p className="text-label-sm">
                       {'نسخه ' + fa(revision.number)}
                       {revision.number === row.revisionNumber ? <span className="text-caption font-normal text-text-secondary"> · فعلی</span> : null}
                     </p>

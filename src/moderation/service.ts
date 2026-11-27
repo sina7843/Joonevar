@@ -13,7 +13,8 @@
  * Reporters are never shown to the content admin or the author: moderation is
  * about what was published, not about who pointed at it (§20).
  */
-import { and, count, desc, eq, gt, inArray, isNull, max, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, inArray, isNull, max, min, sql } from 'drizzle-orm';
+import { likeOf, type QueueSort } from '../domain/queue-query.ts';
 import type { Database, DbClient } from '../db/client.ts';
 import { accounts } from '../db/schema/core.ts';
 import { profiles } from '../db/schema/identity.ts';
@@ -169,36 +170,45 @@ export interface QueueEntry {
   readonly status: ContentStatus;
   readonly openReports: number;
   readonly latestAt: Date;
+  /** The first open report: the case's age in the queue (RTO-015). */
+  readonly firstAt: Date;
   readonly reasons: readonly ReportReason[];
   readonly correctionRequested: boolean;
 }
 
-/** Items with open reports, most recently reported first. */
+/** Items with open reports, oldest first open report first (P09); `q` searches the title. */
 export async function openReportQueue(
   database: DbClient,
   actor: Actor,
-  request: { page: number; pageSize?: number },
+  request: { page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ): Promise<Page<QueueEntry>> {
   assertContentAdmin(actor);
   // §20: one answer never returns a whole table, however large a page is asked for.
   const page = { page: request.page, pageSize: boundedRows(request.pageSize, 20) };
+  const term = (request.q ?? '').trim();
+  const where = and(eq(moderationReports.status, 'OPEN'), term === '' ? undefined : sql`${contentItems.titleFa} ilike ${likeOf(term)}`);
+  const firstAt = min(moderationReports.createdAt);
+  const order = request.sort === 'name' ? asc(contentItems.titleFa) : request.sort === 'newest' ? desc(firstAt) : asc(firstAt);
   const groups = await database
     .select({
       contentId: moderationReports.contentId,
       openReports: count(),
       latestAt: max(moderationReports.createdAt),
+      firstAt,
       reasons: sql<string[]>`array_agg(distinct ${moderationReports.reason}::text)`,
     })
     .from(moderationReports)
-    .where(eq(moderationReports.status, 'OPEN'))
-    .groupBy(moderationReports.contentId)
-    .orderBy(desc(max(moderationReports.createdAt)))
+    .innerJoin(contentItems, eq(contentItems.id, moderationReports.contentId))
+    .where(where)
+    .groupBy(moderationReports.contentId, contentItems.titleFa)
+    .orderBy(order, asc(moderationReports.contentId))
     .limit(page.pageSize)
     .offset(offsetOf(page));
   const [total] = await database
     .select({ value: sql<string>`count(distinct ${moderationReports.contentId})` })
     .from(moderationReports)
-    .where(eq(moderationReports.status, 'OPEN'));
+    .innerJoin(contentItems, eq(contentItems.id, moderationReports.contentId))
+    .where(where);
 
   const ids = groups.map((group) => group.contentId!).filter(Boolean);
   const items = ids.length
@@ -227,6 +237,7 @@ export async function openReportQueue(
           status: item.status,
           openReports: Number(group.openReports),
           latestAt: group.latestAt as Date,
+          firstAt: group.firstAt as Date,
           reasons: group.reasons as ReportReason[],
           correctionRequested: item.correctionNote !== null,
         },
@@ -253,12 +264,15 @@ export interface DecidedReport {
 export async function decidedReports(
   database: DbClient,
   actor: Actor,
-  request: { page: number; pageSize?: number },
+  request: { page: number; pageSize?: number; q?: string; sort?: QueueSort },
 ): Promise<Page<DecidedReport>> {
   assertContentAdmin(actor);
   // §20: one answer never returns a whole table, however large a page is asked for.
   const page = { page: request.page, pageSize: boundedRows(request.pageSize, 20) };
-  const where = sql`${moderationReports.status} <> 'OPEN'`;
+  const term = (request.q ?? '').trim();
+  const where = and(sql`${moderationReports.status} <> 'OPEN'`, term === '' ? undefined : sql`${contentItems.titleFa} ilike ${likeOf(term)}`);
+  const order =
+    request.sort === 'name' ? asc(contentItems.titleFa) : request.sort === 'oldest' ? asc(moderationReports.decidedAt) : desc(moderationReports.decidedAt);
   const rows = await database
     .select({
       report: moderationReports,
@@ -270,10 +284,14 @@ export async function decidedReports(
     .innerJoin(contentItems, eq(contentItems.id, moderationReports.contentId))
     .leftJoin(profiles, eq(profiles.accountId, moderationReports.decidedByAccountId))
     .where(where)
-    .orderBy(desc(moderationReports.decidedAt))
+    .orderBy(order, asc(moderationReports.id))
     .limit(page.pageSize)
     .offset(offsetOf(page));
-  const [total] = await database.select({ value: count() }).from(moderationReports).where(where);
+  const [total] = await database
+    .select({ value: count() })
+    .from(moderationReports)
+    .innerJoin(contentItems, eq(contentItems.id, moderationReports.contentId))
+    .where(where);
   return pageOf(
     rows.map(({ report, titleFa, firstName, lastName }) => ({
       id: report.id,
@@ -351,6 +369,12 @@ export interface DecisionInput {
   readonly reason: string;
   /** For RESTRICT_PUBLISHER: when it ends; null means until lifted. */
   readonly restrictUntil?: Date | null;
+  /**
+   * The content version the decider was looking at (KOPS-029). When given and
+   * the item changed since, the decision is refused rather than applied to a
+   * version nobody reviewed.
+   */
+  readonly expectedVersion?: number;
 }
 
 /**
@@ -378,6 +402,12 @@ export async function decideContentReports(
   return database.transaction(async (tx) => {
     const [item] = await tx.select().from(contentItems).where(eq(contentItems.id, input.contentId)).limit(1);
     if (!item) throw notFound('محتوا پیدا نشد.');
+    if (input.expectedVersion !== undefined && input.expectedVersion !== item.version) {
+      throw conflict('این محتوا از زمانی که این صفحه را باز کردید تغییر کرده است؛ صفحه را دوباره باز کنید و روی نسخه تازه تصمیم بگیرید.', {
+        expectedVersion: input.expectedVersion,
+        actualVersion: item.version,
+      });
+    }
 
     const closed = await tx
       .update(moderationReports)

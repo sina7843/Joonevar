@@ -334,6 +334,8 @@ export interface OfferComparison {
   readonly priceToman: bigint;
   readonly available: number;
   readonly condition: OfferCondition;
+  /** The variant this SKU sells («۱۰ کیلوگرم»); absent for a product without variants. */
+  readonly variantLabelFa?: string | null;
 }
 
 /**

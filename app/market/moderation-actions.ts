@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../../src/db/client.ts';
 import { guardRoute } from '../../src/authz/guard.ts';
-import { AppError } from '../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../src/domain/errors.ts';
 import {
   decideAppeal,
   decideListingReports,
@@ -12,6 +12,7 @@ import {
   submitMarketReport,
 } from '../../src/marketplace/listing-moderation.ts';
 import { startPromotionPurchase } from '../../src/marketplace/promotions.ts';
+import type { BulkResultState } from '../../src/ui/bulk-action-bar.tsx';
 
 export interface MarketModerationState {
   readonly ok?: boolean;
@@ -43,7 +44,7 @@ export async function submitMarketReportAction(
     });
     return { ok: true, message: 'گزارش شما ثبت شد و بررسی می‌شود. نام شما به فروشنده گفته نمی‌شود.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -68,9 +69,50 @@ export async function decideListingReportsAction(
       message: 'تصمیم ثبت شد و ' + result.closed.toLocaleString('fa-IR') + ' گزارش بسته شد.',
     };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
+}
+
+/**
+ * «پنهان‌کردن آگهی‌ها» (K14 bulk, DEC-0235): the single «توقف آگهی توسط
+ * ناظر» decision run once per selected advert with one shared reason, each
+ * against the version the moderator saw. Nothing is decided as a group: every
+ * advert succeeds or fails on its own and is reported on its own line.
+ */
+export async function bulkHideListingsAction(_previous: BulkResultState, form: FormData): Promise<BulkResultState> {
+  const guard = await guardRoute('/market/listings');
+  if (!guard.ok) return { tone: 'error', message: guard.denied.message };
+  if (text(form, 'bulkAction') !== 'hide') return { tone: 'error', message: 'کنش گروهی معتبر نیست.' };
+  const reasonFa = text(form, 'reason');
+  if (reasonFa === '') return { tone: 'error', message: 'دلیل پنهان‌کردن را بنویسید؛ برای فروشنده و در تاریخچه ثبت می‌شود.' };
+  const ids = [...new Set(form.getAll('ids').map(String))].slice(0, 100);
+  if (ids.length === 0) return { tone: 'error', message: 'هیچ آگهی‌ای انتخاب نشده است.' };
+
+  const results: { id: string; label: string; ok: boolean; message?: string }[] = [];
+  for (const listingId of ids) {
+    const label = text(form, 'title-' + listingId) || listingId;
+    try {
+      const result = await decideListingReports(db(), guard.actor, {
+        listingId,
+        decision: 'HIDE',
+        reasonFa,
+        expectedListingVersion: Number(form.get('version-' + listingId)),
+      });
+      results.push({ id: listingId, label: label + ' — پنهان شد، ' + result.closed.toLocaleString('fa-IR') + ' گزارش بسته شد', ok: true });
+    } catch (error) {
+      if (!(error instanceof AppError)) throw error;
+      results.push({ id: listingId, label, ok: false, message: error.message });
+    }
+  }
+  revalidatePath('/market/listings');
+  const done = results.filter((result) => result.ok).length;
+  const fa = (value: number) => value.toLocaleString('fa-IR');
+  return {
+    tone: done === results.length ? 'success' : done === 0 ? 'error' : 'warning',
+    message: fa(done) + ' آگهی از ' + fa(results.length) + ' پنهان شد.',
+    results,
+  };
 }
 
 /** The seller's objection. Nothing about the original decision is rewritten. */
@@ -88,7 +130,7 @@ export async function submitAppealAction(
     revalidatePath('/account/listings');
     return { ok: true, message: 'اعتراض شما ثبت شد و بررسی می‌شود.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -108,7 +150,7 @@ export async function decideAppealAction(
     revalidatePath('/market/listings');
     return { ok: true, message: 'پاسخ اعتراض ثبت شد.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -134,7 +176,7 @@ export async function startPromotionAction(
     revalidatePath('/account/listings/' + listingId);
     return { ok: true, message: 'بسته تبلیغ ثبت شد؛ از صفحه پرداخت‌ها آن را پرداخت کنید.' };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }
@@ -164,7 +206,7 @@ export async function decideMessageReportAction(
       message: result.hidden ? 'پیام پنهان شد و گزارش بسته شد.' : 'گزارش بدون اقدام بسته شد.',
     };
   } catch (error) {
-    if (error instanceof AppError) return { ok: false, message: error.message };
+    if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
     throw error;
   }
 }

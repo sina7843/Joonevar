@@ -13,7 +13,8 @@ import { AppealForm } from '../../../../src/finder/ops-forms.tsx';
 
 export const dynamic = 'force-dynamic';
 
-const APPEAL_FA: Record<string, string> = { OPEN: 'در حال بررسی', UPHELD: 'تصمیم پابرجا ماند', OVERTURNED: 'اعتراض پذیرفته شد' };
+/** UPHELD (the decision stands) is the dictionary's DECLINED; OPEN and OVERTURNED are keys as-is. */
+const APPEAL_KEY: Record<string, string> = { UPHELD: 'DECLINED' };
 
 /** Moderation decisions that affected this person, and their appeals — PHASE-4 PROMPT-007. */
 export default async function FinderAppealsPage() {
@@ -43,9 +44,9 @@ export default async function FinderAppealsPage() {
                 <div className="hz-cardlist__row">
                   <span className="hz-cardlist__title">{TARGET_FA[report.targetKind] ?? report.targetKind}</span>
                   {appeal ? (
-                    <StatusBadge tone={appeal.status === 'OVERTURNED' ? 'success' : appeal.status === 'OPEN' ? 'info' : 'neutral'}>
-                      <span data-testid="finder-appeal-status">{APPEAL_FA[appeal.status]}</span>
-                    </StatusBadge>
+                    <span data-testid="finder-appeal-status">
+                      <StatusBadge status={APPEAL_KEY[appeal.status] ?? appeal.status} />
+                    </span>
                   ) : null}
                 </div>
                 <p className="hz-body-sm">

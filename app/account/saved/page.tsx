@@ -163,7 +163,7 @@ export default async function SavedPage() {
                   className="flex flex-wrap items-baseline justify-between gap-sm py-sm"
                   data-testid={'viewed-' + (row.productId ?? row.listingId)}
                 >
-                  <span className="text-label-md">{row.productNameFa ?? 'آگهی حیوان'}</span>
+                  <span className="text-label-sm">{row.productNameFa ?? 'آگهی حیوان'}</span>
                   <span className="hz-caption">{row.viewedAt.toLocaleDateString('fa-IR')}</span>
                 </li>
               ))}

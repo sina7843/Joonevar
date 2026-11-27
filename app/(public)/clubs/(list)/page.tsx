@@ -8,7 +8,6 @@ import { buildMetadata } from '../../../../src/seo/metadata.ts';
 import { site } from '../../../../src/public/request.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { EmptyState } from '../../../../src/ui/states.tsx';
-import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { Button, ButtonLink } from '../../../../src/ui/button.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
 import { PageHeader } from '../../../../src/ui/section-header.tsx';
@@ -86,11 +85,7 @@ export default async function ClubsPage({ searchParams }: { searchParams: Promis
           <FilterPanel
             clearHref="/clubs"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect id="club-scope" form={FORM} name="scope" label="حوزه" all="همه حوزه‌ها" value={query.scope} testId="club-filter-scope"
               options={COMMUNITY_SCOPES.map((scope) => ({ value: scope, label: COMMUNITY_SCOPE_FA[scope] }))} />
@@ -154,11 +149,6 @@ export default async function ClubsPage({ searchParams }: { searchParams: Promis
                               {club.placeFa}
                             </span>
                           ) : null}
-                          <span className="mt-xs">
-                            <StatusBadge tone="success" size="sm">
-                              تأییدشده
-                            </StatusBadge>
-                          </span>
                         </div>
                       </div>
                       {club.upcomingEvents > 0 ? (

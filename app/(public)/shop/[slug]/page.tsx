@@ -8,7 +8,7 @@ import { JsonLdScript } from '../../../../src/seo/json-ld.tsx';
 import { breadcrumbLd } from '../../../../src/seo/structured-data.ts';
 import { Breadcrumbs } from '../../../../src/ui/breadcrumbs.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
-import { ButtonLink } from '../../../../src/ui/button.tsx';
+import { ButtonLink, StickyActionBar } from '../../../../src/ui/button.tsx';
 import { SectionHeader } from '../../../../src/ui/section-header.tsx';
 import { ProductCard, StockBadge } from '../product-card.tsx';
 import { RecordImage } from '../../../../src/ui/record-image.tsx';
@@ -16,6 +16,8 @@ import { parseShopFilter, publicProduct, shopPage } from '../../../../src/commer
 
 import { OFFER_CONDITION_FA, type OfferCondition } from '../../../../src/commerce/catalog-model.ts';
 import { AddToCartForm } from '../../../../src/commerce/order-forms.tsx';
+import { BuyBox, type BuyVariant } from '../../../../src/commerce/buy-box.tsx';
+import { Rating, RatingSummary } from '../../../../src/ui/rating.tsx';
 import { setCartLineAction } from '../cart/actions.ts';
 import { currentSession } from '../../../../src/authz/request-actor.ts';
 import { productAggregate, reviewsOfProduct } from '../../../../src/commerce/reviews.ts';
@@ -83,6 +85,25 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
   ]);
 
   const cheapest = product.offers.find((offer) => offer.available > 0) ?? product.offers[0] ?? null;
+  // K7 buy box: offers grouped by variant (the server's comparison order kept, so
+  // the first offer of each group is its best), the in-stock ones first.
+  const variants: BuyVariant[] = [];
+  for (const offer of product.offers) {
+    const key = offer.variantLabelFa ?? '';
+    let group = variants.find((candidate) => candidate.key === key);
+    if (!group) variants.push((group = { key, labelFa: offer.variantLabelFa ?? 'پیش‌فرض', offers: [] }));
+    (group.offers as BuyVariant['offers'][number][]).push({
+      offerId: offer.offerId,
+      skuId: offer.skuId,
+      sellerNameFa: offer.sellerNameFa,
+      sellerMetaFa: OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? '',
+      priceFa: fa(offer.priceToman),
+      available: offer.available,
+    });
+  }
+  for (const group of variants) (group.offers as BuyVariant['offers'][number][]).sort((a, b) => Number(b.available > 0) - Number(a.available > 0));
+  // The SKU the buy box opens on: its add form lives there, not twice on the page.
+  const boxSku = (variants.find((variant) => (variant.offers[0]?.available ?? 0) > 0) ?? variants[0])?.offers[0]?.skuId ?? null;
   const origin = site().origin;
   const crumbs = [
     { name: 'خانه', path: '/' },
@@ -116,48 +137,39 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
 
           <div className="min-w-0 space-y-lg">
             <header className="space-y-sm border-b border-border-subtle pb-lg">
-              <ul className="hz-tag-list">
-                {product.brandFa ? <li className="hz-tag">{product.brandFa}</li> : null}
-                <li className="hz-tag hz-tag--neutral">{product.categoryNameFa}</li>
-              </ul>
-              <h1 className="hz-h2">{product.nameFa}</h1>
-              {rating.count > 0 ? (
-                <span className="hz-rating" role="img" aria-label={'امتیاز ' + fa(rating.overall) + ' از ۵، ' + fa(rating.count) + ' نظر'}>
-                  <Icon name="star" size="xs" weight="fill" />
-                  {fa(rating.overall)}
-                  <span className="hz-rating__count">{'(' + fa(rating.count) + ' نظر)'}</span>
-                </span>
-              ) : (
-                <span className="hz-caption">هنوز نظری ثبت نشده است</span>
-              )}
+              <div className="flex flex-wrap items-center gap-sm">
+                {product.brandFa ? <span className="hz-body-sm font-bold">{product.brandFa}</span> : null}
+                <span className="hz-tag hz-tag--neutral">{product.categoryNameFa}</span>
+              </div>
+              <h1 className="hz-h1">{product.nameFa}</h1>
+              <Rating value={rating.overall} count={rating.count} href={rating.count > 0 ? '#rating-title' : undefined} size="md" />
             </header>
 
-            <div className="flex flex-wrap items-center gap-md">
-              <div className={cheapest === null ? 'hz-price hz-price--lg hz-price--unset' : 'hz-price hz-price--lg'} data-testid="product-price">
-                {cheapest === null ? (
-                  <span className="hz-price__amount">قیمتی ثبت نشده</span>
-                ) : (
-                  <>
-                    <span className="hz-price__from">از</span> <span className="hz-price__amount">{fa(cheapest.priceToman)}</span>{' '}
-                    <span className="hz-price__unit">تومان</span>
-                  </>
-                )}
+            {cheapest === null ? (
+              <div className="hz-price hz-price--lg hz-price--unset" data-testid="product-price">
+                <span className="hz-price__amount">قیمتی ثبت نشده</span>
               </div>
-              {cheapest ? <StockBadge available={product.offers.reduce((sum, offer) => sum + offer.available, 0)} /> : null}
-            </div>
+            ) : (
+              <BuyBox
+                productNameFa={product.nameFa}
+                variantNameFa="گزینه"
+                variants={variants}
+                signedIn={signedIn}
+                action={setCartLineAction}
+              />
+            )}
 
             <section aria-labelledby="offers-title" className="space-y-md">
-              <SectionHeader size="sm" id="offers-title" title="فروشندگان این کالا" count={fa(product.offers.length)} />
+              <SectionHeader size="sm" id="offers-title" title="همه فروشندگان این کالا" count={fa(product.offers.length)} />
               <ul className="space-y-md" data-testid="product-offers">
                 {product.offers.map((offer) => (
                   <li key={offer.offerId} className="hz-card hz-seller space-y-md" data-testid={'offer-' + offer.offerId}>
                     <div className="flex flex-wrap items-start justify-between gap-sm">
                       <div className="hz-entity">
-                        <RecordImage variant="thumb" fileId={null} altFa={null} />
                         <div className="hz-entity__body">
                           <h3 className="hz-entity__name">{offer.sellerNameFa}</h3>
                           <span className="hz-entity__meta">
-                            {[OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? offer.condition, product.variantLabels[offer.offerId]]
+                            {[OFFER_CONDITION_FA[offer.condition as OfferCondition] ?? offer.condition, offer.variantLabelFa]
                               .filter(Boolean)
                               .join('، ')}
                           </span>
@@ -167,12 +179,10 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
                         <div className="hz-price">
                           <span className="hz-price__amount">{fa(offer.priceToman)}</span> <span className="hz-price__unit">تومان</span>
                         </div>
-                        <StockBadge available={offer.available} size="sm">
-                          {offer.available > 0 ? 'موجود: ' + fa(offer.available) : 'ناموجود'}
-                        </StockBadge>
+                        <StockBadge available={offer.available} size="sm" />
                       </div>
                     </div>
-                    {signedIn ? (
+                    {signedIn && offer.skuId !== boxSku ? (
                       <AddToCartForm action={setCartLineAction} skuId={offer.skuId} available={offer.available} labelFa={offer.sellerNameFa} />
                     ) : null}
                   </li>
@@ -203,33 +213,42 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
         <div className="grid gap-xl lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start">
           <section aria-labelledby="specs-title" className="space-y-lg">
             <SectionHeader id="specs-title" title="توضیحات و مشخصات" />
-            <div className="hz-card space-y-lg">
+            {/* DS Accordion `--boxed` (K7): description and specifications, both open. */}
+            <div className="hz-accordion hz-accordion--boxed">
               {product.descriptionFa ? (
-                <div className="space-y-xs">
-                  <h3 className="hz-card__title">درباره این کالا</h3>
-                  <p className="hz-body" data-testid="product-description">
-                    {product.descriptionFa}
+                <details className="hz-accordion__item" open>
+                  <summary className="hz-accordion__trigger">
+                    <span className="hz-accordion__title">توضیحات</span>
+                  </summary>
+                  <div className="hz-accordion__panel">
+                    <p className="hz-body m-0" data-testid="product-description">
+                      {product.descriptionFa}
+                    </p>
+                  </div>
+                </details>
+              ) : null}
+              <details className="hz-accordion__item" open>
+                <summary className="hz-accordion__trigger">
+                  <span className="hz-accordion__title">مشخصات</span>
+                </summary>
+                <div className="hz-accordion__panel space-y-xs">
+                  {Object.keys(product.specifications).length === 0 ? (
+                    <p className="hz-caption">مشخصه‌ای ثبت نشده است.</p>
+                  ) : (
+                    <dl className="hz-kv" data-testid="product-specifications">
+                      {Object.entries(product.specifications).map(([key, value]) => (
+                        <div key={key} className="hz-kv__row">
+                          <dt className="hz-kv__key">{key}</dt>
+                          <dd className="hz-kv__value">{String(value)}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                  <p className="hz-caption" data-testid="product-species">
+                    مناسب برای: {product.speciesCodes.join('، ') || 'اعلام نشده'}
                   </p>
                 </div>
-              ) : null}
-              <div className="space-y-xs">
-                <h3 className="hz-card__title">مشخصات</h3>
-                {Object.keys(product.specifications).length === 0 ? (
-                  <p className="hz-caption">مشخصه‌ای ثبت نشده است.</p>
-                ) : (
-                  <dl className="hz-kv" data-testid="product-specifications">
-                    {Object.entries(product.specifications).map(([key, value]) => (
-                      <div key={key} className="hz-kv__row">
-                        <dt className="hz-kv__key">{key}</dt>
-                        <dd className="hz-kv__value">{String(value)}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-                <p className="hz-caption" data-testid="product-species">
-                  مناسب برای: {product.speciesCodes.join('، ') || 'اعلام نشده'}
-                </p>
-              </div>
+              </details>
             </div>
           </section>
 
@@ -237,11 +256,9 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
             <section aria-labelledby="rating-title" className="space-y-lg">
               <SectionHeader id="rating-title" title="نظر خریداران" />
               <div className="hz-card space-y-md">
-                <p className="hz-h3" data-testid="product-rating">
-                  {rating.count === 0
-                    ? 'هنوز نظری ثبت نشده است.'
-                    : fa(rating.overall) + ' از ۵ — بر پایه ' + fa(rating.count) + ' نظر'}
-                </p>
+                <div data-testid="product-rating">
+                  {rating.count === 0 ? <p className="hz-body">هنوز نظری ثبت نشده است.</p> : <RatingSummary value={rating.overall} count={rating.count} />}
+                </div>
                 <p className="hz-caption" data-testid="product-rating-note">
                   نظر فقط پشت خریدی ثبت می‌شود که انجام شده باشد، و امتیاز تنها از همین نظرها ساخته می‌شود.
                 </p>
@@ -303,6 +320,20 @@ export default async function ShopProductPage({ params }: { params: Promise<{ sl
           بازگشت به فروشگاه
         </Link>
       </p>
+
+      {/* K7 phones: the buy action stays reachable (DS StickyActionBar); from 768 it is in the buy box. */}
+      {cheapest ? (
+        <StickyActionBar
+          label="افزودن به سبد"
+          className="md:hidden"
+          context={product.nameFa}
+          total={fa(cheapest.priceToman) + ' تومان'}
+        >
+          <ButtonLink href="#offers-title" size="lg" iconStart="shoppingCart">
+            افزودن به سبد
+          </ButtonLink>
+        </StickyActionBar>
+      ) : null}
     </div>
   );
 }

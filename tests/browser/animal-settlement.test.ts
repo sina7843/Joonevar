@@ -80,7 +80,8 @@ async function setMarketSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/market/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/market/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('market-setting-edit-' + key).click();
     await page.getByTestId('market-setting-value-' + key).fill(value);
     await page.getByTestId('market-setting-reason-' + key).fill(REASON);
     await page.getByTestId('market-setting-save-' + key).click();
@@ -121,7 +122,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -239,7 +240,6 @@ async function publishListing(page: Page, animalId: string): Promise<string> {
   const id = new URL(page.url()).pathname.split('/').pop()!;
   const url = BASE_URL + '/account/listings/' + id;
 
-  await page.getByTestId('listing-price-mode').selectOption('EXACT');
   await page.getByTestId('listing-price').fill(PRICE);
   await page
     .getByTestId('listing-description')
@@ -392,7 +392,7 @@ before(async () => {
     const page = await seller.newPage();
     await page.goto(BASE_URL + '/account/purchases/' + inquiryId, { waitUntil: 'load' });
     await page.getByTestId('accept-inquiry-button-' + inquiryId).click();
-    await page.getByTestId('inquiry-status').filter({ hasText: 'در انتظار پرداخت بیعانه' }).waitFor();
+    await page.getByTestId('inquiry-status').filter({ hasText: 'پذیرفته‌شده' }).waitFor();
   } finally {
     await seller.close();
   }
@@ -461,11 +461,11 @@ test('the refund is owed until a provider pays it, and then it says who did', as
     assert.match(await page.getByTestId('refund-policy-note').innerText(), /شماره پیگیری/);
 
     const refundId = await page
-      .locator('[data-testid^="retry-refund-button-"]')
+      .locator('[data-testid^="open-refund-"]')
       .first()
       .getAttribute('data-testid');
-    const id = refundId!.replace('retry-refund-button-', '');
-    assert.equal(await page.getByTestId('refund-status-' + id).innerText(), 'در انتظار اجرا');
+    const id = refundId!.replace('open-refund-', '');
+    assert.equal(await page.getByTestId('refund-status-' + id).innerText(), 'در جریان');
     await page.screenshot({ path: path.join(SHOTS, 'refund-queue-desktop.png'), fullPage: true });
 
     /*
@@ -474,6 +474,7 @@ test('the refund is owed until a provider pays it, and then it says who did', as
      * that form's success message — with it. Asserted on the resulting state
      * rather than on a toast that is gone by the time the page re-renders.
      */
+    await page.getByTestId('open-refund-' + id).click();
     await page.getByTestId('retry-refund-button-' + id).click();
     await page.getByTestId('refund-status-' + id).waitFor({ state: 'detached' });
 

@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '../../../src/db/client.ts';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { addBreedToRegistry, setBreedActive } from '../../../src/operations/service.ts';
-import { AppError } from '../../../src/domain/errors.ts';
+import { AppError, staleOf } from '../../../src/domain/errors.ts';
 
 export interface BreedFormState {
   readonly ok?: boolean;
@@ -20,7 +20,7 @@ async function superadmin() {
 }
 
 function failure(error: unknown): BreedFormState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 
@@ -44,7 +44,12 @@ export async function setBreedActiveAction(
   const active = text(form, 'active') === 'YES';
   try {
     const actor = await superadmin();
-    await setBreedActive(db(), actor, { breedId: text(form, 'breedId'), active });
+    await setBreedActive(db(), actor, {
+      breedId: text(form, 'breedId'),
+      active,
+      reasonFa: text(form, 'reasonFa'),
+      expectedVersion: Number(text(form, 'expectedVersion')),
+    });
     revalidatePath('/admin/breeds');
     return { ok: true, message: active ? 'نژاد دوباره فعال شد.' : 'نژاد از انتخاب‌های جدید کنار گذاشته شد.' };
   } catch (error) {

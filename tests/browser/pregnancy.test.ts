@@ -119,7 +119,7 @@ async function approveTopKyc(): Promise<void> {
   const context = await contextFor(operatorState);
   try {
     const page = await context.newPage();
-    await page.goto(BASE_URL + '/assoc/kyc', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/assoc/kyc?sort=newest', { waitUntil: 'load' });
     await page.getByTestId('open-case').first().click();
     await page.getByTestId('review-form').waitFor();
     await page.getByTestId('decision-APPROVED').check();
@@ -171,7 +171,8 @@ async function setSetting(key: string, value: string): Promise<void> {
   const admin = await contextFor(adminState);
   try {
     const page = await admin.newPage();
-    await page.goto(BASE_URL + '/admin/settings', { waitUntil: 'load' });
+    await page.goto(BASE_URL + '/admin/settings?q=' + encodeURIComponent(key), { waitUntil: 'load' });
+    await page.getByTestId('setting-edit-' + key).click();
     await page.getByTestId('setting-value-' + key).fill(value);
     await page.getByTestId('setting-reason-' + key).fill('SYNTHETIC — مقدار آزمایشی اجرای تست ' + RUN);
     await page.getByTestId('save-setting-' + key).click();
@@ -299,7 +300,7 @@ async function pedigreedAnimal(
   await owner.getByTestId('upload-receipt').click();
   await expectText(owner, 'تصویر فیش بارگذاری شد');
   await owner.getByTestId('submit-receipt').click();
-  await expectText(owner, 'در حال بررسی مرکز');
+  await expectText(owner, 'در حال بررسی');
 
   // Straight to this receipt: the shared development queue also holds rows left
   // by earlier runs.
@@ -315,7 +316,7 @@ async function pedigreedAnimal(
   await expectText(vet, 'ارسال روی همین کد رهگیری ثبت شد');
 
   const centreRow = () =>
-    centre.locator('[data-testid="centre-sample-list"] > li').filter({ hasText: trackingCode });
+    centre.locator('[data-testid="centre-sample-list"] tbody > tr').filter({ hasText: trackingCode });
   // The centre's list is bounded, so a specific sample is reached by its
   // tracking code rather than by scrolling the queue (DEC-0128).
   await centre.goto(BASE_URL + '/genetics/samples?q=' + encodeURIComponent(trackingCode), {
@@ -328,7 +329,8 @@ async function pedigreedAnimal(
   await centreRow().getByText('در حال پردازش').waitFor({ timeout: 45_000 });
 
   await centre.goto(BASE_URL + '/genetics/results', { waitUntil: 'load' });
-  const resultRow = centre.locator('[data-testid="processing-list"] > li').filter({ hasText: trackingCode });
+  const resultRow = centre.locator('[data-testid="processing-list"] tbody > tr').filter({ hasText: trackingCode });
+  await resultRow.getByTestId('open-result-case').click();
   await resultRow.getByTestId('result-note').fill('پردازش استاندارد.');
   await resultRow.getByTestId('submit-result').click();
   await expectText(centre, 'نتیجه نهایی ثبت شد');
@@ -520,7 +522,7 @@ test('the owner declares pregnancy without a vet, and the permit is untouched', 
 
   // The permit itself is exactly as it was issued.
   await owner.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
-  assert.equal(await owner.getByTestId('permit-status').innerText(), 'مجوز صادر شد');
+  assert.equal(await owner.getByTestId('permit-status').innerText(), 'صادر شد');
 });
 
 test('the assigned vet records an independent result and a difference stays neutral', async () => {
@@ -657,14 +659,14 @@ test('birth counts, provisional puppies, a correction and a later death', async 
   await owner
     .waitForFunction(
       (id) =>
-        document.querySelector('[data-testid="puppy-status-' + id + '"]')?.textContent?.includes('فوت‌شده'),
+        document.querySelector('[data-testid="puppy-status-' + id + '"]')?.textContent?.includes('فوت'),
       first,
       { timeout: 20_000 },
     )
     .catch(async () => {
       throw new Error('death was not recorded | body: ' + (await owner.locator('body').innerText()).slice(0, 1200));
     });
-  assert.equal(await owner.getByTestId('puppy-status-' + first).innerText(), 'فوت‌شده پس از تولد');
+  assert.equal(await owner.getByTestId('puppy-status-' + first).innerText(), 'فوت');
   assert.equal(await owner.getByTestId('living-now').innerText(), '2');
   assert.equal(await owner.getByTestId('profile-count').innerText(), '3', 'the profile is kept');
   assert.equal(await owner.getByTestId('reported-live').innerText(), '2');
@@ -688,5 +690,5 @@ test('birth counts, provisional puppies, a correction and a later death', async 
 
   // The permit is still exactly as issued after all of it.
   await owner.goto(BASE_URL + '/mating/permits/' + permitId, { waitUntil: 'load' });
-  assert.equal(await owner.getByTestId('permit-status').innerText(), 'مجوز صادر شد');
+  assert.equal(await owner.getByTestId('permit-status').innerText(), 'صادر شد');
 });

@@ -30,7 +30,6 @@ import {
 import { PageHeader, SectionHeader } from '../../../../../src/ui/section-header.tsx';
 import { PageCrumbs } from '../../../../../src/ui/page-crumbs.tsx';
 import { Icon } from '../../../../../src/ui/icon.tsx';
-import { statusOf } from '../../../../../src/ui/status-dictionary.ts';
 
 const FINDER_KEY: Partial<Record<string, string>> = { READY: 'FINDER_READY', INVITE_ONLY: 'FINDER_INVITE_ONLY', TEMPORARILY_UNAVAILABLE: 'FINDER_UNAVAILABLE' };
 
@@ -80,9 +79,12 @@ export default async function FinderProfilePage({ params }: { params: Promise<{ 
             back={{ href: '/account/mating-finder/profiles' }}
             aside={
               <span data-testid="finder-profile-state">
-                <StatusBadge tone={(FINDER_KEY[state] ? statusOf(FINDER_KEY[state]!)?.tone : null) ?? (state === 'INACTIVE' ? 'neutral' : 'info')}>
-                  {PROFILE_STATE_FA[state]}
-                </StatusBadge>
+                {state === 'COORDINATING' || state === 'MATCH_SELECTED' ? (
+                  // GAPS #4: no dictionary key for COORDINATING / MATCH_SELECTED
+                  <StatusBadge tone="info">{PROFILE_STATE_FA[state]}</StatusBadge>
+                ) : (
+                  <StatusBadge status={FINDER_KEY[state] ?? state} />
+                )}
               </span>
             }
             meta={[

@@ -6,6 +6,11 @@ import { TextField } from '../../src/ui/field.tsx';
 import { Alert } from '../../src/ui/alert.tsx';
 import { Logo } from '../../src/ui/logo.tsx';
 import { Icon } from '../../src/ui/icon.tsx';
+import { OtpField } from '../../src/ui/otp-field.tsx';
+
+/** «۱:۵۹» — the resend countdown in minutes and seconds (K8). */
+const clockFa = (seconds: number) =>
+  Math.floor(seconds / 60).toLocaleString('fa-IR') + ':' + (seconds % 60).toLocaleString('fa-IR', { minimumIntegerDigits: 2 });
 import Link from 'next/link';
 import { requestCodeAction, verifyCodeAction, type LoginState } from './actions.ts';
 
@@ -42,6 +47,10 @@ export function LoginForm({ next }: { next: string | null }) {
    */
   return (
     <div className="flex min-h-dvh flex-col bg-bg-page">
+      {/* FND-019: the skip link comes first here too. */}
+      <a className="hz-skip-link" href="#main">
+        رفتن به محتوای اصلی
+      </a>
       <header className="hz-site-header">
         <div className="hz-container">
           <div className="hz-site-header__bar">
@@ -66,8 +75,9 @@ export function LoginForm({ next }: { next: string | null }) {
         </div>
 
         <div className="w-full max-w-[440px] space-y-lg">
-          {active.message && !(active.tone === 'error' && active.step === 'MOBILE') ? (
-            <Alert tone={active.tone === 'error' ? 'error' : 'info'} title={active.message} />
+          {/* Errors belong to their field (mobile or code); only notices stay up here. */}
+          {active.message && active.tone !== 'error' ? (
+            <Alert tone="info" title={active.message} />
           ) : null}
 
           <section className="hz-card" aria-labelledby="login-step">
@@ -106,19 +116,25 @@ export function LoginForm({ next }: { next: string | null }) {
                 <input type="hidden" name="mobile" value={active.mobile ?? ''} />
                 {next ? <input type="hidden" name="next" value={next} /> : null}
                 <p className="hz-body-sm text-text-secondary">
-                  کد ۶ رقمی به <bdi dir="ltr" className="hz-id">{active.mobile ?? ''}</bdi> پیامک شد.
+                  کد ۶ رقمی به <bdi dir="ltr" className="hz-id">{active.mobile ?? ''}</bdi> پیامک شد.{' '}
+                  <a className="hz-link" href={'/login' + (next ? '?next=' + encodeURIComponent(next) : '')} data-testid="edit-mobile">
+                    ویرایش شماره
+                  </a>
                 </p>
-                <TextField
-                  label="کد تأیید ۶ رقمی"
-                  name="code"
-                  required
-                  ltr
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  maxLength={6}
-                  className="text-center tracking-[0.5em]"
-                  data-testid="code-input"
-                />
+                <div className="hz-otp-field">
+                  <OtpField
+                    name="code"
+                    autoFocus
+                    invalid={active.tone === 'error'}
+                    describedBy={active.tone === 'error' ? 'code-error' : undefined}
+                    testId="code-input"
+                  />
+                  {active.tone === 'error' && active.message ? (
+                    <p id="code-error" className="hz-field__error" role="alert">
+                      {active.message}
+                    </p>
+                  ) : null}
+                </div>
                 {active.attemptsRemaining !== undefined ? (
                   <p className="hz-caption" data-testid="attempts-remaining">
                     تلاش باقی‌مانده: {active.attemptsRemaining}
@@ -134,7 +150,7 @@ export function LoginForm({ next }: { next: string | null }) {
               <form action={submitMobile} className="mt-md flex justify-center">
                 <input type="hidden" name="mobile" value={active.mobile ?? ''} />
                 <Button tone="ghost" type="submit" disabled={remaining > 0} iconStart="clock" data-testid="resend-code">
-                  {remaining > 0 ? 'ارسال دوباره کد تا ' + remaining.toLocaleString('fa-IR') + ' ثانیه دیگر' : 'ارسال دوباره کد'}
+                  {remaining > 0 ? 'ارسال دوباره کد تا ' + clockFa(remaining) : 'ارسال دوباره کد'}
                 </Button>
               </form>
             ) : null}

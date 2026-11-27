@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '../db/client.ts';
 import { guardRoute } from '../authz/guard.ts';
-import { AppError } from '../domain/errors.ts';
+import { AppError, staleOf } from '../domain/errors.ts';
 import { REVIEW_CHECKS, type VetCaseType } from './professional-profile-model.ts';
 import { claimCase, recordReviewChecks, releaseCase } from './review-workbench.ts';
 
@@ -21,7 +21,7 @@ async function actorAt(path: string) {
 }
 
 function failure(error: unknown): ReviewState {
-  if (error instanceof AppError) return { ok: false, message: error.message };
+  if (error instanceof AppError) return { ok: false, message: error.message, ...staleOf(error) };
   throw error;
 }
 

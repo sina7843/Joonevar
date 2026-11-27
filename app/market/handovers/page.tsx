@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { guardRoute } from '../../../src/authz/guard.ts';
 import { AccessDenied } from '../../../src/ui/access-denied.tsx';
 import { marketNav, OpsShell } from '../../../src/ui/shell.tsx';
-import { CaseItem, CaseList, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseItem, CaseList, DeskHead, DeskVersionNote, Panel, QueueMeta } from '../../../src/ui/desk.tsx';
+import { CaseDrawer } from '../../../src/ui/desk-drawer.tsx';
+import { keyStatus } from '../../../src/ui/queue.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { EmptyState } from '../../../src/ui/states.tsx';
 import { db } from '../../../src/db/client.ts';
@@ -10,6 +12,8 @@ import { AppError } from '../../../src/domain/errors.ts';
 import { stuckHandovers } from '../../../src/marketplace/handover.ts';
 import { HANDOVER_STATUS_FA, type HandoverStatus } from '../../../src/marketplace/handover-model.ts';
 import { HandoverRecoveryForm } from '../../../src/marketplace/settlement-forms.tsx';
+import { QueueFrame } from '../../../src/ui/queue-head.tsx';
+import { readQueueQuery, sliceQueue } from '../../../src/domain/queue-query.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,9 +29,10 @@ const when = (value: Date | null) =>
  * deliberately narrow — it skips the one-time code and nothing else, and every
  * condition of the transfer is checked again when it runs.
  *
- * DS P09 case cards with the narrow recovery step inline (no `[id]` route).
+ * DS P09 case cards; each opens its P10 desk with the narrow recovery step
+ * in a wide Drawer (no `[id]` route).
  */
-export default async function HandoverRecoveryPage() {
+export default async function HandoverRecoveryPage({ searchParams }: { searchParams: Promise<{ q?: string; sort?: string; page?: string }> }) {
   const guard = await guardRoute('/market/handovers');
   if (!guard.ok) return <AccessDenied error={guard.denied} />;
 
@@ -38,10 +43,15 @@ export default async function HandoverRecoveryPage() {
     if (error instanceof AppError) return <AccessDenied error={error} />;
     throw error;
   }
+  const query = readQueueQuery(await searchParams);
+  const page = sliceQueue(queue, query, {
+    text: (entry) => [entry.animalNameFa, entry.endedReasonFa].filter(Boolean).join(' '),
+    at: (entry) => entry.scheduledAt,
+    name: (entry) => entry.animalNameFa,
+  });
 
   return (
-    <OpsShell actor={guard.actor} title="تحویل‌های متوقف‌مانده" nav={marketNav(guard.actor)} pathname="/market/handovers">
-      <QueueMeta total={queue.length} noun="تحویل متوقف" />
+    <OpsShell actor={guard.actor} title="تحویل‌های متوقف‌مانده" nav={marketNav(guard.actor)} pathname="/market/handovers" meta={<QueueMeta total={queue.length} noun="تحویل متوقف" />}>
       <Alert tone="info" title="ثبت دستی، دور زدن شواهد نیست">
         <span data-testid="handover-recovery-note">
           ثبت دستی تحویل فقط کد یک‌بارمصرف را کنار می‌گذارد. بیعانه تأییدشده، حداقل سن، میکروچیپ ثبت‌شده،
@@ -58,42 +68,75 @@ export default async function HandoverRecoveryPage() {
           />
         </div>
       ) : (
-        <CaseList label="تحویل‌های متوقف‌مانده" testId="handover-queue">
-          {queue.map((entry) => {
-            const status = entry.status as HandoverStatus;
-            return (
-              <CaseItem
-                key={entry.handoverId}
-                type="تحویل حیوان"
-                name={entry.animalNameFa}
-                sub={
-                  <>
-                    {'زمان قرار: ' + when(entry.scheduledAt) + ' · '}
-                    <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
-                      پرونده معامله
-                    </Link>
-                    {entry.endedReasonFa ? <span className="block">{entry.endedReasonFa}</span> : null}
-                  </>
-                }
-                status={{
-                  tone: status === 'ON_HOLD' ? 'warning' : 'neutral',
-                  label: HANDOVER_STATUS_FA[status] ?? entry.status,
-                  testId: 'handover-status-' + entry.inquiryId,
-                }}
-                owner="SYSTEM"
-                ownerLabel="پشتیبانی بازار"
-                ownerIsUs
-              >
-                <HandoverRecoveryForm
-                  inquiryId={entry.inquiryId}
-                  version={entry.version}
-                  canRelease={status === 'ON_HOLD'}
-                  canRecord={status === 'SELLER_ENTERED'}
-                />
-              </CaseItem>
-            );
-          })}
-        </CaseList>
+        <QueueFrame
+          path="/market/handovers"
+          params={{ q: query.q || undefined, sort: query.sort === 'oldest' ? undefined : query.sort }}
+          query={query}
+          page={page}
+          all={page.all}
+          noun="تحویل"
+          searchLabel="جست‌وجوی نام یا کد"
+          testId="handover-queue-frame"
+        >
+          {page.items.length === 0 ? (
+            <EmptyState title="نتیجه‌ای پیدا نشد" description="عبارت جست‌وجو را کوتاه‌تر کنید یا پاک کنید." />
+          ) : (
+            <CaseList label="تحویل‌های متوقف‌مانده" testId="handover-queue">
+              {page.items.map((entry) => {
+                const status = entry.status as HandoverStatus;
+                return (
+                  <CaseItem
+                    key={entry.handoverId}
+                    type="تحویل حیوان"
+                    name={entry.animalNameFa}
+                    sub={
+                      <>
+                        {'زمان قرار: ' + when(entry.scheduledAt) + ' · '}
+                        <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link">
+                          پرونده معامله
+                        </Link>
+                        {entry.endedReasonFa ? <span className="block">{entry.endedReasonFa}</span> : null}
+                      </>
+                    }
+                    status={{
+                      // GAPS #4: no dictionary key for SELLER_ENTERED, REFUSED, ON_HOLD — module label and tone kept.
+                      ...keyStatus(status, { tone: status === 'ON_HOLD' ? 'warning' : 'neutral', label: HANDOVER_STATUS_FA[status] ?? entry.status }),
+                      testId: 'handover-status-' + entry.inquiryId,
+                    }}
+                    owner="SYSTEM"
+                    ownerLabel="پشتیبانی بازار"
+                    ownerIsUs
+                  >
+                    <CaseDrawer title="پرونده تحویل حیوان" testId={'open-handover-' + entry.inquiryId}>
+                      <DeskHead
+                        title={entry.animalNameFa}
+                        status={keyStatus(status, { tone: status === 'ON_HOLD' ? 'warning' : 'neutral', label: HANDOVER_STATUS_FA[status] ?? entry.status })}
+                        meta={['زمان قرار: ' + when(entry.scheduledAt)]}
+                      >
+                        {entry.endedReasonFa ? <p className="text-body-sm">{entry.endedReasonFa}</p> : null}
+                        <Link href={'/account/purchases/' + entry.inquiryId} className="hz-link hz-link--standalone">
+                          پرونده معامله
+                        </Link>
+                      </DeskHead>
+                      <Panel title="اقدام">
+                        {status === 'ON_HOLD' || status === 'SELLER_ENTERED' ? null : (
+                          <p className="text-body-sm text-text-secondary">در این وضعیت اقدامی از این صفحه ممکن نیست.</p>
+                        )}
+                        <HandoverRecoveryForm
+                          inquiryId={entry.inquiryId}
+                          version={entry.version}
+                          canRelease={status === 'ON_HOLD'}
+                          canRecord={status === 'SELLER_ENTERED'}
+                        />
+                        <DeskVersionNote version={entry.version} />
+                      </Panel>
+                    </CaseDrawer>
+                  </CaseItem>
+                );
+              })}
+            </CaseList>
+          )}
+        </QueueFrame>
       )}
     </OpsShell>
   );

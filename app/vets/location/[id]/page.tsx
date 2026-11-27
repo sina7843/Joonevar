@@ -88,6 +88,7 @@ export default async function LocationPage({
                 {[location.provinceFa, location.cityFa, location.neighborhoodFa].filter(Boolean).join(' · ')}
               </p>
             </div>
+            {/* GAPS #4: no dictionary key for the derived per-context eligibility state */}
             <StatusBadge tone={eligibility.eligible ? 'success' : 'neutral'}>
               <span data-testid="location-eligibility">
                 {eligibility.eligible ? 'پذیرای ' + CONTEXT_FA[context] : 'در دسترس نیست'}

@@ -14,10 +14,11 @@ import { myPayments } from '../../src/billing/receipts.ts';
 import { findProfile } from '../../src/identity/account.ts';
 import { membershipStanding } from '../../src/billing/membership.ts';
 import { listAnimals } from '../../src/animals/service.ts';
+import { inArray } from 'drizzle-orm';
+import { referenceBreeds } from '../../src/db/schema/core.ts';
 import { listOwnerRequests } from '../../src/vets/visits.ts';
 import { REQUEST_STATUS_FA, REQUEST_STATUS_TONE, SERVICE_TYPE_FA } from '../../src/domain/referral.ts';
 import { formatCivilDateFa } from '../../src/domain/calendar.ts';
-import { generationLabel } from '../../src/domain/lineage.ts';
 import { professionalDashboard } from '../../src/vets/professional-profile.ts';
 
 /** The dashboard is a summary; the full lists live on their own pages. */
@@ -214,6 +215,17 @@ export default async function DashboardPage() {
   });
 
   const greeting = profile === null ? 'سلام' : 'سلام، ' + profile.firstName;
+  // K2 animal row: breed and sex, not the generation code (KUSR-005).
+  const shownAnimals = myAnimals.slice(0, ANIMALS_ON_DASHBOARD);
+  const breedIds = [...new Set(shownAnimals.map((animal) => animal.breedId).filter((id): id is string => id !== null))];
+  const breedName = new Map(
+    breedIds.length === 0
+      ? []
+      : (await db().select({ id: referenceBreeds.id, nameFa: referenceBreeds.nameFa }).from(referenceBreeds).where(inArray(referenceBreeds.id, breedIds))).map(
+          (row) => [row.id, row.nameFa] as const,
+        ),
+  );
+  const SEX_FA: Record<string, string> = { MALE: 'نر', FEMALE: 'ماده' };
   const today = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
 
   /*
@@ -231,10 +243,11 @@ export default async function DashboardPage() {
       header={
         <PageHeader
           title={<span data-testid="dashboard-greeting">{greeting}</span>}
+          // A new account is not told it has «۰ حیوان / ۰ درخواست فعال» (KUSR-009).
           meta={[
             today,
-            myAnimals.length.toLocaleString('fa-IR') + ' حیوان',
-            activeRequests.length.toLocaleString('fa-IR') + ' درخواست فعال',
+            ...(myAnimals.length > 0 ? [myAnimals.length.toLocaleString('fa-IR') + ' حیوان'] : []),
+            ...(activeRequests.length > 0 ? [activeRequests.length.toLocaleString('fa-IR') + ' درخواست فعال'] : []),
           ]}
         />
       }
@@ -373,17 +386,17 @@ export default async function DashboardPage() {
         <section aria-labelledby="membership-heading" className="hz-card">
           <div className="flex items-start justify-between gap-md">
             <SectionHeader size="sm" id="membership-heading" title="عضویت انجمن" />
-            <StatusBadge
-              tone={
-                membershipActive
-                  ? 'success'
-                  : membership.status === 'APPROVED_AWAITING_PAYMENT' || membership.status === 'PENDING_REVIEW'
-                    ? 'info'
-                    : 'neutral'
-              }
-            >
-              <span data-testid="dashboard-membership-status">{membership.statusFa}</span>
-            </StatusBadge>
+            <span data-testid="dashboard-membership-status">
+              <StatusBadge
+                status={
+                  membership.status === 'APPROVED_AWAITING_PAYMENT'
+                    ? 'AWAITING_PAYMENT'
+                    : membership.status === 'PAYMENT_PENDING'
+                      ? 'PENDING_PAYMENT'
+                      : membership.status
+                }
+              />
+            </span>
           </div>
           <dl className="hz-kv hz-kv--2col">
             <div className="hz-kv__row">
@@ -426,7 +439,7 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        <div className="grid gap-lg lg:grid-cols-2 lg:items-start">
+        <div className="grid gap-xl lg:grid-cols-2 lg:items-start">
           {/*
             * §8: what each animal has completed, from the database. The two
             * marketplace entries stay reachable from here (Phase 3 PROMPT-003,
@@ -451,22 +464,28 @@ export default async function DashboardPage() {
                     ? 'می‌توانید اولین حیوان خود را ثبت کنید.'
                     : 'پس از تأیید احراز هویت، می‌توانید حیوان خود را در هم‌زیست ثبت کنید.'}
                 </p>
+                {services.ANIMAL_REGISTRATION.allowed ? (
+                  <div className="hz-state__actions">
+                    <ButtonLink href="/animals/new" size="sm" iconStart="plus">
+                      ثبت حیوان
+                    </ButtonLink>
+                  </div>
+                ) : null}
               </div>
             ) : (
               <ul data-testid="dashboard-animals">
-                {myAnimals.slice(0, ANIMALS_ON_DASHBOARD).map((animal) => (
+                {shownAnimals.map((animal) => (
                   <li key={animal.id}>
                     <AnimalCard
                       name={animal.name ?? 'بدون نام'}
-                      speciesBreed={'سگ · ' + generationLabel(animal.generation)}
-                      petId={animal.petId}
-                      status={
-                        animal.status === 'REGISTERED'
-                          ? animal.identityVerifiedAt === null
-                            ? { tone: 'info', label: 'پرونده اولیه' }
-                            : { tone: 'success', label: 'مشخصات رسمی ثبت‌شده' }
-                          : { tone: 'neutral', label: 'پیش‌نویس' }
+                      speciesBreed={
+                        [animal.breedId ? breedName.get(animal.breedId) : null, animal.sex ? SEX_FA[animal.sex] : null].filter(Boolean).join('، ') ||
+                        'نژاد و جنس هنوز ثبت نشده'
                       }
+                      petId={animal.petId}
+                      // A registered animal is the norm and needs no badge; a draft says so.
+                      status={animal.status === 'REGISTERED' ? undefined : animal.status}
+                      imageSrc={animal.photoFileId ? '/api/files/' + animal.photoFileId : null}
                       href={animal.status === 'REGISTERED' ? '/animals/' + animal.id : '/animals/' + animal.id + '/edit'}
                     />
                   </li>
@@ -474,6 +493,11 @@ export default async function DashboardPage() {
               </ul>
             )}
             <div className="hz-card__footer">
+              {services.ANIMAL_REGISTRATION.allowed && myAnimals.length > 0 ? (
+                <ButtonLink tone="secondary" size="sm" href="/animals/new" iconStart="plus">
+                  ثبت حیوان
+                </ButtonLink>
+              ) : null}
               <Link href="/account/listings" className="hz-link" data-testid="dashboard-listings-link">
                 آگهی‌های فروش
               </Link>
@@ -507,10 +531,14 @@ export default async function DashboardPage() {
                       title={SERVICE_TYPE_FA[row.request.serviceType]}
                       requestCode={row.referral?.code ?? '—'}
                       animalName={row.animalName ?? 'بدون نام'}
-                      status={{
-                        tone: row.expired ? 'warning' : REQUEST_STATUS_TONE[row.request.status]!,
-                        label: row.expired ? 'مهلت گذشته' : REQUEST_STATUS_FA[row.request.status]!,
-                      }}
+                      status={
+                        row.expired
+                          ? 'EXPIRED'
+                          : row.request.status === 'CHECKED_IN' || row.request.status === 'COMPLETED'
+                            ? // GAPS #4: no dictionary key for a visit request's CHECKED_IN / COMPLETED (COMPLETED's label is the market hand-over)
+                              { tone: REQUEST_STATUS_TONE[row.request.status]!, label: REQUEST_STATUS_FA[row.request.status]! }
+                            : row.request.status
+                      }
                       owner={row.request.status === 'ACTIVE' ? 'USER' : 'VET'}
                       {...(row.referral
                         ? { deadlineFa: formatCivilDateFa(row.referral.expiresAt.toISOString().slice(0, 10)) }

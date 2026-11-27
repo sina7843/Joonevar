@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { Button } from '../ui/button.tsx';
 import { FileField, SelectField, TextAreaField, TextField } from '../ui/field.tsx';
+import { ReasonField } from '../ui/decision.tsx';
 import { Result, submitWith } from '../vets/directory-forms.tsx';
 import {
   appealAction,
@@ -149,7 +150,7 @@ export function DecideReportForm({ reportId, actions }: { reportId: string; acti
     <form onSubmit={submitWith(submit)} className="mt-sm grid gap-sm sm:grid-cols-2" data-testid={'finder-decide-form-' + reportId}>
       <input type="hidden" name="reportId" value={reportId} />
       <SelectField label="تصمیم" name="action" required options={actions.map((a) => ({ value: a, label: ACTION_FA[a] }))} data-testid={'finder-decide-action-' + reportId} />
-      <TextField label="دلیل (به کاربر نشان داده می‌شود)" name="reasonFa" required maxLength={500} data-testid={'finder-decide-reason-' + reportId} />
+      <ReasonField name="reasonFa" label="دلیل" required rows={2} testId={'finder-decide-reason-' + reportId} />
       <div className="flex flex-wrap items-center gap-md sm:col-span-2">
         <Button type="submit" disabled={pending} data-testid={'finder-decide-' + reportId}>
           ثبت تصمیم
@@ -174,7 +175,7 @@ export function DecideAppealForm({ appealId }: { appealId: string }) {
           { value: 'no', label: 'اعتراض پذیرفته شد و اقدام برگردانده شود' },
         ]}
       />
-      <TextField label="دلیل" name="reasonFa" required maxLength={500} />
+      <ReasonField name="reasonFa" label="دلیل" required rows={2} audience={null} />
       <div className="flex flex-wrap items-center gap-md sm:col-span-2">
         <Button type="submit" disabled={pending} data-testid={'finder-appeal-decide-' + appealId}>
           ثبت
@@ -203,7 +204,7 @@ export function ImposeSanctionForm({ canRestrictAccount }: { canRestrictAccount:
       <TextField label="مدت (روز، خالی = تا رفع)" name="days" type="number" ltr data-testid="finder-sanction-days" />
       <TextField label="شناسه گزارش مرتبط (اختیاری)" name="reportId" ltr />
       <div className="sm:col-span-2">
-        <TextAreaField label="دلیل" name="reasonFa" rows={2} required maxLength={500} data-testid="finder-sanction-reason" />
+        <ReasonField name="reasonFa" label="دلیل" required rows={2} audience={null} testId="finder-sanction-reason" />
       </div>
       <div className="flex flex-wrap items-center gap-md sm:col-span-2">
         <Button type="submit" disabled={pending} data-testid="finder-sanction-submit">
@@ -220,7 +221,7 @@ export function LiftSanctionForm({ sanctionId }: { sanctionId: string }) {
   return (
     <form onSubmit={submitWith(submit)} className="mt-xs flex flex-wrap items-end gap-sm">
       <input type="hidden" name="sanctionId" value={sanctionId} />
-      <TextField label="دلیل رفع" name="reasonFa" required maxLength={500} />
+      <ReasonField name="reasonFa" label="دلیل رفع" required rows={2} audience={null} />
       <Button type="submit" tone="ghost" disabled={pending} data-testid={'finder-lift-' + sanctionId}>
         رفع
       </Button>

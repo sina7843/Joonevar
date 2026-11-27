@@ -7,7 +7,6 @@ import { EmptyState } from '../../../../src/ui/states.tsx';
 import { StatusBadge } from '../../../../src/ui/status.tsx';
 import { db } from '../../../../src/db/client.ts';
 import { centreReferenceData, manageableCentres } from '../../../../src/centres/service.ts';
-import { CENTRE_STATUS_FA, LICENCE_STATUS_FA, type CentreStatus, type LicenceStatusName } from '../../../../src/centres/model.ts';
 import { CentreCreateForm } from '../../../../src/centres/forms.tsx';
 
 export const dynamic = 'force-dynamic';
@@ -61,25 +60,16 @@ export default async function AdminCentresPage() {
                       </div>
                     </td>
                     <td data-label="وضعیت صفحه">
-                      <StatusBadge
-                        size="sm"
-                        tone={row.centre.publicStatus === 'PUBLISHED' ? 'success' : row.centre.publicStatus === 'HIDDEN' ? 'warning' : 'neutral'}
-                      >
-                        {CENTRE_STATUS_FA[row.centre.publicStatus as CentreStatus]}
-                      </StatusBadge>
+                      <StatusBadge status={row.centre.publicStatus} size="sm" />
                     </td>
                     <td data-label="مجوز">
-                      <StatusBadge size="sm" tone={row.centre.licenceStatus === 'VALID' ? 'info' : 'neutral'}>
-                        {'مجوز: ' + LICENCE_STATUS_FA[row.centre.licenceStatus as LicenceStatusName]}
-                      </StatusBadge>
+                      <StatusBadge status={row.centre.licenceStatus} size="sm" />
                     </td>
                     <td data-label="مالک">
                       {row.centre.ownerAccountId ? (
                         <span className="text-body-sm text-text-secondary">دارای مالک</span>
                       ) : (
-                        <StatusBadge size="sm" tone="warning">
-                          بدون مالک
-                        </StatusBadge>
+                        <span className="hz-tag hz-tag--neutral">بدون مالک</span>
                       )}
                     </td>
                   </tr>

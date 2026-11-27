@@ -80,10 +80,18 @@ test('a fresh database already carries the categories Phase 2.5 asks for', async
   assert.ok(rows.some((row) => isExternalBodyCategory(row.slug)));
 });
 
+test('a category change needs a reason and the version it was made against (RTO-018)', async () => {
+  const category = await categoryOf('ARTICLE', 'club');
+  const change = { categoryId: category!.id, active: false, reasonFa: 'SYNTHETIC — دلیل آزمایشی', expectedVersion: category!.version };
+  await assert.rejects(() => setCategoryActive(testDb.db, contentAdmin, { ...change, reasonFa: '   ' }), /دلیل تغییر/);
+  await assert.rejects(() => setCategoryActive(testDb.db, contentAdmin, { ...change, expectedVersion: category!.version + 5 }), code('CONFLICT'));
+  assert.equal((await categoryOf('ARTICLE', 'club'))!.isActive, category!.isActive, 'a refused change stores nothing');
+});
+
 test('re-seeding adds nothing twice and never overrules an admin', async () => {
   const before = await testDb.db.select().from(contentCategories);
   const retired = await categoryOf('ARTICLE', 'microchip');
-  await setCategoryActive(testDb.db, contentAdmin, { categoryId: retired!.id, active: false });
+  await setCategoryActive(testDb.db, contentAdmin, { categoryId: retired!.id, active: false, reasonFa: 'SYNTHETIC — دلیل آزمایشی', expectedVersion: retired!.version });
   const renamed = await categoryOf('ARTICLE', 'anjoman');
   await testDb.db.update(contentCategories).set({ nameFa: 'انجمن (نام دلخواه ادمین)' }).where(eq(contentCategories.id, renamed!.id));
 
@@ -97,7 +105,7 @@ test('re-seeding adds nothing twice and never overrules an admin', async () => {
   assert.equal((await categoryOf('ARTICLE', 'anjoman'))!.nameFa, 'انجمن (نام دلخواه ادمین)', 'a renamed category keeps its name');
 
   // Put it back for the rest of the suite.
-  await setCategoryActive(testDb.db, contentAdmin, { categoryId: retired!.id, active: true });
+  await setCategoryActive(testDb.db, contentAdmin, { categoryId: retired!.id, active: true, reasonFa: 'SYNTHETIC — دلیل آزمایشی', expectedVersion: retired!.version + 1 });
 });
 
 test('the taxonomy belongs to the content admin alone', async () => {
@@ -109,7 +117,7 @@ test('the taxonomy belongs to the content admin alone', async () => {
   await assert.rejects(() => createCategory(testDb.db, someone, { kind: 'NEWS', nameFa: 'دسته کاربر', slug: 'daste-karbar' }), code('FORBIDDEN'));
   const clubCategory = await categoryOf('ARTICLE', 'club');
   await assert.rejects(
-    () => setCategoryActive(testDb.db, author, { categoryId: clubCategory!.id, active: false }),
+    () => setCategoryActive(testDb.db, author, { categoryId: clubCategory!.id, active: false, reasonFa: 'SYNTHETIC — دلیل آزمایشی', expectedVersion: clubCategory!.version }),
     code('FORBIDDEN'),
   );
 

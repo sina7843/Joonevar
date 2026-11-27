@@ -47,44 +47,6 @@ export function FlagForm({
   );
 }
 
-/** One managed marketplace value, edited in place with a mandatory reason. */
-export function MarketSettingForm({
-  settingKey,
-  version,
-  value,
-  kind,
-}: {
-  settingKey: string;
-  version: number;
-  value: string;
-  kind: string;
-}) {
-  const [state, submit, pending] = useActionState(updateMarketSettingAction, EMPTY);
-  return (
-    <form action={submit} className="mt-md space-y-md" data-testid={'market-setting-form-' + settingKey}>
-      <input type="hidden" name="key" value={settingKey} />
-      <input type="hidden" name="version" value={version} />
-      {state.message ? <Alert tone={state.ok ? 'success' : 'error'} title={state.message} /> : null}
-      <TextField
-        label="مقدار"
-        name="value"
-        ltr
-        defaultValue={value}
-        hint={
-          kind === 'BOOL'
-            ? 'مقدار true یا false. خالی گذاشتن یعنی «تعیین‌نشده» و مثل بسته رفتار می‌شود.'
-            : 'خالی گذاشتن یعنی «تعیین‌نشده»، نه صفر و نه رایگان.'
-        }
-        data-testid={'market-setting-value-' + settingKey}
-      />
-      <TextField label="دلیل تغییر" name="reason" required data-testid={'market-setting-reason-' + settingKey} />
-      <Button tone="secondary" type="submit" disabled={pending} data-testid={'market-setting-save-' + settingKey}>
-        {pending ? 'در حال ذخیره…' : 'ذخیره مقدار'}
-      </Button>
-    </form>
-  );
-}
-
 /** Open or close one species in one market. */
 export function SpeciesForm({
   market,

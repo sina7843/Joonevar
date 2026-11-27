@@ -90,11 +90,7 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
           <FilterPanel
             clearHref="/associations"
             active={filtered}
-            footer={
-              <Button type="submit" tone="secondary" size="sm" form={FORM}>
-                اعمال فیلترها
-              </Button>
-            }
+            formId={FORM}
           >
             <FilterSelect id="community-kind" form={FORM} name="kind" label="نوع" all="انجمن و کلاب" value={query.kind} testId="community-filter-kind"
               options={COMMUNITY_KINDS.map((kind) => ({ value: kind, label: COMMUNITY_KIND_FA[kind] }))} />
@@ -174,15 +170,13 @@ export default async function AssociationsPage({ searchParams }: { searchParams:
                             </span>
                           ) : null}
                           {community.owned ? null : (
+                            // GAPS #4: no dictionary key for UNOWNED (ownership axis)
                             <StatusBadge tone="warning" size="sm">
                               بدون مالک
                             </StatusBadge>
                           )}
-                          {community.registered ? (
-                            <StatusBadge tone="info" size="sm">
-                              ثبت معتبر
-                            </StatusBadge>
-                          ) : null}
+                          {/* A credential fact, not a lifecycle status (same rule as the vet code, FND-009). */}
+                          {community.registered ? <span className="hz-tag hz-tag--neutral">ثبت معتبر</span> : null}
                         </span>
                       ) : null}
                       {community.upcomingEvents > 0 ? (

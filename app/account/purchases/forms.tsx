@@ -1,7 +1,8 @@
 'use client';
 
-import { useActionState, useState } from 'react';
-import { Button } from '../../../src/ui/button.tsx';
+import { useActionState, useEffect, useState } from 'react';
+import { MoneyField } from '../../../src/ui/money-field.tsx';
+import { ActionRow, Button, StickyActionBar } from '../../../src/ui/button.tsx';
 import { Alert } from '../../../src/ui/alert.tsx';
 import { Card } from '../../../src/ui/card.tsx';
 import { Icon } from '../../../src/ui/icon.tsx';
@@ -53,7 +54,7 @@ function Result({ state }: { state: InquiryFormState }) {
  * A negotiable advert may be opened with a first offer; an exact-price one
  * takes the price from the advert, so there is nothing to type.
  */
-export function AskToBuyForm({ listingId, negotiable }: { listingId: string; negotiable: boolean }) {
+export function AskToBuyForm({ listingId }: { listingId: string }) {
   const [state, submit, pending] = useActionState(createInquiryAction, EMPTY);
   return (
     <Card>
@@ -68,16 +69,12 @@ export function AskToBuyForm({ listingId, negotiable }: { listingId: string; neg
           hint="تا پیش از پرداخت بیعانه، شماره تماس و شماره کارت در گفت‌وگو رد و بدل نمی‌شود."
           data-testid="inquiry-message"
         />
-        {negotiable ? (
-          <TextField
-            label="پیشنهاد قیمت شما (تومان)"
-            name="offerToman"
-            ltr
-            inputMode="numeric"
-            hint="اختیاری. با رقم انگلیسی و بدون جداکننده."
-            data-testid="inquiry-offer"
-          />
-        ) : null}
+        <MoneyField
+          label="پیشنهاد قیمت شما"
+          name="offerToman"
+          hint="اختیاری. بدون پیشنهاد، درخواست با همان مبلغ آگهی ثبت می‌شود."
+          testId="inquiry-offer"
+        />
         <Button type="submit" disabled={pending} data-testid="ask-to-buy-submit">
           {pending ? 'در حال ثبت…' : 'ثبت درخواست خرید'}
         </Button>
@@ -92,7 +89,7 @@ export function OfferForm({ inquiryId }: { inquiryId: string }) {
     <form action={submit} className="space-y-sm" data-testid="offer-form">
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <Result state={state} />
-      <TextField label="پیشنهاد قیمت (تومان)" name="amountToman" ltr inputMode="numeric" required data-testid="offer-amount" />
+      <MoneyField label="پیشنهاد قیمت" name="amountToman" required testId="offer-amount" />
       <Button type="submit" tone="secondary" disabled={pending} data-testid="offer-submit">
         {pending ? 'در حال ثبت…' : 'ثبت پیشنهاد'}
       </Button>
@@ -100,21 +97,48 @@ export function OfferForm({ inquiryId }: { inquiryId: string }) {
   );
 }
 
+/**
+ * DS *OfferCard* actions: «پذیرش پیشنهاد» / «رد پیشنهاد». Rejecting is final
+ * for this offer, so it asks once more in place before it is sent (CMPB-043).
+ */
 export function OfferAnswerForm({ inquiryId, offerId }: { inquiryId: string; offerId: string }) {
   const [state, submit, pending] = useActionState(respondToOfferAction, EMPTY);
+  const [confirming, setConfirming] = useState(false);
   return (
-    <form action={submit} className="space-y-sm" data-testid="offer-answer">
+    <form action={submit} className="space-y-sm" data-testid="offer-answer" aria-busy={pending || undefined}>
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <input type="hidden" name="offerId" value={offerId} />
       <Result state={state} />
-      <div className="flex gap-sm">
-        <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="offer-accept">
-          پذیرش این قیمت
-        </Button>
-        <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="offer-reject">
-          رد پیشنهاد
-        </Button>
-      </div>
+      {confirming ? (
+        <div className="space-y-sm" role="group" aria-label="تأیید رد پیشنهاد">
+          <p className="text-body-sm">این پیشنهاد رد می‌شود و دیگر قابل پذیرش نیست. طرف مقابل می‌تواند پیشنهاد تازه بدهد.</p>
+          <ActionRow
+            primary={
+              <Button type="submit" name="answer" value="REJECT" tone="destructive" disabled={pending} data-testid="offer-reject-confirm">
+                {pending ? 'در حال ثبت…' : 'رد پیشنهاد'}
+              </Button>
+            }
+            secondary={
+              <Button type="button" tone="secondary" disabled={pending} onClick={() => setConfirming(false)}>
+                انصراف
+              </Button>
+            }
+          />
+        </div>
+      ) : (
+        <ActionRow
+          primary={
+            <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="offer-accept">
+              {pending ? 'در حال ثبت…' : 'پذیرش پیشنهاد'}
+            </Button>
+          }
+          secondary={
+            <Button type="button" tone="secondary" disabled={pending} onClick={() => setConfirming(true)} data-testid="offer-reject">
+              رد پیشنهاد
+            </Button>
+          }
+        />
+      )}
     </form>
   );
 }
@@ -178,19 +202,20 @@ export function PayDepositForm({ inquiryId, amountFa }: { inquiryId: string; amo
     <form action={submit} className="space-y-sm" data-testid="pay-deposit">
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <Result state={state} />
-      <Button
-        type="submit"
-        size="lg"
-        block
-        iconStart="lockSimple"
-        loading={pending}
-        loadingLabel="در حال انتقال به درگاه…"
-        disabled={pending}
-        data-testid="pay-deposit-button"
-      >
-        {'پرداخت بیعانه ' + amountFa + ' تومان'}
-      </Button>
       <p className="text-caption text-text-secondary">به درگاه بانک منتقل می‌شوید. پس از پرداخت به همزیست برمی‌گردید.</p>
+      <StickyActionBar label="پرداخت" context="بیعانه" total={amountFa + ' تومان'}>
+        <Button
+          type="submit"
+          size="lg"
+          iconStart="lockSimple"
+          loading={pending}
+          loadingLabel="در حال انتقال به درگاه…"
+          disabled={pending}
+          data-testid="pay-deposit-button"
+        >
+          {'پرداخت بیعانه ' + amountFa + ' تومان'}
+        </Button>
+      </StickyActionBar>
     </form>
   );
 }
@@ -202,6 +227,16 @@ export function PayDepositForm({ inquiryId, amountFa }: { inquiryId: string; amo
 export function MessageForm({ inquiryId }: { inquiryId: string }) {
   const [state, submit, pending] = useActionState(postMessageAction, EMPTY);
   const [fileName, setFileName] = useState<string | null>(null);
+  // Nothing to send = the send button stays disabled (CMPB-113).
+  const [text, setText] = useState('');
+  const empty = text.trim() === '' && fileName === null;
+  useEffect(() => {
+    // A sent message clears the composer (the form reset does not clear a controlled field).
+    if (state.ok) {
+      setText('');
+      setFileName(null);
+    }
+  }, [state]);
   return (
     <form action={submit} className="hz-composer" data-testid="message-form">
       <input type="hidden" name="inquiryId" value={inquiryId} />
@@ -230,9 +265,25 @@ export function MessageForm({ inquiryId }: { inquiryId: string }) {
           <label htmlFor="message-body" className="hz-visually-hidden">
             پیام تازه
           </label>
-          <textarea id="message-body" name="body" rows={1} className="hz-composer__input" placeholder="پیام خود را بنویسید" data-testid="message-body" />
+          <textarea
+            id="message-body"
+            name="body"
+            rows={1}
+            className="hz-composer__input"
+            placeholder="پیام خود را بنویسید"
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            data-testid="message-body"
+          />
         </div>
-        <button type="submit" className="hz-composer__send" disabled={pending} aria-busy={pending || undefined} aria-label="ارسال پیام" data-testid="message-submit">
+        <button
+          type="submit"
+          className="hz-composer__send"
+          disabled={pending || empty}
+          aria-busy={pending || undefined}
+          aria-label="ارسال پیام"
+          data-testid="message-submit"
+        >
           {pending ? <span className="hz-spinner" aria-hidden="true" /> : <Icon name="paperPlaneRight" size="md" mirror />}
         </button>
       </div>
@@ -272,14 +323,18 @@ export function HandoverAnswerForm({ inquiryId, proposalId }: { inquiryId: strin
       <input type="hidden" name="inquiryId" value={inquiryId} />
       <input type="hidden" name="proposalId" value={proposalId} />
       <Result state={state} />
-      <div className="flex gap-sm">
-        <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="handover-accept">
-          پذیرش
-        </Button>
-        <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="handover-reject">
-          رد
-        </Button>
-      </div>
+      <ActionRow
+        primary={
+          <Button type="submit" name="answer" value="ACCEPT" disabled={pending} data-testid="handover-accept">
+            پذیرش
+          </Button>
+        }
+        secondary={
+          <Button type="submit" name="answer" value="REJECT" tone="secondary" disabled={pending} data-testid="handover-reject">
+            رد
+          </Button>
+        }
+      />
     </form>
   );
 }

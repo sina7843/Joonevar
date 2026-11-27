@@ -11,7 +11,6 @@ import { PROFILE_STATE_FA, type ProfileState } from '../../../../src/finder/prof
 import { PageHeader } from '../../../../src/ui/section-header.tsx';
 import { ButtonLink } from '../../../../src/ui/button.tsx';
 import { Icon } from '../../../../src/ui/icon.tsx';
-import { statusOf } from '../../../../src/ui/status-dictionary.ts';
 
 const SUB_NAV: ReadonlyArray<{ href: string; label: string; testId?: string }> = [
   { href: '/account/mating-finder', label: 'اشتراک و ظرفیت' },
@@ -94,9 +93,12 @@ export default async function FinderProfilesPage() {
                     >
                       {entry.animal.name ?? 'بدون نام'}
                     </Link>
-                    <StatusBadge tone={(FINDER_KEY[state] ? statusOf(FINDER_KEY[state]!)?.tone : null) ?? (state === 'INACTIVE' ? 'neutral' : 'info')}>
-                      {PROFILE_STATE_FA[state]}
-                    </StatusBadge>
+                    {state === 'COORDINATING' || state === 'MATCH_SELECTED' ? (
+                      // GAPS #4: no dictionary key for COORDINATING / MATCH_SELECTED
+                      <StatusBadge tone="info">{PROFILE_STATE_FA[state]}</StatusBadge>
+                    ) : (
+                      <StatusBadge status={FINDER_KEY[state] ?? state} />
+                    )}
                   </div>
                   <div className="hz-cardlist__row">
                     <span className={entry.eligibility.problems.length === 0 ? 'hz-inline-msg hz-inline-msg--success' : 'hz-inline-msg hz-inline-msg--warning'}>
@@ -107,7 +109,7 @@ export default async function FinderProfilesPage() {
                           : fa(entry.eligibility.problems.length) + ' شرط ورود هنوز برقرار نیست.'}
                       </span>
                     </span>
-                    <Link href={'/account/mating-finder/profiles/' + entry.animal.id} className="inline-flex items-center gap-xs text-label-md text-text-brand">
+                    <Link href={'/account/mating-finder/profiles/' + entry.animal.id} className="inline-flex items-center gap-xs text-label-sm text-text-brand">
                       مدیریت
                       <Icon name="caretRight" size="sm" mirror />
                     </Link>

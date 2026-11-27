@@ -68,11 +68,11 @@ export function BodyEditor({ name, defaultValue }: { name: string; defaultValue:
   return (
     <div className="space-y-sm">
       <div className="flex items-center justify-between gap-md">
-        <span className="text-label-md">متن</span>
+        <span className="text-label-sm">متن</span>
         <button
           type="button"
           onClick={() => setPreview((on) => !on)}
-          className="min-h-[var(--size-control-sm)] rounded-md border border-border-control px-md text-label-md"
+          className="min-h-[var(--size-control-sm)] rounded-md border border-border-control px-md text-label-sm"
           data-testid="body-preview-toggle"
         >
           {preview ? 'ویرایش' : 'پیش‌نمایش'}
@@ -92,7 +92,7 @@ export function BodyEditor({ name, defaultValue }: { name: string; defaultValue:
                 type="button"
                 title={mark.title}
                 onClick={() => apply(mark)}
-                className="min-h-[var(--size-control-sm)] rounded-md border border-border-control bg-bg-surface px-md text-label-md hover:border-border-control"
+                className="min-h-[var(--size-control-sm)] rounded-md border border-border-control bg-bg-surface px-md text-label-sm hover:border-border-control"
                 data-testid={'body-mark-' + mark.before.trim().replace(/[^a-z0-9*#>[\]-]/gi, '') || 'body-mark'}
               >
                 {mark.labelFa}

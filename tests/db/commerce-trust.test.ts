@@ -447,7 +447,7 @@ test('two buyers racing for the last use of a code leave one order holding it', 
     });
     const { sku } = await sellable(ctx, ctx.first.actor, shop.id, 'SYNTHETIC غذا', 10, 500_000n, 'D-2KG');
 
-    const rule = await createDiscountRule(ctx.testDb.db, marketAdmin(ctx), {
+    const rule = await createDiscountRule(ctx.testDb.db, marketAdmin(ctx), { reasonFa: 'SYNTHETIC — دلیل آزمایشی',
       kind: 'PLATFORM_CODE',
       labelFa: 'SYNTHETIC کد یک‌باره',
       code: 'SYNTH-ONCE',
@@ -520,7 +520,7 @@ test('with no stacking policy two discounts do not add up, and with one they com
     });
     const { sku } = await sellable(ctx, ctx.first.actor, shop.id, 'SYNTHETIC غذا', 10, 1_000_000n, 'E-2KG');
 
-    const sellerRule = await createDiscountRule(ctx.testDb.db, ctx.first.actor, {
+    const sellerRule = await createDiscountRule(ctx.testDb.db, ctx.first.actor, { reasonFa: 'SYNTHETIC — دلیل آزمایشی',
       kind: 'SELLER_DISCOUNT',
       labelFa: 'SYNTHETIC تخفیف فروشگاه',
       code: null,
@@ -540,7 +540,7 @@ test('with no stacking policy two discounts do not add up, and with one they com
     });
     await moveDiscountRule(ctx.testDb.db, ctx.first.actor, { ruleId: sellerRule.id, to: 'ACTIVE' });
 
-    const platformRule = await createDiscountRule(ctx.testDb.db, marketAdmin(ctx), {
+    const platformRule = await createDiscountRule(ctx.testDb.db, marketAdmin(ctx), { reasonFa: 'SYNTHETIC — دلیل آزمایشی',
       kind: 'CATEGORY_CAMPAIGN',
       labelFa: 'SYNTHETIC کمپین دسته',
       code: null,
@@ -589,7 +589,7 @@ test('a cancelled order gives its code back', async () => {
     });
     const { sku } = await sellable(ctx, ctx.first.actor, shop.id, 'SYNTHETIC غذا', 10, 400_000n, 'F-2KG');
 
-    const rule = await createDiscountRule(ctx.testDb.db, marketAdmin(ctx), {
+    const rule = await createDiscountRule(ctx.testDb.db, marketAdmin(ctx), { reasonFa: 'SYNTHETIC — دلیل آزمایشی',
       kind: 'PLATFORM_CODE',
       labelFa: 'SYNTHETIC کد محدود',
       code: 'SYNTH-BACK',
